@@ -1,0 +1,12 @@
+{
+  "atUtc": "2026-10-07T04:07:40.781837+00:00",
+  "query": [
+    "ps",
+    "-Ao",
+    "pid=,ppid=,command="
+  ],
+  "queryExitCode": 0,
+  "matchedOwnedProcesses": [],
+  "retainedCopy": "/Users/study_superior/r05t08-work/j02-default-zr71fcjm",
+  "note": "\u6240\u6709\u672c\u8f6e\u6267\u884c\u5de5\u5177\u5df2\u8fd4\u56de\uff1b\u4e34\u65f6legacy\u526f\u672c\u7531\u539ftrap\u5220\u9664\uff0c\u5b8c\u6574\u9ed8\u8ba4\u526f\u672c\u7559\u4f5c\u5ba1\u9605"
+}

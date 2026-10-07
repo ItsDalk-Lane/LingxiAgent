@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+    "exec",
+    "--ephemeral",
+    "--json",
+    "--color",
+    "never",
+    "--sandbox",
+    "danger-full-access",
+    "-c",
+    "approval_policy=\"never\"",
+    "-C",
+    "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "-o",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/dispatch/final.txt",
+    "-"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "createdAt": "2026-10-07T01:24:42.479400+00:00",
+  "freshHistory": true,
+  "ephemeral": true,
+  "modelOverride": null,
+  "permissionProfile": "same danger-full-access / never; no hook or rules bypass",
+  "result": "RUNNING",
+  "startedAt": "2026-10-07T01:24:43.740743+00:00"
+}

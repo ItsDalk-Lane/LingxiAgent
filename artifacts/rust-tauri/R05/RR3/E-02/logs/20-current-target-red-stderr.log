@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-02/check.py", line 130, in <module>
+    elif mode=='current-fixture':current_assert(strict(Path(sys.argv[2])))
+                                 ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-02/check.py", line 27, in current_assert
+    for k in ['A','B','C_F46']:check(p[k]['status']=='CLOSED' and p[k]['independent_review']=='PASS','actual current closed '+k)
+                               ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-02/check.py", line 6, in check
+    if not ok:raise AssertionError(label)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: actual current closed A

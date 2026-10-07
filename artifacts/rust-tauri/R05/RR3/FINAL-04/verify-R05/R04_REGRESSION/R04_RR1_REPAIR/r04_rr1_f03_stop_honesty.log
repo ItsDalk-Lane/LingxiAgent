@@ -1,0 +1,14 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r04_rr1_f03_stop_honesty.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_rr1_f03_stop_honesty-42abc78d2ec6700e)
+
+running 7 tests
+test rr1_f03_c02_pty_cleanup_unconfirmed_poll_agrees_with_the_text ... ok
+test rr1_f03_c01_timeout_cleanup_unconfirmed_never_reports_an_exit ... ok
+test rr1_f03_c04_adversarial_cancel_racing_natural_exit_stays_real ... ok
+test rr1_f03_c04_control_group_real_states_stay_accurate ... ok
+test rr1_f03_c03_repeated_terminate_does_not_upgrade_unconfirmed_to_confirmed ... ok
+test rr1_f03_c05_adversarial_dropped_tool_future_keeps_the_honest_chain ... ok
+test rr1_f03_c05_run_cancel_keeps_control_flow_and_external_unconfirmed_separate ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.22s
+

@@ -1,0 +1,50 @@
+[
+  {
+    "command": "ps",
+    "fault": "silent-exit7",
+    "exit": 1,
+    "startedAt": "2026-10-07T01:01:35.233471+00:00",
+    "endedAt": "2026-10-07T01:01:35.305748+00:00",
+    "stderrSha256": "95d45b16f7a948252df4ce8fb596815e6973fd4a93c8a3bc67652ae501b8fee6"
+  },
+  {
+    "command": "ps",
+    "fault": "stdout-exit9",
+    "exit": 1,
+    "startedAt": "2026-10-07T01:01:35.306116+00:00",
+    "endedAt": "2026-10-07T01:01:35.582047+00:00",
+    "stderrSha256": "871f570ed2e9b624d3750af182169ffabe59fedc30c15021fb3cb998de7b4ed6"
+  },
+  {
+    "command": "lsof",
+    "fault": "silent-exit7",
+    "exit": 1,
+    "startedAt": "2026-10-07T01:01:35.582417+00:00",
+    "endedAt": "2026-10-07T01:01:35.700376+00:00",
+    "stderrSha256": "8dbb8e61d4ef7d6a709ce38f3132151bc4d963515e884128f4b07dbcfe2b75f5"
+  },
+  {
+    "command": "lsof",
+    "fault": "stdout-exit9",
+    "exit": 1,
+    "startedAt": "2026-10-07T01:01:35.700697+00:00",
+    "endedAt": "2026-10-07T01:01:35.818718+00:00",
+    "stderrSha256": "8dbb8e61d4ef7d6a709ce38f3132151bc4d963515e884128f4b07dbcfe2b75f5"
+  },
+  {
+    "command": "git",
+    "fault": "silent-exit7",
+    "exit": 1,
+    "startedAt": "2026-10-07T01:01:35.819476+00:00",
+    "endedAt": "2026-10-07T01:01:36.260055+00:00",
+    "stderrSha256": "d861ae13e81d3b2123da65ea6c09df444b31b072d2b99f1849574805eadd9274"
+  },
+  {
+    "command": "git",
+    "fault": "stdout-exit9",
+    "exit": 1,
+    "startedAt": "2026-10-07T01:01:36.260419+00:00",
+    "endedAt": "2026-10-07T01:01:36.807489+00:00",
+    "stderrSha256": "797819ce8de42b20f284c28e820fe47ebbc3607851bae195ef4d965ec118b19b"
+  }
+]

@@ -1,0 +1,26 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:2377:
+         // assertion; a share leaf must have a real later stage to own the
+         // remainder.
+         for leaf in &map.supplemental_leaves {
+-            let exclusive = leaf.r00_execution_stage_ids.len() == 1
+-                && leaf.r00_execution_stage_ids[0] == "R04";
++            let exclusive =
++                leaf.r00_execution_stage_ids.len() == 1 && leaf.r00_execution_stage_ids[0] == "R04";
+             if exclusive {
+                 assert_eq!(
+-                    leaf.basis_kind,
+-                    BASIS_FULL_ORIGINAL_BEHAVIOR,
++                    leaf.basis_kind, BASIS_FULL_ORIGINAL_BEHAVIOR,
+                     "leaf {} is EXCLUSIVE to R04 — a stage_share_satisfied classification \
+                      would leave an unowned remainder (F54)",
+                     leaf.id
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:2422:
+             map.supplemental_leaves
+                 .iter()
+                 .filter(|l| l.basis_kind == BASIS_FULL_ORIGINAL_BEHAVIOR)
+-                .all(|l| l.assertion_contract.is_some()
+-                    && !l.original_assertion_cases.is_empty()),
++                .all(|l| l.assertion_contract.is_some() && !l.original_assertion_cases.is_empty()),
+             "every R04 full leaf must keep its assertion contract and per-assertion \
+              case assignment (R14-F01 / F54)"
+         );

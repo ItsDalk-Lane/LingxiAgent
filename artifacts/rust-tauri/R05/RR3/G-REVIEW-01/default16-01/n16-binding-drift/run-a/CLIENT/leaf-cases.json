@@ -1,0 +1,108 @@
+{
+  "schema": "lingxi.leaf-case-results.v1",
+  "cases": [
+    {
+      "case": "cli-help-exit0-no-start",
+      "expect": 1,
+      "actual": 0,
+      "ok": false,
+      "observed": {
+        "argv": [
+          "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+          "cli/entry.ts",
+          "help"
+        ],
+        "exitCode": 1,
+        "expectedExit": 0,
+        "stdoutFile": "cli-help-exit0-no-start/stdout.log",
+        "stderrFile": "cli-help-exit0-no-start/stderr.log",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "syntheticHome": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-help-exit0-no-start/home",
+        "homeBefore": [],
+        "homeAfter": [],
+        "cleanupError": null,
+        "checks": {
+          "expectedExit": false,
+          "helpPrinted": false,
+          "errorPrinted": true,
+          "homeUnchanged": true,
+          "serverInfoAbsent": true,
+          "noReadyMarker": true,
+          "noOwnedProcessGroupLeft": true,
+          "notTimedOut": true,
+          "cleanupComplete": true
+        }
+      }
+    },
+    {
+      "case": "cli-unknown-arg-exit1-no-start",
+      "expect": 1,
+      "actual": 0,
+      "ok": false,
+      "observed": {
+        "argv": [
+          "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+          "cli/entry.ts",
+          "--r02-unknown-argument"
+        ],
+        "exitCode": 1,
+        "expectedExit": 1,
+        "stdoutFile": "cli-unknown-arg-exit1-no-start/stdout.log",
+        "stderrFile": "cli-unknown-arg-exit1-no-start/stderr.log",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "syntheticHome": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-unknown-arg-exit1-no-start/home",
+        "homeBefore": [],
+        "homeAfter": [],
+        "cleanupError": null,
+        "checks": {
+          "expectedExit": true,
+          "helpPrinted": false,
+          "errorPrinted": false,
+          "homeUnchanged": true,
+          "serverInfoAbsent": true,
+          "noReadyMarker": true,
+          "noOwnedProcessGroupLeft": true,
+          "notTimedOut": true,
+          "cleanupComplete": true
+        }
+      }
+    },
+    {
+      "case": "cli-serve-unknown-arg-exit1-no-start",
+      "expect": 1,
+      "actual": 0,
+      "ok": false,
+      "observed": {
+        "argv": [
+          "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+          "cli/entry.ts",
+          "serve",
+          "--r02-unknown-argument"
+        ],
+        "exitCode": 1,
+        "expectedExit": 1,
+        "stdoutFile": "cli-serve-unknown-arg-exit1-no-start/stdout.log",
+        "stderrFile": "cli-serve-unknown-arg-exit1-no-start/stderr.log",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "syntheticHome": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-serve-unknown-arg-exit1-no-start/home",
+        "homeBefore": [],
+        "homeAfter": [],
+        "cleanupError": null,
+        "checks": {
+          "expectedExit": true,
+          "helpPrinted": false,
+          "errorPrinted": false,
+          "homeUnchanged": true,
+          "serverInfoAbsent": true,
+          "noReadyMarker": true,
+          "noOwnedProcessGroupLeft": true,
+          "notTimedOut": true,
+          "cleanupComplete": true
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r05_t07_usage_trace.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t07_usage_trace-378feba1c0ca011a)
+
+running 9 tests
+test c01_multi_run_session_trace_stays_continuous_and_per_call_queryable ... ok
+test c02_background_subagent_and_worker_rows_carry_true_parentage ... ok
+test c03_refresh_retry_is_two_physical_requests_in_one_honest_row ... ok
+test c05_unknown_partial_and_reported_states_stay_distinct_everywhere ... ok
+test c06_illegal_usage_numbers_mark_the_row_invalid_and_never_distort ... ok
+test c08_cost_stays_unknown_without_a_price_basis ... ok
+test c09_owner_scoped_queries_isolate_and_secrets_never_enter_the_db ... ok
+test c03_retryable_failure_then_success_are_two_rows_and_unknown_is_not_zero ... ok
+test c10_a_ledger_write_failure_publishes_no_completion_and_the_retry_is_idempotent ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.83s
+

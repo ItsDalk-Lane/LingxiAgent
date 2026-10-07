@@ -1,0 +1,7 @@
+entry: artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/copy/
+  file_count     fresh=70 receipt=70 EQUAL=True
+  symlink_count  fresh=0 receipt=0 EQUAL=True
+  total_bytes    fresh=1626295 receipt=1626295 EQUAL=True
+  tree_digest    fresh=f94e4fe1092b8db21550f5c5c2315a1431fa594743356fa5b54aaa905a35f119 receipt=f94e4fe1092b8db21550f5c5c2315a1431fa594743356fa5b54aaa905a35f119 EQUAL=True
+  ALL_EQUAL: True mode: normal
+d932e5e974251372e2b026ff78d0945c359f9a1d

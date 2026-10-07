@@ -1,0 +1,14 @@
+{
+  "atUtc": "2026-10-07T03:30:27.077781+00:00",
+  "status": "SELF_CHECKED",
+  "sources": {
+    "scripts/rust-tauri/r05_t08_negative_gate.sh": "026a1bca836ff070ad5994d3753fdfe06dcfcda3a04def81ec86471148b46b9d",
+    "scripts/rust-tauri/r05_t08_prepare_node.py": "51abc64c8be5e90b1af7e35a475f3ea9e37cbb37033b9c256b5093333fd8c082",
+    "scripts/rust-tauri/r05_t08_node_selfcheck.py": "0429d60f3a32370377bd9c6864f5c81e2329d1f41ee2a3caab35db545f120614",
+    "scripts/rust-tauri/r05_t08_restore_selfcheck.py": "0cd24624bf7d6079e3cf7b4e6cf693222026db8261ffc60691bdc77fde0f57a4",
+    "scripts/rust-tauri/r05_t08_mutate_pin.py": "7785b41ebadfdc6d6415ee1d337ea48621e25d1bbb1ed1c16456004545279609",
+    "package.json": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+    "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+    ".npmrc": "ce00fe5025692993005d3a5350ff13f8a568d604158041df74f1d229a2dfb607"
+  }
+}

@@ -1,0 +1,9 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.Gz0rkR/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.37s
+     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 1 test
+test stage_map::map_tests::r05_stage_pin_table_matches_the_registered_suites ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 116 filtered out; finished in 0.00s
+

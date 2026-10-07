@@ -1,0 +1,21 @@
+{
+  "name": "prepared-identity-check",
+  "argv": [
+    "/usr/bin/python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/identity_check.py"
+  ],
+  "timeout": 30,
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startUTC": "2026-10-07T01:20:45.049516+00:00",
+  "endUTC": "2026-10-07T01:20:52.383277+00:00",
+  "elapsedSeconds": 7.333607000000001,
+  "parentPID": 87448,
+  "actualExitCode": 0,
+  "supervisorTimedOut": false,
+  "supervisorExitCode": 0,
+  "signalsSent": [],
+  "observedBinaryProcesses": [],
+  "counts": null,
+  "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/prepared-identity-check.log",
+  "logSha256": "8d81a918646a4c14fee4f16f3578f6885ae354fe6564d1fa998921218e111690"
+}

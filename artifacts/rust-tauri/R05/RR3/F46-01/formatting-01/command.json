@@ -1,0 +1,37 @@
+{
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "fmt",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--all",
+    "--",
+    "--check"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedAt": "2026-10-07T00:40:14.732612+00:00",
+  "endedAt": "2026-10-07T00:40:15.884303+00:00",
+  "exitCode": 0,
+  "binaryHashes": {
+    "rust/target/debug/lingxi-service": "b180d47abeeecef4e6d677b9501fde0828cd4061f74276d8e5e2a2a9afb33d81"
+  },
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "inputHashesBefore": {
+    "rust/crates/lingxi-service/src/logging.rs": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+    "rust/crates/lingxi-service/tests/r05_t08_resources.rs": "23b03f56bef900fc0563b3348596e61437995f7c05cc25a5173455f11a23e33f",
+    "rust/crates/lingxi-service/tests/support/r05_resource_sampler.rs": "1f6601122e5d7841f3975ec68ea8c60adb653fc939ca4e65cc3da7565c269274",
+    "rust/Cargo.lock": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+    "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37"
+  },
+  "inputHashesAfter": {
+    "rust/crates/lingxi-service/src/logging.rs": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+    "rust/crates/lingxi-service/tests/r05_t08_resources.rs": "23b03f56bef900fc0563b3348596e61437995f7c05cc25a5173455f11a23e33f",
+    "rust/crates/lingxi-service/tests/support/r05_resource_sampler.rs": "1f6601122e5d7841f3975ec68ea8c60adb653fc939ca4e65cc3da7565c269274",
+    "rust/Cargo.lock": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+    "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37"
+  },
+  "summaries": [],
+  "artifacts": {
+    "stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

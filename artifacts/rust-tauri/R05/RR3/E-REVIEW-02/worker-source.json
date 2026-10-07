@@ -1,0 +1,15 @@
+{
+  "path": "rust/crates/lingxi-service/src/workerrpc.rs",
+  "sha256": "4a158b5321da63d2c6a36d88da8ec7cfd21622c914fa38f7ad6dd674d4cb0788",
+  "fields": [
+    "kind",
+    "cb_id",
+    "op",
+    "purpose",
+    "prompt",
+    "max_output_tokens"
+  ],
+  "declaration": "\n    pub kind: String,\n    pub cb_id: String,\n    pub op: String,\n    #[serde(default)]\n    pub purpose: String,\n    #[serde(default)]\n    pub prompt: String,\n    #[serde(default)]\n    pub max_output_tokens: u32,\n",
+  "fixtureMode": "\n            send_line(&serde_json::json!({\n                \"kind\": \"callback\", \"cb_id\": \"cb-1\", \"op\": \"model.complete\",\n                \"purpose\": \"summarize\",\n                \"prompt\": format!(\"Summarize the granted input. (tag {extra})\"),\n                \"max_output_tokens\": 64,",
+  "sourceFullSnapshot": "source-input/rust/crates/lingxi-service/src/workerrpc.rs"
+}

@@ -1,0 +1,697 @@
+{
+  "findingId": "F49",
+  "status": "SELF_CHECKED",
+  "checks": 35,
+  "failed": 0,
+  "ignored": 0,
+  "filtered": 0,
+  "results": [
+    {
+      "check": "fixture-git-init",
+      "argv": [
+        "git",
+        "init",
+        "-q"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:15.211329+00:00",
+      "endUTC": "2026-10-07T03:40:15.228317+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "fixture-git-add",
+      "argv": [
+        "git",
+        "add",
+        "."
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:15.228821+00:00",
+      "endUTC": "2026-10-07T03:40:15.261191+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "fixture-git-commit",
+      "argv": [
+        "git",
+        "-c",
+        "user.name=F49 fixture",
+        "-c",
+        "user.email=f49@invalid",
+        "commit",
+        "-qm",
+        "隔离夹具基线"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:15.261547+00:00",
+      "endUTC": "2026-10-07T03:40:15.307196+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "dirty-status-before",
+      "argv": [
+        "git",
+        "status",
+        "--porcelain"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:15.309261+00:00",
+      "endUTC": "2026-10-07T03:40:15.322182+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "34b58358333e3f4019f53959a5d9c3835452998201d4c1af786f4536ae4f9847",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "snapshot",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "for f in \"${MUTATED_FILES[@]}\"; do snapshot_pristine \"$f\"; done"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:15.322562+00:00",
+      "endUTC": "2026-10-07T03:40:15.491555+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "N06-append",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "printf '\\n// N06 mid-gate mutation: a candidate byte change during the gate run\\n' \\\n  >> \"$COPY/rust/crates/lingxi-kernel/src/lib.rs\" || fail \"N06 source append failed\""
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:15.493046+00:00",
+      "endUTC": "2026-10-07T03:40:15.498429+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "N06-restore",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "reset_copy"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:15.499098+00:00",
+      "endUTC": "2026-10-07T03:40:15.586935+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "N16-append",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "printf '\\n// N16 post-acceptance mutation: the candidate moved after run A\\n' \\\n  >> \"$COPY/rust/crates/lingxi-kernel/src/lib.rs\""
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:15.588511+00:00",
+      "endUTC": "2026-10-07T03:40:15.594274+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "N16-restore",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "reset_copy"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:15.594672+00:00",
+      "endUTC": "2026-10-07T03:40:15.686911+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "all-targets-restore",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "reset_copy"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:15.699286+00:00",
+      "endUTC": "2026-10-07T03:40:15.827751+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "idempotent-restore",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "reset_copy; reset_copy"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:15.832095+00:00",
+      "endUTC": "2026-10-07T03:40:15.998739+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "dirty-status-after",
+      "argv": [
+        "git",
+        "status",
+        "--porcelain"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.000600+00:00",
+      "endUTC": "2026-10-07T03:40:16.013806+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "34b58358333e3f4019f53959a5d9c3835452998201d4c1af786f4536ae4f9847",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "snapshot-refuses-recapture",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "snapshot_pristine \"rust/crates/lingxi-kernel/src/lib.rs\""
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.014356+00:00",
+      "endUTC": "2026-10-07T03:40:16.019792+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "239fbab3fa29fb740288af1007712b8b772816097bb62a4db1874364641ca36b"
+    },
+    {
+      "check": "restore-cp-failure",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "cp() { echo \"目标 cp 故障\" >&2; return 23; }; reset_copy"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.020359+00:00",
+      "endUTC": "2026-10-07T03:40:16.025772+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "a68c9ca18a857d6a087480c376020d1e1c64f797afc23adcaf8936ec3e2c7a77"
+    },
+    {
+      "check": "restore-cp-failure-recovered",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "reset_copy"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.026237+00:00",
+      "endUTC": "2026-10-07T03:40:16.114287+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "restore-kernel-cp-failure",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "cp() { if [ \"$2\" = \"$COPY/rust/crates/lingxi-kernel/src/lib.rs\" ]; then return 23; fi; command cp \"$@\"; }; reset_copy"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.114943+00:00",
+      "endUTC": "2026-10-07T03:40:16.143308+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "6c9d1747edb6262621c6e37a5174bbceb0fd9658f950eb230254836ef8502465"
+    },
+    {
+      "check": "restore-kernel-cp-failure-recovered",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "reset_copy"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.143745+00:00",
+      "endUTC": "2026-10-07T03:40:16.225551+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "restore-cmp-failure",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "cmp() { echo \"目标 cmp 故障\" >&2; return 2; }; reset_copy"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.226196+00:00",
+      "endUTC": "2026-10-07T03:40:16.234748+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "463bcbf03ac838437a60bf03632752480f4fea34c16930d7203d5369d79fd30b"
+    },
+    {
+      "check": "restore-cmp-failure-recovered",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "reset_copy"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.235177+00:00",
+      "endUTC": "2026-10-07T03:40:16.321567+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "restore-cp-false-success",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "cp() { return 0; }; reset_copy"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.322154+00:00",
+      "endUTC": "2026-10-07T03:40:16.330325+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "6a6fab872f1428736a54479a4497ef4dd497ca613bb1e468550a37a0b847538e",
+      "stderrSha256": "cc25a49e8611b9450da22aca89c12b009e9cea5dc61e8096cdf9df77c3decb02"
+    },
+    {
+      "check": "restore-cp-false-success-recovered",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "reset_copy"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.330736+00:00",
+      "endUTC": "2026-10-07T03:40:16.404259+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "restore-missing-pristine",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "reset_copy"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.404890+00:00",
+      "endUTC": "2026-10-07T03:40:16.431222+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "a3c1fe8a838591381a36e85200dc0396db7f62f24576f11af5ea5a20511e1184"
+    },
+    {
+      "check": "restore-missing-pristine-recovered",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "reset_copy"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.431802+00:00",
+      "endUTC": "2026-10-07T03:40:16.513717+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "snapshot-cp-failure",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "PRISTINE=\"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/snapshot-cp-failure\"; cp() { return 23; }; snapshot_pristine \"rust/crates/lingxi-kernel/src/lib.rs\""
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.514211+00:00",
+      "endUTC": "2026-10-07T03:40:16.526650+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "d37ec456812230d62d08fdda4854896b7e7eb39ec8182e085d6b0e9ce0fdafcd"
+    },
+    {
+      "check": "snapshot-cmp-failure",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "PRISTINE=\"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/snapshot-cmp-failure\"; cmp() { return 2; }; snapshot_pristine \"rust/crates/lingxi-kernel/src/lib.rs\""
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.527223+00:00",
+      "endUTC": "2026-10-07T03:40:16.543111+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "7999c07e806817e922141a318751191c719308047b3ceb860c9c14a9f8f3b12b"
+    },
+    {
+      "check": "git-query-failure-0",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "ROOT=\"$COPY\"; git() { echo \"目标 Git 查询故障\" >&2; return 2; }; SOURCE_HEAD=\"$(git -C \"$ROOT\" rev-parse --short HEAD)\" || fail \"source HEAD query failed\""
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.543837+00:00",
+      "endUTC": "2026-10-07T03:40:16.550977+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "3de787106b9d909dd53c7c04249b1193e1cdeda3be878da25a843ac8567638f3"
+    },
+    {
+      "check": "git-query-failure-1",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "ROOT=\"$COPY\"; git() { echo \"目标 Git 查询故障\" >&2; return 2; }; COPY_BRANCH=\"$(git -C \"$COPY\" rev-parse --abbrev-ref HEAD)\" || fail \"copy branch query failed\""
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.551668+00:00",
+      "endUTC": "2026-10-07T03:40:16.558054+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "174adea7d6a41e5369a000ae5931c0a3dbf51e370b2470421357d653ee8db378"
+    },
+    {
+      "check": "git-query-failure-2",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "ROOT=\"$COPY\"; git() { echo \"目标 Git 查询故障\" >&2; return 2; }; COPY_HEAD=\"$(git -C \"$COPY\" rev-parse --short HEAD)\" || fail \"copy HEAD query failed\""
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.558673+00:00",
+      "endUTC": "2026-10-07T03:40:16.565287+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "1069cad7ae26a9b8977f1edb6b49b10ed139d0e2bdba5489f4c947e3a73b64a4"
+    },
+    {
+      "check": "git-query-failure-3",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "ROOT=\"$COPY\"; git() { echo \"目标 Git 查询故障\" >&2; return 2; }; COPY_STATUS=\"$(git -C \"$COPY\" status --porcelain)\" || fail \"copy status query failed\""
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.565785+00:00",
+      "endUTC": "2026-10-07T03:40:16.572486+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "507fff1b4a6a204f8aae330f3a486e8bad6cc9526dc6742d7e5cb1578450f249"
+    },
+    {
+      "check": "authority-signal",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "n06_start_signal \"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/run-evidence\""
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.573811+00:00",
+      "endUTC": "2026-10-07T03:40:16.609428+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdoutSha256": "7ca2aa4d7adfea53868d0ae02372e9a514c02bae1ac4071e71f3af77374351b4",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "authority-invalid-query",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "n06_start_signal \"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/run-evidence\" || fail \"N06 authority query failed\""
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.610187+00:00",
+      "endUTC": "2026-10-07T03:40:16.657833+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "cfc5c13a5f3479e6bfc7824639a9828a76e0aa4912a071f8be61e16978421e70"
+    },
+    {
+      "check": "sync-no-command-start",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "wait_for_n06_start 90587 \"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/no-start.log\" \"xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t01_service_smoke.sh {EVIDENCE}/A01] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/run-evidence/a01_smoke\" 1"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:16.661924+00:00",
+      "endUTC": "2026-10-07T03:40:17.683084+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "0ab0575934eafd205350fbc4ddceac7b480fcce30e5dd2be4d6bb5ee77e825b0"
+    },
+    {
+      "check": "sync-log-query-failure",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "wait_for_n06_start 90587 \"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/missing.log\" \"xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t01_service_smoke.sh {EVIDENCE}/A01] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/run-evidence/a01_smoke\" 1"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:17.683561+00:00",
+      "endUTC": "2026-10-07T03:40:17.695772+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "75f56bd9495b003495a105cdbd0876be922188cdbca3fdff5bec7b059f6317c3"
+    },
+    {
+      "check": "sync-process-query-failure",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "ps() { return 2; }; wait_for_n06_start 90587 \"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/no-start.log\" \"xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t01_service_smoke.sh {EVIDENCE}/A01] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/run-evidence/a01_smoke\" 1"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:17.696197+00:00",
+      "endUTC": "2026-10-07T03:40:17.702259+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "df37feb078b6c98bd32c8fa010119c88d17540d9cb6792d83ae55110b94231d1"
+    },
+    {
+      "check": "sync-already-exited",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/production-functions.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/pristine",
+        "wait_for_n06_start 90587 \"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/no-start.log\" \"xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t01_service_smoke.sh {EVIDENCE}/A01] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/run-evidence/a01_smoke\" 1"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy",
+      "startUTC": "2026-10-07T03:40:17.702973+00:00",
+      "endUTC": "2026-10-07T03:40:17.712134+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "7f38a403d50b465f37c808ec53cdc753e8ac42cfdae4c31d4a850c5307adcc00"
+    }
+  ],
+  "gateSha256": "026a1bca836ff070ad5994d3753fdfe06dcfcda3a04def81ec86471148b46b9d",
+  "selfcheckSha256": "0cd24624bf7d6079e3cf7b4e6cf693222026db8261ffc60691bdc77fde0f57a4",
+  "productionSyncExecuted": false,
+  "mutationTargets": {
+    "N01": [
+      "rust/crates/xtask/src/stage_maps/R05.json"
+    ],
+    "N02": [
+      "docs/rust-tauri/R05/r05_stage_pins.tsv"
+    ],
+    "N03": [
+      "docs/rust-tauri/R05/r05_stage_pins.tsv"
+    ],
+    "N04": [
+      "rust/crates/lingxi-service/src/credentials/mod.rs",
+      "scripts/rust-tauri/r05_t08_stage_suites.sh"
+    ],
+    "N05": [],
+    "N06": [
+      "rust/crates/lingxi-kernel/src/lib.rs"
+    ],
+    "N07": [
+      "rust/crates/xtask/src/stage_maps/R05.json"
+    ],
+    "N08": [
+      "rust/crates/lingxi-service/src/lib.rs"
+    ],
+    "N09": [
+      "rust/crates/lingxi-adapters/src/models/tool_render.rs"
+    ],
+    "N10": [
+      "rust/crates/lingxi-adapters/src/models/openai_completions.rs"
+    ],
+    "N11": [
+      "rust/crates/lingxi-adapters/src/models/tool_render.rs"
+    ],
+    "N12": [
+      "rust/crates/lingxi-service/src/runs.rs"
+    ],
+    "N13": [
+      "rust/crates/xtask/src/stage_maps/R04.json"
+    ],
+    "N14": [
+      "rust/crates/xtask/src/stage_maps/R05.json"
+    ],
+    "N15": [
+      "rust/crates/lingxi-adapters/src/models/credentials.rs"
+    ],
+    "N16": [
+      "rust/crates/lingxi-kernel/src/lib.rs"
+    ]
+  },
+  "snapshotRestoreRegistry": [
+    "rust/crates/xtask/src/stage_maps/R05.json",
+    "rust/crates/xtask/src/stage_maps/R04.json",
+    "rust/crates/lingxi-service/src/lib.rs",
+    "rust/crates/lingxi-kernel/src/lib.rs",
+    "rust/crates/lingxi-adapters/src/models/tool_render.rs",
+    "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+    "rust/crates/lingxi-adapters/src/models/credentials.rs",
+    "rust/crates/lingxi-service/src/runs.rs",
+    "rust/crates/lingxi-service/src/credentials/mod.rs",
+    "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs",
+    "docs/rust-tauri/R05/r05_stage_pins.tsv",
+    "scripts/rust-tauri/r05_t08_stage_suites.sh"
+  ],
+  "preservedBaseline": {
+    "rust/crates/xtask/src/stage_maps/R05.json": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+    "rust/crates/xtask/src/stage_maps/R04.json": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+    "rust/crates/lingxi-service/src/lib.rs": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+    "rust/crates/lingxi-kernel/src/lib.rs": "604a77e3d3c88a3ac2c2bc772378f2a1946f54f7d5444185e07c2b02c147bcf7",
+    "rust/crates/lingxi-adapters/src/models/tool_render.rs": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+    "rust/crates/lingxi-adapters/src/models/openai_completions.rs": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+    "rust/crates/lingxi-adapters/src/models/credentials.rs": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+    "rust/crates/lingxi-service/src/runs.rs": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+    "rust/crates/lingxi-service/src/credentials/mod.rs": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+    "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+    "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+    "scripts/rust-tauri/r05_t08_stage_suites.sh": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e",
+    "legal-dirty.txt": "40b264f897aeaa03aa4adb3f1b52154bc452773b6246b7a99e259e723480900a"
+  },
+  "restoredBytes": {
+    "rust/crates/xtask/src/stage_maps/R05.json": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+    "rust/crates/xtask/src/stage_maps/R04.json": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+    "rust/crates/lingxi-service/src/lib.rs": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+    "rust/crates/lingxi-kernel/src/lib.rs": "604a77e3d3c88a3ac2c2bc772378f2a1946f54f7d5444185e07c2b02c147bcf7",
+    "rust/crates/lingxi-adapters/src/models/tool_render.rs": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+    "rust/crates/lingxi-adapters/src/models/openai_completions.rs": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+    "rust/crates/lingxi-adapters/src/models/credentials.rs": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+    "rust/crates/lingxi-service/src/runs.rs": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+    "rust/crates/lingxi-service/src/credentials/mod.rs": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+    "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+    "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+    "scripts/rust-tauri/r05_t08_stage_suites.sh": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e",
+    "legal-dirty.txt": "40b264f897aeaa03aa4adb3f1b52154bc452773b6246b7a99e259e723480900a"
+  },
+  "boundary": "原 shell 函数的隔离夹具；不代表默认 16 或完整业务门禁运行；正常同步须实际生产 runner 集成证据。"
+}

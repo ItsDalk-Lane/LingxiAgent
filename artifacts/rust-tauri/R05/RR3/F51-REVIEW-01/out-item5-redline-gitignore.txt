@@ -1,0 +1,5 @@
+== git diff HEAD -- .gitignore (expect empty) ==
+diff_exit=0 bytes=
+== status .gitignore (expect empty) ==
+== working .gitignore identical to HEAD blob? ==
+GITIGNORE-IDENTICAL-TO-HEAD

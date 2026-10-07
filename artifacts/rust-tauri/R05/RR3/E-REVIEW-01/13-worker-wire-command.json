@@ -1,0 +1,16 @@
+{
+  "reviewer": "rr3_e_review_01",
+  "argv": [
+    "python3",
+    "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/worker-wire-audit.py",
+    "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "utc_start": "2026-10-07T01:32:07.396854+00:00",
+  "utc_end": "2026-10-07T01:32:07.420944+00:00",
+  "exit_code": 1,
+  "stdout": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/13-worker-wire-stdout.log",
+  "stderr": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/13-worker-wire-stderr.log",
+  "stdout_sha256": "3e21330be64f483b39ac1ea731343bf4fa9b0a776cdd88178723d977ffa88484",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

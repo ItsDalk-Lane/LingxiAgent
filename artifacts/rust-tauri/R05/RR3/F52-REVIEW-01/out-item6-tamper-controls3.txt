@@ -1,0 +1,10 @@
+tampered receipt sha256 f9dc56ed… -> e9dc56ed…
+[A/tampered] comparator exit 1 (want 1) -> BEHAVED-AS-REQUIRED  TAMPER-DETECTED
+    MISMATCH: [post] git sha256 f9dc56ed2d08e1f687ed2e39c70e00f629cd485136bdea7e21b2bfaa1c0afbf8 != receipt e9dc56ed2d08e1f687ed2e39c70e00f629cd485136bdea7e21b2bfaa1c0afbf8
+    RESULT: FAIL (1 mismatches)
+[A/pristine] comparator exit 0 (want 0) -> BEHAVED-AS-REQUIRED
+    RESULT: PASS (all sha256/readlink/lstat fields equal; inode-independent)
+tampered classification regular_file 69130 -> 69129 (total kept 69130)
+[B/tampered] consistency: sum(counts)=69129 != total_entries=69130 -> TAMPER-DETECTED
+[B/pristine] consistency: consistent (total=69130, regular=69130) -> OK-AS-EXPECTED
+RESULT: PASS (tampering detectable both axes)

@@ -1,0 +1,11 @@
+1900:async fn terminal_family_share_cases() {
+1915:        json!({"cmd": "cat", "tty": true}),
+1930:    let tail_output = send_and_expect(&h, &handle, "TAIL-MARKER").await;
+1931:    let tail_ok = tail_output.contains("TAIL-MARKER");
+1932:    record_case("terminal-tail-cursor-continuation", 1, i64::from(tail_ok));
+1936:    let snapshot_output = send_and_expect(&h, &handle, "SNAPSHOT-MARKER").await;
+1937:    let snapshot_ok =
+1938:        snapshot_output.contains("SNAPSHOT-MARKER") && !snapshot_output.contains("TAIL-MARKER");
+1940:        "terminal-snapshot-current-transcript",
+1942:        i64::from(snapshot_ok),
+1970:        i64::from(tail_ok && snapshot_ok),

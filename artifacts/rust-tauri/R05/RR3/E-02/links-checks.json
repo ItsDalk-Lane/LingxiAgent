@@ -1,0 +1,402 @@
+[
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> R05_REPORT.md#rr3-current",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/command.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/E-02/REPORT.md",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/E-REVIEW-01/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/F46-01/resources-01/f27-resource-series.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/F46-01/resources-01/runtime-binding.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/result.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/f27-resource-series.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/runtime-binding.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/result.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/MANIFEST.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-subagent/command.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-late/command.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_REPORT.md -> R05_HANDOFF.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md -> R05_REPORT.md#rr3-current",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md -> R05_REPORT.md#rr3-current",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_BLOCKERS.md -> R05_REPORT.md#rr3-current",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_BLOCKERS.md -> R05_REPORT.md#rr3-current",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md -> R05_REPORT.md#rr3-current",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md -> ../../../rust/crates/lingxi-service/src/workerrpc.rs",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md -> ../../../rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md -> R05_HANDOFF.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md -> R05_HANDOFF.json",
+    "ok": true
+  },
+  {
+    "check": "Markdown link docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md -> R05_REPORT.md#rr3-current",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-kernel/src/model_exchange.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-adapters/src/models/credentials.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-kernel/src/lib.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-kernel/src/model_exchange.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-service/src/runs.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-kernel/src/ports.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-kernel/src/model_exchange.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-service/src/streaming_norm.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-adapters/src/models/auxiliary.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-service/src/operations.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-adapters/src/models/operations/embedding.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-kernel/src/usage.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-adapters/src/storage/run_store.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-kernel/src/ports.rs",
+    "ok": true
+  },
+  {
+    "check": "consumer source link artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json",
+    "ok": true
+  },
+  {
+    "check": "consumer source link artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json",
+    "ok": true
+  },
+  {
+    "check": "consumer source link rust/crates/lingxi-adapters/src/storage/migrations.rs",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR2/FINAL-01/STAGE_REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/A-02/REPORT.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-subagent/command.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-late/command.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/command.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/f27-resource-series.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/runtime-binding.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/result.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-binding-exclusions.txt",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-run-output-sinks.txt",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/A-REVIEW-02/manifest.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/MANIFEST.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/RESULT.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/command.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/f27-resource-series.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/RESOURCE_ANALYSIS.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/runtime-binding.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/result.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-subagent/command.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-late/command.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/D-REVIEW-01/evidence-manifest.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/D-REVIEW-01/prepared-object.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/D-REVIEW-01/r00-formal-01.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/E-REVIEW-01/REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/E-REVIEW-01/manifest.json",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/E-02/REPORT.md",
+    "ok": true
+  },
+  {
+    "check": "current evidence link artifacts/rust-tauri/R05/RR3/E-02/manifest-consumption.json",
+    "ok": true
+  }
+]

@@ -1,0 +1,189 @@
+{
+  "source": "direct SQLite insert into this run's isolated synthetic home",
+  "columns": [
+    "session_id",
+    "agent_id",
+    "owner_user_id",
+    "title",
+    "created_at_unix_ms"
+  ],
+  "latestExistingCreatedAtUnixMs": 1791369378035,
+  "rows": [
+    [
+      "sess_cli_00",
+      "lingxi",
+      "user_local",
+      "CLI fixture 00",
+      1791369378036
+    ],
+    [
+      "sess_cli_01",
+      "lingxi",
+      "user_local",
+      "CLI fixture 01",
+      1791369378037
+    ],
+    [
+      "sess_cli_02",
+      "lingxi",
+      "user_local",
+      "CLI fixture 02",
+      1791369378038
+    ],
+    [
+      "sess_cli_03",
+      "lingxi",
+      "user_local",
+      "CLI fixture 03",
+      1791369378039
+    ],
+    [
+      "sess_cli_04",
+      "lingxi",
+      "user_local",
+      "CLI fixture 04",
+      1791369378040
+    ],
+    [
+      "sess_cli_05",
+      "lingxi",
+      "user_local",
+      "CLI fixture 05",
+      1791369378041
+    ],
+    [
+      "sess_cli_06",
+      "lingxi",
+      "user_local",
+      "CLI fixture 06",
+      1791369378042
+    ],
+    [
+      "sess_cli_07",
+      "lingxi",
+      "user_local",
+      "CLI fixture 07",
+      1791369378043
+    ],
+    [
+      "sess_cli_08",
+      "lingxi",
+      "user_local",
+      "CLI fixture 08",
+      1791369378044
+    ],
+    [
+      "sess_cli_09",
+      "lingxi",
+      "user_local",
+      "CLI fixture 09",
+      1791369378045
+    ],
+    [
+      "sess_cli_10",
+      "lingxi",
+      "user_local",
+      "CLI fixture 10",
+      1791369378046
+    ],
+    [
+      "sess_cli_11",
+      "lingxi",
+      "user_local",
+      "CLI fixture 11",
+      1791369378047
+    ],
+    [
+      "sess_cli_12",
+      "lingxi",
+      "user_local",
+      "CLI fixture 12",
+      1791369378048
+    ],
+    [
+      "sess_cli_13",
+      "lingxi",
+      "user_local",
+      "CLI fixture 13",
+      1791369378049
+    ],
+    [
+      "sess_cli_14",
+      "lingxi",
+      "user_local",
+      "CLI fixture 14",
+      1791369378050
+    ],
+    [
+      "sess_cli_15",
+      "lingxi",
+      "user_local",
+      "CLI fixture 15",
+      1791369378051
+    ],
+    [
+      "sess_cli_16",
+      "lingxi",
+      "user_local",
+      "CLI fixture 16",
+      1791369378052
+    ],
+    [
+      "sess_cli_17",
+      "lingxi",
+      "user_local",
+      "CLI fixture 17",
+      1791369378053
+    ],
+    [
+      "sess_cli_18",
+      "lingxi",
+      "user_local",
+      "CLI fixture 18",
+      1791369378054
+    ],
+    [
+      "sess_cli_19",
+      "lingxi",
+      "user_local",
+      "CLI fixture 19",
+      1791369378055
+    ],
+    [
+      "sess_cli_20",
+      "lingxi",
+      "user_local",
+      "CLI fixture 20",
+      1791369378056
+    ],
+    [
+      "sess_cli_21",
+      "lingxi",
+      "user_local",
+      "CLI fixture 21",
+      1791369378057
+    ],
+    [
+      "sess_cli_22",
+      "lingxi",
+      "user_local",
+      "CLI fixture 22",
+      1791369378058
+    ],
+    [
+      "sess_cli_23",
+      "lingxi",
+      "user_local",
+      "CLI fixture 23",
+      1791369378059
+    ],
+    [
+      "sess_cli_24",
+      "lingxi",
+      "user_local",
+      "CLI fixture 24",
+      1791369378060
+    ]
+  ],
+  "note": "This seeds server state to test CLI listing; CLI did not create these sessions."
+}

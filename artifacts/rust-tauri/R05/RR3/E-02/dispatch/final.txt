@@ -1,0 +1,7 @@
+两项修复已完成：现行记录已消费 A、C/F46 独立 PASS，worker 消息格式已纠正。修改13份文档，历史失败全部保留。
+
+自检通过，两类反控均为“通过→失败→恢复通过”；423项限定生产输入未变。已停止写入，当前仅 **SELF_CHECKED**，待另一全新验收者独立验收。
+
+R06_READY=false；D仍BLOCKED，G运行中，FINAL未跑。
+
+[本轮修复报告](/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-02/REPORT.md)

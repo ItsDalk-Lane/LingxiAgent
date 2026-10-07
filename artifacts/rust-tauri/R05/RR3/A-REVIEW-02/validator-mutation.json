@@ -1,0 +1,17 @@
+{
+  "originalSha256": "53ff4eddd9af1844b7722c39dd369efcb42dbb6787adc9bb70497af48c10c8df",
+  "mutantSha256": "4ae83884114ab2205bcb57e04d214a48c0db02a50d75af6d28db954c9ef333d5",
+  "mutations": [
+    {
+      "function": "validate_run_output_unit() {",
+      "oldSha256": "55e6217cf6e7a4daa1423dcf15fe847ddb3c003c6377f528ada64b3c18cdf625",
+      "currentSha256": "e6150a5ae5f6fb623d045bd2eb4e07f7aac87f855b88f7a5866701ee6f1f1408"
+    },
+    {
+      "function": "validate_declared_run_root() {",
+      "oldSha256": "583ca566e8df21ca590b1c87d46bcf8e8534eaaa19fda009416ca9d3ca845579",
+      "currentSha256": "40e550a886c392fd6c1c52c5083687911707e76cab8e5f897657f747f08a2b50"
+    }
+  ],
+  "boundary": "仅隔离快照还原旧两校验，永久回归保持当前正确断言"
+}

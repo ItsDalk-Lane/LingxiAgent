@@ -1,0 +1,31 @@
+{
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "xtask",
+    "--bin",
+    "xtask",
+    "stage_map::map_tests::r05_stage_pin_table_matches_the_registered_suites",
+    "--",
+    "--exact"
+  ],
+  "cwd": "/Users/study_superior/r05t08-work/negcopy.qcldNA",
+  "startedAt": "2026-10-07T00:23:34.974894+00:00",
+  "endedAt": "2026-10-07T00:23:35.053100+00:00",
+  "exitCode": 0,
+  "logSha256": "30128410781b75703a1ff2223c07e0fc1d09f1a66e28cc4851c6e3c51699e606",
+  "inputDigest": "1f53b2408722d4c73bf08a6d6358b7383003d3bcdeb04f943c7599073c06a7bd",
+  "afterInputDigest": "1f53b2408722d4c73bf08a6d6358b7383003d3bcdeb04f943c7599073c06a7bd",
+  "binaryPath": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+  "binarySha256": "ae943888174036c35957afaf810f3055c6e0f2037bc436a1ccbd49ca4bf8acf4",
+  "lockSha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+  "tableSha256": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+  "testCounts": [
+    "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+  ],
+  "boundary": "真实 xtask 注册镜像；运行时读取隔离副本权威 TSV；不模拟 cargo/镜像/注入器。"
+}

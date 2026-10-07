@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+    "wire",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-wire.md"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startUTC": "2026-10-07T02:06:21.259327+00:00",
+  "endUTC": "2026-10-07T02:06:21.291007+00:00",
+  "exitCode": 0,
+  "logs": {
+    "stdout": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-wire-normal-stdout.log",
+      "sha256": "229c20693b70731942a9b7c38021c9d7e81073c308529a799bff9b5acf448104",
+      "bytes": 44
+    },
+    "stderr": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-wire-normal-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

@@ -1,0 +1,13 @@
+== relocate fixture out (rename, mimicking F51) ==
+== NEGATIVE/RELEASE CONTROL: re-enumeration ==
+plain-dir/a.txt
+plain-dir/b.txt
+README.md
+== trailing-slash dir entries after relocation (expect none) ==
+dir_entry_count=0
+== binder emulation after relocation ==
+enumerated_entries: 3 non_file_rejections: 0
+BINDING-PRECONDITION-RESTORED: all entries regular files
+== relocated fixture intact at scratch destination ==
+f.txt
+.git

@@ -1,0 +1,59 @@
+{
+  "utc": "2026-10-07T02:00:35.256313+00:00",
+  "mode": "json",
+  "checks": [
+    {
+      "check": "strict docs/rust-tauri/R05/R05_HANDOFF.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "strict docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "strict docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "strict docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "strict docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "strict docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "strict docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "nested duplicate refusal",
+      "ok": true,
+      "detail": "{\"x\":1,\"x\":2}"
+    },
+    {
+      "check": "nested duplicate refusal",
+      "ok": true,
+      "detail": "{\"nested\":{\"x\":1,\"x\":2}}"
+    },
+    {
+      "check": "valid nested zero retained",
+      "ok": true,
+      "detail": null
+    }
+  ],
+  "passed": 10,
+  "failed": 0,
+  "boundary": "independent document/source/evidence assertions; no Cargo tests executed"
+}

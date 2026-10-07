@@ -1,0 +1,88 @@
+{
+  "status": "FAIL",
+  "startedUtc": "2026-10-07T03:30:01.666915+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-dt48lo5b/source",
+      "startedUtc": "2026-10-07T03:30:01.667212+00:00",
+      "finishedUtc": "2026-10-07T03:30:01.679275+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "2d3786cea528c9507a08e7919cd1817be9f780fae1eec9e68ba06d2f74633bb1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-dt48lo5b/hidden-lock-mismatch",
+      "startedUtc": "2026-10-07T03:30:01.680089+00:00",
+      "finishedUtc": "2026-10-07T03:30:01.692479+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "a9e93a12cd916affe052e9ab0115d094125e1744a9f88301e6065fbc575f6b1c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-dt48lo5b/source",
+      "startedUtc": "2026-10-07T03:30:01.692891+00:00",
+      "finishedUtc": "2026-10-07T03:30:01.706965+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "932855e160f202f7663b883d34b9d5f1238f02aa85f1481d06561c232a86e955",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-dt48lo5b/hidden-lock-mismatch",
+      "startedUtc": "2026-10-07T03:30:01.707262+00:00",
+      "finishedUtc": "2026-10-07T03:30:01.720844+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "932855e160f202f7663b883d34b9d5f1238f02aa85f1481d06561c232a86e955",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-dt48lo5b/hidden-lock-mismatch",
+      "startedUtc": "2026-10-07T03:30:01.721174+00:00",
+      "finishedUtc": "2026-10-07T03:30:01.785968+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "source": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-dt48lo5b/source",
+  "copy": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-dt48lo5b/hidden-lock-mismatch",
+  "sourceHead": "fd95a20c5874c09eea70e53a4e8feeb115ec15dd",
+  "copyHead": "fd95a20c5874c09eea70e53a4e8feeb115ec15dd",
+  "inputs": {
+    "package.json": "4ba1a1fa16a7ccc2e80724afccd14f60ceb12478a79a5d51d8a977089ce899db",
+    "package-lock.json": "bcda2f4a9aa22d089a6129c8c911985b677a55b59097cee5d56eef92fadda5f6",
+    ".npmrc": "f6d6be450cc3239fe9569e975697ba7c4264b62ce00f99e3dee8b0845a829d72"
+  },
+  "error": "installed lock mismatch: node_modules/@vitest/snapshot/integrity",
+  "finishedUtc": "2026-10-07T03:30:01.786840+00:00"
+}

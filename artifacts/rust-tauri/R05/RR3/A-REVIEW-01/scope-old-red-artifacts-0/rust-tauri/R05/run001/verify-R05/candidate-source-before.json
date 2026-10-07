@@ -1,0 +1,50 @@
+{
+  "digestSha256": "149d6f04030b81f723912f637ebb99ff6741c87b3b38b53af3e0b5f40faeaf51",
+  "entries": [
+    {
+      "display": ".gitignore",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "2e67697469676e6f7265",
+      "sha256": "8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd"
+    },
+    {
+      "display": "artifacts/rust-tauri/R05/run001/stderr.log",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "6172746966616374732f727573742d74617572692f5230352f72756e3030312f7374646572722e6c6f67",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "display": "artifacts/rust-tauri/R05/run001/stdout.log",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "6172746966616374732f727573742d74617572692f5230352f72756e3030312f7374646f75742e6c6f67",
+      "sha256": "daf071121a9ffe32bbce44190e37a068c96d08bff63fd7b660dd95b77d786dca"
+    },
+    {
+      "display": "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "646f63732f727573742d74617572692f5230302f414343455054414e43455f4d41502e6a736f6e",
+      "sha256": "22fa29fafd427fcc0836144a9a6f5533d436de534686d8458e0f44723910722f"
+    },
+    {
+      "display": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "646f63732f727573742d74617572692f5230302f464541545552455f53544147455f414343455054414e43452e6a736f6e",
+      "sha256": "b1dfdc2efa200373d08a5e77f3a3064e96a399a663557f8880173d8b7a53e4b7"
+    },
+    {
+      "display": "source.txt",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "736f757263652e747874",
+      "sha256": "41cf6794ba4200b839c53531555f0f3998df4cbb01a4d5cb0b94e3ca5e23947d"
+    }
+  ],
+  "fileCount": 6,
+  "pathEncoding": "unix-bytes-hex",
+  "schema": "lingxi-candidate-source-v1"
+}

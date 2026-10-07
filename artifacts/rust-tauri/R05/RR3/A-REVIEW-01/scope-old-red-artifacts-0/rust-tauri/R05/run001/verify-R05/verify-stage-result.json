@@ -1,0 +1,259 @@
+{
+  "candidateSourceBinding": {
+    "checkpointAfterEveryCommand": [
+      {
+        "changedPathBytesHex": [
+          "6172746966616374732f727573742d74617572692f5230352f72756e3030312f7374646f75742e6c6f67"
+        ],
+        "commandKey": "bounded-control-0",
+        "digestSha256": "09270cceae64115c715b62b5fe2f9e48e889e3687a8b0f69475fc0d6a16a7554",
+        "error": null,
+        "stable": false
+      },
+      {
+        "changedPathBytesHex": [
+          "6172746966616374732f727573742d74617572692f5230352f72756e3030312f7374646f75742e6c6f67"
+        ],
+        "commandKey": "bounded-control-1",
+        "digestSha256": "539bd32d33d58c962e8d8e1facc50298757d65871b07411032f89042db361c4e",
+        "error": null,
+        "stable": false
+      },
+      {
+        "changedPathBytesHex": [
+          "6172746966616374732f727573742d74617572692f5230352f72756e3030312f7374646f75742e6c6f67"
+        ],
+        "commandKey": "bounded-control-2",
+        "digestSha256": "e1c9f65642a7a02658b30a7b2e1c874801b19ebba5e05456c8b5b6bb83c2c206",
+        "error": null,
+        "stable": false
+      },
+      {
+        "changedPathBytesHex": [
+          "6172746966616374732f727573742d74617572692f5230352f72756e3030312f7374646f75742e6c6f67"
+        ],
+        "commandKey": "bounded-control-3",
+        "digestSha256": "2d0b0ea36491b146bfdfe007da12fd372dd66f2c77d148d893ff886e06d0e7b2",
+        "error": null,
+        "stable": false
+      },
+      {
+        "changedPathBytesHex": [
+          "6172746966616374732f727573742d74617572692f5230352f72756e3030312f7374646f75742e6c6f67"
+        ],
+        "commandKey": "bounded-control-4",
+        "digestSha256": "5aada5f88eb5aba358bb7dce7378a96f98f91362118679ca973118dc818bd32e",
+        "error": null,
+        "stable": false
+      },
+      {
+        "changedPathBytesHex": [
+          "6172746966616374732f727573742d74617572692f5230352f72756e3030312f7374646f75742e6c6f67"
+        ],
+        "commandKey": "bounded-control-5",
+        "digestSha256": "716ad083a1094cb14749a1f00b66b768a8bb156a977779b9b1a9678c495bdefe",
+        "error": null,
+        "stable": false
+      },
+      {
+        "changedPathBytesHex": [
+          "6172746966616374732f727573742d74617572692f5230352f72756e3030312f7374646f75742e6c6f67"
+        ],
+        "commandKey": "r04_regression_gate",
+        "digestSha256": "cd7707ef27c56050bb35251bdf6fe44da4bac0354e7e8c35260f0c9fc55634a8",
+        "error": null,
+        "stable": false
+      }
+    ],
+    "excluded": {
+      "evidenceOutputPathBytesHex": "6172746966616374732f727573742d74617572692f5230352f72756e3030312f7665726966792d523035",
+      "evidenceOutputRelativePath": "artifacts/rust-tauri/R05/run001/verify-R05",
+      "policy": "This invocation's fresh --evidence subtree and exact real OS fd stdout/stderr files of this process and its ancestors are excluded. No ancestor sink directory is excluded. The set is fixed before binding; other tracked and non-ignored untracked paths stay bound.",
+      "runOutputFiles": [
+        {
+          "kind": "FILE",
+          "pathBytesHex": "6172746966616374732f727573742d74617572692f5230352f72756e3030312f7374646572722e6c6f67",
+          "relativePath": "artifacts/rust-tauri/R05/run001/stderr.log"
+        },
+        {
+          "kind": "FILE",
+          "pathBytesHex": "6172746966616374732f727573742d74617572692f5230352f72756e3030312f7374646f75742e6c6f67",
+          "relativePath": "artifacts/rust-tauri/R05/run001/stdout.log"
+        }
+      ]
+    },
+    "stable": false
+  },
+  "commands": [
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "printf control"
+      ],
+      "cleanup": null,
+      "durationMs": 133,
+      "evidencePaths": [],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "bounded-control-0",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "printf control"
+      ],
+      "cleanup": null,
+      "durationMs": 132,
+      "evidencePaths": [],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "bounded-control-1",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "printf control"
+      ],
+      "cleanup": null,
+      "durationMs": 132,
+      "evidencePaths": [],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "bounded-control-2",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "printf control"
+      ],
+      "cleanup": null,
+      "durationMs": 132,
+      "evidencePaths": [],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "bounded-control-3",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "printf control"
+      ],
+      "cleanup": null,
+      "durationMs": 134,
+      "evidencePaths": [],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "bounded-control-4",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "printf control"
+      ],
+      "cleanup": null,
+      "durationMs": 133,
+      "evidencePaths": [],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "bounded-control-5",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "env",
+        "LINGXI_NESTED_LEVEL=1",
+        "LINGXI_NESTED_EVIDENCE=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-95370-1791333771211731000/artifacts/rust-tauri/R05/run001/verify-R05/R04_REGRESSION",
+        "/tmp/lingxi-rr3-a-review-01-target/debug/deps/xtask-ad766de8ea03e62c",
+        "--exact",
+        "verify::runner_tests::rr3_nested_process_probe",
+        "--nocapture"
+      ],
+      "cleanup": null,
+      "durationMs": 9209,
+      "evidencePaths": [],
+      "exitCode": 101,
+      "internalError": null,
+      "key": "r04_regression_gate",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "FAIL",
+      "timedOut": false
+    }
+  ],
+  "finishedAtUnixMs": 1791333781725,
+  "overall": "FAIL",
+  "platform": {
+    "arch": "aarch64",
+    "family": "unix",
+    "os": "macos"
+  },
+  "resultVersion": "lingxi.xtask.verify-stage.v1",
+  "scenarios": [
+    {
+      "commandRefs": [
+        "bounded-control-0",
+        "bounded-control-1",
+        "bounded-control-2",
+        "bounded-control-3",
+        "bounded-control-4",
+        "bounded-control-5",
+        "r04_regression_gate"
+      ],
+      "id": "RX-A01",
+      "requirement": "REQUIRED",
+      "status": "FAIL"
+    }
+  ],
+  "stage": "RX",
+  "startedAtUnixMs": 0,
+  "supplementalLeafCoverage": {
+    "blocked": 0,
+    "commandsNotPassing": [
+      "r04_regression_gate"
+    ],
+    "declaredInStageMap": 0,
+    "deferredLeafIds": [],
+    "deferredToLaterStage": 0,
+    "deferredToR07": 0,
+    "expectedFromR00Ledger": 0,
+    "fail": 0,
+    "note": "R13-F01/R14-F01: this stage gate CONSUMES the R00 REQUIRED_SUPPLEMENTAL leaves bound to the stage (cross-checked for set equality AND per-leaf FULL-record equality — feature, kind, task/stage responsibility, status, result/test registries, then, assertions, due — against both R00 ledgers before any command ran). R02-final group 1 stage ownership: expected == pass + deferredToR07 + fail + blocked, and overall PASS requires PASS ∪ DEFERRED_TO_R07 to cover every leaf. DEFERRED_TO_R07 is NOT a waiver: the leaf stays REQUIRED and its acceptance belongs to R07, which must consume the remainder (deferredToStage + r07Share on each entry); the deferred set is verified EQUAL to the stage map's deferred_to_r07 declarations. Early-evidence producers of pre-implemented R07 behavior stay registered and run; any failing command (commandsNotPassing) still blocks overall PASS. A BLOCKED entry is an unresolved stage-boundary conflict, a generic-authentication leaf whose cases do not prove its original behavior, or a legacy partial-kind dual-stage leaf. A FAIL entry lacks legal evidence for its R02 share or its pinned cases did not hold as recorded in the producer's structured case file.",
+    "pass": 0,
+    "r00FeatureStageAcceptancePath": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+    "r00LedgerPath": "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+    "shareSatisfiedLeafIds": []
+  },
+  "supplementalLeafScenarios": [],
+  "testedSha": "controlled-fixture",
+  "toolchainChannel": null,
+  "worktreeDirty": true
+}

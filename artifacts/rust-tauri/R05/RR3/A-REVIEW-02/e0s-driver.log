@@ -1,0 +1,9 @@
+e0s 0
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/support_checks.py", line 90, in <module>
+    {'e0s':setup_e0s,'validators':independent_validators,'reuse':reuse}[sys.argv[1]]()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/support_checks.py", line 24, in setup_e0s
+    assert len(fixtures)==62 and all(x.split('expected=[',1)[1].split(']')[0]==x.split('actual=[',1)[1].split(']')[0] for x in fixtures)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

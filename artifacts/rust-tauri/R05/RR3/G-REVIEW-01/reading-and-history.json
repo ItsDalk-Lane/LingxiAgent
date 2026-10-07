@@ -1,0 +1,345 @@
+{
+  "utc": "2026-10-07T01:34:27.449654+00:00",
+  "fullByteReadSources": [
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_G_BRIEF.md",
+      "sha256": "8f05e0ee2e9ebe2506d247fd7904d5cb48134ce6697a5d0a3a130b7e4bb148a3",
+      "bytes": 3115,
+      "lines": 19,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md",
+      "sha256": "9395286d8272ba1c841bc7960cc0e06b93affcfbacc2037cf0a8f0df9fcb1fe8",
+      "bytes": 3911,
+      "lines": 17,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_BRIEF.md",
+      "sha256": "31be412e410ff7be0543c2b9c5ff332ef77540de242070d6d2b1271ab0a6446c",
+      "bytes": 7538,
+      "lines": 43,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_MASTER_PROMPT_2026-10-04.md",
+      "sha256": "7fc077f1b370660f582d964977685d5a619fa988befd26f8a4915f409529f2bc",
+      "bytes": 70892,
+      "lines": 578,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_MASTER_PROMPT_2026-10-06.md",
+      "sha256": "35802f225728954cccedd12ef0453090948afd18db9cb0f8f31cc9d896e92545",
+      "bytes": 8316,
+      "lines": 40,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+      "sha256": "8aa8f61e6c717ee2c44485a516d177e3ca9566c66415c441a0b1adcf3f5c247c",
+      "bytes": 7359,
+      "lines": 139,
+      "jsonRootKeys": [
+        "round",
+        "baselineHead",
+        "stageStatus",
+        "R06_READY",
+        "issues",
+        "preservedRepairs",
+        "historicalGate",
+        "toolchain",
+        "integrationGates"
+      ]
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+      "sha256": "0be22b9b26dc7eea267b5c9ea845949841cbc7570e20c01c7a00eaf043c22097",
+      "bytes": 9939,
+      "lines": 75,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+      "sha256": "386b8f75bb2a0b32df903bb2449e2d21bd04cb80150e73abe36c2fa231be04c1",
+      "bytes": 2931,
+      "lines": 20,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_ISSUE_MATRIX.json",
+      "sha256": "c2f0475ebf998ae225ac300393e58a3365419fb07347861ff78f3a5f0d0c8dbd",
+      "bytes": 37720,
+      "lines": 175,
+      "jsonRootKeys": [
+        "schemaVersion",
+        "generatedAt",
+        "generatedBy",
+        "candidate",
+        "note",
+        "issues",
+        "integrationGaps",
+        "counts",
+        "stageStatus",
+        "closedAt"
+      ]
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_PROGRESS.md",
+      "sha256": "90f1bb1b1cbf0b0cf42114e83e768a4f943723155a7144e061d330a43b649e1e",
+      "bytes": 30484,
+      "lines": 42,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_HANDOFF.md",
+      "sha256": "3560187fb5b114c90a958ef844c204619c5292099d2647fab83e43eca559b044",
+      "bytes": 7454,
+      "lines": 56,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_REPORT.md",
+      "sha256": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+      "bytes": 22823,
+      "lines": 167,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "sha256": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+      "bytes": 76657,
+      "lines": 2370,
+      "jsonRootKeys": [
+        "schemaVersion",
+        "artifactKind",
+        "stage_id",
+        "generated_by",
+        "generated_at",
+        "structure",
+        "aIndex",
+        "entries",
+        "oldProductUntouchedDiff",
+        "ledgerNameCorrections",
+        "aIndexNote",
+        "registryNote",
+        "historical_record_notice",
+        "rr3_current",
+        "rr3_I10_mapping"
+      ]
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_HANDOFF.json",
+      "sha256": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+      "bytes": 40047,
+      "lines": 568,
+      "jsonRootKeys": [
+        "schemaVersion",
+        "artifactKind",
+        "stage_id",
+        "generated_by",
+        "generated_at",
+        "baseline",
+        "interfaces",
+        "consumer_guidance_r06",
+        "deferred_registrations",
+        "stage_gate_registration",
+        "review_status",
+        "rr1_repair_round",
+        "rr2_repair_round",
+        "historical_record_notice",
+        "rr3_current",
+        "source_sha",
+        "source_sha_semantics",
+        "working_tree_digest",
+        "working_tree_digest_scope",
+        "protocol_version",
+        "data_epoch",
+        "storage_schema_version",
+        "dependency_locks",
+        "accepted_tasks",
+        "accepted_tasks_semantics",
+        "unresolved_items",
+        "allowed_next_scope",
+        "artifact_hashes",
+        "consumer_contract",
+        "historical_generated_metadata"
+      ]
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "sha256": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+      "bytes": 11015,
+      "lines": 67,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "sha256": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+      "bytes": 18728,
+      "lines": 336,
+      "jsonRootKeys": [
+        "schemaVersion",
+        "artifactKind",
+        "stage_id",
+        "generated_by",
+        "generated_at",
+        "honestyRule",
+        "preregisteredThresholds",
+        "measured",
+        "notClaimed",
+        "historical_record_notice",
+        "rr3_current",
+        "rr3_resource_selfcheck"
+      ]
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-01/REPORT.md",
+      "sha256": "05c6733ba38b21d4b14d5dabdf4afb5e917116e0c4a17d2564264bc8be1016d7",
+      "bytes": 8985,
+      "lines": 71,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md",
+      "sha256": "b9faa6a18136982a90e0e169a8092e9c1d97228012abc18c3bb3ebe64b42e629",
+      "bytes": 8026,
+      "lines": 59,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md",
+      "sha256": "f12ec6e1f7aba629f244e6c42a3ba25b6128fed4d6e5fda784c1dbd967960008",
+      "bytes": 8065,
+      "lines": 47,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md",
+      "sha256": "cc52fe061bb557a82ba44397277f0dd719b02c8a2fd1ce02ad1b16a7e736f9e9",
+      "bytes": 9411,
+      "lines": 54,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/B-01/REPORT.md",
+      "sha256": "d1b58680ace23b6fd5f7916ec73a8b0661ddfd1f18b4956dd8268689f68fa85d",
+      "bytes": 6266,
+      "lines": 50,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+      "sha256": "8e83638b0b24ed5d98a8bd9acc2d632d5eb07fcba0df431350f20108777c72a1",
+      "bytes": 9917,
+      "lines": 88,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/C-01/REPORT.md",
+      "sha256": "07e42bdaa5d332edeb9028a399c227f01f97f9cc11d996f8f26d4f6623d6192e",
+      "bytes": 17069,
+      "lines": 174,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+      "sha256": "c67fb4795cd3934283ec8ce319e428127c95557584d487f9dae405c3dd31787d",
+      "bytes": 5216,
+      "lines": 24,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md",
+      "sha256": "75fe8d084c6524c2a2390f6f6eb48db1510eddb082bb1e1c4fc111e16c78e91b",
+      "bytes": 14159,
+      "lines": 86,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+      "sha256": "c59ac409a316f5a1affbd29afbb68784c9a1ad48a80bce12a9608a600866de1e",
+      "bytes": 14814,
+      "lines": 112,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-01/REPORT.md",
+      "sha256": "751bf15832843109d7670469514d9a0a32b159d4f90334870d210964ad02baae",
+      "bytes": 9560,
+      "lines": 67,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/D-01/REPORT.md",
+      "sha256": "5ddc3c80e7e7ad7f88df714c6bb0d3c22502119cbe87fa5c0186eedbdf54be52",
+      "bytes": 9525,
+      "lines": 75,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/STAGE_REVIEW.md",
+      "sha256": "0489d596b1c5eea78ada9480baca0112041d9608e1d9ba48f00dcab58dcfa0fb",
+      "bytes": 14710,
+      "lines": 103,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
+      "sha256": "420e01cb179e2003353c24fbe6e8fc8541739e38accb47d146eec44699fb456f",
+      "bytes": 13070,
+      "lines": 81,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md",
+      "sha256": "ba6a7c79b0f7776b7d94640888527113eed2a641e135a46b87ee8c3a516eb961",
+      "bytes": 7313,
+      "lines": 64,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md",
+      "sha256": "55e701cd0015c05ac58e1fc5618c4f67f09603d8541d7f781bd1307b133e1147",
+      "bytes": 11745,
+      "lines": 63,
+      "jsonRootKeys": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md",
+      "sha256": "e9d6de071aa6f08e56a7f27d8b200fe915a4e9468e81361d778660cb97bd954d",
+      "bytes": 18330,
+      "lines": 55,
+      "jsonRootKeys": null
+    }
+  ],
+  "rr2ProbeRaw": [
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/D-R2/probe/probe-suite.log",
+      "sha256": "c688090b8b104c5407ffa4f7857d73798d16edfceeb243c1abb5d87a78359c13",
+      "lines": 46,
+      "summary": [
+        "CodeDirectory v=20400 size=333 flags=0x2(adhoc) hashes=4+2 location=embedded",
+        "TeamIdentifier=not set",
+        "PROBE RESULT: ok",
+        "-- 192.168.3.5 (en0):",
+        "PROBE RESULT: recv-stalled Resource temporarily unavailable",
+        "-- 192.168.3.10 (en1):",
+        "PROBE RESULT: recv-stalled Resource temporarily unavailable",
+        "-- fe80::14c4:ebc4:8942:59c%en0 (v6 link-local):",
+        "PROBE RESULT: recv-stalled Resource temporarily unavailable",
+        "-- after explicit adhoc codesign --force --sign -, 192.168.3.5:",
+        "PROBE RESULT: recv-stalled Resource temporarily unavailable",
+        "",
+        "== Apple-signed /usr/bin/python3 control on the same 192.168.3.5 ==",
+        "PROBE RESULT: ok (14 bytes)",
+        "",
+        "== ALF verdict for the CURRENT-tree r00 binary path (stalled despite old Allow: relinked after verdict) ==",
+        "2 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0 ",
+        "             (Allow incoming connections)"
+      ]
+    }
+  ],
+  "boundary": "全文读取说明和报告；大型JSON完整解析及对相关完整叶记录/原证索引，不将历史作者结论当亲跑"
+}

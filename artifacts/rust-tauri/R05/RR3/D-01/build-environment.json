@@ -1,0 +1,28 @@
+{
+  "time": "2026-10-07T08:33:41.178559+08:00",
+  "buildEnvironment": {
+    "RUSTFLAGS": "<unset>",
+    "CARGO_ENCODED_RUSTFLAGS": "<unset>",
+    "CARGO_TARGET_DIR": "<unset>",
+    "RUSTUP_TOOLCHAIN": "<unset>",
+    "CARGO_PROFILE_TEST_OPT_LEVEL": "<unset>"
+  },
+  "commands": [
+    {
+      "argv": [
+        "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+        "--version"
+      ],
+      "exitCode": 0,
+      "output": "v24.16.0\n"
+    },
+    {
+      "argv": [
+        "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/npm",
+        "--version"
+      ],
+      "exitCode": 0,
+      "output": "11.13.0\n"
+    }
+  ]
+}

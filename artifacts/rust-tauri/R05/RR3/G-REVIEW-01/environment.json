@@ -1,0 +1,122 @@
+{
+  "utc": "2026-10-07T01:32:04.248956+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "--version"
+      ],
+      "startUTC": "2026-10-07T01:32:03.986631+00:00",
+      "endUTC": "2026-10-07T01:32:04.010625+00:00",
+      "exitCode": 0,
+      "stdout": "cargo 1.98.1 (797e8a9bc 2026-08-05)\n",
+      "stderr": "",
+      "executable": "/Users/study_superior/.cargo/bin/cargo",
+      "realExecutable": "/Users/study_superior/.cargo/bin/rustup",
+      "sha256": "ec1b9233e7f72990ecd8e62063fa7f6c3dfc2bec8e97f88bff165f9100ac696a"
+    },
+    {
+      "argv": [
+        "/Users/study_superior/.cargo/bin/rustc",
+        "--version"
+      ],
+      "startUTC": "2026-10-07T01:32:04.016309+00:00",
+      "endUTC": "2026-10-07T01:32:04.051880+00:00",
+      "exitCode": 0,
+      "stdout": "rustc 1.98.1 (48a229cea 2026-09-01)\n",
+      "stderr": "",
+      "executable": "/Users/study_superior/.cargo/bin/rustc",
+      "realExecutable": "/Users/study_superior/.cargo/bin/rustup",
+      "sha256": "ec1b9233e7f72990ecd8e62063fa7f6c3dfc2bec8e97f88bff165f9100ac696a"
+    },
+    {
+      "argv": [
+        "node",
+        "--version"
+      ],
+      "startUTC": "2026-10-07T01:32:04.056762+00:00",
+      "endUTC": "2026-10-07T01:32:04.071763+00:00",
+      "exitCode": 0,
+      "stdout": "v24.16.0\n",
+      "stderr": "",
+      "executable": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+      "realExecutable": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+      "sha256": "1ee75375e33b94fc34b3b19aede049e11dae90efb63b374dc96d6bdace70c4b8"
+    },
+    {
+      "argv": [
+        "npm",
+        "--version"
+      ],
+      "startUTC": "2026-10-07T01:32:04.125236+00:00",
+      "endUTC": "2026-10-07T01:32:04.217588+00:00",
+      "exitCode": 0,
+      "stdout": "11.13.0\n",
+      "stderr": "",
+      "executable": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/npm",
+      "realExecutable": "/Users/study_superior/.nvm/versions/node/v24.16.0/lib/node_modules/npm/bin/npm-cli.js",
+      "sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7"
+    },
+    {
+      "argv": [
+        "python3",
+        "--version"
+      ],
+      "startUTC": "2026-10-07T01:32:04.217741+00:00",
+      "endUTC": "2026-10-07T01:32:04.228687+00:00",
+      "exitCode": 0,
+      "stdout": "Python 3.14.3\n",
+      "stderr": "",
+      "executable": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "realExecutable": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+      "sha256": "1192b994fbb50303c9df2cc97c9d63797d454c7f57f20ca682877c9e770429aa"
+    },
+    {
+      "argv": [
+        "uname",
+        "-sm"
+      ],
+      "startUTC": "2026-10-07T01:32:04.228840+00:00",
+      "endUTC": "2026-10-07T01:32:04.232011+00:00",
+      "exitCode": 0,
+      "stdout": "Darwin arm64\n",
+      "stderr": "",
+      "executable": "/usr/bin/uname",
+      "realExecutable": "/usr/bin/uname",
+      "sha256": "1e2f0483336d6c89259878f8d4880affd9743727ed8afacddfd68d8857e62f93"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "startUTC": "2026-10-07T01:32:04.232469+00:00",
+      "endUTC": "2026-10-07T01:32:04.238799+00:00",
+      "exitCode": 0,
+      "stdout": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b\n",
+      "stderr": "",
+      "executable": "/opt/homebrew/bin/git",
+      "realExecutable": "/opt/homebrew/Cellar/git/2.53.0/bin/git",
+      "sha256": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "origin/codex/rust-tauri-migration"
+      ],
+      "startUTC": "2026-10-07T01:32:04.240785+00:00",
+      "endUTC": "2026-10-07T01:32:04.247358+00:00",
+      "exitCode": 0,
+      "stdout": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b\n",
+      "stderr": "",
+      "executable": "/opt/homebrew/bin/git",
+      "realExecutable": "/opt/homebrew/Cellar/git/2.53.0/bin/git",
+      "sha256": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537"
+    }
+  ],
+  "rustToolchainSHA256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+  "CargoLockSHA256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+  "boundary": "versions read via absolute rustup1.98.1; no environment secret dump"
+}

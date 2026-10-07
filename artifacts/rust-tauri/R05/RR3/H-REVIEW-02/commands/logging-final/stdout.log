@@ -1,0 +1,14 @@
+
+running 9 tests
+test logging::tests::rotation_config_validation_is_loud ... ok
+test logging::tests::log_files_are_owner_only ... ok
+test logging::tests::router_redacts_lines_and_fans_out_to_file ... ok
+test logging::tests::opening_at_the_file_limit_prunes_the_oldest_and_preserves_newer_contents ... ok
+test logging::tests::reopened_sequence_continues_and_never_truncates_old_files ... ok
+test logging::tests::startup_prune_and_rotation_open_failures_are_returned ... ok
+test logging::tests::repeated_open_without_writes_is_bounded_from_the_new_directory ... ok
+test logging::tests::rotation_respects_max_bytes_and_files_are_complete_lines ... ok
+test logging::tests::prune_keeps_only_max_files ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 352 filtered out; finished in 0.11s
+

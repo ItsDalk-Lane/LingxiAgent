@@ -1,0 +1,50 @@
+{
+  "utc": "2026-10-07T02:47:56.692663+00:00",
+  "legs": [
+    {
+      "leg": "run-a",
+      "actualOverall": "FAIL",
+      "stable": true,
+      "runnerSourceBinding": "PASS",
+      "actualCommands": 20,
+      "passCommands": 13,
+      "checkpoints": 20,
+      "stableCheckpoints": 20,
+      "digest": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+      "manifestSHA256": "ff842488bc7d762e4a3deacbef5d285d840d53ab1f7622a056d75473314c08ea"
+    },
+    {
+      "leg": "run-b",
+      "actualOverall": "FAIL",
+      "stable": true,
+      "runnerSourceBinding": "PASS",
+      "actualCommands": 20,
+      "passCommands": 13,
+      "checkpoints": 20,
+      "stableCheckpoints": 20,
+      "digest": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+      "manifestSHA256": "da9c29ced0fcf561075336a4fb1babe7fc43b0b12b56179e994095c4f0188073"
+    }
+  ],
+  "digestsActuallyDiffer": true,
+  "changes": [
+    {
+      "path": "rust/crates/lingxi-kernel/src/lib.rs",
+      "before": {
+        "display": "rust/crates/lingxi-kernel/src/lib.rs",
+        "kind": "file",
+        "mode": 420,
+        "pathBytesHex": "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273",
+        "sha256": "0a5f0c3aee15f437cae03cca5eb182680f6e57aa64e3dcd95fbb5561a243720f"
+      },
+      "after": {
+        "display": "rust/crates/lingxi-kernel/src/lib.rs",
+        "kind": "file",
+        "mode": 420,
+        "pathBytesHex": "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273",
+        "sha256": "cecd3f054673c853992b2c5c9e0e4c7ef1763561b905b65a233a01f1eef471e0"
+      }
+    }
+  ],
+  "boundary": "两真实生产R02已完成；原默认旧根拒收腿因入口被重写未执行，另有独立补证，不能追记原生产16/16"
+}

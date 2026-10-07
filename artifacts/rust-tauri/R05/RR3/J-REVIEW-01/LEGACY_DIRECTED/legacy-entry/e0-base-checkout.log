@@ -1,0 +1,31 @@
+error: unable to write file docs/rust-tauri/R00/R00-T02_UI_SOURCE_BRANCH_CONTRACT.json
+error: unable to write file docs/rust-tauri/R00/R00-T03_IMPORT_GRAPH.json
+error: unable to write file docs/rust-tauri/R00/R00-T07_REVIEW_R1.md
+error: unable to create file docs/rust-tauri/R00/R00-T07_REVIEW_R2.md: No space left on device
+error: unable to create file docs/rust-tauri/R00/R00-T07_REVIEW_R3.md: No space left on device
+error: unable to create file docs/rust-tauri/R00/R00-T08_REPAIR_R1.md: No space left on device
+error: unable to create file docs/rust-tauri/R00/R00-T08_REVIEW_R1.md: No space left on device
+error: unable to create file docs/rust-tauri/R00/R00-T08_REVIEW_R2.md: No space left on device
+error: unable to create file docs/rust-tauri/R00/R00_AUDIT_SEAL_EXECUTION.md: No space left on device
+error: unable to create file docs/rust-tauri/R00/R00_AUDIT_SEAL_REVIEW_C1_R1.md: No space left on device
+error: unable to create file docs/rust-tauri/R00/R00_EVIDENCE_SUMMARY.md: No space left on device
+error: unable to create file docs/rust-tauri/R00/R00_HANDOFF.json: No space left on device
+error: unable to create file docs/rust-tauri/R00/R00_REPORT.md: No space left on device
+error: unable to create file docs/rust-tauri/R00/R00_STAGE_REPAIR_R1.md: No space left on device
+error: unable to create file docs/rust-tauri/R00/R00_STAGE_REVIEW_R1.md: No space left on device
+error: unable to create file docs/rust-tauri/R00/R00_STAGE_REVIEW_R2.md: No space left on device
+error: unable to create file docs/rust-tauri/R00/RUNTIME_DEPENDENCIES.json: No space left on device
+error: unable to create file docs/rust-tauri/R00/STORES.json: No space left on device
+error: unable to create file docs/rust-tauri/R00/ask_user_ast_gate.cjs: No space left on device
+error: unable to create file docs/rust-tauri/R00/r00_t02_inventory.py: No space left on device
+error: unable to create file docs/rust-tauri/R00/r00_t02_source_gates.py: No space left on device
+error: unable to create file docs/rust-tauri/R00/r00_t03_build_matrices.py: No space left on device
+error: unable to create file docs/rust-tauri/R00/r00_t03_import_graph.mjs: No space left on device
+error: unable to create file docs/rust-tauri/R00/r00_t03_validate.py: No space left on device
+error: unable to create file docs/rust-tauri/R00/r00_t04_scan.py: No space left on device
+error: unable to create file docs/rust-tauri/R00/r00_t07_build_map.py: No space left on device
+error: unable to create file docs/rust-tauri/R00/r00_t07_selftest.py: No space left on device
+error: unable to create file docs/rust-tauri/R00/r00_t07_validate_ledger.py: No space left on device
+error: unable to create file docs/rust-tauri/R00/r00_t08_a15_verify_repro.py: No space left on device
+error: unable to create file docs/rust-tauri/R00/r00_t08_a16_spotcheck.py: No space left on device
+fatal: cannot create directory at 'docs/rust-tauri/R01': No space left on device

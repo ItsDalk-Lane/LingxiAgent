@@ -1,0 +1,13 @@
+{
+  "command": [
+    "python3",
+    "/Users/study_superior/r05t08-work/negcopy.qcldNA/scripts/rust-tauri/r05_t08_mutate_pin.py",
+    "/Users/study_superior/r05t08-work/negcopy.qcldNA/docs/rust-tauri/R05/r05_stage_pins.tsv",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/independent-mutation.json"
+  ],
+  "cwd": "/Users/study_superior/r05t08-work/negcopy.qcldNA",
+  "startedAt": "2026-10-07T00:23:35.116982+00:00",
+  "endedAt": "2026-10-07T00:23:35.147482+00:00",
+  "exitCode": 0,
+  "logSha256": "9c369dbff2691baa6d32d3b6bce1138c81c769525964f8002d4db80cb4f620e2"
+}

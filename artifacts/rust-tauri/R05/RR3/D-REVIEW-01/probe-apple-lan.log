@@ -1,0 +1,8 @@
+pid=86542 bind=0.0.0.0:60192 connect=192.168.3.5:60192 listening=true
+client connected
+client send=4
+server accepted
+server recv=4
+server send=4
+client recv=4
+PROBE RESULT: ok accepted=True

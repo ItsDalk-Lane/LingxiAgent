@@ -1,0 +1,1 @@
+{"kind": "fields", "file": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-01/isolated-fields.json", "status": "FAIL", "errors": ["ModelTurnInput complete field list differs: ['submission', 'system_prompt', 'turn', 'prior', 'tools', 'deadline_unix_ms', 'images', 'max_output_tokens']"]}

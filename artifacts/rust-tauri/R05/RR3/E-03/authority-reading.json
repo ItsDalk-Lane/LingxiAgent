@@ -1,0 +1,84 @@
+{
+  "at": "2026-10-07T04:55:31.275162+00:00",
+  "main_actor": "/root/rr3_e_impl_03",
+  "read_only_helper": "/root/rr3_e_impl_03/doc_input_audit",
+  "independent_review": false,
+  "files": [
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_MASTER_PROMPT_2026-10-04.md",
+      "sha256": "7fc077f1b370660f582d964977685d5a619fa988befd26f8a4915f409529f2bc",
+      "bytes": 70892,
+      "scope": "Original 10-02 + eight taskbooks fully read by read-only doc_input_audit; R06 consumption/precondition only used; RR1/RR2 Masters fully read by E03 and relevant clauses checked again. Byte identity checked here."
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_MASTER_PROMPT_2026-10-06.md",
+      "sha256": "35802f225728954cccedd12ef0453090948afd18db9cb0f8f31cc9d896e92545",
+      "bytes": 8316,
+      "scope": "Original 10-02 + eight taskbooks fully read by read-only doc_input_audit; R06 consumption/precondition only used; RR1/RR2 Masters fully read by E03 and relevant clauses checked again. Byte identity checked here."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/Lingxi_R05_完整执行与验收提示词_2026-10-02.md",
+      "sha256": "371fffc32310ff7fdd6f8b383d437d327b6ab3b8848f78154011cad3719bdfdb",
+      "bytes": 76252,
+      "scope": "Original 10-02 + eight taskbooks fully read by read-only doc_input_audit; R06 consumption/precondition only used; RR1/RR2 Masters fully read by E03 and relevant clauses checked again. Byte identity checked here."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/01_通用执行约束.md",
+      "sha256": "d4f07185735acda91b73a2aa97a42ca7ce5795babf1104968c83671131cf871c",
+      "bytes": 8145,
+      "scope": "Original 10-02 + eight taskbooks fully read by read-only doc_input_audit; R06 consumption/precondition only used; RR1/RR2 Masters fully read by E03 and relevant clauses checked again. Byte identity checked here."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/02_目标架构与强制契约.md",
+      "sha256": "53dbf699675d9981b60ea5c982c4d0507afffd5184e6bebac875aae40d173c4d",
+      "bytes": 11718,
+      "scope": "Original 10-02 + eight taskbooks fully read by read-only doc_input_audit; R06 consumption/precondition only used; RR1/RR2 Masters fully read by E03 and relevant clauses checked again. Byte identity checked here."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R05_模型协议、凭证、流式处理与最小完整闭环.md",
+      "sha256": "a10490c115d00f1f0c5bbcf1a5e2f6b8740397103d8b8ad5cc029a3427f1a3e0",
+      "bytes": 17336,
+      "scope": "Original 10-02 + eight taskbooks fully read by read-only doc_input_audit; R06 consumption/precondition only used; RR1/RR2 Masters fully read by E03 and relevant clauses checked again. Byte identity checked here."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/04_阶段依赖与接口交接.md",
+      "sha256": "940c896508e929ec5f25c2b9020c06c2035c3f9800f43b78b1fd5e303e92bde3",
+      "bytes": 4233,
+      "scope": "Original 10-02 + eight taskbooks fully read by read-only doc_input_audit; R06 consumption/precondition only used; RR1/RR2 Masters fully read by E03 and relevant clauses checked again. Byte identity checked here."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/06_风险、技术决策与退出条件.md",
+      "sha256": "6c92962e5bcb739509630eb8c9cf8b96fabf67c0d51315717ae048d9b87786f0",
+      "bytes": 4454,
+      "scope": "Original 10-02 + eight taskbooks fully read by read-only doc_input_audit; R06 consumption/precondition only used; RR1/RR2 Masters fully read by E03 and relevant clauses checked again. Byte identity checked here."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R06_上下文、会话语义、记忆与知识库.md",
+      "sha256": "d54e7fcc638b62fc4303ce4af8f01ba8c358fd1a90d0f85a491bfd4a439bbd2e",
+      "bytes": 17423,
+      "scope": "Original 10-02 + eight taskbooks fully read by read-only doc_input_audit; R06 consumption/precondition only used; RR1/RR2 Masters fully read by E03 and relevant clauses checked again. Byte identity checked here."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/05_验收与性能协议.md",
+      "sha256": "d86c51f4b8571f94f0e9b457e74e79d9281d5c846e7a37d1f39edfdf47324b61",
+      "bytes": 10299,
+      "scope": "Original 10-02 + eight taskbooks fully read by read-only doc_input_audit; R06 consumption/precondition only used; RR1/RR2 Masters fully read by E03 and relevant clauses checked again. Byte identity checked here."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/03_功能与所有权矩阵.md",
+      "sha256": "6e84fc77a9f3124d51fe4d088fda6c8dcb96989e43d280634b94b7fc1d778560",
+      "bytes": 5882,
+      "scope": "Original 10-02 + eight taskbooks fully read by read-only doc_input_audit; R06 consumption/precondition only used; RR1/RR2 Masters fully read by E03 and relevant clauses checked again. Byte identity checked here."
+    }
+  ],
+  "scope_preserved": [
+    "16A",
+    "100 original + 3 additional C",
+    "130 applicable leaves",
+    "I01–I11",
+    "N01–N16",
+    "RR1 §6.1/§6.2",
+    "four original platform groups",
+    "no R06 work"
+  ]
+}

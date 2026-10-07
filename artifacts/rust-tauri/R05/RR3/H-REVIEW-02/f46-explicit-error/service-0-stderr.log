@@ -1,0 +1,2 @@
+LINGXI_SERVICE_LOG_WRITE_FAILED error=Operation not permitted (os error 1) (continuing stderr-only; log dir /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/f46-explicit-error/home/lingxi-service/logs)
+2026-10-07T03:25:03.389400Z ERROR lingxi_service: rotating file log unavailable (explicit degradation: stderr-only) error=Operation not permitted (os error 1) log_dir=/Users/[user][token][user]/logs

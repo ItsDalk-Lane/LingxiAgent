@@ -1,0 +1,437 @@
+{
+  "mode": "links",
+  "checks": [
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> R05_REPORT.md#rr3-current",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/A-02/REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/C-01/REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/D-01/REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/D-01/PREPARED-ALLOW.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/E-01/REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/F46-01/resources-01/f27-resource-series.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/F46-01/resources-01/runtime-binding.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/result.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_REPORT.md -> R05_HANDOFF.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md -> R05_REPORT.md#rr3-current",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md -> R05_REPORT.md#rr3-current",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_BLOCKERS.md -> R05_REPORT.md#rr3-current",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_BLOCKERS.md -> R05_REPORT.md#rr3-current",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md -> R05_REPORT.md#rr3-current",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md -> ../../../artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md -> R05_HANDOFF.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md -> R05_HANDOFF.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新增链接 docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md -> R05_REPORT.md#rr3-current",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "JSON引用 rr3_current/packages/A/evidence_ref",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/packages/B/evidence_ref",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/packages/C_F46/evidence_ref",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/packages/D/evidence_ref",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/D-01/REPORT.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/packages/E/evidence_ref",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/E-01/REPORT.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/historical_layers/0/result_ref",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json"
+    },
+    {
+      "name": "JSON引用 rr3_current/historical_layers/1/result_ref",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/verify-stage-result.json"
+    },
+    {
+      "name": "JSON引用 rr3_current/historical_layers/1/changed_paths/0",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/r04_regression_gate/stdout.log"
+    },
+    {
+      "name": "JSON引用 rr3_current/historical_layers/2/result_ref",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json"
+    },
+    {
+      "name": "JSON引用 rr3_current/historical_layers/2/changed_paths/0",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/historical_audit",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/rr2_final",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/rr2_final_review",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/STAGE_REVIEW.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/a2",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/a1_review",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/b_review",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/c",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-01/REPORT.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/i10",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/ordinary_cancel",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/late_result",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/f46",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/resource_receipt",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/resource_raw",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/f27-resource-series.json"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/runtime_binding",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/runtime-binding.json"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/resource_negative",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/result.json"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/d",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/D-01/REPORT.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/d_prepared",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/D-01/PREPARED-ALLOW.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/rr2_b_review",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/rr2_d_review",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/rr2_i",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/rr2_negative",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/rr2_r02_summary",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/rr2_r02_stdout",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/rr2_r02_exclusions",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-binding-exclusions.txt"
+    },
+    {
+      "name": "JSON引用 rr3_current/evidence_refs/rr2_r02_sinks",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-run-output-sinks.txt"
+    },
+    {
+      "name": "JSON引用 rr3_current/historical_r02/parent_result",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json"
+    },
+    {
+      "name": "JSON引用 rr3_current/historical_r02/summary_ref",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt"
+    },
+    {
+      "name": "JSON引用 rr3_current/historical_r02/raw_stdout_ref",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log"
+    },
+    {
+      "name": "JSON引用 consumer_contract/gateway/source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-kernel/src/model_exchange.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/credentials/source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-adapters/src/models/credentials.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/context/source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-kernel/src/lib.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/model_turn/source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-kernel/src/model_exchange.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/model_turn/runtime_source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-service/src/runs.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/model_turn/port_source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-kernel/src/ports.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/exchange_and_messages/source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-kernel/src/model_exchange.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/exchange_and_messages/normalizer_source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-service/src/streaming_norm.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/auxiliary/source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-adapters/src/models/auxiliary.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/embedding/source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-service/src/operations.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/embedding/request_source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-adapters/src/models/operations/embedding.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/embedding/normal_sample_source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/usage_query/source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-kernel/src/usage.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/usage_query/storage_source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-adapters/src/storage/run_store.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/usage_query/port_source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-kernel/src/ports.rs"
+    },
+    {
+      "name": "JSON引用 consumer_contract/error_unknown_cancel_recovery_budget/ordinary_recovery_refs/0",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json"
+    },
+    {
+      "name": "JSON引用 consumer_contract/error_unknown_cancel_recovery_budget/ordinary_recovery_refs/1",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json"
+    },
+    {
+      "name": "JSON引用 consumer_contract/versions_source",
+      "pass": true,
+      "detail": "rust/crates/lingxi-adapters/src/storage/migrations.rs"
+    },
+    {
+      "name": "JSON引用 working_tree_digest_scope/manifest",
+      "pass": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/E-01/inputhash-before.json"
+    },
+    {
+      "name": "缺文件反控",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "错锚点反控",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "passed": 86,
+  "failed": 0
+}

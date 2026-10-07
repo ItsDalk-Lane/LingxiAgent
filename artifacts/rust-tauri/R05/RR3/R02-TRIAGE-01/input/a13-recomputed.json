@@ -1,0 +1,133 @@
+{
+  "requestId": "req-2385be7efcccbb90c96ac40b6432d50b",
+  "idBytes": 36,
+  "assignmentBytes": 47,
+  "markerLines": [
+    "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:51603",
+    "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:51604",
+    "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/ws status=401 reason=invalid_credential remote=127.0.0.1:51605",
+    "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/ws status=401 reason=invalid_credential remote=127.0.0.1:51611"
+  ],
+  "matchingMarkers": [],
+  "matchingRetainedLines": [],
+  "retention": [
+    {
+      "name": "service-000001.log",
+      "manifestSHA256": "81e78a797c147c6a6e64417d28f7013d72383c756c47cdd1f1d297897cc2522d",
+      "actualSHA256": "81e78a797c147c6a6e64417d28f7013d72383c756c47cdd1f1d297897cc2522d",
+      "bytes": 3150,
+      "manifestBytes": 3150,
+      "same": true
+    },
+    {
+      "name": "service-000002.log",
+      "manifestSHA256": "95955f5ad044360f086f1cb605c51014e6b6a71156a7302aabaedcf7bf86941f",
+      "actualSHA256": "95955f5ad044360f086f1cb605c51014e6b6a71156a7302aabaedcf7bf86941f",
+      "bytes": 3575,
+      "manifestBytes": 3575,
+      "same": true
+    },
+    {
+      "name": "service-000003.log",
+      "manifestSHA256": "5f99d96f071321ff98ac0c165f045ae7a61cde1bf5138d79083b2609649a39a1",
+      "actualSHA256": "5f99d96f071321ff98ac0c165f045ae7a61cde1bf5138d79083b2609649a39a1",
+      "bytes": 201,
+      "manifestBytes": 201,
+      "same": true
+    }
+  ],
+  "retainedCount": 3,
+  "inventoryExists": false,
+  "scanTargets": 41,
+  "recomputedSecrets": {
+    "api_key": {
+      "valueSHA256": "f7836153eff2234d9b031c4a89710de559072df99a763e999a7212b11b6d4a28",
+      "hits": []
+    },
+    "device_secret": {
+      "valueSHA256": "2d8532af21347f5420e978165405d96fde17289879cfb5408de6472b55e27beb",
+      "hits": []
+    },
+    "oauth_bearer": {
+      "valueSHA256": "d5990a6214ee95c63960ba2a725064abd3460c99da7b02674856ef63282c7d26",
+      "hits": []
+    },
+    "query_token": {
+      "valueSHA256": "95a3b431aec16edc904aebe5c3ee413bdc35a3ce384dbb72529daa53b0f16359",
+      "hits": []
+    },
+    "ws_ticket": {
+      "valueSHA256": "0f04c9c0a258802d8e188945b013b163f87e918ff3b3048e1e56c03f22dc529f",
+      "hits": []
+    }
+  },
+  "localTokenRescan": "NOT_EXECUTED: original synthetic home cleaned; original SCAN 246/41 retained",
+  "bodies": {
+    "p2-me-no-auth.body": {
+      "code": "unauthorized",
+      "details": {
+        "causeId": "auth.missing_credential",
+        "reason": "missing_credential",
+        "requestId": "req-43def9866817ac8abc0321811fe07f9a"
+      },
+      "message": "authentication required",
+      "retryable": false
+    },
+    "p2-me-bad-bearer.body": {
+      "code": "unauthorized",
+      "details": {
+        "causeId": "auth.invalid_credential",
+        "reason": "invalid_credential",
+        "requestId": "req-2385be7efcccbb90c96ac40b6432d50b"
+      },
+      "message": "authentication required",
+      "retryable": false
+    },
+    "p2-session-missing.body": {
+      "code": "not_found",
+      "details": {
+        "causeId": "resource.not_found",
+        "requestId": "req-02ae49cf153ebff62da13ee30b1685a9"
+      },
+      "message": "resource not found",
+      "retryable": false
+    },
+    "p2-ws-bad-query.body": {
+      "code": "unauthorized",
+      "details": {
+        "causeId": "auth.invalid_credential",
+        "reason": "invalid_credential",
+        "requestId": "req-89ddfbc3df19230cb774c933494c059c"
+      },
+      "message": "authentication required",
+      "retryable": false
+    },
+    "p2-session-cross.body": {
+      "code": "forbidden",
+      "details": {
+        "causeId": "authz.cross_principal_access",
+        "reason": "cross_principal_access",
+        "requestId": "req-ac7b49e1254b2b1e3882fe4163d128de"
+      },
+      "message": "not allowed for this principal",
+      "retryable": false
+    }
+  },
+  "inputBodies": {
+    "p1-ticket-request.json": {},
+    "p3-execute-request.json": {
+      "input": "synthetic execute during a held write lock"
+    },
+    "p1-issue-request.json": {
+      "userId": "user_remote_b",
+      "scopes": [
+        "chat"
+      ]
+    },
+    "p1-execute-request.json": {
+      "input": "synthetic diagnostic payload for the redaction scan; do not log: api_key = \"sk-test-a13-redact-0123456789abcdef\"; device credential hana_dev_A13oauth0123456789abcdefghij; oauth sk-test-a13-redact-0123456789abcdef"
+    }
+  },
+  "p3StatusCodes": "409\n409\n503\n409\n409\n409\n409\n409\n",
+  "wsTranscriptSHA256": "bc5c798c8846facd87a34da03c3888687355cd3b64ccd008907c9fea00a535ae"
+}

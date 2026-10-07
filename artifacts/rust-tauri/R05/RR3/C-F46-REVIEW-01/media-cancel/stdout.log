@@ -1,0 +1,12 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.71s
+     Running tests/r05_t06_rr1_media_resource.rs (rust/target/debug/deps/r05_t06_rr1_media_resource-a8eec76cae06e894)
+
+running 2 tests
+test rr1_f19_cancel_during_download_leaves_no_registered_product ... RR1-F19 cancel-during-download: late_result=Ok(CancelledLocally { remote_cancel: "unsupported" }); registered_products=0
+ok
+test rr1_f19_cancel_during_inflight_poll_fences_download_and_completion ... RR1-F19 cancellation race: late_result=Ok(CancelledLocally { remote_cancel: "unsupported" }); requests=["/v1/videos", "/agnesapi?video_id=cancel-track&model_name=agnes-video"]; registered_products=0
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 15 filtered out; finished in 0.52s
+

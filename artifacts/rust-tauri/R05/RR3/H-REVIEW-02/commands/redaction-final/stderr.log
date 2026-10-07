@@ -1,0 +1,13 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-0532c49ca08cc763)
+
+thread 'redaction::tests::f48_request_formatting_preserves_user_path_protection' (21542543) panicked at crates/lingxi-service/src/redaction.rs:720:9:
+assertion failed: red.contains(id)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'redaction::tests::f48_formal_random_request_id_keeps_diagnostic_correlation' (21542541) panicked at crates/lingxi-service/src/redaction.rs:681:13:
+真实请求编号必须可关联：LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/ws status=401
+
+thread 'redaction::tests::f48_lookalike_ids_in_secrets_urls_workers_stay_redacted' (21542542) panicked at crates/lingxi-service/src/redaction.rs:709:9:
+编号不能注入另一条日志
+error: test failed, to rerun pass `-p lingxi-service --lib`

@@ -1,0 +1,48 @@
+{
+  "utc": "2026-10-07T04:52:17.445769+00:00",
+  "stopped": true,
+  "scope": "本目录小型输出；无仓库/Git/系统写入，无构建/清理/历史driver/子代理",
+  "available_bytes": 239308800,
+  "git_count_exit": 0,
+  "git_count_stdout": "count: 2049\nsize: 40360\nin-pack: 118494\npacks: 19\nsize-pack: 3608385\nprune-packable: 0\ngarbage: 1\nsize-garbage: 88\n",
+  "git_count_stderr": "warning: garbage found: .git/objects/a0/tmp_obj_fJd8y2\n",
+  "files": [
+    {
+      "name": "BRIEF.md",
+      "bytes": 2133,
+      "sha256": "14abc0583469edf8c398b85f0df59e276d403a868e6e9c36088190e9c529d948"
+    },
+    {
+      "name": "estimate.py",
+      "bytes": 12102,
+      "sha256": "411e265aa5213617c0cb4d5a438a2348c9187d55669fa9f4f45cf5250168314e"
+    },
+    {
+      "name": "estimate-summary.json",
+      "bytes": 43533,
+      "sha256": "72eb4fdc7a852ab45f0bf9c5548b9be4c8659e7ec3a979c5b9518a26351fa3fc"
+    },
+    {
+      "name": "normalization.py",
+      "bytes": 2694,
+      "sha256": "966216ade16324838336c7e720ea3909bc554651976be47390f125694762c846"
+    },
+    {
+      "name": "normalization-boundary.json",
+      "bytes": 130634,
+      "sha256": "3972b3ce42292f072dff6733f99d101389724211e36950de8fefa1f0f54b8d43"
+    },
+    {
+      "name": "REPORT.md",
+      "bytes": 11085,
+      "sha256": "62541c23529001c3091eb3ce9b657255fd9e63dfec75551cd1ed9321b964a796"
+    },
+    {
+      "name": "query-receipt.json",
+      "bytes": 3117,
+      "sha256": "bc5559ff81e7d2cac3fd8d2c97a0c31afd190ab0b0bd695b358a93123f8639e7"
+    }
+  ],
+  "validation": "两份JSON可解析；normalization脚本逐项核Git filtered SHA1；estimate两次核心对象统计相同；index前后相同。未执行产品测试。",
+  "final_note": "补齐最后只读命令回执后停止写入；最终free更新，主体REPORT使用明示估算结束截点。"
+}

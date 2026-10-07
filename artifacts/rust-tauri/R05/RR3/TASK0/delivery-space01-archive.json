@@ -1,0 +1,55 @@
+{
+  "utc": "2026-10-07T04:59:45.578262+00:00",
+  "status": "SAME_BYTES",
+  "files": [
+    {
+      "source": "/private/tmp/rr3-delivery-space-20261007/BRIEF.md",
+      "destination": "artifacts/rust-tauri/R05/RR3/DELIVERY-SPACE-01/BRIEF.md",
+      "bytes": 2133,
+      "sha256": "14abc0583469edf8c398b85f0df59e276d403a868e6e9c36088190e9c529d948"
+    },
+    {
+      "source": "/private/tmp/rr3-delivery-space-20261007/REPORT.md",
+      "destination": "artifacts/rust-tauri/R05/RR3/DELIVERY-SPACE-01/REPORT.md",
+      "bytes": 11085,
+      "sha256": "62541c23529001c3091eb3ce9b657255fd9e63dfec75551cd1ed9321b964a796"
+    },
+    {
+      "source": "/private/tmp/rr3-delivery-space-20261007/STOPPED.json",
+      "destination": "artifacts/rust-tauri/R05/RR3/DELIVERY-SPACE-01/STOPPED.json",
+      "bytes": 1844,
+      "sha256": "2ed33f8dca86f544a1001ab4ddb6b65855e7309a6d20cfcf08cb5c625d471125"
+    },
+    {
+      "source": "/private/tmp/rr3-delivery-space-20261007/estimate-summary.json",
+      "destination": "artifacts/rust-tauri/R05/RR3/DELIVERY-SPACE-01/estimate-summary.json",
+      "bytes": 43533,
+      "sha256": "72eb4fdc7a852ab45f0bf9c5548b9be4c8659e7ec3a979c5b9518a26351fa3fc"
+    },
+    {
+      "source": "/private/tmp/rr3-delivery-space-20261007/estimate.py",
+      "destination": "artifacts/rust-tauri/R05/RR3/DELIVERY-SPACE-01/estimate.py",
+      "bytes": 12102,
+      "sha256": "411e265aa5213617c0cb4d5a438a2348c9187d55669fa9f4f45cf5250168314e"
+    },
+    {
+      "source": "/private/tmp/rr3-delivery-space-20261007/normalization-boundary.json",
+      "destination": "artifacts/rust-tauri/R05/RR3/DELIVERY-SPACE-01/normalization-boundary.json",
+      "bytes": 130634,
+      "sha256": "3972b3ce42292f072dff6733f99d101389724211e36950de8fefa1f0f54b8d43"
+    },
+    {
+      "source": "/private/tmp/rr3-delivery-space-20261007/normalization.py",
+      "destination": "artifacts/rust-tauri/R05/RR3/DELIVERY-SPACE-01/normalization.py",
+      "bytes": 2694,
+      "sha256": "966216ade16324838336c7e720ea3909bc554651976be47390f125694762c846"
+    },
+    {
+      "source": "/private/tmp/rr3-delivery-space-20261007/query-receipt.json",
+      "destination": "artifacts/rust-tauri/R05/RR3/DELIVERY-SPACE-01/query-receipt.json",
+      "bytes": 3117,
+      "sha256": "bc5559ff81e7d2cac3fd8d2c97a0c31afd190ab0b0bd695b358a93123f8639e7"
+    }
+  ],
+  "boundary": "Read-only capacity preparation, not Git write approval or product PASS."
+}

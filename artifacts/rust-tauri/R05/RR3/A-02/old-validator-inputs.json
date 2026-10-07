@@ -1,0 +1,18 @@
+[
+  {
+    "path": ".gitignore",
+    "sha256": "8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd"
+  },
+  {
+    "path": "scripts/rust-tauri/run_output_sinks.py",
+    "sha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061"
+  },
+  {
+    "path": "scripts/rust-tauri/r02_run_output_regression.py",
+    "sha256": "fcee14b8c529d502d9885a4b7a31e8c5f90ade22ab92e149402d52585272fd99"
+  },
+  {
+    "path": "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+    "sha256": "3aca4ae169fa06afc29e6aa89acef79ecd1ce2a6422cf479d7913643d190bf84"
+  }
+]

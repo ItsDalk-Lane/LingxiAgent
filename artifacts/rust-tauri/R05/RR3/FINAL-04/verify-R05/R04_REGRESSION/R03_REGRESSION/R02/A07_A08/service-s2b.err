@@ -1,0 +1,13 @@
+2026-10-07T22:27:49.766796Z  INFO lingxi_service: data root resolved [token] source=cli ignored_sources=none
+2026-10-07T22:27:49.766985Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) [token] [token]
+2026-10-07T22:27:49.776307Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=7a3a6639ef1719a8 pid=47574 entropy="os-random-device" lock=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-bin-610kxJ/lingxi-service/instance.lock network_mode=loopback
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-bin-610kxJ previousInstanceId=6b5201caa778c848a626d00aa60e624f previousPid=47539 previousStartNonce=74d96d8cbd0db615 previousStartedAtUnixMs=1791412069603 handshakeMismatches=none
+2026-10-07T22:27:49.776481Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-bin-610kxJ/lingxi-service/instance.stale.json
+2026-10-07T22:27:49.776775Z  INFO lingxi_service: data-epoch gate passed [token] decision=ProceedSteady(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-10-07T22:27:49.787791Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-bin-610kxJ/lingxi-service/local-token.json run_database=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-bin-610kxJ/lingxi-service/data/runs.db
+2026-10-07T22:27:49.796252Z  INFO lingxi_service: instance record published (atomic write) record=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-bin-610kxJ/lingxi-service/instance.json bind_addr=127.0.0.1:61255
+2026-10-07T22:27:49.868946Z  INFO lingxi_service: request handled request_id="req-bc18e0393cb5046e99f036a6b749e492" method=GET [token] status=200
+2026-10-07T22:27:49.888279Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-10-07T22:27:49.888938Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-10-07T22:27:49.889149Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-10-07T22:27:49.889211Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

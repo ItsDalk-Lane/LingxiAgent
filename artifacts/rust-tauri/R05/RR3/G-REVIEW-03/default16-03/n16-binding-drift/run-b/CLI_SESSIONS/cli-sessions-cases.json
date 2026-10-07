@@ -1,0 +1,87 @@
+{
+  "schema": "lingxi.leaf-case-results.v1",
+  "leafId": "R00-T02-LA-200D4E5D52C9",
+  "route": "GET /lingxi/v1/sessions",
+  "cases": [
+    {
+      "case": "a05-sessions-list-owner",
+      "expect": 200,
+      "actual": 200,
+      "ok": true
+    },
+    {
+      "case": "a05-sessions-list-owner-contains-own-session",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "a05-sessions-list-foreign-principal",
+      "expect": 200,
+      "actual": 200,
+      "ok": true
+    },
+    {
+      "case": "a05-sessions-list-foreign-excludes-owner-sessions",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "case": "a05-sessions-list-empty-shape",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "a05-sessions-list-no-credential",
+      "expect": 401,
+      "actual": 401,
+      "ok": true
+    },
+    {
+      "case": "a05-cli-sessions-owner-list",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 0,
+        "lineCount": 2,
+        "numberedCount": 2
+      }
+    },
+    {
+      "case": "a05-cli-sessions-foreign-empty",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 0,
+        "emptyMessage": true
+      }
+    },
+    {
+      "case": "a05-cli-sessions-unauthorized-error",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 1,
+        "http401": true,
+        "stdoutEmpty": true
+      }
+    },
+    {
+      "case": "a05-cli-sessions-limit-20",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exitCode": 0,
+        "renderedLines": 20,
+        "errors": 0,
+        "suppliedSessions": 25
+      }
+    }
+  ]
+}

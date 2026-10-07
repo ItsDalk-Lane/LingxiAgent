@@ -1,0 +1,2182 @@
+{
+ "schemaVersion": 1,
+ "artifactKind": "R05_TEST_MAP",
+ "stage_id": "R05",
+ "generated_by": "EXECUTOR-R05-T08",
+ "generated_at": "2026-10-06",
+ "structure": "原 A-ID → 细化 C-ID → 具体运行测试。ownedBy 的键是生产者 pin 表的 run 键（svc:/adp: 套件或 lib-<pkg>/<test>），值是该 C-ID 拥有的测试（每个测试恰归一个 C-ID——唯一归属由生产者与 xtask 镜像单测机器核验）；scenario-level 条目按阶段图场景绑定。A-ID 到 C-ID 的汇聚视图见 aIndex。",
+ "aIndex": {
+  "R05-A15": [
+   "R05-T01-C02",
+   "R05-T01-C03",
+   "R05-T08-C01",
+   "R05-T08-C02",
+   "R05-T08-C05",
+   "R05-T08-C08",
+   "R05-T08-C09",
+   "R05-T08-C11",
+   "R05-T08-C12"
+  ],
+  "R05-A05": [
+   "R05-T01-C02",
+   "R05-T03-C01",
+   "R05-T03-C02",
+   "R05-T03-C03",
+   "R05-T03-C04",
+   "R05-T03-C05",
+   "R05-T03-C12"
+  ],
+  "R05-A01": [
+   "R05-T01-C04",
+   "R05-T02-C01",
+   "R05-T03-C01"
+  ],
+  "R05-A02": [
+   "R05-T01-C06",
+   "R05-T06-C01"
+  ],
+  "R05-A03": [
+   "R05-T02-C02",
+   "R05-T02-C03",
+   "R05-T02-C04"
+  ],
+  "R05-A04": [
+   "R05-T02-C05"
+  ],
+  "R05-A07": [
+   "R05-T04-C01",
+   "R05-T04-C02",
+   "R05-T04-C03"
+  ],
+  "R05-A08": [
+   "R05-T04-C05",
+   "R05-T04-C06",
+   "R05-T04-C09",
+   "R05-T04-C11",
+   "R05-T04-C15",
+   "R05-T05-C06"
+  ],
+  "R05-A09": [
+   "R05-T04-C16",
+   "R05-T05-C08"
+  ],
+  "R05-A10": [
+   "R05-T05-C05",
+   "R05-T05-C07"
+  ],
+  "R05-A11": [
+   "R05-T06-C02",
+   "R05-T08-C10"
+  ],
+  "R05-A12": [
+   "R05-T06-C04",
+   "R05-T06-C05",
+   "R05-T06-C06",
+   "R05-T06-C07",
+   "R05-T06-C08",
+   "R05-T06-C09",
+   "R05-T06-C10",
+   "R05-T06-C11",
+   "R05-T06-C12"
+  ],
+  "R05-A13": [
+   "R05-T07-C01",
+   "R05-T07-C02",
+   "R05-T07-C09"
+  ],
+  "R05-A14": [
+   "R05-T07-C03",
+   "R05-T07-C04",
+   "R05-T07-C05",
+   "R05-T07-C06",
+   "R05-T07-C07",
+   "R05-T07-C08",
+   "R05-T07-C10"
+  ],
+  "R05-A16": [
+   "R05-T03-C07",
+   "R05-T03-C08",
+   "R05-T05-C09",
+   "R05-T08-C03",
+   "R05-T08-C04",
+   "R05-T08-C06",
+   "R05-T08-C07"
+  ],
+  "R05-A06": [
+   "R05-T03-C06",
+   "R05-T03-C09",
+   "R05-T03-C10",
+   "R05-T03-C11",
+   "R05-T04-C14"
+  ]
+ },
+ "entries": [
+  {
+   "caseId": "R05-T01-C01",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {},
+   "citedAlsoBy": null,
+   "binding": "command:rust_test_workspace（生产者=xtask 镜像 r05_scope_matrix_covers_every_r05_bound_leaf_honestly：130 叶集合互核+六独占叶 full+单阶段不 defer；RR1 F25 起为具名生产者）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
+   "gateCommands": [
+    "rust_test_workspace"
+   ]
+  },
+  {
+   "caseId": "R05-T01-C02",
+   "formalScenarioIds": [
+    "R05-A15",
+    "R05-A05"
+   ],
+   "scope": "OFFLINE_BINARY",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t01_binary_wiring": [
+     "c02_real_binary_full_chain_through_authenticated_endpoint"
+    ],
+    "svc:r05_t01_model_plane": [
+     "c02_full_chain_real_wiring_real_tool_real_result"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T01-C03",
+   "formalScenarioIds": [
+    "R05-A15"
+   ],
+   "scope": "OFFLINE_BINARY",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t01_binary_wiring": [
+     "c03_real_binary_without_plane_settles_unconfigured"
+    ],
+    "svc:r05_t01_model_plane": [
+     "c03_no_model_plane_is_the_explicit_unconfigured_outcome"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T01-C04",
+   "formalScenarioIds": [
+    "R05-A01"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-adapters/models::gateway::tests::the_pin_pair_rule_never_guesses_a_provider_from_a_model": [
+     "models::gateway::tests::the_pin_pair_rule_never_guesses_a_provider_from_a_model"
+    ],
+    "svc:r05_t01_model_plane": [
+     "c04_same_model_id_different_providers_never_cross_wire"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T01-C05",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-adapters/models::gateway::tests::reload_swaps_atomically_and_bumps_the_generation": [
+     "models::gateway::tests::reload_swaps_atomically_and_bumps_the_generation"
+    ],
+    "svc:r05_t01_model_plane": [
+     "c05_in_flight_call_keeps_its_snapshot_and_cancel_is_unaffected",
+     "c05_reload_through_management_surface_swaps_atomically",
+     "c05_reload_without_a_configured_plane_is_a_loud_404"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T01-C06",
+   "formalScenarioIds": [
+    "R05-A02"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-adapters/models::gateway::tests::a_family_outside_the_operations_matrix_is_loud": [
+     "models::gateway::tests::a_family_outside_the_operations_matrix_is_loud"
+    ],
+    "lib-adapters/models::gateway::tests::unconfigured_operations_are_loud_route_gaps": [
+     "models::gateway::tests::unconfigured_operations_are_loud_route_gaps"
+    ],
+    "svc:r05_t01_model_plane": [
+     "c06_unsupported_family_makes_zero_requests"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T01-C07",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-adapters/models::gateway::tests::chat_and_auxiliary_routes_resolve_independently": [
+     "models::gateway::tests::chat_and_auxiliary_routes_resolve_independently"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T01-C08",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-kernel/model_exchange::tests::empty_snapshot_is_generation_zero": [
+     "model_exchange::tests::empty_snapshot_is_generation_zero"
+    ],
+    "lib-kernel/model_exchange::tests::snapshot_declares_only_callable_resident_targets_at_the_pinned_generation": [
+     "model_exchange::tests::snapshot_declares_only_callable_resident_targets_at_the_pinned_generation"
+    ],
+    "lib-kernel/model_exchange::tests::wire_name_collisions_resolve_deterministically_or_fail_loudly": [
+     "model_exchange::tests::wire_name_collisions_resolve_deterministically_or_fail_loudly"
+    ],
+    "lib-kernel/model_exchange::tests::wire_name_sanitization_fits_the_strictest_protocol_face": [
+     "model_exchange::tests::wire_name_sanitization_fits_the_strictest_protocol_face"
+    ],
+    "lib-kernel/toolcatalog::tests::aliases_resolve_to_the_authoritative_identity_and_share_permissions": [
+     "toolcatalog::tests::aliases_resolve_to_the_authoritative_identity_and_share_permissions"
+    ],
+    "lib-kernel/toolcatalog::tests::same_name_two_sources_never_overwrites_and_name_only_is_ambiguous": [
+     "toolcatalog::tests::same_name_two_sources_never_overwrites_and_name_only_is_ambiguous"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "svc:r05_t01_model_plane"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T01-C09",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-adapters/models::openai_completions::tests::a_history_target_missing_from_the_snapshot_fails_loudly": [
+     "models::openai_completions::tests::a_history_target_missing_from_the_snapshot_fails_loudly"
+    ],
+    "lib-kernel/toolcatalog::tests::disable_and_uninstall_change_callability_and_generation": [
+     "toolcatalog::tests::disable_and_uninstall_change_callability_and_generation"
+    ],
+    "lib-kernel/toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh": [
+     "toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh"
+    ],
+    "lib-kernel/toolcatalog::tests::update_cannot_change_the_target_identity": [
+     "toolcatalog::tests::update_cannot_change_the_target_identity"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T01-C10",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-adapters/models::openai_completions::tests::final_answer_identity_comes_from_the_driver_not_the_response": [
+     "models::openai_completions::tests::final_answer_identity_comes_from_the_driver_not_the_response"
+    ],
+    "lib-adapters/models::openai_completions::tests::parses_tool_calls_with_usage_and_identity_from_the_driver": [
+     "models::openai_completions::tests::parses_tool_calls_with_usage_and_identity_from_the_driver"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "svc:r05_t01_model_plane"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T01-C11",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-adapters/models::config::tests::credential_is_explicit_and_never_defaulted": [
+     "models::config::tests::credential_is_explicit_and_never_defaulted"
+    ],
+    "lib-service/redaction::tests::r05_provider_api_key_shapes_are_redacted": [
+     "redaction::tests::r05_provider_api_key_shapes_are_redacted"
+    ],
+    "lib-service/redaction::tests::r05_secret_key_words_match_case_insensitively": [
+     "redaction::tests::r05_secret_key_words_match_case_insensitively"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "svc:r05_t01_model_plane"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T01-C12",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {},
+   "citedAlsoBy": null,
+   "binding": "command:check_boundaries（依赖方向门禁本体；RR1 F26 登记册 command 绑定）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
+   "gateCommands": [
+    "check_boundaries"
+   ]
+  },
+  {
+   "caseId": "R05-T02-C01",
+   "formalScenarioIds": [
+    "R05-A01"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t02_credentials": [
+     "c01_all_purposes_resolve_through_the_single_credential_service"
+    ],
+    "svc:r05_t03_protocol_adapters": [
+     "c07_auth_header_goes_verbatim_and_none_sends_nothing"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T02-C02",
+   "formalScenarioIds": [
+    "R05-A03"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-service/credentials::tests::a_rotated_credential_is_reused_without_a_second_refresh": [
+     "credentials::tests::a_rotated_credential_is_reused_without_a_second_refresh"
+    ],
+    "lib-service/credentials::tests::concurrent_401s_merge_into_one_refresh": [
+     "credentials::tests::concurrent_401s_merge_into_one_refresh"
+    ],
+    "svc:r05_t02_credentials": [
+     "c02_concurrent_401s_merge_into_one_refresh_full_chain"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T02-C03",
+   "formalScenarioIds": [
+    "R05-A03"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t02_credentials": [
+     "c03_a_blocked_refresh_never_blocks_other_providers"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T02-C04",
+   "formalScenarioIds": [
+    "R05-A03"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-service/credentials::tests::a_cancelled_waiter_does_not_disturb_the_flight": [
+     "credentials::tests::a_cancelled_waiter_does_not_disturb_the_flight"
+    ],
+    "svc:r05_t02_credentials": [
+     "c04_a_cancelled_waiter_leaves_the_shared_refresh_intact"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T02-C05",
+   "formalScenarioIds": [
+    "R05-A04"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-service/credentials::tests::a_reload_replacing_the_cell_discards_the_late_writeback": [
+     "credentials::tests::a_reload_replacing_the_cell_discards_the_late_writeback"
+    ],
+    "lib-service/credentials::tests::revoke_fences_a_late_writeback": [
+     "credentials::tests::revoke_fences_a_late_writeback"
+    ],
+    "svc:r05_t02_credentials": [
+     "c05_a_revoked_credential_never_resurrects_full_chain"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T02-C06",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-service/credentials::store::tests::a_failed_write_keeps_the_previous_state_and_reports": [
+     "credentials::store::tests::a_failed_write_keeps_the_previous_state_and_reports"
+    ],
+    "svc:r05_t02_credentials": [
+     "c06_a_persist_failure_is_reported_honestly_full_chain"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T02-C07",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t02_oauth_flows": [
+     "sub_second_expires_in_mints_an_immediately_expired_token"
+    ],
+    "lib-service/credentials::tests::resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit": [
+     "credentials::tests::resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit"
+    ],
+    "lib-service/credentials::tests::resolve_refreshes_at_most_once_when_every_mint_is_already_expired": [
+     "credentials::tests::resolve_refreshes_at_most_once_when_every_mint_is_already_expired"
+    ],
+    "svc:r05_t02_credentials": [
+     "c07_a_second_401_after_refresh_never_retriggers_a_refresh",
+     "c07_a_static_key_401_is_terminal_without_any_refresh",
+     "c07_a_transient_refresh_failure_is_bounded_by_the_attempt_policy",
+     "c07_invalid_grant_is_terminal_reauthorization_never_a_retry",
+     "c07_oauth_without_a_login_fails_before_any_request"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T02-C08",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t02_oauth_flows": [
+     "device_code_cancellation_wins_at_the_wait",
+     "device_code_deadline_expires_the_flow",
+     "device_code_denial_and_expired_token_are_terminal_and_distinct",
+     "device_code_endpoint_echoes_are_scrubbed_of_in_play_material",
+     "device_code_happy_path_prompts_once_and_mints_tokens",
+     "device_code_slow_down_grows_the_interval_by_five_seconds",
+     "device_code_untrusted_verification_uri_is_a_loud_protocol_failure",
+     "missing_expires_in_falls_back_to_jwt_exp_and_refuses_when_absent",
+     "pkce_cancellation_while_waiting_is_clean",
+     "pkce_duplicate_callback_is_refused_by_the_closed_listener",
+     "pkce_each_begin_mints_fresh_state_and_verifier",
+     "pkce_error_callback_and_codeless_callback_are_terminal_and_loud",
+     "pkce_expired_state_is_rejected_at_the_loop_top_and_after_accept",
+     "pkce_happy_path_binds_state_and_verifier_to_the_exchange",
+     "pkce_wrong_state_is_a_400_and_the_flow_survives_for_the_valid_one",
+     "refresh_classification_invalid_grant_401_transient_and_scrub",
+     "refresh_happy_path_and_refresh_token_rollover_rule",
+     "refresh_timeout_is_transient_never_terminal",
+     "token_endpoint_redirect_is_never_followed"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T02-C09",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-service/redaction::tests::r05_t02_base64_tokens_with_slash_and_padding_are_redacted": [
+     "redaction::tests::r05_t02_base64_tokens_with_slash_and_padding_are_redacted"
+    ],
+    "svc:r05_t02_credentials": [
+     "c09_marker_secret_never_reaches_durable_state_and_echoes_are_scrubbed"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T02-C10",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t02_oauth_flows": [
+     "the_credential_bearing_client_never_consults_the_ambient_proxy"
+    ],
+    "svc:r05_t02_credentials": [
+     "c10_a_redirect_is_never_followed_with_credentials"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "adp:r05_t02_oauth_flows"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T02-C11",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-service/credentials::store::tests::a_version_conflict_is_loud": [
+     "credentials::store::tests::a_version_conflict_is_loud"
+    ],
+    "lib-service/credentials::store::tests::missing_file_loads_empty_and_round_trips": [
+     "credentials::store::tests::missing_file_loads_empty_and_round_trips"
+    ],
+    "lib-service/credentials::store::tests::unknown_fields_survive_a_write": [
+     "credentials::store::tests::unknown_fields_survive_a_write"
+    ],
+    "svc:r05_t02_credentials": [
+     "c11_store_concurrency_fidelity_and_restart_semantics"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T02-C12",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-service/credentials::tests::an_expired_handle_is_refused": [
+     "credentials::tests::an_expired_handle_is_refused"
+    ],
+    "lib-service/credentials::tests::forged_handles_and_provider_references_are_refused": [
+     "credentials::tests::forged_handles_and_provider_references_are_refused"
+    ],
+    "lib-service/credentials::tests::handle_refusal_texts_carry_no_material": [
+     "credentials::tests::handle_refusal_texts_carry_no_material"
+    ],
+    "svc:r05_t02_credentials": [
+     "c12_management_surface_is_local_only_and_forgery_is_refused",
+     "o1_same_model_id_on_two_keyed_providers_never_crosses_material"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T03-C01",
+   "formalScenarioIds": [
+    "R05-A01",
+    "R05-A05"
+   ],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t03_goldens": [
+     "error_goldens_classify_and_transport_exactly",
+     "forward_and_roundtrip_goldens_render_and_parse_exactly",
+     "the_golden_set_covers_five_families_times_three_cases"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T03-C02",
+   "formalScenarioIds": [
+    "R05-A05"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t03_protocol_adapters": [
+     "c01_c04_same_model_id_two_families_never_cross_wire_or_credentials",
+     "c02_anthropic_tool_roundtrip_with_the_real_file_tool",
+     "codex_family_runs_end_to_end_over_sse"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "adp:r05_t03_goldens"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T03-C03",
+   "formalScenarioIds": [
+    "R05-A05"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t03_protocol_adapters": [
+     "c03_google_parallel_calls_pair_function_responses_by_exchange_mapping"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "adp:r05_t03_goldens"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T03-C04",
+   "formalScenarioIds": [
+    "R05-A05"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t03_protocol_adapters": [
+     "c04_same_provider_call_id_in_two_sessions_stays_isolated"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T03-C05",
+   "formalScenarioIds": [
+    "R05-A05"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t03_protocol_adapters": [
+     "c05_runtime_nonce_rides_the_next_request_and_follows_changes"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "svc:r05_t03_protocol_adapters"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T03-C06",
+   "formalScenarioIds": [
+    "R05-A06"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t03_protocol_adapters": [
+     "c06_openai_completions_mixed_content_parts_survive_in_order"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "adp:r05_t03_goldens"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T03-C07",
+   "formalScenarioIds": [
+    "R05-A16"
+   ],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-adapters/models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest": [
+     "models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest"
+    ],
+    "lib-adapters/models::tool_render::tests::success_renders_resources_status_and_truncation_last": [
+     "models::tool_render::tests::success_renders_resources_status_and_truncation_last"
+    ],
+    "lib-adapters/models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary": [
+     "models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "adp:r05_t03_goldens"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T03-C08",
+   "formalScenarioIds": [
+    "R05-A16"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t03_protocol_adapters": [
+     "c08_a_policy_refusal_rides_the_next_request_as_a_structured_failure"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "adp:r05_t03_goldens"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T03-C09",
+   "formalScenarioIds": [
+    "R05-A06"
+   ],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-adapters/models::openai_completions::tests::unknown_wire_names_are_protocol_violations_never_guesses": [
+     "models::openai_completions::tests::unknown_wire_names_are_protocol_violations_never_guesses"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "adp:r05_t03_goldens",
+    "lib-adapters/models::openai_completions::tests::a_history_target_missing_from_the_snapshot_fails_loudly"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T03-C10",
+   "formalScenarioIds": [
+    "R05-A06"
+   ],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-adapters/models::anthropic_messages::tests::cross_family_opaque_state_is_never_echoed": [
+     "models::anthropic_messages::tests::cross_family_opaque_state_is_never_echoed"
+    ],
+    "lib-adapters/models::anthropic_messages::tests::thinking_and_signature_roundtrip_as_state_never_text": [
+     "models::anthropic_messages::tests::thinking_and_signature_roundtrip_as_state_never_text"
+    ],
+    "lib-adapters/models::google_generative_ai::tests::thoughts_signatures_and_function_calls_parse_in_order": [
+     "models::google_generative_ai::tests::thoughts_signatures_and_function_calls_parse_in_order"
+    ],
+    "lib-adapters/models::openai_responses::tests::reasoning_items_roundtrip_verbatim_with_summary_as_reasoning": [
+     "models::openai_responses::tests::reasoning_items_roundtrip_verbatim_with_summary_as_reasoning"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "adp:r05_t03_goldens"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T03-C11",
+   "formalScenarioIds": [
+    "R05-A06"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-adapters/models::openai_codex_responses::tests::codex_body_pins_store_stream_and_instructions": [
+     "models::openai_codex_responses::tests::codex_body_pins_store_stream_and_instructions"
+    ],
+    "lib-adapters/models::openai_responses::tests::request_shape_instructions_tools_and_no_server_state": [
+     "models::openai_responses::tests::request_shape_instructions_tools_and_no_server_state"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "adp:r05_t03_goldens",
+    "svc:r05_t03_protocol_adapters"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T03-C12",
+   "formalScenarioIds": [
+    "R05-A05"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t03_protocol_adapters": [
+     "c12_retry_continues_the_confirmed_exchange_without_rebuild_or_redo"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T04-C01",
+   "formalScenarioIds": [
+    "R05-A07"
+   ],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t04_streaming": [
+     "c01_anthropic_full_response_is_fragmentation_invariant",
+     "c01_openai_full_response_is_fragmentation_invariant",
+     "c01_split_bom_and_crlf_are_fragmentation_invariant"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T04-C02",
+   "formalScenarioIds": [
+    "R05-A07"
+   ],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t04_streaming": [
+     "c02_invalid_utf8_is_deterministic_at_every_fragmentation"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T04-C03",
+   "formalScenarioIds": [
+    "R05-A07"
+   ],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-adapters/models::streaming::tests::a_leading_bom_is_stripped_once": [
+     "models::streaming::tests::a_leading_bom_is_stripped_once"
+    ],
+    "lib-adapters/models::streaming::tests::comments_and_id_and_retry_fields_are_ignored": [
+     "models::streaming::tests::comments_and_id_and_retry_fields_are_ignored"
+    ],
+    "lib-adapters/models::streaming::tests::multi_line_data_joins_and_chunks_may_split_anywhere": [
+     "models::streaming::tests::multi_line_data_joins_and_chunks_may_split_anywhere"
+    ],
+    "lib-adapters/models::streaming::tests::simple_frames_dispatch_on_blank_lines": [
+     "models::streaming::tests::simple_frames_dispatch_on_blank_lines"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "adp:r05_t04_streaming"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T04-C04",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t04_streaming": [
+     "c04_bounds_are_loud_at_the_preregistered_limits"
+    ],
+    "lib-adapters/models::streaming::tests::the_buffer_bound_is_loud": [
+     "models::streaming::tests::the_buffer_bound_is_loud"
+    ],
+    "lib-adapters/models::streaming::tests::the_per_frame_bound_is_loud_across_lines_and_chunks": [
+     "models::streaming::tests::the_per_frame_bound_is_loud_across_lines_and_chunks"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T04-C05",
+   "formalScenarioIds": [
+    "R05-A08"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t04_streaming": [
+     "c05_anthropic_half_json_arguments_close_loud_with_zero_dispatch",
+     "c05_openai_half_json_arguments_close_loud_with_zero_dispatch"
+    ],
+    "svc:r05_t04_streaming": [
+     "c05_half_json_arguments_dispatch_zero_tools"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T04-C06",
+   "formalScenarioIds": [
+    "R05-A08"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t04_streaming": [
+     "c06_parseable_arguments_admit_nothing_before_the_protocol_terminal"
+    ],
+    "svc:r05_t04_streaming": [
+     "c06_parseable_arguments_do_not_dispatch_before_the_terminal"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T04-C07",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t04_streaming": [
+     "c07_duplicate_keys_and_overprecision_numbers_follow_one_canonical_rule",
+     "c07_wrong_shaped_arguments_refuse_loudly"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T04-C08",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t04_streaming": [
+     "c08_anthropic_interleaved_tool_blocks_accumulate_independently"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "adp:r05_t04_streaming"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T04-C09",
+   "formalScenarioIds": [
+    "R05-A08"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t04_streaming": [
+     "c09_anthropic_max_tokens_stop_with_one_complete_tool_dispatches_nothing",
+     "c09_openai_length_stop_with_one_complete_tool_dispatches_nothing"
+    ],
+    "svc:r05_t04_streaming": [
+     "c09_length_truncated_batch_executes_nothing_and_the_retry_is_clean"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T04-C10",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t04_streaming": [
+     "c10_anthropic_duplicates_conflicts_and_event_field_agreement",
+     "c10_openai_duplicates_conflicts_and_adjacent_identical_text"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T04-C11",
+   "formalScenarioIds": [
+    "R05-A08"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t04_streaming": [
+     "c11_stop_reason_table_is_complete_across_the_fragmenting_families"
+    ],
+    "svc:r05_t04_streaming": [
+     "c11_a_content_refusal_fails_in_place_without_retry"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "svc:r05_t04_streaming"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T04-C12",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t04_streaming": [
+     "c12_first_delta_reaches_the_subscriber_before_the_external_stream_ends"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T04-C13",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t04_streaming": [
+     "c13_live_normalization_and_history_projection_share_the_scanner"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T04-C14",
+   "formalScenarioIds": [
+    "R05-A06"
+   ],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t04_streaming": [
+     "c14_opaque_blocks_roundtrip_and_signatures_never_leak_into_deltas"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T04-C15",
+   "formalScenarioIds": [
+    "R05-A08"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t04_streaming": [
+     "c15_decoder_level_stream_failures_are_loud"
+    ],
+    "svc:r05_t04_streaming": [
+     "c15_a08_http200_stream_failures_keep_the_run_honest",
+     "c15_anthropic_in_stream_error_event_retries_cleanly"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T04-C16",
+   "formalScenarioIds": [
+    "R05-A09"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t04_streaming": [
+     "c16_a09_midstream_cancel_releases_the_connection_and_settles_once"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T05-C01",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t05_timeouts": [
+     "connect_refusal_is_retryable_upstream",
+     "connect_refusal_is_the_expected_underlying_kind",
+     "deadline_hit_inside_first_byte_wait_is_non_retryable_budget",
+     "deadline_hit_mid_stream_abandons_the_read_without_rewind",
+     "first_byte_window_hit_is_terminal_no_blind_resend",
+     "pre_send_budget_exhaustion_sends_nothing_and_is_not_retryable"
+    ],
+    "svc:r05_t05_timeouts": [
+     "a_retry_that_cannot_fit_the_call_budget_is_vetoed_not_slept_into",
+     "an_idle_stream_is_cut_at_the_injected_bound_and_settles_honestly"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T05-C02",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t05_timeouts": [
+     "the_backoff_sleep_holds_no_model_call_permit"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T05-C03",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t05_timeouts": [
+     "http_429_delay_seconds_hint_lands_in_details",
+     "http_429_garbage_hint_is_ignored_never_trusted",
+     "http_429_http_date_hint_lands_in_details",
+     "http_5xx_is_bounded_retryable_without_a_fabricated_hint",
+     "retry_after_parsing_pins_the_rfc_9110_forms"
+    ],
+    "svc:r05_t05_timeouts": [
+     "computed_backoff_applies_without_a_hint",
+     "computed_backoff_doubles_from_the_base_to_the_cap",
+     "retry_after_hint_overrides_the_computed_backoff",
+     "the_default_attempt_budget_is_the_preregistered_three"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T05-C04",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {},
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "svc:r05_t05_timeouts"
+   ],
+   "binding": "command:rust_test_workspace（生产者=run_lifecycle 重试腿 retryable_provider_failure_reopens_attempt_on_the_same_run 等）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
+   "gateCommands": [
+    "rust_test_workspace"
+   ]
+  },
+  {
+   "caseId": "R05-T05-C05",
+   "formalScenarioIds": [
+    "R05-A10"
+   ],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t05_timeouts": [
+     "accepted_then_dropped_is_terminal_and_never_resent",
+     "mid_stream_transport_break_is_terminal_and_never_resent"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "adp:r05_t05_timeouts"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T05-C06",
+   "formalScenarioIds": [
+    "R05-A08"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {},
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "adp:r05_t05_timeouts",
+    "svc:r05_t04_streaming"
+   ],
+   "binding": "command:rust_test_workspace（生产者=svc:r05_t05_timeouts/adp:r05_t05_timeouts+run_lifecycle 部分文本/断流腿）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
+   "gateCommands": [
+    "rust_test_workspace"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T05-C07",
+   "formalScenarioIds": [
+    "R05-A10"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t05_timeouts": [
+     "a_retry_after_a_confirmed_tool_effect_never_re_executes_it"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T05-C08",
+   "formalScenarioIds": [
+    "R05-A09"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t05_timeouts": [
+     "cancellation_during_backoff_settles_now_not_after_the_delay"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "svc:r05_t04_streaming"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T05-C09",
+   "formalScenarioIds": [
+    "R05-A16"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {},
+   "citedAlsoBy": null,
+   "binding": "command:rust_test_workspace（生产者=cancellation_tree/cancel_terminal_race/cancel_link_inheritance）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
+   "gateCommands": [
+    "rust_test_workspace"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T05-C10",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {},
+   "citedAlsoBy": null,
+   "binding": "command:rust_test_workspace（生产者=background_disconnect_recovery/event_subscription）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
+   "gateCommands": [
+    "rust_test_workspace"
+   ]
+  },
+  {
+   "caseId": "R05-T05-C11",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-adapters/models::dispatch::tests::error_status_classification_matches_the_incumbent": [
+     "models::dispatch::tests::error_status_classification_matches_the_incumbent"
+    ]
+   },
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "adp:r05_t05_timeouts"
+   ],
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T05-C11B",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "lib-adapters/models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception": [
+     "models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception"
+    ],
+    "lib-adapters/models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only": [
+     "models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only"
+    ],
+    "lib-adapters/models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide": [
+     "models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide"
+    ],
+    "lib-adapters/models::egress::tests::scheme_userinfo_and_host_shapes_refuse": [
+     "models::egress::tests::scheme_userinfo_and_host_shapes_refuse"
+    ],
+    "lib-adapters/models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through": [
+     "models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T05-C12",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {},
+   "citedAlsoBy": null,
+   "binding": "RR1 F14 关闭原 NOT_RUN：统一网络策略 NetworkPlane（system/manual/direct、NO_PROXY+环回 bypass、显式 trusted CA）受控计数代理+源服务+生成 CA 正反对照，cid 拥有=svc:r05_t05_network rr1_f14 九测（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T05-C13",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t05_compat": [
+     "every_golden_aligns_with_the_incumbent_ts_run"
+    ],
+    "lib-adapters/models::compat::tests::anthropic_marks_system_and_two_recent_user_messages": [
+     "models::compat::tests::anthropic_marks_system_and_two_recent_user_messages"
+    ],
+    "lib-adapters/models::compat::tests::anthropic_max_effort_raises_the_implicit_one_third_cap": [
+     "models::compat::tests::anthropic_max_effort_raises_the_implicit_one_third_cap"
+    ],
+    "lib-adapters/models::compat::tests::codex_strips_budget_and_temperature_fields": [
+     "models::compat::tests::codex_strips_budget_and_temperature_fields"
+    ],
+    "lib-adapters/models::compat::tests::dispatch_is_first_match_in_incumbent_order": [
+     "models::compat::tests::dispatch_is_first_match_in_incumbent_order"
+    ],
+    "lib-adapters/models::compat::tests::ollama_bridges_response_format_and_num_ctx": [
+     "models::compat::tests::ollama_bridges_response_format_and_num_ctx"
+    ],
+    "lib-adapters/models::compat::tests::openrouter_adaptive_disable_is_a_loud_refusal": [
+     "models::compat::tests::openrouter_adaptive_disable_is_a_loud_refusal"
+    ],
+    "lib-adapters/models::compat::tests::volcengine_disable_guard_passes_through_without_controls": [
+     "models::compat::tests::volcengine_disable_guard_passes_through_without_controls"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T06-C01",
+   "formalScenarioIds": [
+    "R05-A02"
+   ],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t06_operations": [
+     "c01_embedding_gemini_voyage_minimax_wire",
+     "c01_embedding_ollama_wire",
+     "c01_embedding_openai_wire",
+     "c01_embedding_parse_contracts",
+     "c01_embedding_validation_texts_are_verbatim",
+     "c01_image_agnes_wire",
+     "c01_image_codex_sse_aggregate_parses",
+     "c01_image_dashscope_submit_pending_and_query_states",
+     "c01_image_gemini_wire_and_remote_url_refusal",
+     "c01_image_minimax_refusals_envelope_and_parse",
+     "c01_image_openai_wire_and_parse",
+     "c01_image_volcengine_wire_and_parse",
+     "c01_minimax_speech_parse_hex_envelope_and_refusals",
+     "c01_rerank_wire_and_parse",
+     "c01_speech_dashscope_wire",
+     "c01_speech_minimax_wire_and_group_id_refusal",
+     "c01_speech_openai_wire",
+     "c01_tiers_golden_sizes_match_the_incumbent_search",
+     "c01_tiers_refusal_texts_are_verbatim",
+     "c01_transcribe_bigasr_wire",
+     "c01_transcribe_mimo_and_dashscope_wire",
+     "c01_transcribe_openai_multipart_wire",
+     "c01_video_submit_wire_and_parse",
+     "c02_agnes_video_query_legacy_fallback_only_under_exact_conditions",
+     "c02_bigasr_status_header_gates_the_answer",
+     "c02_openai_image_roundtrip_bytes_out_bytes_in",
+     "c02_operation_body_cap_trips_mid_read_with_one_request"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T06-C02",
+   "formalScenarioIds": [
+    "R05-A11"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t06_operations": [
+     "c02_media_providers_in_one_task_never_cross"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T06-C03",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t06_operations": [
+     "c03_reference_and_audio_reads_are_authorized_and_bounded",
+     "c03_url_products_download_guarded_and_ghost_products_refuse"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T06-C04",
+   "formalScenarioIds": [
+    "R05-A12"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t06_worker_model": [
+     "c04_worker_callback_rides_the_real_gateway_and_trace_joins_parent_and_child"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T06-C05",
+   "formalScenarioIds": [
+    "R05-A12"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t06_worker_model": [
+     "c05_single_threaded_runtime_serves_a_delayed_callback_without_starvation"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T06-C06",
+   "formalScenarioIds": [
+    "R05-A12"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t06_worker_model": [
+     "c06_a_held_global_model_permit_makes_the_callback_refuse_bounded_not_deadlock",
+     "c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T06-C07",
+   "formalScenarioIds": [
+    "R05-A12"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t06_worker_model": [
+     "c07_a_replayed_cb_id_is_answered_from_the_receipt_cache"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T06-C08",
+   "formalScenarioIds": [
+    "R05-A12"
+   ],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t06_worker_model": [
+     "c08_an_overcap_token_ask_is_refused_before_any_provider_contact"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T06-C09",
+   "formalScenarioIds": [
+    "R05-A12"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t06_worker_model": [
+     "c09_identity_fields_and_ungranted_purposes_are_refused"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T06-C10",
+   "formalScenarioIds": [
+    "R05-A12"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t06_worker_model": [
+     "c10_a_hung_callback_kills_the_worker_and_settles_unknown"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T06-C11",
+   "formalScenarioIds": [
+    "R05-A12"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t06_worker_model": [
+     "c11_the_worker_never_sees_credential_material_on_the_real_chain"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T06-C11B",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {},
+   "citedAlsoBy": null,
+   "additionalCitations": [
+    "lib-adapters/models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception",
+    "lib-adapters/models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only",
+    "lib-adapters/models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide",
+    "lib-adapters/models::egress::tests::scheme_userinfo_and_host_shapes_refuse",
+    "lib-adapters/models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through"
+   ],
+   "binding": "command:rust_test_workspace（与 R05-T05-C11B 同一 egress 测试组的 additional citations，cid 归属唯一化归 C11B）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
+   "gateCommands": [
+    "rust_test_workspace"
+   ]
+  },
+  {
+   "caseId": "R05-T06-C12",
+   "formalScenarioIds": [
+    "R05-A12"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t06_operations": [
+     "c12_a_dropped_inflight_call_registers_no_product",
+     "c12_dashscope_pending_then_completed_via_registered_product",
+     "c12_empty_speech_text_refuses_before_any_request",
+     "c12_video_job_acceptance_is_not_completion_and_cancel_is_local_only"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T07-C01",
+   "formalScenarioIds": [
+    "R05-A13"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t07_usage_trace": [
+     "c01_multi_run_session_trace_stays_continuous_and_per_call_queryable"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T07-C02",
+   "formalScenarioIds": [
+    "R05-A13"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t07_usage_trace": [
+     "c02_background_subagent_and_worker_rows_carry_true_parentage"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T07-C03",
+   "formalScenarioIds": [
+    "R05-A14"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t07_usage_trace": [
+     "c03_refresh_retry_is_two_physical_requests_in_one_honest_row",
+     "c03_retryable_failure_then_success_are_two_rows_and_unknown_is_not_zero"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T07-C04",
+   "formalScenarioIds": [
+    "R05-A14"
+   ],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t07_usage_families": [
+     "c04_anthropic_interrupted_before_output_is_partial_never_zero",
+     "c04_anthropic_running_output_replaces_never_sums",
+     "c04_anthropic_running_total_going_backwards_is_loud",
+     "c04_gemini_streaming_running_metadata_replaces_not_sums",
+     "c04_openai_final_usage_repeats_are_idempotent_and_conflicts_are_loud",
+     "c04_responds_families_carry_one_final_snapshot_on_the_terminal_object"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T07-C05",
+   "formalScenarioIds": [
+    "R05-A14"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t07_usage_families": [
+     "c05_absent_usage_is_unknown_and_a_half_reported_usage_is_partial"
+    ],
+    "svc:r05_t07_usage_trace": [
+     "c05_unknown_partial_and_reported_states_stay_distinct_everywhere"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T07-C06",
+   "formalScenarioIds": [
+    "R05-A14"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t07_usage_families": [
+     "c06_anthropic_streaming_violating_usage_fragments_mark_the_fact_invalid",
+     "c06_gemini_streaming_violating_usage_metadata_marks_the_fact_invalid",
+     "c06_negative_float_string_and_overflow_counts_mark_the_fact_invalid"
+    ],
+    "svc:r05_t07_usage_trace": [
+     "c06_illegal_usage_numbers_mark_the_row_invalid_and_never_distort"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T07-C07",
+   "formalScenarioIds": [
+    "R05-A14"
+   ],
+   "scope": "OFFLINE_LOGIC",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "adp:r05_t07_usage_families": [
+     "c07_anthropic_cache_categories_stay_separate_from_the_input_total",
+     "c07_every_chat_family_declares_its_formula_and_inclusion_semantics",
+     "c07_gemini_thoughts_and_cache_map_inside_their_totals",
+     "c07_openai_families_normalize_cache_and_reasoning_without_re_adding"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T07-C08",
+   "formalScenarioIds": [
+    "R05-A14"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t07_usage_trace": [
+     "c08_cost_stays_unknown_without_a_price_basis"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "formalMappingSource": "T08 supplementary（台账原条目该 C-ID 的 formalScenarioIds 为空或不全；按任务书语义补齐，原条目未改写）"
+  },
+  {
+   "caseId": "R05-T07-C09",
+   "formalScenarioIds": [
+    "R05-A13"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t07_persistence": [
+     "identical_replay_is_idempotent_and_a_rewrite_is_a_loud_conflict",
+     "migration_v4_to_v5_upgrades_an_isolated_copy_and_keeps_old_rows",
+     "old_ledger_rows_survive_a_model_config_reload",
+     "the_ledger_round_trips_partial_and_invalid_states"
+    ],
+    "svc:r05_t07_usage_trace": [
+     "c09_owner_scoped_queries_isolate_and_secrets_never_enter_the_db"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T07-C10",
+   "formalScenarioIds": [
+    "R05-A14"
+   ],
+   "scope": "OFFLINE_SERVICE",
+   "ledgerStatus": "PASS",
+   "ownedBy": {
+    "svc:r05_t06_worker_model": [
+     "c10_a_failing_usage_trace_refuses_the_callback_reply_never_answers_unaccounted"
+    ],
+    "svc:r05_t07_usage_trace": [
+     "c10_a_ledger_write_failure_publishes_no_completion_and_the_retry_is_idempotent"
+    ]
+   },
+   "citedAlsoBy": null,
+   "gateCommands": [
+    "r05_stage_suites"
+   ]
+  },
+  {
+   "caseId": "R05-T08-C01",
+   "formalScenarioIds": [
+    "R05-A15"
+   ],
+   "scope": "OFFLINE_BINARY",
+   "ownedBy": {
+    "svc:r05_t08_closed_loop": [
+     "c01_read_edit_read_final_restart_five_way_chain"
+    ]
+   },
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "evidence": "artifacts/rust-tauri/R05/T08-E01/verify-R05/R05_SUITES/ + 台账 T08 条目"
+  },
+  {
+   "caseId": "R05-T08-C02",
+   "formalScenarioIds": [
+    "R05-A15"
+   ],
+   "scope": "OFFLINE_BINARY",
+   "ownedBy": {
+    "svc:r05_t08_closed_loop": [
+     "c02_two_full_chain_runs_different_runtime_nonces"
+    ]
+   },
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "evidence": "artifacts/rust-tauri/R05/T08-E01/verify-R05/R05_SUITES/ + 台账 T08 条目"
+  },
+  {
+   "caseId": "R05-T08-C03",
+   "formalScenarioIds": [
+    "R05-A16"
+   ],
+   "scope": "OFFLINE_BINARY",
+   "ownedBy": {
+    "svc:r05_t08_closed_loop": [
+     "c03_allowed_and_denied_file_sentinels"
+    ]
+   },
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "evidence": "artifacts/rust-tauri/R05/T08-E01/verify-R05/R05_SUITES/ + 台账 T08 条目"
+  },
+  {
+   "caseId": "R05-T08-C04",
+   "formalScenarioIds": [
+    "R05-A16"
+   ],
+   "scope": "OFFLINE_BINARY",
+   "ownedBy": {
+    "svc:r05_t08_closed_loop": [
+     "c04_request_id_replay_and_conflict"
+    ]
+   },
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "evidence": "artifacts/rust-tauri/R05/T08-E01/verify-R05/R05_SUITES/ + 台账 T08 条目"
+  },
+  {
+   "caseId": "R05-T08-C05",
+   "formalScenarioIds": [
+    "R05-A15"
+   ],
+   "scope": "OFFLINE_BINARY",
+   "ownedBy": {
+    "svc:r05_t08_closed_loop": [
+     "c05_restart_reads_history_zero_reexecution"
+    ]
+   },
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "evidence": "artifacts/rust-tauri/R05/T08-E01/verify-R05/R05_SUITES/ + 台账 T08 条目"
+  },
+  {
+   "caseId": "R05-T08-C06",
+   "formalScenarioIds": [
+    "R05-A16"
+   ],
+   "scope": "OFFLINE_BINARY",
+   "ownedBy": {
+    "svc:r05_t08_closed_loop": [
+     "c06_crash_after_tool_effect_no_blind_redo"
+    ]
+   },
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "evidence": "artifacts/rust-tauri/R05/T08-E01/verify-R05/R05_SUITES/ + 台账 T08 条目"
+  },
+  {
+   "caseId": "R05-T08-C07",
+   "formalScenarioIds": [
+    "R05-A16"
+   ],
+   "scope": "OFFLINE_BINARY",
+   "ownedBy": {
+    "svc:r05_t08_closed_loop": [
+     "c07_crash_midstream_honest_terminal"
+    ]
+   },
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "evidence": "artifacts/rust-tauri/R05/T08-E01/verify-R05/R05_SUITES/ + 台账 T08 条目"
+  },
+  {
+   "caseId": "R05-T08-C08",
+   "formalScenarioIds": [
+    "R05-A15"
+   ],
+   "scope": "OFFLINE_BINARY",
+   "ownedBy": {
+    "svc:r05_t08_closed_loop": [
+     "c08_two_sessions_shared_callid_isolated"
+    ]
+   },
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "evidence": "artifacts/rust-tauri/R05/T08-E01/verify-R05/R05_SUITES/ + 台账 T08 条目"
+  },
+  {
+   "caseId": "R05-T08-C09",
+   "formalScenarioIds": [
+    "R05-A15"
+   ],
+   "scope": "OFFLINE_BINARY",
+   "ownedBy": {
+    "svc:r05_t08_closed_loop": [
+     "c09_live_stream_and_history_projection_agree"
+    ]
+   },
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "evidence": "artifacts/rust-tauri/R05/T08-E01/verify-R05/R05_SUITES/ + 台账 T08 条目"
+  },
+  {
+   "caseId": "R05-T08-C10",
+   "formalScenarioIds": [
+    "R05-A11"
+   ],
+   "scope": "OFFLINE_SERVICE/BINARY（混合）",
+   "binding": "command:rust_test_workspace（媒体链腿与 T06-C12 共享 adp:r05_t06_operations 一次有效执行）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
+   "gateCommands": [
+    "rust_test_workspace"
+   ],
+   "representativeTests": [
+    "adp:r05_t06_operations::c12_dashscope_pending_then_completed_via_registered_product",
+    "adp:r05_t06_operations::c12_video_job_acceptance_is_not_completion_and_cancel_is_local_only",
+    "adp:r05_t06_operations::c03_url_products_download_guarded_and_ghost_products_refuse"
+   ],
+   "ledgerStatus": "PASS"
+  },
+  {
+   "caseId": "R05-T08-C11",
+   "formalScenarioIds": [
+    "R05-A15"
+   ],
+   "scope": "OFFLINE_SERVICE/BINARY（混合）",
+   "binding": "RR1 F24 关闭场景级绑定：cid 拥有=svc:r05_t08_production_tools f24_worker_nested_chain_under_global_permit_one（正式二进制、permit=1、真实子进程 worker、父子 usage JOIN）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "representativeTests": [
+    "svc:r05_t06_worker_model::c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one",
+    "svc:r05_t06_worker_model::c04_worker_callback_rides_the_real_gateway_and_trace_joins_parent_and_child"
+   ],
+   "ledgerStatus": "PASS"
+  },
+  {
+   "caseId": "R05-T08-C12",
+   "formalScenarioIds": [
+    "R05-A15"
+   ],
+   "scope": "OFFLINE_BINARY",
+   "ownedBy": {
+    "svc:r05_t08_closed_loop": [
+     "c12_repeated_cycles_stay_bounded"
+    ]
+   },
+   "gateCommands": [
+    "r05_stage_suites"
+   ],
+   "evidence": "artifacts/rust-tauri/R05/T08-E01/verify-R05/R05_SUITES/ + 台账 T08 条目"
+  },
+  {
+   "caseId": "R05-T08-C13",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE/BINARY（混合）",
+   "binding": "command:r04_regression_gate（verify-stage R04 内嵌 R03/R02/RR1 闭包；RR1 F26 登记册 command 绑定）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
+   "gateCommands": [
+    "r04_regression_gate"
+   ],
+   "representativeTests": [],
+   "ledgerStatus": "PASS"
+  },
+  {
+   "caseId": "R05-T08-C14",
+   "formalScenarioIds": [],
+   "scope": "OFFLINE_SERVICE/BINARY（混合）",
+   "binding": "command:check_boundaries（范围/依赖方向+workspace 测试；旧产品零改动 diff 证据）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
+   "gateCommands": [
+    "check_boundaries"
+   ],
+   "representativeTests": [
+    "svc:r05_t01_binary_wiring::c02_real_binary_full_chain_through_authenticated_endpoint"
+   ],
+   "ledgerStatus": "PASS"
+  }
+ ],
+ "oldProductUntouchedDiff": {
+  "checkedBy": "git diff --name-only c549ff654 -- desktop/ shared/ package.json package-lock.json → 空集（T08 执行时核对，证据见 T08-E01/old-product-diff.txt）",
+  "claim": "R05 未提前替壳、未切真实数据、未恢复撤回功能；旧 Electron/Node 生产入口与 R05 并存且零改动。"
+ },
+ "ledgerNameCorrections": [
+  "R05-T01-C06 台账原引用 models::gateway::tests::unsupported_capabilities_refuse_before_any_resolution 与 unimplemented_families_refuse_loudly 两个旧名（测试在 T01/T06 演进中更名为 unconfigured_operations_are_loud_route_gaps 与 a_family_outside_the_operations_matrix_is_loud）；R05-T08 建立 cid 表时按 --list 实名归一，语义不变（路由/能力不支持即响亮拒绝）。台账 T01-C06 条目同步修正。"
+ ],
+ "aIndexNote": "16 个 A-ID 全部有 ≥1 个 C-ID 归属；T01–T07 台账条目自带的 formalScenarioIds 保留原样，空白处由 T08 补充归属（见各 entry 的 formalMappingSource）。",
+ "registryNote": "RR1 F26：103 必需 C-ID 的权威登记册为 docs/rust-tauri/R05/r05_required_cids.tsv（93 cid 拥有〔r05_stage_cids.tsv 逐测试唯一归属〕+10 command 绑定）；assembler 预跑与 xtask 镜像双处精确集合校验。"
+}

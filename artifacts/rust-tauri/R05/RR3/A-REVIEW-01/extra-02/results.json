@@ -1,0 +1,126 @@
+[
+  {
+    "case": "internal-fresh",
+    "exit": 0,
+    "checks": {
+      "actualControls": 8,
+      "logFds": 6,
+      "sourceCopyEqual": true,
+      "mutations": [
+        "source.rs",
+        "scripts/check.sh",
+        "config.json",
+        "stage-map.json",
+        "untracked-new.rs",
+        "artifacts/rust-tauri/R05/static-old.json"
+      ],
+      "restored": true
+    }
+  },
+  {
+    "case": "internal-old-untracked-grandchild",
+    "exit": 0,
+    "checks": {
+      "actualControls": 9,
+      "logFds": 6,
+      "sourceCopyEqual": true,
+      "mutations": [
+        "source.rs",
+        "scripts/check.sh",
+        "config.json",
+        "stage-map.json",
+        "untracked-new.rs",
+        "artifacts/rust-tauri/R05/static-old.json"
+      ],
+      "restored": true
+    }
+  },
+  {
+    "case": "internal-old-tracked-grandchild",
+    "exit": 0,
+    "checks": {
+      "actualControls": 9,
+      "logFds": 6,
+      "sourceCopyEqual": true,
+      "mutations": [
+        "source.rs",
+        "scripts/check.sh",
+        "config.json",
+        "stage-map.json",
+        "untracked-new.rs",
+        "artifacts/rust-tauri/R05/static-old.json"
+      ],
+      "restored": true
+    }
+  },
+  {
+    "case": "external-fresh",
+    "exit": 0,
+    "checks": {
+      "actualControls": 8,
+      "logFds": 6,
+      "sourceCopyEqual": true,
+      "mutations": [
+        "source.rs",
+        "scripts/check.sh",
+        "config.json",
+        "stage-map.json",
+        "untracked-new.rs",
+        "artifacts/rust-tauri/R05/static-old.json"
+      ],
+      "restored": true
+    }
+  },
+  {
+    "case": "external-old-untracked-grandchild",
+    "exit": 0,
+    "checks": {
+      "actualControls": 9,
+      "logFds": 6,
+      "sourceCopyEqual": true,
+      "mutations": [
+        "source.rs",
+        "scripts/check.sh",
+        "config.json",
+        "stage-map.json",
+        "untracked-new.rs",
+        "artifacts/rust-tauri/R05/static-old.json"
+      ],
+      "restored": true
+    }
+  },
+  {
+    "case": "external-old-tracked-grandchild",
+    "exit": 0,
+    "checks": {
+      "actualControls": 9,
+      "logFds": 6,
+      "sourceCopyEqual": true,
+      "mutations": [
+        "source.rs",
+        "scripts/check.sh",
+        "config.json",
+        "stage-map.json",
+        "untracked-new.rs",
+        "artifacts/rust-tauri/R05/static-old.json"
+      ],
+      "restored": true
+    }
+  },
+  {
+    "case": "query-failure-ps",
+    "exit": 1
+  },
+  {
+    "case": "query-failure-lsof",
+    "exit": 1
+  },
+  {
+    "case": "query-failure-git",
+    "exit": 1
+  },
+  {
+    "case": "link-root-rejection",
+    "exit": 1
+  }
+]

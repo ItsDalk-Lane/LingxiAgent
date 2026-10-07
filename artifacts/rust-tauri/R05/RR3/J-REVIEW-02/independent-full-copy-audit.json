@@ -1,0 +1,18 @@
+{
+  "startedUtc": "2026-10-07T04:15:07.371092+00:00",
+  "finishedUtc": "2026-10-07T04:15:15.139003+00:00",
+  "copy": "/Users/study_superior/r05t08-work/j-review02-gvphliks",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "counts": {
+    "tracked": 38066,
+    "trackedArtifacts": 33282,
+    "sourceCandidateContent": 848,
+    "exactHeadContent": 37218,
+    "independentInodes": 38068
+  },
+  "indexMatchesAllHeadEntries": true,
+  "materializationManifestMatchesRealTree": true,
+  "copyHeadIndexIndependent": true,
+  "fullGitCachedDiffEmpty": true,
+  "boundary": "物化时HEAD清单逐项与真实Git核对；覆盖后依原candidate overlay比较，不能把当前dirty字节冒称HEAD"
+}

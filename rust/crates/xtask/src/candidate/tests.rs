@@ -201,3 +201,121 @@ fn tracked_file_parent_symlink_cannot_escape_repository() {
     fs::remove_dir_all(root).unwrap();
     fs::remove_dir_all(outside).unwrap();
 }
+
+#[cfg(unix)]
+#[test]
+fn real_os_fd_parent_and_child_logs_keep_all_checkpoints_stable() {
+    use std::process::Stdio;
+    let root = fixture();
+    let run = root.join("artifacts/rust-tauri/R05/run001");
+    fs::create_dir_all(run.join("child")).unwrap();
+    fs::write(run.join("child/old-evidence.json"), b"old").unwrap();
+    fs::write(root.join("source.txt"), b"source").unwrap();
+    add(&root, "source.txt");
+    let result = Command::new(std::env::current_exe().unwrap())
+        .args([
+            "--exact",
+            "candidate::tests::real_os_fd_scope_process_probe",
+            "--nocapture",
+        ])
+        .env("LINGXI_SCOPE_PROBE_ROOT", &root)
+        .env("LINGXI_SCOPE_PROBE_LEVEL", "parent")
+        .stdout(Stdio::from(File::create(run.join("stdout.log")).unwrap()))
+        .stderr(Stdio::from(File::create(run.join("stderr.log")).unwrap()))
+        .status()
+        .unwrap();
+    assert!(
+        result.success(),
+        "{}",
+        String::from_utf8_lossy(&fs::read(run.join("child/stdout.log")).unwrap())
+    );
+    let report: serde_json::Value =
+        serde_json::from_slice(&fs::read(root.join("probe-result.json")).unwrap()).unwrap();
+    assert_eq!(report["stable"], true);
+    assert_eq!(report["checkpointCount"], 3);
+    assert_eq!(report["oldEvidenceDetected"], true);
+    assert_eq!(report["sourceDetected"], true);
+    assert_eq!(
+        report["excluded"]["runOutputFiles"]
+            .as_array()
+            .unwrap()
+            .len(),
+        4
+    );
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[cfg(unix)]
+#[test]
+fn real_os_fd_scope_process_probe() {
+    use std::process::Stdio;
+    let Some(root) = std::env::var_os("LINGXI_SCOPE_PROBE_ROOT").map(PathBuf::from) else {
+        // 默认腿证明仓库外的真实日志不被错误归属到当前候选。
+        let root = fixture();
+        let scope = Scope::new(&root, &root.join("evidence")).unwrap();
+        assert_eq!(
+            scope.exclusion_json()["runOutputFiles"],
+            serde_json::json!([])
+        );
+        fs::remove_dir_all(root).unwrap();
+        return;
+    };
+    let run = root.join("artifacts/rust-tauri/R05/run001");
+    if std::env::var("LINGXI_SCOPE_PROBE_LEVEL").unwrap() == "parent" {
+        let status = Command::new(std::env::current_exe().unwrap())
+            .args([
+                "--exact",
+                "candidate::tests::real_os_fd_scope_process_probe",
+                "--nocapture",
+            ])
+            .env("LINGXI_SCOPE_PROBE_LEVEL", "child")
+            .stdout(Stdio::from(
+                File::create(run.join("child/stdout.log")).unwrap(),
+            ))
+            .stderr(Stdio::from(
+                File::create(run.join("child/stderr.log")).unwrap(),
+            ))
+            .status()
+            .unwrap();
+        assert!(status.success());
+        return;
+    }
+    let scope = Scope::new(&root, &run.join("child/evidence")).unwrap();
+    let before = scope.snapshot(&root).unwrap();
+    assert!(before
+        .entries
+        .iter()
+        .any(|e| e.display.ends_with("old-evidence.json")));
+    let mut checkpoints = Vec::new();
+    for level in ["", "child/", ""] {
+        let mut log = fs::OpenOptions::new()
+            .append(true)
+            .open(run.join(format!("{level}stdout.log")))
+            .unwrap();
+        writeln!(log, "真实祖先日志增长").unwrap();
+        checkpoints.push((level.to_string(), 0, scope.snapshot(&root)));
+    }
+    let stable = snapshots_stable(&before, &checkpoints, &scope.snapshot(&root));
+    fs::write(run.join("child/old-evidence.json"), b"changed").unwrap();
+    let old_detected = before.digest != scope.snapshot(&root).unwrap().digest;
+    fs::write(run.join("child/old-evidence.json"), b"old").unwrap();
+    fs::write(root.join("source.txt"), b"changed").unwrap();
+    let source_detected = before.digest != scope.snapshot(&root).unwrap().digest;
+    let sink = run.join("child/stdout.log");
+    let moved = run.join("child/moved.log");
+    fs::rename(&sink, &moved).unwrap();
+    fs::write(&sink, b"foreign replacement").unwrap();
+    let replacement_rejected = scope.snapshot(&root).unwrap_err().contains("was replaced");
+    fs::remove_file(&sink).unwrap();
+    fs::rename(&moved, &sink).unwrap();
+    let report = serde_json::json!({"stable": stable, "checkpointCount": checkpoints.len(), "oldEvidenceDetected": old_detected, "sourceDetected": source_detected, "replacedSinkRejected": replacement_rejected, "excluded": scope.exclusion_json()});
+    fs::write(
+        root.join("probe-result.json"),
+        serde_json::to_vec_pretty(&report).unwrap(),
+    )
+    .unwrap();
+    assert!(
+        stable && old_detected && source_detected && replacement_rejected,
+        "{report}"
+    );
+}

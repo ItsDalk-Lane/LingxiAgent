@@ -1,0 +1,30 @@
+[
+  {
+    "pid": 90799,
+    "rc": 0,
+    "errno": 0,
+    "bytes": 123,
+    "RUST_LOG": [],
+    "boundary": "原始环境不保存，只输出日志级别"
+  },
+  {
+    "pid": 87199,
+    "rc": 0,
+    "errno": 0,
+    "bytes": 5756,
+    "RUST_LOG": [
+      "warn"
+    ],
+    "boundary": "原始环境不保存，只输出日志级别"
+  },
+  {
+    "pid": 92997,
+    "rc": 0,
+    "errno": 0,
+    "bytes": 4244,
+    "RUST_LOG": [
+      "warn"
+    ],
+    "boundary": "原始环境不保存，只输出日志级别"
+  }
+]

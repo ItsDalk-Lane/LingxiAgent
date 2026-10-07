@@ -1,0 +1,64 @@
+{
+  "recordedAt": "2026-10-07T00:20:00.153592+00:00",
+  "status": "REGISTERED_BEFORE_FIRST_RESOURCE_MEASUREMENT",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "branch": "codex/rust-tauri-migration",
+  "statusAtRegistration": " M rust/crates/lingxi-service/tests/r05_t08_resources.rs\n M rust/crates/xtask/src/candidate.rs\n M rust/crates/xtask/src/candidate/tests.rs\n M rust/crates/xtask/src/main.rs\n M rust/crates/xtask/src/runner_identity.rs\n M rust/crates/xtask/src/verify/runner_tests.rs\n M scripts/rust-tauri/r02_t08_legacy_entry_regression.sh\n M scripts/rust-tauri/r05_t08_negative_gate.sh\n?? artifacts/rust-tauri/R05/RR3/\n?? docs/rust-tauri/R05/repair-current/RR3_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md\n?? docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json\n?? docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md\n?? docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md\n?? rust/crates/lingxi-service/tests/support/\n?? scripts/rust-tauri/r02_run_output_regression.py\n?? scripts/rust-tauri/r05_t08_mutate_pin.py\n?? scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py\n?? scripts/rust-tauri/run_output_sinks.py\n",
+  "inputHashes": {
+    "rust/crates/lingxi-service/tests/r05_t08_resources.rs": "0514350f338e9ac6d4b7fd74890a4080e568c337b31b58093c0c2061512b38e7",
+    "rust/crates/lingxi-service/tests/support/r05_resource_sampler.rs": "1f6601122e5d7841f3975ec68ea8c60adb653fc939ca4e65cc3da7565c269274",
+    "rust/Cargo.lock": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+    "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+    "docs/rust-tauri/PERFORMANCE_THRESHOLDS.json": "bf40009e347df014dba1d2a2ecb7505bf4bdccfdef1992fc99b144749a992331",
+    "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "c1fd4b03b677d033ddc6a19df1cae2e41be7ea46d3dfd3f4424b7bb2aea0801a"
+  },
+  "originalLoad": {
+    "cancel": 60,
+    "error": 60,
+    "normal": 15,
+    "long512KiB": 10,
+    "worker": 15,
+    "sessions": 2
+  },
+  "bounds": {
+    "rssKiB": 409600,
+    "rssGrowthKiB": 153600,
+    "fds": 400,
+    "fdGrowth": 64,
+    "logs": 3,
+    "serviceTreeRssKiB": 409600,
+    "serviceTreeFds": 400,
+    "liveWorkerProcesses": 1,
+    "workerReleasedProcesses": 0,
+    "workerLiveTcpMinimum": 2,
+    "workerReleasedEstablishedTcp": 0,
+    "ownerPeakRuns": 2,
+    "ownerPeakModelPermits": 1,
+    "ownerPeakToolPermits": 1,
+    "ownerPeakModelWaiters": 1,
+    "ownerReleasedRunsPermitsWaiters": 0
+  },
+  "supplementalOwnerProfile": {
+    "realWorkerCycles": 15,
+    "queuedCancelledSiblingCycles": 15,
+    "baseline": "production bootstrap before cycles",
+    "peakBarrier": "real aux callback HTTP held by external stub; queued model count exactly1",
+    "steady": "3 consecutive snapshots 100ms apart after each cycle; driver futures joined",
+    "samplers": "ps machine PID/PPID/RSS; lsof p identity/exit/numeric FD/ESTABLISHED TCP; recursive exact file inventory",
+    "cleanup": "actual service exit/reap; inventory before cleanup; checked removal of test roots",
+    "boundaries": [
+      "debug resource/correctness proof, no release comparison/claimed benefit",
+      "binary160 mixed cycles and supplementary direct production composition observed separately",
+      "R10 2h/1000 comparison not claimed",
+      "no browser/WebView participates in this service-worker load",
+      "failed sampler UNKNOWN; absent directory error, not empty"
+    ]
+  },
+  "controls": [
+    "+3FD exact",
+    "TCP two endpoints retained/released",
+    "3 temp files retained/released",
+    "alive tree/dead PID",
+    "empty/wrong PID TCP rejected"
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "status": "FAIL",
+  "startedUtc": "2026-10-07T03:23:51.172814+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/source",
+      "startedUtc": "2026-10-07T03:23:51.173116+00:00",
+      "finishedUtc": "2026-10-07T03:23:51.180449+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "339d9c6ea2edb915dedf8839297a9d8eb397cc878a6540043ab42c1498bee03c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/wrong-installed-version",
+      "startedUtc": "2026-10-07T03:23:51.180637+00:00",
+      "finishedUtc": "2026-10-07T03:23:51.187226+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e4478160c39e4cf8eb0de6e1a29288f0928164ca1b9d31ac82e922d8910b1805",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/source",
+      "startedUtc": "2026-10-07T03:23:51.187379+00:00",
+      "finishedUtc": "2026-10-07T03:23:51.194247+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "7add86c2127231561d4808ce813bffab278e95aabce1600ece63fccc4c2e348b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/wrong-installed-version",
+      "startedUtc": "2026-10-07T03:23:51.194370+00:00",
+      "finishedUtc": "2026-10-07T03:23:51.201220+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "7add86c2127231561d4808ce813bffab278e95aabce1600ece63fccc4c2e348b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/wrong-installed-version",
+      "startedUtc": "2026-10-07T03:23:51.201336+00:00",
+      "finishedUtc": "2026-10-07T03:23:51.240542+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "source": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/source",
+  "copy": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/wrong-installed-version",
+  "sourceHead": "cdb10403f4836041638798c7bebe6d6b24d4b3e0",
+  "copyHead": "cdb10403f4836041638798c7bebe6d6b24d4b3e0",
+  "inputs": {
+    "package.json": "4ba1a1fa16a7ccc2e80724afccd14f60ceb12478a79a5d51d8a977089ce899db",
+    "package-lock.json": "eb507d4dcd5eca201cce4c5f70b786eb8109fc1976141b9e2acf794801009bb6",
+    ".npmrc": "f6d6be450cc3239fe9569e975697ba7c4264b62ce00f99e3dee8b0845a829d72"
+  },
+  "error": "installed version mismatch: node_modules/ws",
+  "finishedUtc": "2026-10-07T03:23:51.242315+00:00"
+}

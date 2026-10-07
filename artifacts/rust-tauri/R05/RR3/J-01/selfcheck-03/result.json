@@ -1,0 +1,37 @@
+{
+  "status": "PASS",
+  "fixtureRoot": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s",
+  "commandCount": 42,
+  "checks": [
+    {
+      "name": "preparation-before-pristine-and-gates",
+      "ok": true
+    },
+    {
+      "name": "default-shared-clone",
+      "ok": true
+    },
+    {
+      "name": "dirty-package-byte-equal",
+      "ok": true
+    },
+    {
+      "name": "source-not-mutated-by-copy-write",
+      "ok": true
+    },
+    {
+      "name": "shared-object-source",
+      "ok": true
+    },
+    {
+      "name": "shared-clone-main-git-unchanged",
+      "ok": true
+    },
+    {
+      "name": "source-dependencies-unchanged",
+      "ok": true
+    }
+  ],
+  "scope": "真实生产准备+真实Node/Git/CLI+Vitest；小依赖闭包替身；未跑默认16/完整R02/完整主依赖复制",
+  "selectedPackages": 92
+}

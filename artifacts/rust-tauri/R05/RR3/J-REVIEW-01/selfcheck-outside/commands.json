@@ -1,0 +1,808 @@
+[
+  {
+    "name": "git-init",
+    "argv": [
+      "git",
+      "init",
+      "-q",
+      "-b",
+      "codex/rust-tauri-migration"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:44.764339+00:00",
+    "finishedUtc": "2026-10-07T03:38:44.777640+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "git-add",
+    "argv": [
+      "git",
+      "add",
+      "."
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:44.777972+00:00",
+    "finishedUtc": "2026-10-07T03:38:44.993837+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "git-commit",
+    "argv": [
+      "git",
+      "-c",
+      "user.email=fixture@invalid",
+      "-c",
+      "user.name=Fixture",
+      "commit",
+      "-qm",
+      "fixture"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:44.994185+00:00",
+    "finishedUtc": "2026-10-07T03:38:45.031013+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "old-clone",
+    "argv": [
+      "git",
+      "clone",
+      "-q",
+      "--no-hardlinks",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/old-default-copy"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:45.306803+00:00",
+    "finishedUtc": "2026-10-07T03:38:45.472866+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "old-real-cli-red",
+    "argv": [
+      "node",
+      "cli/entry.ts",
+      "help"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/old-default-copy",
+    "startedUtc": "2026-10-07T03:38:45.473226+00:00",
+    "finishedUtc": "2026-10-07T03:38:45.527593+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "d6694eb7eff85ba5cc1c79e9741b5c3abab432451dc7fe9e3921a7f0f2ebdf43",
+    "ok": true
+  },
+  {
+    "name": "old-real-vitest-red",
+    "argv": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "--version"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/old-default-copy",
+    "startedUtc": "2026-10-07T03:38:45.528111+00:00",
+    "finishedUtc": "2026-10-07T03:38:45.555062+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "3bbe553860686038d2a55fad12dffba489d4ec10e246d4dd0a7bbb0fab37640b",
+    "ok": true
+  },
+  {
+    "name": "prepared-clone",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "clone",
+      "--shared",
+      "--quiet",
+      "--branch",
+      "codex/rust-tauri-migration",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/prepared"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:45.583018+00:00",
+    "finishedUtc": "2026-10-07T03:38:45.662540+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "prepared",
+    "argv": [
+      "bash",
+      "-c",
+      "ROOT=\"$1\"; COPY=\"$2\"; EV=\"$3\"; fail() { echo \"FAIL: $*\" >&2; exit 1; };\npython3 \"$ROOT/scripts/rust-tauri/r05_t08_prepare_node.py\" \\\n  --source \"$ROOT\" --copy \"$COPY\" --evidence \"$EV/node-preparation\" \\\n  || fail \"isolated Node dependency preparation failed\"",
+      "node-prepare",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/prepared",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/prepared"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:45.663297+00:00",
+    "finishedUtc": "2026-10-07T03:38:48.021710+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "prepared-real-cli",
+    "argv": [
+      "node",
+      "cli/entry.ts",
+      "help"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/prepared",
+    "startedUtc": "2026-10-07T03:38:48.022317+00:00",
+    "finishedUtc": "2026-10-07T03:38:48.110033+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "678f09b8753dc1900b1d18d6fc9bf434838e2fdf29639d170533fb47a77bf62b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "prepared-real-vitest",
+    "argv": [
+      "/private/tmp/r05-node-selfcheck-bz5g0665/prepared/node_modules/.bin/vitest",
+      "run",
+      "tests/cli-args.test.ts"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/prepared",
+    "startedUtc": "2026-10-07T03:38:48.110522+00:00",
+    "finishedUtc": "2026-10-07T03:38:48.644753+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "ed7ffc78a27aa1eb73180ba180f92d86469277ce7b78ac89ebd7a55f37fc46f3",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "production-client-cli-cases",
+    "argv": [
+      "python3",
+      "-B",
+      "-c",
+      "import sys,pathlib,json;sys.path.insert(0,'scripts/rust-tauri');import r02_client_leaf_matrix as m;o=pathlib.Path(sys.argv[1]);o.mkdir();rows=[m.run_cli_case(o,*x) for x in m.CLI_CASES];print(json.dumps(rows));assert all(x['ok'] for x in rows)",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/client-cli-cases"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/prepared",
+    "startedUtc": "2026-10-07T03:38:48.645208+00:00",
+    "finishedUtc": "2026-10-07T03:38:48.964810+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "99d3834060cae696fe8755cec04e878c2450bf6b179b842629f649328ca7bb0a",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "verify-normal",
+    "argv": [
+      "python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_prepare_node.py",
+      "--verify",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/prepared/node-preparation/result.json",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/verify-normal"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:48.965234+00:00",
+    "finishedUtc": "2026-10-07T03:38:49.466315+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "verify-own-cache",
+    "argv": [
+      "python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_prepare_node.py",
+      "--verify",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/prepared/node-preparation/result.json",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/verify-own-cache"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:49.466799+00:00",
+    "finishedUtc": "2026-10-07T03:38:50.050944+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "verify-content-red",
+    "argv": [
+      "python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_prepare_node.py",
+      "--verify",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/prepared/node-preparation/result.json",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/verify-content-red"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:50.209539+00:00",
+    "finishedUtc": "2026-10-07T03:38:50.580780+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "a5d6566adc54b4ef89c9921f341c38761713f457c243635da05b744c7988489b",
+    "ok": true
+  },
+  {
+    "name": "verify-content-restored",
+    "argv": [
+      "python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_prepare_node.py",
+      "--verify",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/prepared/node-preparation/result.json",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/verify-content-restored"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:50.581242+00:00",
+    "finishedUtc": "2026-10-07T03:38:51.046588+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "wrong-lock-clone",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "clone",
+      "--shared",
+      "--quiet",
+      "--branch",
+      "codex/rust-tauri-migration",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/wrong-lock"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:51.047244+00:00",
+    "finishedUtc": "2026-10-07T03:38:51.127315+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "wrong-lock",
+    "argv": [
+      "bash",
+      "-c",
+      "ROOT=\"$1\"; COPY=\"$2\"; EV=\"$3\"; fail() { echo \"FAIL: $*\" >&2; exit 1; };\npython3 \"$ROOT/scripts/rust-tauri/r05_t08_prepare_node.py\" \\\n  --source \"$ROOT\" --copy \"$COPY\" --evidence \"$EV/node-preparation\" \\\n  || fail \"isolated Node dependency preparation failed\"",
+      "node-prepare",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/wrong-lock",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/wrong-lock"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:51.128088+00:00",
+    "finishedUtc": "2026-10-07T03:38:51.343738+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "4328ebd41ad0745060512347518d9cdb508c1e64102afd731fccb76d6b73d67e",
+    "ok": true
+  },
+  {
+    "name": "wrong-installed-version-clone",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "clone",
+      "--shared",
+      "--quiet",
+      "--branch",
+      "codex/rust-tauri-migration",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/wrong-installed-version"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:51.344602+00:00",
+    "finishedUtc": "2026-10-07T03:38:51.428501+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "wrong-installed-version",
+    "argv": [
+      "bash",
+      "-c",
+      "ROOT=\"$1\"; COPY=\"$2\"; EV=\"$3\"; fail() { echo \"FAIL: $*\" >&2; exit 1; };\npython3 \"$ROOT/scripts/rust-tauri/r05_t08_prepare_node.py\" \\\n  --source \"$ROOT\" --copy \"$COPY\" --evidence \"$EV/node-preparation\" \\\n  || fail \"isolated Node dependency preparation failed\"",
+      "node-prepare",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/wrong-installed-version",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/wrong-installed-version"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:51.429374+00:00",
+    "finishedUtc": "2026-10-07T03:38:51.558338+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "4e94f7f572e85eff1e823a15b37c4bc3ba02e3ea2be72024a474619e1ec62f94",
+    "ok": true
+  },
+  {
+    "name": "wrong-node-range-clone",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "clone",
+      "--shared",
+      "--quiet",
+      "--branch",
+      "codex/rust-tauri-migration",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/wrong-node-range"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:51.559064+00:00",
+    "finishedUtc": "2026-10-07T03:38:51.645036+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "wrong-node-range",
+    "argv": [
+      "bash",
+      "-c",
+      "ROOT=\"$1\"; COPY=\"$2\"; EV=\"$3\"; fail() { echo \"FAIL: $*\" >&2; exit 1; };\npython3 \"$ROOT/scripts/rust-tauri/r05_t08_prepare_node.py\" \\\n  --source \"$ROOT\" --copy \"$COPY\" --evidence \"$EV/node-preparation\" \\\n  || fail \"isolated Node dependency preparation failed\"",
+      "node-prepare",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/wrong-node-range",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/wrong-node-range"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:51.645855+00:00",
+    "finishedUtc": "2026-10-07T03:38:51.779795+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "4032b802fb3ea86c5647b19da572c0e8a06d8f2ea2ef1fbbe3aa228b3a2726b1",
+    "ok": true
+  },
+  {
+    "name": "actual-node-version-refused-clone",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "clone",
+      "--shared",
+      "--quiet",
+      "--branch",
+      "codex/rust-tauri-migration",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/actual-node-version-refused"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:51.780646+00:00",
+    "finishedUtc": "2026-10-07T03:38:51.861443+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "actual-node-version-refused",
+    "argv": [
+      "bash",
+      "-c",
+      "ROOT=\"$1\"; COPY=\"$2\"; EV=\"$3\"; fail() { echo \"FAIL: $*\" >&2; exit 1; };\npython3 \"$ROOT/scripts/rust-tauri/r05_t08_prepare_node.py\" \\\n  --source \"$ROOT\" --copy \"$COPY\" --evidence \"$EV/node-preparation\" \\\n  || fail \"isolated Node dependency preparation failed\"",
+      "node-prepare",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/actual-node-version-refused",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/actual-node-version-refused"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:51.862378+00:00",
+    "finishedUtc": "2026-10-07T03:38:52.112225+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "b152a8458eae3a1d5634f0acf4f8cb8b407a56bfc7081ca23730eaaaef35a49b",
+    "ok": true
+  },
+  {
+    "name": "hidden-lock-mismatch-clone",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "clone",
+      "--shared",
+      "--quiet",
+      "--branch",
+      "codex/rust-tauri-migration",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/hidden-lock-mismatch"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:52.112950+00:00",
+    "finishedUtc": "2026-10-07T03:38:52.249018+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "hidden-lock-mismatch",
+    "argv": [
+      "bash",
+      "-c",
+      "ROOT=\"$1\"; COPY=\"$2\"; EV=\"$3\"; fail() { echo \"FAIL: $*\" >&2; exit 1; };\npython3 \"$ROOT/scripts/rust-tauri/r05_t08_prepare_node.py\" \\\n  --source \"$ROOT\" --copy \"$COPY\" --evidence \"$EV/node-preparation\" \\\n  || fail \"isolated Node dependency preparation failed\"",
+      "node-prepare",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/hidden-lock-mismatch",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/hidden-lock-mismatch"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:52.251272+00:00",
+    "finishedUtc": "2026-10-07T03:38:52.428925+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "7a3e7e6b5d570f87c66b02390ee1cd0fded826256e640ceeaee1cc5fd9e07e61",
+    "ok": true
+  },
+  {
+    "name": "incomplete-content-clone",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "clone",
+      "--shared",
+      "--quiet",
+      "--branch",
+      "codex/rust-tauri-migration",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/incomplete-content"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:52.429526+00:00",
+    "finishedUtc": "2026-10-07T03:38:52.514152+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "incomplete-content",
+    "argv": [
+      "bash",
+      "-c",
+      "ROOT=\"$1\"; COPY=\"$2\"; EV=\"$3\"; fail() { echo \"FAIL: $*\" >&2; exit 1; };\npython3 \"$ROOT/scripts/rust-tauri/r05_t08_prepare_node.py\" \\\n  --source \"$ROOT\" --copy \"$COPY\" --evidence \"$EV/node-preparation\" \\\n  || fail \"isolated Node dependency preparation failed\"",
+      "node-prepare",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/incomplete-content",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/incomplete-content"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:52.514929+00:00",
+    "finishedUtc": "2026-10-07T03:38:54.280702+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "8e8ef63d4f75d22e572c3e98a37406d38f75496202da71c5fa086ff18165261e",
+    "ok": true
+  },
+  {
+    "name": "missing-package-clone",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "clone",
+      "--shared",
+      "--quiet",
+      "--branch",
+      "codex/rust-tauri-migration",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/missing-package"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:54.281307+00:00",
+    "finishedUtc": "2026-10-07T03:38:54.358957+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "missing-package",
+    "argv": [
+      "bash",
+      "-c",
+      "ROOT=\"$1\"; COPY=\"$2\"; EV=\"$3\"; fail() { echo \"FAIL: $*\" >&2; exit 1; };\npython3 \"$ROOT/scripts/rust-tauri/r05_t08_prepare_node.py\" \\\n  --source \"$ROOT\" --copy \"$COPY\" --evidence \"$EV/node-preparation\" \\\n  || fail \"isolated Node dependency preparation failed\"",
+      "node-prepare",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/missing-package",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/missing-package"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:54.359659+00:00",
+    "finishedUtc": "2026-10-07T03:38:54.481238+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "660bb894dd17aa79f9c55ff47e3da9095f26599c633121ed4ce61e0a4c3401d3",
+    "ok": true
+  },
+  {
+    "name": "external-link-clone",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "clone",
+      "--shared",
+      "--quiet",
+      "--branch",
+      "codex/rust-tauri-migration",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/external-link"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:54.481826+00:00",
+    "finishedUtc": "2026-10-07T03:38:54.558904+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "external-link",
+    "argv": [
+      "bash",
+      "-c",
+      "ROOT=\"$1\"; COPY=\"$2\"; EV=\"$3\"; fail() { echo \"FAIL: $*\" >&2; exit 1; };\npython3 \"$ROOT/scripts/rust-tauri/r05_t08_prepare_node.py\" \\\n  --source \"$ROOT\" --copy \"$COPY\" --evidence \"$EV/node-preparation\" \\\n  || fail \"isolated Node dependency preparation failed\"",
+      "node-prepare",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/external-link",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/external-link"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:54.559660+00:00",
+    "finishedUtc": "2026-10-07T03:38:54.840683+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "1036dbd2097c3c642b796df7cef2b8cd738111a0bab8ce1e66a72ceaf1ed0c32",
+    "ok": true
+  },
+  {
+    "name": "destination-failure-clone",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "clone",
+      "--shared",
+      "--quiet",
+      "--branch",
+      "codex/rust-tauri-migration",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/destination-failure"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:54.841183+00:00",
+    "finishedUtc": "2026-10-07T03:38:54.918714+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "destination-failure",
+    "argv": [
+      "bash",
+      "-c",
+      "ROOT=\"$1\"; COPY=\"$2\"; EV=\"$3\"; fail() { echo \"FAIL: $*\" >&2; exit 1; };\npython3 \"$ROOT/scripts/rust-tauri/r05_t08_prepare_node.py\" \\\n  --source \"$ROOT\" --copy \"$COPY\" --evidence \"$EV/node-preparation\" \\\n  || fail \"isolated Node dependency preparation failed\"",
+      "node-prepare",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/prepared",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/destination-failure"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:54.919435+00:00",
+    "finishedUtc": "2026-10-07T03:38:54.969161+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "b5fd5f7a7beb152a74fc800a70794d97a7d417dfcf2438be331378b40fcd525c",
+    "ok": true
+  },
+  {
+    "name": "real-copy-failure",
+    "argv": [
+      "python3",
+      "-B",
+      "-c",
+      "import importlib.util,pathlib,sys;s=importlib.util.spec_from_file_location('p',sys.argv[1]);m=importlib.util.module_from_spec(s);s.loader.exec_module(m);src=pathlib.Path(sys.argv[2]);m.clone_dependencies(src,pathlib.Path(sys.argv[3]),m.inventory(src))",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_prepare_node.py",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source/node_modules/ws",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/read-only-copy-parent/ws"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:54.969698+00:00",
+    "finishedUtc": "2026-10-07T03:38:55.019864+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "50cc4048fede3634a34df52a1349ea2a0f076d24eb1fff6497c2efa5b63e38a4",
+    "ok": true
+  },
+  {
+    "name": "real-copy-restored",
+    "argv": [
+      "python3",
+      "-B",
+      "-c",
+      "import importlib.util,pathlib,sys;s=importlib.util.spec_from_file_location('p',sys.argv[1]);m=importlib.util.module_from_spec(s);s.loader.exec_module(m);src=pathlib.Path(sys.argv[2]);m.clone_dependencies(src,pathlib.Path(sys.argv[3]),m.inventory(src))",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_prepare_node.py",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source/node_modules/ws",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/read-only-copy-parent/ws"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:55.020309+00:00",
+    "finishedUtc": "2026-10-07T03:38:55.064429+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "shared-clone",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "clone",
+      "--shared",
+      "--quiet",
+      "--branch",
+      "codex/rust-tauri-migration",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/shared-object-check"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:55.064921+00:00",
+    "finishedUtc": "2026-10-07T03:38:55.140879+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "shared-objects-unavailable",
+    "argv": [
+      "python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_prepare_node.py",
+      "--source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "--copy",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/shared-object-check",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/shared-objects-unavailable"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:55.141448+00:00",
+    "finishedUtc": "2026-10-07T03:38:55.240506+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "cccc460cc58981c33d40d04909715f678bd201ea69d482aace83133b19cfbb5b",
+    "ok": true
+  },
+  {
+    "name": "shared-objects-restored",
+    "argv": [
+      "python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_prepare_node.py",
+      "--source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "--copy",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/shared-object-check",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/shared-objects-restored"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:55.240965+00:00",
+    "finishedUtc": "2026-10-07T03:38:57.477779+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "restored-clone",
+    "argv": [
+      "git",
+      "-C",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "clone",
+      "--shared",
+      "--quiet",
+      "--branch",
+      "codex/rust-tauri-migration",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/restored"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:57.510916+00:00",
+    "finishedUtc": "2026-10-07T03:38:57.592606+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "restored",
+    "argv": [
+      "bash",
+      "-c",
+      "ROOT=\"$1\"; COPY=\"$2\"; EV=\"$3\"; fail() { echo \"FAIL: $*\" >&2; exit 1; };\npython3 \"$ROOT/scripts/rust-tauri/r05_t08_prepare_node.py\" \\\n  --source \"$ROOT\" --copy \"$COPY\" --evidence \"$EV/node-preparation\" \\\n  || fail \"isolated Node dependency preparation failed\"",
+      "node-prepare",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "/private/tmp/r05-node-selfcheck-bz5g0665/restored",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/restored"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+    "startedUtc": "2026-10-07T03:38:57.593449+00:00",
+    "finishedUtc": "2026-10-07T03:38:59.993362+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "restored-real-cli",
+    "argv": [
+      "node",
+      "cli/entry.ts",
+      "help"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/restored",
+    "startedUtc": "2026-10-07T03:38:59.993858+00:00",
+    "finishedUtc": "2026-10-07T03:39:00.081193+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "678f09b8753dc1900b1d18d6fc9bf434838e2fdf29639d170533fb47a77bf62b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "restored-real-vitest",
+    "argv": [
+      "/private/tmp/r05-node-selfcheck-bz5g0665/restored/node_modules/.bin/vitest",
+      "run",
+      "tests/cli-args.test.ts"
+    ],
+    "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/restored",
+    "startedUtc": "2026-10-07T03:39:00.082044+00:00",
+    "finishedUtc": "2026-10-07T03:39:00.628497+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "1e6d847e1113a702123fd639878537b80ea9ae41dea32c0a23267254c6f3b2ef",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  }
+]

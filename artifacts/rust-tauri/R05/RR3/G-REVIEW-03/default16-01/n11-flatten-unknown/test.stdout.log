@@ -1,0 +1,24 @@
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/r05t08-work/negcopy.IYrM8z/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/r05t08-work/negcopy.IYrM8z/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.84s
+     Running unittests src/lib.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_adapters-d121ba365f5c0e96)
+
+running 1 test
+test models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest ... FAILED
+
+failures:
+
+---- models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest stdout ----
+
+thread 'models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest' (22401831) panicked at crates/lingxi-adapters/src/models/tool_render.rs:237:9:
+partial
+[process exited with code 0]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p lingxi-adapters --lib`

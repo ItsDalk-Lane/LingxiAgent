@@ -507,5 +507,1511 @@
     "task_level_result": "RR2 矩阵 10 行全部 INDEPENDENT_PASS、G-INT/G-NEG DONE（零异常零新 F-ID）；完整链 s5-full-5 exit 0；workspace 绿窗 exit 0（1476/0）。",
     "stage_status": "READY_FOR_INDEPENDENT_REVIEW——最终 accepted/R06_READY 待 FINAL-01 全新阶段审查者亲跑原总控 §5.3（证据根 artifacts/rust-tauri/R05/RR2/FINAL-01/verify-R05，目录须未存在）；终审前各文档不得写阶段 PASS。",
     "recorded_at": "2026-10-06/07"
-  }
+  },
+  "historical_record_notice": "rr3_current为E-03真实阻断截点；rr3_current_history含E-01/E-02原记录。原FAIL/PASS、RUNNING、旧尚未终审及uncommitted只属历史，不代表今天。当前NOT_ACCEPTED/R06_READY=false。",
+  "rr3_current": {
+    "round": "RR3",
+    "recorded_by": "rr3_e_impl_04（全新实施者；消费 RR3/FINAL-04 真实放行结果，待全新 E-REVIEW-05）",
+    "recorded_at": "2026-10-07T23:07:50.481961+00:00",
+    "status_snapshot": "E-04 回填 RR3/FINAL-04 全新独立终审亲跑 PASS：六条 §5.3 命令全 exit0、三层 gate overall=PASS/stable=true/checkpoint 全稳/runner 全 PASS、失败清单为空。F42–F54 全部独立 CLOSED；G-REVIEW-03 默认 16+full R02/E5 包级 PASS；空间阻断已由总控 cargo clean 等解除（G02 阻断及解除按时间线保留）。接受=离线规定范围；LIVE/平台延期按原登记携带。本 E04 仅 SELF_CHECKED 待全新独立文档审。",
+    "stage_readiness": "ACCEPTED_OFFLINE_SCOPE_WITH_REGISTERED_LIVE_DEFERRALS",
+    "R06_READY": true,
+    "offline_gate": "PASS",
+    "independent_review": "PASS",
+    "independent_review_basis": "RR3/FINAL-04 全新空历史独立阶段审查者亲跑：§5.3 六条命令全部真实 exit=0，verify-stage R05 三层（R05/R04/R03）overall=PASS、candidateSourceBinding before==after、checkpoint 逐项 stable、runner 全 PASS、testedSha=b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b+真实工作树；完整失败清单=空。原 §6.1 八条全部成立（FINAL-04 STAGE_REVIEW §六）。",
+    "rr3_independent_review": "PASS",
+    "live_verification": "BLOCKED_NOT_AUTHORIZED",
+    "release_state": "NOT_IN_SCOPE",
+    "packages": {
+      "A": {
+        "status": "CLOSED",
+        "independent_review": "PASS",
+        "issues": [
+          "F42"
+        ],
+        "mustFix": [],
+        "evidence_ref": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md",
+        "review_sha256": "cc52fe061bb557a82ba44397277f0dd719b02c8a2fd1ce02ad1b16a7e736f9e9",
+        "note": "A1/A2包级独立关闭；A1 17输入相等可复用，A2已变legacy由J02新验；完整正式嵌套链仍待新FINAL。"
+      },
+      "B": {
+        "status": "CLOSED",
+        "independent_review": "PASS",
+        "issues": [
+          "F45"
+        ],
+        "mustFix": [],
+        "evidence_ref": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+        "review_sha256": "8e83638b0b24ed5d98a8bd9acc2d632d5eb07fcba0df431350f20108777c72a1",
+        "note": "动态N03目标红与恢复绿有效；I/J/G限定复用不等于当前默认16完成。"
+      },
+      "C_F46": {
+        "status": "CLOSED",
+        "independent_review": "PASS",
+        "issues": [
+          "F27-RR3",
+          "F46"
+        ],
+        "mustFix": [],
+        "evidence_ref": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/REVIEW.md",
+        "review_sha256": "63568d89efec87085f22ba6e760d6c01d1c3f94bea1c9a4b9c956036a5ad9efc",
+        "note": "C-F46-REVIEW-01历史PASS保留；H修改service诊断后，H02以新service/装备亲跑160轮、资源反控和普通取消，375实际输入仍相等；只签包级资源。",
+        "historical_review_ref": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md"
+      },
+      "D": {
+        "status": "CLOSED_BY_FINAL04_R00_LAN",
+        "independent_review": "PASS（D-REVIEW-01 定位及精确操作准备；r00/ALF 最终由 FINAL-04 实测解除）",
+        "required_gate": "PASS（FINAL-04 内 6 次 LAN 断言全过）",
+        "exit_code": null,
+        "note": "D-REVIEW-01 历史确切对象 9f748902… 曾 0/1/0/0 exit101、非回环 20s 0 字节（历史保留）；FINAL-04 两新对象 cf9bce2f…（命令3）与 d57ea731…/CDHash 364514be…（gate 内 5 次 workspace）共 6 次 r00 LAN 断言全部真实通过，两对象均被 ALF 放行——无证据需要用户防火墙操作。历史对象与准备单不用于当前系统操作；R05-ENV-R00 保留按实例偶发观察属性。",
+        "binary_identity": {
+          "absolutePath": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0",
+          "sha256": "9f7489029c91d1c232e3c204236854bd53c69cee2fef33d6fd778a27f44696d3",
+          "cdhash": "d9676388f524872f1269c13f61f413458c0e9e52",
+          "identity_scope": "H变更前D-REVIEW-01历史实测对象；不是当前或未来FINAL身份承诺。"
+        },
+        "prepared_ref": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+        "evidence_ref": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+        "manifest_ref": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/evidence-manifest.json",
+        "current_final_binary_identity": {
+          "path": "rust/target/debug/deps/r00_management_leaves-590de196dceb15ce",
+          "sha256_gate_object": "d57ea731b6f2561e2bd84cf119049b3bed57278b49fe48ee8332c6514314f67e",
+          "cdhash": "364514be2a80192205220ddee1f4e4c4b41a756f",
+          "sha256_cmd3_object": "cf9bce2fcb58f9d152a941d08a728024fb9366128ae082ee978e4c5d62d18852",
+          "identity_scope": "FINAL-04 窗口实测对象；重链接后新实例仍按 R05-ENV-R00 观察属性逐实例核验"
+        }
+      },
+      "E": {
+        "status": "CLOSED",
+        "independent_review": "PASS（E-REVIEW-04，E03 文档轮）",
+        "round": 3,
+        "evidence_ref": "artifacts/rust-tauri/R05/RR3/E-03/REPORT.md",
+        "note": "原 MF-E01/MF-E02 由 E-REVIEW-02 关闭；E03 文档轮由 E-REVIEW-04 全新独立 PASS（14/14 文档与 MANIFEST 一致、9369 语义输入独立重算、隔离正反控制 METHOD_VALIDATED）。本轮 E04 消费 FINAL-04 真实结果另行回填，再待全新 E-REVIEW-05。",
+        "historical_reviews": [
+          {
+            "round": 1,
+            "verdict": "FAIL",
+            "mustFix": [
+              "MF-E01",
+              "MF-E02"
+            ],
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/REVIEW.md",
+            "sha256": "57023419618ec8bd7f925dd3ef48eb0549f948cdf6af7227a6a37d5abd114fda"
+          },
+          {
+            "round": 2,
+            "verdict": "PASS",
+            "mustFix": [],
+            "closed": [
+              "MF-E01",
+              "MF-E02"
+            ],
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/REVIEW.md",
+            "sha256": "4eee7fc3bb87acf936556057d0553360d80d472be1c7d70c674fb9f179792e7d"
+          },
+          {
+            "round": 4,
+            "verdict": "PASS",
+            "scope": "E03 文档轮（截点 2026-10-07T04:56:55Z；不等于阶段终审）",
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/E-REVIEW-04/REVIEW.md"
+          }
+        ],
+        "snapshot_semantics": "SELF_CHECKED/PENDING仅表示E03生成截点。后续全新E独立报告与总控最新协调记录、真实交付回执为新结论来源；未存在的报告不填路径/哈希/PASS，不要求本报告循环绑定自身提交。"
+      },
+      "G": {
+        "status": "CLOSED",
+        "independent_review": "PASS（G-REVIEW-03 包级）",
+        "closed_by": "G-REVIEW-03 default16-03：16/16 fail-closed 逐项点名、controls 绿、N03 恢复绿、N16 两次不同绑定且旧根拒收、真实 shell exit=0 落盘（G02 的 UNKNOWN 缺口补上）；full R02 N16 run-b 20/20 命令 overall=PASS、a16 E5 全量+seal-family 分类 GREEN；Node verify 64,765 PASS；最终 12 文件逐字节恢复（独立 SHA 复算全等）。",
+        "evidence_dir": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/",
+        "review": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/REVIEW.md",
+        "mapping": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/I-MAPPING.md",
+        "invalid_rounds_preserved": "default16-01 宿主终止（N16 run-b 中途，UNKNOWN 原样保留）；default16-02 共享 NEG_TARGET 缓存污染被 control 即时 fail-closed（流程教训，非产品缺陷，取证后删本轮自建缓存）",
+        "g02_storage_blocked_history": {
+          "result_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/REVIEW.md",
+          "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md",
+          "stopped_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/STOPPED.json",
+          "tested_sha": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+          "tested_sha_semantics": "HEAD + G02保存的dirty候选；不等于纯HEAD或后续文档/交付提交。",
+          "evidence_dir": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/",
+          "default_shell_exit": "UNKNOWN",
+          "recorder_tool_exit": 1,
+          "observer_tool_exit": 143,
+          "normal_controls": {
+            "xtask": {
+              "passed": 8,
+              "failed": 0,
+              "ignored": 0,
+              "filtered": 113,
+              "exit_code": 0
+            },
+            "binary_wiring": {
+              "passed": 2,
+              "failed": 0,
+              "ignored": 0,
+              "filtered": 0,
+              "exit_code": 0
+            }
+          },
+          "N01": {
+            "status": "VALID_TARGET_RED",
+            "exit_code": 101,
+            "passed": 0,
+            "failed": 1,
+            "ignored": 0,
+            "filtered": 120,
+            "target": "R05 map dropped original scenario R05-A16",
+            "restored_bytes": true,
+            "restored_execution": "NOT RUN"
+          },
+          "N02": {
+            "status": "INVALID_ENVIRONMENT_FAILURE",
+            "observed_case_row_exit": 1,
+            "target_reached": false,
+            "producer_runs_completed": 0,
+            "failed_compile_summaries": 28,
+            "cause": "ENOSPC"
+          },
+          "unexecuted_cases": [
+            "N03",
+            "N04",
+            "N05",
+            "N06",
+            "N07",
+            "N08",
+            "N09",
+            "N10",
+            "N11",
+            "N12",
+            "N13",
+            "N14",
+            "N15",
+            "N16"
+          ],
+          "full_R02_runs": 0,
+          "full_E5": "NOT RUN",
+          "final_restore": "NOT RUN",
+          "node_terminal_verify": "NOT RUN",
+          "case_results_json": "NOT PRODUCED",
+          "mustFix": [],
+          "note": "默认入口真实运行后停写。N02构建未抵达零匹配断言；28条编译失败不是业务失败。N03 reset复制失败后退出；默认shell wait回执未落盘，记录器1/观察器143不可混同。旧G01 exit2/15行/N16reuse缺失保留，不能拼成16/16。"
+        },
+        "space_timeline": "G02 BLOCKED_BY_STORAGE 为真实历史（2026-10-07，ENOSPC）；总控 cargo clean（280.7GiB）+部分 RR2 tmp 回收（TASK0 回执）后解除；G-REVIEW-03 冷缓存全量重编完整执行——阻断不写成从未发生",
+        "g01_history_note": "旧 G01 exit2/15 行/N16 reuse 缺失为总控并行入口漂移协调失误，永久保留",
+        "mustFix": []
+      },
+      "FINAL": {
+        "status": "PASS",
+        "independent_review": "PASS",
+        "round": "RR3/FINAL-04",
+        "result_ref": "artifacts/rust-tauri/R05/RR3/FINAL-04/STAGE_REVIEW.md",
+        "result_json": "artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05/verify-stage-result.json",
+        "structured_summary": "artifacts/rust-tauri/R05/RR3/FINAL-04/STRUCTURED_SUMMARY.json",
+        "tested_sha": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+        "tested_sha_semantics": "HEAD + RR3 未提交真实工作树（worktreeDirty=true，testedShaAtEnd 同）；不等于纯 HEAD 或后续文档/交付提交",
+        "note": "全新空历史独立终审亲跑六条 §5.3 命令全 exit0；三层 gate 全 PASS；失败清单为空；r00 两新对象 6 次 LAN 全过；零 Git 写。",
+        "final_history": [
+          {
+            "round": "RR3/FINAL-01",
+            "overall": "FAIL",
+            "window": "STAGE_REVIEW 落盘 2026-10-07T19:39Z",
+            "cause": "命令1–5 全 exit0（workspace 115 组 1486/0 含 r00 新对象 43d95970… LAN 通过、ALF 放行）；命令6 verify-stage R05 启动即被候选绑定器拒收（exit1）：56 个含嵌套 .git 的未跟踪证据夹具目录。证据根未创建、零层 JSON；归因=候选绑定×RR3 证据夹具集成缺口，非环境。→ F51 登记",
+            "stage_review": "artifacts/rust-tauri/R05/RR3/FINAL-01/STAGE_REVIEW.md"
+          },
+          {
+            "round": "RR3/FINAL-02",
+            "overall": "FAIL",
+            "window": "STAGE_REVIEW 落盘 2026-10-07T20:55Z",
+            "cause": "命令1–5 全 exit0；命令6 exit1 于唯一符号链接条目 A-REVIEW-02/independent-validator-bin/python3（终量 69,075 条：69,074 普通文件+1 symlink，F51 保持成立）。→ F52 登记",
+            "stage_review": "artifacts/rust-tauri/R05/RR3/FINAL-02/STAGE_REVIEW.md"
+          },
+          {
+            "round": "RR3/FINAL-03",
+            "overall": "FAIL",
+            "window": "STAGE_REVIEW 落盘 2026-10-08T00:13Z",
+            "cause": "命令1–5 全 exit0；命令6 尝试1 被宿主 SIGKILL（gate UNKNOWN），尝试2 完整执行 76m41s 后 exit1：里程碑=全链候选绑定/runner/checkpoint 首次在主树正式入口全稳；剩余两项必需失败=R03 层 terminal_family_share_cases 满载时序 flake（F53）+ R04 层 46 独占叶分类缺口（F54）。→ F53/F54 登记",
+            "stage_review": "artifacts/rust-tauri/R05/RR3/FINAL-03/STAGE_REVIEW.md"
+          }
+        ]
+      },
+      "H": {
+        "status": "CLOSED",
+        "independent_review": "PASS",
+        "issues": [
+          "F47",
+          "F48"
+        ],
+        "mustFix": [],
+        "evidence_ref": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/REVIEW.md",
+        "review_sha256": "63568d89efec87085f22ba6e760d6c01d1c3f94bea1c9a4b9c956036a5ad9efc",
+        "note": "A01 warn/info原17项、A13秘密/请求关联、redaction25/logging9、5类拒绝及受影响F46/资源均独立PASS；H01中断无结论和无效缓存准备保留。"
+      },
+      "I": {
+        "status": "CLOSED",
+        "independent_review": "PASS",
+        "issues": [
+          "F49"
+        ],
+        "mustFix": [],
+        "evidence_ref": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/REVIEW.md",
+        "review_sha256": "0be606723e10952b6e07fc09211a68c4225f4a0af0f9bd9fbaf11a55ec69a9ed",
+        "note": "原恢复56检查+13额外、B15/41、真实N03和受控来源漂移0→1→0；J准备段变化有保持性证据，不能充当默认16或full R02。"
+      },
+      "J": {
+        "status": "CLOSED",
+        "independent_review": "PASS",
+        "issues": [
+          "F50"
+        ],
+        "mustFix": [],
+        "evidence_ref": "artifacts/rust-tauri/R05/RR3/J-REVIEW-02/REVIEW.md",
+        "review_sha256": "2da7159a953a24e17f94c2eaa4e9bb945b25e377104fc116e5f50ea6226c0a40",
+        "note": "默认完整HEAD/Node准备、历史BASE、原E0–E4.5 directed独立PASS；五项缺依赖准备缺口已关闭，不称五项产品功能失效，也不称完整R02/full E5业务已过。"
+      },
+      "STORAGE": {
+        "status": "PRECISE_CLEANUP_COMPLETED_BUILD_SPACE_UNPROVEN",
+        "evidence_ref": "artifacts/rust-tauri/R05/RR3/STORAGE-03/REPORT.md",
+        "receipt_ref": "artifacts/rust-tauri/R05/RR3/STORAGE-03/execution-receipt.json",
+        "removed_objects": 33,
+        "logical_bytes": 136063856,
+        "protected_checks": 1450,
+        "protected_changed": 0,
+        "retained_fragments": 37,
+        "free_bytes_after": 265158656,
+        "note": "正式24小文件同字节归档；仅回收本轮失败编译自产对象。约0.247GiB只提供文档余量，不能证明新完整构建可行；继续停构建。"
+      },
+      "F51": {
+        "status": "CLOSED",
+        "independent_review": "PASS（F51-REVIEW-01）",
+        "issues": [
+          "F51"
+        ],
+        "mustFix": [],
+        "impl_ref": "artifacts/rust-tauri/R05/RR3/F51-01/REPORT.md",
+        "review_ref": "artifacts/rust-tauri/R05/RR3/F51-REVIEW-01/REVIEW.md",
+        "note": "56 个含嵌套 .git 未跟踪证据夹具目录同卷 rename 迁至仓库外 LingxiAgent-RR3-localonly-fixtures/（110,071 文件+121 链接/5,324,827,710 字节），逐目录前后 tree_digest 全等，41 原父目录 RELOCATED-F51.json 标记；A/F42 绑定器 fail-closed 契约零改动。"
+      },
+      "F52": {
+        "status": "CLOSED",
+        "independent_review": "PASS（F52-REVIEW-01）",
+        "issues": [
+          "F52"
+        ],
+        "mustFix": [],
+        "impl_ref": "artifacts/rust-tauri/R05/RR3/F52-01/REPORT.md",
+        "review_ref": "artifacts/rust-tauri/R05/RR3/F52-REVIEW-01/REVIEW.md",
+        "note": "唯一 symlink 条目（A-REVIEW-02/independent-validator-bin/python3）整目录迁出（并入 LingxiAgent-RR3-localonly-fixtures/，localOnly）；绑定面终量 69,140 条 100% 普通文件、六类异常全 0。"
+      },
+      "L_F53": {
+        "status": "CLOSED",
+        "independent_review": "PASS（L-REVIEW-01）",
+        "issues": [
+          "F53"
+        ],
+        "mustFix": [],
+        "impl_ref": "artifacts/rust-tauri/R05/RR3/L-01/REPORT.md",
+        "review_ref": "artifacts/rust-tauri/R05/RR3/L-REVIEW-01/REVIEW.md",
+        "note": "terminal_family_share_cases PTY 双份 marker 拷贝就绪屏障加固（仅测试文件 r04_t08_tool_matrix.rs，断言一字未动）；满载完整套件 10/0 绿、隔离变异红（幻影重放恰在原断言 :103）；FINAL-04 R03 层 17/17 未复发。"
+      },
+      "M_F54": {
+        "status": "CLOSED",
+        "independent_review": "PASS（M-REVIEW-01）",
+        "issues": [
+          "F54"
+        ],
+        "mustFix": [],
+        "impl_ref": "artifacts/rust-tauri/R05/RR3/M-01/REPORT.md",
+        "review_ref": "artifacts/rust-tauri/R05/RR3/M-REVIEW-01/REVIEW.md",
+        "note": "R04 46 独占叶改 full_original_behavior（119 专属案例组逐条钉住，全部来自 r04_tool_matrix 真实 56 案例集）；改动白名单 stage_maps/R04.json、r04_t08_generate_stage_map.py、stage_map.rs 仅镜像测试；FINAL-04 R04 层叶表 0 FAIL（55=46 full+9 share，69 deferred 合法承接）验证生效。"
+      }
+    },
+    "historical_layers": [
+      {
+        "stage": "R05",
+        "result_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+        "sha256": "0f5911462089380b8eb94d137b98f8d2382d062564c43d54cd84338b0852191e",
+        "overall": "FAIL",
+        "candidate_stable": true,
+        "runner_status": "PASS",
+        "stable_checkpoints": 7,
+        "checkpoints": 7,
+        "commands_passed": 5,
+        "commands_total": 7,
+        "changed_paths": []
+      },
+      {
+        "stage": "R04",
+        "result_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/verify-stage-result.json",
+        "sha256": "b9c115415225b03d19929708095bc3cd3cfae6c8677804a541a6a909ff732d40",
+        "overall": "FAIL",
+        "candidate_stable": false,
+        "runner_status": "PASS",
+        "stable_checkpoints": 0,
+        "checkpoints": 8,
+        "commands_passed": 6,
+        "commands_total": 8,
+        "changed_paths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/r04_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "stage": "R03",
+        "result_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+        "sha256": "157d8cd5e1f03d19f57f5d35ce0041904503c5809964ae1b2900abcd292d6803",
+        "overall": "FAIL",
+        "candidate_stable": false,
+        "runner_status": "PASS",
+        "stable_checkpoints": 0,
+        "checkpoints": 15,
+        "commands_passed": 14,
+        "commands_total": 15,
+        "changed_paths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      }
+    ],
+    "scope_counts": {
+      "applicable_leaves": 130,
+      "shared": 119,
+      "full": 6,
+      "deferred": 5,
+      "dual_stage": 124,
+      "dual_stage_includes_deferred": 5,
+      "original_A": 16,
+      "original_C": 100,
+      "additional_C": 3,
+      "C_total": 103,
+      "cid": 93,
+      "command": 10,
+      "original_negative": 16
+    },
+    "raw_npm": "历史candidate raw npm exit1（3文件/6失败，seal-coordinate-lag）；base exit0。未重跑，不把合法directed/E5登记形态写为raw npm全绿。",
+    "directed_E5": "正式链内 R03 层 r02_legacy_regression 为 directed（E0–E4.5 全绿、E5 BY SCOPE SKIP，原明确许可）；full E5 属负测 N16 范围，由 G-REVIEW-03 隔离副本独立证明（N16 run-b 20/20 命令 overall=PASS、a16 E5 全量+seal-family 分类 GREEN，历史有效，FINAL-04 不重跑不新签）；raw npm 历史 candidate 红（seal trio 3 文件/6 失败）保持 registered-not-formal-green，不写全绿。",
+    "permissions": "仅原许可延期：LIVE=BLOCKED_NOT_AUTHORIZED（RR-BLK-CREDENTIALS，最迟 R10）；平台=Linux x86_64 继承原登记未复验、Windows 未验证（R09/R10 合法继承）。macOS arm64 本轮全部真实执行。r00/ALF 本轮两新对象放行、无用户操作证据；R05-ENV-R00 按二进制实例偶发观察属性保留。不新增延期。",
+    "evidence_refs": {
+      "historical_audit": "artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+      "rr2_final": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+      "rr2_final_review": "artifacts/rust-tauri/R05/RR2/FINAL-01/STAGE_REVIEW.md",
+      "a2": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md",
+      "a1_review": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md",
+      "b_review": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+      "c": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+      "i10": "artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+      "ordinary_cancel": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/ordinary-cancel-recovery/command.json",
+      "late_result": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/late-result-next-run/command.json",
+      "f46": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md",
+      "resource_receipt": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/command.json",
+      "resource_raw": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/f27-resource-series.json",
+      "runtime_binding": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/runtime-binding.json",
+      "resource_negative": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/sampler-negative-final/result.json",
+      "d": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+      "d_prepared": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+      "rr2_b_review": "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
+      "rr2_d_review": "artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md",
+      "rr2_i": "artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md",
+      "rr2_negative": "artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md",
+      "rr2_r02_summary": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+      "rr2_r02_stdout": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log",
+      "rr2_r02_exclusions": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-binding-exclusions.txt",
+      "rr2_r02_sinks": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-run-output-sinks.txt",
+      "a_review": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md",
+      "a_manifest": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/manifest.json",
+      "cf46_review": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+      "cf46_manifest": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/MANIFEST.json",
+      "cf46_result": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/RESULT.json",
+      "cf46_resource_receipt": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/command.json",
+      "cf46_resource_raw": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/f27-resource-series.json",
+      "cf46_analysis": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/RESOURCE_ANALYSIS.json",
+      "cf46_runtime_binding": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/runtime-binding.json",
+      "cf46_negative": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/result.json",
+      "cf46_ordinary_cancel": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-subagent/command.json",
+      "cf46_late_result": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-late/command.json",
+      "d_review": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+      "d_manifest": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/evidence-manifest.json",
+      "d_current_prepared": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+      "d_current_object": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/prepared-object.json",
+      "d_current_receipt": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/r00-formal-01.json",
+      "e_first_fail": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/REVIEW.md",
+      "e_first_manifest": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/manifest.json",
+      "e_round2": "artifacts/rust-tauri/R05/RR3/E-02/REPORT.md",
+      "e_consumption": "artifacts/rust-tauri/R05/RR3/E-02/manifest-consumption.json",
+      "h_review": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/REVIEW.md",
+      "h_binding": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/FINAL_SOURCE_BINDING.json",
+      "i_review": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/REVIEW.md",
+      "j_review": "artifacts/rust-tauri/R05/RR3/J-REVIEW-02/REVIEW.md",
+      "g_review": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/REVIEW.md",
+      "i_mapping": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md",
+      "storage": "artifacts/rust-tauri/R05/RR3/STORAGE-03/REPORT.md",
+      "input_boundary": "artifacts/rust-tauri/R05/RR3/DOC-INPUT-BOUNDARY-01/REPORT.md",
+      "delivery_preparation": "artifacts/rust-tauri/R05/RR3/DELIVERY-PREP-02/REPORT.md",
+      "delivery_refresh_rules": "artifacts/rust-tauri/R05/RR3/DELIVERY-PREP-02/REFRESH_RULES.md",
+      "e_current": "artifacts/rust-tauri/R05/RR3/E-03/REPORT.md",
+      "e_previous_review": "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/REVIEW.md",
+      "final04_stage_review": "artifacts/rust-tauri/R05/RR3/FINAL-04/STAGE_REVIEW.md",
+      "final04_structured_summary": "artifacts/rust-tauri/R05/RR3/FINAL-04/STRUCTURED_SUMMARY.json",
+      "final04_result_r05": "artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05/verify-stage-result.json",
+      "final04_result_r04": "artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05/R04_REGRESSION/verify-stage-result.json",
+      "final04_result_r03": "artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+      "final04_command_records": "artifacts/rust-tauri/R05/RR3/FINAL-04/command-records/",
+      "g_review_03": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/REVIEW.md",
+      "g_review_03_mapping": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/I-MAPPING.md",
+      "e_review_04": "artifacts/rust-tauri/R05/RR3/E-REVIEW-04/REVIEW.md",
+      "f51_impl": "artifacts/rust-tauri/R05/RR3/F51-01/REPORT.md",
+      "f51_review": "artifacts/rust-tauri/R05/RR3/F51-REVIEW-01/REVIEW.md",
+      "f52_impl": "artifacts/rust-tauri/R05/RR3/F52-01/REPORT.md",
+      "f52_review": "artifacts/rust-tauri/R05/RR3/F52-REVIEW-01/REVIEW.md",
+      "f53_impl": "artifacts/rust-tauri/R05/RR3/L-01/REPORT.md",
+      "f53_review": "artifacts/rust-tauri/R05/RR3/L-REVIEW-01/REVIEW.md",
+      "f54_impl": "artifacts/rust-tauri/R05/RR3/M-01/REPORT.md",
+      "f54_review": "artifacts/rust-tauri/R05/RR3/M-REVIEW-01/REVIEW.md",
+      "e04_report": "artifacts/rust-tauri/R05/RR3/E-04/REPORT.md"
+    },
+    "silent_window": "FINAL-04 已收尾停写（其运行期间本仓无其他写者，FINAL-03 遗留外置只读 r00 监控进程非仓内写者，如实记录）。本 E04 在无任何 G/FINAL 运行窗口内做纯文档回填；E14 字节变化使完整候选摘要变化——不能声称与 FINAL-04 被测候选全树相等，实际语义输入逐项前后相等证明见 E-04/REPORT.md 及其输入相等清单。",
+    "historical_r02": {
+      "command": "r02_legacy_regression",
+      "parent_result": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+      "status": "PASS",
+      "exit_code": 0,
+      "mode": "directed-no-seal-family",
+      "E0_to_E4_5": "ALL GREEN",
+      "E5": "SKIP BY SCOPE（原明确许可，非完整npm或正式封印绿）",
+      "summary_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+      "raw_stdout_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log",
+      "scope": "历史RR2 FINAL第4层实际R02脚本结果，不冒称独立R02 verify-stage JSON；其上游R03/R04来源不稳定仍FAIL，不能推导全链PASS。",
+      "candidate_sha": "ad5ec4e9853a51ed929f1e2e077b97d41c951572",
+      "final04_note": "FINAL-04 R03 层同口径复现：r02_* 命令全 PASS、legacy directed E0–E4.5 全绿、E5 BY SCOPE SKIP；candidate_sha=b3ac0e6a+真实工作树。"
+    },
+    "historical_evidence_refs": {
+      "ordinary_cancel": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json",
+      "late_result": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json",
+      "resource_receipt": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json",
+      "resource_raw": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/f27-resource-series.json",
+      "runtime_binding": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/runtime-binding.json",
+      "resource_negative": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/result.json",
+      "d": "artifacts/rust-tauri/R05/RR3/D-01/REPORT.md",
+      "d_prepared": "artifacts/rust-tauri/R05/RR3/D-01/PREPARED-ALLOW.md",
+      "c": "artifacts/rust-tauri/R05/RR3/C-01/REPORT.md",
+      "E02_resource_receipt": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/command.json",
+      "E02_resource_raw": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/f27-resource-series.json",
+      "E02_runtime_binding": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/runtime-binding.json",
+      "E02_resource_negative": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/result.json",
+      "E02_ordinary_cancel": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-subagent/command.json",
+      "E02_late_result": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-late/command.json"
+    },
+    "historical_evidence_refs_notice": "仅E-01/C-01/F46-01/D-01历史轮次；现行通用消费者已指向最新独立结果。",
+    "remaining_required": [
+      "全新 E-REVIEW-05 独立文档审查（消费本 E04 回填与 FINAL-04 真实结果）。",
+      "DELIVERY-FINAL-02 实际新枚举交付分类 → DELIVERY-REVIEW-01 独立审查；PREP02 旧 13,828 拟纳入名单不能直接暂存。",
+      "总控按既有授权执行精确 Git 暂存/提交/推送并按 git_delivery_receipt_contract 归档真实回执；本截点零暂存/零提交/零推送，不预写。",
+      "LIVE 真实供应商验证按原登记延期（RR-BLK-CREDENTIALS，最迟 R10，需用户授权凭证与预算）。",
+      "Linux x86_64 复验与 Windows 验证按原登记平台义务（R09/R10）。"
+    ],
+    "I01_I11": {
+      "I01": {
+        "status": "PASS_BY_FINAL04_FULL_CHAIN",
+        "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/I-MAPPING.md",
+        "note": "G-REVIEW-03 I-MAPPING 所列『完整 producer 组合待 FINAL』由 FINAL-04 正常态全链亲跑补齐：R05 层 workspace 115 组 1486 全绿 + r05_stage_suites 全绿（含各 I 项对应具名套件）+ R04/R03 层闭包 PASS。"
+      },
+      "I02": {
+        "status": "PASS_BY_FINAL04_FULL_CHAIN",
+        "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/I-MAPPING.md",
+        "note": "G-REVIEW-03 I-MAPPING 所列『完整 producer 组合待 FINAL』由 FINAL-04 正常态全链亲跑补齐：R05 层 workspace 115 组 1486 全绿 + r05_stage_suites 全绿（含各 I 项对应具名套件）+ R04/R03 层闭包 PASS。"
+      },
+      "I03": {
+        "status": "PASS_BY_FINAL04_FULL_CHAIN",
+        "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/I-MAPPING.md",
+        "note": "G-REVIEW-03 I-MAPPING 所列『完整 producer 组合待 FINAL』由 FINAL-04 正常态全链亲跑补齐：R05 层 workspace 115 组 1486 全绿 + r05_stage_suites 全绿（含各 I 项对应具名套件）+ R04/R03 层闭包 PASS。"
+      },
+      "I04": {
+        "status": "PASS_BY_FINAL04_FULL_CHAIN",
+        "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/I-MAPPING.md",
+        "note": "G-REVIEW-03 I-MAPPING 所列『完整 producer 组合待 FINAL』由 FINAL-04 正常态全链亲跑补齐：R05 层 workspace 115 组 1486 全绿 + r05_stage_suites 全绿（含各 I 项对应具名套件）+ R04/R03 层闭包 PASS。"
+      },
+      "I05": {
+        "status": "PASS_BY_FINAL04_FULL_CHAIN",
+        "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/I-MAPPING.md",
+        "note": "G-REVIEW-03 I-MAPPING 所列『完整 producer 组合待 FINAL』由 FINAL-04 正常态全链亲跑补齐：R05 层 workspace 115 组 1486 全绿 + r05_stage_suites 全绿（含各 I 项对应具名套件）+ R04/R03 层闭包 PASS。"
+      },
+      "I06": {
+        "status": "PASS_BY_FINAL04_FULL_CHAIN",
+        "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/I-MAPPING.md",
+        "note": "四工具/worker 嵌套链在 FINAL-04 全链绿（production_tools/worker_model/usage_ledger 均在内）。",
+        "extra_worker_permission": "NOT_OBSERVED（观察项，非阶段必需断言；沿 G-INTERRUPTION/G-REVIEW-03 结论如实保留，不补造）"
+      },
+      "I07": {
+        "status": "PASS_BY_FINAL04_FULL_CHAIN",
+        "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/I-MAPPING.md",
+        "note": "G-REVIEW-03 I-MAPPING 所列『完整 producer 组合待 FINAL』由 FINAL-04 正常态全链亲跑补齐：R05 层 workspace 115 组 1486 全绿 + r05_stage_suites 全绿（含各 I 项对应具名套件）+ R04/R03 层闭包 PASS。"
+      },
+      "I08": {
+        "status": "PASS_BY_FINAL04_FULL_CHAIN",
+        "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/I-MAPPING.md",
+        "note": "G-REVIEW-03 I-MAPPING 所列『完整 producer 组合待 FINAL』由 FINAL-04 正常态全链亲跑补齐：R05 层 workspace 115 组 1486 全绿 + r05_stage_suites 全绿（含各 I 项对应具名套件）+ R04/R03 层闭包 PASS。"
+      },
+      "I09": {
+        "status": "PASS_BY_FINAL04_FULL_CHAIN",
+        "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/I-MAPPING.md",
+        "note": "G-REVIEW-03 I-MAPPING 所列『完整 producer 组合待 FINAL』由 FINAL-04 正常态全链亲跑补齐：R05 层 workspace 115 组 1486 全绿 + r05_stage_suites 全绿（含各 I 项对应具名套件）+ R04/R03 层闭包 PASS。"
+      },
+      "I10": {
+        "status": "PASS_LIMITED_REUSE",
+        "review_ref": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/REVIEW.md",
+        "input_count": 375,
+        "binding_ref": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/FINAL_SOURCE_BINDING.json",
+        "qualification": "H02 亲跑；G-REVIEW-03 与本轮 E04 均按输入相等边界只读复用；FINAL-04 workspace 内 resources 套件亦真实绿。"
+      },
+      "I11": {
+        "status": "PASS_BY_G_REVIEW_03",
+        "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/I-MAPPING.md",
+        "note": "default16-03 完整亲跑 16/16 fail-closed 点名+controls 绿+恢复绿+真实 exit0；G01/G02 历史失败永久保留不冲销。"
+      }
+    },
+    "git_delivery": {
+      "status": "NOT_PERFORMED_AT_E04_CUTOFF",
+      "committed_sha": null,
+      "pushed_sha": null,
+      "remote_receipt_ref": null,
+      "authority": "FINAL-04 亲核零暂存/零提交/零推送（reflog 顶条 b3ac0e6a、index 未重写、开工==收尾两哈希相等）；本 E04 同样零 Git 写。精确 Git 动作由总控按既有授权执行并归档真实回执。",
+      "receipt_contract_ref": "docs/rust-tauri/R05/R05_HANDOFF.json#git_delivery_receipt_contract"
+    },
+    "final_gate_detail": {
+      "round": "RR3/FINAL-04",
+      "overall": "PASS",
+      "stage_review": "artifacts/rust-tauri/R05/RR3/FINAL-04/STAGE_REVIEW.md",
+      "structured_summary": "artifacts/rust-tauri/R05/RR3/FINAL-04/STRUCTURED_SUMMARY.json",
+      "command_records": "artifacts/rust-tauri/R05/RR3/FINAL-04/command-records/",
+      "evidence_root": "artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05/",
+      "evidence_root_files": 750,
+      "interrupted_attempt_preserved": "artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05-ATTEMPT1-INTERRUPTED/",
+      "tested_sha": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+      "worktree_dirty": true,
+      "candidate_shape": "HEAD b3ac0e6a + RR3 未提交真实工作树（开工==收尾 git diff HEAD SHA256=7041cafb… 与 git ls-files -s SHA256=3016f7ae… 前后逐字节相等；tracked 集 FINAL-01 起未变；29 M=FINAL-03 25M+L/M 4 文件）",
+      "window_utc": "命令1 2026-10-07T19:56:20Z 起 → 命令6 尝试2 2026-10-07T22:46:35Z 止；gate 4912.7s；STAGE_REVIEW 落盘 2026-10-08T06:56Z",
+      "commands": "6/6 全部真实 exit=0：fmt（0 输出）/clippy（0 警告，真实部分重编 53.06s）/workspace（115 组 1486 passed/0 failed/0 ignored/0 measured/0 filtered，14m52s）/check-contracts（56 生成文件 drift-free+API_COMPAT_MATRIX 626 条）/check-boundaries（RESULT: OK）/verify-stage R05",
+      "cmd6_attempts": "尝试1 20:13:41Z→21:23:31Z 被宿主终止（会话脱离仍被后代进程树清理杀死，gate UNKNOWN 非产品失败，192 文件字节保留）；尝试2 21:24:41Z→22:46:35Z double-fork 孤儿化完整跑完 exit=0（本轮签收依据）",
+      "git_writes": "none（reflog 顶条仍提交 b3ac0e6a、主 .git/index 未重写、零暂存、开工==收尾两哈希相等）",
+      "frozen_inputs": "33 项冻结生产输入（FINAL-03 30 项+L/M 3 项），收尾 postcheck 与 FINAL-03 基线交叉核对：30 项重叠 29 项 SHA 相同、唯一差异 stage_maps/R04.json（M/F54 生成器重建，预期）；开工快照被收尾复跑覆盖的过程失误以三重证明补救（git 双哈希相等/FINAL-03 基线交叉/gate 三层绑定 before==after）",
+      "binder_surface_at_open": "72,097 条 = 100% 普通文件（六类异常全 0，F51/F52 修复保持成立）"
+    },
+    "final_gate_layers": [
+      {
+        "stage": "R05",
+        "overall": "PASS",
+        "commands": "7/7 exit0（rust_test_workspace 844.8s、r05_stage_suites 441.3s、fmt 39.3s、clippy 38.7s、contracts 39.0s、boundaries 38.7s、r04_regression_gate 3390.9s）",
+        "checkpoints": "7/7 stable，changedPathBytesHex 全空",
+        "binding": "before==after（61e8b358…，72,289 文件）",
+        "runner": "PASS",
+        "scenarios": "18/18 PASS（R05-A01–A16 全含 + R05-SUP-R04REG + R05-SUP-SCOPE）",
+        "leaves": "130 声明=期望：130 PASS（124 stage_share_satisfied + 6 full_original_behavior）/ 0 fail / 0 blocked / 0 deferred"
+      },
+      {
+        "stage": "R04",
+        "overall": "PASS",
+        "commands": "8/8 exit0（workspace 845.4s、r04_tool_matrix 339.5s、fmt/clippy/contracts/boundaries、r03_regression_gate 1862.0s、r04_rr1_repair_suites 68.3s）",
+        "checkpoints": "8/8 stable，changed=0",
+        "binding": "before==after（8637832b…，72,402 文件）",
+        "runner": "PASS",
+        "scenarios": "24/24 PASS",
+        "leaves": "124 声明=期望：55 PASS（46 full_original_behavior + 9 stage_share_satisfied）/ 0 FAIL / 69 DEFERRED_TO_LATER_STAGE / 0 blocked；commandsNotPassing=[]（F54 修复在正式主树链生效：FINAL-03 的 46 叶失败面清零）"
+      },
+      {
+        "stage": "R03",
+        "overall": "PASS",
+        "commands": "15/15 exit0（workspace 844.9s、a15、r02_storage_tx、r02_full_chain、r02_backup_restore、r02_recovery_drill、fmt/clippy/contracts/boundaries、r02_auth_matrix 105.0s、r02_legacy_regression 284.6s、a16_seed_mechanism、repair_suites、r02_events_matrix）",
+        "checkpoints": "15/15 stable，changed=0",
+        "binding": "before==after（1a7957ac…，72,475 文件）",
+        "runner": "PASS",
+        "scenarios": "17/17 PASS（F53 flake 未复发：FINAL-03 失败面消失）",
+        "leaves": "48 声明=期望：17 PASS / 0 FAIL / 31 DEFERRED / 0 blocked"
+      }
+    ],
+    "r00_final04": {
+      "expected_reuse": "任务书预期复用 FINAL-01/02/03 对象 43d95970…——未成立，本轮两度重链接，如实记录",
+      "object_cmd3": {
+        "sha256": "cf9bce2fcb58f9d152a941d08a728024fb9366128ae082ee978e4c5d62d18852",
+        "note": "开工观测对象（mtime 2026-10-07T17:04:35Z，M-01 standalone 窗口重链接），供命令3 workspace 1 次 LAN 通过"
+      },
+      "object_gate": {
+        "path": "rust/target/debug/deps/r00_management_leaves-590de196dceb15ce",
+        "sha256": "d57ea731b6f2561e2bd84cf119049b3bed57278b49fe48ee8332c6514314f67e",
+        "cdhash": "364514be2a80192205220ddee1f4e4c4b41a756f",
+        "note": "尝试1 启动后 20:14:37Z 重链接；gate 内全部 5 次 workspace 用此对象"
+      },
+      "lan": "本轮 6 次全部真实通过（命令3 + 尝试1 R05/R04 层 + 尝试2 R05/R04/R03 层；每次测试内真实 LAN Origin/登录/会话/注销交换断言 ok）",
+      "conclusion": "两个新对象均被 ALF 放行——r00/ALF 本轮不是阻断项，无证据需要用户防火墙操作；重链接归因 cargo 指纹判定非源码变化（三层绑定 digest 前后相等佐证）；监听端口细节样本本轮未采到（monitor ps comm 匹配缺陷+窗口短于采样节奏，如实记录）",
+      "env_item": "R05-ENV-R00 保留『按二进制实例偶发』观察属性：历史 9f748902… 曾被拦，43d95970…/cf9bce2f…/d57ea731… 连续放行；不能写成永久解除",
+      "system_modifications": "零（全程无系统/防火墙/权限修改）"
+    },
+    "f42_f54_closure": "F42（A-REVIEW-02）、F45（B-REVIEW-01）、F27-RR3/F46（C-F46-REVIEW-01+H-REVIEW-02）、F28-RR3（E-REVIEW-02/04）、F47/F48（H-REVIEW-02）、F49（I-REVIEW-01）、F50（J-REVIEW-02）、F51（F51-REVIEW-01）、F52（F52-REVIEW-01）、F53（L-REVIEW-01）、F54（M-REVIEW-01）全部独立 CLOSED；R05-ENV-R00 为观察属性非缺口。各独立审指针见 RR3_ISSUE_MATRIX。"
+  },
+  "rr3_current_history": [
+    {
+      "round": "E-01",
+      "historical_only": true,
+      "superseded_by": "E-02",
+      "snapshot": {
+        "round": "RR3",
+        "recorded_by": "rr3_e_impl_01（外部新CLI exec --ephemeral；本轮未spawn代理）",
+        "recorded_at": "2026-10-07T01:11:01.507159+00:00",
+        "status_snapshot": "按RR3 E文件化brief及本轮用户给定截点，不追写正在运行的其他验收结果；正式最终结果由新文档轮补录。",
+        "stage_readiness": "NOT_ACCEPTED",
+        "R06_READY": false,
+        "offline_gate": "FAIL",
+        "independent_review": "FAIL",
+        "independent_review_basis": "最新完成的正式阶段审查RR2/FINAL-01；RR3新阶段审查PENDING、FINAL NOT RUN。",
+        "rr3_independent_review": "PENDING",
+        "live_verification": "BLOCKED_NOT_AUTHORIZED",
+        "release_state": "NOT_IN_SCOPE",
+        "packages": {
+          "A": {
+            "status": "SELF_CHECKED",
+            "independent_review": "PENDING",
+            "note": "A-02仅补shell Git查询异常拒绝；24/24自检绿。A-REVIEW-01 FAIL永久保留；新A复验未签收。",
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md"
+          },
+          "B": {
+            "status": "CLOSED",
+            "independent_review": "PASS",
+            "note": "B-REVIEW-01独立PASS，无包级mustFix。有效N03不代表当前N01–N16全跑。",
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md"
+          },
+          "C_F46": {
+            "status": "SELF_CHECKED",
+            "independent_review": "PENDING",
+            "review_execution": "RUNNING（新CLI联合独立验收已启动，尚无本轮可签收结论）",
+            "note": "F46完整160负载2/2自检绿；C旧measurement-01的2/2因最终4日志超3不证明全部资源PASS。",
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md"
+          },
+          "D": {
+            "status": "BLOCKED",
+            "independent_review": "PENDING",
+            "note": "真实非回环r00 0/1/0/0 exit101；确切系统操作仅准备未执行，当前身份不能冒充最终构建身份。",
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/D-01/REPORT.md"
+          },
+          "E": {
+            "status": "SELF_CHECKED",
+            "independent_review": "PENDING",
+            "note": "文档实施自检，不作独立签收；交全新E审查者。",
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/E-01/REPORT.md"
+          },
+          "G": {
+            "status": "NOT RUN",
+            "independent_review": "PENDING",
+            "note": "新默认N01–N16及必要新增负测尚未执行；历史16/16保留。"
+          },
+          "FINAL": {
+            "status": "NOT RUN",
+            "independent_review": "PENDING",
+            "result_ref": null,
+            "tested_sha": null,
+            "note": "不预造新FINAL目录、结果、最终SHA。"
+          }
+        },
+        "historical_layers": [
+          {
+            "stage": "R05",
+            "result_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+            "sha256": "0f5911462089380b8eb94d137b98f8d2382d062564c43d54cd84338b0852191e",
+            "overall": "FAIL",
+            "candidate_stable": true,
+            "runner_status": "PASS",
+            "stable_checkpoints": 7,
+            "checkpoints": 7,
+            "commands_passed": 5,
+            "commands_total": 7,
+            "changed_paths": []
+          },
+          {
+            "stage": "R04",
+            "result_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/verify-stage-result.json",
+            "sha256": "b9c115415225b03d19929708095bc3cd3cfae6c8677804a541a6a909ff732d40",
+            "overall": "FAIL",
+            "candidate_stable": false,
+            "runner_status": "PASS",
+            "stable_checkpoints": 0,
+            "checkpoints": 8,
+            "commands_passed": 6,
+            "commands_total": 8,
+            "changed_paths": [
+              "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/r04_regression_gate/stdout.log"
+            ]
+          },
+          {
+            "stage": "R03",
+            "result_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+            "sha256": "157d8cd5e1f03d19f57f5d35ce0041904503c5809964ae1b2900abcd292d6803",
+            "overall": "FAIL",
+            "candidate_stable": false,
+            "runner_status": "PASS",
+            "stable_checkpoints": 0,
+            "checkpoints": 15,
+            "commands_passed": 14,
+            "commands_total": 15,
+            "changed_paths": [
+              "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+            ]
+          }
+        ],
+        "scope_counts": {
+          "applicable_leaves": 130,
+          "shared": 119,
+          "full": 6,
+          "deferred": 5,
+          "dual_stage": 124,
+          "dual_stage_includes_deferred": 5,
+          "original_A": 16,
+          "original_C": 100,
+          "additional_C": 3,
+          "C_total": 103,
+          "cid": 93,
+          "command": 10,
+          "original_negative": 16
+        },
+        "raw_npm": "历史candidate raw npm exit1（3文件/6失败，seal-coordinate-lag）；base exit0。未重跑，不把合法directed/E5登记形态写为raw npm全绿。",
+        "directed_E5": "RR2 directed-no-seal-family在原明确授权内E0–E4.5通过/E5 SKIP；完整s5-full-5 exit0含E5严格已登记patch-too-large分类，登记红不转正式绿、不泛化豁免。",
+        "permissions": "仅继承RR-BLK-CREDENTIALS真实账号/LIVE最迟R10及既有平台义务；Windows/Linux本轮未验证，macOS arm64部分实测且必需r00仍BLOCKED。不新增延期。",
+        "evidence_refs": {
+          "historical_audit": "artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+          "rr2_final": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+          "rr2_final_review": "artifacts/rust-tauri/R05/RR2/FINAL-01/STAGE_REVIEW.md",
+          "a2": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md",
+          "a1_review": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md",
+          "b_review": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+          "c": "artifacts/rust-tauri/R05/RR3/C-01/REPORT.md",
+          "i10": "artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+          "ordinary_cancel": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json",
+          "late_result": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json",
+          "f46": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md",
+          "resource_receipt": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json",
+          "resource_raw": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/f27-resource-series.json",
+          "runtime_binding": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/runtime-binding.json",
+          "resource_negative": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/result.json",
+          "d": "artifacts/rust-tauri/R05/RR3/D-01/REPORT.md",
+          "d_prepared": "artifacts/rust-tauri/R05/RR3/D-01/PREPARED-ALLOW.md",
+          "rr2_b_review": "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
+          "rr2_d_review": "artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md",
+          "rr2_i": "artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md",
+          "rr2_negative": "artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md",
+          "rr2_r02_summary": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+          "rr2_r02_stdout": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log",
+          "rr2_r02_exclusions": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-binding-exclusions.txt",
+          "rr2_r02_sinks": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-run-output-sinks.txt"
+        },
+        "silent_window": "本实施交付即停止写全部文件；正式全链静默窗口不写主树或artifact。最终真实结果由另一新文档轮补录并新独立文档终审。",
+        "historical_r02": {
+          "command": "r02_legacy_regression",
+          "parent_result": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+          "status": "PASS",
+          "exit_code": 0,
+          "mode": "directed-no-seal-family",
+          "E0_to_E4_5": "ALL GREEN",
+          "E5": "SKIP BY SCOPE（原明确许可，非完整npm或正式封印绿）",
+          "summary_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+          "raw_stdout_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log",
+          "scope": "历史RR2 FINAL第4层实际R02脚本结果，不冒称独立R02 verify-stage JSON；其上游R03/R04来源不稳定仍FAIL，不能推导全链PASS。",
+          "candidate_sha": "ad5ec4e9853a51ed929f1e2e077b97d41c951572"
+        }
+      }
+    },
+    {
+      "round": "E-02",
+      "historical_only": true,
+      "superseded_by": "E-03",
+      "snapshot": {
+        "round": "RR3",
+        "recorded_by": "rr3_e_impl_02（全新CLI exec --ephemeral；未派代理/外发）",
+        "recorded_at": "2026-10-07T01:46:11.413928+00:00",
+        "status_snapshot": "读取实际已完成独立报告、原始结果与逐文件manifest摘要；E-01派发截点仅为历史。本current消费A/B/C-F46 PASS及D新身份BLOCKED；G运行中，不预造结论。",
+        "stage_readiness": "NOT_ACCEPTED",
+        "R06_READY": false,
+        "offline_gate": "FAIL",
+        "independent_review": "FAIL",
+        "independent_review_basis": "最新完成的正式阶段审查RR2/FINAL-01；RR3新阶段审查PENDING、FINAL NOT RUN。",
+        "rr3_independent_review": "PENDING",
+        "live_verification": "BLOCKED_NOT_AUTHORIZED",
+        "release_state": "NOT_IN_SCOPE",
+        "packages": {
+          "A": {
+            "status": "CLOSED",
+            "independent_review": "PASS",
+            "issues": [
+              "F42"
+            ],
+            "mustFix": [],
+            "note": "A-REVIEW-02 A1/A2同包独立PASS；首轮FAIL保留。完整正式嵌套全链stable/所有checkpoint仍待新FINAL，不作阶段accepted。",
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md",
+            "manifest_ref": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/manifest.json",
+            "review_sha256": "cc52fe061bb557a82ba44397277f0dd719b02c8a2fd1ce02ad1b16a7e736f9e9"
+          },
+          "B": {
+            "status": "CLOSED",
+            "independent_review": "PASS",
+            "note": "B-REVIEW-01独立PASS，无包级mustFix。有效N03不代表当前N01–N16全跑。",
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md"
+          },
+          "C_F46": {
+            "status": "CLOSED",
+            "independent_review": "PASS",
+            "review_execution": "COMPLETED",
+            "issues": [
+              "F27-RR3",
+              "F46"
+            ],
+            "mustFix": [],
+            "note": "C-F46-REVIEW-01联合独立PASS：真实2/2 exit0、337.41s、160轮/54binary/61owner/15存活worker，全部原阈值；旧6轮超3红→字节还原绿。旧C漏检FAIL保留，完整阶段仍待FINAL。",
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+            "manifest_ref": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/MANIFEST.json",
+            "review_sha256": "c59ac409a316f5a1affbd29afbb68784c9a1ad48a80bce12a9608a600866de1e"
+          },
+          "D": {
+            "status": "BLOCKED",
+            "independent_review": "PASS（仅定位及精确操作准备）",
+            "required_gate": "FAIL",
+            "exit_code": 101,
+            "test_summary": {
+              "passed": 0,
+              "failed": 1,
+              "ignored": 0,
+              "filtered": 0
+            },
+            "note": "D-REVIEW-01已完成：真实r00自然101/0通过1失败，非回环20s0字节，应用过滤线索；ALF permitted不代替真绿。未改系统。D-01旧SHA仅历史；FINAL若重链接须按真实新身份重准备并新复验。",
+            "binary_identity": {
+              "absolutePath": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0",
+              "sha256": "9f7489029c91d1c232e3c204236854bd53c69cee2fef33d6fd778a27f44696d3",
+              "cdhash": "d9676388f524872f1269c13f61f413458c0e9e52"
+            },
+            "prepared_ref": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+            "manifest_ref": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/evidence-manifest.json"
+          },
+          "E": {
+            "status": "SELF_CHECKED",
+            "independent_review": "PENDING",
+            "round": 2,
+            "note": "E-REVIEW-01独立FAIL（MF-E01/MF-E02）永久保留；E-02修后仅自检，交另一全新E-REVIEW-02，不自签PASS。",
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/E-02/REPORT.md",
+            "historical_reviews": [
+              {
+                "round": 1,
+                "verdict": "FAIL",
+                "mustFix": [
+                  "MF-E01",
+                  "MF-E02"
+                ],
+                "evidence_ref": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/REVIEW.md",
+                "sha256": "57023419618ec8bd7f925dd3ef48eb0549f948cdf6af7227a6a37d5abd114fda"
+              }
+            ]
+          },
+          "G": {
+            "status": "RUNNING",
+            "independent_review": "PENDING",
+            "result_ref": null,
+            "tested_sha": null,
+            "evidence_dir": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/",
+            "note": "交付前已亲读最新矩阵及观察默认16运行：G-REVIEW-01仍RUNNING，无完整报告/manifest/结论；不猜PASS/FAIL或将部分case当16/16。"
+          },
+          "FINAL": {
+            "status": "NOT RUN",
+            "independent_review": "PENDING",
+            "result_ref": null,
+            "tested_sha": null,
+            "note": "不预造新FINAL目录、结果、最终SHA。"
+          }
+        },
+        "historical_layers": [
+          {
+            "stage": "R05",
+            "result_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+            "sha256": "0f5911462089380b8eb94d137b98f8d2382d062564c43d54cd84338b0852191e",
+            "overall": "FAIL",
+            "candidate_stable": true,
+            "runner_status": "PASS",
+            "stable_checkpoints": 7,
+            "checkpoints": 7,
+            "commands_passed": 5,
+            "commands_total": 7,
+            "changed_paths": []
+          },
+          {
+            "stage": "R04",
+            "result_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/verify-stage-result.json",
+            "sha256": "b9c115415225b03d19929708095bc3cd3cfae6c8677804a541a6a909ff732d40",
+            "overall": "FAIL",
+            "candidate_stable": false,
+            "runner_status": "PASS",
+            "stable_checkpoints": 0,
+            "checkpoints": 8,
+            "commands_passed": 6,
+            "commands_total": 8,
+            "changed_paths": [
+              "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/r04_regression_gate/stdout.log"
+            ]
+          },
+          {
+            "stage": "R03",
+            "result_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+            "sha256": "157d8cd5e1f03d19f57f5d35ce0041904503c5809964ae1b2900abcd292d6803",
+            "overall": "FAIL",
+            "candidate_stable": false,
+            "runner_status": "PASS",
+            "stable_checkpoints": 0,
+            "checkpoints": 15,
+            "commands_passed": 14,
+            "commands_total": 15,
+            "changed_paths": [
+              "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+            ]
+          }
+        ],
+        "scope_counts": {
+          "applicable_leaves": 130,
+          "shared": 119,
+          "full": 6,
+          "deferred": 5,
+          "dual_stage": 124,
+          "dual_stage_includes_deferred": 5,
+          "original_A": 16,
+          "original_C": 100,
+          "additional_C": 3,
+          "C_total": 103,
+          "cid": 93,
+          "command": 10,
+          "original_negative": 16
+        },
+        "raw_npm": "历史candidate raw npm exit1（3文件/6失败，seal-coordinate-lag）；base exit0。未重跑，不把合法directed/E5登记形态写为raw npm全绿。",
+        "directed_E5": "RR2 directed-no-seal-family在原明确授权内E0–E4.5通过/E5 SKIP；完整s5-full-5 exit0含E5严格已登记patch-too-large分类，登记红不转正式绿、不泛化豁免。",
+        "permissions": "仅继承RR-BLK-CREDENTIALS真实账号/LIVE最迟R10及既有平台义务；Windows/Linux本轮未验证，macOS arm64部分实测且必需r00仍BLOCKED。不新增延期。",
+        "evidence_refs": {
+          "historical_audit": "artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+          "rr2_final": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+          "rr2_final_review": "artifacts/rust-tauri/R05/RR2/FINAL-01/STAGE_REVIEW.md",
+          "a2": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md",
+          "a1_review": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md",
+          "b_review": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+          "c": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+          "i10": "artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+          "ordinary_cancel": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-subagent/command.json",
+          "late_result": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-late/command.json",
+          "f46": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md",
+          "resource_receipt": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/command.json",
+          "resource_raw": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/f27-resource-series.json",
+          "runtime_binding": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/runtime-binding.json",
+          "resource_negative": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/result.json",
+          "d": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+          "d_prepared": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+          "rr2_b_review": "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
+          "rr2_d_review": "artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md",
+          "rr2_i": "artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md",
+          "rr2_negative": "artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md",
+          "rr2_r02_summary": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+          "rr2_r02_stdout": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log",
+          "rr2_r02_exclusions": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-binding-exclusions.txt",
+          "rr2_r02_sinks": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-run-output-sinks.txt",
+          "a_review": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md",
+          "a_manifest": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/manifest.json",
+          "cf46_review": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+          "cf46_manifest": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/MANIFEST.json",
+          "cf46_result": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/RESULT.json",
+          "cf46_resource_receipt": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/command.json",
+          "cf46_resource_raw": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/f27-resource-series.json",
+          "cf46_analysis": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/RESOURCE_ANALYSIS.json",
+          "cf46_runtime_binding": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/runtime-binding.json",
+          "cf46_negative": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/result.json",
+          "cf46_ordinary_cancel": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-subagent/command.json",
+          "cf46_late_result": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-late/command.json",
+          "d_review": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+          "d_manifest": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/evidence-manifest.json",
+          "d_current_prepared": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+          "d_current_object": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/prepared-object.json",
+          "d_current_receipt": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/r00-formal-01.json",
+          "e_first_fail": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/REVIEW.md",
+          "e_first_manifest": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/manifest.json",
+          "e_round2": "artifacts/rust-tauri/R05/RR3/E-02/REPORT.md",
+          "e_consumption": "artifacts/rust-tauri/R05/RR3/E-02/manifest-consumption.json"
+        },
+        "silent_window": "本轮仅限定生产输入前后相等；G真实运行并写evidence，不宣称全树静默或freeze。交付后E停止写现行文档；正式全链静默由总控另安排，新FINAL结果须新文档轮及新独立验收。",
+        "historical_r02": {
+          "command": "r02_legacy_regression",
+          "parent_result": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+          "status": "PASS",
+          "exit_code": 0,
+          "mode": "directed-no-seal-family",
+          "E0_to_E4_5": "ALL GREEN",
+          "E5": "SKIP BY SCOPE（原明确许可，非完整npm或正式封印绿）",
+          "summary_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+          "raw_stdout_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log",
+          "scope": "历史RR2 FINAL第4层实际R02脚本结果，不冒称独立R02 verify-stage JSON；其上游R03/R04来源不稳定仍FAIL，不能推导全链PASS。",
+          "candidate_sha": "ad5ec4e9853a51ed929f1e2e077b97d41c951572"
+        },
+        "historical_evidence_refs": {
+          "ordinary_cancel": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json",
+          "late_result": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json",
+          "resource_receipt": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json",
+          "resource_raw": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/f27-resource-series.json",
+          "runtime_binding": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/runtime-binding.json",
+          "resource_negative": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/result.json",
+          "d": "artifacts/rust-tauri/R05/RR3/D-01/REPORT.md",
+          "d_prepared": "artifacts/rust-tauri/R05/RR3/D-01/PREPARED-ALLOW.md",
+          "c": "artifacts/rust-tauri/R05/RR3/C-01/REPORT.md"
+        },
+        "historical_evidence_refs_notice": "仅E-01/C-01/F46-01/D-01历史轮次；现行通用消费者已指向最新独立结果。"
+      }
+    },
+    {
+      "round": "E-03",
+      "historical_only": true,
+      "superseded_by": "E-04",
+      "snapshot": {
+        "round": "RR3",
+        "recorded_by": "rr3_e_impl_03（全新实施者；只读子代理核文档输入边界）",
+        "recorded_at": "2026-10-07T04:50:14.408735+00:00",
+        "status_snapshot": "E-03消费G-REVIEW-02已结束BLOCKED_BY_STORAGE、H-REVIEW-02/J-REVIEW-02实际PASS及STORAGE-03正式归档。全部构建停止；本E仅SELF_CHECKED待另全新独立审。",
+        "stage_readiness": "NOT_ACCEPTED",
+        "R06_READY": false,
+        "offline_gate": "BLOCKED",
+        "independent_review": "FAIL",
+        "independent_review_basis": "最近已完成正式阶段审查仍RR2/FINAL-01历史FAIL；当前G02必需完整执行受空间阻断。RR3 FINAL从未执行，不存在新的阶段PASS。",
+        "rr3_independent_review": "PENDING",
+        "live_verification": "BLOCKED_NOT_AUTHORIZED",
+        "release_state": "NOT_IN_SCOPE",
+        "packages": {
+          "A": {
+            "status": "CLOSED",
+            "independent_review": "PASS",
+            "issues": [
+              "F42"
+            ],
+            "mustFix": [],
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md",
+            "review_sha256": "cc52fe061bb557a82ba44397277f0dd719b02c8a2fd1ce02ad1b16a7e736f9e9",
+            "note": "A1/A2包级独立关闭；A1 17输入相等可复用，A2已变legacy由J02新验；完整正式嵌套链仍待新FINAL。"
+          },
+          "B": {
+            "status": "CLOSED",
+            "independent_review": "PASS",
+            "issues": [
+              "F45"
+            ],
+            "mustFix": [],
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+            "review_sha256": "8e83638b0b24ed5d98a8bd9acc2d632d5eb07fcba0df431350f20108777c72a1",
+            "note": "动态N03目标红与恢复绿有效；I/J/G限定复用不等于当前默认16完成。"
+          },
+          "C_F46": {
+            "status": "CLOSED",
+            "independent_review": "PASS",
+            "issues": [
+              "F27-RR3",
+              "F46"
+            ],
+            "mustFix": [],
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/REVIEW.md",
+            "review_sha256": "63568d89efec87085f22ba6e760d6c01d1c3f94bea1c9a4b9c956036a5ad9efc",
+            "note": "C-F46-REVIEW-01历史PASS保留；H修改service诊断后，H02以新service/装备亲跑160轮、资源反控和普通取消，375实际输入仍相等；只签包级资源。",
+            "historical_review_ref": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md"
+          },
+          "D": {
+            "status": "BLOCKED",
+            "independent_review": "PASS（仅定位及精确操作准备）",
+            "required_gate": "FAIL",
+            "exit_code": 101,
+            "test_summary": {
+              "passed": 0,
+              "failed": 1,
+              "ignored": 0,
+              "filtered": 0
+            },
+            "note": "D-REVIEW-01历史确切对象r00自然101/0过1败、非回环20s0字节；定位准备PASS但必要环境未解除。9f7489对象只对应当时运行，H/未来FINAL可能重链接；当前FINAL对象未知，不让用户按旧对象操作系统。",
+            "binary_identity": {
+              "absolutePath": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0",
+              "sha256": "9f7489029c91d1c232e3c204236854bd53c69cee2fef33d6fd778a27f44696d3",
+              "cdhash": "d9676388f524872f1269c13f61f413458c0e9e52",
+              "identity_scope": "H变更前D-REVIEW-01历史实测对象；不是当前或未来FINAL身份承诺。"
+            },
+            "prepared_ref": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+            "manifest_ref": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/evidence-manifest.json",
+            "current_final_binary_identity": null
+          },
+          "E": {
+            "status": "SELF_CHECKED",
+            "independent_review": "PENDING",
+            "round": 3,
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/E-03/REPORT.md",
+            "note": "原MF-E01/MF-E02已由E-REVIEW-02独立关闭；本轮状态/资源/交付回填须另全新E审。不得用历史E PASS代签本次，亦不重新打开原两mustFix。",
+            "historical_reviews": [
+              {
+                "round": 1,
+                "verdict": "FAIL",
+                "mustFix": [
+                  "MF-E01",
+                  "MF-E02"
+                ],
+                "evidence_ref": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/REVIEW.md",
+                "sha256": "57023419618ec8bd7f925dd3ef48eb0549f948cdf6af7227a6a37d5abd114fda"
+              },
+              {
+                "round": 2,
+                "verdict": "PASS",
+                "mustFix": [],
+                "closed": [
+                  "MF-E01",
+                  "MF-E02"
+                ],
+                "evidence_ref": "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/REVIEW.md",
+                "sha256": "4eee7fc3bb87acf936556057d0553360d80d472be1c7d70c674fb9f179792e7d"
+              }
+            ],
+            "snapshot_semantics": "SELF_CHECKED/PENDING仅表示E03生成截点。后续全新E独立报告与总控最新协调记录、真实交付回执为新结论来源；未存在的报告不填路径/哈希/PASS，不要求本报告循环绑定自身提交。"
+          },
+          "G": {
+            "status": "BLOCKED_BY_STORAGE",
+            "independent_review": "BLOCKED",
+            "result_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/REVIEW.md",
+            "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md",
+            "stopped_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/STOPPED.json",
+            "tested_sha": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+            "tested_sha_semantics": "HEAD + G02保存的dirty候选；不等于纯HEAD或后续文档/交付提交。",
+            "evidence_dir": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/",
+            "default_shell_exit": "UNKNOWN",
+            "recorder_tool_exit": 1,
+            "observer_tool_exit": 143,
+            "normal_controls": {
+              "xtask": {
+                "passed": 8,
+                "failed": 0,
+                "ignored": 0,
+                "filtered": 113,
+                "exit_code": 0
+              },
+              "binary_wiring": {
+                "passed": 2,
+                "failed": 0,
+                "ignored": 0,
+                "filtered": 0,
+                "exit_code": 0
+              }
+            },
+            "N01": {
+              "status": "VALID_TARGET_RED",
+              "exit_code": 101,
+              "passed": 0,
+              "failed": 1,
+              "ignored": 0,
+              "filtered": 120,
+              "target": "R05 map dropped original scenario R05-A16",
+              "restored_bytes": true,
+              "restored_execution": "NOT RUN"
+            },
+            "N02": {
+              "status": "INVALID_ENVIRONMENT_FAILURE",
+              "observed_case_row_exit": 1,
+              "target_reached": false,
+              "producer_runs_completed": 0,
+              "failed_compile_summaries": 28,
+              "cause": "ENOSPC"
+            },
+            "unexecuted_cases": [
+              "N03",
+              "N04",
+              "N05",
+              "N06",
+              "N07",
+              "N08",
+              "N09",
+              "N10",
+              "N11",
+              "N12",
+              "N13",
+              "N14",
+              "N15",
+              "N16"
+            ],
+            "full_R02_runs": 0,
+            "full_E5": "NOT RUN",
+            "final_restore": "NOT RUN",
+            "node_terminal_verify": "NOT RUN",
+            "case_results_json": "NOT PRODUCED",
+            "mustFix": [],
+            "note": "默认入口真实运行后停写。N02构建未抵达零匹配断言；28条编译失败不是业务失败。N03 reset复制失败后退出；默认shell wait回执未落盘，记录器1/观察器143不可混同。旧G01 exit2/15行/N16reuse缺失保留，不能拼成16/16。"
+          },
+          "FINAL": {
+            "status": "NOT RUN",
+            "independent_review": "PENDING",
+            "result_ref": null,
+            "tested_sha": null,
+            "note": "RR3 FINAL-01从未执行；计划不是实际结果路径。原§5.3全新独立阶段审查及完整注册前序闭包仍必需。"
+          },
+          "H": {
+            "status": "CLOSED",
+            "independent_review": "PASS",
+            "issues": [
+              "F47",
+              "F48"
+            ],
+            "mustFix": [],
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/REVIEW.md",
+            "review_sha256": "63568d89efec87085f22ba6e760d6c01d1c3f94bea1c9a4b9c956036a5ad9efc",
+            "note": "A01 warn/info原17项、A13秘密/请求关联、redaction25/logging9、5类拒绝及受影响F46/资源均独立PASS；H01中断无结论和无效缓存准备保留。"
+          },
+          "I": {
+            "status": "CLOSED",
+            "independent_review": "PASS",
+            "issues": [
+              "F49"
+            ],
+            "mustFix": [],
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/REVIEW.md",
+            "review_sha256": "0be606723e10952b6e07fc09211a68c4225f4a0af0f9bd9fbaf11a55ec69a9ed",
+            "note": "原恢复56检查+13额外、B15/41、真实N03和受控来源漂移0→1→0；J准备段变化有保持性证据，不能充当默认16或full R02。"
+          },
+          "J": {
+            "status": "CLOSED",
+            "independent_review": "PASS",
+            "issues": [
+              "F50"
+            ],
+            "mustFix": [],
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/J-REVIEW-02/REVIEW.md",
+            "review_sha256": "2da7159a953a24e17f94c2eaa4e9bb945b25e377104fc116e5f50ea6226c0a40",
+            "note": "默认完整HEAD/Node准备、历史BASE、原E0–E4.5 directed独立PASS；五项缺依赖准备缺口已关闭，不称五项产品功能失效，也不称完整R02/full E5业务已过。"
+          },
+          "STORAGE": {
+            "status": "PRECISE_CLEANUP_COMPLETED_BUILD_SPACE_UNPROVEN",
+            "evidence_ref": "artifacts/rust-tauri/R05/RR3/STORAGE-03/REPORT.md",
+            "receipt_ref": "artifacts/rust-tauri/R05/RR3/STORAGE-03/execution-receipt.json",
+            "removed_objects": 33,
+            "logical_bytes": 136063856,
+            "protected_checks": 1450,
+            "protected_changed": 0,
+            "retained_fragments": 37,
+            "free_bytes_after": 265158656,
+            "note": "正式24小文件同字节归档；仅回收本轮失败编译自产对象。约0.247GiB只提供文档余量，不能证明新完整构建可行；继续停构建。"
+          }
+        },
+        "historical_layers": [
+          {
+            "stage": "R05",
+            "result_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+            "sha256": "0f5911462089380b8eb94d137b98f8d2382d062564c43d54cd84338b0852191e",
+            "overall": "FAIL",
+            "candidate_stable": true,
+            "runner_status": "PASS",
+            "stable_checkpoints": 7,
+            "checkpoints": 7,
+            "commands_passed": 5,
+            "commands_total": 7,
+            "changed_paths": []
+          },
+          {
+            "stage": "R04",
+            "result_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/verify-stage-result.json",
+            "sha256": "b9c115415225b03d19929708095bc3cd3cfae6c8677804a541a6a909ff732d40",
+            "overall": "FAIL",
+            "candidate_stable": false,
+            "runner_status": "PASS",
+            "stable_checkpoints": 0,
+            "checkpoints": 8,
+            "commands_passed": 6,
+            "commands_total": 8,
+            "changed_paths": [
+              "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/r04_regression_gate/stdout.log"
+            ]
+          },
+          {
+            "stage": "R03",
+            "result_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+            "sha256": "157d8cd5e1f03d19f57f5d35ce0041904503c5809964ae1b2900abcd292d6803",
+            "overall": "FAIL",
+            "candidate_stable": false,
+            "runner_status": "PASS",
+            "stable_checkpoints": 0,
+            "checkpoints": 15,
+            "commands_passed": 14,
+            "commands_total": 15,
+            "changed_paths": [
+              "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+            ]
+          }
+        ],
+        "scope_counts": {
+          "applicable_leaves": 130,
+          "shared": 119,
+          "full": 6,
+          "deferred": 5,
+          "dual_stage": 124,
+          "dual_stage_includes_deferred": 5,
+          "original_A": 16,
+          "original_C": 100,
+          "additional_C": 3,
+          "C_total": 103,
+          "cid": 93,
+          "command": 10,
+          "original_negative": 16
+        },
+        "raw_npm": "历史candidate raw npm exit1（3文件/6失败，seal-coordinate-lag）；base exit0。未重跑，不把合法directed/E5登记形态写为raw npm全绿。",
+        "directed_E5": "RR2 directed-no-seal-family在原明确授权内E0–E4.5通过/E5 SKIP；完整s5-full-5 exit0含E5严格已登记patch-too-large分类，登记红不转正式绿、不泛化豁免。",
+        "permissions": "仅继承RR-BLK-CREDENTIALS真实账号/LIVE最迟R10及既有平台义务；Windows/Linux本轮未验证，macOS arm64部分实测且必需r00仍BLOCKED。不新增延期。",
+        "evidence_refs": {
+          "historical_audit": "artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+          "rr2_final": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+          "rr2_final_review": "artifacts/rust-tauri/R05/RR2/FINAL-01/STAGE_REVIEW.md",
+          "a2": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md",
+          "a1_review": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md",
+          "b_review": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+          "c": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+          "i10": "artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+          "ordinary_cancel": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/ordinary-cancel-recovery/command.json",
+          "late_result": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/late-result-next-run/command.json",
+          "f46": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md",
+          "resource_receipt": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/command.json",
+          "resource_raw": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/f27-resource-series.json",
+          "runtime_binding": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/runtime-binding.json",
+          "resource_negative": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/sampler-negative-final/result.json",
+          "d": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+          "d_prepared": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+          "rr2_b_review": "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
+          "rr2_d_review": "artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md",
+          "rr2_i": "artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md",
+          "rr2_negative": "artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md",
+          "rr2_r02_summary": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+          "rr2_r02_stdout": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log",
+          "rr2_r02_exclusions": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-binding-exclusions.txt",
+          "rr2_r02_sinks": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-run-output-sinks.txt",
+          "a_review": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md",
+          "a_manifest": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/manifest.json",
+          "cf46_review": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+          "cf46_manifest": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/MANIFEST.json",
+          "cf46_result": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/RESULT.json",
+          "cf46_resource_receipt": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/command.json",
+          "cf46_resource_raw": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/f27-resource-series.json",
+          "cf46_analysis": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/RESOURCE_ANALYSIS.json",
+          "cf46_runtime_binding": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/runtime-binding.json",
+          "cf46_negative": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/result.json",
+          "cf46_ordinary_cancel": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-subagent/command.json",
+          "cf46_late_result": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-late/command.json",
+          "d_review": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+          "d_manifest": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/evidence-manifest.json",
+          "d_current_prepared": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+          "d_current_object": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/prepared-object.json",
+          "d_current_receipt": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/r00-formal-01.json",
+          "e_first_fail": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/REVIEW.md",
+          "e_first_manifest": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/manifest.json",
+          "e_round2": "artifacts/rust-tauri/R05/RR3/E-02/REPORT.md",
+          "e_consumption": "artifacts/rust-tauri/R05/RR3/E-02/manifest-consumption.json",
+          "h_review": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/REVIEW.md",
+          "h_binding": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/FINAL_SOURCE_BINDING.json",
+          "i_review": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/REVIEW.md",
+          "j_review": "artifacts/rust-tauri/R05/RR3/J-REVIEW-02/REVIEW.md",
+          "g_review": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/REVIEW.md",
+          "i_mapping": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md",
+          "storage": "artifacts/rust-tauri/R05/RR3/STORAGE-03/REPORT.md",
+          "input_boundary": "artifacts/rust-tauri/R05/RR3/DOC-INPUT-BOUNDARY-01/REPORT.md",
+          "delivery_preparation": "artifacts/rust-tauri/R05/RR3/DELIVERY-PREP-02/REPORT.md",
+          "delivery_refresh_rules": "artifacts/rust-tauri/R05/RR3/DELIVERY-PREP-02/REFRESH_RULES.md",
+          "e_current": "artifacts/rust-tauri/R05/RR3/E-03/REPORT.md",
+          "e_previous_review": "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/REVIEW.md"
+        },
+        "silent_window": "G02/H02/J02所有真实运行已结束。本E改动报告元数据，旧全树候选必变；实际语义输入逐项前后hash与H375相等另存E-03。E03报告及manifest封口后全部停写，交另一全新E审；不是FINAL冻结或PASS。",
+        "historical_r02": {
+          "command": "r02_legacy_regression",
+          "parent_result": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+          "status": "PASS",
+          "exit_code": 0,
+          "mode": "directed-no-seal-family",
+          "E0_to_E4_5": "ALL GREEN",
+          "E5": "SKIP BY SCOPE（原明确许可，非完整npm或正式封印绿）",
+          "summary_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+          "raw_stdout_ref": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log",
+          "scope": "历史RR2 FINAL第4层实际R02脚本结果，不冒称独立R02 verify-stage JSON；其上游R03/R04来源不稳定仍FAIL，不能推导全链PASS。",
+          "candidate_sha": "ad5ec4e9853a51ed929f1e2e077b97d41c951572"
+        },
+        "historical_evidence_refs": {
+          "ordinary_cancel": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json",
+          "late_result": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json",
+          "resource_receipt": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json",
+          "resource_raw": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/f27-resource-series.json",
+          "runtime_binding": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/runtime-binding.json",
+          "resource_negative": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/result.json",
+          "d": "artifacts/rust-tauri/R05/RR3/D-01/REPORT.md",
+          "d_prepared": "artifacts/rust-tauri/R05/RR3/D-01/PREPARED-ALLOW.md",
+          "c": "artifacts/rust-tauri/R05/RR3/C-01/REPORT.md",
+          "E02_resource_receipt": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/command.json",
+          "E02_resource_raw": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/f27-resource-series.json",
+          "E02_runtime_binding": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/runtime-binding.json",
+          "E02_resource_negative": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/result.json",
+          "E02_ordinary_cancel": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-subagent/command.json",
+          "E02_late_result": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-late/command.json"
+        },
+        "historical_evidence_refs_notice": "仅E-01/C-01/F46-01/D-01历史轮次；现行通用消费者已指向最新独立结果。",
+        "remaining_required": [
+          "恢复足够实际可写构建空间并核旧进程结束；当前约265MB没有完整构建可行证据，不盲重跑、不新增豁免。",
+          "全新G使用新证据目录/新副本，从默认入口完成N01–N16、目标性红→恢复绿、终末恢复与Node核验；实际full R02/full E5必须执行。",
+          "当前H之后I01–I09完整producer组合仍待验；I06额外worker-permission未观察，I11未完成；I10仅按H375相等输入复用。",
+          "D必需LAN条件未解除；待未来FINAL实际Cargo对象确定后重新核身份/精确操作与真实复验，旧D对象不替当前。",
+          "本轮E03全新独立文档审查；随后全新FINAL亲跑原§5.3及所有checkpoint/runner/摘要依赖核验；最终真实结果另新文档实施/新审。",
+          "最终交付按实际新枚举分类/秘密与引用边界检查、精确暂存及真实提交/推送回执；本截点Git交付未发生。"
+        ],
+        "I01_I11": {
+          "I01": {
+            "status": "PENDING_CURRENT_COMBINATION",
+            "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md"
+          },
+          "I02": {
+            "status": "PENDING_CURRENT_COMBINATION",
+            "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md"
+          },
+          "I03": {
+            "status": "PENDING_CURRENT_COMBINATION",
+            "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md"
+          },
+          "I04": {
+            "status": "PENDING_CURRENT_COMBINATION",
+            "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md"
+          },
+          "I05": {
+            "status": "PENDING_CURRENT_COMBINATION",
+            "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md"
+          },
+          "I06": {
+            "status": "PENDING_CURRENT_COMBINATION",
+            "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md",
+            "extra_worker_permission": "NOT_OBSERVED；旧中断与G02均无实际运行证明。"
+          },
+          "I07": {
+            "status": "PENDING_CURRENT_COMBINATION",
+            "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md"
+          },
+          "I08": {
+            "status": "PENDING_CURRENT_COMBINATION",
+            "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md"
+          },
+          "I09": {
+            "status": "PENDING_CURRENT_COMBINATION",
+            "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md"
+          },
+          "I10": {
+            "status": "PASS_LIMITED_REUSE",
+            "review_ref": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/REVIEW.md",
+            "input_count": 375,
+            "binding_ref": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/FINAL_SOURCE_BINDING.json",
+            "qualification": "H02亲跑，本E只读核原件与375输入相等；不是G02新跑。"
+          },
+          "I11": {
+            "status": "INCOMPLETE",
+            "mapping_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md",
+            "note": "限定机制反例不能拼成默认16；本轮N01有效、N02无效、其余未跑。"
+          }
+        },
+        "git_delivery": {
+          "status": "NOT_PERFORMED_AT_E03_CUTOFF",
+          "committed_sha": null,
+          "pushed_sha": null,
+          "remote_receipt_ref": null,
+          "authority": "精确Git动作由总控按既有授权执行；本E无Git写操作。",
+          "receipt_contract_ref": "docs/rust-tauri/R05/R05_HANDOFF.json#git_delivery_receipt_contract"
+        }
+      }
+    }
+  ]
 }

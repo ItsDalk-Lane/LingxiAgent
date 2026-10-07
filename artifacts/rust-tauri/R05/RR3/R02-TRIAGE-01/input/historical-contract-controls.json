@@ -1,0 +1,47 @@
+[
+  {
+    "path": "artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence",
+    "a01Cases": 17,
+    "a01Fail": [],
+    "a01NewerOriginalEqual": true,
+    "a01NewerDiagnosticPresent": true,
+    "a13RequestId": "req-de1ece6474130dc5e4fa386522b01e68",
+    "a13MatchingAuthMarkers": 0,
+    "a13AuthMarkers": [
+      "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:50359",
+      "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:50360",
+      "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/ws status=401 reason=invalid_credential remote=127.0.0.1:50361",
+      "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/ws status=401 reason=invalid_credential remote=127.0.0.1:50364"
+    ]
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a",
+    "a01Cases": 17,
+    "a01Fail": [],
+    "a01NewerOriginalEqual": true,
+    "a01NewerDiagnosticPresent": true,
+    "a13RequestId": "req-91fc56625233e1cd10b70f9e186e911c",
+    "a13MatchingAuthMarkers": 0,
+    "a13AuthMarkers": [
+      "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:54228",
+      "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:54229",
+      "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/ws status=401 reason=invalid_credential remote=127.0.0.1:54230",
+      "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/ws status=401 reason=invalid_credential remote=127.0.0.1:54233"
+    ]
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b",
+    "a01Cases": 17,
+    "a01Fail": [],
+    "a01NewerOriginalEqual": true,
+    "a01NewerDiagnosticPresent": true,
+    "a13RequestId": "req-360b38ab3e621f503ded78e93e191563",
+    "a13MatchingAuthMarkers": 0,
+    "a13AuthMarkers": [
+      "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:57873",
+      "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57874",
+      "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/ws status=401 reason=invalid_credential remote=127.0.0.1:57875",
+      "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/ws status=401 reason=invalid_credential remote=127.0.0.1:57878"
+    ]
+  }
+]

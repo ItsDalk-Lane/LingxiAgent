@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r05-t08/debug/deps/lingxi_service-0532c49ca08cc763)
+
+running 1 test
+test redaction::tests::r05_t02_base64_tokens_with_slash_and_padding_are_redacted ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 360 filtered out; finished in 0.00s
+

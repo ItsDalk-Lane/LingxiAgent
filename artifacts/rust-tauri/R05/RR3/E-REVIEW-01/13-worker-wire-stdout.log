@@ -1,0 +1,10 @@
+{
+  "boundary": "源码与现行文档的独立静态一致性；非本E生产进程调用",
+  "document": "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+  "document_kind": "model.complete",
+  "production_first_branch_kind": "callback",
+  "production_rejects_other_kind": true,
+  "fixture_has_callback_with_op": true,
+  "source_sha256": "4a158b5321da63d2c6a36d88da8ec7cfd21622c914fa38f7ad6dd674d4cb0788",
+  "status": "FAIL"
+}

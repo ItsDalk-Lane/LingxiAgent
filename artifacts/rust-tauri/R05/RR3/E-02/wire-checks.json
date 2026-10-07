@@ -1,0 +1,50 @@
+[
+  {
+    "check": "wire two separate actual fields",
+    "ok": true
+  },
+  {
+    "check": "wire JSON example exists",
+    "ok": true
+  },
+  {
+    "check": "wire declaration all six ordered fields",
+    "ok": true
+  },
+  {
+    "check": "wire example kind/op exact",
+    "ok": true
+  },
+  {
+    "check": "production actual kind dispatcher and rejection",
+    "ok": true
+  },
+  {
+    "check": "actual callback deserializes and dispatches host complete",
+    "ok": true
+  },
+  {
+    "check": "real normal fixture \"kind\": \"callback\"",
+    "ok": true
+  },
+  {
+    "check": "real normal fixture \"cb_id\": \"cb-1\"",
+    "ok": true
+  },
+  {
+    "check": "real normal fixture \"op\": \"model.complete\"",
+    "ok": true
+  },
+  {
+    "check": "real normal fixture \"purpose\": \"summarize\"",
+    "ok": true
+  },
+  {
+    "check": "real normal fixture \"max_output_tokens\": 64",
+    "ok": true
+  },
+  {
+    "check": "no invented op validation claim",
+    "ok": true
+  }
+]

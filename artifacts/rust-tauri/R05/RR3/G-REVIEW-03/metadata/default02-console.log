@@ -1,0 +1,42 @@
+== preparing the isolated copy at /Users/study_superior/r05t08-work/negcopy.n7dHPH (local clone of HEAD b3ac0e6ae + uncommitted working-tree overlay) ==
+== copy ready (branch codex/rust-tauri-migration, HEAD b3ac0e6ae, worktree dirty=72 files) ==
+== CONTROL: xtask r05 mirror tests green in the copy ==
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-2ada07f2097522dd)
+
+running 8 tests
+test stage_map::map_tests::r05_stage_pin_table_matches_the_registered_suites ... ok
+test stage_map::map_tests::r05_production_map_registers_the_suite_producer_and_r04_regression_gate ... ok
+test stage_map::map_tests::r05_production_map_registers_the_supplemental_duty_scenarios ... ok
+test stage_map::map_tests::r05_scope_matrix_covers_every_r05_bound_leaf_honestly ... ok
+test stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim ... FAILED
+test stage_map::map_tests::r05_map_declares_no_live_lane_and_only_offline_commands ... FAILED
+test stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once ... ok
+test stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05 ... ok
+
+failures:
+
+---- stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim stdout ----
+
+thread 'stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim' (22657440) panicked at crates/xtask/src/stage_map.rs:3010:9:
+assertion `left == right` failed: the R05 map must carry exactly 16 A-IDs + 2 supplemental duties, got ["R05-A01", "R05-A02", "R05-A03", "R05-A04", "R05-A05", "R05-A06", "R05-A07", "R05-A08", "R05-A09", "R05-A10", "R05-A11", "R05-A12", "R05-A13", "R05-A14", "R05-A15", "R05-A16", "R05-SUP-R04REG", "R05-SUP-SCOPE", "R05-LIVE-SNEAK"]
+  left: 19
+ right: 18
+
+---- stage_map::map_tests::r05_map_declares_no_live_lane_and_only_offline_commands stdout ----
+
+thread 'stage_map::map_tests::r05_map_declares_no_live_lane_and_only_offline_commands' (22657439) panicked at crates/xtask/src/stage_map.rs:3512:9:
+assertion `left == right` failed: the R05 map's command set drifted — new commands need explicit review against the offline-only policy
+  left: ["check_boundaries", "check_contracts", "live_probe", "r04_regression_gate", "r05_stage_suites", "rust_clippy", "rust_fmt", "rust_test_workspace"]
+ right: ["check_boundaries", "check_contracts", "r04_regression_gate", "r05_stage_suites", "rust_clippy", "rust_fmt", "rust_test_workspace"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    stage_map::map_tests::r05_map_declares_no_live_lane_and_only_offline_commands
+    stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim
+
+test result: FAILED. 6 passed; 2 failed; 0 ignored; 0 measured; 113 filtered out; finished in 0.04s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`
+FAIL: CONTROL failed: the untouched r05 mirror tests are not green in the copy

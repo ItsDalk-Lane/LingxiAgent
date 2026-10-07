@@ -1,0 +1,255 @@
+{
+  "utc": "2026-10-07T02:06:21.604356+00:00",
+  "mode": "fields",
+  "checks": [
+    {
+      "check": "full order ModelRouteRequest",
+      "ok": true,
+      "detail": {
+        "actual": [
+          "operation",
+          "provider",
+          "model"
+        ],
+        "document": [
+          "operation",
+          "provider",
+          "model"
+        ],
+        "declaration": "\n    pub operation: ModelOperation,\n    /// Explicit provider id (`None` = the operation's configured default).\n    pub provider: Option<String>,\n    /// Explicit model id (legal only together with `provider`).\n    pub model: Option<String>,\n"
+      }
+    },
+    {
+      "check": "full order RunContext",
+      "ok": true,
+      "detail": {
+        "actual": [
+          "principal",
+          "session_id",
+          "run_id",
+          "attempt",
+          "generation"
+        ],
+        "document": [
+          "principal",
+          "session_id",
+          "run_id",
+          "attempt",
+          "generation"
+        ],
+        "declaration": "\n    /// Authenticated principal resolved by the service auth layer.\n    /// Never a model-supplied or frontend-supplied claim.\n    pub principal: Principal,\n    pub session_id: SessionId,\n    pub run_id: RunId,\n    /// Attempt/generation fence: results from an older attempt must never\n    /// overwrite a newer one.\n    pub attempt: AttemptId,\n    /// Registry generation the tool/model snapshots were taken at.\n    pub generation: u64,\n"
+      }
+    },
+    {
+      "check": "full order ModelTurnInput",
+      "ok": true,
+      "detail": {
+        "actual": [
+          "submission",
+          "system_prompt",
+          "turn",
+          "prior",
+          "tools",
+          "deadline_unix_ms",
+          "images",
+          "max_output_tokens"
+        ],
+        "document": [
+          "submission",
+          "system_prompt",
+          "turn",
+          "prior",
+          "tools",
+          "deadline_unix_ms",
+          "images",
+          "max_output_tokens"
+        ],
+        "declaration": "\n    /// The user submission that opened the run, with any steering text\n    /// drained before THIS turn appended under the frozen\n    /// `[steering]` convention (the incumbent semantics: steered text\n    /// reaches the next model call's input; the loop never interrupts).\n    pub submission: String,\n    /// The system prompt the host layer resolved for this run (R05-T03:\n    /// the contract anchor the persona/system layer lands on). `None`\n    /// today — the driver passes `None` and every adapter omits the\n    /// family-specific system slot entirely (except codex, whose protocol\n    /// demands an `instructions` string and falls back to its documented\n    /// constant); persona wiring is a later stage's decision, never an\n    /// adapter-local guess.\n    pub system_prompt: Option<String>,\n    /// 1-based turn index of the run drive (matches the model call id's\n    /// sequence; monotonic across the attempts of one run — a retried\n    /// attempt keeps numbering its calls after the failed attempt's).\n    pub turn: u32,\n    /// The run's prior exchange, oldest first (empty on turn 1 of a\n    /// run). R05-T03 C12: a retried attempt CONTINUES this exchange — the\n    /// confirmed assistant/tool exchanges of the failed attempt are REAL\n    /// history the next call must see (a retry never rebuilds from the\n    /// bare submission, never re-executes a confirmed write); only the\n    /// failed call itself leaves no assistant turn behind.\n    pub prior: Vec<ExchangeItem>,\n    /// The tool declaration snapshot at send time (C08).\n    pub tools: ToolDeclarationSnapshot,\n    /// Absolute deadline of the call when one exists (None today: the\n    /// run-level cancellation tree is the cancel authority; the field is\n    /// the contract anchor budget wiring lands on).\n    pub deadline_unix_ms: Option<u64>,\n    /// R05-T06 (auxiliary vision slot / media-capable aux calls): image\n    /// inputs the HOST authorized and read (bytes + MIME, bounded) — the\n    /// model-facing request renders them per family (openai `image_url`\n    /// data URLs, anthropic `image` blocks, google `inlineData`,\n    /// responses `input_image`). The main chat path never sets this\n    /// (empty), so the incumbent chat wire is byte-identical.\n    pub images: Vec<InputImage>,\n    /// R05-T06: the host-decided output-token bound of THIS call (worker\n    /// callbacks / aux slots). `None` = the family default (the incumbent\n    /// chat path behavior; anthropic keeps its required 16384 constant).\n    pub max_output_tokens: Option<u32>,\n"
+      }
+    },
+    {
+      "check": "full order AuxiliaryRequest",
+      "ok": true,
+      "detail": {
+        "actual": [
+          "prompt",
+          "images",
+          "max_output_tokens",
+          "deadline_unix_ms"
+        ],
+        "document": [
+          "prompt",
+          "images",
+          "max_output_tokens",
+          "deadline_unix_ms"
+        ],
+        "declaration": "\n    pub prompt: String,\n    /// Host-authorized image inputs (vision slot) — read + bounded\n    /// host-side before they reach here.\n    pub images: Vec<InputImage>,\n    /// Host-decided output-token cap (None = the family default).\n    pub max_output_tokens: Option<u32>,\n    /// Host-computed absolute deadline clamping the call's network budget.\n    pub deadline_unix_ms: Option<u64>,\n"
+      }
+    },
+    {
+      "check": "full order EmbeddingRequest",
+      "ok": true,
+      "detail": {
+        "actual": [
+          "inputs",
+          "dimensions",
+          "context_window",
+          "input_type"
+        ],
+        "document": [
+          "inputs",
+          "dimensions",
+          "context_window",
+          "input_type"
+        ],
+        "declaration": "\n    pub inputs: Vec<String>,\n    /// Requested output dimensionality (openai `dimensions`, ollama\n    /// `dimensions`, gemini `outputDimensionality`, voyage `dimensions`);\n    /// absent = the model default. MiniMax does NOT carry it (embo-01 is\n    /// fixed 1536 — the incumbent omits the field).\n    pub dimensions: Option<u32>,\n    /// The ollama num_ctx DECLARED value (the incumbent contextWindow\n    /// parameter); the dialect clamps/derives per the incumbent rule.\n    pub context_window: Option<u32>,\n    pub input_type: EmbeddingInputType,\n"
+      }
+    },
+    {
+      "check": "full order OperationCallContext",
+      "ok": true,
+      "detail": {
+        "actual": [
+          "session_id",
+          "run_id",
+          "attempt",
+          "cause_ref"
+        ],
+        "document": [
+          "session_id",
+          "run_id",
+          "attempt",
+          "cause_ref"
+        ],
+        "declaration": "\n    pub session_id: String,\n    pub run_id: String,\n    pub attempt: Option<String>,\n    /// The causal anchor inside the run (e.g. the tool call id that\n    /// triggered this operation).\n    pub cause_ref: Option<String>,\n"
+      }
+    },
+    {
+      "check": "full order ModelUsageQuery",
+      "ok": true,
+      "detail": {
+        "actual": [
+          "owner_user_id",
+          "session_id",
+          "run_id",
+          "purpose",
+          "model",
+          "recorded_from_unix_ms",
+          "recorded_to_unix_ms"
+        ],
+        "document": [
+          "owner_user_id",
+          "session_id",
+          "run_id",
+          "purpose",
+          "model",
+          "recorded_from_unix_ms",
+          "recorded_to_unix_ms"
+        ],
+        "declaration": "\n    /// Owner scoping (`None` = internal diagnostics over all rows).\n    pub owner_user_id: Option<String>,\n    pub session_id: Option<String>,\n    pub run_id: Option<String>,\n    /// Category filter — exact match on the row's `purpose`\n    /// (`chat`, `auxiliary.{slot}`, an operation name, …).\n    pub purpose: Option<String>,\n    /// Model filter — exact match on the row's `model`.\n    pub model: Option<String>,\n    /// Date-window filter (inclusive bounds on `recorded_at_unix_ms`).\n    pub recorded_from_unix_ms: Option<u64>,\n    pub recorded_to_unix_ms: Option<u64>,\n"
+      }
+    },
+    {
+      "check": "full enum field order AssistantTurn",
+      "ok": true,
+      "detail": [
+        "call",
+        "content",
+        "tool_calls",
+        "origin"
+      ]
+    },
+    {
+      "check": "full enum field order ToolResult",
+      "ok": true,
+      "detail": [
+        "tool_call_id",
+        "provider_call_id",
+        "outcome"
+      ]
+    },
+    {
+      "check": "schema actual max7",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "data epoch real1",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "wire actual1",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "all mandatory handoff keys",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "real credentials port resolve unauthorized",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "operation real signature embed",
+      "ok": true,
+      "detail": "pub async fn embed(\n        &self,\n        request: dialects::embedding::EmbeddingRequest,\n        deadline_unix_ms: Option<u64>,\n        context: Option<&OperationCallContext>,\n    ) -> Result<dialects::embedding::EmbeddingOutcome, OperationFailure> "
+    },
+    {
+      "check": "operation real signature rerank",
+      "ok": true,
+      "detail": "pub async fn rerank(\n        &self,\n        request: RerankRequest,\n        deadline_unix_ms: Option<u64>,\n        context: Option<&OperationCallContext>,\n    ) -> Result<dialects::rerank::RerankOutcome, OperationFailure> "
+    },
+    {
+      "check": "normal embedding real complete sample",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "normal usage does not infer missing output",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "decoder output not total difference",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "actual main deadline",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "actual LedgerWorkerCallbackTrace wired",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "unknown and cancelled ledger facts",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "real owner and filter query",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "opaque provenance exact source match",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "error unknown cancel recovery budget present",
+      "ok": true,
+      "detail": null
+    }
+  ],
+  "passed": 25,
+  "failed": 0,
+  "boundary": "independent document/source/evidence assertions; no Cargo tests executed"
+}

@@ -1,0 +1,16 @@
+{
+  "utc": "2026-10-07T03:47:07.405145+00:00",
+  "failedFixture": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/tmp/r05-node-selfcheck-v0rtfuag",
+  "legacyTemporaryPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/tmp/r02-a16.cy5Jqx",
+  "legacyTemporaryPathExists": false,
+  "reason": "initial selfcheck fixture was nested under main repository; old CLI found ancestor ws; this attempt is INVALID_REVIEW_SETUP, raw logs retained",
+  "preserved": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/copy",
+    "/private/tmp/r05-node-selfcheck-bz5g0665"
+  ],
+  "beforeFree": 1756884992,
+  "failureLogSha256": "62c56b0fe91210cfea3f4f4c0454e11b675736519b399dbf4ec0e23a320ebde1",
+  "removedFileCount": 4356,
+  "removedLogicalBytes": 69206780,
+  "afterFree": 1838919680
+}

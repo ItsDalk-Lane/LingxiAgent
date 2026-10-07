@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "python3",
+    "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/snapshot.py",
+    "before"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startUTC": "2026-10-07T01:58:37.976757+00:00",
+  "endUTC": "2026-10-07T01:58:38.024896+00:00",
+  "exitCode": 0,
+  "logs": {
+    "stdout": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/01-input-stdout.log",
+      "sha256": "345747842c4ec00c622116b29031e994f320e00e6e24c955b1ef3aafadfedd08",
+      "bytes": 15
+    },
+    "stderr": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/01-input-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

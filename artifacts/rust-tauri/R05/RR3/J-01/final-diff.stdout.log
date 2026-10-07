@@ -1,0 +1,69 @@
+diff --git a/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-01/negative-before.sh b/scripts/rust-tauri/r05_t08_negative_gate.sh
+index bfc011c8b..66dceb41b 100755
+--- a/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-01/negative-before.sh
++++ b/scripts/rust-tauri/r05_t08_negative_gate.sh
+@@ -9,11 +9,8 @@
+ # check must fail for the REASON the case exists (never an unrelated compile
+ # error — each mutation compiles and only changes the behavior under test).
+ #
+-# The copy is created WITHOUT any git write operation on the main repo:
+-# `git archive HEAD` (read-only export) + an rsync overlay of the uncommitted
+-# working-tree state, plus a `git init`-free metadata shim — verify-stage
+-# needs git HEAD, so the copy clones the local repo read-only via
+-# `git clone --no-hardlinks` (a pure read of the source) before the overlay.
++# 隔离副本使用Git标准共享对象克隆：历史对象只读复用，工作树、index和HEAD独立。
++# 未提交候选随后覆盖；依赖准备前后检查对象可达性，来源失效明确失败。
+ #
+ # Usage: scripts/rust-tauri/r05_t08_negative_gate.sh [EVIDENCE_DIR] [--case N03]
+ #        every case's real exit code and gap-naming text land under
+@@ -57,7 +54,7 @@ COPY="$(mktemp -d "$HOME/r05t08-work/negcopy.XXXXXX")" || fail "cannot create is
+ SOURCE_HEAD="$(git -C "$ROOT" rev-parse --short HEAD)" || fail "source HEAD query failed"
+ note "== preparing the isolated copy at $COPY (local clone of HEAD $SOURCE_HEAD + uncommitted working-tree overlay) =="
+ rm -rf "$COPY"
+-if ! git -C "$ROOT" clone --no-hardlinks --quiet --branch codex/rust-tauri-migration "$ROOT" "$COPY" > "$EV/clone.log" 2>&1; then
++if ! git -C "$ROOT" clone --shared --quiet --branch codex/rust-tauri-migration "$ROOT" "$COPY" > "$EV/clone.log" 2>&1; then
+   cat "$EV/clone.log"; fail "local clone failed"
+ fi
+ # Overlay the uncommitted candidate: rust/, scripts/, docs/rust-tauri/
+@@ -68,6 +65,11 @@ fi
+ for sub in rust scripts docs/rust-tauri; do
+   rsync -a --delete --exclude 'target/' "$ROOT/$sub/" "$COPY/$sub/" || fail "rsync overlay failed for $sub"
+ done
++# 先准备当前候选的Node输入及独立依赖，再拍任何快照或启动门禁。
++# 失败直接停止；完整依赖清单、真实工具及读取探针保存在本轮证据。
++python3 "$ROOT/scripts/rust-tauri/r05_t08_prepare_node.py" \
++  --source "$ROOT" --copy "$COPY" --evidence "$EV/node-preparation" \
++  || fail "isolated Node dependency preparation failed"
+ # The copy must NOT carry main-tree artifacts (evidence trees stay behind);
+ # its candidate binding covers its own tree only.
+ COPY_BRANCH="$(git -C "$COPY" rev-parse --abbrev-ref HEAD)" || fail "copy branch query failed"
+@@ -213,6 +215,13 @@ run_n03() {
+   note "PASS N03 restore: authoritative table byte-equal, exact mirror 1/1 green"
+ }
+ 
++verify_node_dependencies() {
++  # 依赖虽被Git忽略，仍必须与准备时的实际读取内容一致。
++  python3 "$ROOT/scripts/rust-tauri/r05_t08_prepare_node.py" \
++    --verify "$EV/node-preparation/result.json" --evidence "$EV/node-verification" \
++    || fail "isolated Node dependencies changed during negative gate"
++}
++
+ write_results() {
+ # ── verdict ─────────────────────────────────────────────────────────────────
+ python3 - "$EV" "$CASE_SCOPE" "$COPY" <<'PY' || fail "at least one R05 negative case did NOT fail closed with the gap named"
+@@ -262,6 +271,7 @@ note "PASS control: xtask r05_ tests green (exit 0)"
+ 
+ if [ "$CASE_SCOPE" = "N03" ]; then
+   run_n03
++  verify_node_dependencies
+   write_results
+   note "RESULT: selected N03 failed closed with the target named (1/1), restored mirror green; other 15 cases NOT RUN"
+   exit 0
+@@ -677,6 +687,7 @@ if [ "$N16_REUSE_EXIT" -ne 0 ] && [ "$N16_NAMED" = "OK" ]; then N16_VERDICT=OK;
+ record_case "R05-GATE-N16" "$N16_REUSE_EXIT" "$N16_NAMED" "$N16_VERDICT" "验收后改码 → 绑定摘要漂移且旧证据根拒收（属性判定不依赖 R02 整体结果——其矩阵命令受已登记的间歇 LAN 停驻环境项影响，与绑定机制无关）"
+ 
+ # 最后一项也必须还原，汇总不能在副本仍带变异时宣称完整恢复。
++verify_node_dependencies
+ reset_copy
+ write_results
+ note "RESULT: every R05 negative case failed closed with the gap named (16/16), controls green"

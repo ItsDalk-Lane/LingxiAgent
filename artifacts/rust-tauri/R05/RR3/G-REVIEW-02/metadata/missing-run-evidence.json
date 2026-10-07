@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-07T04:36:27.348840+00:00",
+  "missing": [
+    "n02-zero-match/exit-code.txt",
+    "n02-zero-match/suites/gaps.txt",
+    "n03-restored/exit-code.txt",
+    "case-results.json",
+    "node-verification/result.json"
+  ],
+  "missingCommandJson": true,
+  "note": "Final production case-results.json did not exist. Failed recorder source-after/post writes were regenerated later with explicit post-abort timestamps; no failed command exit is synthesized. No zero-byte JSON existed in the default output at inspection.",
+  "zeroByteJson": []
+}

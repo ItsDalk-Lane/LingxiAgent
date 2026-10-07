@@ -1,0 +1,71 @@
+{
+  "preparationWindowUnchanged": true,
+  "fullRunUnchanged": false,
+  "changedPaths": {
+    "objects/66/dceb41b73716daea2c6865bc16a8a172acd567": {
+      "before": null,
+      "after": {
+        "sha256": "ba9abd028bcc3399998976a676491c54253d84a23e83e373309588b9a0c76410",
+        "size": 13158,
+        "mode": 292
+      }
+    },
+    "objects/info/commit-graphs/graph-6f0e28b0addb9fd462354b447d700c456bf47bbe.graph": {
+      "before": null,
+      "after": {
+        "sha256": "af017b0a659664c930ea5b0c20f916bccde52643426c9d40490d321265d2c358",
+        "size": 376741,
+        "mode": 292
+      }
+    },
+    "gk/config": {
+      "before": {
+        "sha256": "3b545c00849aad16c01ef2bc552cf0b7f3e0cb910266069b5335889a603ca39d",
+        "size": 4994,
+        "mode": 420
+      },
+      "after": {
+        "sha256": "9105f0c284ba1c2776badc3af634ab487dfb733978d59f5ecaa6c684fb2bcb49",
+        "size": 4994,
+        "mode": 420
+      }
+    },
+    "objects/info/commit-graphs/commit-graph-chain": {
+      "before": null,
+      "after": {
+        "sha256": "a3782f5daac18f6431bc64ff624f716cb338e65a4f2dc30e531cb55e22a56b4d",
+        "size": 82,
+        "mode": 292
+      }
+    },
+    "objects/info/commit-graph": {
+      "before": {
+        "sha256": "af017b0a659664c930ea5b0c20f916bccde52643426c9d40490d321265d2c358",
+        "size": 376741,
+        "mode": 292
+      },
+      "after": null
+    },
+    "objects/info/commit-graphs/graph-4d5eaeebdba40935d2537a2d22304a2d6d025cc0.graph": {
+      "before": null,
+      "after": {
+        "sha256": "7fcc49afcd8bf490bf8fe1e528c2dbb0d93d83a95bc51b60172f33fd75315e4e",
+        "size": 1316,
+        "mode": 292
+      }
+    },
+    "FETCH_HEAD": {
+      "before": {
+        "sha256": "7d918e1681d9f7b9812d3098cc1e117822c26ec88dd384705346d910bbb6b4c1",
+        "size": 254,
+        "mode": 420
+      },
+      "after": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size": 0,
+        "mode": 420
+      }
+    }
+  },
+  "attribution": "UNKNOWN: reviewer ran no fetch/commit/maintenance on main; cannot claim whole .git bytewise unchanged through entire run. Source HEAD/index and 504 source files remain equal."
+}

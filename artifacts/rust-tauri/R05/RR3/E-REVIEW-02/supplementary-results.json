@@ -1,0 +1,1942 @@
+{
+  "utc": "2026-10-07T02:06:06.383861+00:00",
+  "checks": [
+    {
+      "name": "160/54/61 exact",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "load exactly preserved",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "phase count raw vs doc",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "preregistered thresholds actual",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "raw resource hash actual",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "service extrema doc",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary tree extrema doc",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner tree extrema doc",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 0",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 0",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 0",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 1",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 1",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 1",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 2",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 2",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 2",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 3",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 3",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 3",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 4",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 4",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 4",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 5",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 5",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 5",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 6",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 6",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 6",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 7",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 7",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 7",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 8",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 8",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 8",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 9",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 9",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 9",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 10",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 10",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 10",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 11",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 11",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 11",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 12",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 12",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 12",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 13",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 13",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 13",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 14",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 14",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 14",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 15",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 15",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 15",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 16",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 16",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 16",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 17",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 17",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 17",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 18",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 18",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 18",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 19",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 19",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 19",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 20",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 20",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 20",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 21",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 21",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 21",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 22",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 22",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 22",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 23",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 23",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 23",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 24",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 24",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 24",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 25",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 25",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 25",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 26",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 26",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 26",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 27",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 27",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 27",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 28",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 28",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 28",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 29",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 29",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 29",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 30",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 30",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 30",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 31",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 31",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 31",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 32",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 32",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 32",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 33",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 33",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 33",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 34",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 34",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 34",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 35",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 35",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 35",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 36",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 36",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 36",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 37",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 37",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 37",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 38",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 38",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 38",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 39",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 39",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 39",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 40",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 40",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 40",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 41",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 41",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 41",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 42",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 42",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 42",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 43",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 43",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 43",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 44",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 44",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 44",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 45",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 45",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 45",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 46",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 46",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 46",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 47",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 47",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 47",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 48",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 48",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 48",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 49",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 49",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 49",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 50",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 50",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 50",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 51",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 51",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 51",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 52",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 52",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 52",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary sums 53",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary absolute/growth 53",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "binary logs bound 53",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 0",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 0",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 0",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 1",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 1",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 1",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 2",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 2",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 2",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 3",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 3",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 3",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 4",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 4",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 4",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 5",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 5",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 5",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 6",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 6",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 6",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 7",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 7",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 7",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 8",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 8",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 8",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 9",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 9",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 9",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 10",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 10",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 10",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 11",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 11",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 11",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 12",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 12",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 12",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 13",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 13",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 13",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 14",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 14",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 14",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 15",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 15",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 15",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 16",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 16",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 16",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 17",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 17",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 17",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 18",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 18",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 18",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 19",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 19",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 19",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 20",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 20",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 20",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 21",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 21",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 21",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 22",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 22",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 22",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 23",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 23",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 23",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 24",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 24",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 24",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 25",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 25",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 25",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 26",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 26",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 26",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 27",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 27",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 27",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 28",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 28",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 28",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 29",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 29",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 29",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 30",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 30",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 30",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 31",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 31",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 31",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 32",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 32",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 32",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 33",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 33",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 33",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 34",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 34",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 34",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 35",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 35",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 35",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 36",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 36",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 36",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 37",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 37",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 37",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 38",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 38",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 38",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 39",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 39",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 39",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 40",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 40",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 40",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 41",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 41",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 41",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 42",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 42",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 42",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 43",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 43",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 43",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 44",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 44",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 44",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 45",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 45",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 45",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 46",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 46",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 46",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 47",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 47",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 47",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 48",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 48",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 48",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 49",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 49",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 49",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 50",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 50",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 50",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 51",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 51",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 51",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 52",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 52",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 52",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 53",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 53",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 53",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 54",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 54",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 54",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 55",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 55",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 55",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 56",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 56",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 56",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 57",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 57",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 57",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 58",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 58",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 58",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 59",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 59",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 59",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner sums 60",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner absolute/growth 60",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner logs bound 60",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "15 real worker-live",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "15 real worker-released",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "owner45 all drained",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "no steady tmp",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "budget408 not ordinary recovery",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "actual cleanup matches doc",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "ordinary recovery actual ordinary-subagent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "ordinary recovery actual ordinary-late",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "FD/TCP raw controls",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "six log runs isolated-normal",
+      "ok": true,
+      "detail": [
+        "caseId",
+        "finding",
+        "mode",
+        "binary",
+        "binarySha256",
+        "rows",
+        "threshold",
+        "cleanup",
+        "status"
+      ]
+    },
+    {
+      "name": "six log runs isolated-old",
+      "ok": true,
+      "detail": [
+        "caseId",
+        "finding",
+        "mode",
+        "binary",
+        "binarySha256",
+        "rows",
+        "threshold",
+        "cleanup",
+        "status"
+      ]
+    },
+    {
+      "name": "six log runs isolated-restored",
+      "ok": true,
+      "detail": [
+        "caseId",
+        "finding",
+        "mode",
+        "binary",
+        "binarySha256",
+        "rows",
+        "threshold",
+        "cleanup",
+        "status"
+      ]
+    },
+    {
+      "name": "C321 every runtime input same",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "A19 every input same",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "B relevant four inputs same",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "raw historical layer R05",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "raw historical layer R04",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "raw historical layer R03",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "130 correct scope ownership",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full original raw npm evidence read",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "raw npm reds retained",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "E5 strict registered shape retained",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "directed E5 actual legal scope",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "anthropic_messages enforces opaque source",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "google_generative_ai enforces opaque source",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "openai_responses enforces opaque source",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "real data epoch and legacy versions",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "event schema actual1",
+      "ok": true,
+      "detail": null
+    }
+  ],
+  "passed": 381,
+  "failed": 0
+}

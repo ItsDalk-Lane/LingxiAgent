@@ -1,0 +1,121 @@
+2026-10-07T11:54:44Z HEAD=b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b
+2026-10-07T11:54:44Z gate1: master=56 (from FINAL-01); live dir entries=16; in_main=16 already_at_dest=40; missing=0 unexpected=0
+2026-10-07T11:54:44Z entry sanity: 56 entries OK (dirs with nested .git where still present; no nesting; no collisions)
+2026-10-07T11:54:44Z destination root ready: /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures
+2026-10-07T11:54:44Z checkpoint pre-digests loaded: 56
+2026-10-07T11:54:44Z pre-digest refreshed (fd-scanner, equals checkpoint) 41 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-01/copy
+2026-10-07T11:54:44Z pre-digest refreshed (fd-scanner, equals checkpoint) 42 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/copy
+2026-10-07T11:54:44Z pre-digest refreshed (fd-scanner, equals checkpoint) 43 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/runner-copy
+2026-10-07T11:54:44Z pre-digest refreshed (fd-scanner, equals checkpoint) 44 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/copy
+2026-10-07T11:54:44Z pre-digest refreshed (fd-scanner, equals checkpoint) 45 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/runner-copy
+2026-10-07T11:54:44Z pre-digest refreshed (fd-scanner, equals checkpoint) 46 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/copy
+2026-10-07T11:54:44Z pre-digest refreshed (fd-scanner, equals checkpoint) 47 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/runner-copy
+2026-10-07T11:54:44Z pre-digest refreshed (fd-scanner, equals checkpoint) 48 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/copy
+2026-10-07T11:54:44Z pre-digest refreshed (fd-scanner, equals checkpoint) 49 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/runner-copy
+2026-10-07T11:54:44Z pre-digest refreshed (fd-scanner, equals checkpoint) 50 artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/copy
+2026-10-07T11:54:44Z pre-digest refreshed (fd-scanner, equals checkpoint) 51 artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy
+2026-10-07T11:54:44Z pre-digest refreshed (fd-scanner, equals checkpoint) 52 artifacts/rust-tauri/R05/RR3/J-01/i-restore-final/copy
+2026-10-07T11:54:44Z pre-digest refreshed (fd-scanner, equals checkpoint) 53 artifacts/rust-tauri/R05/RR3/J-02/i-restore/copy
+2026-10-07T11:54:50Z pre-digest refreshed (fd-scanner, equals checkpoint) 54 artifacts/rust-tauri/R05/RR3/J-REVIEW-01/copy
+2026-10-07T11:54:50Z pre-digest refreshed (fd-scanner, equals checkpoint) 55 artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy
+2026-10-07T11:54:50Z pre-digest refreshed (fd-scanner, equals checkpoint) 56 artifacts/rust-tauri/R05/RR3/J-REVIEW-02/i-restore/copy
+2026-10-07T11:54:50Z verified  1/56 artifacts/rust-tauri/R05/RR3/A-02/copy-delete-rename                   -> artifacts_rust-tauri_R05_RR3_A-02_copy-delete-rename  equal=True
+2026-10-07T11:54:50Z verified  2/56 artifacts/rust-tauri/R05/RR3/A-02/extra/external-fresh/repo            -> artifacts_rust-tauri_R05_RR3_A-02_extra_external-fresh_repo  equal=True
+2026-10-07T11:54:50Z verified  3/56 artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-tracked-grandchild/repo -> artifacts_rust-tauri_R05_RR3_A-02_extra_external-old-tracked-grandchild_repo  equal=True
+2026-10-07T11:54:50Z verified  4/56 artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-untracked-grandchild/repo -> artifacts_rust-tauri_R05_RR3_A-02_extra_external-old-untracked-grandchild_repo  equal=True
+2026-10-07T11:54:50Z verified  5/56 artifacts/rust-tauri/R05/RR3/A-02/extra/internal-fresh/repo            -> artifacts_rust-tauri_R05_RR3_A-02_extra_internal-fresh_repo  equal=True
+2026-10-07T11:54:50Z verified  6/56 artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-tracked-grandchild/repo -> artifacts_rust-tauri_R05_RR3_A-02_extra_internal-old-tracked-grandchild_repo  equal=True
+2026-10-07T11:54:50Z verified  7/56 artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-untracked-grandchild/repo -> artifacts_rust-tauri_R05_RR3_A-02_extra_internal-old-untracked-grandchild_repo  equal=True
+2026-10-07T11:54:50Z verified  8/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename            -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_copy-delete-rename  equal=True
+2026-10-07T11:54:50Z verified  9/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename-02         -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_copy-delete-rename-02  equal=True
+2026-10-07T11:54:50Z verified 10/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-fresh/repo  -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_external-fresh_repo  equal=True
+2026-10-07T11:54:50Z verified 11/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-old-tracked-grandchild/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_external-old-tracked-grandchild_repo  equal=True
+2026-10-07T11:54:50Z verified 12/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-old-untracked-grandchild/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_external-old-untracked-grandchild_repo  equal=True
+2026-10-07T11:54:50Z verified 13/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-fresh/repo  -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_internal-fresh_repo  equal=True
+2026-10-07T11:54:50Z verified 14/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-old-tracked-grandchild/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_internal-old-tracked-grandchild_repo  equal=True
+2026-10-07T11:54:50Z verified 15/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-old-untracked-grandchild/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_internal-old-untracked-grandchild_repo  equal=True
+2026-10-07T11:54:50Z verified 16/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-fresh/repo     -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_external-fresh_repo  equal=True
+2026-10-07T11:54:50Z verified 17/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-old-tracked-grandchild/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_external-old-tracked-grandchild_repo  equal=True
+2026-10-07T11:54:50Z verified 18/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-old-untracked-grandchild/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_external-old-untracked-grandchild_repo  equal=True
+2026-10-07T11:54:50Z verified 19/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-fresh/repo     -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_internal-fresh_repo  equal=True
+2026-10-07T11:54:50Z verified 20/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-old-tracked-grandchild/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_internal-old-tracked-grandchild_repo  equal=True
+2026-10-07T11:54:50Z verified 21/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-old-untracked-grandchild/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_internal-old-untracked-grandchild_repo  equal=True
+2026-10-07T11:54:50Z verified 22/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo          -> artifacts_rust-tauri_R05_RR3_A-REVIEW-01_validator-fault-repo  equal=True
+2026-10-07T11:54:50Z verified 23/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-fresh/candidate-copy -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-02_internal-fresh_candidate-copy  equal=True
+2026-10-07T11:54:50Z verified 24/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-fresh/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-02_internal-fresh_repo  equal=True
+2026-10-07T11:54:50Z verified 25/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-untracked/candidate-copy -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-02_internal-untracked_candidate-copy  equal=True
+2026-10-07T11:54:50Z verified 26/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-untracked/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-02_internal-untracked_repo  equal=True
+2026-10-07T11:54:50Z verified 27/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-fresh/candidate-copy -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-fresh_candidate-copy  equal=True
+2026-10-07T11:54:50Z verified 28/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-fresh/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-fresh_repo  equal=True
+2026-10-07T11:54:50Z verified 29/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-tracked/candidate-copy -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-tracked_candidate-copy  equal=True
+2026-10-07T11:54:50Z verified 30/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-tracked/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-tracked_repo  equal=True
+2026-10-07T11:54:50Z verified 31/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-untracked/candidate-copy -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-untracked_candidate-copy  equal=True
+2026-10-07T11:54:50Z verified 32/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-untracked/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-untracked_repo  equal=True
+2026-10-07T11:54:50Z verified 33/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-fresh/candidate-copy -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-fresh_candidate-copy  equal=True
+2026-10-07T11:54:50Z verified 34/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-fresh/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-fresh_repo  equal=True
+2026-10-07T11:54:50Z verified 35/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-tracked/candidate-copy -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-tracked_candidate-copy  equal=True
+2026-10-07T11:54:50Z verified 36/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-tracked/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-tracked_repo  equal=True
+2026-10-07T11:54:50Z verified 37/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-untracked/candidate-copy -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-untracked_candidate-copy  equal=True
+2026-10-07T11:54:50Z verified 38/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-untracked/repo -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-untracked_repo  equal=True
+2026-10-07T11:54:50Z verified 39/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-validator-repo    -> artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-validator-repo  equal=True
+2026-10-07T11:54:50Z naming deviation (run-1 entry) artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent/internal-fresh/repo -> 40--repo (max_relpath_len=902)
+2026-10-07T11:54:50Z verified 40/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent/internal-fresh/repo -> 40--repo  equal=True
+2026-10-07T11:54:50Z verified 41/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-01/copy                    -> artifacts_rust-tauri_R05_RR3_I-01_selfcheck-01_copy  equal=True
+2026-10-07T11:54:50Z verified 42/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/copy                    -> artifacts_rust-tauri_R05_RR3_I-01_selfcheck-02_copy  equal=True
+2026-10-07T11:54:50Z verified 43/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/runner-copy             -> artifacts_rust-tauri_R05_RR3_I-01_selfcheck-02_runner-copy  equal=True
+2026-10-07T11:54:50Z verified 44/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/copy                    -> artifacts_rust-tauri_R05_RR3_I-01_selfcheck-03_copy  equal=True
+2026-10-07T11:54:51Z verified 45/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/runner-copy             -> artifacts_rust-tauri_R05_RR3_I-01_selfcheck-03_runner-copy  equal=True
+2026-10-07T11:54:51Z verified 46/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/copy                    -> artifacts_rust-tauri_R05_RR3_I-01_selfcheck-04_copy  equal=True
+2026-10-07T11:54:51Z verified 47/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/runner-copy             -> artifacts_rust-tauri_R05_RR3_I-01_selfcheck-04_runner-copy  equal=True
+2026-10-07T11:54:51Z verified 48/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/copy                 -> artifacts_rust-tauri_R05_RR3_I-01_selfcheck-final_copy  equal=True
+2026-10-07T11:54:51Z verified 49/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/runner-copy          -> artifacts_rust-tauri_R05_RR3_I-01_selfcheck-final_runner-copy  equal=True
+2026-10-07T11:54:51Z verified 50/56 artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/copy          -> artifacts_rust-tauri_R05_RR3_I-REVIEW-01_permanent-final_copy  equal=True
+2026-10-07T11:54:51Z verified 51/56 artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy   -> artifacts_rust-tauri_R05_RR3_I-REVIEW-01_permanent-final_runner-copy  equal=True
+2026-10-07T11:54:51Z verified 52/56 artifacts/rust-tauri/R05/RR3/J-01/i-restore-final/copy                 -> artifacts_rust-tauri_R05_RR3_J-01_i-restore-final_copy  equal=True
+2026-10-07T11:54:51Z verified 53/56 artifacts/rust-tauri/R05/RR3/J-02/i-restore/copy                       -> artifacts_rust-tauri_R05_RR3_J-02_i-restore_copy  equal=True
+2026-10-07T11:54:56Z verified 54/56 artifacts/rust-tauri/R05/RR3/J-REVIEW-01/copy                          -> artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy  equal=True
+2026-10-07T11:54:56Z verified 55/56 artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy           -> artifacts_rust-tauri_R05_RR3_J-REVIEW-01_i-preservation_copy  equal=True
+2026-10-07T11:54:56Z verified 56/56 artifacts/rust-tauri/R05/RR3/J-REVIEW-02/i-restore/copy                -> artifacts_rust-tauri_R05_RR3_J-REVIEW-02_i-restore_copy  equal=True
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-02/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-02/extra/external-fresh/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-tracked-grandchild/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-untracked-grandchild/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-02/extra/internal-fresh/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-tracked-grandchild/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-untracked-grandchild/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-01/RELOCATED-F51.json (3 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-fresh/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-old-tracked-grandchild/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-old-untracked-grandchild/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-fresh/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-old-tracked-grandchild/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-old-untracked-grandchild/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-fresh/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-old-tracked-grandchild/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-old-untracked-grandchild/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-fresh/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-old-tracked-grandchild/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-old-untracked-grandchild/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-02/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-fresh/RELOCATED-F51.json (2 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-untracked/RELOCATED-F51.json (2 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-fresh/RELOCATED-F51.json (2 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-tracked/RELOCATED-F51.json (2 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-untracked/RELOCATED-F51.json (2 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-fresh/RELOCATED-F51.json (2 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-tracked/RELOCATED-F51.json (2 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-untracked/RELOCATED-F51.json (2 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent/internal-fresh/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/I-01/selfcheck-01/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/RELOCATED-F51.json (2 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/RELOCATED-F51.json (2 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/RELOCATED-F51.json (2 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/RELOCATED-F51.json (2 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/RELOCATED-F51.json (2 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/J-01/i-restore-final/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/J-02/i-restore/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/J-REVIEW-01/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z marker written: artifacts/rust-tauri/R05/RR3/J-REVIEW-02/i-restore/RELOCATED-F51.json (1 children)
+2026-10-07T11:54:56Z post-enumeration: 0 directory entries
+2026-10-07T11:54:56Z totals: entries=56 files=110071 symlinks=121 bytes=5324827710 all_equal=True

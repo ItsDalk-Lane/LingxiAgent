@@ -1,0 +1,30 @@
+{
+  "time": "2026-10-07T00:58:46.112293+00:00",
+  "owned": {
+    "docs/rust-tauri/R05/R05_REPORT.md": "a13ca7342991da5725a721e93fa8dade0437b600a06e64814206254872a23907",
+    "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "edaefa5b5a1d0f5afaa3c75760c264269fecadaa54acb2915793052e99557d2c",
+    "docs/rust-tauri/R05/R05_BLOCKERS.md": "de950b466ac930d201f61bbb464a66a49a7b69afd79295931a7d753a637ae563",
+    "docs/rust-tauri/R05/R05_HANDOFF.json": "41eb3ad1a91a577511402736b80b38cc5529b937ca6574bbc074acc7d01376b1",
+    "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "2c431b2bf9fa6ad83ca010f4392cc262844eca2e2366a6e6aa204e14b280f108",
+    "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "6fc4c7096145a3bfa3d6f318b32721ad520f064162d34f007080a41a524c73d1",
+    "docs/rust-tauri/R05/R05_TEST_MAP.json": "c6b5da4a74938e66b6962b733a46a1d9ef8401cab36dc816ccbdb2de553bec99",
+    "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "0cfd02db2ab41fd1b876b694d705410dd90564265d56917413e98d28508a61f2",
+    "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "c1fd4b03b677d033ddc6a19df1cae2e41be7ea46d3dfd3f4424b7bb2aea0801a",
+    "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "11afe718db1c1c251fe915f77b378fe54450ed76a01966939b8df83b2bc5102b",
+    "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "027afa74e452e5839885ccd6d1412301b7ffcc19812fffaaea9ffd9bdd3f35c4",
+    "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "c219180aab39823c647f8758028fe91150bd2e5e76d735b3dd9000ab99ec7b37",
+    "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+    "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "43419656975bc810639fbe5e4b4870c3a460fdc6d9a65fabe14a45dbb75b8429"
+  },
+  "authority": {
+    "docs/rust-tauri/R05/r05_stage_cids.tsv": "ffffbe56313a1d5e50e7b216499cd851b1efc988da811a57d4fe0b07cc0be556",
+    "docs/rust-tauri/R05/r05_leaf_case_map.tsv": "a4f5866d11a833a7bbcd7224e898baaaa047a485cf4b2c66c515af25348db64f",
+    "docs/rust-tauri/R05/r05_required_cids.tsv": "1a046aa162d62bc1fdefdd286a6211d37c15852a2683073df9c629d26190676c",
+    "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+    "docs/rust-tauri/R05/R05_SCOPE_MATRIX.json": "222e8e7e54030578c0ce4697d33a98b59ec3ca5cc210642bdc83bdb3b7a72110"
+  },
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "remote_tracking_head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "branch": "codex/rust-tauri-migration",
+  "status": " M rust/crates/lingxi-service/src/logging.rs\n M rust/crates/lingxi-service/tests/r05_t08_resources.rs\n M rust/crates/xtask/src/candidate.rs\n M rust/crates/xtask/src/candidate/tests.rs\n M rust/crates/xtask/src/main.rs\n M rust/crates/xtask/src/runner_identity.rs\n M rust/crates/xtask/src/verify/runner_tests.rs\n M scripts/rust-tauri/r02_t08_legacy_entry_regression.sh\n M scripts/rust-tauri/r05_t08_negative_gate.sh\n?? artifacts/rust-tauri/R05/RR3/\n?? docs/rust-tauri/R05/repair-current/RR3_A_R2_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_CF46_REVIEW_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_E_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_G_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md\n?? docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json\n?? docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md\n?? docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md\n?? rust/crates/lingxi-service/tests/support/\n?? scripts/rust-tauri/r02_run_output_regression.py\n?? scripts/rust-tauri/r05_t08_mutate_pin.py\n?? scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py\n?? scripts/rust-tauri/run_output_sinks.py\n"
+}

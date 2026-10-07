@@ -1,0 +1,41 @@
+{
+  "utc": "2026-10-07T02:54:25.417881+00:00",
+  "checks": {
+    "load160": true,
+    "samples54": true,
+    "owners61": true,
+    "aggregateSums": true,
+    "all115LogsMax3": true,
+    "workerLive15Actual2Processes": true,
+    "workerReleased15OneProcessNoTCP": true,
+    "treeRSSandFDBounds": true,
+    "ownerBounds": true,
+    "owner15ActualPeak": true,
+    "owner45AllReleased": true,
+    "cleanupActual": true
+  },
+  "allCheckedTrue": true,
+  "logMax": 3,
+  "ownerPhases": {
+    "baseline": 1,
+    "worker-and-queued-live": 15,
+    "released-steady": 45
+  },
+  "thresholds": {
+    "fdBound": 400,
+    "fdGrowthBound": 64,
+    "logFilesBound": 3,
+    "registeredBeforeRun": true,
+    "rssBoundKiB": 409600,
+    "rssGrowthBoundKiB": 153600
+  },
+  "rssTreeRangeKiB": [
+    27200,
+    51568
+  ],
+  "fdsTreeRange": [
+    15,
+    22
+  ],
+  "boundary": "本轮原始点/逐PID重算；旧隔离生产输入，不转签新main"
+}

@@ -1,0 +1,26 @@
+{
+ "argv": [
+  "/Users/study_superior/.cargo/bin/cargo",
+  "run",
+  "--manifest-path",
+  "rust/Cargo.toml",
+  "--locked",
+  "-p",
+  "xtask",
+  "--",
+  "check-contracts"
+ ],
+ "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+ "df_after": "/dev/disk3s5   926Gi   389Gi   513Gi    44%    5.5M  5.4G    0%   /System/Volumes/Data",
+ "df_before": "/dev/disk3s5   926Gi   389Gi   513Gi    44%    5.5M  5.4G    0%   /System/Volumes/Data",
+ "exit": 0,
+ "label": "cmd-04-check-contracts",
+ "stderr_bytes": 127,
+ "stderr_file": "cmd-04-check-contracts.stderr",
+ "stderr_sha256": "5ef3f5fb034a94d0829a61f09f58917e3c0fc605f694a45189db12d40ec0b202",
+ "stdout_bytes": 599,
+ "stdout_file": "cmd-04-check-contracts.stdout",
+ "stdout_sha256": "7cf855eceb957b871950139268e9c2934039e796d79afedf73570aca6e7d1f12",
+ "utc_end": "2026-10-07T20:12:37.381138+00:00",
+ "utc_start": "2026-10-07T20:12:36.374889+00:00"
+}

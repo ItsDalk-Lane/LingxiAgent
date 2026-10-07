@@ -1,0 +1,11 @@
+from review_capture import *
+pin=ROOT/'docs/rust-tauri/R05/r05_stage_pins.tsv';cid=ROOT/'docs/rust-tauri/R05/r05_stage_cids.tsv';reg=ROOT/'docs/rust-tauri/R05/r05_required_cids.tsv';script=ROOT/'scripts/rust-tauri/r05_t08_stage_suites.sh'
+rows=[l.split() for l in pin.read_text().splitlines() if l.startswith('pin ')];lib=[r for r in rows if r[1].startswith('lib-')];integration=[r for r in rows if r[1].startswith(('svc:','adp:'))]
+lists={pkg:set(re.findall(r'^(.+): test$',(EV/f'{pkg}-list/stdout.log').read_text(),re.M)) for pkg in ('service','kernel','adapters')}
+checks={'libPins64':len(lib)==64,'integration27':len(integration)==27,'resourcesStill2':[r[2] for r in integration if r[1]=='svc:r05_t08_resources']==['2'],'allLibCountsExactly1':all(r[2]=='1' for r in lib),'producerUsesExact':'RUN_ARGS=(-p "$CRATE" --lib "$TEST_PATH" -- --exact)' in script.read_text(),'pinsUnchangedAgainstHEAD':subprocess.check_output(['git','show','HEAD:docs/rust-tauri/R05/r05_stage_pins.tsv'])==pin.read_bytes(),'cidUnchangedAgainstHEAD':subprocess.check_output(['git','show','HEAD:docs/rust-tauri/R05/r05_stage_cids.tsv'])==cid.read_bytes(),'libNamesExistInActualLists':all(r[1].split('/',1)[1] in lists[r[1].split('/',1)[0].replace('lib-','')] for r in lib),'loggingNotGlobalLibraryTotalPin':all('logging::' not in r[1] for r in lib),'loggingNineActuallyRan':'test result: ok. 9 passed; 0 failed; 0 ignored;' in (EV/'logging-nine/stdout.log').read_text()}
+owned=[]
+for r in lib:
+ run=r[1];test=run.split('/',1)[1];hits=[l for l in cid.read_text().splitlines() if l.startswith('cid ') and l.split()[2]==run and test in l.split()[3].split('+')];owned.append({'run':run,'test':test,'cidRows':hits,'exactListMatch':test in lists[run.split('/',1)[0].replace('lib-','')]})
+checks['all64UniqueCidOwnership']=all(len(r['cidRows'])==1 for r in owned)
+record={'utc':utc(),'checks':checks,'actualListedCounts':{k:len(v) for k,v in lists.items()},'libPins':owned,'tableHashes':{str(p.relative_to(ROOT)):sha(p) for p in (pin,cid,reg,script)},'status':'PASS' if all(checks.values()) else 'FAIL','boundary':'lists prove named --exact relationship; listing is not execution of all 64 pins; no empty filter counted PASS'}
+(EV/'PIN_AUDIT.json').write_text(json.dumps(record,ensure_ascii=False,indent=2));print(json.dumps({'status':record['status'],'checks':checks},ensure_ascii=False))

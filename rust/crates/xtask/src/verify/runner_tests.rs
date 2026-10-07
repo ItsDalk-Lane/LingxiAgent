@@ -2311,3 +2311,196 @@ fn r03_share_and_deferred_coverage_makes_overall_pass() {
     assert_eq!(share_entry["deferredToStages"], serde_json::json!(["RY"]));
     std::fs::remove_dir_all(&root).ok();
 }
+
+#[cfg(unix)]
+#[test]
+fn rr3_real_fd_standard_nested_layout_has_stable_checkpoints_at_every_layer() {
+    let root = temp_root("rr3-nested").canonicalize().unwrap();
+    write_minimal_r00_ledger(&root, &[]);
+    assert!(std::process::Command::new("git")
+        .args(["init", "-q"])
+        .arg(&root)
+        .status()
+        .unwrap()
+        .success());
+    std::fs::write(
+        root.join(".gitignore"),
+        include_bytes!("../../../../../.gitignore"),
+    )
+    .unwrap();
+    std::fs::write(root.join("source.txt"), b"source").unwrap();
+    assert!(std::process::Command::new("git")
+        .args(["add", ".gitignore", "source.txt", "docs"])
+        .current_dir(&root)
+        .status()
+        .unwrap()
+        .success());
+    let outside = std::env::var_os("LINGXI_NESTED_EXTERNAL")
+        .map(|_| temp_root("rr3-external").canonicalize().unwrap());
+    let evidence = match &outside {
+        Some(path) => path.join("run001/verify-R05"),
+        None => root.join("artifacts/rust-tauri/R05/run001/verify-R05"),
+    };
+    std::fs::create_dir_all(evidence.parent().unwrap()).unwrap();
+    let status = std::process::Command::new(std::env::current_exe().unwrap())
+        .args([
+            "--exact",
+            "verify::runner_tests::rr3_nested_process_probe",
+            "--nocapture",
+        ])
+        .env("LINGXI_NESTED_ROOT", &root)
+        .env("LINGXI_NESTED_LEVEL", "0")
+        .env("LINGXI_NESTED_EVIDENCE", &evidence)
+        .stdout(std::process::Stdio::from(
+            std::fs::File::create(evidence.parent().unwrap().join("stdout.log")).unwrap(),
+        ))
+        .stderr(std::process::Stdio::from(
+            std::fs::File::create(evidence.parent().unwrap().join("stderr.log")).unwrap(),
+        ))
+        .status()
+        .unwrap();
+    assert!(
+        status.success(),
+        "{}",
+        std::fs::read_to_string(evidence.parent().unwrap().join("stdout.log")).unwrap()
+    );
+    let paths = [
+        evidence.clone(),
+        evidence.join("R04_REGRESSION"),
+        evidence.join("R04_REGRESSION/R03_REGRESSION"),
+        evidence.join("R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry"),
+    ];
+    for (path, expected) in paths.iter().zip([7, 8, 15, 20]) {
+        let report: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(path.join("verify-stage-result.json")).unwrap())
+                .unwrap();
+        assert_eq!(report["overall"], "PASS");
+        assert_eq!(report["candidateSourceBinding"]["stable"], true);
+        assert_eq!(
+            report["candidateSourceBinding"]["checkpointAfterEveryCommand"]
+                .as_array()
+                .unwrap()
+                .len(),
+            expected
+        );
+    }
+    if let Some(archive) = std::env::var_os("LINGXI_NESTED_ARCHIVE") {
+        let archive = PathBuf::from(archive);
+        assert!(!archive.exists());
+        std::fs::create_dir_all(&archive).unwrap();
+        assert!(std::process::Command::new("cp")
+            .arg("-R")
+            .arg(evidence.parent().unwrap())
+            .arg(archive.join("run001"))
+            .status()
+            .unwrap()
+            .success());
+    }
+    std::fs::remove_dir_all(root).unwrap();
+    if let Some(outside) = outside {
+        std::fs::remove_dir_all(outside).unwrap();
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn rr3_nested_process_probe() {
+    let Some(root) = std::env::var_os("LINGXI_NESTED_ROOT").map(PathBuf::from) else {
+        // 默认腿核实本轮真实编译来源，子进程腿负责多层运行断言。
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .ancestors()
+            .nth(3)
+            .unwrap()
+            .canonicalize()
+            .unwrap();
+        assert_eq!(
+            crate::runner_identity::check(&root).unwrap()["status"],
+            "PASS"
+        );
+        return;
+    };
+    let level: usize = std::env::var("LINGXI_NESTED_LEVEL")
+        .unwrap()
+        .parse()
+        .unwrap();
+    let evidence = PathBuf::from(std::env::var_os("LINGXI_NESTED_EVIDENCE").unwrap());
+    let scope = crate::candidate::Scope::new(&root, &evidence).unwrap();
+    let before = scope.snapshot(&root).unwrap();
+    let counts = [7, 8, 15, 20];
+    let mut commands = Vec::new();
+    for index in 0..counts[level] - 1 {
+        commands.push(spec(
+            &format!("bounded-control-{index}"),
+            &["sh", "-c", "printf control"],
+            &[],
+            20,
+        ));
+    }
+    if level < 3 {
+        let key = [
+            "r04_regression_gate",
+            "r03_regression_gate",
+            "r02_legacy_regression",
+        ][level];
+        let child_evidence =
+            evidence.join(["R04_REGRESSION", "R03_REGRESSION", "R02/A16/legacy-entry"][level]);
+        // 调用真实生产编排与真实子进程；仅被执行检查是有界控制命令。
+        let mut nested = spec(key, &["env"], &[], 60);
+        nested.argv.extend([
+            format!("LINGXI_NESTED_LEVEL={}", level + 1),
+            format!("LINGXI_NESTED_EVIDENCE={}", child_evidence.display()),
+            std::env::current_exe()
+                .unwrap()
+                .to_string_lossy()
+                .into_owned(),
+            "--exact".into(),
+            "verify::runner_tests::rr3_nested_process_probe".into(),
+            "--nocapture".into(),
+        ]);
+        commands.push(nested);
+    } else {
+        commands.push(spec("leaf-control", &["sh", "-c", "printf leaf"], &[], 20));
+    }
+    let mut map = one_command_map(commands[0].clone());
+    map.commands = commands;
+    map.scenarios[0].command_refs = map.commands.iter().map(|c| c.key.clone()).collect();
+    let mut checkpoints = Vec::new();
+    let mut report = crate::verify::verify_stage_with_checkpoint(
+        &map,
+        &root,
+        &evidence,
+        "controlled-fixture",
+        true,
+        0,
+        |key| {
+            println!("本层真实 stdout 在 checkpoint 前增长：{level}/{key}");
+            checkpoints.push((key.to_string(), 0, scope.snapshot(&root)));
+        },
+    )
+    .unwrap();
+    let after = scope.snapshot(&root);
+    let stable = crate::candidate::snapshots_stable(&before, &checkpoints, &after);
+    let checkpoint_json: Vec<_> = checkpoints.iter().map(|(key, _, shot)| serde_json::json!({
+        "commandKey": key, "stable": shot.as_ref().is_ok_and(|s| s.digest == before.digest),
+        "digestSha256": shot.as_ref().ok().map(|s| &s.digest),
+        "changedPathBytesHex": shot.as_ref().ok().map(|s| crate::candidate::differences(&before, s)),
+        "error": shot.as_ref().err(),
+    })).collect();
+    crate::candidate::write_manifest(&evidence.join("candidate-source-before.json"), &before)
+        .unwrap();
+    crate::candidate::write_manifest(
+        &evidence.join("candidate-source-after.json"),
+        after.as_ref().unwrap(),
+    )
+    .unwrap();
+    report["candidateSourceBinding"] = serde_json::json!({"stable": stable, "excluded": scope.exclusion_json(), "checkpointAfterEveryCommand": checkpoint_json});
+    if !stable {
+        report["overall"] = serde_json::json!("FAIL");
+    }
+    std::fs::write(
+        evidence.join("verify-stage-result.json"),
+        serde_json::to_vec_pretty(&report).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(report["overall"], "PASS", "{report}");
+}

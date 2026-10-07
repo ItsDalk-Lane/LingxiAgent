@@ -1,0 +1,124 @@
+{
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "tools": {
+    "git": {
+      "path": "/opt/homebrew/Cellar/git/2.53.0/bin/git",
+      "sha256": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537"
+    },
+    "python3": {
+      "path": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+      "sha256": "1192b994fbb50303c9df2cc97c9d63797d454c7f57f20ca682877c9e770429aa"
+    },
+    "node": {
+      "path": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+      "sha256": "1ee75375e33b94fc34b3b19aede049e11dae90efb63b374dc96d6bdace70c4b8"
+    },
+    "npm": {
+      "path": "/Users/study_superior/.nvm/versions/node/v24.16.0/lib/node_modules/npm/bin/npm-cli.js",
+      "sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7"
+    }
+  },
+  "locks": {
+    "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+    "rust/Cargo.lock": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+    "package.json": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+    "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+    ".npmrc": "ce00fe5025692993005d3a5350ff13f8a568d604158041df74f1d229a2dfb607"
+  },
+  "commands": [
+    {
+      "name": "git",
+      "argv": [
+        "git",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T04:02:30.978533+00:00",
+      "finishedUtc": "2026-10-07T04:02:30.985874+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "97452bcde974ef512f9552791fc4f6a3219a724877671fba270baca1a6075b74",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "python",
+      "argv": [
+        "python3",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T04:02:30.985909+00:00",
+      "finishedUtc": "2026-10-07T04:02:30.996659+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "25c3049ed7f825e0565baa3279c7e5218335801d85737ffddce1b39e394d8793",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "node",
+      "argv": [
+        "node",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T04:02:30.996686+00:00",
+      "finishedUtc": "2026-10-07T04:02:31.012795+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "a8f8f7ba69d43285857a0ea34017ef8dadd3ba012404bb7dd188fc773cf63ee2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "npm",
+      "argv": [
+        "npm",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T04:02:31.012825+00:00",
+      "finishedUtc": "2026-10-07T04:02:31.078731+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3dbc807e13de125e909bea5877613d5d67989a43fb8e982fd79ba0efa46ac952",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "rustc",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/rustc",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T04:02:31.078768+00:00",
+      "finishedUtc": "2026-10-07T04:02:31.240958+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "2073de5abf149185c2f4d7473dc833bc921b99135560d24ae7b2293f33a9c376",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "cargo",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T04:02:31.240994+00:00",
+      "finishedUtc": "2026-10-07T04:02:31.289874+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "9950bbb2d5c3417b1a068f0e81f6d3cac991a363193bdf2a22d447f5acf8b503",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "shell-syntax",
+      "argv": [
+        "bash",
+        "-n",
+        "scripts/rust-tauri/r05_t08_negative_gate.sh",
+        "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T04:02:31.289905+00:00",
+      "finishedUtc": "2026-10-07T04:02:31.295367+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

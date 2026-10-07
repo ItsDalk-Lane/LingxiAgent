@@ -1,0 +1,230 @@
+{
+  "at": "2026-10-07T04:37:11.643182+00:00",
+  "method": "byte-copy after original default driver and mutation observer ended; read-only supplemental audit also finished; all source hashes compared after copy.",
+  "files": [
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/audit-reference-raw.py",
+      "destination": "metadata/audit-reference-raw.py",
+      "bytes": 2437,
+      "beforeSha256": "74e5b7640552d0160949acf7dc3638f685daec3ea617db3f60970552c42cd000",
+      "archivedSha256": "74e5b7640552d0160949acf7dc3638f685daec3ea617db3f60970552c42cd000",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/authority-files.json",
+      "destination": "metadata/authority-files.json",
+      "bytes": 6017,
+      "beforeSha256": "cd32072878b71fcbce19ee792d8f03fa31d01f54a9a2e47c6afaf6e87fa498a7",
+      "archivedSha256": "cd32072878b71fcbce19ee792d8f03fa31d01f54a9a2e47c6afaf6e87fa498a7",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/binary-observations.jsonl",
+      "destination": "metadata/binary-observations.jsonl",
+      "bytes": 47118,
+      "beforeSha256": "39a1c56e772dc5c7a0a6e2cb3aa6dff3a8b27cb8e8282e7e4e6a638bd098b7fc",
+      "archivedSha256": "39a1c56e772dc5c7a0a6e2cb3aa6dff3a8b27cb8e8282e7e4e6a638bd098b7fc",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/cache-single-object-cleanup.json",
+      "destination": "metadata/cache-single-object-cleanup.json",
+      "bytes": 1282,
+      "beforeSha256": "5635ca37f8677daa8f7ec1ccebd44cc45d034ab0c4bd031446de47bf416ac965",
+      "archivedSha256": "5635ca37f8677daa8f7ec1ccebd44cc45d034ab0c4bd031446de47bf416ac965",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/command-start.json",
+      "destination": "metadata/command-start.json",
+      "bytes": 416,
+      "beforeSha256": "777d4e6f5d5b9f32d612f4e55aa4668a091f65b85c7950bb29ba1656506717d2",
+      "archivedSha256": "777d4e6f5d5b9f32d612f4e55aa4668a091f65b85c7950bb29ba1656506717d2",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/copy-initial-comparison.json",
+      "destination": "metadata/copy-initial-comparison.json",
+      "bytes": 291715,
+      "beforeSha256": "c7bb256f1ab3210831a8c556e9e816d92385bb5978198bb93c52b1c92f613244",
+      "archivedSha256": "c7bb256f1ab3210831a8c556e9e816d92385bb5978198bb93c52b1c92f613244",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/copy-state-after-abort.json",
+      "destination": "metadata/copy-state-after-abort.json",
+      "bytes": 4500,
+      "beforeSha256": "51cd6a1cbd0c40be0e7285bb08f7d8dc0e48857ec67315b929c38641b77d7485",
+      "archivedSha256": "51cd6a1cbd0c40be0e7285bb08f7d8dc0e48857ec67315b929c38641b77d7485",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/default-console.log",
+      "destination": "metadata/default-console.log",
+      "bytes": 1477,
+      "beforeSha256": "812bf514f3fbcf6a952e04e83256f5eb1081fb20fe5949e889295d4a870aeda6",
+      "archivedSha256": "812bf514f3fbcf6a952e04e83256f5eb1081fb20fe5949e889295d4a870aeda6",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/driver.py",
+      "destination": "metadata/driver.py",
+      "bytes": 4458,
+      "beforeSha256": "4d96cbc1442563d844eadca25d9ba079bb0f4cc1d9eb9214fdb3de12f0279ab4",
+      "archivedSha256": "4d96cbc1442563d844eadca25d9ba079bb0f4cc1d9eb9214fdb3de12f0279ab4",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/execution-interruption.json",
+      "destination": "metadata/execution-interruption.json",
+      "bytes": 1735,
+      "beforeSha256": "a5d95a0c60c4e5c273b40fdc44488e17b0a3300bc66479700acaa209834dafcf",
+      "archivedSha256": "a5d95a0c60c4e5c273b40fdc44488e17b0a3300bc66479700acaa209834dafcf",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/f25-f26-reference-audit.json",
+      "destination": "metadata/f25-f26-reference-audit.json",
+      "bytes": 21877,
+      "beforeSha256": "ebd7bb8768cf733f030fe98d759aa9cefcd8ed2fe604ccea3987980ec2b9b473",
+      "archivedSha256": "ebd7bb8768cf733f030fe98d759aa9cefcd8ed2fe604ccea3987980ec2b9b473",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/final-preparation-readback.json",
+      "destination": "metadata/final-preparation-readback.json",
+      "bytes": 660,
+      "beforeSha256": "7860a5a68e6cdbf7669ee55d7de2688e8c0f032f9f313ca8818b470c0b7af3a1",
+      "archivedSha256": "7860a5a68e6cdbf7669ee55d7de2688e8c0f032f9f313ca8818b470c0b7af3a1",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/missing-run-evidence.json",
+      "destination": "metadata/missing-run-evidence.json",
+      "bytes": 554,
+      "beforeSha256": "f84ded67967a52e633bc16ba6116b66613d44e801080d8d106cd7315d161639c",
+      "archivedSha256": "f84ded67967a52e633bc16ba6116b66613d44e801080d8d106cd7315d161639c",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/mutation-observations.jsonl",
+      "destination": "metadata/mutation-observations.jsonl",
+      "bytes": 8012,
+      "beforeSha256": "a801a620e54a4d990da30bdc09880af6a20ad57201f27591199ad57c81d40b95",
+      "archivedSha256": "a801a620e54a4d990da30bdc09880af6a20ad57201f27591199ad57c81d40b95",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/observe-mutations.py",
+      "destination": "metadata/observe-mutations.py",
+      "bytes": 947,
+      "beforeSha256": "8e8e255bf805fc38771f03e17b534b1378e19d326ef8854030cd00a47496bacc",
+      "archivedSha256": "8e8e255bf805fc38771f03e17b534b1378e19d326ef8854030cd00a47496bacc",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/owned-cache-boundary.json",
+      "destination": "metadata/owned-cache-boundary.json",
+      "bytes": 9526,
+      "beforeSha256": "25dd2c48430e85d063037c33e11191bdd6f19450798d53168143a0ff0923febd",
+      "archivedSha256": "25dd2c48430e85d063037c33e11191bdd6f19450798d53168143a0ff0923febd",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/post-default.json",
+      "destination": "metadata/post-default.json",
+      "bytes": 155008,
+      "beforeSha256": "d7ebc0a53297033101612e1a489be9eeb9508c442f33672e52cadbbe3284a92d",
+      "archivedSha256": "d7ebc0a53297033101612e1a489be9eeb9508c442f33672e52cadbbe3284a92d",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/preflight.json",
+      "destination": "metadata/preflight.json",
+      "bytes": 2963514,
+      "beforeSha256": "bafb794850b25d7e4d3b580a6a268a9ce9c37279d6be64033d497f9f3a2183f9",
+      "archivedSha256": "bafb794850b25d7e4d3b580a6a268a9ce9c37279d6be64033d497f9f3a2183f9",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/process-observations.jsonl",
+      "destination": "metadata/process-observations.jsonl",
+      "bytes": 22751,
+      "beforeSha256": "b6fc857b29ac489236e03ac73e95c660c155b1d0e525d3f0a2d457202f2a8af5",
+      "archivedSha256": "b6fc857b29ac489236e03ac73e95c660c155b1d0e525d3f0a2d457202f2a8af5",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/process-start.json",
+      "destination": "metadata/process-start.json",
+      "bytes": 63,
+      "beforeSha256": "8b20cf6ba5249e67737539e58fc46ff3fba576792e60bc449bdcfae34204fb6d",
+      "archivedSha256": "8b20cf6ba5249e67737539e58fc46ff3fba576792e60bc449bdcfae34204fb6d",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/reference-input-comparison.json",
+      "destination": "metadata/reference-input-comparison.json",
+      "bytes": 433998,
+      "beforeSha256": "89ca513ea3d489e05a631abdcfdeb914f24c70e754ada98277955f05287c9d84",
+      "archivedSha256": "89ca513ea3d489e05a631abdcfdeb914f24c70e754ada98277955f05287c9d84",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/reference-raw-audit.json",
+      "destination": "metadata/reference-raw-audit.json",
+      "bytes": 989459,
+      "beforeSha256": "7c74f9bca32e2543f419ba3953c7031e9b5bfe4a2a7a1ed2e94f00ced90bf361",
+      "archivedSha256": "7c74f9bca32e2543f419ba3953c7031e9b5bfe4a2a7a1ed2e94f00ced90bf361",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/reuse-audit.py",
+      "destination": "metadata/reuse-audit.py",
+      "bytes": 1297,
+      "beforeSha256": "2a976000385ab02c310121edc70908ffef8b44081baf987294e0722fe55f69a4",
+      "archivedSha256": "2a976000385ab02c310121edc70908ffef8b44081baf987294e0722fe55f69a4",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/run-index.json",
+      "destination": "metadata/run-index.json",
+      "bytes": 10400,
+      "beforeSha256": "44559da96d6c9fb8f8ea4af81a170860eab1679ef4bf27f0181cebcf37fa5f30",
+      "archivedSha256": "44559da96d6c9fb8f8ea4af81a170860eab1679ef4bf27f0181cebcf37fa5f30",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/source-after-default.json",
+      "destination": "metadata/source-after-default.json",
+      "bytes": 245943,
+      "beforeSha256": "3830601ba242c33c72e4ef8b57c7fdf6786f9466da5302c4834b2cbd8cb75c46",
+      "archivedSha256": "3830601ba242c33c72e4ef8b57c7fdf6786f9466da5302c4834b2cbd8cb75c46",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/source-before.json",
+      "destination": "metadata/source-before.json",
+      "bytes": 245943,
+      "beforeSha256": "c9b14c21b438c612dd7b006cd9adedcbb096d406f13aa99052a957870bae6f30",
+      "archivedSha256": "c9b14c21b438c612dd7b006cd9adedcbb096d406f13aa99052a957870bae6f30",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/tested-binary-identities.json",
+      "destination": "metadata/tested-binary-identities.json",
+      "bytes": 3158,
+      "beforeSha256": "274f4a02f1d945e69f672ba3f01eb359b9ff13eb9bf1d9569a93d2724ce803b6",
+      "archivedSha256": "274f4a02f1d945e69f672ba3f01eb359b9ff13eb9bf1d9569a93d2724ce803b6",
+      "equal": true
+    },
+    {
+      "source": "/private/tmp/rr3-g-review-02-20261007/tool-identities.json",
+      "destination": "metadata/tool-identities.json",
+      "bytes": 1921,
+      "beforeSha256": "3222d622d2446ee456fc1feef125db2e35d3a24840b2f5b76ce9389e254003a2",
+      "archivedSha256": "3222d622d2446ee456fc1feef125db2e35d3a24840b2f5b76ce9389e254003a2",
+      "equal": true
+    }
+  ]
+}

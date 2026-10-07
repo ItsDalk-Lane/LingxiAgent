@@ -1,0 +1,410 @@
+[
+  {
+    "command": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f46-old-prune-red-build/command.json",
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated",
+    "exit": 0,
+    "artifacts": [
+      {
+        "fresh": false,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/lib.rs",
+        "kind": [
+          "lib"
+        ],
+        "executable": null,
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/liblingxi_service.rlib",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/liblingxi_service-d1b960a1b85442c2.rmeta"
+        ]
+      },
+      {
+        "fresh": false,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/main.rs",
+        "kind": [
+          "bin"
+        ],
+        "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+        ]
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "cb6976e73625edad015434194fcc693ef4b0890921e6756f0c0ccc5b7dc3b52d"
+    }
+  },
+  {
+    "command": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f46-restored-green-build/command.json",
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated",
+    "exit": 0,
+    "artifacts": [
+      {
+        "fresh": false,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/lib.rs",
+        "kind": [
+          "lib"
+        ],
+        "executable": null,
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/liblingxi_service.rlib",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/liblingxi_service-d1b960a1b85442c2.rmeta"
+        ]
+      },
+      {
+        "fresh": false,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/main.rs",
+        "kind": [
+          "bin"
+        ],
+        "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+        ]
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "0afad67acdc9c36c41508ffbc5a16dc1a763fd72eec98edbc7147ee2227346e6"
+    }
+  },
+  {
+    "command": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f47-guard-red-build/command.json",
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated",
+    "exit": 0,
+    "artifacts": [
+      {
+        "fresh": true,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/lib.rs",
+        "kind": [
+          "lib"
+        ],
+        "executable": null,
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/liblingxi_service.rlib",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/liblingxi_service-d1b960a1b85442c2.rmeta"
+        ]
+      },
+      {
+        "fresh": false,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/main.rs",
+        "kind": [
+          "bin"
+        ],
+        "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+        ]
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "fe8deb7b72e8f7ba3d3fc5d9d4a28b18ad9aebf1c62f6619c0e1aec827bc77bd"
+    }
+  },
+  {
+    "command": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f47-old-warn-build/command.json",
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated",
+    "exit": 0,
+    "artifacts": [
+      {
+        "fresh": false,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/lib.rs",
+        "kind": [
+          "lib"
+        ],
+        "executable": null,
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/liblingxi_service.rlib",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/liblingxi_service-d1b960a1b85442c2.rmeta"
+        ]
+      },
+      {
+        "fresh": false,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/main.rs",
+        "kind": [
+          "bin"
+        ],
+        "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+        ]
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "926499974b2631fed4debfb90dae9820b21b741b87a42f816ef657d66109d8ee"
+    }
+  },
+  {
+    "command": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f47-restored-green-2-build/command.json",
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated",
+    "exit": 0,
+    "artifacts": [
+      {
+        "fresh": true,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/lib.rs",
+        "kind": [
+          "lib"
+        ],
+        "executable": null,
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/liblingxi_service.rlib",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/liblingxi_service-d1b960a1b85442c2.rmeta"
+        ]
+      },
+      {
+        "fresh": false,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/main.rs",
+        "kind": [
+          "bin"
+        ],
+        "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+        ]
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "c59fc012a29bbbf97f2dc2459e2e29fea467556048ea254848d752bc6fd2f006"
+    }
+  },
+  {
+    "command": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f47-restored-green-build/command.json",
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated",
+    "exit": 0,
+    "artifacts": [
+      {
+        "fresh": true,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/lib.rs",
+        "kind": [
+          "lib"
+        ],
+        "executable": null,
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/liblingxi_service.rlib",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/liblingxi_service-d1b960a1b85442c2.rmeta"
+        ]
+      },
+      {
+        "fresh": true,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/main.rs",
+        "kind": [
+          "bin"
+        ],
+        "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+        ]
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "926499974b2631fed4debfb90dae9820b21b741b87a42f816ef657d66109d8ee"
+    }
+  },
+  {
+    "command": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f47-root-red-build/command.json",
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated",
+    "exit": 0,
+    "artifacts": [
+      {
+        "fresh": true,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/lib.rs",
+        "kind": [
+          "lib"
+        ],
+        "executable": null,
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/liblingxi_service.rlib",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/liblingxi_service-d1b960a1b85442c2.rmeta"
+        ]
+      },
+      {
+        "fresh": false,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/main.rs",
+        "kind": [
+          "bin"
+        ],
+        "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+        ]
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "1af150c69e7293c533b3df2ecb54c61a4bbe2f2e673a4d8bf98546f5bca952a3"
+    }
+  },
+  {
+    "command": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-boundary-red-build/command.json",
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated",
+    "exit": 0,
+    "artifacts": [
+      {
+        "fresh": false,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/lib.rs",
+        "kind": [
+          "lib"
+        ],
+        "executable": null,
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/liblingxi_service.rlib",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/liblingxi_service-d1b960a1b85442c2.rmeta"
+        ]
+      },
+      {
+        "fresh": false,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/main.rs",
+        "kind": [
+          "bin"
+        ],
+        "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+        ]
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "ea64674ecda3d0b449d0e5ab294cc4bb6d9d08d31e3f694217bb84e2b363c4a9"
+    }
+  },
+  {
+    "command": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green-2-build/command.json",
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated",
+    "exit": 0,
+    "artifacts": [
+      {
+        "fresh": false,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/lib.rs",
+        "kind": [
+          "lib"
+        ],
+        "executable": null,
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/liblingxi_service.rlib",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/liblingxi_service-d1b960a1b85442c2.rmeta"
+        ]
+      },
+      {
+        "fresh": false,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/main.rs",
+        "kind": [
+          "bin"
+        ],
+        "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+        ]
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "b7665bf31fba1c90de91dcbb98af2722e216a9b48e78f6c3161cd8d472818c0b"
+    }
+  },
+  {
+    "command": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green-build/command.json",
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated",
+    "exit": 0,
+    "artifacts": [
+      {
+        "fresh": true,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/lib.rs",
+        "kind": [
+          "lib"
+        ],
+        "executable": null,
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/liblingxi_service.rlib",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/liblingxi_service-d1b960a1b85442c2.rmeta"
+        ]
+      },
+      {
+        "fresh": false,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated/rust/crates/lingxi-service/src/main.rs",
+        "kind": [
+          "bin"
+        ],
+        "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+        ]
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "63e70031d291fc56ade28c3571d3fb5d1e40c080f0e07377fbd574122b2914aa"
+    }
+  },
+  {
+    "command": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/primary-default-build/command.json",
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "exit": 0,
+    "artifacts": [
+      {
+        "fresh": true,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs",
+        "kind": [
+          "lib"
+        ],
+        "executable": null,
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/liblingxi_service.rlib",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/liblingxi_service-d1b960a1b85442c2.rmeta"
+        ]
+      },
+      {
+        "fresh": true,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/main.rs",
+        "kind": [
+          "bin"
+        ],
+        "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+        ]
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "0afad67acdc9c36c41508ffbc5a16dc1a763fd72eec98edbc7147ee2227346e6"
+    }
+  },
+  {
+    "command": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-equipment-build/command.json",
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "exit": 0,
+    "artifacts": [
+      {
+        "fresh": true,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs",
+        "kind": [
+          "lib"
+        ],
+        "executable": null,
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/liblingxi_service-d1b960a1b85442c2.rlib",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/liblingxi_service-d1b960a1b85442c2.rmeta"
+        ]
+      },
+      {
+        "fresh": true,
+        "src": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/main.rs",
+        "kind": [
+          "bin"
+        ],
+        "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "filenames": [
+          "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+        ]
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  }
+]

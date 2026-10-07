@@ -1,0 +1,112 @@
+{
+  "generated_at_utc": "2026-10-07T23:13:45Z",
+  "owned_14": [
+    "docs/rust-tauri/R05/R05_REPORT.md",
+    "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+    "docs/rust-tauri/R05/R05_BLOCKERS.md",
+    "docs/rust-tauri/R05/R05_HANDOFF.json",
+    "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+    "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+    "docs/rust-tauri/R05/R05_TEST_MAP.json",
+    "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+    "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+    "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+    "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+    "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+    "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+    "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json"
+  ],
+  "changed_owned_docs": [
+    {
+      "path": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "before_sha256": "e48fd59d0294dd9349175d3e21cac7e4d6e32684b581a9a2bdc9f346893bb87b",
+      "after_sha256": "e004d6867e4b5a6af4f25d99cb7d9d9feb07dc73bd0480cbee9166055a757bad",
+      "before_bytes": 280355,
+      "after_bytes": 329004
+    },
+    {
+      "path": "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "before_sha256": "8b2b592db1c70f082a4f7eb0ea5031fd7a2356ab5311a8bacd8f0941fe5ca0f9",
+      "after_sha256": "126efd850f0afc6225e2d4e8ba6b7da45a899366987ac1534e7cd18ec2c5a27d",
+      "before_bytes": 21257,
+      "after_bytes": 21533
+    },
+    {
+      "path": "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "before_sha256": "384a3875c5d97d8032a07f1523c40a243e7383bf678fdec326198a5e85f68f43",
+      "after_sha256": "5c260e51e24e94064e33db647ff8e76ba3d67223e395b3502162ae97d415161b",
+      "before_bytes": 92496,
+      "after_bytes": 137180
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "before_sha256": "dab66326ef8989cd8b2fe5b3d29b40008cae114dd3182208e777ad5d59b00565",
+      "after_sha256": "f36fb7c5bfa41efa4f7985bfd963866fa7fcee22b22276da2b429df6a32e1241",
+      "before_bytes": 4079196,
+      "after_bytes": 4235493
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "before_sha256": "6d6a11274f56c53070112301cd5c5bd262cd3e0e98f8da63213f4e3c7f28b10b",
+      "after_sha256": "7ca532f2844d1dfc209718733ed9d53626c704108a0e45434b3727c5f466e63a",
+      "before_bytes": 13493,
+      "after_bytes": 16135
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_HANDOFF.json",
+      "before_sha256": "37e546d074cceda8fee977fcca815073c8c7577a007c08deea1453e167e78b6d",
+      "after_sha256": "f31fc5ac46fc472f7f3183e08ba4b0bf6e05f24a3b5eb388b9e727087347e862",
+      "before_bytes": 93786,
+      "after_bytes": 141198
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "before_sha256": "f25410b6b54c0aa23eee9168b47d155ed09d897af10ab49362b2816cb4c3f087",
+      "after_sha256": "a0226ed7f194570a50c31a1306d704232d900fb88aa57974aee18eb870e4fffe",
+      "before_bytes": 25368,
+      "after_bytes": 28437
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "before_sha256": "76f81d2bc5a6adafe5a5864d8ccf0d95bf4edbfb758e28e2c6eef7ad2cb21e59",
+      "after_sha256": "2aa55b8e1f57da7be31431d2d8bc429104ca685a0961c369d08a818b6816a8ff",
+      "before_bytes": 52595,
+      "after_bytes": 97804
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "before_sha256": "f645789eba97821a00a66ee007889969ecd6b1afadbbc4efa83eb7a0a52f69d7",
+      "after_sha256": "2febb42197a69c21f7c8988f3cd378e82c5ed6ef2456e1a037715e1d5295bc51",
+      "before_bytes": 13088,
+      "after_bytes": 15739
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "before_sha256": "a63bf246bb9725f71b9ef6f6e712c8ec1bb009a6a29b25f4b9f5bdd3cb80e309",
+      "after_sha256": "2e6863c4c233bf6230fe9a9ffce392b194e2a5b52895dfbcfdb3c19803b07f91",
+      "before_bytes": 69886,
+      "after_bytes": 114570
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_REPORT.md",
+      "before_sha256": "231b0421f270f16ceac50c879738d402d29ab7597e2eaefc497948857f7fed7c",
+      "after_sha256": "64a0cb2f2076e59afac9184df422bce3d5ba6879200c6723eb1847e33679cbf3",
+      "before_bytes": 31894,
+      "after_bytes": 41209
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "before_sha256": "b29c486cee16797ceaf27e291563058c6b53b27860d22131a34373dd2d771368",
+      "after_sha256": "83eef333cde9316cea189e4588a5774183a101fc47a54531b574ce85c8dee98b",
+      "before_bytes": 121073,
+      "after_bytes": 177641
+    }
+  ],
+  "byte_identical_owned_docs": [
+    "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+    "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md"
+  ],
+  "non_owned_changed": [],
+  "removed": [],
+  "added_outside_e04_evidence": []
+}

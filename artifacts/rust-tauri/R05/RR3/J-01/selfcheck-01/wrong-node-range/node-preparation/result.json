@@ -1,0 +1,74 @@
+{
+  "status": "FAIL",
+  "startedUtc": "2026-10-07T03:20:11.613487+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/source",
+      "startedUtc": "2026-10-07T03:20:11.613797+00:00",
+      "finishedUtc": "2026-10-07T03:20:11.621078+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "63e6a97288cd18e716de9f86f12ea844483ec71ce17c11e111bcf60fee206081",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/wrong-node-range",
+      "startedUtc": "2026-10-07T03:20:11.621255+00:00",
+      "finishedUtc": "2026-10-07T03:20:11.628457+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "05b56fa74d4ce2cf3666fa34f651da85b1451f0ada8ceb5d9a252f833a921818",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/source",
+      "startedUtc": "2026-10-07T03:20:11.628595+00:00",
+      "finishedUtc": "2026-10-07T03:20:11.635535+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "1264cde08e9044337ee8392b1e5103616df4f3fb4dc1dbeb8be132fb83628177",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/wrong-node-range",
+      "startedUtc": "2026-10-07T03:20:11.635666+00:00",
+      "finishedUtc": "2026-10-07T03:20:11.642982+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "1264cde08e9044337ee8392b1e5103616df4f3fb4dc1dbeb8be132fb83628177",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "source": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/source",
+  "copy": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/wrong-node-range",
+  "sourceHead": "23471fb8f7233ffc698da328d342f9541bfc9b37",
+  "copyHead": "23471fb8f7233ffc698da328d342f9541bfc9b37",
+  "inputs": {
+    "package.json": "bdd8676740837e552913e374020ecc5857b6b8475843fdb128528caceb8e43cf",
+    "package-lock.json": "30a578a386373b098320d4e029eca8ef08b43df21cb334216c456d0634275d76",
+    ".npmrc": "f6d6be450cc3239fe9569e975697ba7c4264b62ce00f99e3dee8b0845a829d72"
+  },
+  "error": "package/lock mismatch: engines",
+  "finishedUtc": "2026-10-07T03:20:11.643738+00:00"
+}

@@ -1,0 +1,759 @@
+[
+  {
+    "caseId": "toolchain",
+    "F-ID": "F42",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "--version"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:40:19.059408+00:00",
+    "finishedAt": "2026-10-07T00:40:19.084221+00:00",
+    "durationSeconds": 0.024687041994184256,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "9950bbb2d5c3417b1a068f0e81f6d3cac991a363193bdf2a22d447f5acf8b503",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "expectedMatched": true
+  },
+  {
+    "caseId": "rustc",
+    "F-ID": "F42",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/rustc",
+      "--version"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:40:19.084589+00:00",
+    "finishedAt": "2026-10-07T00:40:19.120346+00:00",
+    "durationSeconds": 0.03577479103114456,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "2073de5abf149185c2f4d7473dc833bc921b99135560d24ae7b2293f33a9c376",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "expectedMatched": true
+  },
+  {
+    "caseId": "discovery-green",
+    "F-ID": "F42",
+    "argv": [
+      "python3",
+      "scripts/rust-tauri/r02_run_output_regression.py",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-green"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:40:19.120747+00:00",
+    "finishedAt": "2026-10-07T00:40:25.605603+00:00",
+    "durationSeconds": 6.4848589160246775,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "fba7a9e8b4f9901358b6cc2eb7d35fc9f21fc638e5ec316cd1e10c0b0177390a",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "cases": {
+      "actual": 4,
+      "ignored": 0,
+      "filtered": 0,
+      "notRun": null
+    },
+    "expectedMatched": true
+  },
+  {
+    "caseId": "discovery-old-red",
+    "F-ID": "F42",
+    "argv": [
+      "python3",
+      "scripts/rust-tauri/r02_run_output_regression.py",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-old-red",
+      "--discovery",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discover-old.py"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:40:25.606338+00:00",
+    "finishedAt": "2026-10-07T00:40:26.550140+00:00",
+    "durationSeconds": 0.9438282500486821,
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "logSha256": "0c4b9c4a9fb0b09f4d3103e068bb9142eb8ee3ab17febbe1fe31cf5388a3b710",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "cases": {
+      "actual": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "notRun": "旧算法首次目标红后其余3对照未执行"
+    },
+    "expectedMatched": true
+  },
+  {
+    "caseId": "discovery-restored-green",
+    "F-ID": "F42",
+    "argv": [
+      "python3",
+      "scripts/rust-tauri/r02_run_output_regression.py",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-restored-green"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:40:26.550736+00:00",
+    "finishedAt": "2026-10-07T00:40:32.681830+00:00",
+    "durationSeconds": 6.131089917034842,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "fba7a9e8b4f9901358b6cc2eb7d35fc9f21fc638e5ec316cd1e10c0b0177390a",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "cases": {
+      "actual": 4,
+      "ignored": 0,
+      "filtered": 0,
+      "notRun": null
+    },
+    "expectedMatched": true
+  },
+  {
+    "caseId": "xtask-all",
+    "F-ID": "F42",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {
+      "CARGO_TARGET_DIR": "/tmp/lingxi-rr3-a-review-01-target",
+      "LINGXI_NESTED_ARCHIVE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/nested-internal"
+    },
+    "startedAt": "2026-10-07T00:40:32.682351+00:00",
+    "finishedAt": "2026-10-07T00:40:47.664575+00:00",
+    "durationSeconds": 14.982168416958302,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "b0774cd35e192b48ee95f70a1a928734b5d9cb66775b863e9bbb93bc9fc73c11",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "testCount": {
+      "passed": 121,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0
+    },
+    "expectedMatched": true
+  },
+  {
+    "caseId": "nested-external",
+    "F-ID": "F42",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "rr3_real_fd_standard_nested_layout",
+      "--",
+      "--nocapture"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {
+      "CARGO_TARGET_DIR": "/tmp/lingxi-rr3-a-review-01-target",
+      "LINGXI_NESTED_EXTERNAL": "1",
+      "LINGXI_NESTED_ARCHIVE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/nested-external"
+    },
+    "startedAt": "2026-10-07T00:40:47.665065+00:00",
+    "finishedAt": "2026-10-07T00:40:55.415633+00:00",
+    "durationSeconds": 7.750558041036129,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "b97ea090f3a17c02012bdae783984768248e0977a5d0567dd2590418366b448e",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "testCount": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 120
+    },
+    "expectedMatched": true
+  },
+  {
+    "caseId": "build-xtask",
+    "F-ID": "F42",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "build",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {
+      "CARGO_TARGET_DIR": "/tmp/lingxi-rr3-a-review-01-target"
+    },
+    "startedAt": "2026-10-07T00:40:55.416122+00:00",
+    "finishedAt": "2026-10-07T00:40:56.494006+00:00",
+    "durationSeconds": 1.0779082500375807,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "6cb3ea7dd03ec156c034b2938d5390654d55f5ae9288b77195e05fd583c429ca",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "expectedMatched": true
+  },
+  {
+    "caseId": "helper-baseline",
+    "F-ID": "F42",
+    "argv": [
+      "/tmp/lingxi-rr3-a-review-01-target/debug/deps/xtask-4e4cec2af9d831e0",
+      "--exact",
+      "verify::runner_tests::rr3_nested_process_probe",
+      "--nocapture"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:42:39.546550+00:00",
+    "finishedAt": "2026-10-07T00:42:39.817144+00:00",
+    "durationSeconds": 0.27045645797625184,
+    "exitCode": 2,
+    "expectedExitCode": 0,
+    "logSha256": "6e32b128e2e8605760ff1fb51123bf1abfc2505948bb50c8f0c0a78ead5cb266",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "expectedMatched": false
+  },
+  {
+    "caseId": "helper-baseline-02",
+    "F-ID": "F42",
+    "argv": [
+      "/tmp/lingxi-rr3-a-review-01-target/debug/deps/xtask-ad766de8ea03e62c",
+      "--exact",
+      "verify::runner_tests::rr3_nested_process_probe",
+      "--nocapture"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:42:50.222960+00:00",
+    "finishedAt": "2026-10-07T00:42:50.232825+00:00",
+    "durationSeconds": 0.009714208077639341,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "21617496e6a0b1026e7461538b95579b172a0a0cab774439b2bebfab7601f983",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "testCount": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 120
+    },
+    "binaryReceipt": "binary-manifest-before.json",
+    "sourceMutationReceipt": null,
+    "expectedMatched": true
+  },
+  {
+    "caseId": "helper-mismatch-red",
+    "F-ID": "F42",
+    "argv": [
+      "/tmp/lingxi-rr3-a-review-01-target/debug/deps/xtask-ad766de8ea03e62c",
+      "--exact",
+      "verify::runner_tests::rr3_nested_process_probe",
+      "--nocapture"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:42:50.237678+00:00",
+    "finishedAt": "2026-10-07T00:42:50.241897+00:00",
+    "durationSeconds": 0.004235917003825307,
+    "exitCode": 101,
+    "expectedExitCode": 101,
+    "logSha256": "835fb4eb3b609ed8a4cbd7380e69536d96e89c1df192f2d3075ba124965e0043",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "testCount": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 120
+    },
+    "binaryReceipt": "binary-manifest-before.json",
+    "sourceMutationReceipt": "helper-mutation.json",
+    "expectedMatched": true
+  },
+  {
+    "caseId": "helper-restored-green",
+    "F-ID": "F42",
+    "argv": [
+      "/tmp/lingxi-rr3-a-review-01-target/debug/deps/xtask-ad766de8ea03e62c",
+      "--exact",
+      "verify::runner_tests::rr3_nested_process_probe",
+      "--nocapture"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:42:50.242313+00:00",
+    "finishedAt": "2026-10-07T00:42:50.251549+00:00",
+    "durationSeconds": 0.009255166980437934,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "21617496e6a0b1026e7461538b95579b172a0a0cab774439b2bebfab7601f983",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "testCount": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 120
+    },
+    "binaryReceipt": "binary-manifest-before.json",
+    "sourceMutationReceipt": null,
+    "expectedMatched": true
+  },
+  {
+    "caseId": "scope-ancestor-old-red",
+    "F-ID": "F42",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "rr3_real_fd_standard_nested_layout",
+      "--",
+      "--nocapture"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {
+      "CARGO_TARGET_DIR": "/tmp/lingxi-rr3-a-review-01-target"
+    },
+    "startedAt": "2026-10-07T00:42:50.252715+00:00",
+    "finishedAt": "2026-10-07T00:43:01.759981+00:00",
+    "durationSeconds": 11.50723870890215,
+    "exitCode": 101,
+    "expectedExitCode": 101,
+    "logSha256": "c6c8b4553fb357de787693d8ce05600081ed8048df542297f0728d1f16974a51",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "testCount": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 120
+    },
+    "sourceMutationReceipt": "scope-mutation.json",
+    "binaryReceipt": "首次Scope红二进制SHA未捕获，非最后有效绑定轮",
+    "expectedMatched": true
+  },
+  {
+    "caseId": "scope-restored-green",
+    "F-ID": "F42",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "rr3_real_fd_standard_nested_layout",
+      "--",
+      "--nocapture"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {
+      "CARGO_TARGET_DIR": "/tmp/lingxi-rr3-a-review-01-target",
+      "LINGXI_NESTED_ARCHIVE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/scope-restored-nested"
+    },
+    "startedAt": "2026-10-07T00:43:01.760999+00:00",
+    "finishedAt": "2026-10-07T00:43:13.584625+00:00",
+    "durationSeconds": 11.823586832964793,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "0ff43d017d742d9be24557b981e00eebb8d6847c252917d4d93dce5dd8f3a0b7",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "testCount": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 120
+    },
+    "sourceMutationReceipt": null,
+    "binaryReceipt": "首次Scope红二进制SHA未捕获，非最后有效绑定轮",
+    "expectedMatched": true
+  },
+  {
+    "caseId": "validator-normal-reject-validate_run_output_unit",
+    "F-ID": "F42",
+    "argv": [
+      "bash",
+      "-c",
+      "source \"$1\"; validate_run_output_unit \"$2\" \"$3\"",
+      "bash",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-green/fence-functions.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo",
+      "artifacts/rust-tauri/R05/declared-run"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:43:15.727230+00:00",
+    "finishedAt": "2026-10-07T00:43:15.757341+00:00",
+    "durationSeconds": 0.029949125018902123,
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "logSha256": "9a0e0cbedc478e8b16b4d0b46093d8436152e73647e02b4f0ddf5e01c83dccd0",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "executedProductionFunctionCalls": 1,
+    "expectedMatched": true
+  },
+  {
+    "caseId": "validator-git-error-validate_run_output_unit",
+    "F-ID": "F42",
+    "argv": [
+      "bash",
+      "-c",
+      "source \"$1\"; validate_run_output_unit \"$2\" \"$3\"",
+      "bash",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-green/fence-functions.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo",
+      "artifacts/rust-tauri/R05/declared-run"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {
+      "PATH": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.codex/tmp/arg0/codex-arg0uQYuTZ:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/study_superior/.lmstudio/bin"
+    },
+    "startedAt": "2026-10-07T00:43:15.757998+00:00",
+    "finishedAt": "2026-10-07T00:43:16.020790+00:00",
+    "durationSeconds": 0.26281537499744445,
+    "exitCode": 0,
+    "expectedExitCode": 1,
+    "logSha256": "65c118d2333f75ccf2a93fab022ac990d61e635f6954d4e336c346a4a916a8b5",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "executedProductionFunctionCalls": 1,
+    "expectedMatched": false
+  },
+  {
+    "caseId": "validator-query-restored-validate_run_output_unit",
+    "F-ID": "F42",
+    "argv": [
+      "bash",
+      "-c",
+      "source \"$1\"; validate_run_output_unit \"$2\" \"$3\"",
+      "bash",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-green/fence-functions.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo",
+      "artifacts/rust-tauri/R05/declared-run"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:43:16.021344+00:00",
+    "finishedAt": "2026-10-07T00:43:16.049845+00:00",
+    "durationSeconds": 0.028517749975435436,
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "logSha256": "9a0e0cbedc478e8b16b4d0b46093d8436152e73647e02b4f0ddf5e01c83dccd0",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "executedProductionFunctionCalls": 1,
+    "expectedMatched": true
+  },
+  {
+    "caseId": "validator-normal-reject-validate_declared_run_root",
+    "F-ID": "F42",
+    "argv": [
+      "bash",
+      "-c",
+      "source \"$1\"; validate_declared_run_root \"$2\" \"$3\"",
+      "bash",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-green/fence-functions.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo",
+      "artifacts/rust-tauri/R05/declared-run"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:43:16.050359+00:00",
+    "finishedAt": "2026-10-07T00:43:16.078657+00:00",
+    "durationSeconds": 0.02832791698165238,
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "logSha256": "9a0e0cbedc478e8b16b4d0b46093d8436152e73647e02b4f0ddf5e01c83dccd0",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "executedProductionFunctionCalls": 1,
+    "expectedMatched": true
+  },
+  {
+    "caseId": "validator-git-error-validate_declared_run_root",
+    "F-ID": "F42",
+    "argv": [
+      "bash",
+      "-c",
+      "source \"$1\"; validate_declared_run_root \"$2\" \"$3\"",
+      "bash",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-green/fence-functions.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo",
+      "artifacts/rust-tauri/R05/declared-run"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {
+      "PATH": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.codex/tmp/arg0/codex-arg0uQYuTZ:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/study_superior/.lmstudio/bin"
+    },
+    "startedAt": "2026-10-07T00:43:16.079265+00:00",
+    "finishedAt": "2026-10-07T00:43:16.106659+00:00",
+    "durationSeconds": 0.02742291591130197,
+    "exitCode": 0,
+    "expectedExitCode": 1,
+    "logSha256": "65c118d2333f75ccf2a93fab022ac990d61e635f6954d4e336c346a4a916a8b5",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "executedProductionFunctionCalls": 1,
+    "expectedMatched": false
+  },
+  {
+    "caseId": "validator-query-restored-validate_declared_run_root",
+    "F-ID": "F42",
+    "argv": [
+      "bash",
+      "-c",
+      "source \"$1\"; validate_declared_run_root \"$2\" \"$3\"",
+      "bash",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-green/fence-functions.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo",
+      "artifacts/rust-tauri/R05/declared-run"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:43:16.107303+00:00",
+    "finishedAt": "2026-10-07T00:43:16.135956+00:00",
+    "durationSeconds": 0.028677667025476694,
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "logSha256": "9a0e0cbedc478e8b16b4d0b46093d8436152e73647e02b4f0ddf5e01c83dccd0",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "executedProductionFunctionCalls": 1,
+    "expectedMatched": true
+  },
+  {
+    "caseId": "scope-old-build-02",
+    "F-ID": "F42",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--no-run"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {
+      "CARGO_TARGET_DIR": "/tmp/lingxi-rr3-a-review-01-target"
+    },
+    "startedAt": "2026-10-07T00:45:02.838568+00:00",
+    "finishedAt": "2026-10-07T00:45:03.787893+00:00",
+    "durationSeconds": 0.9492087080143392,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "bb55f32754fd74ece2c545c5ad66e49719463110c10da6d4a4812a4e3729811a",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "sourceMutationReceipt": "scope-mutation.json",
+    "binaryReceipt": "scope-binary-identities.json",
+    "expectedMatched": true
+  },
+  {
+    "caseId": "scope-ancestor-old-red-02",
+    "F-ID": "F42",
+    "argv": [
+      "/tmp/lingxi-rr3-a-review-01-target/debug/deps/xtask-ad766de8ea03e62c",
+      "--exact",
+      "verify::runner_tests::rr3_real_fd_standard_nested_layout_has_stable_checkpoints_at_every_layer",
+      "--nocapture"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:45:03.793463+00:00",
+    "finishedAt": "2026-10-07T00:45:14.193004+00:00",
+    "durationSeconds": 10.399495500023477,
+    "exitCode": 101,
+    "expectedExitCode": 101,
+    "logSha256": "f67fe578a2d16607092ad615c9e63ed44055df4e59a21d764181f761216e29e2",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "testCount": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 120
+    },
+    "sourceMutationReceipt": "scope-mutation.json",
+    "binaryReceipt": "scope-binary-identities.json",
+    "expectedMatched": true
+  },
+  {
+    "caseId": "scope-restored-build-02",
+    "F-ID": "F42",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--no-run"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {
+      "CARGO_TARGET_DIR": "/tmp/lingxi-rr3-a-review-01-target"
+    },
+    "startedAt": "2026-10-07T00:45:14.193644+00:00",
+    "finishedAt": "2026-10-07T00:45:14.893394+00:00",
+    "durationSeconds": 0.6997771670576185,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "ee01cf8b362d5d8f302c4fe9651cc92864f80c90a13cd3a2ac9d4743feb56644",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "sourceMutationReceipt": null,
+    "binaryReceipt": "scope-binary-identities.json",
+    "expectedMatched": true
+  },
+  {
+    "caseId": "scope-restored-green-02",
+    "F-ID": "F42",
+    "argv": [
+      "/tmp/lingxi-rr3-a-review-01-target/debug/deps/xtask-ad766de8ea03e62c",
+      "--exact",
+      "verify::runner_tests::rr3_real_fd_standard_nested_layout_has_stable_checkpoints_at_every_layer",
+      "--nocapture"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {
+      "LINGXI_NESTED_ARCHIVE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/scope-restored-nested-02"
+    },
+    "startedAt": "2026-10-07T00:45:14.898195+00:00",
+    "finishedAt": "2026-10-07T00:45:25.406141+00:00",
+    "durationSeconds": 10.507919708034024,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "ff38921dcea5e9e793337782eacb29910c5915fa4d293f4ca9b0bca75543114e",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "testCount": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 120
+    },
+    "sourceMutationReceipt": null,
+    "binaryReceipt": "scope-binary-identities.json",
+    "expectedMatched": true
+  },
+  {
+    "caseId": "copy-delete-rename",
+    "F-ID": "F42",
+    "argv": [
+      "bash",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-fresh/production-functions.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-fresh/repo",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename-evidence",
+      "artifacts/rust-tauri/R05/run001/child/child\nartifacts/rust-tauri/R05/run001/child\nartifacts/rust-tauri/R05/run001\n"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:45:31.396792+00:00",
+    "finishedAt": "2026-10-07T00:45:31.469763+00:00",
+    "durationSeconds": 0.07285712496377528,
+    "exitCode": 1,
+    "expectedExitCode": 0,
+    "logSha256": "0189b7596e1e20f74b60e86d877e898e984ed2dec0f540c8e6327b600f1dbe0f",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "expectedMatched": false
+  },
+  {
+    "caseId": "copy-delete-rename-02",
+    "F-ID": "F42",
+    "argv": [
+      "bash",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-fresh/production-functions.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-fresh/repo",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename-02",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename-evidence-02",
+      "artifacts/rust-tauri/R05/run001/child/child\nartifacts/rust-tauri/R05/run001/child\nartifacts/rust-tauri/R05/run001\n"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:45:45.162176+00:00",
+    "finishedAt": "2026-10-07T00:45:45.438442+00:00",
+    "durationSeconds": 0.27617308299522847,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "expectedMatched": true
+  },
+  {
+    "caseId": "extra-controls-02",
+    "F-ID": "F42",
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra_controls.py"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {
+      "EXTRA_CASE_DIR": "extra-02"
+    },
+    "startedAt": "2026-10-07T00:46:04.994751+00:00",
+    "finishedAt": "2026-10-07T00:46:16.917130+00:00",
+    "durationSeconds": 11.922200749977492,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "logSha256": "b61805ac93bd3094d334c581ba619c2dc1cb4bd13f2c6113dfcc6a8fe7c03d96",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "controls": {
+      "cases": 10,
+      "threeLevelSixFdTrees": 6,
+      "mutationRestoreChecks": 52,
+      "ignored": 0,
+      "filtered": 0
+    },
+    "expectedMatched": true
+  }
+]

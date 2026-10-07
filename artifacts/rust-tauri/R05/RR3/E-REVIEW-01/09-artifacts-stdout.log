@@ -1,0 +1,207 @@
+{
+  "mode": "artifacts",
+  "checks": [
+    {
+      "name": "历史层真实字段 R05",
+      "pass": true,
+      "detail": {
+        "overall": "FAIL",
+        "candidate_stable": true,
+        "runner_status": "PASS",
+        "stable_checkpoints": 7,
+        "checkpoints": 7,
+        "commands_passed": 5,
+        "commands_total": 7
+      }
+    },
+    {
+      "name": "历史层真实字段 R04",
+      "pass": true,
+      "detail": {
+        "overall": "FAIL",
+        "candidate_stable": false,
+        "runner_status": "PASS",
+        "stable_checkpoints": 0,
+        "checkpoints": 8,
+        "commands_passed": 6,
+        "commands_total": 8
+      }
+    },
+    {
+      "name": "历史层真实字段 R03",
+      "pass": true,
+      "detail": {
+        "overall": "FAIL",
+        "candidate_stable": false,
+        "runner_status": "PASS",
+        "stable_checkpoints": 0,
+        "checkpoints": 15,
+        "commands_passed": 14,
+        "commands_total": 15
+      }
+    },
+    {
+      "name": "资源原始字段 load",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "资源原始字段 thresholds",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "真实160轮",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "binary点",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "owner点",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "资源逐相位 series",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "资源逐相位 ownerResourceSeries",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "raw资源清理",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "权威130口径",
+      "pass": true,
+      "detail": {
+        "base": 16,
+        "supplemental_total": 130,
+        "share": 119,
+        "full": 6,
+        "deferred": 5,
+        "single_stage_r05_only": 6,
+        "dual_stage_r05_r07": 124
+      }
+    },
+    {
+      "name": "普通取消实际回执 subagent_closeout::parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap",
+      "pass": true,
+      "detail": {
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "subagent_closeout",
+          "parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap",
+          "--",
+          "--exact",
+          "--nocapture"
+        ],
+        "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "startedAt": "2026-10-07T00:27:38.259646+00:00",
+        "endedAt": "2026-10-07T00:27:53.326679+00:00",
+        "exitCode": 0,
+        "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+        "inputHashesBefore": {
+          "rust/crates/lingxi-service/tests/r05_t08_resources.rs": "104af86dc594f4dc990f43bfc420d194be647667a30819e5645bd3d82bd65d7d",
+          "rust/crates/lingxi-service/tests/support/r05_resource_sampler.rs": "1f6601122e5d7841f3975ec68ea8c60adb653fc939ca4e65cc3da7565c269274",
+          "rust/Cargo.lock": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+          "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37"
+        },
+        "inputHashesAfter": {
+          "rust/crates/lingxi-service/tests/r05_t08_resources.rs": "104af86dc594f4dc990f43bfc420d194be647667a30819e5645bd3d82bd65d7d",
+          "rust/crates/lingxi-service/tests/support/r05_resource_sampler.rs": "1f6601122e5d7841f3975ec68ea8c60adb653fc939ca4e65cc3da7565c269274",
+          "rust/Cargo.lock": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+          "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37"
+        },
+        "summaries": [
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.10s"
+        ],
+        "artifacts": {
+          "stdout.log": "d6e56903a9dbb0ac5a9751f0ecaba3679ecf57c0c4df3afdb1c5c5fa29b80f48"
+        }
+      }
+    },
+    {
+      "name": "普通取消实际回执 late_result_fence::r03_a07_late_result_after_cancel_and_next_run_pollutes_nothing",
+      "pass": true,
+      "detail": {
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "late_result_fence",
+          "r03_a07_late_result_after_cancel_and_next_run_pollutes_nothing",
+          "--",
+          "--exact",
+          "--nocapture"
+        ],
+        "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "startedAt": "2026-10-07T00:28:22.947480+00:00",
+        "endedAt": "2026-10-07T00:28:41.905944+00:00",
+        "exitCode": 0,
+        "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+        "inputHashesBefore": {
+          "rust/crates/lingxi-service/tests/r05_t08_resources.rs": "104af86dc594f4dc990f43bfc420d194be647667a30819e5645bd3d82bd65d7d",
+          "rust/crates/lingxi-service/tests/support/r05_resource_sampler.rs": "1f6601122e5d7841f3975ec68ea8c60adb653fc939ca4e65cc3da7565c269274",
+          "rust/Cargo.lock": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+          "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37"
+        },
+        "inputHashesAfter": {
+          "rust/crates/lingxi-service/tests/r05_t08_resources.rs": "104af86dc594f4dc990f43bfc420d194be647667a30819e5645bd3d82bd65d7d",
+          "rust/crates/lingxi-service/tests/support/r05_resource_sampler.rs": "1f6601122e5d7841f3975ec68ea8c60adb653fc939ca4e65cc3da7565c269274",
+          "rust/Cargo.lock": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+          "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37"
+        },
+        "summaries": [
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.06s"
+        ],
+        "artifacts": {
+          "stdout.log": "83373bfb09d4ddc7a2f18e8c9abef4b8569649ff319f71ee549692fc3a1f2990"
+        }
+      }
+    },
+    {
+      "name": "预算408仍记running",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "许可与raw红明确 raw_npm",
+      "pass": true,
+      "detail": "历史candidate raw npm exit1（3文件/6失败，seal-coordinate-lag）；base exit0。未重跑，不把合法directed/E5登记形态写为raw npm全绿。"
+    },
+    {
+      "name": "许可与raw红明确 directed_E5",
+      "pass": true,
+      "detail": "RR2 directed-no-seal-family在原明确授权内E0–E4.5通过/E5 SKIP；完整s5-full-5 exit0含E5严格已登记patch-too-large分类，登记红不转正式绿、不泛化豁免。"
+    },
+    {
+      "name": "许可与raw红明确 permissions",
+      "pass": true,
+      "detail": "仅继承RR-BLK-CREDENTIALS真实账号/LIVE最迟R10及既有平台义务；Windows/Linux本轮未验证，macOS arm64部分实测且必需r00仍BLOCKED。不新增延期。"
+    }
+  ],
+  "passed": 18,
+  "failed": 0
+}

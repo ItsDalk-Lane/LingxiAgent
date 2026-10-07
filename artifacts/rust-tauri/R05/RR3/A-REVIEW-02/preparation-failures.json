@@ -1,0 +1,49 @@
+{
+  "policy": "全部准备失败保留；不计作产品红证；正确生产入口的有效运行另列",
+  "firstIndependent": {
+    "command": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/review_driver.py",
+      "extra"
+    ],
+    "topLevelExit": 1,
+    "topLevelUtc": "未由顶层包装保存；下列为真实子case时间",
+    "childCase": {
+      "case": "internal-fresh",
+      "startedAt": "2026-10-07T01:00:06.045476+00:00",
+      "endedAt": "2026-10-07T01:00:07.012577+00:00",
+      "exit": 1,
+      "result": null
+    },
+    "stderrLog": "independent/internal-fresh/repo/artifacts/rust-tauri/R05/run-review/child/child/stderr.log",
+    "reason": "副本误放入源树导致递归复制；改到case独立目录，新编号03有效"
+  },
+  "otherFailures": [
+    {
+      "name": "independent-controls-02",
+      "exit": 1,
+      "expected": 0
+    },
+    {
+      "name": "e0s-driver",
+      "exit": 1,
+      "expected": 0
+    },
+    {
+      "name": "e0s-count-audit",
+      "exit": 1,
+      "expected": 0
+    },
+    {
+      "name": "e0s-count-audit-02",
+      "exit": 1,
+      "expected": 0
+    }
+  ],
+  "explanations": {
+    "independent-controls-02": "无获证的祖先DIR应拒绝；自己新鲜evidence子DIR可以获证，原断言误把两者等同；修正后03绿",
+    "e0s-driver": "生产E0s exit0；统计器把61期望判定、1缺块拒绝、1合法绿共63行误认为62条全是expected行；独立重计原62+合法绿通过",
+    "e0s-count-audit": "准备脚本替换定位失败，未添加新mode，KeyError；保留失败日志",
+    "e0s-count-audit-02": "同上，之后按真实单空格缩进定位成功；03只重计已通过E0s，不重复产品测试"
+  }
+}

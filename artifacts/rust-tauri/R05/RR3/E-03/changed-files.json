@@ -1,0 +1,21 @@
+{
+  "count": 12,
+  "paths": [
+    "docs/rust-tauri/R05/R05_REPORT.md",
+    "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+    "docs/rust-tauri/R05/R05_BLOCKERS.md",
+    "docs/rust-tauri/R05/R05_HANDOFF.json",
+    "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+    "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+    "docs/rust-tauri/R05/R05_TEST_MAP.json",
+    "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+    "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+    "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+    "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+    "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json"
+  ],
+  "unchanged": [
+    "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+    "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "observedAt": "2026-10-07T03:16:51.062950+00:00",
+  "matrixSha256": "ca69ace7dafb8fe9f5a93aaaea9d50f26494fe0a42428777347ec648d8f5aae0",
+  "F50": {
+    "id": "F50",
+    "workPackage": "J",
+    "title": "默认负测隔离副本遗漏Node依赖，五项R02正测未抵达目标",
+    "status": "OPEN",
+    "requiredForR05": true,
+    "owner": "rr3_j_impl_01 fresh native",
+    "round": 1,
+    "scope": "scripts/rust-tauri/r05_t08_negative_gate.sh默认准备及必要永久自检；不改R02契约/原叶",
+    "authorization": "本轮新必需缺口登记修好；有效前置不弱化既有检查",
+    "rootCauseEvidence": "G-INTERRUPTION-01只读原证与实际入口；旧G四轮R02每轮20命令13PASS/7FAIL，五项缺ws/vitest/node_modules，另A01/A13已有F47/F48",
+    "nextCommand": "新J修默认依赖准备→新独立审查→所有写者停后新G02默认16",
+    "remaining": "不能以某次手工补copy依赖替代生产默认入口可复跑",
+    "implementationState": "RUNNING"
+  }
+}

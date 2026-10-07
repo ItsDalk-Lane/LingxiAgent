@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/r05_t01_binary_wiring.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t01_binary_wiring-de97e3ad3e74884c)
+
+running 2 tests
+test c03_real_binary_without_plane_settles_unconfigured ... ok
+test c02_real_binary_full_chain_through_authenticated_endpoint ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.81s
+

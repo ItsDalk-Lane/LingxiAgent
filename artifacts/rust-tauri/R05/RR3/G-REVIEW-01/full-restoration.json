@@ -1,0 +1,91 @@
+{
+  "utc": "2026-10-07T02:28:48.898420+00:00",
+  "files": [
+    {
+      "path": "scripts/rust-tauri/r05_t08_stage_suites.sh",
+      "beforeRestore": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e",
+      "pristine": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e",
+      "afterRestore": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e",
+      "equal": true
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_stage_pins.tsv",
+      "beforeRestore": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+      "pristine": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+      "afterRestore": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs",
+      "beforeRestore": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+      "pristine": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+      "afterRestore": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "beforeRestore": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756",
+      "pristine": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756",
+      "afterRestore": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "beforeRestore": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+      "pristine": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+      "afterRestore": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/credentials/mod.rs",
+      "beforeRestore": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+      "pristine": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+      "afterRestore": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R04.json",
+      "beforeRestore": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "pristine": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "afterRestore": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R05.json",
+      "beforeRestore": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "pristine": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "afterRestore": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/lib.rs",
+      "beforeRestore": "cecd3f054673c853992b2c5c9e0e4c7ef1763561b905b65a233a01f1eef471e0",
+      "pristine": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+      "afterRestore": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+      "beforeRestore": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+      "pristine": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+      "afterRestore": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/credentials.rs",
+      "beforeRestore": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+      "pristine": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+      "afterRestore": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/tool_render.rs",
+      "beforeRestore": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+      "pristine": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+      "afterRestore": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+      "equal": true
+    }
+  ],
+  "allEqual": true,
+  "note": "包括生产reset遗漏的kernel；只恢复审查自有副本，不修主生产脚本"
+}

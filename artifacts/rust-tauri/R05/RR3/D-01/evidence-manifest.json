@@ -1,0 +1,118 @@
+{
+  "generatedAt": "2026-10-07T08:34:45.816682+08:00",
+  "root": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01",
+  "files": {
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/PREPARED-ALLOW.md": {
+      "sha256": "b0f25a7b61b0028650631611044139eba84bd2722697160ab43c9ede450dae0f",
+      "size": 3417
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/REPORT.md": {
+      "sha256": "5ddc3c80e7e7ad7f88df714c6bb0d3c22502119cbe87fa5c0186eedbdf54be52",
+      "size": 9525
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/build-environment.json": {
+      "sha256": "17f09fe2f2c0162c1e3dd625a2c157dd37c930608fa1ed5ffac6d21ee0be19fa",
+      "size": 638
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/compile-probe.json": {
+      "sha256": "8d648e8447af9af72af09f9d63b069a5e2a6fd731c6538b18f6183c2b0dcaf26",
+      "size": 727
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/compile-probe.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/identity-after.json": {
+      "sha256": "4a3b0cacb972af2532a9e275783bddf4b88cc8c2ccf88139eb15cf91d6c7c6bc",
+      "size": 65083
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/identity-before.json": {
+      "sha256": "2a5750976bc246c07ac7d2c7dd1edd0a220ab7178d9e0983898c050b0195d301",
+      "size": 65083
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/input-comparison.json": {
+      "sha256": "e9fdcce6fd3750721da67b54426e49b55641761f00cc2a318c539a81e1bc7215",
+      "size": 13142
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe": {
+      "sha256": "86d4f4f5fec48a66dfd38278331578e6764bf9edc2592e4315334294ab7b6b65",
+      "size": 34632
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe.c": {
+      "sha256": "9d6b3b25bc0d7a363e8c9efceb23cb17da022fd8fd72f2e801135a7d5bc96959",
+      "size": 2709
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe.py": {
+      "sha256": "9bac28fb72f376a6846c460289226e1cf62259713bfe9158103edf683f74f906",
+      "size": 1477
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/prebuild-r00.json": {
+      "sha256": "82735de951e514494f1fa4ee964b0b8ccbdefd676043b98ec406555f648571c5",
+      "size": 787
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/prebuild-r00.log": {
+      "sha256": "35f6b3c18ac7b13b9f36b4390dfea4588a2afe844bc1d759a4a2ac15463d5ec4",
+      "size": 196607
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/prepared-identity-check.json": {
+      "sha256": "7a7f0f8fff095b4a421682695d3c1c6a3921fba10448606b219fdcbc253561ec",
+      "size": 692
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/prepared-identity-check.log": {
+      "sha256": "b7b020bee5440dc373103d79f3e59ea2dfc5eb6fb0c7c689f460783675fb6bb4",
+      "size": 351
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-apple-lan.json": {
+      "sha256": "b68f217a7a9456fa5479abf34c975e3366b7b8fffa13720d7e62b8f33c73731c",
+      "size": 680
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-apple-lan.log": {
+      "sha256": "55ce46732c73cd0912a9cf46aa36c8c2c1fb3400336645b3c03463e7374705e8",
+      "size": 161
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-c-lan.json": {
+      "sha256": "84ffaeebab372054317e0bc1da02f5da7f9d006cb089f929cf319c4511834919",
+      "size": 645
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-c-lan.log": {
+      "sha256": "b49afda5b6751d4df292e3fe9a37da703452545138c3c9de4421ecfef6126f51",
+      "size": 202
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-c-loopback.json": {
+      "sha256": "642290a68f6f56f20a678ebedce98a7a9b99467feb96d2232247c45feaa33ed3",
+      "size": 653
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-c-loopback.log": {
+      "sha256": "98e974f6df695899c8588d773f8cee4d5fe3dd36a6b902f4856f0b88bb4fd36f",
+      "size": 209
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-identities.json": {
+      "sha256": "b911a3d9591892d4a2ef0b1c713cb05dbb7b1c4b9af7c1b908a7a60b8f1cd5e0",
+      "size": 5049
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/r00-formal-01-listeners.log": {
+      "sha256": "6faf3b2315428a8820284f138c6f4a04341d7ee7e87a066a4aa0466192dff5fc",
+      "size": 23565
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/r00-formal-01.json": {
+      "sha256": "a37c27a740ca39d13aae0d9a84643abdc797c46b843b59b5d1753d8cf7d20039",
+      "size": 796
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/r00-formal-01.log": {
+      "sha256": "895a83c72efdb5b1fa9542df1b90d5ac3b5b5e58fcb96e102123783c4f1f894e",
+      "size": 3288
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/run_capture.py": {
+      "sha256": "206052c4f8881bac43608b56ee8898bcb28aa83857454b8799cb6266340967b4",
+      "size": 2648
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/snapshot.py": {
+      "sha256": "3cac6314ab1340a7e681c9945a9ae4c7ab7e21ee13404205c12aaba4e58d0169",
+      "size": 3230
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/verify_prepared_identity.py": {
+      "sha256": "3c16a2ce8850249d409e31b4f5c81942e1ca0d0b874129735580b47c10aff2f5",
+      "size": 1447
+    }
+  }
+}

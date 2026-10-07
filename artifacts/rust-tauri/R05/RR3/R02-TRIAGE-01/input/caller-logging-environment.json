@@ -1,0 +1,20 @@
+[
+  {
+    "pid": "85741",
+    "ppid": "90799",
+    "command": "bash scripts/rust-tauri/r05_t08_negative_gate.sh artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01",
+    "psExit": 0,
+    "RUST_LOG": [],
+    "UTC": "2026-10-07T02:01:45.532865+00:00",
+    "boundary": "只保存RUST_LOG，未输出其他环境值"
+  },
+  {
+    "pid": "90799",
+    "ppid": "90794",
+    "command": "bash scripts/rust-tauri/r05_t08_negative_gate.sh artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01",
+    "psExit": 0,
+    "RUST_LOG": [],
+    "UTC": "2026-10-07T02:01:45.536233+00:00",
+    "boundary": "只保存RUST_LOG，未输出其他环境值"
+  }
+]

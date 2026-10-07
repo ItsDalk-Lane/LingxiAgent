@@ -1,0 +1,155 @@
+{
+  "scope": "read-only Git object identity/size estimate; actual candidate dirty bytes must still be checked before reuse",
+  "headFileCount": 38066,
+  "headBytes": 3741290865,
+  "baseFileCount": 8880,
+  "baseBytes": 1562337119,
+  "baseObjectsAlsoInHeadCount": 8795,
+  "baseObjectsAlsoInHeadBytes": 1554750971,
+  "baseUnmatchedCount": 85,
+  "baseUnmatchedBytes": 7586148,
+  "largestUnmatched": [
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "5f963a983bbf8f8d0333b4e8920aa829410a8731",
+      "bytes": 3512124,
+      "path": "build/cli-runtime-closure.json"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "0268b5efe0f32e813c792b3f52e8e88eb8c11d6b",
+      "bytes": 443333,
+      "path": "build/persistence-schema-fingerprint.json"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "14de19472cb784b895f6579fe2e964f441ac2cba",
+      "bytes": 354246,
+      "path": "desktop/src/locales/ja.json"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "4e3b52497dfcd2211c387d892ebd7646e91f0ce1",
+      "bytes": 321669,
+      "path": "desktop/src/locales/ko.json"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "968be84fddf33d57581ec33ad40def2e410aee85",
+      "bytes": 286993,
+      "path": "desktop/src/locales/en.json"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "f86e70086450368afc73393c9d00173d76e108a6",
+      "bytes": 282615,
+      "path": "docs/rust-tauri/R01/API_COMPAT_MATRIX.json"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "fec56b9d412edafbf61d090a0228b94c857c5a74",
+      "bytes": 279649,
+      "path": "desktop/src/locales/zh.json"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "6aa2d413e84f0ca3788675e63ccae938e168ee69",
+      "bytes": 276130,
+      "path": "desktop/src/locales/zh-TW.json"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "8c77ffff4c520476c4f0a5c26f8c0fbaac9c2457",
+      "bytes": 275507,
+      "path": "desktop/main.cjs"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "a41dd042aec7d88df8eff6bab114b9438feb1174",
+      "bytes": 122293,
+      "path": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "52f1d7f590e5cb40b7ffb9089658142f240d7143",
+      "bytes": 91001,
+      "path": "tests/artifact-ota.test.ts"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "f07c73f76464de73749ec2246b16c36e05457401",
+      "bytes": 88944,
+      "path": "shared/artifact-core/ota-core.cjs"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "65eea33d2a14977d687a5d3f6d9dd5d6a3ad6f4a",
+      "bytes": 68677,
+      "path": "rust/Cargo.lock"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "638533e040e95f9a1d786196348bcff2a0ec29b3",
+      "bytes": 67206,
+      "path": "scripts/compute-cli-closure.mjs"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "85f4f13e21406e1972a9ed404bda124ac5fee9ec",
+      "bytes": 48420,
+      "path": "tests/artifact-boot.test.ts"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "cef90a9d48c1b55c25be537fe26130e6fc8fee47",
+      "bytes": 44406,
+      "path": "desktop/src/react/__tests__/components/composer-send.transaction.test.ts"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "528c3bf14e4d084dd0e0fcc245095c630abc84ae",
+      "bytes": 43257,
+      "path": "desktop/src/react/__tests__/mobile/MobileApp.test.tsx"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "5414012515727c5204347cbb64093684f684d123",
+      "bytes": 43136,
+      "path": "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "e892253231f22b19c5dcbc3d839032bda5ce328a",
+      "bytes": 40128,
+      "path": "tests/server-startup-diagnostics-contract.test.ts"
+    },
+    {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "65e82699d6adff6e0e42b65810905081be09cbbb",
+      "bytes": 39633,
+      "path": ".github/workflows/build.yml"
+    }
+  ],
+  "headNamesEqualCurrentIndex": true,
+  "initialEstimateCorrection": "git quoted path strings cannot compare directly with NUL raw paths; final uses -z"
+}

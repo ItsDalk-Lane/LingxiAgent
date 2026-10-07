@@ -1,0 +1,15 @@
+
+running 1 test
+
+thread 'f27_sampler_controls_detect_growth_release_and_failure' (21616313) panicked at crates/lingxi-service/tests/r05_t08_resources.rs:1022:30:
+the plain helper samples: SampleError { what: "fds: invalid live-process sample", detail: "pid 81403 has 0 numeric descriptors; expected at least stdio" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test f27_sampler_controls_detect_growth_release_and_failure ... FAILED
+
+failures:
+
+failures:
+    f27_sampler_controls_detect_growth_release_and_failure
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.42s
+

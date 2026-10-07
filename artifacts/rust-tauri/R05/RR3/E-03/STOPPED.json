@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-07T04:56:55.082524+00:00",
+  "status": "SELF_CHECKED_STOP_WRITING_AFTER_MANIFEST",
+  "owner": "/root/rr3_e_impl_03",
+  "read_only_helper": "/root/rr3_e_impl_03/doc_input_audit (completed)",
+  "documents_changed": 12,
+  "documents_owned": 14,
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "branch": "codex/rust-tauri-migration",
+  "index_sha256": "e65fd8f9353224483a9b94cc32bca37dde0505f363692af58539d270df9dfc9d",
+  "index_comparison": "G02 review records e65fd8f9353224483a9b94cc32bca37dde0505f363692af58539d270df9dfc9d; this is readback, no index write",
+  "source_and_authority_writes": false,
+  "git_writes": false,
+  "system_changes": false,
+  "builds_started": false,
+  "free_bytes": 237142016,
+  "followup": "Separate new E independent review; stage NOT_ACCEPTED/R06_READY=false; no further writes by this author.",
+  "finalizer_pid": 16018,
+  "finalizer": "This process only seals the manifest and exits. Actual final tool exit is the completion acknowledgement; no background writer was started."
+}

@@ -1,0 +1,141 @@
+[
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "utc_start": "2026-10-07T01:32:57.368111+00:00",
+    "utc_end": "2026-10-07T01:32:57.374264+00:00",
+    "exit_code": 0,
+    "stdout": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "refs/remotes/origin/codex/rust-tauri-migration"
+    ],
+    "utc_start": "2026-10-07T01:32:57.374281+00:00",
+    "utc_end": "2026-10-07T01:32:57.379998+00:00",
+    "exit_code": 0,
+    "stdout": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "utc_start": "2026-10-07T01:32:57.380019+00:00",
+    "utc_end": "2026-10-07T01:32:57.385683+00:00",
+    "exit_code": 0,
+    "stdout": "codex/rust-tauri-migration\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "utc_start": "2026-10-07T01:32:57.385710+00:00",
+    "utc_end": "2026-10-07T01:32:57.623759+00:00",
+    "exit_code": 0,
+    "stdout": " M docs/rust-tauri/ORCHESTRATOR_PROGRESS.json\n M docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md\n M docs/rust-tauri/R05/PROGRESS_LEDGER.json\n M docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json\n M docs/rust-tauri/R05/R05_BLOCKERS.md\n M docs/rust-tauri/R05/R05_HANDOFF.json\n M docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md\n M docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json\n M docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md\n M docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json\n M docs/rust-tauri/R05/R05_REPORT.md\n M docs/rust-tauri/R05/R05_TEST_MAP.json\n M docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md\n M rust/crates/lingxi-service/src/logging.rs\n M rust/crates/lingxi-service/tests/r05_t08_resources.rs\n M rust/crates/xtask/src/candidate.rs\n M rust/crates/xtask/src/candidate/tests.rs\n M rust/crates/xtask/src/main.rs\n M rust/crates/xtask/src/runner_identity.rs\n M rust/crates/xtask/src/verify/runner_tests.rs\n M scripts/rust-tauri/r02_t08_legacy_entry_regression.sh\n M scripts/rust-tauri/r05_t08_negative_gate.sh\n?? artifacts/rust-tauri/R05/RR3/\n?? docs/rust-tauri/R05/repair-current/RR3_A_R2_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_CF46_REVIEW_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_D_REVIEW_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_E_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_FINAL_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_G_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md\n?? docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json\n?? docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md\n?? docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md\n?? rust/crates/lingxi-service/tests/support/\n?? scripts/rust-tauri/r02_run_output_regression.py\n?? scripts/rust-tauri/r05_t08_mutate_pin.py\n?? scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py\n?? scripts/rust-tauri/run_output_sinks.py\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/rustc",
+      "--version"
+    ],
+    "utc_start": "2026-10-07T01:32:57.623794+00:00",
+    "utc_end": "2026-10-07T01:32:57.659336+00:00",
+    "exit_code": 0,
+    "stdout": "rustc 1.98.1 (48a229cea 2026-09-01)\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "--version"
+    ],
+    "utc_start": "2026-10-07T01:32:57.659369+00:00",
+    "utc_end": "2026-10-07T01:32:57.681995+00:00",
+    "exit_code": 0,
+    "stdout": "cargo 1.98.1 (797e8a9bc 2026-08-05)\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "node",
+      "--version"
+    ],
+    "utc_start": "2026-10-07T01:32:57.682027+00:00",
+    "utc_end": "2026-10-07T01:32:57.696361+00:00",
+    "exit_code": 0,
+    "stdout": "v24.16.0\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "npm",
+      "--version"
+    ],
+    "utc_start": "2026-10-07T01:32:57.696389+00:00",
+    "utc_end": "2026-10-07T01:32:57.757249+00:00",
+    "exit_code": 0,
+    "stdout": "11.13.0\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "--version"
+    ],
+    "utc_start": "2026-10-07T01:32:57.757280+00:00",
+    "utc_end": "2026-10-07T01:32:57.766809+00:00",
+    "exit_code": 0,
+    "stdout": "Python 3.14.3\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "uname",
+      "-sm"
+    ],
+    "utc_start": "2026-10-07T01:32:57.766838+00:00",
+    "utc_end": "2026-10-07T01:32:57.769546+00:00",
+    "exit_code": 0,
+    "stdout": "Darwin arm64\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check",
+      "--",
+      "docs/rust-tauri/R05/R05_REPORT.md",
+      "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "docs/rust-tauri/R05/R05_HANDOFF.json",
+      "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+      "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+      "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

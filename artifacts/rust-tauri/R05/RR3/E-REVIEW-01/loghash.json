@@ -1,0 +1,295 @@
+{
+  "verified": true,
+  "logs": [
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/01-e-package-read-stdout.log",
+      "sha256": "0e04af134ebcc4296c9050325649f75a35c9232f097e70ab8a71d5cf075a3af2",
+      "bytes": 118611
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/01-e-package-read-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/02-json-stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/02-json-stderr.log",
+      "sha256": "7c2ed97873282b4c5ebee5bd642ae857da1171488ae0cffa2875c5dc7e2364c7",
+      "bytes": 1378
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/03-links-stdout.log",
+      "sha256": "b2157c5230f4f48a15ad19a3ff69a39f43e7a93366b99aaac2f7fc3ba5199cc4",
+      "bytes": 15485
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/03-links-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/04-history-stdout.log",
+      "sha256": "a8176803f3e9738061ec37e71cd4cfbd2761fb68da1fb928003b473c064a6bc2",
+      "bytes": 14957
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/04-history-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/05-hashes-stdout.log",
+      "sha256": "8d30db86fb37b996c2f28a0696de5c256828f1d6a6bc83e056adb2444837c78c",
+      "bytes": 40538
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/05-hashes-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/06-current-stdout.log",
+      "sha256": "6be7113541bb7cc14517ae92556af89dfa465b1510deb438c735cb4d6f9770e1",
+      "bytes": 12274
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/06-current-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/07-json-stdout.log",
+      "sha256": "23ddbae3e1ec7f045904392661018cc6345e116c2909dbeeeaa437a0c04584e0",
+      "bytes": 3245
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/07-json-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/08-fields-stdout.log",
+      "sha256": "922f7867aa65c28d735664ec389cf6b7b8c8203fd746baf984a2f1c8a7942f89",
+      "bytes": 10824
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/08-fields-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/09-artifacts-stdout.log",
+      "sha256": "8e242cd8d36320ed68efc4b334ebb4c7c00e991e6175bfc8f372a7d674a9a533",
+      "bytes": 7271
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/09-artifacts-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/10-fields-stdout.log",
+      "sha256": "0783ff62144bbfad4fa1a5df06e7e66076688fb4a195da55bed5b8965438ce83",
+      "bytes": 10802
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/10-fields-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/11-controls-stdout.log",
+      "sha256": "5871d362f4ffd31175b6aaea621a55d101249c2f839f8b53189a294d9243ddee",
+      "bytes": 12635
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/11-controls-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/12-supplemental-stdout.log",
+      "sha256": "ee8f8ee97c1449ffa73b45b9ba4bcd9b98f504cf8df1af5c061fa4f57025558f",
+      "bytes": 71
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/12-supplemental-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/13-worker-wire-stdout.log",
+      "sha256": "3e21330be64f483b39ac1ea731343bf4fa9b0a776cdd88178723d977ffa88484",
+      "bytes": 427
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/13-worker-wire-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/14-environment-stdout.log",
+      "sha256": "1579fac19529800b3908376e130b5995c014727c7121198f69e6ac54386fe91d",
+      "bytes": 5475
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/14-environment-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-current-mutated-stdout.log",
+      "sha256": "c8e79b4d2a1bf88c25fb88253f3b2f6f7b72c7a25e64ad4c92347963d80b033e",
+      "bytes": 220
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-current-mutated-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-current-normal-stdout.log",
+      "sha256": "b72daad53f158f4085e65193513c9eed76c270a202b1a17279ddf0f1c31bbf80",
+      "bytes": 173
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-current-normal-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-current-restored-stdout.log",
+      "sha256": "b72daad53f158f4085e65193513c9eed76c270a202b1a17279ddf0f1c31bbf80",
+      "bytes": 173
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-current-restored-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-fields-mutated-stdout.log",
+      "sha256": "0e74cd87eb4e4a31e1ae47b7330d8e14eadc8fdbe2579412d0ae7908f57c4d43",
+      "bytes": 325
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-fields-mutated-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-fields-normal-stdout.log",
+      "sha256": "fa4d4988926b208265b349c2dd100d9c691b79b711c257a32567e62cb1112934",
+      "bytes": 171
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-fields-normal-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-fields-restored-stdout.log",
+      "sha256": "fa4d4988926b208265b349c2dd100d9c691b79b711c257a32567e62cb1112934",
+      "bytes": 171
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-fields-restored-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-hash-mutated-stdout.log",
+      "sha256": "54e35b5a1e902b06896896befb94e3e124482da8a150d6b7db62a4c2c2e4c6d2",
+      "bytes": 255
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-hash-mutated-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-hash-normal-stdout.log",
+      "sha256": "c4d89e2d98f968bc43757272ecd6a40de6f8e639022a8d1d416a07b932f2047c",
+      "bytes": 167
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-hash-normal-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-hash-restored-stdout.log",
+      "sha256": "c4d89e2d98f968bc43757272ecd6a40de6f8e639022a8d1d416a07b932f2047c",
+      "bytes": 167
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-hash-restored-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-history-mutated-stdout.log",
+      "sha256": "9b08289830f9b4db4afd2ba831c25c097393523c3d56ca15c251009178c4f4c2",
+      "bytes": 195
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-history-mutated-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-history-normal-stdout.log",
+      "sha256": "df0564d9de2622d011aec6a911faa6d791ba501e88cace96041063b6f4b39f19",
+      "bytes": 173
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-history-normal-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-history-restored-stdout.log",
+      "sha256": "df0564d9de2622d011aec6a911faa6d791ba501e88cace96041063b6f4b39f19",
+      "bytes": 173
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-history-restored-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-worker-wire-mutated-stdout.log",
+      "sha256": "155a8441a916fba8ecb4499b603d35ee9ae425aa9d5f1ba2b3466fc5b071991b",
+      "bytes": 451
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-worker-wire-mutated-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-worker-wire-normal-stdout.log",
+      "sha256": "2ebca275fa5b9a4d85609d676d45f0bf7367ab425365b7a9b8cbcd811fd8139c",
+      "bytes": 445
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-worker-wire-normal-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-worker-wire-restored-stdout.log",
+      "sha256": "2ebca275fa5b9a4d85609d676d45f0bf7367ab425365b7a9b8cbcd811fd8139c",
+      "bytes": 445
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-worker-wire-restored-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ]
+}

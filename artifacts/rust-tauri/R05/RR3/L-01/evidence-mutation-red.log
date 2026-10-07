@@ -1,0 +1,24 @@
+   Compiling lingxi-protocol v0.0.0 (/tmp/l01-mutation/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/tmp/l01-mutation/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/tmp/l01-mutation/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/tmp/l01-mutation/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.36s
+     Running tests/r04_t08_tool_matrix.rs (/tmp/l01-load-target/debug/deps/r04_t08_tool_matrix-94e01f57d41763de)
+
+running 1 test
+
+thread 'terminal_family_share_cases' (27225473) panicked at crates/lingxi-service/tests/r04_t08_tool_matrix.rs:103:5:
+assertion `left == right` failed: case terminal-snapshot-current-transcript: pinned expectation 1 did not hold (observed 0)
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test terminal_family_share_cases ... FAILED
+
+failures:
+
+failures:
+    terminal_family_share_cases
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.17s
+
+error: test failed, to rerun pass `-p lingxi-service --test r04_t08_tool_matrix`

@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "bash",
+    "scripts/rust-tauri/r05_t08_negative_gate.sh",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startUTC": "2026-10-07T01:25:56.935082+00:00",
+  "endUTC": "2026-10-07T02:28:48.697982+00:00",
+  "exitCode": 2,
+  "log": "default-console.log",
+  "logSHA256": "23c81ff55745906608c09cca28708f6a1b0f68b6fb31dcc98b068bea9e9aa3ed"
+}

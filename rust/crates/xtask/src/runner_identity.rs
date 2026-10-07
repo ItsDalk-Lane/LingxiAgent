@@ -6,6 +6,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 const EMBEDDED: &[(&str, &[u8])] = &[
+    (
+        "scripts/rust-tauri/run_output_sinks.py",
+        include_bytes!("../../../../scripts/rust-tauri/run_output_sinks.py"),
+    ),
     ("rust/crates/xtask/src/main.rs", include_bytes!("main.rs")),
     (
         "rust/crates/xtask/src/verify.rs",
@@ -170,6 +174,11 @@ mod tests {
             }
         }
         assert_eq!(check(&root).unwrap()["status"], "PASS");
+        let discovery_path = root.join("scripts/rust-tauri/run_output_sinks.py");
+        let discovery_bytes = fs::read(&discovery_path).unwrap();
+        fs::write(&discovery_path, b"changed discovery implementation").unwrap();
+        assert!(check(&root).unwrap_err().contains("run_output_sinks.py"));
+        fs::write(discovery_path, discovery_bytes).unwrap();
         fs::write(
             root.join("rust/crates/xtask/src/stage_maps/R02.json"),
             b"{\"new\":true}",

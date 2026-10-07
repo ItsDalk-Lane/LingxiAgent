@@ -1,0 +1,474 @@
+[
+  {
+    "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+    "sha256": "0f5911462089380b8eb94d137b98f8d2382d062564c43d54cd84338b0852191e",
+    "stage": "R05",
+    "overall": "FAIL",
+    "candidateStable": true,
+    "runnerStatus": "PASS",
+    "checkpoints": [
+      {
+        "command": "rust_test_workspace",
+        "stable": true,
+        "changedPaths": []
+      },
+      {
+        "command": "r05_stage_suites",
+        "stable": true,
+        "changedPaths": []
+      },
+      {
+        "command": "rust_fmt",
+        "stable": true,
+        "changedPaths": []
+      },
+      {
+        "command": "rust_clippy",
+        "stable": true,
+        "changedPaths": []
+      },
+      {
+        "command": "check_contracts",
+        "stable": true,
+        "changedPaths": []
+      },
+      {
+        "command": "check_boundaries",
+        "stable": true,
+        "changedPaths": []
+      },
+      {
+        "command": "r04_regression_gate",
+        "stable": true,
+        "changedPaths": []
+      }
+    ],
+    "commands": [
+      {
+        "key": "rust_test_workspace",
+        "status": "FAIL",
+        "exitCode": 101,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "r05_stage_suites",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "rust_fmt",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "rust_clippy",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "check_contracts",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "check_boundaries",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "r04_regression_gate",
+        "status": "FAIL",
+        "exitCode": 1,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      }
+    ]
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/verify-stage-result.json",
+    "sha256": "b9c115415225b03d19929708095bc3cd3cfae6c8677804a541a6a909ff732d40",
+    "stage": "R04",
+    "overall": "FAIL",
+    "candidateStable": false,
+    "runnerStatus": "PASS",
+    "checkpoints": [
+      {
+        "command": "rust_test_workspace",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/r04_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "r04_tool_matrix",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/r04_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "rust_fmt",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/r04_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "rust_clippy",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/r04_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "check_contracts",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/r04_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "check_boundaries",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/r04_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "r03_regression_gate",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/r04_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "r04_rr1_repair_suites",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/r04_regression_gate/stdout.log"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "key": "rust_test_workspace",
+        "status": "FAIL",
+        "exitCode": 101,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "r04_tool_matrix",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "rust_fmt",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "rust_clippy",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "check_contracts",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "check_boundaries",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "r03_regression_gate",
+        "status": "FAIL",
+        "exitCode": 1,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "r04_rr1_repair_suites",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      }
+    ]
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+    "sha256": "157d8cd5e1f03d19f57f5d35ce0041904503c5809964ae1b2900abcd292d6803",
+    "stage": "R03",
+    "overall": "FAIL",
+    "candidateStable": false,
+    "runnerStatus": "PASS",
+    "checkpoints": [
+      {
+        "command": "rust_test_workspace",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "a15_combo_and_leaves",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "r02_storage_tx",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "r02_full_chain",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "r02_backup_restore",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "r02_recovery_drill",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "rust_fmt",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "rust_clippy",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "check_contracts",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "check_boundaries",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "r02_auth_matrix",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "r02_legacy_regression",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "a16_seed_mechanism",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "repair_suites",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      },
+      {
+        "command": "r02_events_matrix",
+        "stable": false,
+        "changedPaths": [
+          "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "key": "rust_test_workspace",
+        "status": "FAIL",
+        "exitCode": 101,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "a15_combo_and_leaves",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "r02_storage_tx",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "r02_full_chain",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "r02_backup_restore",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "r02_recovery_drill",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "rust_fmt",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "rust_clippy",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "check_contracts",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "check_boundaries",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "r02_auth_matrix",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "r02_legacy_regression",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "a16_seed_mechanism",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "repair_suites",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      },
+      {
+        "key": "r02_events_matrix",
+        "status": "PASS",
+        "exitCode": 0,
+        "timedOut": false,
+        "missingEvidence": [],
+        "internalError": null
+      }
+    ]
+  }
+]

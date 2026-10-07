@@ -1,0 +1,185 @@
+{
+  "generatedUTC": "2026-10-07T01:25:38.683818+00:00",
+  "root": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01",
+  "files": {
+    "D01-to-current-input-difference.json": {
+      "sha256": "2963beb67b286287f402ac623121987189ae3cbca432d05e05b9bac928536cdf",
+      "size": 1219
+    },
+    "PREPARED-ALLOW.md": {
+      "sha256": "f690074bbb9c3603dc71906aa776de07e7bd1785470ccd823dde8ae13da58e3a",
+      "size": 4355
+    },
+    "REVIEW.md": {
+      "sha256": "6e2db4cdc7dfb8eca20d478b33bf272fa3753ce21663d8c8b528971c036c6a36",
+      "size": 9713
+    },
+    "binary-path.txt": {
+      "sha256": "c14046f87ac1623ff54274e0b21643d9f31ec17a68b7e5a5d5d1351f01085982",
+      "size": 109
+    },
+    "binarylogs-summary.json": {
+      "sha256": "85f5d4425ed85955331f03f31421907e56220b81142aff535fc89fed17714031",
+      "size": 4428
+    },
+    "build-environment.json": {
+      "sha256": "475965bc3846f9a78622899a5aa5c985bd06c01b690427eef75b52ef168e834f",
+      "size": 7095
+    },
+    "cargo-artifact.json": {
+      "sha256": "670c9b8a459d7ea15479f1bde06a9097b07d3d06f7cb5908a2c436eceb33a28b",
+      "size": 1216
+    },
+    "commands.json": {
+      "sha256": "5b1082e0e100836e7869a29b2b84f7f26fda30160737f77a999b2bc2897934af",
+      "size": 34240
+    },
+    "compile-probe.json": {
+      "sha256": "6a9052cca6485d839d49e523cd82e4994b98f1df768e2c73a9f17a562b4491d2",
+      "size": 820
+    },
+    "compile-probe.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    "delivery-checks.json": {
+      "sha256": "e1dc2af7022af33b4356b7da068aec30bb60eec6aeec6780c3aa13984ce97e1f",
+      "size": 1329
+    },
+    "historical-D-audit.json": {
+      "sha256": "8b66f5077bdb9e14195062569a8bcc72fa88ea42712158eb666ef38ceec85bd9",
+      "size": 40653
+    },
+    "historical-final-layers.json": {
+      "sha256": "14530a63960f2a86bf9b3c16a02123d19c3870087e0c023157fcf14f31238621",
+      "size": 57914
+    },
+    "identity-after.json": {
+      "sha256": "b00d51c6c24cf262711373d037983deb4a629cec11f13393ee7033a9ad617fc7",
+      "size": 103331
+    },
+    "identity-before.json": {
+      "sha256": "b6de628e8a6e781148da1569d4fd20c2f9fadeaa56ff31ae0e760b174c2aa747",
+      "size": 103325
+    },
+    "identity_check.py": {
+      "sha256": "a3a974277fe5b681463d591f303589785b0a9b441ee1923ae5812b6f26afe700",
+      "size": 1118
+    },
+    "inherited-reading-index.json": {
+      "sha256": "d277c80bb80c1b741a1739255dd7e26d9a191aecd2253e8f26d571869a0a3ce3",
+      "size": 167483
+    },
+    "input-comparison.json": {
+      "sha256": "31c7d7d52f872e24c3780ee9c4d1bbb4f8fd731f3ad926b5e3865102cb093467",
+      "size": 706
+    },
+    "inputs-before-build.json": {
+      "sha256": "5ed7f1da3c7cce1d04d9ddaac9c5331abe307879d6c9805635c79539dd111bf3",
+      "size": 70945
+    },
+    "inspection-errors.json": {
+      "sha256": "013a56c856f3022b7d6374e60ab6f64e591951da9f9e79e6ebcc4d18eccae847",
+      "size": 1396
+    },
+    "lan_probe": {
+      "sha256": "bae663f002198af37ca27b1c6886dd377aabf17f5eb026dfc3fae0e7193bfe2b",
+      "size": 34600
+    },
+    "lan_probe.c": {
+      "sha256": "159ca492af1e020724a83ea1456113d1e9be8c10c893da48fbbddf317ccbcd44",
+      "size": 3246
+    },
+    "lan_probe.py": {
+      "sha256": "8b78faa4210169e510641db6a7d32a963cff645d3d3f3d3aa585f7adb9b95621",
+      "size": 2046
+    },
+    "prebuild-r00.json": {
+      "sha256": "23ba41887fc178e717acd9718fe9eba61c67a3671df56607b7251f7052b53cb0",
+      "size": 884
+    },
+    "prebuild-r00.log": {
+      "sha256": "36df4e05db7f195c6859fb5730403425acee732f76418d96cd2bec5e01aa925c",
+      "size": 196720
+    },
+    "prepared-identity-check.json": {
+      "sha256": "6e5e0d50b7d2ba7e21b5391a4b1797bfae6e349b2da30cfa4c73b69b995dd2bb",
+      "size": 792
+    },
+    "prepared-identity-check.log": {
+      "sha256": "8d81a918646a4c14fee4f16f3578f6885ae354fe6564d1fa998921218e111690",
+      "size": 3383
+    },
+    "prepared-object.json": {
+      "sha256": "05f6fe6a4884cf2ff6a69cacd6c9211247cd89fb70a7973bc439e661d9850f1a",
+      "size": 625
+    },
+    "probe-apple-lan.json": {
+      "sha256": "5a6c1cd5f41b90ff56db5e6eb3182c98a5b71f345e18c1e98671a419788ac7cd",
+      "size": 784
+    },
+    "probe-apple-lan.log": {
+      "sha256": "773b3e938fa81129aa4eab6cece139e54f2139a79543c66de8cd0704d53def7b",
+      "size": 190
+    },
+    "probe-c-lan.json": {
+      "sha256": "241866f645c56777297591081ac0dc459dadeb1e830d5fecf546ae075c53e308",
+      "size": 749
+    },
+    "probe-c-lan.log": {
+      "sha256": "84acc61ec8e41e0e2a5fa9b7ea1d51599dc99d476dd6f88488426f3a3b148082",
+      "size": 331
+    },
+    "probe-c-loopback.json": {
+      "sha256": "de79c5510ff4d354726c04193c6c0d8546618f28bf396a76207472936541ae87",
+      "size": 757
+    },
+    "probe-c-loopback.log": {
+      "sha256": "e19266b64672bb012142afb97b6d0ccbca5e2eaa4a120932a33ec8f6962de8ef",
+      "size": 615
+    },
+    "probe-identities-after.json": {
+      "sha256": "ad031b0e34504ea1fac0300ef30d3d33cd296831ad725fc6f7ab4126e8e74332",
+      "size": 98597
+    },
+    "probe-identities-before.json": {
+      "sha256": "31fb7dd4a1e1e2b82854afed99a499b6d0ef8d902a57c917ceff51d2cac67a9d",
+      "size": 8284
+    },
+    "r00-formal-01-listeners.jsonl": {
+      "sha256": "a1438c1c63e83710e37da32f45393e7aded319d3733078d764f5374f8bcd9a9a",
+      "size": 41357
+    },
+    "r00-formal-01.json": {
+      "sha256": "3837305fa9218dfb8b0e52d3f464f7d02760ee48cb39f51b2cc8cacbc4df6c29",
+      "size": 3878
+    },
+    "r00-formal-01.log": {
+      "sha256": "e7eef5354356ded2c3c09d03602be1365caef9e48d48012aee02771ba4954dc7",
+      "size": 3288
+    },
+    "review_tools.py": {
+      "sha256": "eca772d66ea335ca623c2b6ad80be4d55d60d6ee5c03bace1fc68cbc49977147",
+      "size": 6087
+    },
+    "schema-config-fixture-inputs.json": {
+      "sha256": "03adcdda2d3e4957c7535b431ec0980e34c44853b1aba6bfc8553d21c33a0faa",
+      "size": 8284
+    },
+    "session-identity.json": {
+      "sha256": "6b84687f3a90c25042d61c65d476e8ce6b570c068308d93b42bf7d4ca38e2bdd",
+      "size": 1389
+    }
+  },
+  "fileCount": 42,
+  "excluded": [
+    "evidence-manifest.json (self)",
+    "dispatch/** (parent ongoing output, immutable request/prompt hashes in session-identity.json)"
+  ],
+  "status": {
+    "localizationAndPreparation": "PASS",
+    "requiredGate": "FAIL",
+    "environment": "BLOCKED",
+    "R06_READY": false
+  }
+}

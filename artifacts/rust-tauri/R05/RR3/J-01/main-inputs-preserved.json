@@ -1,0 +1,11 @@
+{
+  "atUtc": "2026-10-07T03:26:30.643589+00:00",
+  "dependencyFiles": 64760,
+  "dependencyManifestSha256": "a7194de703eabe3832f360f856d613e1ee1e4df7191250726c115ee6bb289408",
+  "sameBytes": true,
+  "rootInputs": {
+    "package.json": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+    "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+    ".npmrc": "ce00fe5025692993005d3a5350ff13f8a568d604158041df74f1d229a2dfb607"
+  }
+}

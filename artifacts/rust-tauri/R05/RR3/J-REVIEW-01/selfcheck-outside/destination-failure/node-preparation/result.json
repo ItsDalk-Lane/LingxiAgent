@@ -1,0 +1,14 @@
+{
+  "status": "FAIL",
+  "startedUtc": "2026-10-07T03:38:54.963178+00:00",
+  "commands": [],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "source": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+  "copy": "/private/tmp/r05-node-selfcheck-bz5g0665/prepared",
+  "error": "copy node_modules must not exist",
+  "finishedUtc": "2026-10-07T03:38:54.963443+00:00"
+}

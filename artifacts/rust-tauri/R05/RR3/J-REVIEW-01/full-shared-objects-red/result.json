@@ -1,0 +1,27 @@
+{
+  "status": "FAIL",
+  "startedUtc": "2026-10-07T03:43:25.668583+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/copy",
+      "startedUtc": "2026-10-07T03:43:34.124459+00:00",
+      "finishedUtc": "2026-10-07T03:43:34.230212+00:00",
+      "exitCode": 10,
+      "stdoutSha256": "5d6a62b5165b18ccb13f8af24c973cdb6585d5ef93d61f7b81e926e434187399",
+      "stderrSha256": "37fbcb7b748e8cd7fc54497f2b11bcf39a1ef1693585f1f983d45cb8592486a5"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "error": "command failed (10): ['git', 'fsck', '--connectivity-only', '--no-dangling']; see /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/full-shared-objects-red/command-00.stderr.log",
+  "finishedUtc": "2026-10-07T03:43:34.235858+00:00"
+}

@@ -1,0 +1,29 @@
+{
+  "utc": "2026-10-07T01:16:04.570787+00:00",
+  "checks": {
+    "sameTwoTestIdentities": true,
+    "sameAllRegisteredConstants": true,
+    "noIgnoredResourceTests": true,
+    "loudUnknownTreeRssFdTcpAndFiles": true,
+    "fdFalseZeroRejected": true,
+    "postRestartAndSteadyLogAssertionsPresent": true,
+    "strictCopyRestoredBytes": true
+  },
+  "testIdentities": [
+    "f27_sampler_controls_detect_growth_release_and_failure",
+    "f27_sustained_cancel_error_worker_load_stays_bounded"
+  ],
+  "constants": {
+    "RSS_BOUND_KIB": "400 * 1024",
+    "RSS_GROWTH_BOUND_KIB": "150 * 1024",
+    "FD_BOUND": "400",
+    "FD_GROWTH_BOUND": "64",
+    "CANCEL_CYCLES": "60",
+    "ERROR_CYCLES": "60",
+    "OK_CYCLES": "15",
+    "LONG_CYCLES": "10",
+    "WORKER_CYCLES": "15"
+  },
+  "status": "PASS",
+  "boundary": "结构核对补充真实运行，不把静态字符串当作行为测试"
+}

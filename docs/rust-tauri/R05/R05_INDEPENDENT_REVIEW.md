@@ -1,4 +1,6 @@
-# R05 独立终审报告（R05_INDEPENDENT_REVIEW · 第 1 轮）
+# R05_INDEPENDENT_REVIEW — RR3当前独立结论索引（原首轮报告为历史）
+
+> **RR3 E-04 生成截点（2026-10-08）：stage_readiness=ACCEPTED_OFFLINE_SCOPE_WITH_REGISTERED_LIVE_DEFERRALS / R06_READY=true / offline_gate=PASS / independent_review=PASS。** 依据 RR3/FINAL-04 全新独立终审亲跑：§5.3 六条命令全部真实 exit=0，verify-stage R05 三层（R05/R04/R03）overall=PASS、stable=true、checkpoint 全稳、runner 全 PASS、testedSha=b3ac0e6a+真实工作树，失败清单为空；F42–F54 全部独立 CLOSED；r00 两新对象 cf9bce2f…/d57ea731… LAN 6 次实测通过且 ALF 放行（无证据需要用户操作）。LIVE=BLOCKED_NOT_AUTHORIZED（原许可最迟 R10）、Linux x86_64 继承未复验/Windows 未验证（R09/R10）原边界不变；raw npm 历史 candidate红保持登记不写全绿。Git 至今零暂存/零提交/零推送（FINAL-04 亲核），本 E04 不预写提交回执。本 E04 仅 SELF_CHECKED，待全新 E-REVIEW-05；现行范围见[R05_REPORT §13](R05_REPORT.md#rr3-current)，此前各轮原文（含 §12 E-03 截点）均保留为历史。
 
 - 审查者：T08 独立审查员（未参与 R05-T01—T08 任何实现、修复或此前审查；本轮为阶段级独立终审第 1 轮）。
 - 日期：2026-10-04。审查对象：分支 `codex/rust-tauri-migration`，HEAD `c549ff654508ab951e2cf39cf9d309fc9c6b8656` 之上的**未提交工作树改动**（R05-T01—T06 全部实现 + T07/T08 交付；no_commit_push_authorization=true）。
@@ -164,3 +166,24 @@ artifacts/rust-tauri/R05/REVIEW-T08/
 隔离副本（仓库外，仅审查者可处置）：`~/Desktop/Code/LingxiAgent-R05-REV-SCRATCH/negcopy-r3`（含变异历史）与 `negtarget-r3`（独立编译目标）。
 
 —— 审查者签章：本轮所有 [亲跑] 项的命令与退出码见 §3/§5 及上述证据；无任何结论转抄自实现者或此前审查者的自述。未验证项如实列于 §8。
+
+## RR3 E-02历史文档实施注记（不构成当前结论）
+
+本文原首轮PASS为历史，已由RR1对抗审查撤销继承；RR2 FINAL正式FAIL及嵌套来源漂移见[R05_REPORT §11](R05_REPORT.md#rr3-current)。RR3 A-REVIEW-02、B-REVIEW-01、C-F46-REVIEW-01均包级独立PASS；D-REVIEW-01定位准备PASS但必需r00自然101/BLOCKED；G默认16 RUNNING无完整结论，FINAL NOT RUN。E-REVIEW-01独立FAIL（MF-E01/MF-E02）永久保留；E-02仅修后SELF_CHECKED，须另一全新E-REVIEW-02。本现行注记由rr3_e_impl_02写，不替审查者自签PASS。原审查者亲跑记录逐字保留。
+
+## RR3 E-03 历史独立结论索引（本注记不自签审查；已由下方 E-04 索引取代）
+
+A-REVIEW-02、B-REVIEW-01、H-REVIEW-02（F47/F48及受影响C/F27/F46资源）、I-REVIEW-01和J-REVIEW-02为各自包级独立PASS。E-REVIEW-02已关闭原MF-E01/MF-E02；本轮E03回填仅SELF_CHECKED，另全新E审查待完成。旧C/F46 PASS保留，当前资源指向H02真实新程序与160序列；旧H01中断无报告不算通过。
+
+[G02独立结论](../../../artifacts/rust-tauri/R05/RR3/G-REVIEW-02/REVIEW.md)为BLOCKED_BY_STORAGE，正常8+2绿、N01有效101；N02 ENOSPC未达目标，N03–N16/full R02/full E5/终末恢复均未完成。默认shell退出UNKNOWN，记录器1/观察器143分开；无新增已证产品mustFix，不能签G PASS。I01–I09当前组合仍待验、I06额外worker-permission未观察、I10按H375相等输入复用、I11未完成。
+
+最近正式阶段审查仍RR2/FINAL历史FAIL：R05 5/7、R04 8/8及R03 15/15 checkpoint不稳；RR3 FINAL从未执行。D历史必需LAN阻断未解除，未来实际对象未知。当前NOT_ACCEPTED/R06_READY=false，全部剩余步骤和本地/远端交付边界见[R05_REPORT §12](R05_REPORT.md#rr3-current)。本注记由新E实施者写，只消费已存在报告，不代替未来E/FINAL独立判断。
+
+
+## RR3 E-04 当前独立结论索引（FINAL-04；本注记不自签审查）
+
+**最新已完成正式阶段审查=RR3/FINAL-04，PASS。** 全新空历史独立终审者亲跑 §5.3 六条命令全部 exit=0，三层 verify-stage（R05/R04/R03）overall=PASS、stable=true、checkpoint 全稳、runner 全 PASS、testedSha=b3ac0e6a+真实工作树、失败清单空（[STAGE_REVIEW](../../../artifacts/rust-tauri/R05/RR3/FINAL-04/STAGE_REVIEW.md)、[STRUCTURED_SUMMARY](../../../artifacts/rust-tauri/R05/RR3/FINAL-04/STRUCTURED_SUMMARY.json)）。
+
+包级独立结论链（全部 PASS，指针）：[A-REVIEW-02](../../../artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md)（F42）、[B-REVIEW-01](../../../artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md)（F45）、[C-F46-REVIEW-01](../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md)+[H-REVIEW-02](../../../artifacts/rust-tauri/R05/RR3/H-REVIEW-02/REVIEW.md)（F27/F46/F47/F48 及受影响资源）、[I-REVIEW-01](../../../artifacts/rust-tauri/R05/RR3/I-REVIEW-01/REVIEW.md)（F49）、[J-REVIEW-02](../../../artifacts/rust-tauri/R05/RR3/J-REVIEW-02/REVIEW.md)（F50）、[G-REVIEW-03](../../../artifacts/rust-tauri/R05/RR3/G-REVIEW-03/REVIEW.md)（默认 16+full R02/E5，G02 空间阻断按时间线保留）、[F51-REVIEW-01](../../../artifacts/rust-tauri/R05/RR3/F51-REVIEW-01/REVIEW.md)、[F52-REVIEW-01](../../../artifacts/rust-tauri/R05/RR3/F52-REVIEW-01/REVIEW.md)、[L-REVIEW-01](../../../artifacts/rust-tauri/R05/RR3/L-REVIEW-01/REVIEW.md)（F53）、[M-REVIEW-01](../../../artifacts/rust-tauri/R05/RR3/M-REVIEW-01/REVIEW.md)（F54）、[E-REVIEW-04](../../../artifacts/rust-tauri/R05/RR3/E-REVIEW-04/REVIEW.md)（E03 文档轮）。D-REVIEW-01 定位/精确准备 PASS；其历史 r00 gate FAIL 由 FINAL-04 两新对象（cf9bce2f…/d57ea731…）6 次 LAN 实测通过解除，无用户防火墙操作证据。
+
+历史 FAIL 全部保留为历史：FINAL-01/02/03（三连最终终审 FAIL：F51/F52 夹具、F53 flake、F54 分类，均已独立修复关闭）、RR2/FINAL-01（R05 5/7、R04 8/8 与 R03 15/15 checkpoint 不稳）、G01/G02、E-REVIEW-01（MF-E01/MF-E02，已由 E-REVIEW-02 关闭）、A-REVIEW-01、RR1 INDEPENDENT-9。本轮 E04 文档回填仅 SELF_CHECKED，另待全新 E-REVIEW-05；不预写 Git 提交回执（至今零暂存/零提交/零推送）。六元组与剩余延期边界（LIVE 最迟 R10、平台 R09/R10、raw npm 登记红、directed/E5 原许可）见 [R05_REPORT §13](R05_REPORT.md#rr3-current)。

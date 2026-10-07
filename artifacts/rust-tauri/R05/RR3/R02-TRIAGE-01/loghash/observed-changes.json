@@ -1,0 +1,142 @@
+{
+  "time": "2026-10-07T02:14:51.654266+00:00",
+  "changes": [
+    {
+      "set": "primary-before",
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/run.log",
+      "before": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/run.log",
+        "sha256": "e2e64ba266b2c332e9af208e5fcb9ebb5fb499b042ee10b3ec3498df9bb00300",
+        "bytes": 5621,
+        "mtime_ns": 1791338175202557503
+      },
+      "after": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/run.log",
+        "sha256": "b127bfa174433dab04d60bd101d28a0befa68367db576ab2aaaaabdde3a43438",
+        "bytes": 9953,
+        "mtime_ns": 1791338430922476965
+      },
+      "bytesChanged": true
+    },
+    {
+      "set": "raw-before",
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+      "before": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+        "sha256": "8ef151f0d64a29441da28d55195a62748b29ffa4b9c02ca6e80d944a497fcae1",
+        "bytes": 10775,
+        "mtime_ns": 1791338210039328378
+      },
+      "after": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+        "sha256": "d10c21714af63ff0c46bb7912f0277084035c77c62153061e20722f86bc81103",
+        "bytes": 11341,
+        "mtime_ns": 1791339187182496172
+      },
+      "bytesChanged": true
+    },
+    {
+      "set": "raw-before",
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+      "before": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+        "sha256": "635ad078c6b9acb850092626ea8ab1f6e883181f3eed0f7049be019020bbcac0",
+        "bytes": 7652,
+        "mtime_ns": 1791338210039230502
+      },
+      "after": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+        "sha256": "a46de5622be82acb70a38cbea6fd8a0b5bb363c668060789cb03934b66d08800",
+        "bytes": 9018,
+        "mtime_ns": 1791339187182215837
+      },
+      "bytesChanged": true
+    },
+    {
+      "set": "raw-before",
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+      "before": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+        "sha256": "3d9d389e6cef875a781b1312e22f5856f14b2ad49866a8d670d9a8def834e80b",
+        "bytes": 3424,
+        "mtime_ns": 1791338210039380628
+      },
+      "after": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+        "sha256": "614a1a466a5f2667b8e977dc39fe6864cbcf1f65eef4d2d70470f00960a88a6d",
+        "bytes": 3703,
+        "mtime_ns": 1791339187182557047
+      },
+      "bytesChanged": true
+    },
+    {
+      "set": "source-before",
+      "path": "/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service/src/lib.rs",
+      "before": {
+        "path": "/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service/src/lib.rs",
+        "sha256": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756",
+        "bytes": 203023,
+        "mtime_ns": 1791337668541808103
+      },
+      "after": {
+        "path": "/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service/src/lib.rs",
+        "sha256": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756",
+        "bytes": 203023,
+        "mtime_ns": 1791338531112702256
+      },
+      "bytesChanged": false
+    },
+    {
+      "set": "source-before",
+      "path": "/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask/src/stage_maps/R05.json",
+      "before": {
+        "path": "/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask/src/stage_maps/R05.json",
+        "sha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+        "bytes": 306003,
+        "mtime_ns": 1791337668535905151
+      },
+      "after": {
+        "path": "/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask/src/stage_maps/R05.json",
+        "sha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+        "bytes": 306003,
+        "mtime_ns": 1791338531106107759
+      },
+      "bytesChanged": false
+    },
+    {
+      "set": "source-before",
+      "path": "/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask/src/stage_maps/R04.json",
+      "before": {
+        "path": "/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask/src/stage_maps/R04.json",
+        "sha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+        "bytes": 231496,
+        "mtime_ns": 1791337668539278546
+      },
+      "after": {
+        "path": "/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask/src/stage_maps/R04.json",
+        "sha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+        "bytes": 231496,
+        "mtime_ns": 1791338531109336569
+      },
+      "bytesChanged": false
+    },
+    {
+      "set": "source-before",
+      "path": "/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/Cargo.lock",
+      "before": {
+        "path": "/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/Cargo.lock",
+        "sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+        "bytes": 77319,
+        "mtime_ns": 1791337720980533720
+      },
+      "after": {
+        "path": "/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/Cargo.lock",
+        "sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+        "bytes": 77319,
+        "mtime_ns": 1791338587080876226
+      },
+      "bytesChanged": false
+    }
+  ],
+  "claimBoundary": "只报告已读取文件与两个观察时点，不宣称活跃目录冻结或G已完成"
+}

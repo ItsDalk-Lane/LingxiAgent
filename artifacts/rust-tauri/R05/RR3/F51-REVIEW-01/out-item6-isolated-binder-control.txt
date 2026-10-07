@@ -1,0 +1,12 @@
+== POSITIVE CONTROL: enumeration shape (nested .git vs plain dir) ==
+evidence-fixture/repo/
+plain-dir/a.txt
+plain-dir/b.txt
+README.md
+== trailing-slash dir entries ==
+evidence-fixture/repo/
+== binder emulation (candidate.rs:177-229 enumerate + :364 non-file rejection) ==
+enumerated_entries: 4
+hashable_regular_files: 3
+REJECTED: evidence-fixture/repo/
+error: cannot snapshot candidate before stage gate: candidate file /private/tmp/f51-review-01-scratch/repo/evidence-fixture/repo/ was replaced by a non-file

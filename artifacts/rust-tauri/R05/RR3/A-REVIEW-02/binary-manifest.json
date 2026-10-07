@@ -1,0 +1,116 @@
+{
+  "utc": "2026-10-07T01:03:56.552340+00:00",
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "binaries": [
+    {
+      "command": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "path": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "realPath": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+      "sha256": "1192b994fbb50303c9df2cc97c9d63797d454c7f57f20ca682877c9e770429aa",
+      "bytes": 135696
+    },
+    {
+      "command": "/bin/bash",
+      "path": "/bin/bash",
+      "realPath": "/bin/bash",
+      "sha256": "d59c6f2312e551e9c46497329d435b6ec74fbc46e9155b84170f377127ed004e",
+      "bytes": 1961872
+    },
+    {
+      "command": "/usr/bin/git",
+      "path": "/usr/bin/git",
+      "realPath": "/usr/bin/git",
+      "sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+      "bytes": 200560
+    },
+    {
+      "command": "ps",
+      "path": "/bin/ps",
+      "realPath": "/bin/ps",
+      "sha256": "a06fe087161557f1f8c030672eaedcd90bc6a8e92b8f2d44e07cffedc3349205",
+      "bytes": 268736
+    },
+    {
+      "command": "lsof",
+      "path": "/usr/sbin/lsof",
+      "realPath": "/usr/sbin/lsof",
+      "sha256": "deff85c7b4750a948a69fcd48eae3b394a37575e5048e5eb4a35b7a0482c3dc8",
+      "bytes": 470608
+    },
+    {
+      "command": "node",
+      "path": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+      "realPath": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+      "sha256": "1ee75375e33b94fc34b3b19aede049e11dae90efb63b374dc96d6bdace70c4b8",
+      "bytes": 120573328
+    },
+    {
+      "command": "npm",
+      "path": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/npm",
+      "realPath": "/Users/study_superior/.nvm/versions/node/v24.16.0/lib/node_modules/npm/bin/npm-cli.js",
+      "sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+      "bytes": 54
+    },
+    {
+      "command": "/Users/study_superior/.cargo/bin/cargo",
+      "path": "/Users/study_superior/.cargo/bin/cargo",
+      "realPath": "/Users/study_superior/.cargo/bin/rustup",
+      "sha256": "ec1b9233e7f72990ecd8e62063fa7f6c3dfc2bec8e97f88bff165f9100ac696a",
+      "bytes": 11319056
+    },
+    {
+      "command": "/Users/study_superior/.cargo/bin/rustc",
+      "path": "/Users/study_superior/.cargo/bin/rustc",
+      "realPath": "/Users/study_superior/.cargo/bin/rustup",
+      "sha256": "ec1b9233e7f72990ecd8e62063fa7f6c3dfc2bec8e97f88bff165f9100ac696a",
+      "bytes": 11319056
+    },
+    {
+      "command": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+      "path": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+      "realPath": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+      "sha256": "6b582e8813ce7e8ed4c52814ee5cf230dba647bf2292df747a4003f2657ef201",
+      "bytes": 241555024
+    },
+    {
+      "command": "pinned cargo",
+      "path": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo",
+      "sha256": "6e17e865f3a20dd55a1d212f849f58b77124179f0de7c52973096d84ba34118d",
+      "bytes": 31960040
+    },
+    {
+      "command": "pinned rustc",
+      "path": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc",
+      "sha256": "766eda9d8f53afd6fc7f27b3cd2e444dd22afacb5afa710a5625fc8e45b8c941",
+      "bytes": 412504
+    }
+  ],
+  "reusedRustBinaries": {
+    "binary-manifest-before.json": [
+      {
+        "path": "/tmp/lingxi-rr3-a-review-01-target/debug/xtask",
+        "sha256": "33f865036134e25eb23399f161b2605c3d37b3bf943cc54fac041e9143d5ccd3"
+      },
+      {
+        "path": "/tmp/lingxi-rr3-a-review-01-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "0222c6eb675bdf3cb75016734a1afb246d6b568afc50869947730831159f7de3"
+      }
+    ],
+    "scope-binary-identities.json": [
+      {
+        "phase": "scope-ancestor-old-red-02",
+        "path": "/tmp/lingxi-rr3-a-review-01-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "30131b3da571dbf1787167a03ab1b51218e696d1ea4ec25bfaae9e4692bde50c",
+        "candidateSourceSha256": "d28897b64c78e1bad6f1b9385cf82e13b5f2112795b23bfc10b5a4e89ae23006"
+      },
+      {
+        "phase": "scope-restored-green-02",
+        "path": "/tmp/lingxi-rr3-a-review-01-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "9c0357780be92c1e6658c3c490310f3d08795db095630ab0d2501ddbcd35e4fa",
+        "candidateSourceSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86"
+      }
+    ],
+    "policy": "原独立运行身份引用，不声称本轮新运行/构建，不复制target"
+  }
+}

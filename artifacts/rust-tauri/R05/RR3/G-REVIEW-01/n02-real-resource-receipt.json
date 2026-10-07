@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-07T01:40:05.952605+00:00",
+  "sourcePrintedByRealTest": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-series-5671-1791336718608123000/f27-resource-series.json",
+  "sourceSHA256": "687f06e2e60c553f0bfed00f0923c086aa385342992acc244dc84795f5a0e9db",
+  "copiedSHA256": "687f06e2e60c553f0bfed00f0923c086aa385342992acc244dc84795f5a0e9db",
+  "testSummary": [
+    "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 333.67s"
+  ],
+  "load": {
+    "cancelCycles": 60,
+    "cancelDanglingActive": 60,
+    "cancelSettled": 0,
+    "errorCycles": 60,
+    "errorRuns": 60,
+    "longResponseCycles": 10,
+    "okCycles": 15,
+    "sessions": [
+      "sess_local_alpha",
+      "sess_local_beta"
+    ],
+    "workerCycles": 15
+  },
+  "seriesCount": 54,
+  "cycleCount": 160,
+  "ownerCount": 61,
+  "boundary": "negative producer deliberately aborts assembly; this audit preserves actual test raw output explicitly, not a false full producer green"
+}

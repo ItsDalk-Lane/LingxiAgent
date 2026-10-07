@@ -1,0 +1,18 @@
+== reflog (last 3) ==
+b3ac0e6ae HEAD@{0} commit: docs(rust-tauri): RR2 handoff git receipt + ALF unblock path (commit e8c0672e5)
+e8c0672e5 HEAD@{1} commit: fix(rust-tauri): R05 RR2 closeout — 6 items closed + F44, stage review NOT_ACCEPTED on ALF env item only (R06_READY=false)
+ad5ec4e98 HEAD@{2} checkout: moving from ad5ec4e9853a51ed929f1e2e077b97d41c951572 to codex/rust-tauri-migration
+== reflog total entries ==
+     351
+== main index stat (expect mtime 03:02:15 local, size 6139139 per F51-REVIEW-01) ==
+size=6139139 mtime=2026-10-07T03:02:15
+== refs snapshot sha ==
+46d8d10c55fef64e09471619630e248f881cf16707b0610807662262a4a18071  -
+== branch list ==
+* codex/rust-tauri-migration
+  main
+  remotes/origin/HEAD -> origin/main
+  remotes/origin/codex/rust-tauri-migration
+  remotes/origin/main
+  remotes/upstream/HEAD -> upstream/main
+  remotes/upstream/main

@@ -1,0 +1,26 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/r05t08-work/negcopy.IYrM8z/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.66s
+     Running tests/r05_t04_streaming.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t04_streaming-dc5cbb33f6c278c3)
+
+running 18 tests
+test c01_openai_full_response_is_fragmentation_invariant ... ok
+test c01_anthropic_full_response_is_fragmentation_invariant ... ok
+test c02_invalid_utf8_is_deterministic_at_every_fragmentation ... ok
+test c01_split_bom_and_crlf_are_fragmentation_invariant ... ok
+test c05_anthropic_half_json_arguments_close_loud_with_zero_dispatch ... ok
+test c05_openai_half_json_arguments_close_loud_with_zero_dispatch ... ok
+test c06_parseable_arguments_admit_nothing_before_the_protocol_terminal ... ok
+test c07_duplicate_keys_and_overprecision_numbers_follow_one_canonical_rule ... ok
+test c07_wrong_shaped_arguments_refuse_loudly ... ok
+test c08_anthropic_interleaved_tool_blocks_accumulate_independently ... ok
+test c09_anthropic_max_tokens_stop_with_one_complete_tool_dispatches_nothing ... ok
+test c09_openai_length_stop_with_one_complete_tool_dispatches_nothing ... ok
+test c10_anthropic_duplicates_conflicts_and_event_field_agreement ... ok
+test c10_openai_duplicates_conflicts_and_adjacent_identical_text ... ok
+test c11_stop_reason_table_is_complete_across_the_fragmenting_families ... ok
+test c14_opaque_blocks_roundtrip_and_signatures_never_leak_into_deltas ... ok
+test c15_decoder_level_stream_failures_are_loud ... ok
+test c04_bounds_are_loud_at_the_preregistered_limits ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s
+

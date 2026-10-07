@@ -1,0 +1,9 @@
+{
+ "at": "2026-10-07T11:08:18.880496+00:00",
+ "kind": "default16-02-cache-pollution-record",
+ "fact": "control-xtask in default16-02 FAILED 6/8 (r05_production_map_keeps_the_sixteen_a_scenarios_verbatim saw R05-LIVE-SNEAK/19 scenarios; r05_map_declares_no_live_lane saw live_probe) although the negcopy.n7dHPH copy R05.json is byte-identical to the clean main tree (sha a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798); the cargo run printed ZERO Compiling lines (pure reuse)",
+ "rootCause": "shared NEG_TARGET still held the xtask test binary compiled during default16-01 N14 mutation in copy IYrM8z (fingerprinted in neg-target-before-deletion.json: xtask-2ada07f2097522dd sha 66c0206fa7961fd2bac1ed4011ad9fd01f701c6c10988008b0401e01a7a0f19e, mtime 2026-10-07T07:52:41Z); rsync -a overlay into the fresh copy preserved the OLD main-tree mtime of R05.json, which cargo treats as not-newer-than the mutated fingerprint, so the stale mutated binary was judged fresh and reused across copies",
+ "classification": "cache-identity hazard of cross-round shared NEG_TARGET with mtime-preserving overlay; NOT a product or checker defect — the control check itself correctly failed closed and rejected the polluted run; same family as the brief rule that cache reuse requires verifying the actual recompile source and that old-mtime binary reuse cannot count as a restored green",
+ "remedy": "deleted the G-REVIEW-03-created NEG_TARGET cache (it did not exist at round start; created cold by default16-01; contained mutated-build artifacts from 01 and 02), then full fresh rerun default16-03 recompiled everything from current sources (control-xtask 16 Compiling lines)",
+ "preserved": "default16-01 (interrupted) and default16-02 (control failed) both kept byte-as-is; their facts are not spliced into the valid run"
+}

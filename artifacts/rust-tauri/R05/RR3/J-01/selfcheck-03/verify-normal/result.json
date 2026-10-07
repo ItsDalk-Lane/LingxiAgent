@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "startedUtc": "2026-10-07T03:23:48.741182+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/prepared",
+      "startedUtc": "2026-10-07T03:23:49.097083+00:00",
+      "finishedUtc": "2026-10-07T03:23:49.142639+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "receipt": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-01/selfcheck-03/prepared/node-preparation/result.json",
+  "receiptSha256": "6cc7bb9ed29b472d9292c6e297c368420571cd1a25600597c3af454f4bbf95a9",
+  "checkedFiles": 2902,
+  "finishedUtc": "2026-10-07T03:23:49.190800+00:00"
+}

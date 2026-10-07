@@ -1,0 +1,4 @@
+# L-REVIEW-01 frozen comparison baselines (captured 2026-10-07T16:45Z, HEAD=b3ac0e6ae)
+sha256(git diff HEAD -- rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs) = 3a9365d402e6ec36ff9f77ba0574ad949369bcfc0fe63537d14d73800e29b321
+sha256(git show HEAD:rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs)   = 69aaa7925a7064288b45c7d39e25ee5d17a8b90b6efaf02bcaf30a299ead9e33
+sha256(working rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs)        = 899dc82900afd0bf4ce14e5fbfc0046ad5bb35fb2362d3242bd4a2f266e18579

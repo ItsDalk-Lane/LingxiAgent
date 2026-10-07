@@ -1,0 +1,15 @@
+
+running 3 tests
+test redaction::tests::f48_request_formatting_preserves_user_path_protection ... FAILED
+test redaction::tests::f48_formal_random_request_id_keeps_diagnostic_correlation ... FAILED
+test redaction::tests::f48_lookalike_ids_in_secrets_urls_workers_stay_redacted ... FAILED
+
+failures:
+
+failures:
+    redaction::tests::f48_formal_random_request_id_keeps_diagnostic_correlation
+    redaction::tests::f48_lookalike_ids_in_secrets_urls_workers_stay_redacted
+    redaction::tests::f48_request_formatting_preserves_user_path_protection
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 358 filtered out; finished in 0.00s
+

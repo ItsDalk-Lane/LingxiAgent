@@ -1,0 +1,17 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/main.rs (rust/target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 9 tests
+test candidate::tests::refuses_evidence_at_repository_root ... ok
+test candidate::tests::evidence_symlink_to_source_or_parent_is_refused ... ok
+test candidate::tests::real_os_fd_scope_process_probe ... ok
+test candidate::tests::symlink_is_refused_and_non_utf8_path_identity_is_byte_exact ... ok
+test candidate::tests::a_changed_checkpoint_cannot_be_erased_by_restoring_final_bytes ... ok
+test candidate::tests::evidence_outside_repository_does_not_exclude_candidate_paths ... ok
+test candidate::tests::tracked_file_parent_symlink_cannot_escape_repository ... ok
+test candidate::tests::binds_tracked_and_nonignored_untracked_bytes_without_own_evidence ... ok
+test candidate::tests::real_os_fd_parent_and_child_logs_keep_all_checkpoints_stable ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 112 filtered out; finished in 0.91s
+
+/Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml    2.29s user 2.08s system 390% cpu 1.119 total

@@ -1,0 +1,54 @@
+{
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r05_t08_closed_loop",
+    "c07_crash_midstream_honest_terminal",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedAt": "2026-10-07T01:06:14.266199+00:00",
+  "endedAt": "2026-10-07T01:06:16.093828+00:00",
+  "exitCode": 0,
+  "counts": [
+    "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 1.50s"
+  ],
+  "inputBeforeDigest": "a9027ff2e3fdeadecfb6554b315afaaf05eabc4237db9d8f5a7a654cf5f56514",
+  "inputAfterDigest": "a9027ff2e3fdeadecfb6554b315afaaf05eabc4237db9d8f5a7a654cf5f56514",
+  "inputEqual": true,
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "binaryHashes": {
+    "rust/target/debug/spike_health": "569e8a26f631f20b5e7904695624c72a7f4fc6858eadd2b30c1ebe86a13af3b5",
+    "rust/target/debug/spike_browser": "6da59f331df90bd8511c3b86f2fb3b6f86ebd5aaf08951877e986713a179ab36",
+    "rust/target/debug/review-t05-idle-probe": "2a3569ceb0fa3dc0e9406f8b6e5968bf53bd9a872f376d555470e0790b312598",
+    "rust/target/debug/spike_mcp_handshake": "3c551faec6d653c109e292041a19a6b78cdb3618b025ea93c635674ab0d456a0",
+    "rust/target/debug/spike_tls_probe": "4a25dc1cb5022be8489a2b6bba4ce9f61ac2e1e431884942879572915abc6c31",
+    "rust/target/debug/spike_sqlite_queue": "ac64fd0a9e64ccd3cc22e5588c6f5f732007ceb7386a7edd9acb4b47a52c1531",
+    "rust/target/debug/review-t05-proxy-discrimination-probe": "e22aa11235acc1b5f6e4a1e1e399a5000fc4ded4d98c42e41f89d6ffa3d44646",
+    "rust/target/debug/spike_pdf": "b6be0795aa7a734a01b66a4a39f74e80af862fb733b800dab29070f2ed363d15",
+    "rust/target/debug/lingxi-proto-server": "24b0cb359b1190db2353372cc11079a34cc85ef6f855931a14700e2f8657a894",
+    "rust/target/debug/lingxi-storage-inspect": "a218db3e5ee38295ebee062b4c937e0b2ce5c15729b8d88d8ac580bb69eeee09",
+    "rust/target/debug/review-t05-connect-probe": "9497c692ef26b47c526f075b479bd452e959edae778d7fa93e19ac8120b5e25a",
+    "rust/target/debug/lingxi-protocol-verify": "83de6f3b67767317f36f55db94651931b2e503c91d0064c21d5cfb2ad3a3fca6",
+    "rust/target/debug/spike_schema_validate": "01baa53004ec29140f2d96003a25624bc58aae52ebf0d64da48f1add467b4764",
+    "rust/target/debug/spike_check_deps": "135308a8bfb0fe979ff698d71bf36b016fef1059c446e09d65aa07b51bab5e92",
+    "rust/target/debug/xtask": "8766f2f1e83894d3be29add3e0d733ef63e02cfb167f6cd5281a38bbde60a34d",
+    "rust/target/debug/lingxi-protocol-gen": "5679e3434c4cfc5531afccc3e2a10389cdeb2fc18b09af029c3fc25b322eb6d4",
+    "rust/target/debug/lingxi-service": "b180d47abeeecef4e6d677b9501fde0828cd4061f74276d8e5e2a2a9afb33d81",
+    "rust/target/debug/r04_t07_fixture": "0b9e45e0c4e6530bbf02959f7d7f23704e7a9d9c82cd590dabbd899ae55cc794",
+    "rust/target/debug/review-t05-tls-probe": "c13439ea89df64dd028cea82521f50691506a4ed0a744ee6b13c25a7f2463622"
+  },
+  "outputHash": "9ed1e4f0709efd228833882064f8a7729a20416d3eecf3c13674771a44470bfd",
+  "environment": {
+    "TMPDIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/tmp",
+    "RUST_LOG": "unset"
+  }
+}

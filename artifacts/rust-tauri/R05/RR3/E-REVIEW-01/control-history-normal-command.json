@@ -1,0 +1,17 @@
+{
+  "reviewer": "rr3_e_review_01",
+  "argv": [
+    "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-01/fixture-check.py",
+    "history",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-01/isolated-history.json"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "utc_start": "2026-10-07T01:29:50.938460+00:00",
+  "utc_end": "2026-10-07T01:29:50.987505+00:00",
+  "exit_code": 0,
+  "stdout": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-history-normal-stdout.log",
+  "stderr": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-history-normal-stderr.log",
+  "stdout_sha256": "df0564d9de2622d011aec6a911faa6d791ba501e88cace96041063b6f4b39f19",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

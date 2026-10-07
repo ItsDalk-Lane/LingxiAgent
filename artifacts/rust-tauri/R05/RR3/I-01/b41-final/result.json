@@ -1,0 +1,750 @@
+{
+  "status": "PASS",
+  "checks": 41,
+  "results": [
+    {
+      "case": "old-fixed-seven",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/old-fixed-seven/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/old-fixed-seven/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:04.727858+00:00",
+      "endedAt": "2026-10-07T02:33:04.757155+00:00",
+      "exitCode": 0,
+      "expectedExit": 0,
+      "beforeSha256": "871414735616c149037c489037be4c6a8c3306184634dcc8e41a883cb4aeb3b4",
+      "afterSha256": "f5ba163b832a69858cf52c6d31bd129f44403799834f3ef80fd9061fce8d53aa",
+      "receiptPresent": true,
+      "status": "PASS"
+    },
+    {
+      "case": "future-count-forty-two",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/future-count-forty-two/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/future-count-forty-two/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:04.757859+00:00",
+      "endedAt": "2026-10-07T02:33:04.786690+00:00",
+      "exitCode": 0,
+      "expectedExit": 0,
+      "beforeSha256": "5fc779edd8bc4bfc8296fd3bd8016cb6a3ed43a23d5c859a0d67cf82a5b14ee0",
+      "afterSha256": "b2fca308eddb990270c14ad882ff1e1ba371bb91fdc07a3c5de5e79eed4f9af3",
+      "receiptPresent": true,
+      "status": "PASS"
+    },
+    {
+      "case": "spacing-crlf-other-rows",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/spacing-crlf-other-rows/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/spacing-crlf-other-rows/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:04.787156+00:00",
+      "endedAt": "2026-10-07T02:33:04.817134+00:00",
+      "exitCode": 0,
+      "expectedExit": 0,
+      "beforeSha256": "aed8bcf84cb501c20abc4de7081de26b55f64ab8dd6d2909a88d6fa6f105a65c",
+      "afterSha256": "ef1cd02c52ec39d3e7e7c178c8f0dbe2066463ebdf9293663a64ecbd27e3509f",
+      "receiptPresent": true,
+      "status": "PASS"
+    },
+    {
+      "case": "missing",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/missing/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/missing/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:04.817647+00:00",
+      "endedAt": "2026-10-07T02:33:04.845974+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "beforeSha256": "b071c3e28870e2808e2f61f47a93c581471c00e321c6e2ee0dc7346be54a269a",
+      "afterSha256": "b071c3e28870e2808e2f61f47a93c581471c00e321c6e2ee0dc7346be54a269a",
+      "receiptPresent": false,
+      "status": "PASS"
+    },
+    {
+      "case": "duplicate",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/duplicate/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/duplicate/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:04.846466+00:00",
+      "endedAt": "2026-10-07T02:33:04.875258+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "beforeSha256": "05f423e6b8ee776d2a7d9ad0bfdfd1c0a2efe8dfac246f78b467ea08847deec7",
+      "afterSha256": "05f423e6b8ee776d2a7d9ad0bfdfd1c0a2efe8dfac246f78b467ea08847deec7",
+      "receiptPresent": false,
+      "status": "PASS"
+    },
+    {
+      "case": "conflicting",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/conflicting/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/conflicting/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:04.875921+00:00",
+      "endedAt": "2026-10-07T02:33:04.905019+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "beforeSha256": "c86ce2548df27d6ca59ca3dfb1f778594c1aa361c3d5244769b4df4db728d2e2",
+      "afterSha256": "c86ce2548df27d6ca59ca3dfb1f778594c1aa361c3d5244769b4df4db728d2e2",
+      "receiptPresent": false,
+      "status": "PASS"
+    },
+    {
+      "case": "non-decimal",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/non-decimal/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/non-decimal/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:04.905558+00:00",
+      "endedAt": "2026-10-07T02:33:04.933906+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "beforeSha256": "2b3f46686f43eb2066f2d13959742a4dba307ab6be4d11bdc22bc5e37ce57196",
+      "afterSha256": "2b3f46686f43eb2066f2d13959742a4dba307ab6be4d11bdc22bc5e37ce57196",
+      "receiptPresent": false,
+      "status": "PASS"
+    },
+    {
+      "case": "fraction",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/fraction/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/fraction/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:04.934483+00:00",
+      "endedAt": "2026-10-07T02:33:04.962914+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "beforeSha256": "de69273043156b5fb02023aee54d42ea700d433f59439ebd2f2cbb1b5c7bbfa6",
+      "afterSha256": "de69273043156b5fb02023aee54d42ea700d433f59439ebd2f2cbb1b5c7bbfa6",
+      "receiptPresent": false,
+      "status": "PASS"
+    },
+    {
+      "case": "signed",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/signed/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/signed/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:04.963454+00:00",
+      "endedAt": "2026-10-07T02:33:04.991474+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "beforeSha256": "128b2d8f03b9a72e2a48b1fbebe1de10a25653cbb97702d279496dfbff367398",
+      "afterSha256": "128b2d8f03b9a72e2a48b1fbebe1de10a25653cbb97702d279496dfbff367398",
+      "receiptPresent": false,
+      "status": "PASS"
+    },
+    {
+      "case": "negative",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/negative/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/negative/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:04.991901+00:00",
+      "endedAt": "2026-10-07T02:33:05.021998+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "beforeSha256": "928752801e2ea32cbcdb813254a5097fbfc53001ef1225a1379d36e9a5aa0873",
+      "afterSha256": "928752801e2ea32cbcdb813254a5097fbfc53001ef1225a1379d36e9a5aa0873",
+      "receiptPresent": false,
+      "status": "PASS"
+    },
+    {
+      "case": "zero",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/zero/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/zero/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:05.022504+00:00",
+      "endedAt": "2026-10-07T02:33:05.052507+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "beforeSha256": "265cb800b783e6cde47a6d7b8308dbc0340df572f6a939610adc45c88fc1ae7d",
+      "afterSha256": "265cb800b783e6cde47a6d7b8308dbc0340df572f6a939610adc45c88fc1ae7d",
+      "receiptPresent": false,
+      "status": "PASS"
+    },
+    {
+      "case": "one",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/one/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/one/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:05.053576+00:00",
+      "endedAt": "2026-10-07T02:33:05.083942+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "beforeSha256": "437238d3312c29417e7999f8e439d342fa4788cb8c71abc980d2704f035dba91",
+      "afterSha256": "437238d3312c29417e7999f8e439d342fa4788cb8c71abc980d2704f035dba91",
+      "receiptPresent": false,
+      "status": "PASS"
+    },
+    {
+      "case": "missing-filter",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/missing-filter/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/missing-filter/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:05.084537+00:00",
+      "endedAt": "2026-10-07T02:33:05.127796+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "beforeSha256": "9ca7adcdcdfd4682c8d20523fcebed1caa6e5a1a39cfc01acd632175183eaa49",
+      "afterSha256": "9ca7adcdcdfd4682c8d20523fcebed1caa6e5a1a39cfc01acd632175183eaa49",
+      "receiptPresent": false,
+      "status": "PASS"
+    },
+    {
+      "case": "extra-field",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/extra-field/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/extra-field/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:05.128705+00:00",
+      "endedAt": "2026-10-07T02:33:05.182939+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "beforeSha256": "22e86312ef3e7cc081101844b10fa7c066e03780a4afa83b7118a2e6c8331f45",
+      "afterSha256": "22e86312ef3e7cc081101844b10fa7c066e03780a4afa83b7118a2e6c8331f45",
+      "receiptPresent": false,
+      "status": "PASS"
+    },
+    {
+      "case": "non-ascii-count",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/non-ascii-count/input.tsv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/non-ascii-count/mutation.json"
+      ],
+      "startedAt": "2026-10-07T02:33:05.183553+00:00",
+      "endedAt": "2026-10-07T02:33:05.213116+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "beforeSha256": "5fd2e69fca7da7987808173f8d2141b0379fc472026ec85aee350cc282a7ba74",
+      "afterSha256": "5fd2e69fca7da7987808173f8d2141b0379fc472026ec85aee350cc282a7ba74",
+      "receiptPresent": false,
+      "status": "PASS"
+    },
+    {
+      "case": "single-only",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/single-only",
+        "N03"
+      ],
+      "startedAt": "2026-10-07T02:33:05.214646+00:00",
+      "endedAt": "2026-10-07T02:33:05.268614+00:00",
+      "exitCode": 0,
+      "expectedExit": 0,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "single-empty",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/single-empty",
+        "N03"
+      ],
+      "startedAt": "2026-10-07T02:33:05.270368+00:00",
+      "endedAt": "2026-10-07T02:33:05.319607+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "single-other",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/single-other",
+        "N03"
+      ],
+      "startedAt": "2026-10-07T02:33:05.320488+00:00",
+      "endedAt": "2026-10-07T02:33:05.351379+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "single-duplicate",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/single-duplicate",
+        "N03"
+      ],
+      "startedAt": "2026-10-07T02:33:05.352372+00:00",
+      "endedAt": "2026-10-07T02:33:05.382193+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-sixteen",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-sixteen",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.383138+00:00",
+      "endedAt": "2026-10-07T02:33:05.414332+00:00",
+      "exitCode": 0,
+      "expectedExit": 0,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-one-is-not-sixteen",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-one-is-not-sixteen",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.415161+00:00",
+      "endedAt": "2026-10-07T02:33:05.445040+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-empty",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-empty",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.446052+00:00",
+      "endedAt": "2026-10-07T02:33:05.476298+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-duplicate",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-duplicate",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.477149+00:00",
+      "endedAt": "2026-10-07T02:33:05.508539+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-bad-verdict",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-bad-verdict",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.509516+00:00",
+      "endedAt": "2026-10-07T02:33:05.541226+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-wrong-identity",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-wrong-identity",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.542101+00:00",
+      "endedAt": "2026-10-07T02:33:05.573823+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N01",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N01",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.574853+00:00",
+      "endedAt": "2026-10-07T02:33:05.606647+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N02",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N02",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.607775+00:00",
+      "endedAt": "2026-10-07T02:33:05.640373+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N03",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N03",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.641444+00:00",
+      "endedAt": "2026-10-07T02:33:05.673470+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N04",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N04",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.674330+00:00",
+      "endedAt": "2026-10-07T02:33:05.705736+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N05",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N05",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.706864+00:00",
+      "endedAt": "2026-10-07T02:33:05.738590+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N06",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N06",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.739771+00:00",
+      "endedAt": "2026-10-07T02:33:05.771763+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N07",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N07",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.772943+00:00",
+      "endedAt": "2026-10-07T02:33:05.804452+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N08",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N08",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.805339+00:00",
+      "endedAt": "2026-10-07T02:33:05.836233+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N09",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N09",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.837257+00:00",
+      "endedAt": "2026-10-07T02:33:05.868749+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N10",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N10",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.869687+00:00",
+      "endedAt": "2026-10-07T02:33:05.901016+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N11",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N11",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.901831+00:00",
+      "endedAt": "2026-10-07T02:33:05.932373+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N12",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N12",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.933183+00:00",
+      "endedAt": "2026-10-07T02:33:05.963527+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N13",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N13",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.964311+00:00",
+      "endedAt": "2026-10-07T02:33:05.994748+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N14",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N14",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:05.995498+00:00",
+      "endedAt": "2026-10-07T02:33:06.025283+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N15",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N15",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:06.026043+00:00",
+      "endedAt": "2026-10-07T02:33:06.057704+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    },
+    {
+      "case": "full-missing-N16",
+      "command": [
+        "bash",
+        "-c",
+        "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+        "independent-summary",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/summary-function.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/full-missing-N16",
+        "ALL"
+      ],
+      "startedAt": "2026-10-07T02:33:06.058878+00:00",
+      "endedAt": "2026-10-07T02:33:06.100515+00:00",
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "PASS",
+      "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+    }
+  ],
+  "registeredIdentities": [
+    "R05-GATE-N03",
+    "R05-GATE-N01",
+    "R05-GATE-N02",
+    "R05-GATE-N04",
+    "R05-GATE-N05",
+    "R05-GATE-N06",
+    "R05-GATE-N07",
+    "R05-GATE-N08",
+    "R05-GATE-N09",
+    "R05-GATE-N10",
+    "R05-GATE-N11",
+    "R05-GATE-N12",
+    "R05-GATE-N13",
+    "R05-GATE-N14",
+    "R05-GATE-N15",
+    "R05-GATE-N16"
+  ],
+  "defaultScope": "ALL",
+  "implementationHelperSha256": "7785b41ebadfdc6d6415ee1d337ea48621e25d1bbb1ed1c16456004545279609",
+  "gateSha256": "a69110b81298705a9161652d28402a5e5a585f945fdfd214ccf071132ecb67dd"
+}

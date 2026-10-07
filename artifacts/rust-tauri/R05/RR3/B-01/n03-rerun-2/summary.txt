@@ -1,0 +1,8 @@
+== preparing the isolated copy at /Users/study_superior/r05t08-work/negcopy.Gz0rkR (local clone of HEAD b3ac0e6ae + uncommitted working-tree overlay) ==
+== copy ready (branch codex/rust-tauri-migration, HEAD b3ac0e6ae, worktree dirty=14 files) ==
+== CONTROL: xtask r05 mirror tests green in the copy ==
+PASS control: xtask r05_ tests green (exit 0)
+== N03: exactly one authoritative pin count lowered; old/new saved in mutation.json ==
+case R05-GATE-N03: exit=101 gap-named=OK verdict=OK (权威表唯一目标降钉恰一次 → 镜像单测红点名漂移)
+PASS N03 restore: authoritative table byte-equal, exact mirror 1/1 green
+RESULT: selected N03 failed closed with the target named (1/1), restored mirror green; other 15 cases NOT RUN

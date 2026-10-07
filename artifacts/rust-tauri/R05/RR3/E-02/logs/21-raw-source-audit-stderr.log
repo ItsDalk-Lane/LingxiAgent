@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-02/audit-raw.py", line 19, in <module>
+    tree=x['serviceTree']
+         ~^^^^^^^^^^^^^^^
+KeyError: 'serviceTree'

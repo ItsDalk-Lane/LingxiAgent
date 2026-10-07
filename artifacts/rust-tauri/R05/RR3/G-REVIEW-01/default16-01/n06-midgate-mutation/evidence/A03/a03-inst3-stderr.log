@@ -1,0 +1,2 @@
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t02-a03-home.9q4ETG previousInstanceId=71459f873f6be4d4e84af901c3c8290d previousPid=53212 previousStartNonce=c47c7878bdd19b70 previousStartedAtUnixMs=1791337754416 handshakeMismatches=none
+2026-10-07T01:49:15.001699Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t02-a03-home.9q4ETG/lingxi-service/instance.stale.json

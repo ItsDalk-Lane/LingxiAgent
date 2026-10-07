@@ -1,0 +1,1525 @@
+{
+ "aborted": false,
+ "destination_root": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures",
+ "driver_argv": [
+  "artifacts/rust-tauri/R05/RR3/F51-01/run-relocation.py"
+ ],
+ "entries": [
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.078959Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_copy-delete-rename",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-02/copy-delete-rename/",
+   "post": {
+    "du_kilobytes": 144,
+    "file_count": 33,
+    "max_relpath_len": 54,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 1,
+    "total_bytes": 34456,
+    "tree_digest": "291f53295f8d67a4005b96cb7989baf56eb7c4591bdd6e48ced40c81b8122ca4"
+   },
+   "pre": {
+    "du_kilobytes": 144,
+    "file_count": 33,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 1,
+    "total_bytes": 34456,
+    "tree_digest": "291f53295f8d67a4005b96cb7989baf56eb7c4591bdd6e48ced40c81b8122ca4"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.098935Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_external-fresh_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-02/extra/external-fresh/repo/",
+   "post": {
+    "du_kilobytes": 144,
+    "file_count": 33,
+    "max_relpath_len": 54,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 1,
+    "total_bytes": 34456,
+    "tree_digest": "0bc8742e0ef05a0281a0ff8fecc2afd4e24a124cbc7d17ecc59701aa0296fded"
+   },
+   "pre": {
+    "du_kilobytes": 144,
+    "file_count": 33,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 1,
+    "total_bytes": 34456,
+    "tree_digest": "0bc8742e0ef05a0281a0ff8fecc2afd4e24a124cbc7d17ecc59701aa0296fded"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.119395Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_external-old-tracked-grandchild_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-tracked-grandchild/repo/",
+   "post": {
+    "du_kilobytes": 152,
+    "file_count": 35,
+    "max_relpath_len": 61,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34467,
+    "tree_digest": "b6a124b406c419f69c3fed11cec8cba7252052ef826e8793bf497e78074f66f3"
+   },
+   "pre": {
+    "du_kilobytes": 152,
+    "file_count": 35,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34467,
+    "tree_digest": "b6a124b406c419f69c3fed11cec8cba7252052ef826e8793bf497e78074f66f3"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.139462Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_external-old-untracked-grandchild_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-untracked-grandchild/repo/",
+   "post": {
+    "du_kilobytes": 148,
+    "file_count": 34,
+    "max_relpath_len": 61,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34321,
+    "tree_digest": "20a2632a557d943d3f78ce923c57a45fd5a74dd93ae71731ea65f7cd459874cf"
+   },
+   "pre": {
+    "du_kilobytes": 148,
+    "file_count": 34,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34321,
+    "tree_digest": "20a2632a557d943d3f78ce923c57a45fd5a74dd93ae71731ea65f7cd459874cf"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.160068Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_internal-fresh_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-02/extra/internal-fresh/repo/",
+   "post": {
+    "du_kilobytes": 192,
+    "file_count": 46,
+    "max_relpath_len": 76,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 50949,
+    "tree_digest": "0064cac73a3d1cec1fc49e5b77f172cf75fcd514adc467d486361330b1009e44"
+   },
+   "pre": {
+    "du_kilobytes": 192,
+    "file_count": 46,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 50949,
+    "tree_digest": "0064cac73a3d1cec1fc49e5b77f172cf75fcd514adc467d486361330b1009e44"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.180813Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_internal-old-tracked-grandchild_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-tracked-grandchild/repo/",
+   "post": {
+    "du_kilobytes": 208,
+    "file_count": 50,
+    "max_relpath_len": 76,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 65146,
+    "tree_digest": "85cdc9cd30a3d1c451d5b3b17a011dfeb0a729abbadd871f649416658c86625b"
+   },
+   "pre": {
+    "du_kilobytes": 208,
+    "file_count": 50,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 65146,
+    "tree_digest": "85cdc9cd30a3d1c451d5b3b17a011dfeb0a729abbadd871f649416658c86625b"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.201451Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_internal-old-untracked-grandchild_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-untracked-grandchild/repo/",
+   "post": {
+    "du_kilobytes": 204,
+    "file_count": 49,
+    "max_relpath_len": 76,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 65000,
+    "tree_digest": "542a4e332e9aca8874edfa3d49a1946cc3fc2e52ac411816093c2a37a6fef8a8"
+   },
+   "pre": {
+    "du_kilobytes": 204,
+    "file_count": 49,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 65000,
+    "tree_digest": "542a4e332e9aca8874edfa3d49a1946cc3fc2e52ac411816093c2a37a6fef8a8"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.221847Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_copy-delete-rename",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename/",
+   "post": {
+    "du_kilobytes": 168,
+    "file_count": 39,
+    "max_relpath_len": 60,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34354,
+    "tree_digest": "6a442564411e9335418de0d74cea9930a322cd7689cc99c3ded133fa67abf3b7"
+   },
+   "pre": {
+    "du_kilobytes": 168,
+    "file_count": 39,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34354,
+    "tree_digest": "6a442564411e9335418de0d74cea9930a322cd7689cc99c3ded133fa67abf3b7"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.241961Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_copy-delete-rename-02",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename-02/",
+   "post": {
+    "du_kilobytes": 144,
+    "file_count": 33,
+    "max_relpath_len": 54,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 1,
+    "total_bytes": 34463,
+    "tree_digest": "aa03677c1236eaf4af81738bba2cdfd1e35ef681d8bfcd9d1f9ab5a1c307668e"
+   },
+   "pre": {
+    "du_kilobytes": 144,
+    "file_count": 33,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 1,
+    "total_bytes": 34463,
+    "tree_digest": "aa03677c1236eaf4af81738bba2cdfd1e35ef681d8bfcd9d1f9ab5a1c307668e"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.261974Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_external-fresh_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-fresh/repo/",
+   "post": {
+    "du_kilobytes": 144,
+    "file_count": 33,
+    "max_relpath_len": 54,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 1,
+    "total_bytes": 34466,
+    "tree_digest": "3d4ac933a4ade65bb7fe1c48294f370e5ac568bf98d7c35314386c00f5ea22ca"
+   },
+   "pre": {
+    "du_kilobytes": 144,
+    "file_count": 33,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 1,
+    "total_bytes": 34466,
+    "tree_digest": "3d4ac933a4ade65bb7fe1c48294f370e5ac568bf98d7c35314386c00f5ea22ca"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.281792Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_external-old-tracked-grandchild_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-old-tracked-grandchild/repo/",
+   "post": {
+    "du_kilobytes": 152,
+    "file_count": 35,
+    "max_relpath_len": 61,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34467,
+    "tree_digest": "b06bf650b28fb63958bd941115c08c9d223ee8ef9610a2d19da37bd0d2633420"
+   },
+   "pre": {
+    "du_kilobytes": 152,
+    "file_count": 35,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34467,
+    "tree_digest": "b06bf650b28fb63958bd941115c08c9d223ee8ef9610a2d19da37bd0d2633420"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.301623Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_external-old-untracked-grandchild_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-old-untracked-grandchild/repo/",
+   "post": {
+    "du_kilobytes": 148,
+    "file_count": 34,
+    "max_relpath_len": 61,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34321,
+    "tree_digest": "00831b492f91ceef6cc68a0afe10501307de10ce3f804c3a69ced8dbef5095e7"
+   },
+   "pre": {
+    "du_kilobytes": 148,
+    "file_count": 34,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34321,
+    "tree_digest": "00831b492f91ceef6cc68a0afe10501307de10ce3f804c3a69ced8dbef5095e7"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.322180Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_internal-fresh_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-fresh/repo/",
+   "post": {
+    "du_kilobytes": 192,
+    "file_count": 46,
+    "max_relpath_len": 76,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 50949,
+    "tree_digest": "b4732af99d37bbdfc3a4bc7246824e0651efea6ca6ba2b196ca6ba99cf641008"
+   },
+   "pre": {
+    "du_kilobytes": 192,
+    "file_count": 46,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 50949,
+    "tree_digest": "b4732af99d37bbdfc3a4bc7246824e0651efea6ca6ba2b196ca6ba99cf641008"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.342912Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_internal-old-tracked-grandchild_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-old-tracked-grandchild/repo/",
+   "post": {
+    "du_kilobytes": 208,
+    "file_count": 50,
+    "max_relpath_len": 76,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 65146,
+    "tree_digest": "9168d4712ef85c4df3945ae4acc4df95e50d3979708b3f6b93d2ceaec81b1ae3"
+   },
+   "pre": {
+    "du_kilobytes": 208,
+    "file_count": 50,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 65146,
+    "tree_digest": "9168d4712ef85c4df3945ae4acc4df95e50d3979708b3f6b93d2ceaec81b1ae3"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.363386Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_internal-old-untracked-grandchild_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-old-untracked-grandchild/repo/",
+   "post": {
+    "du_kilobytes": 204,
+    "file_count": 49,
+    "max_relpath_len": 76,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 65000,
+    "tree_digest": "3867b2fb6ae4c56ae65071ca1dceb9776fdccb781353501453a0afab17c67d5e"
+   },
+   "pre": {
+    "du_kilobytes": 204,
+    "file_count": 49,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 65000,
+    "tree_digest": "3867b2fb6ae4c56ae65071ca1dceb9776fdccb781353501453a0afab17c67d5e"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.383239Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_external-fresh_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-fresh/repo/",
+   "post": {
+    "du_kilobytes": 144,
+    "file_count": 33,
+    "max_relpath_len": 54,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 1,
+    "total_bytes": 34463,
+    "tree_digest": "9824c6269a864dfcf52c2061ed6853e8239d7a11beeaa09063d482da616d115f"
+   },
+   "pre": {
+    "du_kilobytes": 144,
+    "file_count": 33,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 1,
+    "total_bytes": 34463,
+    "tree_digest": "9824c6269a864dfcf52c2061ed6853e8239d7a11beeaa09063d482da616d115f"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.403034Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_external-old-tracked-grandchild_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-old-tracked-grandchild/repo/",
+   "post": {
+    "du_kilobytes": 152,
+    "file_count": 35,
+    "max_relpath_len": 61,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34467,
+    "tree_digest": "c7a31f09d5742427d1f9be36ce578b362fdfccf654aba0f02eb57b9fe3a20594"
+   },
+   "pre": {
+    "du_kilobytes": 152,
+    "file_count": 35,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34467,
+    "tree_digest": "c7a31f09d5742427d1f9be36ce578b362fdfccf654aba0f02eb57b9fe3a20594"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.422705Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_external-old-untracked-grandchild_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-old-untracked-grandchild/repo/",
+   "post": {
+    "du_kilobytes": 148,
+    "file_count": 34,
+    "max_relpath_len": 61,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34321,
+    "tree_digest": "17545bad2666407617d4578634cce0bc6d7f5f41244368d6a61732f9270ecd0a"
+   },
+   "pre": {
+    "du_kilobytes": 148,
+    "file_count": 34,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34321,
+    "tree_digest": "17545bad2666407617d4578634cce0bc6d7f5f41244368d6a61732f9270ecd0a"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.442869Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_internal-fresh_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-fresh/repo/",
+   "post": {
+    "du_kilobytes": 192,
+    "file_count": 46,
+    "max_relpath_len": 76,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 50949,
+    "tree_digest": "4ef56ac24f132107bf30498ad2bc9ffa22cd2211f0a4c40d3152c847df7ebce9"
+   },
+   "pre": {
+    "du_kilobytes": 192,
+    "file_count": 46,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 50949,
+    "tree_digest": "4ef56ac24f132107bf30498ad2bc9ffa22cd2211f0a4c40d3152c847df7ebce9"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.462917Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_internal-old-tracked-grandchild_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-old-tracked-grandchild/repo/",
+   "post": {
+    "du_kilobytes": 208,
+    "file_count": 50,
+    "max_relpath_len": 76,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 65146,
+    "tree_digest": "fe1e6bcc24e613d14a6a1e5dd4e5883f27e6dbde810e754b3661583b85afb903"
+   },
+   "pre": {
+    "du_kilobytes": 208,
+    "file_count": 50,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 65146,
+    "tree_digest": "fe1e6bcc24e613d14a6a1e5dd4e5883f27e6dbde810e754b3661583b85afb903"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.483511Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_internal-old-untracked-grandchild_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-old-untracked-grandchild/repo/",
+   "post": {
+    "du_kilobytes": 204,
+    "file_count": 49,
+    "max_relpath_len": 76,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 65000,
+    "tree_digest": "2c77fdddef1dd51679b6cba1391f32d95fd2bd263faab702efc4fe027e2432b3"
+   },
+   "pre": {
+    "du_kilobytes": 204,
+    "file_count": 49,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 65000,
+    "tree_digest": "2c77fdddef1dd51679b6cba1391f32d95fd2bd263faab702efc4fe027e2432b3"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.502941Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_validator-fault-repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo/",
+   "post": {
+    "du_kilobytes": 92,
+    "file_count": 21,
+    "max_relpath_len": 55,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 26479,
+    "tree_digest": "d0b4c4645f7294418c1e0f9e08af64c9f52e8303c99f226bd78f06f38e4ebc11"
+   },
+   "pre": {
+    "du_kilobytes": 92,
+    "file_count": 21,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 26479,
+    "tree_digest": "d0b4c4645f7294418c1e0f9e08af64c9f52e8303c99f226bd78f06f38e4ebc11"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.522215Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-02_internal-fresh_candidate-copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-fresh/candidate-copy/",
+   "post": {
+    "du_kilobytes": 124,
+    "file_count": 33,
+    "max_relpath_len": 58,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34443,
+    "tree_digest": "d5602566da7600170629d3b276b2693c052b721dcbb8465716f8fb9f25dc950e"
+   },
+   "pre": {
+    "du_kilobytes": 124,
+    "file_count": 33,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34443,
+    "tree_digest": "d5602566da7600170629d3b276b2693c052b721dcbb8465716f8fb9f25dc950e"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.543379Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-02_internal-fresh_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-fresh/repo/",
+   "post": {
+    "du_kilobytes": 432,
+    "file_count": 103,
+    "max_relpath_len": 100,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 165855,
+    "tree_digest": "69f9d1a91b7632891acf5d06ba2d15aa28dd5c1b2400206e7402842c1d4dc62b"
+   },
+   "pre": {
+    "du_kilobytes": 432,
+    "file_count": 103,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 165855,
+    "tree_digest": "69f9d1a91b7632891acf5d06ba2d15aa28dd5c1b2400206e7402842c1d4dc62b"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.564810Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-02_internal-untracked_candidate-copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-untracked/candidate-copy/",
+   "post": {
+    "du_kilobytes": 128,
+    "file_count": 34,
+    "max_relpath_len": 65,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34454,
+    "tree_digest": "3a1de05c4923da719c5dfb0da3b1bf759b6f83592f0666d5b324ead8a5d9fcc2"
+   },
+   "pre": {
+    "du_kilobytes": 128,
+    "file_count": 34,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34454,
+    "tree_digest": "3a1de05c4923da719c5dfb0da3b1bf759b6f83592f0666d5b324ead8a5d9fcc2"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.586674Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-02_internal-untracked_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-untracked/repo/",
+   "post": {
+    "du_kilobytes": 448,
+    "file_count": 107,
+    "max_relpath_len": 100,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 238778,
+    "tree_digest": "6a00e7e776b953f2b96cbca40e472723b882d3b9eb03aaef5bd823b44305670b"
+   },
+   "pre": {
+    "du_kilobytes": 448,
+    "file_count": 107,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 238778,
+    "tree_digest": "6a00e7e776b953f2b96cbca40e472723b882d3b9eb03aaef5bd823b44305670b"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.607903Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-fresh_candidate-copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-fresh/candidate-copy/",
+   "post": {
+    "du_kilobytes": 124,
+    "file_count": 33,
+    "max_relpath_len": 58,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34395,
+    "tree_digest": "cb93bce2a10624fe847a29c5b25408229e8a6d3adf7bbd2e8a913bffbd9dc324"
+   },
+   "pre": {
+    "du_kilobytes": 124,
+    "file_count": 33,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34395,
+    "tree_digest": "cb93bce2a10624fe847a29c5b25408229e8a6d3adf7bbd2e8a913bffbd9dc324"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.628193Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-fresh_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-fresh/repo/",
+   "post": {
+    "du_kilobytes": 148,
+    "file_count": 33,
+    "max_relpath_len": 58,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 39323,
+    "tree_digest": "77a1557d0346cdf5fa0dc38f3cbfa6ed40676bb28c08435b708824361c253001"
+   },
+   "pre": {
+    "du_kilobytes": 148,
+    "file_count": 33,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 39323,
+    "tree_digest": "77a1557d0346cdf5fa0dc38f3cbfa6ed40676bb28c08435b708824361c253001"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.648249Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-tracked_candidate-copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-tracked/candidate-copy/",
+   "post": {
+    "du_kilobytes": 132,
+    "file_count": 35,
+    "max_relpath_len": 65,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34548,
+    "tree_digest": "db9a1fbd66a27b38df13d352808d622c3696bf57080e13ae1a3ff18040f7c43a"
+   },
+   "pre": {
+    "du_kilobytes": 132,
+    "file_count": 35,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34548,
+    "tree_digest": "db9a1fbd66a27b38df13d352808d622c3696bf57080e13ae1a3ff18040f7c43a"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.668199Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-tracked_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-tracked/repo/",
+   "post": {
+    "du_kilobytes": 156,
+    "file_count": 35,
+    "max_relpath_len": 65,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 39872,
+    "tree_digest": "51cc35f8a2e98fb20413360d6aee81da7f0352b7c1e892fc81531e6f0d1fbfff"
+   },
+   "pre": {
+    "du_kilobytes": 156,
+    "file_count": 35,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 39872,
+    "tree_digest": "51cc35f8a2e98fb20413360d6aee81da7f0352b7c1e892fc81531e6f0d1fbfff"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.688377Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-untracked_candidate-copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-untracked/candidate-copy/",
+   "post": {
+    "du_kilobytes": 128,
+    "file_count": 34,
+    "max_relpath_len": 65,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34406,
+    "tree_digest": "cdb866e544f3d8537f582245394c9407e89b7a81670c4f2a127a77cc45d9f670"
+   },
+   "pre": {
+    "du_kilobytes": 128,
+    "file_count": 34,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34406,
+    "tree_digest": "cdb866e544f3d8537f582245394c9407e89b7a81670c4f2a127a77cc45d9f670"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.708211Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-untracked_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-untracked/repo/",
+   "post": {
+    "du_kilobytes": 152,
+    "file_count": 34,
+    "max_relpath_len": 65,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 39870,
+    "tree_digest": "561a1892e429458bb9c45b6c92f8ebc591ef79d77fc5d87b33419a0852110955"
+   },
+   "pre": {
+    "du_kilobytes": 152,
+    "file_count": 34,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 39870,
+    "tree_digest": "561a1892e429458bb9c45b6c92f8ebc591ef79d77fc5d87b33419a0852110955"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.727876Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-fresh_candidate-copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-fresh/candidate-copy/",
+   "post": {
+    "du_kilobytes": 124,
+    "file_count": 33,
+    "max_relpath_len": 58,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34459,
+    "tree_digest": "03338530578e42cd143cc9cf97ee2557aabfca4c3647c2a47ebdebb58dd4665b"
+   },
+   "pre": {
+    "du_kilobytes": 124,
+    "file_count": 33,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34459,
+    "tree_digest": "03338530578e42cd143cc9cf97ee2557aabfca4c3647c2a47ebdebb58dd4665b"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.749736Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-fresh_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-fresh/repo/",
+   "post": {
+    "du_kilobytes": 432,
+    "file_count": 103,
+    "max_relpath_len": 100,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 165871,
+    "tree_digest": "885ed272a2c9c682b1a6fb05f7526b0af9376f17b2403ce4355982c654180c8a"
+   },
+   "pre": {
+    "du_kilobytes": 432,
+    "file_count": 103,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 165871,
+    "tree_digest": "885ed272a2c9c682b1a6fb05f7526b0af9376f17b2403ce4355982c654180c8a"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.770423Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-tracked_candidate-copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-tracked/candidate-copy/",
+   "post": {
+    "du_kilobytes": 132,
+    "file_count": 35,
+    "max_relpath_len": 65,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34612,
+    "tree_digest": "1ea9a7097a0572b80720e8474fa5cec4619c0a137ae83383853b01d6993f2825"
+   },
+   "pre": {
+    "du_kilobytes": 132,
+    "file_count": 35,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34612,
+    "tree_digest": "1ea9a7097a0572b80720e8474fa5cec4619c0a137ae83383853b01d6993f2825"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.792247Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-tracked_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-tracked/repo/",
+   "post": {
+    "du_kilobytes": 456,
+    "file_count": 109,
+    "max_relpath_len": 100,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 241320,
+    "tree_digest": "c5403a000a40c0eca076f484584720313e0cbd0490b10a4bd9f24645713a0283"
+   },
+   "pre": {
+    "du_kilobytes": 456,
+    "file_count": 109,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 241320,
+    "tree_digest": "c5403a000a40c0eca076f484584720313e0cbd0490b10a4bd9f24645713a0283"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.813757Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-untracked_candidate-copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-untracked/candidate-copy/",
+   "post": {
+    "du_kilobytes": 128,
+    "file_count": 34,
+    "max_relpath_len": 65,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34470,
+    "tree_digest": "6a350e33b0438624a6ca2bc42304438a94128dc671e36fb238880b4a770d1e04"
+   },
+   "pre": {
+    "du_kilobytes": 128,
+    "file_count": 34,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 34470,
+    "tree_digest": "6a350e33b0438624a6ca2bc42304438a94128dc671e36fb238880b4a770d1e04"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.835399Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-untracked_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-untracked/repo/",
+   "post": {
+    "du_kilobytes": 452,
+    "file_count": 108,
+    "max_relpath_len": 100,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 241318,
+    "tree_digest": "02db964dd9dcc2f107705740598f72595cde5a41506c3f8724a78a487d99173b"
+   },
+   "pre": {
+    "du_kilobytes": 452,
+    "file_count": 108,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 241318,
+    "tree_digest": "02db964dd9dcc2f107705740598f72595cde5a41506c3f8724a78a487d99173b"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.856114Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-validator-repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-validator-repo/",
+   "post": {
+    "du_kilobytes": 92,
+    "file_count": 21,
+    "max_relpath_len": 54,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 1,
+    "total_bytes": 27584,
+    "tree_digest": "e628034ec98b497c50d5652c999d7f281364cbbb4689d83e0b3e9706aaf392ef"
+   },
+   "pre": {
+    "du_kilobytes": 92,
+    "file_count": 21,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 1,
+    "total_bytes": 27584,
+    "tree_digest": "e628034ec98b497c50d5652c999d7f281364cbbb4689d83e0b3e9706aaf392ef"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.884939Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/40--repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent/internal-fresh/repo/",
+   "post": {
+    "du_kilobytes": 268,
+    "file_count": 117,
+    "max_relpath_len": 902,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 75371,
+    "tree_digest": "d6de2b1ecca2aeb6e9a260547aa7bb406d3f51991cb63c84915be2bddfb6c90b"
+   },
+   "pre": {
+    "du_kilobytes": 268,
+    "file_count": 117,
+    "nested_git_head": null,
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 75371,
+    "tree_digest": "d6de2b1ecca2aeb6e9a260547aa7bb406d3f51991cb63c84915be2bddfb6c90b"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.904148Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_I-01_selfcheck-01_copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-01/copy/",
+   "post": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "7e20b5bbac4b97d33814c874dbd2a1248cee922b",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626294,
+    "tree_digest": "be82f2f79f703e63a669fea38309b0c3ad99982ca51402dbba3db3a8ed7673ac"
+   },
+   "pre": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "7e20b5bbac4b97d33814c874dbd2a1248cee922b",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626294,
+    "tree_digest": "be82f2f79f703e63a669fea38309b0c3ad99982ca51402dbba3db3a8ed7673ac"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.918052Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_I-01_selfcheck-02_copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/copy/",
+   "post": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "0e6fc3527abf244cfcf87f67a6bce808aab23ba6",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626293,
+    "tree_digest": "92a4896d2cc4f0a19234c10aabccc9f8480173180e12749a2343e669660ee23b"
+   },
+   "pre": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "0e6fc3527abf244cfcf87f67a6bce808aab23ba6",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626293,
+    "tree_digest": "92a4896d2cc4f0a19234c10aabccc9f8480173180e12749a2343e669660ee23b"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.932452Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_I-01_selfcheck-02_runner-copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/runner-copy/",
+   "post": {
+    "du_kilobytes": 15944,
+    "file_count": 728,
+    "max_relpath_len": 221,
+    "nested_git_head": "20f41d7fab8a685013bf231d46dad6e2e32daa49",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 14534054,
+    "tree_digest": "ad2b075c88725d681311bd26bcf8ceb0ced1ab97576f2602f50cc2e22584c53b"
+   },
+   "pre": {
+    "du_kilobytes": 15944,
+    "file_count": 728,
+    "max_relpath_len": 221,
+    "nested_git_head": "20f41d7fab8a685013bf231d46dad6e2e32daa49",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 14534054,
+    "tree_digest": "ad2b075c88725d681311bd26bcf8ceb0ced1ab97576f2602f50cc2e22584c53b"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.978937Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_I-01_selfcheck-03_copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/copy/",
+   "post": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "d932e5e974251372e2b026ff78d0945c359f9a1d",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626295,
+    "tree_digest": "f94e4fe1092b8db21550f5c5c2315a1431fa594743356fa5b54aaa905a35f119"
+   },
+   "pre": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "d932e5e974251372e2b026ff78d0945c359f9a1d",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626295,
+    "tree_digest": "f94e4fe1092b8db21550f5c5c2315a1431fa594743356fa5b54aaa905a35f119"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:50.993977Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_I-01_selfcheck-03_runner-copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/runner-copy/",
+   "post": {
+    "du_kilobytes": 24236,
+    "file_count": 733,
+    "max_relpath_len": 221,
+    "nested_git_head": "824931f29114a7b9fb425416c6940a15c258939c",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 23016900,
+    "tree_digest": "395d001b1de02d7091194a23072e21f6945902b27dc521ef48442a2a411d5341"
+   },
+   "pre": {
+    "du_kilobytes": 24236,
+    "file_count": 733,
+    "max_relpath_len": 221,
+    "nested_git_head": "824931f29114a7b9fb425416c6940a15c258939c",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 23016900,
+    "tree_digest": "395d001b1de02d7091194a23072e21f6945902b27dc521ef48442a2a411d5341"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:51.044544Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_I-01_selfcheck-04_copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/copy/",
+   "post": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "3077ac091a0b0348e0875b9c59bc22bcab39a783",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626296,
+    "tree_digest": "13c243de84e75b3ede0a287abe16844b4cee2e62f6591d98e47f2d69a3a51743"
+   },
+   "pre": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "3077ac091a0b0348e0875b9c59bc22bcab39a783",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626296,
+    "tree_digest": "13c243de84e75b3ede0a287abe16844b4cee2e62f6591d98e47f2d69a3a51743"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:51.059237Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_I-01_selfcheck-04_runner-copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/runner-copy/",
+   "post": {
+    "du_kilobytes": 58072,
+    "file_count": 1181,
+    "max_relpath_len": 221,
+    "nested_git_head": "66091edaa83e6a4dc31b55bf29e28c5a7e3610bb",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 56740719,
+    "tree_digest": "1f938ad061b0a65eb454528293022a674a606403acf53de965fd4a3fec57114c"
+   },
+   "pre": {
+    "du_kilobytes": 58072,
+    "file_count": 1181,
+    "max_relpath_len": 221,
+    "nested_git_head": "66091edaa83e6a4dc31b55bf29e28c5a7e3610bb",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 56740719,
+    "tree_digest": "1f938ad061b0a65eb454528293022a674a606403acf53de965fd4a3fec57114c"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:51.137066Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_I-01_selfcheck-final_copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/copy/",
+   "post": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "7394f109f28d45c127d726bba29b19312cb923bf",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626295,
+    "tree_digest": "c6148026e07e6443d5721598351468e37b0448550996ca5670385c20e5d3258d"
+   },
+   "pre": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "7394f109f28d45c127d726bba29b19312cb923bf",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626295,
+    "tree_digest": "c6148026e07e6443d5721598351468e37b0448550996ca5670385c20e5d3258d"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:51.153631Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_I-01_selfcheck-final_runner-copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/runner-copy/",
+   "post": {
+    "du_kilobytes": 24236,
+    "file_count": 733,
+    "max_relpath_len": 221,
+    "nested_git_head": "1616721cadcf2521848927748ab4d0d30e9c590c",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 23016910,
+    "tree_digest": "ff26dfcdf220139d51ab020fe7364147dd4fd3715b563629c44287ea39a9c201"
+   },
+   "pre": {
+    "du_kilobytes": 24236,
+    "file_count": 733,
+    "max_relpath_len": 221,
+    "nested_git_head": "1616721cadcf2521848927748ab4d0d30e9c590c",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 23016910,
+    "tree_digest": "ff26dfcdf220139d51ab020fe7364147dd4fd3715b563629c44287ea39a9c201"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:51.205508Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_I-REVIEW-01_permanent-final_copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/copy/",
+   "post": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "f04a6b404269421b08648808de494ece1aa73875",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626294,
+    "tree_digest": "dddca0d23dff6ce7e17dcfb5bcf5efcf0a4434f8754ee5e85590e4cc99166e35"
+   },
+   "pre": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "f04a6b404269421b08648808de494ece1aa73875",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626294,
+    "tree_digest": "dddca0d23dff6ce7e17dcfb5bcf5efcf0a4434f8754ee5e85590e4cc99166e35"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:51.220950Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_I-REVIEW-01_permanent-final_runner-copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy/",
+   "post": {
+    "du_kilobytes": 59616,
+    "file_count": 1201,
+    "max_relpath_len": 221,
+    "nested_git_head": "12e22ded65828da9e19c875648c2b15e43f48d64",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 58288269,
+    "tree_digest": "12e22b46f021a58376913184dd699c5f80cf6a3ab22ef460d3071c352ba8daf3"
+   },
+   "pre": {
+    "du_kilobytes": 59616,
+    "file_count": 1201,
+    "max_relpath_len": 221,
+    "nested_git_head": "12e22ded65828da9e19c875648c2b15e43f48d64",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 58288269,
+    "tree_digest": "12e22b46f021a58376913184dd699c5f80cf6a3ab22ef460d3071c352ba8daf3"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:51.298265Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-01_i-restore-final_copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/J-01/i-restore-final/copy/",
+   "post": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "0456067c121417943f1afa7599aec93374d9f93a",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626298,
+    "tree_digest": "153331d1c5b4d87909f2e51e5c1e3b58b49369525ddbd8ecbfcfbebacd2100c6"
+   },
+   "pre": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "0456067c121417943f1afa7599aec93374d9f93a",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626298,
+    "tree_digest": "153331d1c5b4d87909f2e51e5c1e3b58b49369525ddbd8ecbfcfbebacd2100c6"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:51.313718Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-02_i-restore_copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/J-02/i-restore/copy/",
+   "post": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "fac0371eb8a67faca0bb633194285396ea89a5e7",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626294,
+    "tree_digest": "fecb5aa45f3fda68f006bcd6ffa8e45a858da4587c727d0eb0cabce68e378288"
+   },
+   "pre": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "fac0371eb8a67faca0bb633194285396ea89a5e7",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626294,
+    "tree_digest": "fecb5aa45f3fda68f006bcd6ffa8e45a858da4587c727d0eb0cabce68e378288"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:51.329982Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/copy/",
+   "post": {
+    "du_kilobytes": 5298004,
+    "file_count": 102887,
+    "max_relpath_len": 221,
+    "nested_git_head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+    "other_count": 0,
+    "symlink_count": 115,
+    "total_bytes": 5130434169,
+    "tree_digest": "79736540a1201ae9fda8133baf4d1dfa41789e0ebca52e941b8acfc5f1bc9e8a"
+   },
+   "pre": {
+    "du_kilobytes": 5298004,
+    "file_count": 102887,
+    "max_relpath_len": 221,
+    "nested_git_head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+    "other_count": 0,
+    "symlink_count": 115,
+    "total_bytes": 5130434169,
+    "tree_digest": "79736540a1201ae9fda8133baf4d1dfa41789e0ebca52e941b8acfc5f1bc9e8a"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:56.474475Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_i-preservation_copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy/",
+   "post": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "64de497425b003d1178385c252465200f351678c",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626299,
+    "tree_digest": "35d002f73c95a547703f03d0bdfaa80a3c4a644ad5622d948488437753425d1d"
+   },
+   "pre": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "64de497425b003d1178385c252465200f351678c",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626299,
+    "tree_digest": "35d002f73c95a547703f03d0bdfaa80a3c4a644ad5622d948488437753425d1d"
+   }
+  },
+  {
+   "digests_equal": true,
+   "moved_utc": "2026-10-07T11:54:56.488291Z",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-02_i-restore_copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-02/i-restore/copy/",
+   "post": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "5071f84a637238140ee4f010873b91fa894078cc",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626296,
+    "tree_digest": "947c4b3eebcf5d8b628b47e96082cbd7c4cb4b1a1ef3b20f6ca03b36b59002a5"
+   },
+   "pre": {
+    "du_kilobytes": 1784,
+    "file_count": 70,
+    "max_relpath_len": 60,
+    "nested_git_head": "5071f84a637238140ee4f010873b91fa894078cc",
+    "other_count": 0,
+    "symlink_count": 0,
+    "total_bytes": 1626296,
+    "tree_digest": "947c4b3eebcf5d8b628b47e96082cbd7c4cb4b1a1ef3b20f6ca03b36b59002a5"
+   }
+  }
+ ],
+ "finished_utc": "2026-10-07T11:54:56.839866Z",
+ "gates": {
+  "entry_sanity": {
+   "checked": 56,
+   "problems": []
+  },
+  "enumeration": {
+   "already_at_destination": 40,
+   "final01_master_count": 56,
+   "live_directory_entries_at_start": 16,
+   "live_entries_in_main_tree": 16,
+   "live_matches_master": true,
+   "missing_entries": [],
+   "unexpected_new_entries": []
+  },
+  "post_enumeration_dir_entries": []
+ },
+ "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+ "markers": [
+  "artifacts/rust-tauri/R05/RR3/A-02/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-02/extra/external-fresh/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-tracked-grandchild/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-untracked-grandchild/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-02/extra/internal-fresh/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-tracked-grandchild/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-untracked-grandchild/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-fresh/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-old-tracked-grandchild/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-old-untracked-grandchild/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-fresh/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-old-tracked-grandchild/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-old-untracked-grandchild/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-fresh/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-old-tracked-grandchild/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-old-untracked-grandchild/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-fresh/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-old-tracked-grandchild/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-old-untracked-grandchild/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-fresh/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-untracked/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-fresh/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-tracked/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-untracked/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-fresh/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-tracked/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-untracked/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent/internal-fresh/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-01/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/J-01/i-restore-final/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/J-02/i-restore/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/RELOCATED-F51.json",
+  "artifacts/rust-tauri/R05/RR3/J-REVIEW-02/i-restore/RELOCATED-F51.json"
+ ],
+ "method": {
+  "digest": "digest_tree.scan_tree (fd-based, PATH_MAX-safe): sorted manifest of (type,size,sha256-content-or-linktarget,relpath); tree_digest=sha256(manifest); manifest format identical to run 1",
+  "enumeration": "git ls-files --cached --others --exclude-standard (trailing-slash entries)",
+  "naming": "slash-encoded relative path; when len(dest_prefix)+max_relpath_len>1000 a short '<idx>--<basename>' name is used (documented deviation, PATH_MAX)",
+  "path_safety_bound": 1000,
+  "relocation": "os.rename (same-filesystem rename(2), byte-preserving; mv equivalent)"
+ },
+ "naming_deviations": [
+  {
+   "entry": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent/internal-fresh/repo",
+   "max_relpath_len": 902,
+   "name": "40--repo",
+   "reason": "relocated in run 1 under slash-encoded name; deepest absolute child paths exceeded macOS PATH_MAX 1024, renamed to short form to restore reachability (bytes untouched)"
+  }
+ ],
+ "pre_digests_complete_utc": "2026-10-07T11:54:50.069426Z",
+ "relocation_complete_utc": "2026-10-07T11:54:56.502510Z",
+ "repo": "/Users/study_superior/Desktop/Code/LingxiAgent",
+ "run": 3,
+ "run_history": {
+  "run1": {
+   "outcome": "aborted at entry 40/56 post-digest: OSError ENAMETOOLONG (path-based scanner; ~100-level nested tree + slash-encoded destination prefix exceeded macOS PATH_MAX 1024)",
+   "started_utc": "2026-10-07T11:47:31Z",
+   "state_at_abort": "entries 1-39 renamed out and verified digest-equal; entry 40 renamed out (bytes intact) but unverified; entries 41-56 untouched in main tree; all 56 pre-digests saved in relocation-checkpoint.json; no bytes deleted (log: run1-abort-log.txt)"
+  },
+  "run2": {
+   "outcome": "aborted at gate 1 (resume semantics bug): already-relocated entries missing from live enumeration were misclassified as 'FINAL-01 entries no longer present'; zero filesystem changes (receipt: RELOCATION-RECEIPT.json.aborted-run2)",
+   "started_utc": "2026-10-07T11:53:23Z"
+  }
+ },
+ "started_utc": "2026-10-07T11:54:44.188216Z",
+ "task": "F51 relocation of nested-.git untracked fixture directories out of the main tree",
+ "totals": {
+  "all_digests_equal": true,
+  "entries": 56,
+  "total_bytes": 5324827710,
+  "total_files": 110071,
+  "total_symlinks": 121
+ }
+}

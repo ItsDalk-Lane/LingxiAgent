@@ -43,6 +43,9 @@ impl Snapshot {
 #[derive(Clone, Debug)]
 pub struct Scope {
     excluded_relative: Option<PathBuf>,
+    output_files: Vec<PathBuf>,
+    #[cfg(unix)]
+    output_identities: Vec<(u64, u64)>,
 }
 
 impl Scope {
@@ -62,18 +65,115 @@ impl Scope {
                 "--evidence cannot be the repo root: it would exclude the entire candidate".into(),
             );
         }
-        Ok(Self { excluded_relative })
+        if let Some(relative) = &excluded_relative {
+            reject_tracked_output(&root, relative)?;
+        }
+        // 只识别真实 fd 对应的精确文件；祖先日志的父目录不因此变成输出目录。
+        let discovery = Command::new("python3")
+            .args([
+                "-c",
+                include_str!("../../../../scripts/rust-tauri/run_output_sinks.py"),
+            ])
+            .arg(&root)
+            .arg(&evidence)
+            .arg("--files")
+            .output()
+            .map_err(|e| format!("cannot discover run-output sinks: {e}"))?;
+        if !discovery.status.success() {
+            return Err(format!(
+                "run-output discovery failed: {}",
+                String::from_utf8_lossy(&discovery.stderr)
+            ));
+        }
+        let mut output_files = Vec::new();
+        for row in discovery
+            .stdout
+            .split(|b| *b == b'\n')
+            .filter(|row| !row.is_empty())
+        {
+            if row == b"DISCOVERY-UNAVAILABLE" {
+                return Err(
+                    "run-output discovery unavailable; refusing incomplete candidate binding"
+                        .into(),
+                );
+            }
+            let raw = row.strip_prefix(b"FILE ").ok_or_else(|| {
+                format!(
+                    "invalid or tracked run-output sink: {}",
+                    String::from_utf8_lossy(row)
+                )
+            })?;
+            let relative = path_from_git(raw)?;
+            if relative
+                .components()
+                .any(|c| !matches!(c, Component::Normal(_)))
+            {
+                return Err("run-output sink is not a plain repository-relative file".into());
+            }
+            reject_symlink_components(&root.join(&relative))?;
+            reject_tracked_output(&root, &relative)?;
+            output_files.push(relative);
+        }
+        output_files.sort();
+        output_files.dedup();
+        #[cfg(unix)]
+        let output_identities = output_files
+            .iter()
+            .map(|relative| {
+                use std::os::unix::fs::MetadataExt;
+                let metadata = fs::symlink_metadata(root.join(relative))
+                    .map_err(|e| format!("cannot identify output sink: {e}"))?;
+                Ok((metadata.dev(), metadata.ino()))
+            })
+            .collect::<Result<Vec<_>, String>>()?;
+        Ok(Self {
+            excluded_relative,
+            output_files,
+            #[cfg(unix)]
+            output_identities,
+        })
     }
 
     pub fn exclusion_json(&self) -> serde_json::Value {
         serde_json::json!({
             "evidenceOutputRelativePath": self.excluded_relative.as_ref().map(|p| p.to_string_lossy().to_string()),
             "evidenceOutputPathBytesHex": self.excluded_relative.as_ref().map(|p| hex(&os_bytes(p.as_os_str()))),
-            "policy": "Only this invocation's --evidence output subtree is excluded; Git-ignored paths are outside the candidate source set. Tracked paths and non-ignored untracked paths elsewhere are included.",
+            "runOutputFiles": self.output_files.iter().map(|p| serde_json::json!({
+                "relativePath": p.to_string_lossy(), "pathBytesHex": hex(&os_bytes(p.as_os_str())), "kind": "FILE"
+            })).collect::<Vec<_>>(),
+            "policy": "This invocation's fresh --evidence subtree and exact real OS fd stdout/stderr files of this process and its ancestors are excluded. No ancestor sink directory is excluded. The set is fixed before binding; other tracked and non-ignored untracked paths stay bound.",
         })
     }
 
     pub fn snapshot(&self, root: &Path) -> Result<Snapshot, String> {
+        if let Some(relative) = &self.excluded_relative {
+            reject_symlink_components(&root.join(relative))?;
+            reject_tracked_output(root, relative)?;
+        }
+        for (index, relative) in self.output_files.iter().enumerate() {
+            reject_symlink_components(&root.join(relative))?;
+            reject_tracked_output(root, relative)?;
+            let metadata = fs::symlink_metadata(root.join(relative))
+                .map_err(|e| format!("cannot inspect run-output sink: {e}"))?;
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::MetadataExt;
+                if (metadata.dev(), metadata.ino()) != self.output_identities[index] {
+                    return Err(format!(
+                        "run-output sink {} was replaced after binding",
+                        relative.display()
+                    ));
+                }
+            }
+            #[cfg(windows)]
+            let _ = index;
+            if !metadata.is_file() {
+                return Err(format!(
+                    "run-output sink {} disappeared or changed type",
+                    relative.display()
+                ));
+            }
+        }
         let output = Command::new("git")
             .args([
                 "ls-files",
@@ -114,6 +214,7 @@ impl Scope {
                 .excluded_relative
                 .as_ref()
                 .is_some_and(|p| relative.starts_with(p))
+                || self.output_files.contains(&relative)
             {
                 continue;
             }
@@ -144,6 +245,22 @@ impl Scope {
             entries,
         })
     }
+}
+
+fn reject_tracked_output(root: &Path, relative: &Path) -> Result<(), String> {
+    let query = Command::new("git")
+        .args(["--literal-pathspecs", "ls-files", "-z", "--"])
+        .arg(relative)
+        .current_dir(root)
+        .output()
+        .map_err(|e| format!("cannot inspect output ownership: {e}"))?;
+    if !query.status.success() || !query.stdout.is_empty() {
+        return Err(format!(
+            "run-output path {} covers tracked candidate content",
+            relative.display()
+        ));
+    }
+    Ok(())
 }
 
 #[cfg(unix)]

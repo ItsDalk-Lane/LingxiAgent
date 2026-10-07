@@ -1,0 +1,18 @@
+{
+  "observedAt": "2026-10-07T03:07:40.059334+00:00",
+  "observation": "旧G42187及H3546 write_stdin均Unknown process id；ps无对应CLI/dispatcher/driver；无final/report。原request RUNNING为中断遗留，不改历史。",
+  "exitCode": null,
+  "result": "INTERRUPTED_UNKNOWN_EXIT",
+  "evidence": {
+    "G-REVIEW-01": {
+      "eventsSha256": "5424723b436fa84bb296c1ebdf43cb1799e1ba53eb8db0b4f42e47ddf5be802d",
+      "eventsBytes": 2158268,
+      "mtime": 1791341897.1460743
+    },
+    "H-REVIEW-01": {
+      "eventsSha256": "cb83400ce412485f8cb8db4c178f63bb1a08842edd1e1d3f6001ef89f41136ba",
+      "eventsBytes": 1595656,
+      "mtime": 1791341925.930651
+    }
+  }
+}

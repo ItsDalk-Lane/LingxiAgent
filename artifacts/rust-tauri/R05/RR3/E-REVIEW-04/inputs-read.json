@@ -1,0 +1,71 @@
+{
+  "at": "2026-10-07T07:20:00Z",
+  "scope": "Inputs actually read (in full or targeted-full sections) by E-REVIEW-04. Historical giant manifests were not re-hashed wholesale; equality was established by independent recomputation from current disk against recorded digests.",
+  "briefs_and_authority": [
+    "docs/rust-tauri/R05/repair-current/RR3_E_R4_REVIEW_BRIEF.md (task brief, full)",
+    "docs/rust-tauri/R05/repair-current/RR1_MASTER_PROMPT_2026-10-04.md (full)",
+    "docs/rust-tauri/R05/repair-current/RR2_MASTER_PROMPT_2026-10-06.md (full)",
+    "docs/rust-tauri/R05/repair-current/RR3_BRIEF.md (full)",
+    "docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md (full)",
+    "docs/rust-tauri/R05/repair-current/RR3_E_R3_BRIEF.md (full)",
+    "docs/rust-tauri/R05/repair-current/RR3_E_R3_REVIEW_BRIEF.md (full)",
+    "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json (full)",
+    "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md (full)",
+    "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md (full)"
+  ],
+  "e03_package": [
+    "artifacts/rust-tauri/R05/RR3/E-03/REPORT.md (full)",
+    "artifacts/rust-tauri/R05/RR3/E-03/MANIFEST.json (full)",
+    "artifacts/rust-tauri/R05/RR3/E-03/STOPPED.json (full)",
+    "artifacts/rust-tauri/R05/RR3/E-03/SELF_CHECK.json (summary fields + failed list)",
+    "artifacts/rust-tauri/R05/RR3/E-03/commands.jsonl (full)",
+    "artifacts/rust-tauri/R05/RR3/E-03/changed-files.json (full)",
+    "artifacts/rust-tauri/R05/RR3/E-03/{h02,g02}-current-{before,after}-comparison.json (full)",
+    "artifacts/rust-tauri/R05/RR3/E-03/historical-dispatch-differences.json (full)",
+    "artifacts/rust-tauri/R05/RR3/E-03/read-inputs.json / authority-reading.json / evidence-self-check.json (summaries)",
+    "artifacts/rust-tauri/R05/RR3/E-03/semantic-inputs-{before,after,before-initial-scope}.json (structure + full per-entry rehash via recompute)",
+    "artifacts/rust-tauri/R05/RR3/E-03/audit.py / update.py / check.py / driver formula (targeted reads for digest algorithm)",
+    "artifacts/rust-tauri/R05/RR3/E-03/before-documents.json.gz (decompressed; used for historical preservation diff)"
+  ],
+  "owned_documents_14": [
+    "docs/rust-tauri/R05/R05_REPORT.md (full)",
+    "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md (full)",
+    "docs/rust-tauri/R05/R05_BLOCKERS.md (full)",
+    "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md (full)",
+    "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md (RR3 sections full)",
+    "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md (targeted: boundary/callback/trace sections)",
+    "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md (byte-equality vs before-baseline; no content re-audit beyond E-REVIEW-02 scope)",
+    "docs/rust-tauri/R05/R05_HANDOFF.json (all current fields + consumer_contract full)",
+    "docs/rust-tauri/R05/PROGRESS_LEDGER.json (current fields + strict parse)",
+    "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json (strict parse + byte-prefix + key preservation)",
+    "docs/rust-tauri/R05/R05_TEST_MAP.json (rr3_current + rr3_I10_mapping + I01_I11 full)",
+    "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json (rr3_current + rr3_resource_independent_review full)",
+    "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json (current fields + rr3_platform_verification full)",
+    "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json (stages.R05 full, incl. rr3_current)"
+  ],
+  "independent_reviews": [
+    "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md (full)",
+    "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md (full)",
+    "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md (full)",
+    "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md (full)",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/REVIEW.md (full) + STOPPED.json + MANIFEST.json + I-MAPPING.md (full) + default16-01/case-results.tsv",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/REVIEW.md (full) + FINAL_SOURCE_BINDING.json (375 inputs rehashed) + RESOURCE_ANALYSIS-resources-final.json + commands/{ordinary-cancel-recovery,late-result-next-run,resources-final}/command.json",
+    "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/REVIEW.md (full)",
+    "artifacts/rust-tauri/R05/RR3/J-REVIEW-02/REVIEW.md (full)"
+  ],
+  "environment_and_evidence": [
+    "artifacts/rust-tauri/R05/RR3/TASK0/cargo-clean-receipt.txt (full) + live df checks",
+    "artifacts/rust-tauri/R05/RR3/STORAGE-03/REPORT.md (full)",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/metadata/{source-before,source-after-default}.json (full rehash) + driver.py (digest formula)",
+    "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json (commands/overall/binding)",
+    "artifacts/rust-tauri/R05/RR3/E-REVIEW-03/ (directory inventory + audit-results.json head: raw interrupted capture, no conclusions)"
+  ],
+  "source_spot_checks": [
+    "rust/crates/lingxi-kernel/src/model_exchange.rs (resolve_route, ModelTurnInput)",
+    "rust/crates/lingxi-service/src/workerrpc.rs (callback kind/op comment/lines)",
+    "rust/crates/lingxi-service/src/lib.rs (LedgerWorkerCallbackTrace wiring)",
+    "rust/crates/lingxi-adapters/src/storage/migrations.rs (version 7)",
+    "rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs (rr1_f21 sample 5/9)",
+    "scripts/rust-tauri/r05_t08_negative_gate.sh (NEG_TARGET definition; copy used only in isolated control)"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "compile-probe",
+  "argv": [
+    "/usr/bin/clang",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-pthread",
+    "artifacts/rust-tauri/R05/RR3/D-01/lan_probe.c",
+    "-o",
+    "artifacts/rust-tauri/R05/RR3/D-01/lan_probe"
+  ],
+  "timeout": 60,
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "start": "2026-10-07T08:28:50.465957+08:00",
+  "end": "2026-10-07T08:28:50.678052+08:00",
+  "elapsedSeconds": 0.212,
+  "pid": 63754,
+  "actualExitCode": 0,
+  "supervisorTimedOut": false,
+  "supervisorExitCode": 0,
+  "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/compile-probe.log",
+  "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

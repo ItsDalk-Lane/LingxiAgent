@@ -1,0 +1,1 @@
+{"argv": ["ps", "-axo", "pid=,ppid=,command="], "followup": ["ps", "eww", "-p", "<matched PID>", "-o", "command="], "outputFilter": "RUST_LOG only; read raw in memory, other env discarded"}

@@ -1,0 +1,10 @@
+{
+  "utc": "2026-10-07T01:03:27.049040+00:00",
+  "configured": {
+    "model": "gpt-6.1-sol",
+    "model_provider": null,
+    "model_reasoning_effort": "high"
+  },
+  "modelOverride": null,
+  "boundary": "config readback does not itself attest actual serving model; session system identifies GPT-6-based Codex; no model settings changed"
+}

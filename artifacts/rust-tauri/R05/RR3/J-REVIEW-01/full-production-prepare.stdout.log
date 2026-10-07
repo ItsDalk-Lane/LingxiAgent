@@ -1,0 +1,31 @@
+== preparing the isolated copy at /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/copy (local clone of HEAD b3ac0e6ae + uncommitted working-tree overlay) ==
+error: unable to write file artifacts/rust-tauri/R05/T08-E01/verify-R05/R04_REGRESSION/candidate-source-before.json
+error: unable to write file artifacts/rust-tauri/R05/T08-E01/verify-R05/candidate-source-after.json
+error: unable to write file artifacts/rust-tauri/R05/T08-E01/verify-R05/candidate-source-before.json
+error: unable to write file artifacts/rust-tauri/R05/T08-E01/working-tree-manifest.txt
+error: unable to write file build/cli-runtime-closure.json
+error: unable to write file core/model-operation-client.ts
+error: unable to create file core/model-operation-resolver.ts: No space left on device
+error: unable to create file core/model-sync.ts: No space left on device
+error: unable to create file core/mount-aware-file-service.ts: No space left on device
+error: unable to create file core/oauth-force-refresh.ts: No space left on device
+error: unable to create file core/output-length-contract.ts: No space left on device
+error: unable to create file core/persona-source.ts: No space left on device
+error: unable to create file core/pinned-tenets-backup-dir.ts: No space left on device
+error: unable to create file core/pinned-tenets-migration.ts: No space left on device
+error: unable to create file core/pinned-tenets-recovery.ts: No space left on device
+error: unable to create file core/platform-prompt.ts: No space left on device
+error: unable to create file core/plugin-config.ts: No space left on device
+error: unable to create file core/plugin-context.ts: No space left on device
+error: unable to create file core/plugin-manager.ts: No space left on device
+error: unable to create file core/plugin-route-request-context.ts: No space left on device
+error: unable to create file core/preferences-manager.ts: No space left on device
+error: unable to create file core/provider-auth-migration.ts: No space left on device
+error: unable to create file core/provider-catalog.ts: No space left on device
+error: unable to create file core/provider-compat.ts: No space left on device
+fatal: cannot create directory at 'core/provider-compat': No space left on device
+warning: Clone succeeded, but checkout failed.
+You can inspect what was checked out with 'git status'
+and retry with 'git restore --source=HEAD :/'
+
+FAIL: local clone failed

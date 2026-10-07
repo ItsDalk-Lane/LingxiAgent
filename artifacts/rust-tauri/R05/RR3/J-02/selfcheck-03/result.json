@@ -1,0 +1,218 @@
+{
+  "status": "PASS",
+  "checks": [
+    "default HEAD correct with staged and unstaged source",
+    "missing source restored from exact Git blob",
+    "all historical artifacts retained",
+    "executable and original external symlink target preserved",
+    "candidate-only untracked content not presented as HEAD",
+    "source Git files unchanged by preparation",
+    "normal clone agrees: head",
+    "normal clone agrees: tree",
+    "normal clone agrees: index",
+    "normal clone agrees: status",
+    "normal clone complete file bytes and modes agree",
+    "copy file/index/HEAD writes cannot change source",
+    "historical BASE bytes differ correctly from candidate HEAD",
+    "historical BASE pristine",
+    "query-failure rejected at target",
+    "query-stderr rejected at target",
+    "copy-permission rejected at target",
+    "source-drift rejected at target",
+    "source-late-drift rejected at target",
+    "missing Git object refused",
+    "shared object loss refuses execution",
+    "invalid destination rejected: same",
+    "invalid destination rejected: ancestor",
+    "invalid destination rejected: nested",
+    "invalid destination rejected: nonempty",
+    "invalid destination rejected: linked",
+    "existing destination unchanged",
+    "special source file refused",
+    "source linked parent never followed; accurate Git content restored",
+    "production inputs unchanged during selfcheck",
+    "source Git unchanged after all controls"
+  ],
+  "checkCount": 31,
+  "commandCount": 49,
+  "inputs": {
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/prepare_git_copy.py": "37f4246a11f54826f2a31a772c1db0b5e3422c0261ea56c9872c3a3b75c9cb24",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_negative_gate.sh": "7ca614a77b2e4f0613ed82c3df171776dbb5f5866c77c54a07c10e16bcd931b6",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh": "171eaa1f7f24635d736afe1abf6f5dc8a8d563f1f21c52655fa8ddc37995cde4",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/prepare_git_copy_selfcheck.py": "5dc5e9486c9cf18b2c856082b611d2c64f5433cc4e0dafa5c0635e7fa527fc6f"
+  },
+  "fixture": "/private/tmp/lingxi-git-copy-ws1v5fvq",
+  "sourceGit": {
+    "COMMIT_EDITMSG": {
+      "sha256": "4389dd3d869749915ea2dfdb81a7b6aecfde619b7544475d2ab8eaf2d5322bc0",
+      "mode": 420
+    },
+    "HEAD": {
+      "sha256": "a5514e446d5aa78abd1b01492bf577b9b369799dd4461fd9e7da0ae3c87814e4",
+      "mode": 420
+    },
+    "config": {
+      "sha256": "f996b0cc441112e3799dba3d014066cce81f0c52a4f96127ef785ba94e123749",
+      "mode": 420
+    },
+    "description": {
+      "sha256": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+      "mode": 420
+    },
+    "index": {
+      "sha256": "78f1c58a45ecd65cff52ffc1a9bfb6f30585c99ac96fd9ebafd7dc0b160704d2",
+      "mode": 420
+    },
+    "objects/3b/4d6f7a723189a757279ea4a946fb874bc0869a": {
+      "sha256": "33b2feb744a61d680da671fdb43a40b578783c1d330faebb856453335f7549cf",
+      "mode": 292
+    },
+    "objects/03/9e4d0069c5c26909f86c505b9de66182e6d1f3": {
+      "sha256": "0cbc2ba3ebf51893d6c5a337b475053bc6000f9267e71ec34cda2862e508f589",
+      "mode": 292
+    },
+    "objects/3c/8316dc5c7ace5d8b09464297605304ecb58342": {
+      "sha256": "39df8795fb2a05b30dff89773a261664106fe698892dcaa2c0c8e249a3f5a39f",
+      "mode": 292
+    },
+    "objects/56/3f544578dd2c9464e5ed845ac6e517258dd62d": {
+      "sha256": "1275070c2cb780bef0d18cef7651cad5b373d541e131c5009a0d1ef1f4f6d02f",
+      "mode": 292
+    },
+    "objects/3d/0f1fa384d56ff1f7b673e7c8fbc0a97bc68fe6": {
+      "sha256": "e1dcc10adc734cc5d0eb7915bb39a0f04c8f2e82db5da8ab5f22e16955e1ef95",
+      "mode": 292
+    },
+    "objects/0b/13aae038153d12b771c9825a714b0e17449ffa": {
+      "sha256": "2633b5c351fc5d157d560566f0fd91303d98e0352f2d54fc925cfc10e3a3d3f9",
+      "mode": 292
+    },
+    "objects/a3/5782b043e7eef88dd19b56249ae3071eae2189": {
+      "sha256": "eb7a3b6b6e0e71b5e209cedbb3d107713377c0963ac3d9ba28ffe0b4f3684700",
+      "mode": 292
+    },
+    "objects/f5/2754046b71cedc2b86e760317834da33706c8e": {
+      "sha256": "6246e71cee5c50643be70a3162f3164bb9e222c8fd1cd92ba5ac85082452ebcc",
+      "mode": 292
+    },
+    "objects/4e/261541b51d9842234d2285184305448cd8b294": {
+      "sha256": "d26ad300f110e64bef2d42280c5c0087d7d3f3e571ed3bc0a6c0ee4ddc6c7b69",
+      "mode": 292
+    },
+    "objects/19/ae44f3544647cf196ff01a667673f12f10f094": {
+      "sha256": "9e4baab5d2823aec1d263654852498d55c2a1040c8f060ba7f5e0d447857dfcd",
+      "mode": 292
+    },
+    "objects/19/d9cc8584ac2c7dcf57d2680375e80f099dc481": {
+      "sha256": "cae98968c741c8800bcdda61f1fa07fe79683038358afa4a1314ccdf5377b78e",
+      "mode": 292
+    },
+    "objects/44/77950194ee35800bcd55c7b20130e565b4d937": {
+      "sha256": "f64f50383091576901c523b562ac4255dd3906277890e1c327459915c9e255ce",
+      "mode": 292
+    },
+    "objects/2f/f0cc013f80a72af170879f7c91252348570649": {
+      "sha256": "412b5e26b21801bc19d4420cc2a0349b22270ebd3985e02b78f8070c9b77e8d4",
+      "mode": 292
+    },
+    "objects/0a/de7bbf6f8fe3ff6ff296165f2d5b0b924f4ac9": {
+      "sha256": "2d4a4055c19553f552a7ff06367571c5316c9c65b04a72beac21c94167085e42",
+      "mode": 292
+    },
+    "objects/d3/f00cd4b5e8c4a4d526ad181b2f591b0d11d583": {
+      "sha256": "70529e1c073d47b91184bf5091d59ad57d99e95c3aa68573cdf7e6dd0c3238e1",
+      "mode": 292
+    },
+    "objects/b7/2ecdf01cf82b95f1f276ad24b20805bfb7c974": {
+      "sha256": "6b6c0b8da72d98737bebe44213fda006e46984e71b968607f04dd98e22504a43",
+      "mode": 292
+    },
+    "objects/ff/ea877c93f101d661df845365937e698c1e1761": {
+      "sha256": "f397ade386362b176a8b74c4a606f6de295a7bfb61acf2dadfd809608381bb99",
+      "mode": 292
+    },
+    "objects/c2/45c291546a24cf481fb16c27f4c599a4c4df7b": {
+      "sha256": "7734baa4b7eb4ee49e1e9f6adf71f9869939bafda7470de713bd8cf7d73ff2f4",
+      "mode": 292
+    },
+    "objects/49/b95ba822113b797b9c3322aa9e5605ee3cd12a": {
+      "sha256": "2cc9dccdb5990add73e309ffae854a63c0b9e95dffa662e9dfce1e4986a3fb7d",
+      "mode": 292
+    },
+    "info/exclude": {
+      "sha256": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+      "mode": 420
+    },
+    "logs/HEAD": {
+      "sha256": "04317ee891e1712e5dbc4be6609b055bce433acf50ae3d2811672f367874fd04",
+      "mode": 420
+    },
+    "logs/refs/heads/codex/rust-tauri-migration": {
+      "sha256": "04317ee891e1712e5dbc4be6609b055bce433acf50ae3d2811672f367874fd04",
+      "mode": 420
+    },
+    "hooks/applypatch-msg.sample": {
+      "sha256": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+      "mode": 493
+    },
+    "hooks/commit-msg.sample": {
+      "sha256": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+      "mode": 493
+    },
+    "hooks/fsmonitor-watchman.sample": {
+      "sha256": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+      "mode": 493
+    },
+    "hooks/post-update.sample": {
+      "sha256": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+      "mode": 493
+    },
+    "hooks/pre-applypatch.sample": {
+      "sha256": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+      "mode": 493
+    },
+    "hooks/pre-commit.sample": {
+      "sha256": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b",
+      "mode": 493
+    },
+    "hooks/pre-merge-commit.sample": {
+      "sha256": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+      "mode": 493
+    },
+    "hooks/pre-push.sample": {
+      "sha256": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+      "mode": 493
+    },
+    "hooks/pre-rebase.sample": {
+      "sha256": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+      "mode": 493
+    },
+    "hooks/pre-receive.sample": {
+      "sha256": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+      "mode": 493
+    },
+    "hooks/prepare-commit-msg.sample": {
+      "sha256": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+      "mode": 493
+    },
+    "hooks/push-to-checkout.sample": {
+      "sha256": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+      "mode": 493
+    },
+    "hooks/sendemail-validate.sample": {
+      "sha256": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+      "mode": 493
+    },
+    "hooks/update.sample": {
+      "sha256": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+      "mode": 493
+    },
+    "refs/heads/codex/rust-tauri-migration": {
+      "sha256": "f238b42bb8a44e6967b01d2794563d8ca89cf3bca98daef46b1f7b219b626771",
+      "mode": 420
+    }
+  },
+  "ignored": 0,
+  "filtered": 0,
+  "boundary": "\u5c0f\u771f\u5b9e Git \u4ed3\u5e93\uff1b\u751f\u4ea7\u9ed8\u8ba4/\u5386\u53f2\u8c03\u7528\u7247\u6bb5\u3001Git\u3001CoW \u548c\u6587\u4ef6\u7cfb\u7edf\u771f\u5b9e\u3002\u53ea\u6709\u6545\u969c\u817f\u4ee3\u7406 Git \u547d\u4ee4\u6ce8\u5165\u67e5\u8be2\u5931\u8d25/\u6743\u9650/\u5e76\u53d1\u6f02\u79fb\u3002"
+}

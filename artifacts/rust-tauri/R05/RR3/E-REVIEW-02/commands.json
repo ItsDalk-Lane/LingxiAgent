@@ -1,0 +1,897 @@
+[
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/snapshot.py",
+      "before"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T01:58:37.976757+00:00",
+    "endUTC": "2026-10-07T01:58:38.024896+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/01-input-stdout.log",
+        "sha256": "345747842c4ec00c622116b29031e994f320e00e6e24c955b1ef3aafadfedd08",
+        "bytes": 15
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/01-input-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "01-input-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "read"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:00:28.555456+00:00",
+    "endUTC": "2026-10-07T02:00:28.601963+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/02-read-stdout.log",
+        "sha256": "8c3c99b21698c83019e1d223c0da47ed2200da92a9b25f9fdc03ad9aef042911",
+        "bytes": 44
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/02-read-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "02-read-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "json"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:00:35.206818+00:00",
+    "endUTC": "2026-10-07T02:00:35.260336+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/03-json-stdout.log",
+        "sha256": "b46a760861231b7a16abdc6813d5bd3244c6193cf5ebb10eca20aaff61173578",
+        "bytes": 45
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/03-json-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "03-json-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "current"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:00:35.206887+00:00",
+    "endUTC": "2026-10-07T02:00:35.292247+00:00",
+    "exitCode": 1,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/04-current-stdout.log",
+        "sha256": "98b682da5b8f61ae0e537e1e0ae7a66fc44cbbd1e30816ac64fe5bdb714df705",
+        "bytes": 128
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/04-current-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "04-current-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "wire"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:00:35.206887+00:00",
+    "endUTC": "2026-10-07T02:00:35.251600+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/05-wire-stdout.log",
+        "sha256": "229c20693b70731942a9b7c38021c9d7e81073c308529a799bff9b5acf448104",
+        "bytes": 44
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/05-wire-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "05-wire-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "fields"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:00:35.206685+00:00",
+    "endUTC": "2026-10-07T02:00:35.253308+00:00",
+    "exitCode": 1,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/06-fields-stdout.log",
+        "sha256": "872cc30be21157f119ac0fd1502ef0794b0b84714e89687e0ad3efe3dd9a20ec",
+        "bytes": 808
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/06-fields-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "06-fields-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "hashes"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:00:35.206887+00:00",
+    "endUTC": "2026-10-07T02:00:35.563164+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/07-hashes-stdout.log",
+        "sha256": "bf2f875e5339831f78f53f76080e262ccba25cb8731016812c44a85b664e64f6",
+        "bytes": 49
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/07-hashes-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "07-hashes-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "history"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:00:35.206743+00:00",
+    "endUTC": "2026-10-07T02:00:35.305762+00:00",
+    "exitCode": 1,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/08-history-stdout.log",
+        "sha256": "e418b58970794ad40ae0774d472a376dc07318638424ab89100e928e20a7f319",
+        "bytes": 701
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/08-history-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "08-history-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "links"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:00:35.206685+00:00",
+    "endUTC": "2026-10-07T02:00:35.251554+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/09-links-stdout.log",
+        "sha256": "0935d83d98b5c944b7eb67b103f7fa25daf0557d1d080b4d020542b36fff8e36",
+        "bytes": 47
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/09-links-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "09-links-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "current"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:01:29.163025+00:00",
+    "endUTC": "2026-10-07T02:01:29.240932+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/10-current-stdout.log",
+        "sha256": "742eb0c662de075dc50a8ba8f2bb0b85d1b095a94740c9034d06ad67308de147",
+        "bytes": 48
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/10-current-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "10-current-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "fields"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:01:29.162113+00:00",
+    "endUTC": "2026-10-07T02:01:29.202354+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/10-fields-stdout.log",
+        "sha256": "363e78e1c2a89eed2e379c100d74cdc77c127539af97433d888a7673cccb85a1",
+        "bytes": 47
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/10-fields-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "10-fields-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "history"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:01:29.163026+00:00",
+    "endUTC": "2026-10-07T02:01:29.252294+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/10-history-stdout.log",
+        "sha256": "8151ffdee9b77f930c03207e788ba380af35a29eebb8e58e244d189d5ddb3ae2",
+        "bytes": 48
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/10-history-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "10-history-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/supplementary-audit.py"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:05:32.458883+00:00",
+    "endUTC": "2026-10-07T02:05:32.516516+00:00",
+    "exitCode": 1,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/11-supplementary-stdout.log",
+        "sha256": "1554f84d69027afb4a13c88fa689a5c7097f50a79bd89b7df0a871ee9f209e8a",
+        "bytes": 581
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/11-supplementary-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "11-supplementary-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/supplementary-audit.py"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:06:06.341025+00:00",
+    "endUTC": "2026-10-07T02:06:06.387359+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/12-supplementary-stdout.log",
+        "sha256": "8cce11ecd292137a6674c4e519203773ecbd6e9d90bbc24658e44599b5fe8763",
+        "bytes": 30
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/12-supplementary-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "12-supplementary-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/run-controls.py"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:06:20.908792+00:00",
+    "endUTC": "2026-10-07T02:06:22.741467+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/13-controls-stdout.log",
+        "sha256": "7cfc5a87838dfc1e41d98018909e700e51a64e6804a76538836e00229d517fbc",
+        "bytes": 5632
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/13-controls-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "13-controls-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/environment-audit.py"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:07:13.824775+00:00",
+    "endUTC": "2026-10-07T02:07:14.328340+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/14-environment-stdout.log",
+        "sha256": "46ec3652d893fe65cacd21bcadb897329b4cfbb580beeb687579bbf6e737b15d",
+        "bytes": 142
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/14-environment-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "14-environment-command.json"
+  },
+  {
+    "argv": [
+      "/usr/bin/codesign",
+      "-d",
+      "--verbose=4",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:07:28.251907+00:00",
+    "endUTC": "2026-10-07T02:07:31.111554+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/15-d-codesign-stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/15-d-codesign-stderr.log",
+        "sha256": "70e054d57a2f60c4be70ad79366982ce641cd6ef7c7c76538ada8eb5ef239c1c",
+        "bytes": 907
+      }
+    },
+    "receipt": "15-d-codesign-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "-c",
+      "import pathlib,subprocess,json; p=pathlib.Path(\"artifacts/rust-tauri/R05/RR3/G-REVIEW-01\"); print(json.dumps({\"completed_report_exists\":(p/\"REVIEW.md\").exists(),\"result_exists\":(p/\"RESULT.json\").exists(),\"console\":(p/\"default-console.log\").read_text(),\"processes\":[x for x in subprocess.run([\"ps\",\"-axo\",\"pid,ppid,command\"],capture_output=True,text=True).stdout.splitlines() if (\"run-default.py\" in x or \"r05_t08_negative_gate.sh\" in x) and \"python3 -c\" not in x]},ensure_ascii=False))"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:07:28.251907+00:00",
+    "endUTC": "2026-10-07T02:07:28.314307+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/16-g-observe-stdout.log",
+        "sha256": "b9c4b49106a7cec821a0d0444c8e7c55aa171ad360a3b553e6d4ef7992c60afe",
+        "bytes": 4455
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/16-g-observe-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "16-g-observe-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/final-input-check.py"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:08:59.893755+00:00",
+    "endUTC": "2026-10-07T02:08:59.945158+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/17-reenumerate-stdout.log",
+        "sha256": "f3d426c9281197aa2f2d6de0d6ce34ad48c10aafb6e69176aa045a097a0178f1",
+        "bytes": 147
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/17-reenumerate-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "17-reenumerate-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/snapshot.py",
+      "after"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:08:59.975285+00:00",
+    "endUTC": "2026-10-07T02:09:00.022369+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/18-input-final-stdout.log",
+        "sha256": "e83e3b1d3d825003d7f8349b86a95bb1710becccb26bc6e9cbafa6a025b4f6b5",
+        "bytes": 30
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/18-input-final-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "18-input-final-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/history-controls.py"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:09:32.432728+00:00",
+    "endUTC": "2026-10-07T02:09:32.687699+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/19-history-controls-stdout.log",
+        "sha256": "e0503267b7b66c95c03b20886fbfac80468bfea173d295942eaaf1743d3747dd",
+        "bytes": 342
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/19-history-controls-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "19-history-controls-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "-c",
+      "import pathlib,json,hashlib; r=pathlib.Path(\"artifacts/rust-tauri/R05/RR3/E-REVIEW-02\"); g=pathlib.Path(\"artifacts/rust-tauri/R05/RR3/G-REVIEW-01\"); print(\"G completed report exists:\",(g/\"REVIEW.md\").exists()); b=json.loads((r/\"input-before.json\").read_text()); changes=[p for p,h in b[\"files\"].items() if hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()!=h]; assert not changes,changes; print(\"444 protected inputs unchanged\"); controls=json.loads((r/\"controls-results.json\").read_text()); assert all(x[\"actualExit\"]==x[\"expectedExit\"] and x[\"restoredBytesEqual\"] for x in controls); logs=json.loads((r/\"loghash.json\").read_text()); assert all(hashlib.sha256((r/p).read_bytes()).hexdigest()==v[\"sha256\"] for p,v in logs.items()); print(\"isolated controls and existing log hashes valid; report PASS/mustFix empty\")"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:11:50.518841+00:00",
+    "endUTC": "2026-10-07T02:11:50.565253+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/20-delivery-check-stdout.log",
+        "sha256": "2dacc8d140ad6dce6f9d542fc7a17f4333e542ed0dc39113c5056fec58cbe506",
+        "bytes": 139
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/20-delivery-check-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "20-delivery-check-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "current",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-current.json"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:06:21.057288+00:00",
+    "endUTC": "2026-10-07T02:06:21.126511+00:00",
+    "exitCode": 1,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-current-mutated-stdout.log",
+        "sha256": "9552405c297b92e2f8a01321c9d7bf5ff3743f60560642594f59e06361c28301",
+        "bytes": 799
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-current-mutated-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-current-mutated-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "current",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-current.json"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:06:20.957531+00:00",
+    "endUTC": "2026-10-07T02:06:21.027780+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-current-normal-stdout.log",
+        "sha256": "742eb0c662de075dc50a8ba8f2bb0b85d1b095a94740c9034d06ad67308de147",
+        "bytes": 48
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-current-normal-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-current-normal-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "current",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-current.json"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:06:21.156269+00:00",
+    "endUTC": "2026-10-07T02:06:21.230102+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-current-restored-stdout.log",
+        "sha256": "742eb0c662de075dc50a8ba8f2bb0b85d1b095a94740c9034d06ad67308de147",
+        "bytes": 48
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-current-restored-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-current-restored-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "fields",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-fields.json"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:06:21.512467+00:00",
+    "endUTC": "2026-10-07T02:06:21.546194+00:00",
+    "exitCode": 1,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-fields-mutated-stdout.log",
+        "sha256": "c9ab13f9625a29f8090c8cb7358561fd68f1ef78fe27c6538a280d131acc6d38",
+        "bytes": 2946
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-fields-mutated-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-fields-mutated-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "fields",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-fields.json"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:06:21.445765+00:00",
+    "endUTC": "2026-10-07T02:06:21.482472+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-fields-normal-stdout.log",
+        "sha256": "363e78e1c2a89eed2e379c100d74cdc77c127539af97433d888a7673cccb85a1",
+        "bytes": 47
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-fields-normal-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-fields-normal-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "fields",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-fields.json"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:06:21.574177+00:00",
+    "endUTC": "2026-10-07T02:06:21.607701+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-fields-restored-stdout.log",
+        "sha256": "363e78e1c2a89eed2e379c100d74cdc77c127539af97433d888a7673cccb85a1",
+        "bytes": 47
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-fields-restored-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-fields-restored-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "hashes",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-hashes.json"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:06:21.954761+00:00",
+    "endUTC": "2026-10-07T02:06:22.387053+00:00",
+    "exitCode": 1,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-hashes-mutated-stdout.log",
+        "sha256": "dc6e352bbe54c2b2b63c42f01e7fb1c7b160dd26e3f17f72b2ad82e657f90a25",
+        "bytes": 162
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-hashes-mutated-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-hashes-mutated-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "hashes",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-hashes.json"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:06:21.635783+00:00",
+    "endUTC": "2026-10-07T02:06:21.924955+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-hashes-normal-stdout.log",
+        "sha256": "bf2f875e5339831f78f53f76080e262ccba25cb8731016812c44a85b664e64f6",
+        "bytes": 49
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-hashes-normal-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-hashes-normal-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "hashes",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-hashes.json"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:06:22.420812+00:00",
+    "endUTC": "2026-10-07T02:06:22.732968+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-hashes-restored-stdout.log",
+        "sha256": "bf2f875e5339831f78f53f76080e262ccba25cb8731016812c44a85b664e64f6",
+        "bytes": 49
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-hashes-restored-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-hashes-restored-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/history-control-check.py",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-history.json"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:09:32.570250+00:00",
+    "endUTC": "2026-10-07T02:09:32.604223+00:00",
+    "exitCode": 1,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-history-mutated-stdout.log",
+        "sha256": "ad812f030f7f1ef0803bc9e132fe304ba46d1a5c8fc7d012d3b57404f43c5d8c",
+        "bytes": 43
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-history-mutated-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-history-mutated-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/history-control-check.py",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-history.json"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:09:32.484001+00:00",
+    "endUTC": "2026-10-07T02:09:32.529297+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-history-normal-stdout.log",
+        "sha256": "d65da057dcc9faf155f79c008ad5f779914473603ede25c2b1d32de41c188138",
+        "bytes": 30
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-history-normal-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-history-normal-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/history-control-check.py",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-history.json"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:09:32.634708+00:00",
+    "endUTC": "2026-10-07T02:09:32.678040+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-history-restored-stdout.log",
+        "sha256": "d65da057dcc9faf155f79c008ad5f779914473603ede25c2b1d32de41c188138",
+        "bytes": 30
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-history-restored-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-history-restored-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "wire",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-wire.md"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:06:21.318754+00:00",
+    "endUTC": "2026-10-07T02:06:21.349984+00:00",
+    "exitCode": 1,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-wire-mutated-stdout.log",
+        "sha256": "50fe1e4cdbfe330e55728a785d610b2e8d6943a5f65b8acd49981c90e97f75ef",
+        "bytes": 113
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-wire-mutated-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-wire-mutated-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "wire",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-wire.md"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:06:21.259327+00:00",
+    "endUTC": "2026-10-07T02:06:21.291007+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-wire-normal-stdout.log",
+        "sha256": "229c20693b70731942a9b7c38021c9d7e81073c308529a799bff9b5acf448104",
+        "bytes": 44
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-wire-normal-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-wire-normal-command.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "wire",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-wire.md"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:06:21.377783+00:00",
+    "endUTC": "2026-10-07T02:06:21.413706+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-wire-restored-stdout.log",
+        "sha256": "229c20693b70731942a9b7c38021c9d7e81073c308529a799bff9b5acf448104",
+        "bytes": 44
+      },
+      "stderr": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-wire-restored-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "receipt": "control-wire-restored-command.json"
+  }
+]

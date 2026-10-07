@@ -1,0 +1,139 @@
+{
+  "round": "RR3",
+  "baselineHead": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "stageStatus": "NOT_ACCEPTED",
+  "R06_READY": false,
+  "issues": [
+    {
+      "id": "F42",
+      "workPackage": "A",
+      "title": "跨层输入/输出误报与漏报",
+      "status": "CLOSED",
+      "owner": "rr3_a_impl_02",
+      "round": 2,
+      "scope": "xtask绑定及R02真实OS发现器",
+      "evidenceDir": "artifacts/rust-tauri/R05/RR3/A-02/",
+      "independentReview": "rr3_a_review_02 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md；首轮review01 FAIL永久保留",
+      "nextCommand": "E/G各自独立收口后冻结，新FINAL亲跑全链",
+      "selfChecks": "A-02仅两授权文件；旧两校验8/24目标红exit1→修后24/24；真实fd4/非法7、6组52变异/sourcecopy、E0s62+4+24新跑绿；A1 17输入同字节复用新review01的121及100checkpoint。",
+      "mustFixHistory": [
+        {
+          "round": 1,
+          "review": "A-REVIEW-01/REVIEW.md",
+          "issue": "生产shell validate_run_output_unit及validate_declared_run_root把git ls-files查询exit2/stderr当空集合，含tracked根被接受；需异常显式拒绝",
+          "status": "CLOSED by A-REVIEW-02 PASS"
+        }
+      ],
+      "remaining": "无包级mustFix；正式全链stable/全部checkpoint仍待新FINAL"
+    },
+    {
+      "id": "F45",
+      "workPackage": "B",
+      "title": "N03过期锚点无实际变异",
+      "status": "CLOSED",
+      "owner": "rr3_b_impl_01",
+      "round": 1,
+      "scope": "负测脚本唯一权威目标解析与计数变异",
+      "evidenceDir": "artifacts/rust-tauri/R05/RR3/B-01/",
+      "independentReview": "rr3_b_review_01 / PASS / artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+      "nextCommand": "集成冻结后默认N01–N16",
+      "selfChecks": "N03真实8/8绿→动态24/23目标1/1红exit101并点名→字节还原精确1/1绿；15辅助自检通过。首轮测试定位错误记录保留不算有效注入。",
+      "remaining": "无包级mustFix；集成G-NEG-RR3仍待冻结后全16新复验"
+    },
+    {
+      "id": "F27-RR3",
+      "workPackage": "C",
+      "title": "全部实际进程和资源稳态证据缺口",
+      "status": "CLOSED",
+      "owner": "rr3_c_impl_01",
+      "round": 1,
+      "scope": "限定补证及I10正确引用",
+      "evidenceDir": "artifacts/rust-tauri/R05/RR3/C-01/",
+      "independentReview": "rr3_cf46_review_01 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+      "nextCommand": "消费新独立资源证据进入G/最终正式链",
+      "selfChecks": "新独立2/2 exit0、337.41s；160/54binary/61owner/15存活worker/60重启消解，普通取消及媒体/恢复具名新复验；FD/TCP假零红恢复绿；全部原阈值不变。E性能汇总1变动真实记录，321执行输入相等。",
+      "remaining": "无包级mustFix；完整正式阶段需FINAL"
+    },
+    {
+      "id": "R05-ENV-R00",
+      "workPackage": "D",
+      "title": "确切二进制非回环入站超时",
+      "status": "BLOCKED",
+      "owner": "rr3_d_impl_01",
+      "round": 1,
+      "scope": "本轮身份/过滤/监听及最小差分探针",
+      "evidenceDir": "artifacts/rust-tauri/R05/RR3/D-01/",
+      "independentReview": "rr3_d_review_01 CLI fresh ephemeral / RUNNING / artifacts/rust-tauri/R05/RR3/D-REVIEW-01/",
+      "nextCommand": "F46后最终源码预构建确切r00+一次真实LAN/最小差分/精确操作准备，不改系统",
+      "selfChecks": "D-01 REPORT/28文件manifest完成：真实r00 exit101，0/1/0/0；SHA256 c5975a452505bd4f90fcf87509902f812148f809b21674302e6dbd34886daa6a，CDHash6eadd46c232408547f08e305c792f1c4c2614a94，非回环20s超时。同路径permitted但实测红，C差分LAN红/Apple Python绿。只准备系统操作未执行；非独立PASS。"
+    },
+    {
+      "id": "F28-RR3",
+      "workPackage": "E",
+      "title": "阶段结论和交接纠错收口",
+      "status": "SELF_CHECKED",
+      "owner": "rr3_e_impl_01 CLI fresh ephemeral",
+      "round": 1,
+      "scope": "报告矩阵交接和进度一致",
+      "evidenceDir": "artifacts/rust-tauri/R05/RR3/E-01/",
+      "independentReview": "rr3_e_review_01 CLI fresh ephemeral / RUNNING / artifacts/rust-tauri/R05/RR3/E-REVIEW-01/",
+      "nextCommand": "新E独立验证真实§6.2与current一致，G/FINAL结果后新文档轮补录",
+      "selfChecks": "E-01更新13现行文档，423限定生产输入前后相同；文档检查7JSON/链接65/一致57/历史55/接口38/证据44绿，旧失败不覆盖；本轮截点A/C pending现已过时，下一新独立验收列必要current纠错，G/FINAL真结果后新文档轮补录。"
+    },
+    {
+      "id": "F46",
+      "workPackage": "C-adjacent",
+      "title": "重启后日志数超过原3文件阈值且旧断言漏检",
+      "status": "CLOSED",
+      "owner": "rr3_f46_impl_01",
+      "round": 1,
+      "scope": "rust/crates/lingxi-service/src/logging.rs启动清理及必要内联回归；C测试交接后必要邻接须登记",
+      "authorization": "本轮新增必需缺口修好；保持日志数3原契约，不新造资源系统",
+      "evidenceDir": "artifacts/rust-tauri/R05/RR3/F46-01/",
+      "independentReview": "rr3_cf46_review_01 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+      "nextCommand": "消费新独立资源证据进入G/最终正式链",
+      "historicalRed": "C-01/f46-directed-command-01 exit1；真实4次启动日志数[1,2,3,4]超3；C-01/measurement-01虽旧cargo2/2但完整原始清单不满足门槛",
+      "brief": "docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md",
+      "selfChecks": "本人旧binary6轮[1,2,3,4,4,4]exit1；新6轮[1,2,3,3,3,3]绿。完整新C2/2 exit0、335.40s、160轮/54binary点/61owner点全部原阈值绿，最终重启3/owner45稳态≤3；normal→假FD/TCP零各101→恢复0；logging9/9、权威镜像2/2，无pins变更。",
+      "remaining": "无mustFix；新独立真实旧6轮超3红→字节还原重build6轮≤3绿，正式原C全量通过"
+    }
+  ],
+  "preservedRepairs": [
+    "F31",
+    "F34",
+    "F41",
+    "F43-test-readiness",
+    "F44"
+  ],
+  "historicalGate": {
+    "round": "RR2/FINAL-01",
+    "commandsPassed": 5,
+    "commandsTotal": 7,
+    "overall": "FAIL",
+    "note": "另有candidateSourceBinding不稳定，不能写只剩ALF",
+    "layerAudit": "artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+    "bindingFailures": [
+      "R04全部8 checkpoint不稳：外层stdout变化",
+      "R03全部15 checkpoint不稳：父层stdout变化"
+    ]
+  },
+  "toolchain": {
+    "rustc": "1.98.1",
+    "cargo": "1.98.1",
+    "pin": "rust-toolchain.toml",
+    "cargoPath": "/Users/study_superior/.cargo/bin/cargo",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "platform": "Darwin arm64"
+  },
+  "integrationGates": [
+    {
+      "id": "G-NEG-RR3",
+      "status": "RUNNING",
+      "owner": "rr3_g_review_01 CLI fresh ephemeral",
+      "scope": "集成冻结后默认N01–N16及受影响F25/F26/F27/A新反例；受影响来源绑定负测不只继承历史16/16",
+      "evidenceDir": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/",
+      "nextCommand": "亲跑default16-01完整生产默认16及恢复controls，独立I01-I11映射；G通过不代FINAL"
+    }
+  ]
+}

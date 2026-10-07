@@ -1,0 +1,244 @@
+{
+  "utc": "2026-10-07T04:08:26.128712+00:00",
+  "scope": "静态读取边界准备，非动态系统调用追踪，非产品独立验收",
+  "documents": [
+    {
+      "path": "docs/rust-tauri/R05/R05_REPORT.md",
+      "sha256": "e1e73289c4e9abb0be2a3e094c60274225028082506adbb5f802966d711895dc",
+      "bytes": 24828,
+      "currentGateSemanticUse": "NOT_FOUND_IN_INSPECTED_REGISTERED_CHAIN",
+      "otherRequiredDocumentConsumer": "E-audit:62–63、136–141：当前报告文字、历史行顺序及链接；正式stage map没有读取该MD作为状态开关。",
+      "allowedMetadataPlacement": "现有§11当前结果/交接、真实测试与交付边界。",
+      "bindingUse": [
+        "B1",
+        "B2",
+        "B3",
+        "C1"
+      ],
+      "gEvidenceEffect": "Whole-candidate identity changes. Metadata-only changes do not by themselves change inspected gate test semantics; reuse requires preserved original manifests and explicit runtime-input equality, new document review, and truthful candidate delta. This is not a product PASS.",
+      "minimumRecheck": "新E当前/历史/链接核验",
+      "finalSection53Coverage": "Fresh formal candidate binding and registered positive checks; not automatic new E review, negative fault injections, or full R02 E5."
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "sha256": "1b5d6f3cfdb4ce089f21003cb40ecc44547e31c93837be7f43cc19b43cf91e26",
+      "bytes": 24115,
+      "currentGateSemanticUse": "NOT_FOUND_IN_INSPECTED_REGISTERED_CHAIN",
+      "otherRequiredDocumentConsumer": "E-audit:62–63、136–141：当前审查引用、历史原文；标题中的PASS不被G解析。",
+      "allowedMetadataPlacement": "RR3独立结论索引；仅引用新审查者实际报告，不能作者自签。",
+      "bindingUse": [
+        "B1",
+        "B2",
+        "B3",
+        "C1"
+      ],
+      "gEvidenceEffect": "Whole-candidate identity changes. Metadata-only changes do not by themselves change inspected gate test semantics; reuse requires preserved original manifests and explicit runtime-input equality, new document review, and truthful candidate delta. This is not a product PASS.",
+      "minimumRecheck": "新E当前/历史/链接核验",
+      "finalSection53Coverage": "Fresh formal candidate binding and registered positive checks; not automatic new E review, negative fault injections, or full R02 E5."
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "sha256": "08dd8c15aafb420668b2569a43084f038d1a0ddcec438f9e9e022f4f03648abc",
+      "bytes": 12005,
+      "currentGateSemanticUse": "NOT_FOUND_IN_INSPECTED_REGISTERED_CHAIN",
+      "otherRequiredDocumentConsumer": "E-audit:62–63、136–141：当前阻断文字、历史原文。",
+      "allowedMetadataPlacement": "现有§8当前阻断及真实尚未满足项。",
+      "bindingUse": [
+        "B1",
+        "B2",
+        "B3",
+        "C1"
+      ],
+      "gEvidenceEffect": "Whole-candidate identity changes. Metadata-only changes do not by themselves change inspected gate test semantics; reuse requires preserved original manifests and explicit runtime-input equality, new document review, and truthful candidate delta. This is not a product PASS.",
+      "minimumRecheck": "新E当前/历史/链接核验",
+      "finalSection53Coverage": "Fresh formal candidate binding and registered positive checks; not automatic new E review, negative fault injections, or full R02 E5."
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_HANDOFF.json",
+      "sha256": "87ea87b09f37bd073a6ed85df4dec6769e18cf41326c2541d20588ae834517c0",
+      "bytes": 59052,
+      "currentGateSemanticUse": "NOT_FOUND_IN_INSPECTED_REGISTERED_CHAIN",
+      "otherRequiredDocumentConsumer": "E-audit:22、41–65、80–123、148–167：严格JSON、rr3_current、accepted_tasks、unresolved_items、allowed_next_scope、consumer_contract、版本、锁与artifact_hashes。",
+      "allowedMetadataPlacement": "当前状态/证据引用；source_sha及working_tree_digest必须保留准确范围，交付事实另登记。",
+      "bindingUse": [
+        "B1",
+        "B2",
+        "B3",
+        "C1"
+      ],
+      "gEvidenceEffect": "Whole-candidate identity changes. Metadata-only changes do not by themselves change inspected gate test semantics; reuse requires preserved original manifests and explicit runtime-input equality, new document review, and truthful candidate delta. This is not a product PASS.",
+      "minimumRecheck": "新E JSON/当前/接口字段/源代码/引用摘要核验",
+      "finalSection53Coverage": "Fresh formal candidate binding and registered positive checks; not automatic new E review, negative fault injections, or full R02 E5."
+    },
+    {
+      "path": "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "sha256": "a4e362636b909d4a5a7646f932c58408d149623cb041cde812f7d300f36f4f7d",
+      "bytes": 67257,
+      "currentGateSemanticUse": "NOT_FOUND_IN_INSPECTED_REGISTERED_CHAIN",
+      "otherRequiredDocumentConsumer": "E-audit:33–45、134–135、144–145：严格JSON、rr3_current一致、原历史字段与限定增量。",
+      "allowedMetadataPlacement": "rr3_current及对应历史快照；不重写旧任务事实。",
+      "bindingUse": [
+        "B1",
+        "B2",
+        "B3",
+        "C1"
+      ],
+      "gEvidenceEffect": "Whole-candidate identity changes. Metadata-only changes do not by themselves change inspected gate test semantics; reuse requires preserved original manifests and explicit runtime-input equality, new document review, and truthful candidate delta. This is not a product PASS.",
+      "minimumRecheck": "新E JSON/当前/历史核验",
+      "finalSection53Coverage": "Fresh formal candidate binding and registered positive checks; not automatic new E review, negative fault injections, or full R02 E5."
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "sha256": "ef28cb6a1f9d200381d94781a7ad5d594f349f95089ab7deb3f70bfd4984faca",
+      "bytes": 4053957,
+      "currentGateSemanticUse": "NOT_FOUND_IN_INSPECTED_REGISTERED_CHAIN",
+      "otherRequiredDocumentConsumer": "E-audit:33–45、134–135、144–145：严格JSON、rr3_current、旧acceptances保留。不是verify.rs读取的R00 ACCEPTANCE_MAP。",
+      "allowedMetadataPlacement": "rr3_current；新增真实结果按原记录结构追加，不能重打旧PASS。",
+      "bindingUse": [
+        "B1",
+        "B2",
+        "B3",
+        "C1"
+      ],
+      "gEvidenceEffect": "Whole-candidate identity changes. Metadata-only changes do not by themselves change inspected gate test semantics; reuse requires preserved original manifests and explicit runtime-input equality, new document review, and truthful candidate delta. This is not a product PASS.",
+      "minimumRecheck": "新E JSON/当前/历史及证据映射核验",
+      "finalSection53Coverage": "Fresh formal candidate binding and registered positive checks; not automatic new E review, negative fault injections, or full R02 E5."
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "sha256": "3def9a60679edb5de237a1b164adb08951ae3d3920abdd32f338f58a11c1c22d",
+      "bytes": 92362,
+      "currentGateSemanticUse": "NOT_FOUND_IN_INSPECTED_REGISTERED_CHAIN",
+      "otherRequiredDocumentConsumer": "E-audit:33–45、134–145；E-check:76、86–87：rr3_current、rr3_I10_mapping、历史entries。stage_maps/R05.json:6、262和rebuild_tables.py:40、54、410仅说明；stage_suites实际读取另四份TSV。",
+      "allowedMetadataPlacement": "rr3_current、rr3_I10_mapping与新历史快照；实际权威TSV不属于E修改范围。",
+      "bindingUse": [
+        "B1",
+        "B2",
+        "B3",
+        "C1"
+      ],
+      "gEvidenceEffect": "Whole-candidate identity changes. Metadata-only changes do not by themselves change inspected gate test semantics; reuse requires preserved original manifests and explicit runtime-input equality, new document review, and truthful candidate delta. This is not a product PASS.",
+      "minimumRecheck": "新E JSON/当前/I10具名证据与映射核验",
+      "finalSection53Coverage": "Fresh formal candidate binding and registered positive checks; not automatic new E review, negative fault injections, or full R02 E5."
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "sha256": "472a278c59f1897ace517db9650a920041998da43feeceff3dc8d990ffee407a",
+      "bytes": 11297,
+      "currentGateSemanticUse": "NOT_FOUND_IN_INSPECTED_REGISTERED_CHAIN",
+      "otherRequiredDocumentConsumer": "E-audit:62–63、136–141：当前负测状态/原失败历史。negative_gate.sh汇总写EV/case-results.json，未读取本MD判定16项。",
+      "allowedMetadataPlacement": "当前默认16实际轮次、历史FAIL、每项来源及复用边界。",
+      "bindingUse": [
+        "B1",
+        "B2",
+        "B3",
+        "C1"
+      ],
+      "gEvidenceEffect": "Whole-candidate identity changes. Metadata-only changes do not by themselves change inspected gate test semantics; reuse requires preserved original manifests and explicit runtime-input equality, new document review, and truthful candidate delta. This is not a product PASS.",
+      "minimumRecheck": "新E当前/负测结果逐项核验；若仅回填不自动重跑16",
+      "finalSection53Coverage": "Fresh formal candidate binding and registered positive checks; not automatic new E review, negative fault injections, or full R02 E5."
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "sha256": "f8eef564b4dc2981ab53cd68e1c1cfb7018cf8f159f23985fbf5d69ffa97a972",
+      "bytes": 38128,
+      "currentGateSemanticUse": "NOT_FOUND_IN_INSPECTED_REGISTERED_CHAIN",
+      "otherRequiredDocumentConsumer": "E-supplement:7–30：rr3_resource_independent_review及其cycles、points、phases、thresholds、raw_sha256、ranges、cleanup；E-audit:33–45、134。资源Rust测试:1141–1156是常量，不加载本JSON。",
+      "allowedMetadataPlacement": "rr3_resource_independent_review/rr3_current的真实新对象、新序列、新摘要；历史preregisteredThresholds不追改。",
+      "bindingUse": [
+        "B1",
+        "B2",
+        "B3",
+        "C1"
+      ],
+      "gEvidenceEffect": "Whole-candidate identity changes. Metadata-only changes do not by themselves change inspected gate test semantics; reuse requires preserved original manifests and explicit runtime-input equality, new document review, and truthful candidate delta. This is not a product PASS.",
+      "minimumRecheck": "新E原序列复算/阈值前后/当前二进制绑定核验；语义或阈值变更另评估资源重验",
+      "finalSection53Coverage": "Fresh formal candidate binding and registered positive checks; not automatic new E review, negative fault injections, or full R02 E5."
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "sha256": "ba1942aa792f8f2629ad504218f6079fd118c960cd9e2cb87bfe29f7b1d08e89",
+      "bytes": 27259,
+      "currentGateSemanticUse": "NOT_FOUND_IN_INSPECTED_REGISTERED_CHAIN",
+      "otherRequiredDocumentConsumer": "E-audit:33–45、134–135：严格JSON、rr3_current和历史字段；negative_gate.sh:591–611的N14改stage map并跑r05_map_declares_no_live_lane，未读本JSON。",
+      "allowedMetadataPlacement": "rr3_current、rr3_platform_verification；不把离线结果改成LIVE通过。",
+      "bindingUse": [
+        "B1",
+        "B2",
+        "B3",
+        "C1"
+      ],
+      "gEvidenceEffect": "Whole-candidate identity changes. Metadata-only changes do not by themselves change inspected gate test semantics; reuse requires preserved original manifests and explicit runtime-input equality, new document review, and truthful candidate delta. This is not a product PASS.",
+      "minimumRecheck": "新E JSON/实际授权与平台边界核验",
+      "finalSection53Coverage": "Fresh formal candidate binding and registered positive checks; not automatic new E review, negative fault injections, or full R02 E5."
+    },
+    {
+      "path": "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+      "sha256": "2e36bfa19d2efab9c16080461a1bfb252df1566cba497ced6b9c2099d0949b17",
+      "bytes": 6992,
+      "currentGateSemanticUse": "NOT_FOUND_IN_INSPECTED_REGISTERED_CHAIN",
+      "otherRequiredDocumentConsumer": "E-audit:66–79：读取全文、抽取首个JSON例子、逐字段对照WorkerCallbackLine及正式源码。G相关Rust测试没有加载这份MD。",
+      "allowedMetadataPlacement": "仅有新源码依据时修正接口说明；交付边界优先集中在报告/HANDOFF。",
+      "bindingUse": [
+        "B1",
+        "B2",
+        "B3",
+        "C1"
+      ],
+      "gEvidenceEffect": "Whole-candidate identity changes. Metadata-only changes do not by themselves change inspected gate test semantics; reuse requires preserved original manifests and explicit runtime-input equality, new document review, and truthful candidate delta. This is not a product PASS.",
+      "minimumRecheck": "新E callback字段/身份/取消/配额与源接口核验",
+      "finalSection53Coverage": "Fresh formal candidate binding and registered positive checks; not automatic new E review, negative fault injections, or full R02 E5."
+    },
+    {
+      "path": "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "sha256": "7eecc3908d9672d3d6b2588463c1f1ebbdd9a5451f62f58b98b45bb9f2844c43",
+      "bytes": 20505,
+      "currentGateSemanticUse": "NOT_FOUND_IN_INSPECTED_REGISTERED_CHAIN",
+      "otherRequiredDocumentConsumer": "E-audit:62–63及E-check:70–73：当前资源/usage证据文字与链接。kernel/usage.rs:8、adapters/models/usage.rs:6、77、usage_families.rs:7均为注释引用。",
+      "allowedMetadataPlacement": "当前证据边界；公式/未知值/操作ctx等正确语义保持。",
+      "bindingUse": [
+        "B1",
+        "B2",
+        "B3",
+        "C1"
+      ],
+      "gEvidenceEffect": "Whole-candidate identity changes. Metadata-only changes do not by themselves change inspected gate test semantics; reuse requires preserved original manifests and explicit runtime-input equality, new document review, and truthful candidate delta. This is not a product PASS.",
+      "minimumRecheck": "新E usage说明与实际字段/公式/存储核验；若改事实契约不能按纯元数据继承",
+      "finalSection53Coverage": "Fresh formal candidate binding and registered positive checks; not automatic new E review, negative fault injections, or full R02 E5."
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+      "sha256": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+      "bytes": 67889,
+      "currentGateSemanticUse": "NOT_FOUND_IN_INSPECTED_REGISTERED_CHAIN",
+      "otherRequiredDocumentConsumer": "真实名称即本名；E-audit:146和E-check:98只检查其整文件hash未变；runs/streaming_norm/anthropic源码引用是注释。E-audit:148起另做MD链接检查。",
+      "allowedMetadataPlacement": "无新增真实接口演进时保持字节不变；改接口说明需新E逐项源码核对。",
+      "bindingUse": [
+        "B1",
+        "B2",
+        "B3",
+        "C1"
+      ],
+      "gEvidenceEffect": "Whole-candidate identity changes. Metadata-only changes do not by themselves change inspected gate test semantics; reuse requires preserved original manifests and explicit runtime-input equality, new document review, and truthful candidate delta. This is not a product PASS.",
+      "minimumRecheck": "新E接口/链接/历史核验；接口实现变化另触发相关G复验",
+      "finalSection53Coverage": "Fresh formal candidate binding and registered positive checks; not automatic new E review, negative fault injections, or full R02 E5."
+    },
+    {
+      "path": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "sha256": "be5ee9671acc3cfcc458cd1ec2dd384ca6a7f31a9a1ab9ee5b21effad156694c",
+      "bytes": 252562,
+      "currentGateSemanticUse": "NOT_FOUND_IN_INSPECTED_REGISTERED_CHAIN",
+      "otherRequiredDocumentConsumer": "E-audit:33–45、143：stages.R05.rr3_current与其他JSON相等；其他stages及tasks保持；E-check:88–92同类核验。",
+      "allowedMetadataPlacement": "stages.R05当前信息及与实际一致的current_task；不改变R06开工状态。",
+      "bindingUse": [
+        "B1",
+        "B2",
+        "B3",
+        "C1"
+      ],
+      "gEvidenceEffect": "Whole-candidate identity changes. Metadata-only changes do not by themselves change inspected gate test semantics; reuse requires preserved original manifests and explicit runtime-input equality, new document review, and truthful candidate delta. This is not a product PASS.",
+      "minimumRecheck": "新E JSON/跨文档当前状态/其他阶段不变核验",
+      "finalSection53Coverage": "Fresh formal candidate binding and registered positive checks; not automatic new E review, negative fault injections, or full R02 E5."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "utc": "2026-10-07T02:13:06.458708+00:00",
+  "triageOnly": true,
+  "report": "REPORT.md",
+  "records": [
+    {
+      "id": "RR3-R02-OBS-A01",
+      "recommendedStatus": "OPEN",
+      "requiredForR05": true,
+      "classification": "CHECKER_ENVIRONMENT_PRECONDITION",
+      "productEpochRefusal": "OBSERVED_CORRECT",
+      "rootCause": "A01要求INFO选根诊断而未固定日志环境；原文件和fallback不变",
+      "ownerRole": "全新R02检查器修复者，由总控指派",
+      "minimalAuthorizedAdjacency": [
+        "scripts/rust-tauri/r02_t01_service_smoke.sh",
+        "必要精准永久回归"
+      ],
+      "forbiddenShortcut": [
+        "删根保护断言",
+        "更改epoch或迁移",
+        "归并ALF"
+      ],
+      "completion": "全新独立审查在外层warn/info分别完整17/17、三选根拒启2和实物保持；准备限制不假绿"
+    },
+    {
+      "id": "RR3-R02-OBS-A13",
+      "recommendedStatus": "OPEN",
+      "requiredForR05": true,
+      "classification": "PRODUCT_REDACTION_REGRESSION_PRE_RR3",
+      "rootCause": "request_id=真实36字符ID组合47字符，被≥40含等号token规则吞掉",
+      "ownerRole": "全新脱敏修复者，由总控指派",
+      "minimalAuthorizedAdjacency": [
+        "rust/crates/lingxi-service/src/redaction.rs",
+        "必要永久生产形状回归",
+        "如确需可信字段调用点：lib.rs/日志调用须先登记唯一所有者"
+      ],
+      "forbiddenShortcut": [
+        "缩短正式ID取绿",
+        "撤销base64秘密防线",
+        "全局req前缀放行",
+        "删除CORRELATION",
+        "用N06绑定红代业务绿"
+      ],
+      "completion": "新独立真实401/Auth/Transport/trace关联旧红新绿；完整6秘密scan及fresh retention/inventory；必要安全路径和F46资源受影响复验；新G/FINAL仍待执行"
+    }
+  ],
+  "coordinationWritten": false,
+  "G_FINAL_verdict": "NOT_ISSUED"
+}

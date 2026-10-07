@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-02/old-validator-snapshot/scripts/rust-tauri/r02_run_output_regression.py", line 263, in <module>
+    main()
+    ~~~~^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-02/old-validator-snapshot/scripts/rust-tauri/r02_run_output_regression.py", line 139, in main
+    query_regression = validator_query_regression(evidence, scratch, args.discovery.resolve())
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-02/old-validator-snapshot/scripts/rust-tauri/r02_run_output_regression.py", line 124, in validator_query_regression
+    assert summary["passed"] == summary["actual"], ("生产 Git 查询异常未显式拒绝", summary["passed"], summary["actual"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('生产 Git 查询异常未显式拒绝', 8, 24)

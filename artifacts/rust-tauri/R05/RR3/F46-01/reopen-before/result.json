@@ -1,0 +1,231 @@
+{
+  "caseId": "R05-T08-C12",
+  "finding": "F46",
+  "binaryPath": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+  "binarySha256": "9628ba09d14e66ab9ba7824b4f3afeb1844e568ae1d66b88f95a57a8a02d119b",
+  "input": "six real opens/readiness/SIGTERM cycles on same isolated home; no injected logging state/provider",
+  "rows": [
+    {
+      "restartIndex": 0,
+      "command": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "--home",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05-f46-reopen-idz7_tc9",
+        "--bind",
+        "127.0.0.1:0",
+        "--log-max-files",
+        "3",
+        "--log-max-bytes",
+        "65536"
+      ],
+      "startedAt": "2026-10-07T00:37:26.343181+00:00",
+      "pid": 81112,
+      "ready": true,
+      "files": [
+        {
+          "name": "service-000001.log",
+          "bytes": 0
+        }
+      ],
+      "count": 1,
+      "threshold": 3,
+      "assertionPass": true,
+      "exitCode": 0,
+      "endedAt": "2026-10-07T00:37:26.938559+00:00"
+    },
+    {
+      "restartIndex": 1,
+      "command": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "--home",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05-f46-reopen-idz7_tc9",
+        "--bind",
+        "127.0.0.1:0",
+        "--log-max-files",
+        "3",
+        "--log-max-bytes",
+        "65536"
+      ],
+      "startedAt": "2026-10-07T00:37:26.938580+00:00",
+      "pid": 81113,
+      "ready": true,
+      "files": [
+        {
+          "name": "service-000001.log",
+          "bytes": 0
+        },
+        {
+          "name": "service-000002.log",
+          "bytes": 0
+        }
+      ],
+      "count": 2,
+      "threshold": 3,
+      "assertionPass": true,
+      "exitCode": 0,
+      "endedAt": "2026-10-07T00:37:26.977365+00:00"
+    },
+    {
+      "restartIndex": 2,
+      "command": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "--home",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05-f46-reopen-idz7_tc9",
+        "--bind",
+        "127.0.0.1:0",
+        "--log-max-files",
+        "3",
+        "--log-max-bytes",
+        "65536"
+      ],
+      "startedAt": "2026-10-07T00:37:26.977384+00:00",
+      "pid": 81114,
+      "ready": true,
+      "files": [
+        {
+          "name": "service-000001.log",
+          "bytes": 0
+        },
+        {
+          "name": "service-000002.log",
+          "bytes": 0
+        },
+        {
+          "name": "service-000003.log",
+          "bytes": 0
+        }
+      ],
+      "count": 3,
+      "threshold": 3,
+      "assertionPass": true,
+      "exitCode": 0,
+      "endedAt": "2026-10-07T00:37:27.015053+00:00"
+    },
+    {
+      "restartIndex": 3,
+      "command": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "--home",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05-f46-reopen-idz7_tc9",
+        "--bind",
+        "127.0.0.1:0",
+        "--log-max-files",
+        "3",
+        "--log-max-bytes",
+        "65536"
+      ],
+      "startedAt": "2026-10-07T00:37:27.015067+00:00",
+      "pid": 81115,
+      "ready": true,
+      "files": [
+        {
+          "name": "service-000001.log",
+          "bytes": 0
+        },
+        {
+          "name": "service-000002.log",
+          "bytes": 0
+        },
+        {
+          "name": "service-000003.log",
+          "bytes": 0
+        },
+        {
+          "name": "service-000004.log",
+          "bytes": 0
+        }
+      ],
+      "count": 4,
+      "threshold": 3,
+      "assertionPass": false,
+      "exitCode": 0,
+      "endedAt": "2026-10-07T00:37:27.052409+00:00"
+    },
+    {
+      "restartIndex": 4,
+      "command": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "--home",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05-f46-reopen-idz7_tc9",
+        "--bind",
+        "127.0.0.1:0",
+        "--log-max-files",
+        "3",
+        "--log-max-bytes",
+        "65536"
+      ],
+      "startedAt": "2026-10-07T00:37:27.052427+00:00",
+      "pid": 81116,
+      "ready": true,
+      "files": [
+        {
+          "name": "service-000002.log",
+          "bytes": 0
+        },
+        {
+          "name": "service-000003.log",
+          "bytes": 0
+        },
+        {
+          "name": "service-000004.log",
+          "bytes": 0
+        },
+        {
+          "name": "service-000005.log",
+          "bytes": 0
+        }
+      ],
+      "count": 4,
+      "threshold": 3,
+      "assertionPass": false,
+      "exitCode": 0,
+      "endedAt": "2026-10-07T00:37:27.089326+00:00"
+    },
+    {
+      "restartIndex": 5,
+      "command": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "--home",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05-f46-reopen-idz7_tc9",
+        "--bind",
+        "127.0.0.1:0",
+        "--log-max-files",
+        "3",
+        "--log-max-bytes",
+        "65536"
+      ],
+      "startedAt": "2026-10-07T00:37:27.089345+00:00",
+      "pid": 81117,
+      "ready": true,
+      "files": [
+        {
+          "name": "service-000003.log",
+          "bytes": 0
+        },
+        {
+          "name": "service-000004.log",
+          "bytes": 0
+        },
+        {
+          "name": "service-000005.log",
+          "bytes": 0
+        },
+        {
+          "name": "service-000006.log",
+          "bytes": 0
+        }
+      ],
+      "count": 4,
+      "threshold": 3,
+      "assertionPass": false,
+      "exitCode": 0,
+      "endedAt": "2026-10-07T00:37:27.126252+00:00"
+    }
+  ],
+  "bound": 3,
+  "status": "FAIL",
+  "cleanup": {
+    "homeRemoved": true,
+    "allProcessesReaped": true
+  }
+}

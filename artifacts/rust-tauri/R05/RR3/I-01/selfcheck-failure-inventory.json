@@ -1,0 +1,27 @@
+{
+  "recordedAtUTC": "2026-10-07T02:36:27.406813+00:00",
+  "records": [
+    {
+      "attempt": "selfcheck-02 --production-sync",
+      "observedExitCode": 1,
+      "reason": "RX夹具缺R00台账，未达注入前置",
+      "source": "当次真实工具输出及selfcheck-02/sync-production-normal.run.log",
+      "commandUTC": "未由外层驱动捕获；不填伪造时间"
+    },
+    {
+      "attempt": "selfcheck-03 --production-sync",
+      "observedExitCode": 1,
+      "reason": "正常门禁PASS后自检读取checkpoints错误字段KeyError",
+      "source": "真实工具输出；selfcheck-03/sync-production-normal/verify-stage-result.json",
+      "commandUTC": "未由外层驱动捕获；不填伪造时间"
+    },
+    {
+      "attempt": "首次selfcheck-04启动",
+      "observedExitCode": 1,
+      "reason": "永久回归第56行缩进错误，未进入执行；更正后同目录首次实际执行成功",
+      "source": "真实工具返回IndentationError: unexpected indent",
+      "commandUTC": "未由外层驱动捕获；不填伪造时间"
+    }
+  ],
+  "note": "明确保留失败事实；未捕获命令时间不冒充已捕获。最终命令逐项完整UTC/exit原始证据在selfcheck-final。"
+}

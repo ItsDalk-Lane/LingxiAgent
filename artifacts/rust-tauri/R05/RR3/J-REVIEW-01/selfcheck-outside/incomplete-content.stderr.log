@@ -1,0 +1,2 @@
+FAIL: Node dependency preparation: command failed (1): ['node', '--input-type=module', '-e', "import WebSocket from 'ws';import {createRequire} from 'node:module';const r=createRequire(process.cwd()+'/package.json');console.log(JSON.stringify({ws:r.resolve('ws'),type:typeof WebSocket}));if(typeof WebSocket!=='function')process.exit(1)"]; see /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/incomplete-content/node-preparation/command-08.stderr.log
+FAIL: isolated Node dependency preparation failed

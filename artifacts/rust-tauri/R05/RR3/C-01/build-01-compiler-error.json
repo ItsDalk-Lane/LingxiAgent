@@ -1,0 +1,22 @@
+{
+  "status": "BUILD_FAILURE_FIXED",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r05_t08_resources",
+    "--no-run"
+  ],
+  "exitCode": 101,
+  "reason": "E0382 borrow of moved value stub: stop consumes StubServer before doc reads counts",
+  "observedVia": "exec session 35920 tool output; build stderr not independently redirected",
+  "startedAt": "UNKNOWN (not recorded)",
+  "endedAt": "UNKNOWN (not recorded)",
+  "fix": "capture stub hit/drop counts before stop; measurement not started",
+  "nextBuild": "build-02/command.json (exit0; no-run only, superseded by final source compilation in measurement-01)"
+}

@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/snapshot/scripts/rust-tauri/run_output_sinks.py", line 19, in <module>
+    out = subprocess.run(
+          ~~~~~~~~~~~~~~^
+        ["ps", "-o", "ppid=", "-p", str(cur)],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        capture_output=True, text=True, check=True,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).stdout.strip()
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['ps', '-o', 'ppid=', '-p', '50556']' returned non-zero exit status 9.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/snapshot/scripts/rust-tauri/run_output_sinks.py", line 25, in <module>
+    raise RuntimeError("cannot walk run-output ancestor process") from exc
+RuntimeError: cannot walk run-output ancestor process

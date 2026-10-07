@@ -1,0 +1,9 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.45s
+     Running tests/r05_t06_worker_model.rs (rust/target/debug/deps/r05_t06_worker_model-209d0a13dc6d2262)
+
+running 1 test
+test c07_a_replayed_cb_id_is_answered_from_the_receipt_cache ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.28s
+

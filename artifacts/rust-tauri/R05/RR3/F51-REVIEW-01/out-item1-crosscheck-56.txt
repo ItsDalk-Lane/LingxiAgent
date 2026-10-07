@@ -1,0 +1,11 @@
+final01_n= 56 receipt_n= 56 unique_ok= True
+in_final01_not_receipt: []
+in_receipt_not_final01: []
+bidirectional_identical: True
+ancestor_pairs: []
+dest_unique: True
+naming_deviations: ['40--repo']
+slash_encoded_count: 55 short_name_count: 1
+sum_entries: files 110071 symlinks 121 bytes 5324827710
+receipt_totals: 110071 121 5324827710
+totals_consistent: True

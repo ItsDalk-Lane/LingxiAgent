@@ -1,0 +1,84 @@
+{
+  "caseTargets": {
+    "N01": [
+      "rust/crates/xtask/src/stage_maps/R05.json"
+    ],
+    "N02": [
+      "docs/rust-tauri/R05/r05_stage_pins.tsv"
+    ],
+    "N03": [
+      "docs/rust-tauri/R05/r05_stage_pins.tsv"
+    ],
+    "N04": [
+      "rust/crates/lingxi-service/src/credentials/mod.rs",
+      "scripts/rust-tauri/r05_t08_stage_suites.sh"
+    ],
+    "N05": [],
+    "N06": [
+      "rust/crates/lingxi-kernel/src/lib.rs"
+    ],
+    "N07": [
+      "rust/crates/xtask/src/stage_maps/R05.json"
+    ],
+    "N08": [
+      "rust/crates/lingxi-service/src/lib.rs"
+    ],
+    "N09": [
+      "rust/crates/lingxi-adapters/src/models/tool_render.rs"
+    ],
+    "N10": [
+      "rust/crates/lingxi-adapters/src/models/openai_completions.rs"
+    ],
+    "N11": [
+      "rust/crates/lingxi-adapters/src/models/tool_render.rs"
+    ],
+    "N12": [
+      "rust/crates/lingxi-service/src/runs.rs"
+    ],
+    "N13": [
+      "rust/crates/xtask/src/stage_maps/R04.json"
+    ],
+    "N14": [
+      "rust/crates/xtask/src/stage_maps/R05.json"
+    ],
+    "N15": [
+      "rust/crates/lingxi-adapters/src/models/credentials.rs"
+    ],
+    "N16": [
+      "rust/crates/lingxi-kernel/src/lib.rs"
+    ]
+  },
+  "registeredFiles": [
+    "rust/crates/xtask/src/stage_maps/R05.json",
+    "rust/crates/xtask/src/stage_maps/R04.json",
+    "rust/crates/lingxi-service/src/lib.rs",
+    "rust/crates/lingxi-kernel/src/lib.rs",
+    "rust/crates/lingxi-adapters/src/models/tool_render.rs",
+    "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+    "rust/crates/lingxi-adapters/src/models/credentials.rs",
+    "rust/crates/lingxi-service/src/runs.rs",
+    "rust/crates/lingxi-service/src/credentials/mod.rs",
+    "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs",
+    "docs/rust-tauri/R05/r05_stage_pins.tsv",
+    "scripts/rust-tauri/r05_t08_stage_suites.sh"
+  ],
+  "actualLiteralTargets": [
+    "docs/rust-tauri/R05/r05_stage_pins.tsv",
+    "rust/crates/lingxi-adapters/src/models/credentials.rs",
+    "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+    "rust/crates/lingxi-adapters/src/models/tool_render.rs",
+    "rust/crates/lingxi-kernel/src/lib.rs",
+    "rust/crates/lingxi-service/src/credentials/mod.rs",
+    "rust/crates/lingxi-service/src/lib.rs",
+    "rust/crates/lingxi-service/src/runs.rs",
+    "rust/crates/xtask/src/stage_maps/R04.json",
+    "rust/crates/xtask/src/stage_maps/R05.json",
+    "scripts/rust-tauri/r05_t08_stage_suites.sh"
+  ],
+  "allTargetsCovered": true,
+  "unusedSnapshotSafeSuperset": [
+    "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs"
+  ],
+  "N05": "变更独立证据文件，不是候选源变异；不纳入候选pristine",
+  "kernelExactRestored": true
+}

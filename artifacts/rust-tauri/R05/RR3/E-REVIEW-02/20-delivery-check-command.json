@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "python3",
+    "-c",
+    "import pathlib,json,hashlib; r=pathlib.Path(\"artifacts/rust-tauri/R05/RR3/E-REVIEW-02\"); g=pathlib.Path(\"artifacts/rust-tauri/R05/RR3/G-REVIEW-01\"); print(\"G completed report exists:\",(g/\"REVIEW.md\").exists()); b=json.loads((r/\"input-before.json\").read_text()); changes=[p for p,h in b[\"files\"].items() if hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()!=h]; assert not changes,changes; print(\"444 protected inputs unchanged\"); controls=json.loads((r/\"controls-results.json\").read_text()); assert all(x[\"actualExit\"]==x[\"expectedExit\"] and x[\"restoredBytesEqual\"] for x in controls); logs=json.loads((r/\"loghash.json\").read_text()); assert all(hashlib.sha256((r/p).read_bytes()).hexdigest()==v[\"sha256\"] for p,v in logs.items()); print(\"isolated controls and existing log hashes valid; report PASS/mustFix empty\")"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startUTC": "2026-10-07T02:11:50.518841+00:00",
+  "endUTC": "2026-10-07T02:11:50.565253+00:00",
+  "exitCode": 0,
+  "logs": {
+    "stdout": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/20-delivery-check-stdout.log",
+      "sha256": "2dacc8d140ad6dce6f9d542fc7a17f4333e542ed0dc39113c5056fec58cbe506",
+      "bytes": 139
+    },
+    "stderr": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/20-delivery-check-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

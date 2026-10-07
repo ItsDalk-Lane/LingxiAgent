@@ -1,0 +1,28 @@
+{
+  "utc": "2026-10-07T01:48:31.784509+00:00",
+  "actualPrintedSource": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-series-29197-1791337333209211000/f27-resource-series.json",
+  "sourceSHA256": "a8a50d7f9ea927c5216ea1a5566c8f27d8645b79bdb71baecf50fe133bc9ccda",
+  "savedSHA256": "a8a50d7f9ea927c5216ea1a5566c8f27d8645b79bdb71baecf50fe133bc9ccda",
+  "sourceLog": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n04-swallowed-exit/suites/svc_r05_t08_resources.log",
+  "sourceLogSHA256": "61a90e3a2bb0242ff41da36a19bb6d574e86b1753351402d9df17fc6095f4e55",
+  "load": {
+    "cancelCycles": 60,
+    "cancelDanglingActive": 60,
+    "cancelSettled": 0,
+    "errorCycles": 60,
+    "errorRuns": 60,
+    "longResponseCycles": 10,
+    "okCycles": 15,
+    "sessions": [
+      "sess_local_alpha",
+      "sess_local_beta"
+    ],
+    "workerCycles": 15
+  },
+  "counts": {
+    "series": 54,
+    "cycles": 160,
+    "owners": 61
+  },
+  "boundary": "N04资源套件真实绿；完整生产者因真实无料断言失败而红，不能写整体绿"
+}

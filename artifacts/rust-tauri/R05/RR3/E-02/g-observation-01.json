@@ -1,0 +1,23 @@
+{
+  "utc": "2026-10-07T01:51:00.796020+00:00",
+  "conclusionFiles": {
+    "REVIEW.md": false,
+    "REPORT.md": false,
+    "RESULT.json": false,
+    "MANIFEST.json": false,
+    "manifest.json": false
+  },
+  "boundary": "仅观察G当前目录；未修改，未将部分结果当完整16/16结论。",
+  "default16-01/summary.txt": {
+    "bytes": 1681,
+    "sha256": "e0cb4d85dcecc4648b890e5c926809431d18b7b0c6d4af7859f6a836c582c9d3"
+  },
+  "default16-01/case-results.tsv": {
+    "bytes": 387,
+    "sha256": "455cd06a6a05de293989b5b2c5fac7437ac98c42e27ead9931586440ba30eaca"
+  },
+  "default-console.log": {
+    "bytes": 1681,
+    "sha256": "e0cb4d85dcecc4648b890e5c926809431d18b7b0c6d4af7859f6a836c582c9d3"
+  }
+}

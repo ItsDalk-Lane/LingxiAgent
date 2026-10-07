@@ -1,0 +1,4 @@
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/additional_checks.py", line 14
+    (c/k).write_bytes((c/k).read_bytes()+b'\n// I 独立合法候选\n')
+                                         ^^^^^^^^^^^^^^^^^^
+SyntaxError: bytes can only contain ASCII literal characters

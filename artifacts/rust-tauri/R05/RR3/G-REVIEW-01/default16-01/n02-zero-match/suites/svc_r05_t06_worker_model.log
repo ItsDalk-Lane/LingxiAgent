@@ -1,0 +1,17 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r05_t06_worker_model.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t06_worker_model-209d0a13dc6d2262)
+
+running 10 tests
+test c04_worker_callback_rides_the_real_gateway_and_trace_joins_parent_and_child ... ok
+test c05_single_threaded_runtime_serves_a_delayed_callback_without_starvation ... ok
+test c06_a_held_global_model_permit_makes_the_callback_refuse_bounded_not_deadlock ... ok
+test c07_a_replayed_cb_id_is_answered_from_the_receipt_cache ... ok
+test c08_an_overcap_token_ask_is_refused_before_any_provider_contact ... ok
+test c09_identity_fields_and_ungranted_purposes_are_refused ... ok
+test c10_a_failing_usage_trace_refuses_the_callback_reply_never_answers_unaccounted ... ok
+test c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one ... ok
+test c11_the_worker_never_sees_credential_material_on_the_real_chain ... ok
+test c10_a_hung_callback_kills_the_worker_and_settles_unknown ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.20s
+

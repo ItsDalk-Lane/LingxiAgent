@@ -1,0 +1,4 @@
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/finalize_audit.py", line 24
+    inputs=['AGENTS.md','docs/rust-tauri/R05/repair-current/'+x for x in []] if False else ['AGENTS.md']
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: did you forget parentheses around the comprehension target?

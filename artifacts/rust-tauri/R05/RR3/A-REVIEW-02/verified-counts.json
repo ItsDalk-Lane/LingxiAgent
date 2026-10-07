@@ -1,0 +1,99 @@
+{
+  "validators-old-red": {
+    "actual": 24,
+    "passed": 8,
+    "normalRestoreActual": 8,
+    "normalRestorePassed": 8,
+    "faultActual": 16,
+    "faultPassed": 0,
+    "sha256": "c4d281319aceb74456c0c53da2283829df0e9c86c0c311b21b2ffd1a5f6e02ea"
+  },
+  "validators-restored-green": {
+    "actual": 24,
+    "passed": 24,
+    "normalRestoreActual": 8,
+    "normalRestorePassed": 8,
+    "faultActual": 16,
+    "faultPassed": 16,
+    "sha256": "4fd89fa3233a18c51a70183303cf3563442f81c465c359fe494e1df31d3e0ed6"
+  },
+  "discovery-green": {
+    "actual": 24,
+    "passed": 24,
+    "normalRestoreActual": 8,
+    "normalRestorePassed": 8,
+    "faultActual": 16,
+    "faultPassed": 16,
+    "sha256": "9ea4812b8d05fae833047a06896adb1fe70dc3aa5bd852f93b51ffebfbb51cf2",
+    "fdCases": 4,
+    "ignored": 0,
+    "filtered": 0
+  },
+  "discovery-old-red": {
+    "actual": 24,
+    "passed": 24,
+    "normalRestoreActual": 8,
+    "normalRestorePassed": 8,
+    "faultActual": 16,
+    "faultPassed": 16,
+    "sha256": "fc28c13adc07bc46c69d34877b17a88a6220af2b8ee20d0dd739ec4eca54aecf"
+  },
+  "discovery-restored-green": {
+    "actual": 24,
+    "passed": 24,
+    "normalRestoreActual": 8,
+    "normalRestorePassed": 8,
+    "faultActual": 16,
+    "faultPassed": 16,
+    "sha256": "11cbf7d8a566e102c3d37f1ddd40296ad37d35fe4e475f45d6b075f2f90d921a",
+    "fdCases": 4,
+    "ignored": 0,
+    "filtered": 0
+  },
+  "e0s/f42-real-fd": {
+    "actual": 24,
+    "passed": 24,
+    "normalRestoreActual": 8,
+    "normalRestorePassed": 8,
+    "faultActual": 16,
+    "faultPassed": 16,
+    "sha256": "8d885dfc4b6dc159ace9e3b27d5e489d59aeba3f325e8511610563351542e738",
+    "fdCases": 4,
+    "ignored": 0,
+    "filtered": 0
+  },
+  "oldDiscoveryTarget": {
+    "exit": 1,
+    "changedOldJsonWasMissed": true,
+    "beforeSha256": "5597c105ab557106e2d0d35a1fbc57a9d9634b18660b46cdeb154ee11a7d3c6a",
+    "afterSha256": "5597c105ab557106e2d0d35a1fbc57a9d9634b18660b46cdeb154ee11a7d3c6a",
+    "sinksSha256": "d185249545d5603acca4fd9ba7ecaa4f489401a55cb9798d0d6de25659d86955"
+  },
+  "independent": {
+    "fdGroups": 6,
+    "fdPerGroup": 6,
+    "transformations": 100,
+    "sourceCopySymmetricTransformations": 100,
+    "discoveryFaults": 6,
+    "validatorControls": 29
+  },
+  "a1": {
+    "equalInputs": 17,
+    "reusedUnitTests": 121,
+    "reusedInternalCheckpoints": 50,
+    "reusedExternalCheckpoints": 50,
+    "reusedRedCheckpoints": 50,
+    "stableMainSourceAuditOnly": true,
+    "fullFormalGateNotRun": true
+  },
+  "e0s": {
+    "actualClassifierFixtures": 62,
+    "expectedActualFixtureRows": 61,
+    "missingBlockRowsNegative": 1,
+    "greenPositiveControl": 1,
+    "passed": 62,
+    "ignored": 0,
+    "filtered": 0,
+    "explanation": "独立逐行统计：61条expected/actual判定+1缺块拒绝=原62；另1合法全绿对照"
+  }
+}

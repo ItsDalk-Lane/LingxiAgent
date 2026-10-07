@@ -1,0 +1,28 @@
+{
+  "copy": "/Users/study_superior/r05t08-work/negcopy.qcldNA",
+  "sourceBeforeDigest": "6d67aedb5730517216e5a284684dc0fd3399c34138ee839bc7579eb094cce7bb",
+  "sourceAfterDigest": "23a44cc3997e36060842effa4ed1b667f50cafd076b163bc4e9a49532afda071",
+  "copyDigest": "1f53b2408722d4c73bf08a6d6358b7383003d3bcdeb04f943c7599073c06a7bd",
+  "sourceChangedPaths": [
+    "rust/crates/xtask/src/candidate.rs",
+    "rust/crates/xtask/src/candidate/tests.rs",
+    "scripts/rust-tauri/__pycache__/r02_run_output_regression.cpython-314.pyc",
+    "scripts/rust-tauri/__pycache__/run_output_sinks.cpython-314.pyc",
+    "scripts/rust-tauri/r02_run_output_regression.py",
+    "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+    "scripts/rust-tauri/run_output_sinks.py"
+  ],
+  "copyVsSourceAfterChangedPaths": [
+    "scripts/rust-tauri/__pycache__/r02_run_output_regression.cpython-314.pyc",
+    "scripts/rust-tauri/__pycache__/run_output_sinks.cpython-314.pyc",
+    "scripts/rust-tauri/r02_run_output_regression.py",
+    "scripts/rust-tauri/run_output_sinks.py"
+  ],
+  "reviewedBFilesUnchanged": true,
+  "bFileHashes": {
+    "scripts/rust-tauri/r05_t08_negative_gate.sh": "4853e129e2d0cf7dbd6c93c8c158186fad23e6f231a03ff64f140cca61e0042f",
+    "scripts/rust-tauri/r05_t08_mutate_pin.py": "7785b41ebadfdc6d6415ee1d337ea48621e25d1bbb1ed1c16456004545279609",
+    "scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py": "f94f76721e77bf5a738b1270bd875569fd3f9ba3cc552795033ac057a8ee1867",
+    "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5"
+  }
+}

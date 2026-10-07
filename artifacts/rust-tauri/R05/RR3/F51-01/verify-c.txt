@@ -1,0 +1,28 @@
+== (c) sampling 3 relocated directories (incl. deep 40--repo and largest J-REVIEW-01/copy) ==
+--- sample: artifacts_rust-tauri_R05_RR3_A-02_copy-delete-rename
+{"du_kilobytes": 144, "file_count": 33, "max_relpath_len": 54, "nested_git_head": null, "other_count": 0, "symlink_count": 1, "total_bytes": 34456, "tree_digest": "291f53295f8d67a4005b96cb7989baf56eb7c4591bdd6e48ced40c81b8122ca4"}
+--- sample: 40--repo
+{"du_kilobytes": 268, "file_count": 117, "max_relpath_len": 902, "nested_git_head": null, "other_count": 0, "symlink_count": 0, "total_bytes": 75371, "tree_digest": "d6de2b1ecca2aeb6e9a260547aa7bb406d3f51991cb63c84915be2bddfb6c90b"}
+--- sample: artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy
+{"du_kilobytes": 5298004, "file_count": 102887, "max_relpath_len": 221, "nested_git_head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b", "other_count": 0, "symlink_count": 115, "total_bytes": 5130434169, "tree_digest": "79736540a1201ae9fda8133baf4d1dfa41789e0ebca52e941b8acfc5f1bc9e8a"}
+== byte-readability spot checks ==
+-- git -C /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/40--repo rev-parse HEAD:
+fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+HEAD
+-- git -C /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy rev-parse HEAD:
+b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b
+-- git -C /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_copy-delete-rename rev-parse HEAD:
+fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+HEAD
+-- git -C /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy status --porcelain (byte-level readable of many files):
+ M docs/rust-tauri/ORCHESTRATOR_PROGRESS.json
+ M docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md
+ M docs/rust-tauri/R05/PROGRESS_LEDGER.json
+ M docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json
+ M docs/rust-tauri/R05/R05_BLOCKERS.md
+-- head bytes of a file inside 40--repo (deep tree):
+file: /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/40--repo/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/stderr.log

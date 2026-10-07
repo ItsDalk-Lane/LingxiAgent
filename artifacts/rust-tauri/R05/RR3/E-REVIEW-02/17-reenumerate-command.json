@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/final-input-check.py"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startUTC": "2026-10-07T02:08:59.893755+00:00",
+  "endUTC": "2026-10-07T02:08:59.945158+00:00",
+  "exitCode": 0,
+  "logs": {
+    "stdout": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/17-reenumerate-stdout.log",
+      "sha256": "f3d426c9281197aa2f2d6de0d6ce34ad48c10aafb6e69176aa045a097a0178f1",
+      "bytes": 147
+    },
+    "stderr": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/17-reenumerate-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

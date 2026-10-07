@@ -1,0 +1,16 @@
+[
+  {
+    "validator": "validate_run_output_unit",
+    "normalExit": 1,
+    "controlledGitErrorExit": 0,
+    "expected": "非零拒绝；不允许把无法检查当未跟踪",
+    "trackedContent": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo/artifacts/rust-tauri/R05/declared-run/tracked-source.rs"
+  },
+  {
+    "validator": "validate_declared_run_root",
+    "normalExit": 1,
+    "controlledGitErrorExit": 0,
+    "expected": "非零拒绝；不允许把无法检查当未跟踪",
+    "trackedContent": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo/artifacts/rust-tauri/R05/declared-run/tracked-source.rs"
+  }
+]

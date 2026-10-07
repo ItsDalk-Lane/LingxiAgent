@@ -1,0 +1,2 @@
+LINGXI_SERVICE_LOG_WRITE_FAILED error=Operation not permitted (os error 1) (continuing stderr-only; log dir /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f46-log-error-eqv57bv7/lingxi-service/logs)
+2026-10-07T00:45:48.943787Z ERROR lingxi_service: rotating file log unavailable (explicit degradation: stderr-only) error=Operation not permitted (os error 1) [token]

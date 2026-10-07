@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-07T00:26:07.413466+00:00",
+  "cleanup": [
+    {
+      "pid": 38987,
+      "action": "already gone or identity differs; no signal",
+      "psExit": 1,
+      "observedCommand": ""
+    },
+    {
+      "pid": 38988,
+      "action": "already gone or identity differs; no signal",
+      "psExit": 1,
+      "observedCommand": ""
+    },
+    {
+      "pid": 39009,
+      "action": "already gone or identity differs; no signal",
+      "psExit": 1,
+      "observedCommand": ""
+    },
+    {
+      "pid": 2000000,
+      "action": "already gone or identity differs; no signal",
+      "psExit": 1,
+      "observedCommand": ""
+    }
+  ]
+}

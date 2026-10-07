@@ -1,0 +1,299 @@
+{
+  "at": "2026-10-07T04:56:17.431614+00:00",
+  "baseline_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/metadata/source-before.json",
+  "baseline_count": 1068,
+  "baseline_digest": "878533ef3fe5b8fd5e50bdb633a22b8e17451f4d80f8510ab9b7b8058571e69e",
+  "changed": [
+    {
+      "path": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "before": {
+        "path": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+        "sha256": "be5ee9671acc3cfcc458cd1ec2dd384ca6a7f31a9a1ab9ee5b21effad156694c",
+        "link": null,
+        "bytes": 252562,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+        "sha256": "e48fd59d0294dd9349175d3e21cac7e4d6e32684b581a9a2bdc9f346893bb87b",
+        "bytes": 280355,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "before": {
+        "path": "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+        "sha256": "7eecc3908d9672d3d6b2588463c1f1ebbdd9a5451f62f58b98b45bb9f2844c43",
+        "link": null,
+        "bytes": 20505,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+        "sha256": "8b2b592db1c70f082a4f7eb0ea5031fd7a2356ab5311a8bacd8f0941fe5ca0f9",
+        "bytes": 21257,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "before": {
+        "path": "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+        "sha256": "a4e362636b909d4a5a7646f932c58408d149623cb041cde812f7d300f36f4f7d",
+        "link": null,
+        "bytes": 67257,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+        "sha256": "384a3875c5d97d8032a07f1523c40a243e7383bf678fdec326198a5e85f68f43",
+        "bytes": 92496,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "before": {
+        "path": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+        "sha256": "ef28cb6a1f9d200381d94781a7ad5d594f349f95089ab7deb3f70bfd4984faca",
+        "link": null,
+        "bytes": 4053957,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+        "sha256": "dab66326ef8989cd8b2fe5b3d29b40008cae114dd3182208e777ad5d59b00565",
+        "bytes": 4079196,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "before": {
+        "path": "docs/rust-tauri/R05/R05_BLOCKERS.md",
+        "sha256": "08dd8c15aafb420668b2569a43084f038d1a0ddcec438f9e9e022f4f03648abc",
+        "link": null,
+        "bytes": 12005,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/R05_BLOCKERS.md",
+        "sha256": "6d6a11274f56c53070112301cd5c5bd262cd3e0e98f8da63213f4e3c7f28b10b",
+        "bytes": 13493,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_HANDOFF.json",
+      "before": {
+        "path": "docs/rust-tauri/R05/R05_HANDOFF.json",
+        "sha256": "87ea87b09f37bd073a6ed85df4dec6769e18cf41326c2541d20588ae834517c0",
+        "link": null,
+        "bytes": 59052,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/R05_HANDOFF.json",
+        "sha256": "37e546d074cceda8fee977fcca815073c8c7577a007c08deea1453e167e78b6d",
+        "bytes": 93786,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "before": {
+        "path": "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+        "sha256": "1b5d6f3cfdb4ce089f21003cb40ecc44547e31c93837be7f43cc19b43cf91e26",
+        "link": null,
+        "bytes": 24115,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+        "sha256": "f25410b6b54c0aa23eee9168b47d155ed09d897af10ab49362b2816cb4c3f087",
+        "bytes": 25368,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "before": {
+        "path": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+        "sha256": "ba1942aa792f8f2629ad504218f6079fd118c960cd9e2cb87bfe29f7b1d08e89",
+        "link": null,
+        "bytes": 27259,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+        "sha256": "76f81d2bc5a6adafe5a5864d8ccf0d95bf4edbfb758e28e2c6eef7ad2cb21e59",
+        "bytes": 52595,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "before": {
+        "path": "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+        "sha256": "472a278c59f1897ace517db9650a920041998da43feeceff3dc8d990ffee407a",
+        "link": null,
+        "bytes": 11297,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+        "sha256": "f645789eba97821a00a66ee007889969ecd6b1afadbbc4efa83eb7a0a52f69d7",
+        "bytes": 13088,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "before": {
+        "path": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+        "sha256": "f8eef564b4dc2981ab53cd68e1c1cfb7018cf8f159f23985fbf5d69ffa97a972",
+        "link": null,
+        "bytes": 38128,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+        "sha256": "a63bf246bb9725f71b9ef6f6e712c8ec1bb009a6a29b25f4b9f5bdd3cb80e309",
+        "bytes": 69886,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_REPORT.md",
+      "before": {
+        "path": "docs/rust-tauri/R05/R05_REPORT.md",
+        "sha256": "e1e73289c4e9abb0be2a3e094c60274225028082506adbb5f802966d711895dc",
+        "link": null,
+        "bytes": 24828,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/R05_REPORT.md",
+        "sha256": "231b0421f270f16ceac50c879738d402d29ab7597e2eaefc497948857f7fed7c",
+        "bytes": 31894,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "before": {
+        "path": "docs/rust-tauri/R05/R05_TEST_MAP.json",
+        "sha256": "3def9a60679edb5de237a1b164adb08951ae3d3920abdd32f338f58a11c1c22d",
+        "link": null,
+        "bytes": 92362,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/R05_TEST_MAP.json",
+        "sha256": "b29c486cee16797ceaf27e291563058c6b53b27860d22131a34373dd2d771368",
+        "bytes": 121073,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_BRIEF.md",
+      "before": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_BRIEF.md",
+        "sha256": "7e4e363d7e5f53cd1e98640a5ce1d06e26cf096f892726c7a668cab8d2cb609b",
+        "link": null,
+        "bytes": 4376,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_BRIEF.md",
+        "sha256": "04121285aa6bb2a9bbc81c21b00e222b7027a5170a7171b510d946b3444ac4a5",
+        "bytes": 6192,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_REVIEW_BRIEF.md",
+      "before": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_REVIEW_BRIEF.md",
+        "sha256": "98daf5d74b479a3a52e459f2430b26103ce43ef6c7f1a72fa015eb3fbae85376",
+        "link": null,
+        "bytes": 1438,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_REVIEW_BRIEF.md",
+        "sha256": "a5a58474633d05ae020cad73b9d837c9a8e2e9beb56f4a5d4e510d1a34251654",
+        "bytes": 2085,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+      "before": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+        "sha256": "b1512a730609e4842df4040141e7249bdd9fe18cab8692e2edb0c2dce30b7a47",
+        "link": null,
+        "bytes": 10604,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+        "sha256": "92e51a4bfc3b6ea366bb52a2962d122c3f04a1f9213bab5b91ad6a4f3f43ca09",
+        "bytes": 11474,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+      "before": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+        "sha256": "5e396796f2947305d76a1c0db9d5c2a17ce68abde7c2e76a72004805b33b6a32",
+        "link": null,
+        "bytes": 18282,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+        "sha256": "b00ab1fb75b431294f5d9a04112c1256c7ab2503e33a4e6bb5555f138b64c6f9",
+        "bytes": 19714,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+      "before": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+        "sha256": "ea23e457d50b890f671cd8ca27cfb002090985711a643e38ee757d3e61bda2a8",
+        "link": null,
+        "bytes": 15118,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+        "sha256": "c6a69274a8344da0e473924f9cb8a3874f7bc4540ca9705d5f8b8e21044bf2ce",
+        "bytes": 16089,
+        "mode": 420,
+        "link": null
+      }
+    }
+  ],
+  "whole_candidate_equal": false,
+  "qualification": "This retained G inventory is not full candidateSourceBinding. Changed metadata listed honestly; additional E03/storage/coordination evidence also changes whole candidate membership. Old G facts retain original tested HEAD+dirty, never rebound to a later commit."
+}

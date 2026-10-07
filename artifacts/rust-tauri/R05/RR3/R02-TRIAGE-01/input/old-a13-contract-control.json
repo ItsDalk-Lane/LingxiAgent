@@ -1,0 +1,10 @@
+{
+  "source": "artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan",
+  "requestId": "req-267c498748e351d107464ccdd91c9ff2",
+  "matchingMarkerLines": [
+    "LINGXI_AUTH_REJECTED request_id=req-267c498748e351d107464ccdd91c9ff2 method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:59539"
+  ],
+  "normalContractReached": true,
+  "binarySHA256": "UNKNOWN_FROM_SELECTED_HISTORICAL_ARTIFACTS",
+  "reexecuted": false
+}

@@ -1,0 +1,957 @@
+{
+  "schema": "lingxi.leaf-case-results.v1",
+  "producer": "r02_cli_rust_matrix.py",
+  "producedUtc": "2026-10-07T07:47:33.239070+00:00",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "candidateSources": {
+    "cli/args.ts": "7ea449b5b3a6d0448357d7b23116259aa4d8b71f2ce31cb2f29dca2d90fc04ef",
+    "cli/bundle.ts": "897ae058d45c589f56bbdda6082497bc607dcf565e1fb58ed0dfd81ec43c8f54",
+    "cli/chat.ts": "ea981a843a94495e63e4b2dfa3e337284329a41b5c3943b7ec80bef4fae34c1f",
+    "cli/client.ts": "b53b6ca0cf4b46d6430733dd9e005279835b0586ea45046ae618fe47077d1832",
+    "cli/data.ts": "2614bd32315be5ad306fe8de252a894149896fb2e1eb82613caaccf549d9b261",
+    "cli/entry.ts": "c3e720e6b6d9a2c5aca82e8616849280e130186e0d7d6d7efcaf3dfe3a1bf9be",
+    "cli/local-server.ts": "c62ec795e10a4312e6e192b1c5359f071e9316143b5f0ab6c177955bcbd3be58",
+    "cli/rust-service.ts": "5215855a4bac180adddc098516d460ee63c063973ac3f6450064eb1510d8184c",
+    "cli/server-runner.ts": "357b9b2542eca630c2776525f3457fe5bb7596ca2be620c2f4734c37072d87b3",
+    "cli/terminal-theme.ts": "c123fe8b3adbcc9724ae2fca038fead6dedcf5b52048cd3e633cd9615f5fb4ac",
+    "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+    "package.json": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+    "rust/Cargo.lock": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+    "rust/Cargo.toml": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+    "rust/crates/lingxi-adapters/Cargo.toml": "f7252fdd642075333d050340c3d2b4687d936c92a3ac07c6e2019fd8c71f5c61",
+    "rust/crates/lingxi-adapters/src/bin/lingxi-storage-inspect.rs": "ce38f8f7442142e14567331270a70901662fd32da0fae311d19536fdf78756d1",
+    "rust/crates/lingxi-adapters/src/lib.rs": "b7abdb77d7a3bbf8ed5caac833ae9322804591bb4696c0e5a53d2a2e146559f7",
+    "rust/crates/lingxi-adapters/src/models/anthropic_messages.rs": "abca1b0fb608c74be9fb5da690a2843891a58cff1a744f0bf2523b3cc38fa59d",
+    "rust/crates/lingxi-adapters/src/models/auxiliary.rs": "504cc229598a737f260eb09b308b052aa9c9d196acaa471a8fd21281cdc46c04",
+    "rust/crates/lingxi-adapters/src/models/batch_admission.rs": "d6944a71609ac765625c7b549f5508d9a0e4bdeb7197eb8a234e977f612320e6",
+    "rust/crates/lingxi-adapters/src/models/compat.rs": "be1229f65e2e462ad37ddccc6cbaee08d49e12dcd6144fc1c8a763822e3a25ca",
+    "rust/crates/lingxi-adapters/src/models/config.rs": "09f5f6533911cb76dbbe8a77844fdebd816fbe5b1006fd92a077b75ede91e144",
+    "rust/crates/lingxi-adapters/src/models/credentials.rs": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+    "rust/crates/lingxi-adapters/src/models/dispatch.rs": "877badc332ed687c59f183e0fe2097d4f19daef37858b3d61889791bcc74fef1",
+    "rust/crates/lingxi-adapters/src/models/egress.rs": "209ddd869203fdf198970353a2832b1765b7b02fb01b1394cf91be4cbee67c67",
+    "rust/crates/lingxi-adapters/src/models/gateway.rs": "23e97214cc66a75fca73e957a3a19b5bf2142c72ea6448db827f32c8ab8c5deb",
+    "rust/crates/lingxi-adapters/src/models/google_generative_ai.rs": "494e92ed53b58754f05ad763b8cb7d66cca8a2768029cb14e517efbfb23e18cc",
+    "rust/crates/lingxi-adapters/src/models/mod.rs": "6ca2aa31b3bc52b4f2d4a471edc0ac19eca41159b883c74a1ecbcbb754aec400",
+    "rust/crates/lingxi-adapters/src/models/network.rs": "38eb8d28653957bb2eddfe1bfeb2df45bffd663514399b078cec2652c6d9ace5",
+    "rust/crates/lingxi-adapters/src/models/oauth.rs": "df4a8db93d629c20826c9316114e03eaa615d1c9286b61a1cadf34fb15fa047a",
+    "rust/crates/lingxi-adapters/src/models/openai_codex_responses.rs": "89ce79f6b73f18f1e77ebb8bd299eb5478cadad33f76d03192bdfea650751b4c",
+    "rust/crates/lingxi-adapters/src/models/openai_completions.rs": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+    "rust/crates/lingxi-adapters/src/models/openai_responses.rs": "2bedaf6c8d437eebc9937e0868d93db554094c48db7fbf579294498b9ecf8880",
+    "rust/crates/lingxi-adapters/src/models/operations/embedding.rs": "b410cfe1bddcad6ba82506ff0cda702741bab7588f13d2c6ab9c86cbcb613e47",
+    "rust/crates/lingxi-adapters/src/models/operations/image.rs": "dc6c426b1a9ef7de4219c711922f5f47669b0c0ee3e998943f045d4350d60ae6",
+    "rust/crates/lingxi-adapters/src/models/operations/mod.rs": "2cc0e91acbb8a189959c1013afafe9d4bfc09fbd101258b07b39b16bec248320",
+    "rust/crates/lingxi-adapters/src/models/operations/rerank.rs": "551c6b2029dcd5069bd01eb48428275f90000540e14e81a9c064c28ba5859f57",
+    "rust/crates/lingxi-adapters/src/models/operations/speech.rs": "5265559b851dcf965879a2c7ae9be73b7d4ee2691550b804ef705b89c3bbcf29",
+    "rust/crates/lingxi-adapters/src/models/operations/tiers.rs": "2571a2a1879b72c249678d3d44923e4c84c7f76c5a08b7cc854ff0a2b33b4e21",
+    "rust/crates/lingxi-adapters/src/models/operations/transcribe.rs": "96fea443459a93bacbda54b3ca976522133db269b4917afba7de772951735aba",
+    "rust/crates/lingxi-adapters/src/models/operations/video.rs": "f4940723e287b031a527d980809de0c08763658545e4936fee9e252b7c505e31",
+    "rust/crates/lingxi-adapters/src/models/provider.rs": "c31ac88b7d4dd5d391928c222dc543d4cf8e506c2b1b4216e58221b69ea3e657",
+    "rust/crates/lingxi-adapters/src/models/streaming.rs": "8b17798d3239d6243f399dae25830aaddc0da4877d04680ef3d35d3427efaa76",
+    "rust/crates/lingxi-adapters/src/models/tool_render.rs": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+    "rust/crates/lingxi-adapters/src/models/usage.rs": "0a6a1340f0160206ed65e555a941fbfee67d9ff26e352e08a8cf58019184230a",
+    "rust/crates/lingxi-adapters/src/storage/backup.rs": "7c0b4e696d3cdac3811d788e9c3e1234d3f370c11657dfb9a510e0ef423f2d51",
+    "rust/crates/lingxi-adapters/src/storage/migrations.rs": "df9519611c4020c5eed3acccedc92287feeb9f6b0af477ee69e1317ef089859d",
+    "rust/crates/lingxi-adapters/src/storage/mod.rs": "9dbca03fe05bddd352dddc3588601afe8682d4b825c74af128b4768b45939a92",
+    "rust/crates/lingxi-adapters/src/storage/queue.rs": "705b588721103bb4a97ff66ac0eef43d1dc57ba1b2b9156692c05518107fd24c",
+    "rust/crates/lingxi-adapters/src/storage/run_store.rs": "542973c1a89e0b458b0bacd73bb594934d4a97369bc2785d7c4723caaad06496",
+    "rust/crates/lingxi-adapters/src/storage/windows_acl.rs": "96b06d6bcdbefb4c97ce2d8ab670f37af794dc1dd4d1d85a4d97a26940f33479",
+    "rust/crates/lingxi-browser-spike/Cargo.toml": "74ec57bbd9395ea26ba4df5f2f15195188e9ce0d52235fd5cbb50b8fa629a236",
+    "rust/crates/lingxi-kernel/Cargo.toml": "2fab453351437b78d219d01c19f4a0c1f6f522869de1a2e1ce9941731deff0df",
+    "rust/crates/lingxi-kernel/src/invocation.rs": "a964426e6d70bd9213a6475e7ca817193d32a22a3cc0630a0648adcdfa522292",
+    "rust/crates/lingxi-kernel/src/lib.rs": "0a5f0c3aee15f437cae03cca5eb182680f6e57aa64e3dcd95fbb5561a243720f",
+    "rust/crates/lingxi-kernel/src/model_exchange.rs": "62bb3b1b3ad42f5ea46961ab5c5b1d98d54f22c0a359f8d099ad1e323a6d4c6b",
+    "rust/crates/lingxi-kernel/src/ports.rs": "3f32e8c7c0a617d6bcb73ed11ab5eb468acfbb383ac844964a9ad52a75fa3936",
+    "rust/crates/lingxi-kernel/src/recovery.rs": "796cc13cfbfe0ef9aa021e3f7c47668d9374468a1defb1dfa0d046b853803268",
+    "rust/crates/lingxi-kernel/src/subagent.rs": "0287c242edc782989e1232046661a956216f5576e1247f94a4ea669c0edc0276",
+    "rust/crates/lingxi-kernel/src/toolcatalog.rs": "2b7505387b6b45aebc9ff7a0c836d49d24573df1d2de2e3137549eab5983ad1f",
+    "rust/crates/lingxi-kernel/src/usage.rs": "209bc2f127595674ed86c64cbf92d7fc1632bcbbfcc446909cd0f632cf470f3b",
+    "rust/crates/lingxi-protocol/Cargo.toml": "55ec1b90bb8aa610bf507d70e168a1fdf73e84e8771defe9018ab6f2b0fc4ddc",
+    "rust/crates/lingxi-protocol/src/bin/lingxi-proto-server.rs": "1aeddfa2c4d4a8eab8ab75aed8a2555288c6ce2e1ebe05584b307d0cc0760aa3",
+    "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs": "8af4fb30089bae8e55fb62b18412a05e172b55f966cd4b6f5aaa1ef8952cee05",
+    "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-verify.rs": "b68c1d1a0fbf2d0e9355f34e7f89582d902650ce9721390b7311b317ac103e3c",
+    "rust/crates/lingxi-protocol/src/canon.rs": "2c1bb1c229a3bd0eafe6ab6d911cf8e41c158717fc4632f390e0684a3d1cea71",
+    "rust/crates/lingxi-protocol/src/devgate.rs": "292ed1cb45356234a6a7423c9ef60dfe908eb9573c5d5580fd32b1d85d411749",
+    "rust/crates/lingxi-protocol/src/handshake.rs": "17bb9902607d3d94fa2356cd2b55a32ad76b6eda38377b8d181be931af25d51d",
+    "rust/crates/lingxi-protocol/src/lib.rs": "7dc6fe93e4c9aa29da6ca4690e039f647c23938599557c374d185f047c62fce2",
+    "rust/crates/lingxi-protocol/src/wire.rs": "a3509c6d31fe584980bef21cc615e21a56afe44ab57266108b3f5d2d7c71d3ff",
+    "rust/crates/lingxi-service/Cargo.toml": "c778bbe5821bc8d7dc1e5d22292879f3f3cb2ac6af480316acc1bad705b08b17",
+    "rust/crates/lingxi-service/src/approval.rs": "70040aaec9a0a6ca41e059113b2c53275361ad8cbc6e40b3d0fdfa339b5bed3e",
+    "rust/crates/lingxi-service/src/approval_service.rs": "cc0ee1fafa087a37801a626008215638214b59f6bbe8cc2284e8897dd114ae72",
+    "rust/crates/lingxi-service/src/artifactverify.rs": "3b4e84802fd3dda9719295f3d3e95a2218fca520a88d4b2ea610865113c049d7",
+    "rust/crates/lingxi-service/src/auth.rs": "5d9408afc747e3249f0d7b7d9148be8fe3c22eb1aac3815835b466c409cf31e8",
+    "rust/crates/lingxi-service/src/background.rs": "1e642710a45e4e4360f34ed5588f16eb847ae74bd2a66cabb0b6f8e972db69a5",
+    "rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs": "c569a06220d6672432e2dc1871f2f6c9f2d2b4d5eeae2c5773fec98e0a2d4e2f",
+    "rust/crates/lingxi-service/src/cancel.rs": "45db14322dc7daa18b1926acc5d87ed153682c7830a991210c0838534f7e1872",
+    "rust/crates/lingxi-service/src/config.rs": "960365bee86e48825681bf6962730ac0f67f48dab870656cde174ff44981cd8d",
+    "rust/crates/lingxi-service/src/credentials/login.rs": "397b40157707c9bbee786ae86dff15b6989aca7c3a3942583caf71bae8276bf8",
+    "rust/crates/lingxi-service/src/credentials/mod.rs": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+    "rust/crates/lingxi-service/src/credentials/store.rs": "a69b4d4e2bab340055e30907cfece32bbd58c54da1898fe8c72d133eb253696f",
+    "rust/crates/lingxi-service/src/dedup.rs": "f80cd8a86451f5563217bc293aa2dfa3afc97a6666dba068b5196470e7aecf82",
+    "rust/crates/lingxi-service/src/epoch.rs": "9c29d9ee8924d7b514a9bc4b7f8d374d420287f25b1b36f5295619c0f882b855",
+    "rust/crates/lingxi-service/src/events.rs": "709b9adc34ba6d35252ff1ebf8332981b47f9defb0d178e3880bf5caffd855a4",
+    "rust/crates/lingxi-service/src/exectools.rs": "433584042b95dcb51b9b4f40509bce0123de078b6b0d85edeeb8ec7c3af64e98",
+    "rust/crates/lingxi-service/src/filetools.rs": "4803fe5164ad448860b162d58a374f945fc8920dad0f526aa70f73c2c64fd116",
+    "rust/crates/lingxi-service/src/inject.rs": "c440a0c38f5710500b3aa3c557ca33d9503db485d13fc1555416a7efb4c560e4",
+    "rust/crates/lingxi-service/src/instance.rs": "f329de65613332af3024763e0fb17ce7f545962252233c10ba2400aabda7f846",
+    "rust/crates/lingxi-service/src/invocations.rs": "42826a77c2a9625fea27ea085b822949946777db6ac7c8bd2b7a00ccd04a32d8",
+    "rust/crates/lingxi-service/src/lib.rs": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+    "rust/crates/lingxi-service/src/limits.rs": "93d7bbd0a1bc22417cfb800d75601c61e8ee396ff8801218382738938d6767c5",
+    "rust/crates/lingxi-service/src/logging.rs": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+    "rust/crates/lingxi-service/src/main.rs": "9ea695ee5b2eef4163db16df4b584b363df6a375ca334f02c9160886ed1b5f5b",
+    "rust/crates/lingxi-service/src/management.rs": "c9402d83a16f3b0c4f6f193968b099fe29c6121968b337d6109dfeeb14c8c27d",
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "e3312f6ab87ad6562233c3ec71a14e1925685a28c9879999b99731ddfa6f6fbf",
+    "rust/crates/lingxi-service/src/operations.rs": "bbb2054886f6e08093aeba416570ecadee866891db06e59a6d5406815b965639",
+    "rust/crates/lingxi-service/src/paths.rs": "10b13d4d0639e134c118f0ef421648f55e3d9498dd210d7ad0428e009e89008e",
+    "rust/crates/lingxi-service/src/procsupervisor.rs": "d586aa01efa0085f5890e73dcd056431ae84abf1b5b8aa379ce8159ff2ca7b37",
+    "rust/crates/lingxi-service/src/quotas.rs": "5830926c2c1f61792c5269e622680b78f146d50997a4b609ffdf214a446b48cc",
+    "rust/crates/lingxi-service/src/recovery.rs": "37a268ac26b368e27fac3e81a173f6d29a4d2789603259df2968a4a72be79e45",
+    "rust/crates/lingxi-service/src/redaction.rs": "5b192ab43df13d6add0705a9f1eb2ead45da1131f012c3afb61dd9f90ac10b7a",
+    "rust/crates/lingxi-service/src/resourceaccess.rs": "9cb2b2267e581eff500b4e9a995541ea055a56f217955fd910cd7dd0e2c7766f",
+    "rust/crates/lingxi-service/src/runs.rs": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+    "rust/crates/lingxi-service/src/sandbox.rs": "57dbdcb309fa17878e58ea360cc9e5d69cdb126d7907f2d9aaa82bc68888b676",
+    "rust/crates/lingxi-service/src/security_audit.rs": "ec34626d0c03a8e86cc1beb69cea951a55571bddd92624284e896f8654506cdf",
+    "rust/crates/lingxi-service/src/serve.rs": "95faa3f52bb1c1a33738501b33038bda41e0e29eca6eee541fadb84b202847b8",
+    "rust/crates/lingxi-service/src/session_supervisor.rs": "fcf0822ceef2000057b41d3a0a7d67581815db0aef2908629f146d0a44e8ef74",
+    "rust/crates/lingxi-service/src/sessions.rs": "61d032f1d3407f973360738c150c03ac49d780efc79afec49bf5e9ff6ab83c4f",
+    "rust/crates/lingxi-service/src/shutdown.rs": "401ab707932219fc2a6c174e978705b4c16d57aafa09a0b276580be5d7f4113f",
+    "rust/crates/lingxi-service/src/static_web.rs": "65341c5ddce91341687c922c3116c1e48423605d16112cfc7b3864900e885d6d",
+    "rust/crates/lingxi-service/src/streaming_norm.rs": "bca91fd70a29eaef7cc9c7210f13c5e6f13e5844f256fa10aa18e9bf0fb360c3",
+    "rust/crates/lingxi-service/src/subagents.rs": "2c97b7964cdd0ecbf6dda0881cd6510ba880a6a3fd428274e936441b469f44d7",
+    "rust/crates/lingxi-service/src/task_supervisor.rs": "2f78d303b89b4df43899f4ccd593e0f71ea6e82535d44455f71bf462a11998c1",
+    "rust/crates/lingxi-service/src/toolgateway.rs": "17e9c05aec1d03cdc68db66b97ec84947cccf3d49a8759bca2fa126db6f2bc84",
+    "rust/crates/lingxi-service/src/transport.rs": "d4a5fe9ac17e2f0e2e666bc04658008002fa48d1f661875fa41121f5ff012c95",
+    "rust/crates/lingxi-service/src/workermodel.rs": "85b25b95f026dd9ce53119bd0caff44e4df4ef5f90c6e3b2abfad5e89932af29",
+    "rust/crates/lingxi-service/src/workerrpc.rs": "4a158b5321da63d2c6a36d88da8ec7cfd21622c914fa38f7ad6dd674d4cb0788",
+    "rust/crates/lingxi-service/src/ws.rs": "03c9a6887b0d194127a4401bf92c26fb6debcc344cfe9b3b091a7503b1186b20",
+    "rust/crates/lingxi-spike/Cargo.toml": "6a63f3596f63a2e21735fff068adc228f5ae653dbae206d671df93086282ca48",
+    "rust/crates/xtask/Cargo.toml": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+    "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+    "scripts/rust-tauri/r02_cli_rust_matrix.py": "d349246f684582a66dd33878e832e61441394e2ab8f6762aa317a4be2f83b6e3",
+    "scripts/rust-tauri/r02_owned_process_group.py": "6526fb08c8cfaf67f498a067b7d3213c1d88425ffd167604a3cf26b42353ea81",
+    "shared/artifact-core/activation.cjs": "fc3c685f3fbb2c6610006f2df369333b3d8758a3360cd3b959fe0c630a3f606c",
+    "shared/artifact-core/index.cjs": "6d64d6ef2081f38a94df1e67c5d115b95e5f4c5bc76c76fb3ef01f153f108e66",
+    "shared/artifact-core/keyset.cjs": "6f2894f3a1e0d8bacb9773603adddd6c5090571a7de0c1bfe299d5992a5ac033",
+    "shared/artifact-core/manifest.cjs": "75061ce5ae98872db2aa380a46620d35dbc70caab44caec74e7b9d4df5e99fb5",
+    "shared/artifact-core/ota-core.cjs": "6c3766d8b746349adfe8151e48e4ca150d6383e0cbd6d6c76e9386a5547fe0f0",
+    "shared/artifact-core/pointer-channels.cjs": "8f7d1c912662f1a42c3d536c280bf5524a6ca4e78dcf0c4e639130b4801ba3ba",
+    "shared/artifact-core/pointer-store.cjs": "e23e742c2f79f3f0f136b199a32dbb692d77dd881e41a32f29369b9ed72bb55f",
+    "shared/artifact-core/release-order.cjs": "5b1fb5eacb2bd14127bb85b25a7e534c5a51992e9d86d7197110bbb3829c2e22",
+    "shared/artifact-core/ustar.cjs": "508868bbcdb88628f7d20ba35df4e82892e8e69e0bfe4cbfe91a2ee0085bf49d",
+    "shared/server-info-probe.cjs": "2e8603a8419f2bd648a66d966d376cb71b6e83e7a9d79d3618875e00f23a3cd8",
+    "tests/cli-abort-contract.test.ts": "e0b31f19110e0a8c73763eb2cba159df1036cbf63d66ca19bc6b6d5716b66c07",
+    "tests/cli-agent-selection.test.ts": "68beb9a3caf96318cd84be078f03b4158599e71bb719c73114fabe3ee8bfaecc",
+    "tests/cli-args.test.ts": "ba6b7fe7a6d3495768d9afde096e1f0b6c2f4cf4ad208cf695b36342a766a0f2",
+    "tests/cli-bundle.test.ts": "8c360ac28b2b71f751aa1b2fba04644ff10f8282f1ca26341bde3cf4623221a8",
+    "tests/cli-chat-runtime.test.ts": "798e733b646abaed943fe198270224fd3e0f51bb4a1c9f0d49252b3008c8ff44",
+    "tests/cli-chat.test.ts": "09022dae07999fca08c4112e9ea0f8289b0f0f970ce5524bd5f4659a2769dabb",
+    "tests/cli-closure-census.test.ts": "cddb32aedcf184aa9df36d07e044392df69996ae081fb20bf0d249ed3c62c27c",
+    "tests/cli-data.test.ts": "9d2d0683afe25a803ae15a09dd8912fdf43d884d865ec10b7a33246248b9dfc6",
+    "tests/cli-local-server.test.ts": "1bbefe70bf75f303036c9af01abd7c8335ffae3e5325e9cd1c4b57c9a3e818de",
+    "tests/cli-rust-service.test.ts": "7e709932200cc41004bcc972cc79de8d1954af6c8fc90b3aadd23501f69875fb",
+    "tests/cli-server-runner.test.ts": "45ad8fd0883564e9ec5b7cbacd194b87b4498b7b5a05109087732e9b95df069e"
+  },
+  "candidateSourcesSha256": "1628b504dc952c3fa94b21fd8e11daa10af574bf5f0e6e3636b03d40c350d803",
+  "binaryPath": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+  "binarySha256": "5980175bdb88c6b0f655997c0ee256779e59f7e4cb59027b25ed0fca734d7679",
+  "commands": [
+    {
+      "name": "build-current-service",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "lingxi-service"
+      ],
+      "startedUtc": "2026-10-07T07:47:08.753087+00:00",
+      "endedUtc": "2026-10-07T07:47:30.771344+00:00",
+      "exit": 0,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "build-current-service.stdout.log",
+      "stderr": "build-current-service.stderr.log",
+      "environment": {
+        "CARGO_TARGET_DIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior"
+      }
+    },
+    {
+      "name": "serve-foreground",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "serve",
+        "--runtime",
+        "rust",
+        "--channel",
+        "stable",
+        "--",
+        "--home",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+        "--bind",
+        "127.0.0.1:0"
+      ],
+      "startedUtc": "2026-10-07T07:47:30.780481+00:00",
+      "pid": 52401,
+      "stdout": "serve.stdout.log",
+      "stderr": "serve.stderr.log",
+      "environment": {
+        "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service"
+      },
+      "readyUtc": "2026-10-07T07:47:31.902423+00:00",
+      "bindAddr": "127.0.0.1:64697",
+      "endedUtc": "2026-10-07T07:47:32.817245+00:00"
+    },
+    {
+      "name": "status-owner",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "status",
+        "--runtime",
+        "rust"
+      ],
+      "startedUtc": "2026-10-07T07:47:31.917826+00:00",
+      "endedUtc": "2026-10-07T07:47:32.025763+00:00",
+      "exit": 1,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "status-owner.stdout.log",
+      "stderr": "status-owner.stderr.log",
+      "environment": {
+        "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+        "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior"
+      }
+    },
+    {
+      "name": "sessions-owner",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "sessions",
+        "--runtime",
+        "rust"
+      ],
+      "startedUtc": "2026-10-07T07:47:32.026208+00:00",
+      "endedUtc": "2026-10-07T07:47:32.117849+00:00",
+      "exit": 0,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "sessions-owner.stdout.log",
+      "stderr": "sessions-owner.stderr.log",
+      "environment": {
+        "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+        "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior"
+      }
+    },
+    {
+      "name": "continue-missing",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "continue",
+        "--runtime",
+        "rust",
+        "does-not-exist"
+      ],
+      "startedUtc": "2026-10-07T07:47:32.119544+00:00",
+      "endedUtc": "2026-10-07T07:47:32.232271+00:00",
+      "exit": 1,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "continue-missing.stdout.log",
+      "stderr": "continue-missing.stderr.log",
+      "environment": {
+        "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+        "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior"
+      }
+    },
+    {
+      "name": "continue-existing",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "continue",
+        "--runtime",
+        "rust",
+        "sess_local_alpha"
+      ],
+      "startedUtc": "2026-10-07T07:47:32.233043+00:00",
+      "endedUtc": "2026-10-07T07:47:32.345149+00:00",
+      "exit": 1,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "continue-existing.stdout.log",
+      "stderr": "continue-existing.stderr.log",
+      "environment": {
+        "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+        "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior"
+      }
+    },
+    {
+      "name": "chat-no-kernel",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "chat",
+        "--runtime",
+        "rust"
+      ],
+      "startedUtc": "2026-10-07T07:47:32.345959+00:00",
+      "endedUtc": "2026-10-07T07:47:32.433218+00:00",
+      "exit": 1,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "chat-no-kernel.stdout.log",
+      "stderr": "chat-no-kernel.stderr.log",
+      "environment": {
+        "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+        "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior"
+      }
+    },
+    {
+      "name": "sessions-unauthorized",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "sessions",
+        "--runtime",
+        "rust",
+        "--url",
+        "http://127.0.0.1:64697",
+        "--token",
+        "intentionally-invalid-token"
+      ],
+      "startedUtc": "2026-10-07T07:47:32.434092+00:00",
+      "endedUtc": "2026-10-07T07:47:32.524167+00:00",
+      "exit": 1,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "sessions-unauthorized.stdout.log",
+      "stderr": "sessions-unauthorized.stderr.log",
+      "environment": {
+        "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+        "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior"
+      }
+    },
+    {
+      "name": "status-identity-failure",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "status",
+        "--runtime",
+        "rust",
+        "--url",
+        "http://127.0.0.1:64697",
+        "--token",
+        "intentionally-invalid-token"
+      ],
+      "startedUtc": "2026-10-07T07:47:32.524596+00:00",
+      "endedUtc": "2026-10-07T07:47:32.617141+00:00",
+      "exit": 1,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "status-identity-failure.stdout.log",
+      "stderr": "status-identity-failure.stderr.log",
+      "environment": {
+        "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+        "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior"
+      }
+    },
+    {
+      "name": "sessions-limit",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "sessions",
+        "--runtime",
+        "rust"
+      ],
+      "startedUtc": "2026-10-07T07:47:32.618333+00:00",
+      "endedUtc": "2026-10-07T07:47:32.712755+00:00",
+      "exit": 0,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "sessions-limit.stdout.log",
+      "stderr": "sessions-limit.stderr.log",
+      "environment": {
+        "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+        "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior"
+      }
+    },
+    {
+      "name": "sessions-empty",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "sessions",
+        "--runtime",
+        "rust"
+      ],
+      "startedUtc": "2026-10-07T07:47:32.716570+00:00",
+      "endedUtc": "2026-10-07T07:47:32.805024+00:00",
+      "exit": 0,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "sessions-empty.stdout.log",
+      "stderr": "sessions-empty.stderr.log",
+      "environment": {
+        "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+        "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior"
+      }
+    },
+    {
+      "name": "serve-invalid-bind",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "serve",
+        "--runtime",
+        "rust",
+        "--",
+        "--home",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-bad-bind",
+        "--bind",
+        "not-an-address"
+      ],
+      "startedUtc": "2026-10-07T07:47:32.817863+00:00",
+      "endedUtc": "2026-10-07T07:47:32.901560+00:00",
+      "exit": 2,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "serve-invalid-bind.stdout.log",
+      "stderr": "serve-invalid-bind.stderr.log",
+      "environment": {
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+        "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior"
+      }
+    },
+    {
+      "name": "serve-beta-unavailable",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "serve",
+        "--runtime",
+        "rust",
+        "--channel",
+        "beta",
+        "--",
+        "--home",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-beta",
+        "--bind",
+        "127.0.0.1:0"
+      ],
+      "startedUtc": "2026-10-07T07:47:32.902148+00:00",
+      "endedUtc": "2026-10-07T07:47:32.978267+00:00",
+      "exit": 1,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "serve-beta-unavailable.stdout.log",
+      "stderr": "serve-beta-unavailable.stderr.log",
+      "environment": {
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+        "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior"
+      }
+    },
+    {
+      "name": "serve-downgrade-refused",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "serve",
+        "--runtime",
+        "rust",
+        "--allow-data-downgrade",
+        "--",
+        "--home",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-downgrade",
+        "--bind",
+        "127.0.0.1:0"
+      ],
+      "startedUtc": "2026-10-07T07:47:32.978852+00:00",
+      "endedUtc": "2026-10-07T07:47:33.054671+00:00",
+      "exit": 1,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "serve-downgrade-refused.stdout.log",
+      "stderr": "serve-downgrade-refused.stderr.log",
+      "environment": {
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+        "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior"
+      }
+    },
+    {
+      "name": "serve-newer-epoch",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "serve",
+        "--runtime",
+        "rust",
+        "--",
+        "--home",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-newer",
+        "--bind",
+        "127.0.0.1:0"
+      ],
+      "startedUtc": "2026-10-07T07:47:33.055480+00:00",
+      "endedUtc": "2026-10-07T07:47:33.139067+00:00",
+      "exit": 2,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "serve-newer-epoch.stdout.log",
+      "stderr": "serve-newer-epoch.stderr.log",
+      "environment": {
+        "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-fallback",
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+        "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-fallback",
+        "XDG_DATA_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-fallback/xdg-data",
+        "XDG_CONFIG_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-fallback/xdg-config"
+      }
+    },
+    {
+      "name": "sessions-after-shutdown",
+      "argv": [
+        "node",
+        "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+        "sessions",
+        "--runtime",
+        "rust",
+        "--url",
+        "http://127.0.0.1:64697",
+        "--token",
+        "intentionally-invalid-token"
+      ],
+      "startedUtc": "2026-10-07T07:47:33.139621+00:00",
+      "endedUtc": "2026-10-07T07:47:33.228605+00:00",
+      "exit": 1,
+      "timedOut": false,
+      "cleanupError": null,
+      "stdout": "sessions-after-shutdown.stdout.log",
+      "stderr": "sessions-after-shutdown.stderr.log",
+      "environment": {
+        "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service",
+        "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "CARGO_NET_OFFLINE": "true",
+        "HOME": "/Users/study_superior"
+      }
+    }
+  ],
+  "homes": {
+    "home-main": {
+      "data-epoch.json": "SHA256:813de46320540bb2d84c7cdc121a7d2acc9d3f8a095f0bad12e4c3cef11efec1",
+      "lingxi-service": "DIR",
+      "lingxi-service/data": "DIR",
+      "lingxi-service/data/runs.db": "SHA256:e335f8c18e67a493ec5216590973b8de75aa0da68237871c4fea90e48bd28450",
+      "lingxi-service/data/runs.db-shm": "SHA256:6bebfb98a30fd5386340143ebe8b89b78c0b89acd4ef3de9adf58e816be8b6ac",
+      "lingxi-service/data/runs.db-wal": "SHA256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lingxi-service/device-credentials.json": "SHA256:775917010717880ac23230514a3631e216a4298f5adbf83095015b93ec7c698c",
+      "lingxi-service/devices.json": "SHA256:74a057e6130fd808dcec01d814fc8094ff84ab28b2b0be8a65a66e4e491c647a",
+      "lingxi-service/instance.lock": "SHA256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lingxi-service/local-token.json": "SHA256:9f6435afd31f8f7c67c3fc1ef4b98d48f60b3a5edd00e49ee10d82a19e46a040",
+      "lingxi-service/logs": "DIR",
+      "lingxi-service/logs/service-000001.log": "SHA256:3a09003a0d1b6b82133315e4ae62bca029a42fbd85f3a3fbc381f2b920c399a7",
+      "lingxi-service/management.json": "SHA256:a868bf6eda93c04955889c25467f0811b3377096968d108722c5a67324ee245b",
+      "lingxi-service/tmp": "DIR",
+      "logs": "DIR",
+      "logs/security-audit.jsonl": "SHA256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "home-bad-bind": {},
+    "home-newer": {
+      "data-epoch.json": "SHA256:fef1da12458d4f58e5ac150ea8cf9628d7234180c32d4ceed0b3b71d4e83f05e",
+      "lingxi-service": "DIR",
+      "lingxi-service/instance.lock": "SHA256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lingxi-service/logs": "DIR",
+      "lingxi-service/logs/service-000001.log": "SHA256:c7fc0879fd8ac0f7f9c74a0c85ecb49697397633c3b9daf8d4c91b6913397918",
+      "lingxi-service/tmp": "DIR"
+    },
+    "home-fallback": {},
+    "home-beta": {},
+    "home-downgrade": {}
+  },
+  "cases": [
+    {
+      "case": "cli-rust-current-binary-build",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 0,
+        "binary": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-xf8vtm37/debug/lingxi-service"
+      }
+    },
+    {
+      "case": "cli-rust-serve-ready",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "cliPid": 52401,
+        "rustPid": 52402,
+        "rustBirth": "Wed Oct  7 15:47:30 2026",
+        "rustParent": "52401",
+        "bindAddr": "127.0.0.1:64697",
+        "instanceTransport": "http",
+        "instanceFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main/lingxi-service/instance.json"
+      }
+    },
+    {
+      "case": "cli-rust-channel-stable-selected",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "cliArgv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.IYrM8z/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--channel",
+          "stable",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "ready": true,
+        "instanceTransport": "http"
+      }
+    },
+    {
+      "case": "cli-rust-status-real-health-identity",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 1,
+        "healthServerVersion": "0.0.0",
+        "dbCounts": {
+          "sessions": 2,
+          "runs": 0,
+          "key_events": 0
+        }
+      }
+    },
+    {
+      "case": "cli-rust-sessions-owner",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 0,
+        "apiSessionIds": [
+          "sess_local_beta",
+          "sess_local_alpha"
+        ],
+        "dbCounts": {
+          "sessions": 2,
+          "runs": 0,
+          "key_events": 0
+        }
+      }
+    },
+    {
+      "case": "cli-rust-continue-missing-no-create",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 1,
+        "before": {
+          "sessions": 2,
+          "runs": 0,
+          "key_events": 0
+        },
+        "after": {
+          "sessions": 2,
+          "runs": 0,
+          "key_events": 0
+        }
+      }
+    },
+    {
+      "case": "cli-rust-continue-existing-no-fake-reply",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 1,
+        "before": {
+          "sessions": 2,
+          "runs": 0,
+          "key_events": 0
+        },
+        "after": {
+          "sessions": 2,
+          "runs": 0,
+          "key_events": 0
+        }
+      }
+    },
+    {
+      "case": "cli-rust-chat-no-fake-run",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 1,
+        "before": {
+          "sessions": 2,
+          "runs": 0,
+          "key_events": 0
+        },
+        "after": {
+          "sessions": 2,
+          "runs": 0,
+          "key_events": 0
+        }
+      }
+    },
+    {
+      "case": "cli-rust-sessions-unauthorized",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 1
+      }
+    },
+    {
+      "case": "cli-rust-status-no-fake-auth",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 1
+      }
+    },
+    {
+      "case": "cli-rust-sessions-limit20",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 0,
+        "printedRows": [
+          "CLI fixture 24",
+          "CLI fixture 23",
+          "CLI fixture 22",
+          "CLI fixture 21",
+          "CLI fixture 20",
+          "CLI fixture 19",
+          "CLI fixture 18",
+          "CLI fixture 17",
+          "CLI fixture 16",
+          "CLI fixture 15",
+          "CLI fixture 14",
+          "CLI fixture 13",
+          "CLI fixture 12",
+          "CLI fixture 11",
+          "CLI fixture 10",
+          "CLI fixture 09",
+          "CLI fixture 08",
+          "CLI fixture 07",
+          "CLI fixture 06",
+          "CLI fixture 05"
+        ],
+        "apiSessionIds": [
+          "sess_cli_24",
+          "sess_cli_23",
+          "sess_cli_22",
+          "sess_cli_21",
+          "sess_cli_20",
+          "sess_cli_19",
+          "sess_cli_18",
+          "sess_cli_17",
+          "sess_cli_16",
+          "sess_cli_15",
+          "sess_cli_14",
+          "sess_cli_13",
+          "sess_cli_12",
+          "sess_cli_11",
+          "sess_cli_10",
+          "sess_cli_09",
+          "sess_cli_08",
+          "sess_cli_07",
+          "sess_cli_06",
+          "sess_cli_05",
+          "sess_cli_04",
+          "sess_cli_03",
+          "sess_cli_02",
+          "sess_cli_01",
+          "sess_cli_00",
+          "sess_local_beta",
+          "sess_local_alpha"
+        ],
+        "expectedNewestSessionIds": [
+          "sess_cli_24",
+          "sess_cli_23",
+          "sess_cli_22",
+          "sess_cli_21",
+          "sess_cli_20",
+          "sess_cli_19",
+          "sess_cli_18",
+          "sess_cli_17",
+          "sess_cli_16",
+          "sess_cli_15",
+          "sess_cli_14",
+          "sess_cli_13",
+          "sess_cli_12",
+          "sess_cli_11",
+          "sess_cli_10",
+          "sess_cli_09",
+          "sess_cli_08",
+          "sess_cli_07",
+          "sess_cli_06",
+          "sess_cli_05"
+        ],
+        "storedTitles": 27,
+        "dbCounts": {
+          "sessions": 27,
+          "runs": 0,
+          "key_events": 0
+        }
+      }
+    },
+    {
+      "case": "cli-rust-sessions-empty",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 0,
+        "apiSessions": [],
+        "dbCounts": {
+          "sessions": 0,
+          "runs": 0,
+          "key_events": 0
+        }
+      }
+    },
+    {
+      "case": "cli-rust-serve-sigterm-clean",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 0,
+        "bindAddr": "127.0.0.1:64697",
+        "rustPid": 52402,
+        "rustChildStateBeforeCleanup": "exited",
+        "rustChildStateAfterCleanup": "exited",
+        "portClosed": true
+      }
+    },
+    {
+      "case": "cli-rust-serve-startup-error",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 2,
+        "before": {},
+        "after": {}
+      }
+    },
+    {
+      "case": "cli-rust-serve-beta-no-silent-stable",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 1,
+        "before": {},
+        "after": {}
+      }
+    },
+    {
+      "case": "cli-rust-serve-downgrade-refused",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 1,
+        "before": {},
+        "after": {}
+      }
+    },
+    {
+      "case": "cli-rust-serve-newer-epoch-no-root-switch",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 2,
+        "stampSha256": "fef1da12458d4f58e5ac150ea8cf9628d7234180c32d4ceed0b3b71d4e83f05e",
+        "fallbackBefore": {},
+        "fallbackAfter": {}
+      }
+    },
+    {
+      "case": "cli-rust-sessions-disconnected",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "exit": 1
+      }
+    },
+    {
+      "case": "cli-rust-candidate-unchanged-during-probe",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "sourceFiles": 145,
+        "changedPaths": []
+      }
+    }
+  ]
+}

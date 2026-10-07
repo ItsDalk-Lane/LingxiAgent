@@ -1,0 +1,24 @@
+2026-10-07T02:48:28.547805Z  INFO lingxi_service: data root resolved effective_home=/tmp/h48.fd2tzxc8 source=cli ignored_sources=env(LINGXI_HOME)=/tmp/h48.fd2tzxc8
+2026-10-07T02:48:28.548092Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/h48.fd2tzxc8 runtime_dir=/private/tmp/h48.fd2tzxc8/lingxi-service
+2026-10-07T02:48:28.548268Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=cf6fcdeff8c4ba22 pid=34848 entropy="os-random-device" lock=/private/tmp/h48.fd2tzxc8/lingxi-service/instance.lock network_mode=loopback
+2026-10-07T02:48:28.560386Z  INFO lingxi_service: data-epoch gate passed home=/private/tmp/h48.fd2tzxc8 decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-10-07T02:48:28.601272Z DEBUG lingxi_adapters::storage::queue: db worker connection ready db=/private/tmp/h48.fd2tzxc8/lingxi-service/data/runs.db journal_mode=wal
+2026-10-07T02:48:28.606335Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/tmp/h48.fd2tzxc8/lingxi-service/data/runs.db applied=[1, 2, 3, 4, 5, 6, 7] version=7
+2026-10-07T02:48:28.606768Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/tmp/h48.fd2tzxc8/lingxi-service/local-token.json run_database=/private/tmp/h48.fd2tzxc8/lingxi-service/data/runs.db
+2026-10-07T02:48:28.615424Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/h48.fd2tzxc8/lingxi-service/instance.json bind_addr=127.0.0.1:55095
+LINGXI_AUTH_REJECTED request_id="req-aa7c9ef127ad2050f316fa8df38cd34e" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:55096
+2026-10-07T02:48:28.662576Z  INFO lingxi_service: request handled request_id="req-aa7c9ef127ad2050f316fa8df38cd34e" method=GET path=/lingxi/v1/me status=401
+LINGXI_AUTH_REJECTED request_id="req-1720297b10593515e1ed80e704639507" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55097
+2026-10-07T02:48:28.663942Z  INFO lingxi_service: request handled request_id="req-1720297b10593515e1ed80e704639507" method=GET path=/lingxi/v1/me status=401
+LINGXI_AUTH_REJECTED request_id="req-9b11c2d292f1126b88dc756098823dce" method=GET path=/lingxi/v1/ws status=401 reason=invalid_credential remote=127.0.0.1:55098
+2026-10-07T02:48:28.665106Z  INFO lingxi_service: request handled request_id="req-9b11c2d292f1126b88dc756098823dce" method=GET path=/lingxi/v1/ws status=401
+2026-10-07T02:48:28.665858Z DEBUG lingxi_service: ws upgrade authenticated source=authorization request_id="req-6038d0c017d95cc0f9a116dda6888b13"
+LINGXI_TRANSPORT_REJECTED request_id="req-6038d0c017d95cc0f9a116dda6888b13" method=GET path=/lingxi/v1/ws status=400 reason=missing Connection: upgrade
+2026-10-07T02:48:28.666048Z  INFO lingxi_service: request handled request_id="req-6038d0c017d95cc0f9a116dda6888b13" method=GET path=/lingxi/v1/ws status=400
+LINGXI_TRANSPORT_REJECTED request_id="req-3f966553cc4aa084440c0b0dac519997" method=GET path=/lingxi/v1/me status=403 reason=bad_origin origin=https://untrusted.invalid host=127.0.0.1:55095 remote=127.0.0.1:55100
+2026-10-07T02:48:28.666865Z  INFO lingxi_service: request handled request_id="req-3f966553cc4aa084440c0b0dac519997" method=GET path=/lingxi/v1/me status=403
+2026-10-07T02:48:28.667276Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-10-07T02:48:28.667342Z DEBUG lingxi_service::serve: shutdown signal: connection accept loop stopping
+2026-10-07T02:48:28.668757Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-10-07T02:48:28.669110Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-10-07T02:48:28.669193Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

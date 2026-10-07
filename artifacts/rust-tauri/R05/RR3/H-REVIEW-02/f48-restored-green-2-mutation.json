@@ -1,0 +1,19 @@
+{
+  "UTC": "2026-10-07T03:13:37.244600+00:00",
+  "source": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated",
+  "original": {
+    "rust/crates/lingxi-service/src/main.rs": "9ea695ee5b2eef4163db16df4b584b363df6a375ca334f02c9160886ed1b5f5b",
+    "rust/crates/lingxi-service/src/redaction.rs": "5b192ab43df13d6add0705a9f1eb2ead45da1131f012c3afb61dd9f90ac10b7a",
+    "rust/crates/lingxi-service/src/logging.rs": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+    "rust/crates/lingxi-service/src/lib.rs": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+    "scripts/rust-tauri/r02_t01_service_smoke.sh": "76f3e9fd143842b4f9ef7577bf3c857ddaee29e02ec849b9b93d2cc14afede1c"
+  },
+  "mutated": {
+    "rust/crates/lingxi-service/src/main.rs": "9ea695ee5b2eef4163db16df4b584b363df6a375ca334f02c9160886ed1b5f5b",
+    "rust/crates/lingxi-service/src/redaction.rs": "5b192ab43df13d6add0705a9f1eb2ead45da1131f012c3afb61dd9f90ac10b7a",
+    "rust/crates/lingxi-service/src/logging.rs": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+    "rust/crates/lingxi-service/src/lib.rs": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+    "scripts/rust-tauri/r02_t01_service_smoke.sh": "76f3e9fd143842b4f9ef7577bf3c857ddaee29e02ec849b9b93d2cc14afede1c"
+  },
+  "boundary": "隔离源码；实际Cargo构建复用主缓存，但主源码不改；不操作G COPY或NEG_TARGET"
+}

@@ -1,0 +1,4 @@
+# RR3 临时空间准备（仅本轮可重建缓存）
+你是全新辅助执行者，总控只协调。当前磁盘约2.8GiB，下轮真实negative默认clone需要约3.5GiB独立git对象暂存及编译余量。只处理可从证据确证属于本轮RR3且已结束的派生构建缓存；先读RR3_HANDOFF、TASK0/temp-storage-receipt.json、interruption-recovery-20261007.json。你不是产品修复/验收者，不改任何生产/脚本/docs/Git主库/系统。H-REVIEW-02独占主rust/target及NEG_TARGET，两者完全禁止写/清理。G-INTERRUPTION-01正在只读旧G原始证据，旧G目录也禁止你改。
+范围：artifacts/rust-tauri/R05/RR3 下已结束A/B/C/D/E/F46/H-01/H-REVIEW-01/I各包产生的target/own-target等可重建编译中间缓存，及从其命令明确确认对应的本轮外部临时目录；不碰RR1/RR2/其他用户临时目录。先清点空间和归属及活跃进程；保留所有源码/隔离故障副本正文/实际被测二进制/日志/原始序列/manifest所列证据。只能删除没有证据要求保留的编译中间文件（incremental、确实可重建的deps .rlib/.rmeta/.o等），不能只按目录名大范围rm。若文件列入历史manifest必须不删或明确保留完整证据原件，不能以摘要代替要求的证据。
+写新RR3/STORAGE-01/REPORT.md与结构化前后receipt：路径所有者证明/真实命令/时间/被删中间缓存清单及size/保留文件摘要前后一致/实际释放/磁盘。优先达到足够clone余量即止；不可为凑量清理来源不明数据或触H缓存。没有安全空间就报告确切差额和只读候选，不能擅改negative脚本或系统。此任务无需Cargo/测试/新agent。完成停止写，告诉总控能否安全启动下一轮。

@@ -1,0 +1,8 @@
+{"du_kilobytes": 5298004, "file_count": 102887, "max_relpath_len": 221, "nested_git_head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b", "other_count": 0, "symlink_count": 115, "total_bytes": 5130434169, "tree_digest": "fee8e52b9a4965766eb4b3b3fd376f3da761e05d47db1d7eabd966815ea39e9b"}
+file_count  fresh=102887 receipt_post=102887 EQUAL=True
+symlinks    fresh=115 receipt_post=115 EQUAL=True
+total_bytes fresh=5130434169 receipt_post=5130434169 EQUAL=True
+digest vs receipt pre/post (79736540): False
+digest vs incident current (fee8e52b): True
+fresh_digest: fee8e52b9a4965766eb4b3b3fd376f3da761e05d47db1d7eabd966815ea39e9b
+b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b

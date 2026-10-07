@@ -1,0 +1,63 @@
+{
+  "utc": "2026-10-07T01:25:38.681122+00:00",
+  "sourceInputsStillEqual": true,
+  "inputDigest": "0f945b9884ee73957a6db3fe19c3d6b4a6b87672feef7c3fd1b46998f2f92b75",
+  "preparedStatus": "MATCH",
+  "formalExecutedExactlyOnce": true,
+  "formalCounts": [
+    {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0
+    }
+  ],
+  "actualExits": [
+    {
+      "name": "prebuild-r00",
+      "exitCode": 0
+    },
+    {
+      "name": "r00-formal-01",
+      "exitCode": 101
+    },
+    {
+      "name": "compile-probe",
+      "exitCode": 0
+    },
+    {
+      "name": "probe-c-loopback",
+      "exitCode": 0
+    },
+    {
+      "name": "probe-c-lan",
+      "exitCode": 1
+    },
+    {
+      "name": "probe-apple-lan",
+      "exitCode": 0
+    },
+    {
+      "name": "prepared-identity-check",
+      "exitCode": 0
+    }
+  ],
+  "allRuntimeLogHashesMatch": true,
+  "reportIdentityMatches": true,
+  "systemChangesExecuted": false,
+  "reviewStatus": "PASS for localization/preparation",
+  "requiredGate": "FAIL",
+  "environment": "BLOCKED",
+  "R06_READY": false,
+  "dispatchExcludedReason": "parent ongoing raw tool events; no writes by reviewer",
+  "notRun": [
+    "workspace",
+    "full S5.3",
+    "FINAL",
+    "system allow operation",
+    "LIVE",
+    "other platforms",
+    "A/C/F46 acceptance"
+  ]
+}

@@ -1,0 +1,3 @@
+overall=FAIL
+stable=False
+reason=Candidate file bytes or HEAD changed during the registered stage checks, or a snapshot failed; stage PASS is forbidden.

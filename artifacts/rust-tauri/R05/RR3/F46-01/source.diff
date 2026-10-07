@@ -1,0 +1,111 @@
+diff --git a/rust/crates/lingxi-service/src/logging.rs b/rust/crates/lingxi-service/src/logging.rs
+index 73b094362..be2bd9e32 100644
+--- a/rust/crates/lingxi-service/src/logging.rs
++++ b/rust/crates/lingxi-service/src/logging.rs
+@@ -99,8 +99,8 @@ pub struct RotatingLogFile {
+ }
+ 
+ impl RotatingLogFile {
+-    /// Opens the log directory (0700, created if missing), prunes older
+-    /// files beyond `max_files` and opens the next sequence.
++    /// 打开日志目录（缺失时创建为 0700），创建下一份日志后，
++    /// 将包含当前文件的完整集合裁剪到 `max_files`。
+     pub fn open(dir: PathBuf, config: &LogRotationConfig) -> io::Result<Self> {
+         config
+             .validate()
+@@ -116,8 +116,8 @@ impl RotatingLogFile {
+             written: 0,
+         };
+         log.seq = log.next_seq()?;
+-        log.prune()?;
+         log.open_current()?;
++        log.prune()?;
+         Ok(log)
+     }
+ 
+@@ -478,6 +478,85 @@ mod tests {
+         let _ = fs::remove_dir_all(&dir);
+     }
+ 
++    #[test]
++    fn opening_at_the_file_limit_prunes_the_oldest_and_preserves_newer_contents() {
++        let dir = temp_dir("open-at-limit");
++        fs::create_dir_all(&dir).expect("准备旧日志目录");
++        for seq in 1..=3 {
++            fs::write(
++                dir.join(format!("service-{seq:06}.log")),
++                format!("existing {seq}\n"),
++            )
++            .expect("准备旧日志");
++        }
++        let config = LogRotationConfig {
++            max_bytes: 128,
++            max_files: 3,
++        };
++        let mut log = RotatingLogFile::open(dir.clone(), &config).expect("打开已有满额日志");
++        assert_eq!(
++            all_log_files(&dir).len(),
++            3,
++            "打开后即满足包含当前文件的上限"
++        );
++        assert!(!dir.join("service-000001.log").exists());
++        for seq in 2..=3 {
++            assert_eq!(
++                fs::read_to_string(dir.join(format!("service-{seq:06}.log"))).unwrap(),
++                format!("existing {seq}\n"),
++                "保留日志内容不能被截断"
++            );
++        }
++        log.write_line("newest run").expect("新日志仍可正常写入");
++        assert_eq!(lines_of(&dir.join("service-000004.log")), ["newest run"]);
++        drop(log);
++        fs::remove_dir_all(&dir).expect("清理日志目录");
++    }
++
++    #[test]
++    fn repeated_open_without_writes_is_bounded_from_the_new_directory() {
++        let dir = temp_dir("open-without-writes");
++        let config = LogRotationConfig {
++            max_bytes: 128,
++            max_files: 3,
++        };
++        for restart in 1..=6 {
++            let log = RotatingLogFile::open(dir.clone(), &config).expect("连续打开");
++            let files = all_log_files(&dir);
++            assert_eq!(files.len(), restart.min(3), "没有写入也必须保持数量上限");
++            assert_eq!(log.seq, restart as u64, "重启不能复用旧序号");
++            assert!(files.iter().all(|p| fs::metadata(p).unwrap().len() == 0));
++            drop(log);
++        }
++        fs::remove_dir_all(&dir).expect("清理日志目录");
++    }
++
++    #[test]
++    fn startup_prune_and_rotation_open_failures_are_returned() {
++        let dir = temp_dir("open-prune-error");
++        fs::create_dir_all(dir.join("service-000001.log")).expect("准备不可删除为文件的旧条目");
++        for seq in 2..=3 {
++            fs::write(dir.join(format!("service-{seq:06}.log")), "older\n").unwrap();
++        }
++        let config = LogRotationConfig {
++            max_bytes: 64,
++            max_files: 3,
++        };
++        assert!(
++            RotatingLogFile::open(dir.clone(), &config).is_err(),
++            "启动裁剪失败不能报告成功"
++        );
++        fs::remove_dir_all(&dir).expect("清理错误夹具");
++
++        let mut log = RotatingLogFile::open(dir.clone(), &config).expect("正常打开");
++        log.write_line("first line").expect("正常写入");
++        fs::remove_dir_all(&dir).expect("使下一份日志无法创建");
++        assert!(
++            log.write_line(&"x".repeat(64)).is_err(),
++            "轮转创建失败必须显式返回"
++        );
++    }
++
+     #[cfg(unix)]
+     #[test]
+     fn log_files_are_owner_only() {

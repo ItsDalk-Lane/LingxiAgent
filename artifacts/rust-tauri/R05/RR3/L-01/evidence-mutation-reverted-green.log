@@ -1,0 +1,9 @@
+   Compiling lingxi-service v0.0.0 (/tmp/l01-mutation/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.38s
+     Running tests/r04_t08_tool_matrix.rs (/tmp/l01-load-target/debug/deps/r04_t08_tool_matrix-94e01f57d41763de)
+
+running 1 test
+test terminal_family_share_cases ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.20s
+

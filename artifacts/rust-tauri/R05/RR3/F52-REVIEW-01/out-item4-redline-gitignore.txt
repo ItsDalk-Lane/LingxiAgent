@@ -1,0 +1,8 @@
+== .gitignore diff vs HEAD (expect empty) ==
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  -
+       0
+== .gitignore worktree vs HEAD blob byte-compare ==
+GITIGNORE-IDENTICAL-TO-HEAD
+== production reference scan: independent-validator-bin ==
+HEAD grep exit: 0 (1=none)
+worktree grep exit: 0 (1=none)

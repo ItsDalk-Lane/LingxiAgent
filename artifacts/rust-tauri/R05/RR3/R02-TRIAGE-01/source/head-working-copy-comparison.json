@@ -1,0 +1,65 @@
+[
+  {
+    "path": "scripts/rust-tauri/r02_t01_service_smoke.sh",
+    "HEADSHA256": "14516af32a59d2f590018be232c601817dfeadb3e4355fa860fd90b1cc34bd79",
+    "workingSHA256": "14516af32a59d2f590018be232c601817dfeadb3e4355fa860fd90b1cc34bd79",
+    "copySHA256": "14516af32a59d2f590018be232c601817dfeadb3e4355fa860fd90b1cc34bd79",
+    "gitShowExit": 0
+  },
+  {
+    "path": "scripts/rust-tauri/r02_t07_redaction_scan.sh",
+    "HEADSHA256": "59876a68d3b3c1a68a889bb4e4739e2710918f23861b822f5bad3eb34d9fb792",
+    "workingSHA256": "59876a68d3b3c1a68a889bb4e4739e2710918f23861b822f5bad3eb34d9fb792",
+    "copySHA256": "59876a68d3b3c1a68a889bb4e4739e2710918f23861b822f5bad3eb34d9fb792",
+    "gitShowExit": 0
+  },
+  {
+    "path": "rust/crates/lingxi-service/src/redaction.rs",
+    "HEADSHA256": "9d749fc88d7c653399db7908b4fddd1bcca3264362c9da3a6a7ba49318c6a1ed",
+    "workingSHA256": "9d749fc88d7c653399db7908b4fddd1bcca3264362c9da3a6a7ba49318c6a1ed",
+    "copySHA256": "9d749fc88d7c653399db7908b4fddd1bcca3264362c9da3a6a7ba49318c6a1ed",
+    "gitShowExit": 0
+  },
+  {
+    "path": "rust/crates/lingxi-service/src/inject.rs",
+    "HEADSHA256": "c440a0c38f5710500b3aa3c557ca33d9503db485d13fc1555416a7efb4c560e4",
+    "workingSHA256": "c440a0c38f5710500b3aa3c557ca33d9503db485d13fc1555416a7efb4c560e4",
+    "copySHA256": "c440a0c38f5710500b3aa3c557ca33d9503db485d13fc1555416a7efb4c560e4",
+    "gitShowExit": 0
+  },
+  {
+    "path": "rust/crates/lingxi-service/src/main.rs",
+    "HEADSHA256": "9ea695ee5b2eef4163db16df4b584b363df6a375ca334f02c9160886ed1b5f5b",
+    "workingSHA256": "9ea695ee5b2eef4163db16df4b584b363df6a375ca334f02c9160886ed1b5f5b",
+    "copySHA256": "9ea695ee5b2eef4163db16df4b584b363df6a375ca334f02c9160886ed1b5f5b",
+    "gitShowExit": 0
+  },
+  {
+    "path": "rust/crates/lingxi-service/src/logging.rs",
+    "HEADSHA256": "5f0aa8ccabc62295d64ff0ca6b61a5fc9a384e6a4bdd6e092d70a15ab73b6be1",
+    "workingSHA256": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+    "copySHA256": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+    "gitShowExit": 0
+  },
+  {
+    "path": "rust/crates/lingxi-service/src/epoch.rs",
+    "HEADSHA256": "9c29d9ee8924d7b514a9bc4b7f8d374d420287f25b1b36f5295619c0f882b855",
+    "workingSHA256": "9c29d9ee8924d7b514a9bc4b7f8d374d420287f25b1b36f5295619c0f882b855",
+    "copySHA256": "9c29d9ee8924d7b514a9bc4b7f8d374d420287f25b1b36f5295619c0f882b855",
+    "gitShowExit": 0
+  },
+  {
+    "path": "rust/crates/lingxi-adapters/src/storage/migrations.rs",
+    "HEADSHA256": "df9519611c4020c5eed3acccedc92287feeb9f6b0af477ee69e1317ef089859d",
+    "workingSHA256": "df9519611c4020c5eed3acccedc92287feeb9f6b0af477ee69e1317ef089859d",
+    "copySHA256": "df9519611c4020c5eed3acccedc92287feeb9f6b0af477ee69e1317ef089859d",
+    "gitShowExit": 0
+  },
+  {
+    "path": "rust/crates/lingxi-protocol/src/lib.rs",
+    "HEADSHA256": "7dc6fe93e4c9aa29da6ca4690e039f647c23938599557c374d185f047c62fce2",
+    "workingSHA256": "7dc6fe93e4c9aa29da6ca4690e039f647c23938599557c374d185f047c62fce2",
+    "copySHA256": "7dc6fe93e4c9aa29da6ca4690e039f647c23938599557c374d185f047c62fce2",
+    "gitShowExit": 0
+  }
+]

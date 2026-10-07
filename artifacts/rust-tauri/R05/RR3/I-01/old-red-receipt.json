@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "bash",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/old-red-command.sh",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/old-red-copy",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/old-red-pristine"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startUTC": "2026-10-07T02:26:35.642325+00:00",
+  "endUTC": "2026-10-07T02:26:35.783080+00:00",
+  "exitCode": 1,
+  "target": "cmp kernel after original reset_copy",
+  "pristineSha256": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+  "afterOriginalResetSha256": "0a5f0c3aee15f437cae03cca5eb182680f6e57aa64e3dcd95fbb5561a243720f",
+  "files": [
+    "rust/crates/xtask/src/stage_maps/R05.json",
+    "rust/crates/xtask/src/stage_maps/R04.json",
+    "rust/crates/lingxi-service/src/lib.rs",
+    "rust/crates/lingxi-kernel/src/lib.rs",
+    "rust/crates/lingxi-adapters/src/models/tool_render.rs",
+    "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+    "rust/crates/lingxi-adapters/src/models/credentials.rs",
+    "rust/crates/lingxi-service/src/runs.rs",
+    "rust/crates/lingxi-service/src/credentials/mod.rs",
+    "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs",
+    "docs/rust-tauri/R05/r05_stage_pins.tsv",
+    "scripts/rust-tauri/r05_t08_stage_suites.sh"
+  ],
+  "count": 1,
+  "expected": "旧目标红；shell原函数实际未恢复"
+}

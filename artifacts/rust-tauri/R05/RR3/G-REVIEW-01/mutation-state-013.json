@@ -1,0 +1,22 @@
+{
+  "utc": "2026-10-07T02:01:12.095694+00:00",
+  "consoleLastLines": [
+    "== N09: Success rendered as the fixed string 'done'; the runtime-nonce checks must go red ==",
+    "case R05-GATE-N09: exit=101 gap-named=OK verdict=OK (固定 done 替代真实回传 → 运行时 nonce 检查红)",
+    "== N10: tool results paired to a constant id; the pairing assertions must go red =="
+  ],
+  "hashes": {
+    "scripts/rust-tauri/r05_t08_stage_suites.sh": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e",
+    "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+    "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+    "rust/crates/lingxi-service/src/lib.rs": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756",
+    "rust/crates/lingxi-service/src/runs.rs": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+    "rust/crates/lingxi-service/src/credentials/mod.rs": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+    "rust/crates/xtask/src/stage_maps/R04.json": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+    "rust/crates/xtask/src/stage_maps/R05.json": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+    "rust/crates/lingxi-kernel/src/lib.rs": "0a5f0c3aee15f437cae03cca5eb182680f6e57aa64e3dcd95fbb5561a243720f",
+    "rust/crates/lingxi-adapters/src/models/openai_completions.rs": "d9d80f28777717949256e7f49be08193be9c101cab5d49f920b6be2a65c4bbae",
+    "rust/crates/lingxi-adapters/src/models/credentials.rs": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+    "rust/crates/lingxi-adapters/src/models/tool_render.rs": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0"
+  }
+}

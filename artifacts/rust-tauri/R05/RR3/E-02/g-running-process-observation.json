@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-07T01:51:36.500798+00:00",
+  "argv": [
+    "ps",
+    "-axo",
+    "pid=,ppid=,etime=,command="
+  ],
+  "exitCode": 0,
+  "selectedMatches": [
+    "50448 90799       03:48 bash scripts/rust-tauri/r05_t08_negative_gate.sh artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01",
+    "90794 87860       25:40 /Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python artifacts/rust-tauri/R05/RR3/G-REVIEW-01/run-default.py",
+    "90799 90794       25:40 bash scripts/rust-tauri/r05_t08_negative_gate.sh artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01"
+  ],
+  "boundary": "只保存G运行相关匹配，不保存无关用户进程；只读，不发信号。"
+}

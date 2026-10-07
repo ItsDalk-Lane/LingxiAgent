@@ -1,0 +1,21 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.65s
+     Running tests/r05_t05_timeouts.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t05_timeouts-524bff1312d5bf4d)
+
+running 13 tests
+test connect_refusal_is_retryable_upstream ... ok
+test connect_refusal_is_the_expected_underlying_kind ... ok
+test accepted_then_dropped_is_terminal_and_never_resent ... ok
+test deadline_hit_inside_first_byte_wait_is_non_retryable_budget ... ok
+test deadline_hit_mid_stream_abandons_the_read_without_rewind ... ok
+test http_429_delay_seconds_hint_lands_in_details ... ok
+test http_429_garbage_hint_is_ignored_never_trusted ... ok
+test http_429_http_date_hint_lands_in_details ... ok
+test http_5xx_is_bounded_retryable_without_a_fabricated_hint ... ok
+test mid_stream_transport_break_is_terminal_and_never_resent ... ok
+test pre_send_budget_exhaustion_sends_nothing_and_is_not_retryable ... ok
+test retry_after_parsing_pins_the_rfc_9110_forms ... ok
+test first_byte_window_hit_is_terminal_no_blind_resend ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.71s
+

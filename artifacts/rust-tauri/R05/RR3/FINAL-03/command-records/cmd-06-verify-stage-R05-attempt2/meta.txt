@@ -1,0 +1,14 @@
+label: cmd-06-verify-stage-R05-attempt2
+argv: /Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05
+cwd: /Users/study_superior/Desktop/Code/LingxiAgent
+HOME: /Users/study_superior
+user: study_superior
+utcStart: 2026-10-07T14:30:51.155116000Z
+dfBefore: /dev/disk3s5       926  358       543    40% 5129756 5699372200    0%   /System/Volumes/Data
+utcEnd: 2026-10-07T15:47:33.108524000Z
+exit: 1
+stdoutBytes: 13708
+stderrBytes: 188
+stdoutSha256: e949c14992e8cbba3284f26069336c910427fc36bd4225a45f8b3085bbe9d0f3
+stderrSha256: 00ce4430ecae91673c2bb27c27d2b57f6d4229fa52cdfba04eb8111185290a07
+dfAfter: /dev/disk3s5       926  375       526    42% 5174866 5522606480    0%   /System/Volumes/Data

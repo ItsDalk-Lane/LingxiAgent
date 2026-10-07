@@ -1,0 +1,11 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running `/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R02 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n16-binding-drift/run-b`
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t01_service_smoke.sh {EVIDENCE}/A01] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n16-binding-drift/run-b/a01_smoke
+xtask: verify-stage R02 [a01_smoke] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t01_boundary_negative.sh {EVIDENCE}/A02] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n16-binding-drift/run-b/a02_boundary_negative
+xtask: verify-stage R02 [a02_boundary_negative] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t02_dual_instance.sh {EVIDENCE}/A03] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n16-binding-drift/run-b/a03_dual_instance
+xtask: verify-stage R02 [a03_dual_instance] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t02_path_priority.sh {EVIDENCE}/A04] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n16-binding-drift/run-b/a04_path_priority
+xtask: verify-stage R02 [a04_path_priority] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t03_auth_matrix.sh {EVIDENCE}/A05_A06] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n16-binding-drift/run-b/a05_a06_auth_matrix

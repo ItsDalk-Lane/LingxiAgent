@@ -1,0 +1,23 @@
+{
+ "argv": [
+  "/Users/study_superior/.cargo/bin/cargo",
+  "test",
+  "--manifest-path",
+  "rust/Cargo.toml",
+  "--workspace",
+  "--locked"
+ ],
+ "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+ "df_after": "/dev/disk3s5   926Gi   389Gi   513Gi    44%    5.5M  5.4G    0%   /System/Volumes/Data",
+ "df_before": "/dev/disk3s5   926Gi   389Gi   513Gi    44%    5.5M  5.4G    0%   /System/Volumes/Data",
+ "exit": 0,
+ "label": "cmd-03-workspace-test",
+ "stderr_bytes": 12037,
+ "stderr_file": "cmd-03-workspace-test.stderr",
+ "stderr_sha256": "da35fee8bd8693efcdc10962d3b40e90d5682c2c8d1d92d38f39a3732b1f1020",
+ "stdout_bytes": 123070,
+ "stdout_file": "cmd-03-workspace-test.stdout",
+ "stdout_sha256": "33e73c047133460ae6b8d4450fbc3a2ac866d2853aea9ee1032bc28c7651d936",
+ "utc_end": "2026-10-07T20:12:19.949549+00:00",
+ "utc_start": "2026-10-07T19:57:27.666487+00:00"
+}

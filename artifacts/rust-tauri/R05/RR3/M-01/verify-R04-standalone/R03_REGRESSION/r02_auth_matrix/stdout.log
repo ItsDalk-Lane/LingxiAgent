@@ -1,0 +1,146 @@
+== building lingxi-service (rustup 1.98.1, /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r02-t03, --locked) ==
+== service up addr=127.0.0.1:60512 home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t03-home-sEV7bS ==
+== A05: forged identity is ineffective ==
+PASS a05-no-credential-read (http=401)
+PASS a05-no-credential-read-reason (body contains 'missing_credential')
+PASS a05-no-credential-execute (http=401)
+PASS a05-no-credential-ws-ticket (http=403)
+PASS a05-no-credential-ws-ticket-reason (body contains 'missing_credential')
+d7581d72640c972bc581a5f1d67d03ff28eccb82b03d3959f70ad230de3573f8  devices.json
+c02ba625c4f78459904a1a109c230725c41a7af80b0ab8960b35322ec3ee11e8  device-credentials.json
+685cdeba6a27062408bbb3cd2e14d9fe0cf0f94772feebf83d760372163a3add  local-token.json
+PASS a05-no-credential-me (http=401)
+d7581d72640c972bc581a5f1d67d03ff28eccb82b03d3959f70ad230de3573f8  devices.json
+c02ba625c4f78459904a1a109c230725c41a7af80b0ab8960b35322ec3ee11e8  device-credentials.json
+685cdeba6a27062408bbb3cd2e14d9fe0cf0f94772feebf83d760372163a3add  local-token.json
+PASS a05-forged-principal-headers (http=401)
+PASS a05-me-with-forged-header (http=200)
+PASS a05-me-server-computed (body contains '"kind":"local_user"')
+PASS a05-me-owner-full-projection (version, identity, scoped capabilities)
+PASS a05-me-never-echoes-forged-values
+PASS a05-identity-shaped-body-rejected (http=400)
+PASS a05-identity-shaped-body-reason (body contains 'invalid_message')
+PASS a05-forged-session-id (http=404)
+PASS a05-forged-session-id-reason (body contains 'not_found')
+PASS a05-forged-session-id-execute (http=404)
+PASS a05-wrong-token (http=401)
+PASS a05-wrong-token-reason (body contains 'invalid_credential')
+PASS a05-issue-expired-credential (http=201)
+PASS a05-ws-ticket-issue-owner (http=200)
+PASS a05-ws-ticket-issue-owner-shape (body contains '"ticket":"')
+PASS a05-devices-credentials-empty-user-id (http=400)
+PASS a05-devices-credentials-invalid-json (http=400)
+PASS a05-devices-credentials-invalid-json-reason (body contains 'invalid_message')
+PASS a05-issue-foreign-credential (http=201)
+PASS a05-foreign-credential-authenticates (http=200)
+PASS a05-foreign-principal-kind (body contains '"kind":"device"')
+PASS a05-me-device-full-projection (version, identity, scoped capabilities)
+PASS a05-issue-no-chat-credential (http=201)
+PASS a05-ws-ticket-insufficient-scope (http=403)
+PASS a05-ws-ticket-insufficient-scope-reason (body contains 'insufficient_scope')
+667612988941d2323c8a43a6454ca7e67150521977e206135af999373978edeb  devices.json
+4d7dc2b12cfec57fbd674d844e5d08f175c7025206d9ea29e487cadf05d10d7e  device-credentials.json
+685cdeba6a27062408bbb3cd2e14d9fe0cf0f94772feebf83d760372163a3add  local-token.json
+state before negatives: runCounts=0 0
+PASS a05-expired-credential (http=401)
+PASS a05-expired-credential-reason (body contains 'invalid_credential')
+PASS a05-expired-credential-execute (http=401)
+667612988941d2323c8a43a6454ca7e67150521977e206135af999373978edeb  devices.json
+4d7dc2b12cfec57fbd674d844e5d08f175c7025206d9ea29e487cadf05d10d7e  device-credentials.json
+685cdeba6a27062408bbb3cd2e14d9fe0cf0f94772feebf83d760372163a3add  local-token.json
+PASS a05-authn-failures-registry-files-byte-identical
+667612988941d2323c8a43a6454ca7e67150521977e206135af999373978edeb  devices.json
+4d7dc2b12cfec57fbd674d844e5d08f175c7025206d9ea29e487cadf05d10d7e  device-credentials.json
+685cdeba6a27062408bbb3cd2e14d9fe0cf0f94772feebf83d760372163a3add  local-token.json
+PASS a05-cross-principal-read (http=403)
+PASS a05-cross-principal-read-reason (body contains 'cross_principal_access')
+PASS a05-cross-principal-execute (http=403)
+ac155cbdc0cf47a6b3b73dc2e9db90efe8e39537b57ed209ee593382d106a023  devices.json
+373a476a117c96e00821659b17b2ce8d99d76b61761c9efc55a94fb783612764  device-credentials.json
+685cdeba6a27062408bbb3cd2e14d9fe0cf0f94772feebf83d760372163a3add  local-token.json
+PASS a05-authz-negatives-audit-only-changes (devices-before-authz.json vs devices-after-authz.json)
+PASS a05-authz-negatives-audit-only-changes (creds-before-authz.json vs creds-after-authz.json)
+state after negatives:  runCounts=0 0
+PASS a05-no-observable-business-state-change (runCounts stable)
+PASS a05-positive-control-owner-execute (http=200)
+PASS a05-positive-control-run-id (body contains '"runId":"run_')
+PASS a05-positive-control-advanced-run-count (owner execute works, denied ones did not)
+PASS a05-sessions-list-owner (http=200)
+PASS a05-sessions-list-owner-contains-own-session
+PASS a05-sessions-list-foreign-principal (http=200)
+PASS a05-sessions-list-foreign-excludes-owner-sessions
+PASS a05-sessions-list-empty-shape
+PASS a05-sessions-list-no-credential (http=401)
+PASS a05-sessions-list-no-credential-reason (body contains 'missing_credential')
+sessions-list-matrix.json: 6 cases
+PASS a05-cli-sessions-owner-list
+PASS a05-cli-sessions-foreign-empty
+PASS a05-cli-sessions-unauthorized-error
+== A06: malicious web page cannot ride loopback ==
+PASS a06-evil-origin-health (http=403)
+PASS a06-evil-origin-health-reason (body contains 'bad_origin')
+PASS a06-evil-origin-with-valid-token (http=403)
+PASS a06-allowed-origin-http://localhost:60512 (http=200)
+PASS a06-allowed-origin-http://127.0.0.1:60512 (http=200)
+PASS a06-allowed-origin-file:// (http=200)
+PASS a06-allowed-origin-null (http=200)
+PASS a06-rebinding-origin-http://sub.localhost:1 (http=403)
+PASS a06-rebinding-origin-http://127.0.0.1.evil.example (http=403)
+PASS a06-foreign-host-health (http=403)
+PASS a06-foreign-host-with-token (http=403)
+PASS a06-localhost-host-ok (http=200)
+PASS a06-rate-limit-live (429 observed)
+rate window expired; continuing
+PASS a06-body-limit-live (413 observed)
+== WS matrix (includes a real 30s ticket-TTL wait) ==
+PASS ws-evil-origin (expected=403 actual=403)
+PASS ws-foreign-host (expected=403 actual=403)
+PASS ws-no-credential (expected=401 actual=401)
+PASS ws-ticket-legit-origin-upgrade (expected=101 actual=101)
+PASS ws-server-hello (expected=True actual=True)
+PASS ws-session-read-owner (expected=True actual=True)
+PASS ws-ticket-replay (expected=401 actual=401)
+PASS ws-no-origin-cli-bearer (expected=101 actual=101)
+PASS ws-cli-server-hello (expected=True actual=True)
+PASS ws-unmasked-text-upgrade (expected=101 actual=101)
+PASS ws-unmasked-text-hello (expected=text actual=text)
+PASS ws-unmasked-text-protocol-close (expected=['close', 1002] actual=['close', 1002])
+PASS ws-unmasked-close-upgrade (expected=101 actual=101)
+PASS ws-unmasked-close-hello (expected=text actual=text)
+PASS ws-unmasked-close-protocol-close (expected=['close', 1002] actual=['close', 1002])
+PASS ws-unmasked-ping-upgrade (expected=101 actual=101)
+PASS ws-unmasked-ping-hello (expected=text actual=text)
+PASS ws-unmasked-ping-protocol-close (expected=['close', 1002] actual=['close', 1002])
+PASS ws-unmasked-pong-upgrade (expected=101 actual=101)
+PASS ws-unmasked-pong-hello (expected=text actual=text)
+PASS ws-unmasked-pong-protocol-close (expected=['close', 1002] actual=['close', 1002])
+PASS ws-invalid-upgrade-missing-version (expected=400 actual=400)
+PASS ws-invalid-upgrade-missing-key (expected=400 actual=400)
+PASS ws-invalid-upgrade-malformed-key (expected=400 actual=400)
+PASS ws-invalid-upgrade-wrong-upgrade (expected=400 actual=400)
+PASS ws-invalid-upgrade-substring-connection (expected=400 actual=400)
+PASS unknown-trailing-slash-/lingxi/v1/health/ (expected=401 actual=401)
+PASS unknown-trailing-slash-/lingxi/v1/web-auth/session/ (expected=401 actual=401)
+PASS ws-live-revoke-issue (expected=201 actual=201)
+PASS ws-live-revoke-upgrade (expected=101 actual=101)
+PASS ws-live-revoke-hello (expected=text actual=text)
+PASS ws-live-revoke-action (expected=200 actual=200)
+PASS ws-live-revoke-denial-frame (expected=True actual=True)
+PASS ws-live-revoke-idle-close (expected=['close', 4401] actual=['close', 4401])
+PASS ws-web-logout-password-setup (expected=200 actual=200)
+PASS ws-web-logout-login (expected=200 actual=200)
+PASS ws-web-logout-cookie-issued (expected=True actual=True)
+PASS ws-web-logout-ticket (expected=200 actual=200)
+PASS ws-web-logout-upgrade (expected=101 actual=101)
+PASS ws-web-logout-hello (expected=text actual=text)
+PASS ws-web-logout-action (expected=200 actual=200)
+PASS ws-web-logout-denial-frame (expected=True actual=True)
+PASS ws-web-logout-idle-close (expected=['close', 4401] actual=['close', 4401])
+PASS ws-ticket-expired (expected=401 actual=401)
+PASS a06-cli-no-origin-owner-read (http=200)
+PASS a06-cli-query-token-local (http=200)
+PASS a06-non-loopback-bind-requires-explicit-lan-mode (exit 2)
+leaf-cases.json: 93 cases, 0 failing
+PASS leaf-cases-json-assembled
+negative protocol log markers on stderr: 30 lines
+== ALL CASES PASSED ==

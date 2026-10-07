@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-07T03:26:14.361443+00:00",
+  "pid": 37009,
+  "verifiedCommand": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python artifacts/rust-tauri/R05/RR3/G-REVIEW-01/observe-supplement-processes.py",
+  "reason": "本轮G01已中断的孤儿观察器仍写原证；只停止确证本任务观察器，不改历史原件。",
+  "before": {
+    "sha256": "7cd810b6a4f359d4f1865b5e5a92741f2c7fc670b0b9b3eb65d73cb9db98f3cb",
+    "size": 5663631,
+    "mtime": 1791343512.7464418
+  },
+  "signal": "SIGTERM",
+  "originalProcessExitCode": null,
+  "processQueryExit": 1,
+  "processQueryOutput": "",
+  "after": {
+    "sha256": "7cd810b6a4f359d4f1865b5e5a92741f2c7fc670b0b9b3eb65d73cb9db98f3cb",
+    "size": 5663631,
+    "mtime": 1791343512.7464418
+  },
+  "oneSecondLater": {
+    "sha256": "7cd810b6a4f359d4f1865b5e5a92741f2c7fc670b0b9b3eb65d73cb9db98f3cb",
+    "size": 5663631,
+    "mtime": 1791343512.7464418
+  },
+  "stableAfterStop": true,
+  "notAnObservedNaturalExit": true
+}

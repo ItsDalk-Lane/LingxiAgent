@@ -1,0 +1,246 @@
+[
+  {
+    "id": "A02_READONLY_INPUT",
+    "decision": "INCLUDE_EVIDENCE_SNAPSHOT",
+    "reason": "仅选择三个正常脚本作为输入留样；extra_controls导入/读取它们，实际变异在extra/*/repo和source-copy；旧校验变异另在old-validator-snapshot。不是完整实验工作树。",
+    "driverReferences": [
+      "artifacts/rust-tauri/R05/RR3/A-02/extra_controls.py",
+      "artifacts/rust-tauri/R05/RR3/A-02/run_checks.py"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/A-02/input-manifest.json",
+      "artifacts/rust-tauri/R05/RR3/A-02/commands.json",
+      "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md"
+    ],
+    "evidenceRole": "A第二轮正常源输入原文；按证据文本阅读，不在交付路径运行",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "A_REVIEW1_WORKCOPY",
+    "decision": "LOCAL_ONLY",
+    "reason": "review_driver把rust/scripts/docs整体复制到snapshot并以它为运行cwd；target_controls直接变异其中helper和candidate后恢复。恢复后的hash相等仍不改变故障实验工作副本归属；复制的docs也不单独冒充本轮独立报告。",
+    "driverReferences": [
+      "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/review_driver.py",
+      "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/target_controls.py"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/input-manifest.json",
+      "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/helper-mutation.json",
+      "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/scope-mutation.json",
+      "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/delivery-inputs.json"
+    ],
+    "evidenceRole": "故障实验工作副本；本地原件保留，独立驱动/原日志/变异与恢复回执继续交付",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "A_REVIEW2_WORKCOPY",
+    "decision": "LOCAL_ONLY",
+    "reason": "prepare复制四个输入到snapshot，old_new直接替换其中生产shell两函数，在该目录执行旧红与恢复绿；它是受变异的可运行小副本，不是未参与变异的独立原文留样。",
+    "driverReferences": [
+      "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/review_driver.py"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/input-manifest.json",
+      "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/validator-mutation.json",
+      "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md"
+    ],
+    "evidenceRole": "故障校验工作副本；保存身份和复现来源，原件不远端交付",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "NEGATIVE_PRISTINE_INPUT",
+    "decision": "INCLUDE_EVIDENCE_SNAPSHOT",
+    "reason": "生产negative_gate在任何case变异前，从独立COPY逐项cp到EV/pristine；变异写COPY，reset_copy读pristine。这里是独立恢复输入，不是运行的故障COPY。保留旧恢复缺陷与历史FAIL，不把旧输入称为当前候选。",
+    "driverReferences": [
+      "artifacts/rust-tauri/R05/RR3/I-01/original-negative-gate.sh",
+      "artifacts/rust-tauri/R05/RR3/B-01/phase-driver.py",
+      "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/review-driver.py",
+      "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/run-default.py"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/B-01/REPORT.md",
+      "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+      "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/source-before.json"
+    ],
+    "evidenceRole": "负测前独立原始源码/配置恢复基线",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "RESTORE_PRISTINE_INPUT",
+    "decision": "INCLUDE_EVIDENCE_SNAPSHOT",
+    "reason": "永久恢复回归先将主源写入copy，加入明确合法候选脏字节，再snapshot到pristine；故障写copy，恢复读取pristine。pristine曾在缺失负控中移走再按已保存字节放回，最终与同轮preservedBaseline核对；合法候选注释不属于故障注入。",
+    "driverReferences": [
+      "scripts/rust-tauri/r05_t08_restore_selfcheck.py"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/I-01/REPORT.md",
+      "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/REVIEW.md",
+      "artifacts/rust-tauri/R05/RR3/J-01/REPORT.md"
+    ],
+    "evidenceRole": "同轮恢复基线文本；保留合法未提交候选而非覆盖为HEAD",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "RUNNER_PRISTINE_INPUT",
+    "decision": "INCLUDE_EVIDENCE_SNAPSHOT",
+    "reason": "恢复驱动另建runner-copy并在外侧runner-pristine留恢复输入；实际同步/中途故障发生于runner-copy。被审的8个rs是读取恢复用源码，控制authority另在runner-copy写入；不将这8项混作真实R02业务结果。",
+    "driverReferences": [
+      "scripts/rust-tauri/r05_t08_restore_selfcheck.py",
+      "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/sync_independent.py"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/I-01/REPORT.md",
+      "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/REVIEW.md"
+    ],
+    "evidenceRole": "生产runner同步负控的独立恢复输入",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "SNAPSHOT_CMP_RAW_INPUT",
+    "decision": "INCLUDE_EVIDENCE_SNAPSHOT",
+    "reason": "snapshot-cmp-failure负控只令cmp返回2，cp已将恢复后的基线写入独立目的路径；并未将故障注入该文件。以同轮pristine原文hash相等证明它是失败时保留下来的原始输入，不冒称快照检查成功。",
+    "driverReferences": [
+      "scripts/rust-tauri/r05_t08_restore_selfcheck.py"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/I-01/REPORT.md",
+      "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/REVIEW.md",
+      "artifacts/rust-tauri/R05/RR3/J-01/REPORT.md"
+    ],
+    "evidenceRole": "失败快照尝试的独立原始输入，与原失败日志一起留证",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "I_OLD_WORKCOPY",
+    "decision": "LOCAL_ONLY",
+    "reason": "additional_checks建立old-independent-copy，加入合法候选后执行真实N06 append，旧reset后红，再以同一pristine和新reset恢复。即使现字节恢复仍是被执行与变异的工作副本。",
+    "driverReferences": [
+      "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/additional_checks.py",
+      "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/old-independent-functions.sh"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/old-new-independent.json",
+      "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/REVIEW.md"
+    ],
+    "evidenceRole": "独立旧红/新绿的故障工作副本，原件本地保留",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "I_OLD_PRISTINE",
+    "decision": "INCLUDE_EVIDENCE_SNAPSHOT",
+    "reason": "old-independent-pristine由旧snapshot函数在N06 append之前写入，旧/新reset均读取同一原件；additional_checks证明未重拍并与baseline相等。独立恢复输入不因兄弟copy经历故障就排除。",
+    "driverReferences": [
+      "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/additional_checks.py",
+      "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/old-independent-functions.sh"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/old-new-independent.json"
+    ],
+    "evidenceRole": "独立旧红与新恢复对照共用的原始基线",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "I_MKDIR_RECOVERED_INPUT",
+    "decision": "INCLUDE_EVIDENCE_SNAPSHOT",
+    "reason": "mkdir故障腿断言目标不存在；随后撤去替身，用实际mkdir/cp/cmp在该独立路径写入并证明等于permanent-final/copy的合法基线。保留的是恢复成功后的输入，不能当失败腿已存在文件。",
+    "driverReferences": [
+      "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/additional_checks.py"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/REVIEW.md",
+      "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/old-new-independent.json"
+    ],
+    "evidenceRole": "mkdir负控恢复腿的独立输入留样",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "C_FROZEN_SOURCE",
+    "decision": "INCLUDE_EVIDENCE_SNAPSHOT",
+    "reason": "logging-frozen.rs在工作副本之外保存正常源码；mutation目标是isolated中的logging，finalize_review三方比较frozen/isolated/main并记录恢复。单个外置正常原文不等于故障工作副本。",
+    "driverReferences": [
+      "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/finalize_review.py"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/mutation.json",
+      "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/restoration.json",
+      "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/SOURCE_AUDIT.json"
+    ],
+    "evidenceRole": "F46独立审查的变异前正常源码原文",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "F46_ORIGINAL_SOURCE",
+    "decision": "INCLUDE_EVIDENCE_SNAPSHOT",
+    "reason": "实施报告明确先保存logging-before.rs再修生产；DIGESTS保存其原始身份。它是旧缺陷的独立原文，不是后续编译/故障运行目录。",
+    "driverReferences": [
+      "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/F46-01/DIGESTS.json"
+    ],
+    "evidenceRole": "F46修复前独立原文与历史红证输入",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "E_READONLY_SOURCE_EXCERPT",
+    "decision": "INCLUDE_EVIDENCE_SNAPSHOT",
+    "reason": "source-read-index逐项记录25个选读文件，24个Rust源码在本次待定集合；source-input是只读选读留样，没有Cargo项目根或运行copy。审查驱动从ROOT读取源码，在另外isolated-*.json/md变异文档；逐项将留样与读取索引及当时input-before摘要核对。创建复制命令未独立保存，不据此虚称有逐项复制命令回执。",
+    "driverReferences": [
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/run-controls.py",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/snapshot.py"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/source-read-index.json",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/input-before.json",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/worker-source.json",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-02/manifest.json"
+    ],
+    "evidenceRole": "文档契约核对所消费的原始源码，按非执行证据文本交付",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "TRIAGE_CAPTURED_SOURCE",
+    "decision": "INCLUDE_EVIDENCE_SNAPSHOT",
+    "reason": "collect.capture逐文件读取前后hash并把字节写入input/tag；不会在捕获文件中注入或执行。source-before/external只是从当时负测copy定向摘录20个源码/权威配置，不是复制用户配置目录，也不是继续运行的整个副本；原外部位置本轮未访问。",
+    "driverReferences": [
+      "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/source/collect.py"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/loghash/source-before.json",
+      "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/loghash/requirements-before.json",
+      "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/source/head-working-copy-comparison.json",
+      "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/REPORT.md"
+    ],
+    "evidenceRole": "现场或要求读取时刻的独立源码/构建命令/配置原文摘存",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "TRIAGE_GIT_SOURCE",
+    "decision": "INCLUDE_EVIDENCE_SNAPSHOT",
+    "reason": "HEAD/旧提交源码为只读取证中的git show原文，单文件存于source供版本差异比较；不是构建或故障运行工作目录。仅保留所声明提交的历史证据用途。",
+    "driverReferences": [
+      "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/source/collect.py"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/source/head-working-copy-comparison.json",
+      "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/REPORT.md"
+    ],
+    "evidenceRole": "历史提交原始源码的独立摘存",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  },
+  {
+    "id": "SYNTHETIC_RUNTIME_TICKET",
+    "decision": "LOCAL_ONLY",
+    "reason": "A13生产检查器用mktemp新home启动服务，p1-ticket.body是服务真实签发的临时票据响应；含运行令牌。虽属合成测试而非真实用户密钥，交付仍只登记SHA/大小/来源，不公开响应原文。取证复制件继承此边界。",
+    "driverReferences": [
+      "scripts/rust-tauri/r02_t07_redaction_scan.sh",
+      "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/source/collect.py"
+    ],
+    "evidenceReferences": [
+      "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/REPORT.md"
+    ],
+    "evidenceRole": "临时运行令牌原件本地保留；其请求/响应头/测试日志/失败结论保留",
+    "sourceOfTruth": "driver用途与读写位置决定；扩展名和manifest引用本身均不决定纳入"
+  }
+]

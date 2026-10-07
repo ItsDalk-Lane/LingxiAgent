@@ -1,0 +1,27 @@
+{
+ "argv": [
+  "/Users/study_superior/.cargo/bin/cargo",
+  "clippy",
+  "--manifest-path",
+  "rust/Cargo.toml",
+  "--workspace",
+  "--all-targets",
+  "--locked",
+  "--",
+  "-D",
+  "warnings"
+ ],
+ "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+ "df_after": "/dev/disk3s5   926Gi   389Gi   513Gi    44%    5.5M  5.4G    0%   /System/Volumes/Data",
+ "df_before": "/dev/disk3s5   926Gi   389Gi   513Gi    44%    5.5M  5.4G    0%   /System/Volumes/Data",
+ "exit": 0,
+ "label": "cmd-02-clippy",
+ "stderr_bytes": 239,
+ "stderr_file": "cmd-02-clippy.stderr",
+ "stderr_sha256": "ff6defcc4cf11661c9fc0dc3fa2495ce1b5eaa734675d68589519f8b63838c0e",
+ "stdout_bytes": 0,
+ "stdout_file": "cmd-02-clippy.stdout",
+ "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "utc_end": "2026-10-07T19:57:17.250748+00:00",
+ "utc_start": "2026-10-07T19:56:24.095183+00:00"
+}

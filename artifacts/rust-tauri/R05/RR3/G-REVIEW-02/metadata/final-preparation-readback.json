@@ -1,0 +1,19 @@
+{
+  "start": "2026-10-07T04:34:04.140614+00:00",
+  "end": "2026-10-07T04:34:27.132489+00:00",
+  "trackedSourceCount": 38066,
+  "trackedSourceDifferences": [],
+  "node": [
+    {
+      "root": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "count": 64760,
+      "differences": []
+    },
+    {
+      "root": "/Users/study_superior/r05t08-work/negcopy.HwNE95",
+      "count": 64760,
+      "differences": []
+    }
+  ],
+  "scope": "Independently rereads prior manifest-listed bytes after abort. Does not substitute for unexecuted production node final verify or any R02 business command; does not enumerate new dependencies beyond the original manifest."
+}

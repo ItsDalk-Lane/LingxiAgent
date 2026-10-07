@@ -1,0 +1,53 @@
+{
+ "at": "2026-10-07T07:03:00.503913+00:00",
+ "design": "Isolated positive/negative control, second run with corrected probe (R06_READY lives at rr3_current.R06_READY; first run exposed and retained the broken top-level probe as its own control of the control). Seeds on negative copy: R06_READY flipped true; true duplicate accepted_tasks key (naive json.loads silently last-wins); one byte mutated in copy of protected scripts/rust-tauri/r05_t08_negative_gate.sh. Positive copy byte-identical. No repository file touched.",
+ "first_run_note": "First run verdict METHOD_BLIND was caused solely by a wrong probe location (top-level R06_READY key absent in pristine doc); the negative side already flagged all four fault classes. First-run results retained in git history of this file.",
+ "checks": [
+  {
+   "group": "positive",
+   "check": "strict-JSON-dup-key",
+   "verdict": "PASS"
+  },
+  {
+   "group": "positive",
+   "check": "fact rr3_current.R06_READY is false",
+   "verdict": "PASS"
+  },
+  {
+   "group": "positive",
+   "check": "fact accepted_tasks==[]",
+   "verdict": "PASS"
+  },
+  {
+   "group": "positive",
+   "check": "manifest-hash-tamper",
+   "verdict": "PASS"
+  },
+  {
+   "group": "negative",
+   "check": "strict-JSON-dup-key",
+   "verdict": "FLAG: duplicate key: accepted_tasks"
+  },
+  {
+   "group": "negative",
+   "check": "fact rr3_current.R06_READY is false",
+   "verdict": "FLAG: rr3_current.R06_READY=True"
+  },
+  {
+   "group": "negative",
+   "check": "fact accepted_tasks==[]",
+   "verdict": "FLAG: accepted_tasks=['R05-T08']"
+  },
+  {
+   "group": "negative",
+   "check": "manifest-hash-tamper",
+   "verdict": "FLAG: hash differs from pristine"
+  },
+  {
+   "group": "negative",
+   "check": "input-equality-digest",
+   "verdict": "FLAG: digest differs from positive control"
+  }
+ ],
+ "verdict": "METHOD_VALIDATED"
+}

@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "git",
+    "check-ignore",
+    "-v",
+    "--no-index",
+    "--stdin"
+  ],
+  "stdinPaths": [
+    "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/build/liblingxi_service.rlib",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/verified-binaries/lingxi-service",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a13-final/stdout.log",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/request-correlation/home/lingxi-service/local-token.json",
+    "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/target/probe",
+    "artifacts/rust-tauri/R05/RR3/J-01/node_modules/probe"
+  ],
+  "startUTC": "2026-10-07T03:36:18.285577+00:00",
+  "endUTC": "2026-10-07T03:36:18.295365+00:00",
+  "exitCode": 0,
+  "stdoutSHA256": "87d872e9e52abb126913e50481c849f551b419870a163b678c252b16a10c02ec",
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

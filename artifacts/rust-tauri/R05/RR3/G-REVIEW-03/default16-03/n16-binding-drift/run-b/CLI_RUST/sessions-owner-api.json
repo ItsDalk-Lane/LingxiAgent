@@ -1,0 +1,20 @@
+{
+  "sessions": [
+    {
+      "sessionId": "sess_local_beta",
+      "agentId": "lingxi",
+      "ownerUserId": "user_local",
+      "title": "Synthetic session beta",
+      "runCount": 0,
+      "lastRuns": []
+    },
+    {
+      "sessionId": "sess_local_alpha",
+      "agentId": "lingxi",
+      "ownerUserId": "user_local",
+      "title": "Synthetic session alpha",
+      "runCount": 0,
+      "lastRuns": []
+    }
+  ]
+}

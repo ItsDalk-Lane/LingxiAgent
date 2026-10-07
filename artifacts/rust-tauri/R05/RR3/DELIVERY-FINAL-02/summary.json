@@ -1,0 +1,67 @@
+{
+ "startedUtc": "2026-10-07T23:35:56.566525+00:00",
+ "finishedUtc": "2026-10-07T23:36:24.228617+00:00",
+ "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+ "scope": {
+  "untracked": 35041,
+  "modifiedTracked": 29,
+  "union": 35070
+ },
+ "staged": 0,
+ "directoryEntries": 0,
+ "missingFiles": [],
+ "symlinksInScope": [],
+ "rows": 35070,
+ "newSincePrep02": 15390,
+ "changedSincePrep02": [
+  "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+  "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+  "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+  "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+  "docs/rust-tauri/R05/R05_BLOCKERS.md",
+  "docs/rust-tauri/R05/R05_HANDOFF.json",
+  "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+  "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+  "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+  "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+  "docs/rust-tauri/R05/R05_REPORT.md",
+  "docs/rust-tauri/R05/R05_TEST_MAP.json",
+  "docs/rust-tauri/R05/repair-current/RR3_E_R3_BRIEF.md",
+  "docs/rust-tauri/R05/repair-current/RR3_E_R3_REVIEW_BRIEF.md",
+  "docs/rust-tauri/R05/repair-current/RR3_FINAL_BRIEF.md",
+  "docs/rust-tauri/R05/repair-current/RR3_G_R2_BRIEF.md",
+  "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+  "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+  "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+  "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+  "scripts/rust-tauri/r05_t08_negative_gate.sh"
+ ],
+ "goneSincePrep02": 54,
+ "buckets": {
+  "include": {
+   "count": 29158,
+   "bytes": 2490626419
+  },
+  "local": {
+   "count": 5912,
+   "bytes": 1218175981
+  },
+  "unknown": {
+   "count": 0,
+   "bytes": 0
+  }
+ },
+ "crlf": {
+  "total": 163,
+  "mismatches": []
+ },
+ "blobStats": {
+  "unique": 8615,
+  "existing": 861,
+  "missing": 7754
+ },
+ "space": {
+  "conservativeTotalLocalWrite": 234418592,
+  "availableGiB": 509
+ }
+}

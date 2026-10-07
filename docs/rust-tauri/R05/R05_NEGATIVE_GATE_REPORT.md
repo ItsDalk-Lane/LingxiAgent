@@ -1,5 +1,7 @@
 # R05_NEGATIVE_GATE_REPORT — 附录 C 十六项故障注入（正反对照）
 
+> **RR3 E-04 生成截点（2026-10-08）：stage_readiness=ACCEPTED_OFFLINE_SCOPE_WITH_REGISTERED_LIVE_DEFERRALS / R06_READY=true / offline_gate=PASS / independent_review=PASS。** 依据 RR3/FINAL-04 全新独立终审亲跑：§5.3 六条命令全部真实 exit=0，verify-stage R05 三层（R05/R04/R03）overall=PASS、stable=true、checkpoint 全稳、runner 全 PASS、testedSha=b3ac0e6a+真实工作树，失败清单为空；F42–F54 全部独立 CLOSED；r00 两新对象 cf9bce2f…/d57ea731… LAN 6 次实测通过且 ALF 放行（无证据需要用户操作）。LIVE=BLOCKED_NOT_AUTHORIZED（原许可最迟 R10）、Linux x86_64 继承未复验/Windows 未验证（R09/R10）原边界不变；raw npm 历史 candidate红保持登记不写全绿。Git 至今零暂存/零提交/零推送（FINAL-04 亲核），本 E04 不预写提交回执。本 E04 仅 SELF_CHECKED，待全新 E-REVIEW-05；现行范围见[R05_REPORT §13](R05_REPORT.md#rr3-current)，此前各轮原文（含 §12 E-03 截点）均保留为历史。
+
 - 执行者：EXECUTOR-R05-T08。执行窗口：2026-10-04。脚本：`scripts/rust-tauri/r05_t08_negative_gate.sh`（注册的负向门禁生产者）。
 - 结果：**16/16 全部按目标断言失败关闭（fail-closed）且缺口被点名；两个同环境正常对照全绿**。机器记录：`artifacts/rust-tauri/R05/T08-E01/negative/case-results.json`（`allRefused: true, controlsGreen: true`），逐例日志同目录 `<case>/`。
 - 隔离方式：副本在 `$HOME/r05t08-work/negcopy`——对主仓库**只读**的本地 clone（HEAD `c549ff654`）+ 未提交工作树 overlay（rust/、scripts/、docs/rust-tauri/，rsync --delete、排除 target/）；主工作树零注入（每例前 `reset_copy` 从 pristine 快照还原全部被改文件；脚本结束保留最后状态仅为诊断）。副本 cargo 全部 `CARGO_NET_OFFLINE=true` 且剥离代理环境变量——负向验证本身零真实外发（N14 的语义正是禁止未经授权外发）。
@@ -59,3 +61,33 @@
 | RR1-F27-MUT7（采样器回退） | r05_t08_resources.rs 的 fds_of 回退为冻结候选谓词（默认格式 lsof+行首数字计数） | `--test r05_t08_resources f27_sampler_controls` | 101 | `a live unix process has at least stdio open; the sampler saw 0`——CL-06 的恒 0 缺陷被正对照抓住 | OK |
 
 - 每例均有注入前正常对照（镜像 8/8、controls 绿）；恢复后复跑全绿。注：MUT4/MUT5 涉及 include_str! 编译期内嵌，副本内重编译后判定（与门禁真实运行方式一致）。
+
+## RR3 E-02历史负测截点（2026-10-07）
+
+[B-REVIEW-01](../../../artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md)已独立PASS：N03 normal8/0/0/113，动态计数24→23唯一变异，目标0/1/0/120 exit101、字节还原1/0/0/120 exit0。F45 CLOSED，无包级mustFix；不作为R06维护债。新默认N01–N16及新增反例由G-REVIEW-01正在真实执行，当前**RUNNING**，无完整独立结论，不将部分case当16/16；历史16/16+6/6保留。A-REVIEW-02已A1/A2同包独立PASS；C-F46-REVIEW-01联合独立PASS，资源测量假FD/TCP零负控各101、恢复0均亲跑，不再写仅自检/PENDING；两包CLOSED仍不代FINAL。E首轮独立FAIL后E-02仅SELF_CHECKED待另一新独立验收。全局NOT_ACCEPTED／R06_READY=false，raw npm红及directed/E5原许可见现行报告§11.3。
+
+## RR3 E-03 当前默认负测状态（2026-10-07；已由 E-04 节取代，历史截点）
+
+**[G-REVIEW-02](../../../artifacts/rust-tauri/R05/RR3/G-REVIEW-02/REVIEW.md) BLOCKED_BY_STORAGE，未完成，不签16/16。** 真正默认命令未带--case，full模式；当前正常xtask 8/0/0/113与正式binary接线2/0/0/0均exit0。
+
+| 项目 | 实际结果 |
+|---|---|
+| N01 | 0过/1败/0忽略/120过滤、exit101，精确缺R05-A16，有效目标红；随后map仅字节恢复，未重跑恢复检查 |
+| N02 | case行exit1/BAD/MISSING目标；构建ENOSPC、28条编译失败汇总，producer完成0；未达零匹配断言，无效环境失败 |
+| N03–N16 | NOT RUN；N03入口reset复制失败，不能当N03已完成 |
+| full R02/full E5 | 都未执行；N06/N16未开始，R02真实完整命令数0 |
+| 最终恢复/Node终末验证/汇总JSON | 均未抵达；失败副本封存，不手工补恢复冒充原脚本完成 |
+
+默认shell实际wait退出值未落盘记UNKNOWN，外层记录器exit1、观察器exit143不是该值。旧G01 exit2/15行/N16reuse未执行与并行入口漂移历史保留，G中断整理不是新实跑。B/F45与I/F49的单N03、56+13及15/41控制可以在输入保持的限定边界复用；J02改准备后原注入/恢复正文保持并新验准备，均不能拼成新默认16。A、F25/F26注册和H资源反控同理，完整映射见[G02 I01–I11](../../../artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md)。
+
+J/F50准备修复已独立CLOSED，无新增已证产品mustFix；空间阻断单列。先恢复空间，再由全新角色/目录/副本完成原默认16及恢复、真正full R02/full E5与新FINAL。原16A/100+3C/130叶和所有原负测身份不变。raw npm红、directed/E5许可及LIVE/平台未验边界见[R05_REPORT §12](R05_REPORT.md#rr3-current)。R06_READY=false。
+
+
+## RR3 E-04 当前默认负测状态（2026-10-08）
+
+**[G-REVIEW-03](../../../artifacts/rust-tauri/R05/RR3/G-REVIEW-03/REVIEW.md) 包级独立 PASS（无 mustFix）**：有效轮 default16-03 完整真实默认运行——N01–N16 **16/16 fail-closed 且逐项点名**、controls 绿（xtask 镜像 8/0/0/113 与 binary_wiring 2/0/0/0 全量真实重编）、N03 字节恢复后精确 1/1 绿、N06/N16 绑定先于变异+两次不同绑定 digest 且旧根拒收、**真实 shell exit=0 落盘**（G02 的 UNKNOWN 缺口补上，2026-10-07T10:59:20Z）、最终 12 文件 cp+cmp 逐字节恢复（独立 SHA 复算全等）。两次无效轮原样保留：default16-01 宿主终止（UNKNOWN）、default16-02 共享 NEG_TARGET 缓存污染被 control 即时 fail-closed（流程教训，非产品缺陷）。
+
+- **full R02/full E5（G02 未达范围的覆盖）**：N16 run-a 19/20（a16 E5 全量 npm 真实跑、一次 vitest worker 崩溃被完备性谓词正确 fail-closed，环境偶发）；**N16 run-b 20/20 命令 overall=PASS，a16 E5 全量+seal-family 分类 GREEN**（候选红 ⊆ baseline replay 红 ∪ 登记预存族）；F47/F48/F50 修复后 a01/a13/a05_a06/三 CLI supplemental 多轮全 PASS；Node verify 64,765 项 PASS。
+- **raw npm（如实）**：候选端 seal trio 3 文件/6 失败历史红**保持登记 registered-not-formal-green**，不写全绿、不扩大豁免；directed-no-seal-family E0–E4.5 原明确许可不变。
+- 正式链内口径：FINAL-04 R03 层 r02_legacy_regression 为 directed（E0–E4.5 全绿、E5 BY SCOPE SKIP）；full E5 义务由上述 G-REVIEW-03 隔离副本独立证明（历史有效）。G01 exit2/15 行与 G02 ENOSPC 阻断保留为历史（空间解除时间线见 R05_REPORT §13.4）。
+- 原 16A/100+3C/130 叶与全部原负测身份不变；受影响链复用按 [G-REVIEW-03 reuse-input-equality](../../../artifacts/rust-tauri/R05/RR3/G-REVIEW-03/metadata/reuse-input-equality.json) 输入相等边界执行（H02 375/375、A1 17、J 998/1016 差异全为已审 docs、I 20/21 唯一差为 J02 已新验准备段）。

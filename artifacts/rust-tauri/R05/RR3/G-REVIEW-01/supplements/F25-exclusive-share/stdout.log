@@ -1,0 +1,22 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.99s
+     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 1 test
+test stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05 ... FAILED
+
+failures:
+
+---- stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05 stdout ----
+
+thread 'stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05' (21441073) panicked at crates/xtask/src/stage_map.rs:2885:14:
+the registered R05 stage map must parse with this runner: "stage map invalid: supplemental leaf \"R00-T02-LA-16CEB6D12A6A\" stageShare must be a non-empty string, got \"\""
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`

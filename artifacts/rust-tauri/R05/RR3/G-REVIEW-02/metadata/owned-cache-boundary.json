@@ -1,0 +1,218 @@
+{
+  "at": "2026-10-07T04:35:39.207323+00:00",
+  "target": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps",
+  "scan": "Only immediate debug/deps entries with mtime after this run start; no complete historical cache inventory.",
+  "modifiedCount": 453,
+  "modifiedLogicalBytes": 1140706206,
+  "intermediateCount": 354,
+  "intermediateLogicalBytes": 487518160,
+  "largestIntermediateCandidates": [
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-a471cc98d99c4e85.lingxi_service.32c2c160575e245a-cgu.06.rcgu.o",
+      "bytes": 16087872,
+      "allocatedBytes": 16089088,
+      "birthUtc": "2026-10-07T04:27:31.982340+00:00",
+      "mtimeUtc": "2026-10-07T04:28:08.259028+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.15.rcgu.o",
+      "bytes": 15418744,
+      "allocatedBytes": 15421440,
+      "birthUtc": "2026-10-07T04:28:22.240196+00:00",
+      "mtimeUtc": "2026-10-07T04:28:22.765110+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.00.rcgu.o",
+      "bytes": 15151824,
+      "allocatedBytes": 15155200,
+      "birthUtc": "2026-10-07T04:28:21.215836+00:00",
+      "mtimeUtc": "2026-10-07T04:28:21.902783+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.09.rcgu.o",
+      "bytes": 15082224,
+      "allocatedBytes": 15085568,
+      "birthUtc": "2026-10-07T04:28:31.591346+00:00",
+      "mtimeUtc": "2026-10-07T04:28:32.309828+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-a471cc98d99c4e85.lingxi_service.32c2c160575e245a-cgu.13.rcgu.o",
+      "bytes": 13444720,
+      "allocatedBytes": 13447168,
+      "birthUtc": "2026-10-07T04:27:30.701496+00:00",
+      "mtimeUtc": "2026-10-07T04:28:06.454518+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-a471cc98d99c4e85.lingxi_service.32c2c160575e245a-cgu.15.rcgu.o",
+      "bytes": 13209896,
+      "allocatedBytes": 13213696,
+      "birthUtc": "2026-10-07T04:27:29.989572+00:00",
+      "mtimeUtc": "2026-10-07T04:28:05.402771+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-a471cc98d99c4e85.lingxi_service.32c2c160575e245a-cgu.05.rcgu.o",
+      "bytes": 12420456,
+      "allocatedBytes": 12423168,
+      "birthUtc": "2026-10-07T04:27:31.537536+00:00",
+      "mtimeUtc": "2026-10-07T04:28:07.551329+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.12.rcgu.o",
+      "bytes": 11918352,
+      "allocatedBytes": 11919360,
+      "birthUtc": "2026-10-07T04:28:27.003508+00:00",
+      "mtimeUtc": "2026-10-07T04:28:27.462155+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-a471cc98d99c4e85.lingxi_service.32c2c160575e245a-cgu.02.rcgu.o",
+      "bytes": 10837016,
+      "allocatedBytes": 10838016,
+      "birthUtc": "2026-10-07T04:27:30.452834+00:00",
+      "mtimeUtc": "2026-10-07T04:28:06.089329+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-a471cc98d99c4e85.lingxi_service.32c2c160575e245a-cgu.10.rcgu.o",
+      "bytes": 10630816,
+      "allocatedBytes": 10633216,
+      "birthUtc": "2026-10-07T04:27:31.698975+00:00",
+      "mtimeUtc": "2026-10-07T04:28:07.823851+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.06.rcgu.o",
+      "bytes": 9776656,
+      "allocatedBytes": 9777152,
+      "birthUtc": "2026-10-07T04:28:30.730526+00:00",
+      "mtimeUtc": "2026-10-07T04:28:31.275925+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.01.rcgu.o",
+      "bytes": 9738880,
+      "allocatedBytes": 9740288,
+      "birthUtc": "2026-10-07T04:28:23.016985+00:00",
+      "mtimeUtc": "2026-10-07T04:28:23.558866+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.05.rcgu.o",
+      "bytes": 9244344,
+      "allocatedBytes": 9244672,
+      "birthUtc": "2026-10-07T04:28:29.142587+00:00",
+      "mtimeUtc": "2026-10-07T04:28:29.743075+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-a471cc98d99c4e85.lingxi_service.32c2c160575e245a-cgu.07.rcgu.o",
+      "bytes": 7649224,
+      "allocatedBytes": 7651328,
+      "birthUtc": "2026-10-07T04:27:32.321809+00:00",
+      "mtimeUtc": "2026-10-07T04:28:08.560578+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.11.rcgu.o",
+      "bytes": 7590240,
+      "allocatedBytes": 7593984,
+      "birthUtc": "2026-10-07T04:28:28.389011+00:00",
+      "mtimeUtc": "2026-10-07T04:28:28.894208+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-a471cc98d99c4e85.lingxi_service.32c2c160575e245a-cgu.12.rcgu.o",
+      "bytes": 7571240,
+      "allocatedBytes": 7573504,
+      "birthUtc": "2026-10-07T04:27:31.016211+00:00",
+      "mtimeUtc": "2026-10-07T04:28:06.762977+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-a471cc98d99c4e85.lingxi_service.32c2c160575e245a-cgu.11.rcgu.o",
+      "bytes": 7490600,
+      "allocatedBytes": 7491584,
+      "birthUtc": "2026-10-07T04:27:31.332932+00:00",
+      "mtimeUtc": "2026-10-07T04:28:07.328071+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-a471cc98d99c4e85.lingxi_service.32c2c160575e245a-cgu.09.rcgu.o",
+      "bytes": 6886952,
+      "allocatedBytes": 6889472,
+      "birthUtc": "2026-10-07T04:27:32.116836+00:00",
+      "mtimeUtc": "2026-10-07T04:28:08.279861+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-a471cc98d99c4e85.lingxi_service.32c2c160575e245a-cgu.14.rcgu.o",
+      "bytes": 6759544,
+      "allocatedBytes": 6762496,
+      "birthUtc": "2026-10-07T04:27:30.285692+00:00",
+      "mtimeUtc": "2026-10-07T04:28:05.739994+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-a471cc98d99c4e85.lingxi_service.32c2c160575e245a-cgu.04.rcgu.o",
+      "bytes": 5592592,
+      "allocatedBytes": 5595136,
+      "birthUtc": "2026-10-07T04:27:31.168906+00:00",
+      "mtimeUtc": "2026-10-07T04:28:07.152789+00:00",
+      "executable": false,
+      "newBirthAfterStart": true,
+      "intermediate": true
+    }
+  ],
+  "observedBinariesCount": 164,
+  "notes": [
+    "Birth after start can mean new or compiler replacement of an old pathname; no proof of historical non-reference for the whole list.",
+    "Candidates are not deletion authorization. Only the one explicitly authorized 19546160-byte object was removed, see cache-single-object-cleanup.json.",
+    "Actual runtime binary references are preserved separately. Do not delete them wholesale or infer du/logical bytes equal recoverable physical space.",
+    "The isolated copy negcopy.HwNE95 is owned by this failed G02 but is quarantined evidence; no deletion or restoration done."
+  ]
+}

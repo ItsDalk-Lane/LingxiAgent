@@ -1,0 +1,17 @@
+{
+  "case": "extra-field",
+  "command": [
+    "python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial/extra-field/input.tsv",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial/extra-field/mutation.json"
+  ],
+  "startedAt": "2026-10-07T00:23:50.504168+00:00",
+  "endedAt": "2026-10-07T00:23:50.532928+00:00",
+  "exitCode": 1,
+  "expectedExit": 1,
+  "beforeSha256": "22e86312ef3e7cc081101844b10fa7c066e03780a4afa83b7118a2e6c8331f45",
+  "afterSha256": "22e86312ef3e7cc081101844b10fa7c066e03780a4afa83b7118a2e6c8331f45",
+  "receiptPresent": false,
+  "status": "PASS"
+}

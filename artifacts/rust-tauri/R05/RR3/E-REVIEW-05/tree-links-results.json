@@ -1,0 +1,42 @@
+[
+ {
+  "name": "独立全树对比 vs E-04 after 快照: 意外变更=0、删除=0、意外新增=0（预期外仅总控台账 1 改+brief 1 增）",
+  "ok": true,
+  "detail": "changed=['docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md'] removed=[] added=['docs/rust-tauri/R05/repair-current/RR3_E_R5_REVIEW_BRIEF.md'] unexpected_changed=[] unexpected_added=[]"
+ },
+ {
+  "name": "RR3_PROGRESS.md 变化内容=E04 SELF_CHECKED 追加行（总控台账职责，非 E-04 所有权文件）",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "5 份 owned MD 相对链接全部解析存在",
+  "ok": true,
+  "detail": "total_links=86 bad=[]"
+ },
+ {
+  "name": "矩阵: finalGate RR3/FINAL-04 PASS + stageStatus/R06_READY 翻正",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "HANDOFF: rr3_current 与矩阵 finalGate 同值",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "进度台账: FINAL-04 完成 + E04 SELF_CHECKED + 待 E-REVIEW-05 记录一致",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "报告: §13 六元组/130/130 与矩阵一致",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "矩阵: F42–F54 全部 CLOSED（R05-ENV-R00 为观察属性项）",
+  "ok": true,
+  "detail": "issues=['F42', 'F45', 'F27-RR3', 'R05-ENV-R00', 'F28-RR3', 'F46', 'F47', 'F48', 'F49', 'F50', 'F51', 'F52', 'F53', 'F54']"
+ }
+]

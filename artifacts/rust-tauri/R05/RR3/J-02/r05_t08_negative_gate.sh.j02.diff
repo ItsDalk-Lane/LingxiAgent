@@ -1,0 +1,28 @@
+--- before-J02/scripts/rust-tauri/r05_t08_negative_gate.sh
++++ after-J02/scripts/rust-tauri/r05_t08_negative_gate.sh
+@@ -53,9 +53,11 @@
+ COPY="$(mktemp -d "$HOME/r05t08-work/negcopy.XXXXXX")" || fail "cannot create isolated copy"
+ SOURCE_HEAD="$(git -C "$ROOT" rev-parse --short HEAD)" || fail "source HEAD query failed"
+ note "== preparing the isolated copy at $COPY (local clone of HEAD $SOURCE_HEAD + uncommitted working-tree overlay) =="
+-rm -rf "$COPY"
+-if ! git -C "$ROOT" clone --shared --quiet --branch codex/rust-tauri-migration "$ROOT" "$COPY" > "$EV/clone.log" 2>&1; then
+-  cat "$EV/clone.log"; fail "local clone failed"
++rmdir "$COPY" || fail "isolated copy is no longer empty"
++if ! python3 "$ROOT/scripts/rust-tauri/prepare_git_copy.py" \
++  --source "$ROOT" --copy "$COPY" --revision HEAD --branch codex/rust-tauri-migration \
++  --evidence "$EV/git-preparation" > "$EV/clone.log" 2>&1; then
++  cat "$EV/clone.log"; fail "complete Git copy preparation failed"
+ fi
+ # Overlay the uncommitted candidate: rust/, scripts/, docs/rust-tauri/
+ # (the clone already carries the committed R00–R04 docs; rsync --delete makes
+@@ -70,8 +72,8 @@
+ python3 "$ROOT/scripts/rust-tauri/r05_t08_prepare_node.py" \
+   --source "$ROOT" --copy "$COPY" --evidence "$EV/node-preparation" \
+   || fail "isolated Node dependency preparation failed"
+-# The copy must NOT carry main-tree artifacts (evidence trees stay behind);
+-# its candidate binding covers its own tree only.
++# 已提交的历史证据完整保留；本轮新增输出不从来源额外带入。
++# 副本绑定覆盖其全部候选输入，规则与原先相同。
+ COPY_BRANCH="$(git -C "$COPY" rev-parse --abbrev-ref HEAD)" || fail "copy branch query failed"
+ COPY_HEAD="$(git -C "$COPY" rev-parse --short HEAD)" || fail "copy HEAD query failed"
+ COPY_STATUS="$(git -C "$COPY" status --porcelain)" || fail "copy status query failed"

@@ -1,0 +1,1302 @@
+[
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/devices-before-authz.json",
+    "sha256": "23012ff12c9852c70eb91676f8135122e2f9f19ec61cab37757469378563aa39",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/creds-after-authz.json",
+    "sha256": "3f55f9693e7958bc28d01827d987ff67e7e8de4ced2ddcddf22c442cab5e405d",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/sessions-list-matrix.json",
+    "sha256": "619f672f5d1247eef1353214562142a0c18f81db27331b177429a79ec3342345",
+    "bytes": 777
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/server-stderr.log",
+    "sha256": "89683572e7df7d98f70c0ce8c48a80dba553b62fe16f1bbba307edce7067fec7",
+    "bytes": 1262
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/cli-sessions-owner.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/devices-after-authz.json",
+    "sha256": "83af287509418d95d40c30dbc192b6b1949cf0dbd6881193544c6a689162417f",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/summary.txt",
+    "sha256": "c179f3faf4969254f95d6b72675fe616363dcb18f4c268fe3c57d435edee19b9",
+    "bytes": 3246
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/creds-before-authz.json",
+    "sha256": "4f6bff3824638e4ced79a487b52ff820d18e8a8aa2c7001d45eebb2f476f5b01",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/state-before-authz.txt",
+    "sha256": "3176cd564952ae35c9b9f0ba27e7341dca81c483ab481358a2cccedbe52eb1b4",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/state-before.txt",
+    "sha256": "3176cd564952ae35c9b9f0ba27e7341dca81c483ab481358a2cccedbe52eb1b4",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/state-after.txt",
+    "sha256": "8d96e2db998d15469e08623e9f3d4084ee9c941047327fe980f5d0dedbe307f8",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/server-stdout.log",
+    "sha256": "ad72d66a6281f0e8e8cdea040b75a2e1164d87fffb5eafeed691e90b0a0d4bef",
+    "bytes": 141
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/state-after-authn.txt",
+    "sha256": "3176cd564952ae35c9b9f0ba27e7341dca81c483ab481358a2cccedbe52eb1b4",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/build.log",
+    "sha256": "c92508a29848820f033cd2ea015c85dde0953c88b07cc967ce34b7c08f610549",
+    "bytes": 72
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A05_A06/cli-sessions-owner.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/summary.json",
+    "sha256": "be4482b81790f6e43f98badb4db1138218474957d521e337e98a59d954efe1d5",
+    "bytes": 1901
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/sharing-vitest.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/sharing-vitest.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/leaf-cases.json",
+    "sha256": "8cc537eda0a82ef15cc6e8d10e89935a00c4ec7250b7cb28440498ecd5c4bd3f",
+    "bytes": 3948
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-unknown-arg-exit1-no-start/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-unknown-arg-exit1-no-start/home-after.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-unknown-arg-exit1-no-start/home-before.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-serve-unknown-arg-exit1-no-start/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-after.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-before.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-help-exit0-no-start/stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-help-exit0-no-start/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-help-exit0-no-start/home-after.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-help-exit0-no-start/home-before.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/serve.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/serve-beta-unavailable.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/serve-invalid-bind.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/serve-newer-epoch.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/sessions-after-shutdown.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/build-current-service.stderr.log",
+    "sha256": "a09e8d4ec458d208fcd90e2a21429bccbcef7baf46a2179e1b63cafac08d74db",
+    "bytes": 6238
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/serve-downgrade-refused.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/cli-rust-cases.json",
+    "sha256": "b099353d2ed5bc8d7d7d1617aae3ea3fd7cd90a254e0c7f0053ebec82e767e86",
+    "bytes": 28972
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/serve-newer-epoch.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/serve-invalid-bind.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/serve.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/serve-beta-unavailable.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/build-current-service.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/sessions-after-shutdown.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/serve-downgrade-refused.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-newer/data-epoch.json",
+    "sha256": "fef1da12458d4f58e5ac150ea8cf9628d7234180c32d4ceed0b3b71d4e83f05e",
+    "bytes": 147
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/summary.json",
+    "sha256": "c5fc3a1141ce464190eed8269a5ad160ff367093ea6169c756ff29ce320e23c4",
+    "bytes": 7487
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/producer.stdout.log",
+    "sha256": "10a69247c22e66cd4b5b2c6fd777132cefedd8802a71eb7708a200f7dd22c9a8",
+    "bytes": 4793
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/producer.stderr.log",
+    "sha256": "6a63b05e2116113ffdbe7aa6da153d30fcf9522e86d469c5335447e99009f738",
+    "bytes": 71
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/devices-before-authz.json",
+    "sha256": "03407c905838974d560305269ce5308e492988f00896b0ad8d33470017fc892a",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/creds-after-authz.json",
+    "sha256": "d9538e876ec31b8da2cf5d5b3472e7db360e87be533e0de3d7d25e30ab536c75",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/sessions-list-matrix.json",
+    "sha256": "619f672f5d1247eef1353214562142a0c18f81db27331b177429a79ec3342345",
+    "bytes": 777
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/server-stderr.log",
+    "sha256": "e9cde686f2cf745b4bfdf92f8236a9171dd44a60e4a103ac83e33556277e297f",
+    "bytes": 1262
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/cli-sessions-owner.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/devices-after-authz.json",
+    "sha256": "4b9add0c51b136a30ec010d44f3afd077d8637b0a72808f3bae2d6ba1c2e49d6",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/summary.txt",
+    "sha256": "429b50245bd930fc7ea109f4e1c2851f627f98572629b7479bbd61b92e0d30f6",
+    "bytes": 3246
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/creds-before-authz.json",
+    "sha256": "1ad9423b4daa37c37b87d00e7feb09a339742f89076974e318ccb3c4be8fecaf",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/state-before-authz.txt",
+    "sha256": "d720b79e67b884d95d09bbeb743c1dbab7ecdec079b7875a7fd8d252e3a16992",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/state-before.txt",
+    "sha256": "d720b79e67b884d95d09bbeb743c1dbab7ecdec079b7875a7fd8d252e3a16992",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/state-after.txt",
+    "sha256": "2b8ec7b339177ae7d417a76290785949a9b89948d92dfbfa735773312037ca4a",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/server-stdout.log",
+    "sha256": "a99d02211cf2d0944aa3858e0ea67eb56fe345a119b75b5a1a237ce904dd63b1",
+    "bytes": 141
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/state-after-authn.txt",
+    "sha256": "d720b79e67b884d95d09bbeb743c1dbab7ecdec079b7875a7fd8d252e3a16992",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/build.log",
+    "sha256": "c92508a29848820f033cd2ea015c85dde0953c88b07cc967ce34b7c08f610549",
+    "bytes": 72
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth/cli-sessions-owner.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/devices-before-authz.json",
+    "sha256": "725efb7ebf39d48f53a22749730e0433fb5f5df070198c6d8d6c7ace943aab9d",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/creds-after-authz.json",
+    "sha256": "776dfa30b9fdec29ec3d1bef2be6bb9bf4381f84288cfc9cd4e0cb44ead1935a",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/sessions-list-matrix.json",
+    "sha256": "619f672f5d1247eef1353214562142a0c18f81db27331b177429a79ec3342345",
+    "bytes": 777
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/server-stderr.log",
+    "sha256": "32e265af4065ea42769a303caed301bcd294498aae1512bfeca6e2b03bf8ce0b",
+    "bytes": 1262
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/cli-sessions-owner.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/devices-after-authz.json",
+    "sha256": "bd4eccff4aa2785b6959ee2bc3851376bea5bd06ff31edf61c423f7e5eefca87",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/summary.txt",
+    "sha256": "2c336fde81aa456389792142a1b8ff70798ac2d3fe8f4ef97f03ab41d0408242",
+    "bytes": 3246
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/creds-before-authz.json",
+    "sha256": "2e83819383fde6a7ec9515afb28d637857042f1f7347cb9e449136102a06a023",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/state-before-authz.txt",
+    "sha256": "89c131ff4f4c880d677ba8bee952e8da269a9833172bf3a75c464623e3d87121",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/state-before.txt",
+    "sha256": "89c131ff4f4c880d677ba8bee952e8da269a9833172bf3a75c464623e3d87121",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/state-after.txt",
+    "sha256": "d6b8613cc56dc6d4e782c6d932de81dbfe6e97bedffbe2a281c76315fcdb6788",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/server-stdout.log",
+    "sha256": "d0b9811e10eeb873c065cf3c7f40fb08ac54410f10fefb093994cd7968690ceb",
+    "bytes": 141
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/state-after-authn.txt",
+    "sha256": "89c131ff4f4c880d677ba8bee952e8da269a9833172bf3a75c464623e3d87121",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/build.log",
+    "sha256": "c92508a29848820f033cd2ea015c85dde0953c88b07cc967ce34b7c08f610549",
+    "bytes": 72
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A05_A06/cli-sessions-owner.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/summary.json",
+    "sha256": "d78e8e2e50742e0abeda6d04154f1e9e9e66e35776e89a16c0ca99f77dd81846",
+    "bytes": 1901
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/sharing-vitest.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/sharing-vitest.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/leaf-cases.json",
+    "sha256": "c14358a749c3940843f2e9e4775cb8e8d0550a9c033bd9b367c02f3110c4f441",
+    "bytes": 3930
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-unknown-arg-exit1-no-start/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-unknown-arg-exit1-no-start/home-after.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-unknown-arg-exit1-no-start/home-before.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-serve-unknown-arg-exit1-no-start/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-after.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-before.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-help-exit0-no-start/stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-help-exit0-no-start/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-help-exit0-no-start/home-after.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLIENT/cli-help-exit0-no-start/home-before.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/serve.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/serve-beta-unavailable.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/serve-invalid-bind.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/serve-newer-epoch.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/sessions-after-shutdown.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/build-current-service.stderr.log",
+    "sha256": "afadd3a2105f45c8ac58dda8256e378e899dec09e08ef11cd3f6a9aa2f4a6e82",
+    "bytes": 6238
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/serve-downgrade-refused.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/cli-rust-cases.json",
+    "sha256": "e1f1067edb83f7d57ef2f9d181d1aa9a05f901681e13a6834bd7f26dc792f15c",
+    "bytes": 28900
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/serve-newer-epoch.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/serve-invalid-bind.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/serve.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/serve-beta-unavailable.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/build-current-service.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/sessions-after-shutdown.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/serve-downgrade-refused.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/home-newer/data-epoch.json",
+    "sha256": "fef1da12458d4f58e5ac150ea8cf9628d7234180c32d4ceed0b3b71d4e83f05e",
+    "bytes": 147
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/summary.json",
+    "sha256": "ae7ba103a3b9eabfb44ba4379b738291213d8a8c359498d876cdbe21972ad364",
+    "bytes": 7481
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/producer.stdout.log",
+    "sha256": "393d39edd881fcee0545127296413652df84e760fba942a15f013a4628babdc6",
+    "bytes": 4793
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/producer.stderr.log",
+    "sha256": "6a63b05e2116113ffdbe7aa6da153d30fcf9522e86d469c5335447e99009f738",
+    "bytes": 71
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/devices-before-authz.json",
+    "sha256": "7ef07335c3fec94c3db1d76d7f687d01d665e55d9aa8febd606de1759175e97a",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/creds-after-authz.json",
+    "sha256": "2230ff3bb6b9b56df6a8d92984f46e2c191046ab9c411834498046f55e50718f",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/sessions-list-matrix.json",
+    "sha256": "619f672f5d1247eef1353214562142a0c18f81db27331b177429a79ec3342345",
+    "bytes": 777
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/server-stderr.log",
+    "sha256": "a53270205a86ee25fc7a800f4fbe519a8e7b7f5c94c9a6aaeac3807e2a733029",
+    "bytes": 1262
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/cli-sessions-owner.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/devices-after-authz.json",
+    "sha256": "590ee25604db317045efe006c79d71d1d92c9c6abc139ffcf50f430fd922b3de",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/summary.txt",
+    "sha256": "701a6c797088b88bdbd1707c9e015c443f0090842c7b499fad111d4aa1b9d5a0",
+    "bytes": 3246
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/creds-before-authz.json",
+    "sha256": "dcd0f69dd493648f5ef06fc57885e8c4579c94a0c4fad518bdba8182a56b8e61",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/state-before-authz.txt",
+    "sha256": "8e710b0f28583f6f07ee1d2970938d88f6712df76acfa07b90c77e1779c8d5f0",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/state-before.txt",
+    "sha256": "8e710b0f28583f6f07ee1d2970938d88f6712df76acfa07b90c77e1779c8d5f0",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/state-after.txt",
+    "sha256": "83ec1a425df5a41d8fb036c048023e7cf0b2decba212c8be7151c249c6a325ef",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/server-stdout.log",
+    "sha256": "65f49c9120971a9cf38b8fb25239a2e58d32180cd02e679c09784fec8d8c2101",
+    "bytes": 141
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/state-after-authn.txt",
+    "sha256": "8e710b0f28583f6f07ee1d2970938d88f6712df76acfa07b90c77e1779c8d5f0",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/build.log",
+    "sha256": "c92508a29848820f033cd2ea015c85dde0953c88b07cc967ce34b7c08f610549",
+    "bytes": 72
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth/cli-sessions-owner.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/devices-before-authz.json",
+    "sha256": "97bd7cdacf5fac4390aaaa062e2fc44304ddffaa71ef27c808f5f8ca36428cac",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/creds-after-authz.json",
+    "sha256": "907e8428926d1d560b1c0efaaffd508b56b3ed40999363b71460b8293734a629",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/sessions-list-matrix.json",
+    "sha256": "619f672f5d1247eef1353214562142a0c18f81db27331b177429a79ec3342345",
+    "bytes": 777
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/server-stderr.log",
+    "sha256": "b6db76bfa1c0c20acd43b7990be108145b32052ed19e4ca83e642d6847394d64",
+    "bytes": 1262
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/cli-sessions-owner.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/devices-after-authz.json",
+    "sha256": "1fab202cd877d79ed7fc48871a25f079cf3412b6877b42e4385fdc3d49b09ff6",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/summary.txt",
+    "sha256": "9985a487f2b334bddb758389682eb6aecbaf42ebbe954b83a5e5c973017efe4c",
+    "bytes": 3246
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/creds-before-authz.json",
+    "sha256": "c113c215213f5274af9515d44a5f804addd104f8ad1304ad3cbcae6cd89dcb11",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/state-before-authz.txt",
+    "sha256": "de8d71145d4af369f48dc194f1ca5cbd14ed4000af514f264679e804ec9f12a1",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/state-before.txt",
+    "sha256": "de8d71145d4af369f48dc194f1ca5cbd14ed4000af514f264679e804ec9f12a1",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/state-after.txt",
+    "sha256": "ebf5d6e5da5093c271c12d82ead75a2644b7e9f9702938d4045ed160e8cb8ad9",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/server-stdout.log",
+    "sha256": "9867fac4499a56a85466ae3415d2893c741a12e7e6c697328430a20a67c795d6",
+    "bytes": 141
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/state-after-authn.txt",
+    "sha256": "de8d71145d4af369f48dc194f1ca5cbd14ed4000af514f264679e804ec9f12a1",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/build.log",
+    "sha256": "c92508a29848820f033cd2ea015c85dde0953c88b07cc967ce34b7c08f610549",
+    "bytes": 72
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A05_A06/cli-sessions-owner.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/summary.json",
+    "sha256": "e236ff01d99d840ec129bef1ffe95504be2a8aad2b0439d104942765165823e3",
+    "bytes": 1901
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/sharing-vitest.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/sharing-vitest.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/leaf-cases.json",
+    "sha256": "806fa2ddcab47f2cc25d74d806e2089815dc4895ab9f51975b6819a7572e5497",
+    "bytes": 3930
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/cli-unknown-arg-exit1-no-start/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/cli-unknown-arg-exit1-no-start/home-after.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/cli-unknown-arg-exit1-no-start/home-before.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/cli-serve-unknown-arg-exit1-no-start/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-after.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-before.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/cli-help-exit0-no-start/stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/cli-help-exit0-no-start/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/cli-help-exit0-no-start/home-after.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLIENT/cli-help-exit0-no-start/home-before.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/serve.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/serve-beta-unavailable.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/serve-invalid-bind.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/serve-newer-epoch.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/sessions-after-shutdown.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/build-current-service.stderr.log",
+    "sha256": "741b768f711fe16e8a0830cb616464fea39338659a1e21d78e1c78bf6df99508",
+    "bytes": 6238
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/serve-downgrade-refused.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/cli-rust-cases.json",
+    "sha256": "7fa5c6a37d6ad3ed9f016fe7d38711d833e8e854806558164ca65b6a04bab79d",
+    "bytes": 28900
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/serve-newer-epoch.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/serve-invalid-bind.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/serve.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/serve-beta-unavailable.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/build-current-service.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/sessions-after-shutdown.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/serve-downgrade-refused.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/home-newer/data-epoch.json",
+    "sha256": "fef1da12458d4f58e5ac150ea8cf9628d7234180c32d4ceed0b3b71d4e83f05e",
+    "bytes": 147
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/summary.json",
+    "sha256": "895c8cef3d8f53f6e4af3a3d0fd7dae2f232ed52240edb98b3cb108a14c6f62a",
+    "bytes": 7481
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/producer.stdout.log",
+    "sha256": "2739dc97d3073ea827785011db4a4dd395dcb745e2ab5a6663d64ea8bc761b9f",
+    "bytes": 4793
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/producer.stderr.log",
+    "sha256": "6a63b05e2116113ffdbe7aa6da153d30fcf9522e86d469c5335447e99009f738",
+    "bytes": 71
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/devices-before-authz.json",
+    "sha256": "2f4a4187363e81d9c8109d2c376d0a263bea128060e6a1b77669923cee480a81",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/creds-after-authz.json",
+    "sha256": "0006e61a84c7db0d4bce8b07cb97685f7ca2e305ca4fdc15c33bbbbedcf1d0eb",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/sessions-list-matrix.json",
+    "sha256": "619f672f5d1247eef1353214562142a0c18f81db27331b177429a79ec3342345",
+    "bytes": 777
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/server-stderr.log",
+    "sha256": "27b491b54fda924e1ca62c0b02a027fe0a082c4a822e5bfeccbac7c791858fa7",
+    "bytes": 1262
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/cli-sessions-owner.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/devices-after-authz.json",
+    "sha256": "10945a7eb504b0f9c45fdd8bac047e1ecf05fa07017a72d11c75690c4107b995",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/summary.txt",
+    "sha256": "5cc522ad18d6f5c94662f686f0dd3df045f818aa4b2e072db841fcbcf23a6fe5",
+    "bytes": 3246
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/creds-before-authz.json",
+    "sha256": "3174520fe36ef3bb09bf367c857711439bc4cee6245c19c3da3001a079f7b7b9",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/state-before-authz.txt",
+    "sha256": "67fd99ace8f1eca153997c9bdb97828f2b1e9c35e1c876e44f07c2364faca013",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/state-before.txt",
+    "sha256": "67fd99ace8f1eca153997c9bdb97828f2b1e9c35e1c876e44f07c2364faca013",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/state-after.txt",
+    "sha256": "62a902a4ee44eb890a07ab0dc09b9813767e3c3665a1dc113784455d5b0d03af",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/server-stdout.log",
+    "sha256": "add4a70bd3be314e028c2ccd7395f9125e2472e1468a37ff6464a7b7646bf3e7",
+    "bytes": 141
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/state-after-authn.txt",
+    "sha256": "67fd99ace8f1eca153997c9bdb97828f2b1e9c35e1c876e44f07c2364faca013",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/build.log",
+    "sha256": "4cf86278c1e6d659943a46a3d7e3da429ac15be90f0f17742e24ef85228e7d3e",
+    "bytes": 72
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth/cli-sessions-owner.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/devices-before-authz.json",
+    "sha256": "b7427bb99785eae73e64457d660ac3a5b1991aea6d402703c274a92785eaf9a0",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/creds-after-authz.json",
+    "sha256": "f38dc2c87d016850686f373a303f397836f1dd5109da57271ee8115a5ebe8cc9",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/sessions-list-matrix.json",
+    "sha256": "619f672f5d1247eef1353214562142a0c18f81db27331b177429a79ec3342345",
+    "bytes": 777
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/server-stderr.log",
+    "sha256": "54a647faf9776907a475ea68f3a3620337ab2ba7728b877679b92d6345f93a1d",
+    "bytes": 1262
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/cli-sessions-owner.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/devices-after-authz.json",
+    "sha256": "25cb69c5d8010f8064453a11c3036b01dca7721eb51f1dbfe2fb2293e76a02c0",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/summary.txt",
+    "sha256": "197639960aa4c23b3660f402ec4ea46755bc7291eda2dd6ff477f309041e45bf",
+    "bytes": 3246
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/creds-before-authz.json",
+    "sha256": "f6b1f801e660d5687a52d3fb4279e33f26f5e5a574026c8f299e8c22464bc692",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/state-before-authz.txt",
+    "sha256": "51112ff7a999b9e5cae0a15c6c47c7ff9859cbbb304e9d372a630eecf0c9a857",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/state-before.txt",
+    "sha256": "51112ff7a999b9e5cae0a15c6c47c7ff9859cbbb304e9d372a630eecf0c9a857",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/state-after.txt",
+    "sha256": "d141d3ba7855d0153b7dd385188a1d0462d5d4e3863331138522b1b64faffd13",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/server-stdout.log",
+    "sha256": "aa750c21bd3a61435d4b91841c15c1ab2c7a05c99e265a7613cf732463dc9eea",
+    "bytes": 141
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/state-after-authn.txt",
+    "sha256": "51112ff7a999b9e5cae0a15c6c47c7ff9859cbbb304e9d372a630eecf0c9a857",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/build.log",
+    "sha256": "c92508a29848820f033cd2ea015c85dde0953c88b07cc967ce34b7c08f610549",
+    "bytes": 72
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A05_A06/cli-sessions-owner.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/summary.json",
+    "sha256": "df9773d3a4353738762d46fd8bf6cc39a85377c979e977dfa9ff5dd38a9d182c",
+    "bytes": 1901
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/sharing-vitest.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/sharing-vitest.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/leaf-cases.json",
+    "sha256": "209ed602fb33c847638ce8a32750fafe17ec7f416c7e07528a17ead9d20c113b",
+    "bytes": 3960
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/cli-unknown-arg-exit1-no-start/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/cli-unknown-arg-exit1-no-start/home-after.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/cli-unknown-arg-exit1-no-start/home-before.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/cli-serve-unknown-arg-exit1-no-start/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-after.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-before.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/cli-help-exit0-no-start/stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/cli-help-exit0-no-start/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/cli-help-exit0-no-start/home-after.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLIENT/cli-help-exit0-no-start/home-before.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "bytes": 2
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/serve.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/serve-beta-unavailable.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/serve-invalid-bind.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/serve-newer-epoch.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/sessions-after-shutdown.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/build-current-service.stderr.log",
+    "sha256": "7396298d2bad533a4f87085bda586affb51f3135429855f383b1273ca1cef7e3",
+    "bytes": 6238
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/serve-downgrade-refused.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/cli-rust-cases.json",
+    "sha256": "a838a56010ef4e2f36b8bc31ab84809613058f980512bd019136ebdf680def53",
+    "bytes": 29020
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/serve-newer-epoch.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/serve-invalid-bind.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/serve.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/serve-beta-unavailable.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/build-current-service.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/sessions-after-shutdown.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/serve-downgrade-refused.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/home-newer/data-epoch.json",
+    "sha256": "fef1da12458d4f58e5ac150ea8cf9628d7234180c32d4ceed0b3b71d4e83f05e",
+    "bytes": 147
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/summary.json",
+    "sha256": "a66ac7a65a8be36cdcaef2335b98c66a0bca501f0b26fec20b1810e7376d4427",
+    "bytes": 7491
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/producer.stdout.log",
+    "sha256": "4f50b2c2eff95eb7ab742ae239bbcfd213c28038a79420c2e69443ff728c440f",
+    "bytes": 4793
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/producer.stderr.log",
+    "sha256": "6a63b05e2116113ffdbe7aa6da153d30fcf9522e86d469c5335447e99009f738",
+    "bytes": 71
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/devices-before-authz.json",
+    "sha256": "0c86e8f80e99133e673ec20845b5d633894bd9237795cbc4d6f58505d23a2945",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/creds-after-authz.json",
+    "sha256": "015af676e03daaf7a31a9734582e251f867e8630751d05e18c15c515bf2f7d37",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/sessions-list-matrix.json",
+    "sha256": "619f672f5d1247eef1353214562142a0c18f81db27331b177429a79ec3342345",
+    "bytes": 777
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/server-stderr.log",
+    "sha256": "1d67cd359b53726e7989301d0b033896ce776eafea317adeb205fe6e9e56a0d0",
+    "bytes": 1262
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/cli-sessions-owner.stderr.log",
+    "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+    "bytes": 1035
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/devices-after-authz.json",
+    "sha256": "d3c476fe788d957adf3fb735bfe80306a268258306fb47235edc38abab9d981b",
+    "bytes": 1066
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/summary.txt",
+    "sha256": "1270f48f7bdcc1bdf9817aa6d80d769d3955c6bb85e16e239d6dd7444dbb13bc",
+    "bytes": 3246
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/creds-before-authz.json",
+    "sha256": "43514216be3d2920b4820bd5aed9d368f66e4ca57669dcf7010f981a966dcce2",
+    "bytes": 2542
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/state-before-authz.txt",
+    "sha256": "e9317e108e7aad47129ee3d5541ca58aaef5684e20ca90ff637c134f9ff538f8",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/state-before.txt",
+    "sha256": "e9317e108e7aad47129ee3d5541ca58aaef5684e20ca90ff637c134f9ff538f8",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/state-after.txt",
+    "sha256": "a8bd6bca71e42e234bf9e1ac6347546cc28e4356e455e913436931013e7e1ccd",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/server-stdout.log",
+    "sha256": "bd5644fef30686fec2523550e954bfb2f3ac15426440b3fe4826738796b727a3",
+    "bytes": 141
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/state-after-authn.txt",
+    "sha256": "e9317e108e7aad47129ee3d5541ca58aaef5684e20ca90ff637c134f9ff538f8",
+    "bytes": 252
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/build.log",
+    "sha256": "c92508a29848820f033cd2ea015c85dde0953c88b07cc967ce34b7c08f610549",
+    "bytes": 72
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth/cli-sessions-owner.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  }
+]

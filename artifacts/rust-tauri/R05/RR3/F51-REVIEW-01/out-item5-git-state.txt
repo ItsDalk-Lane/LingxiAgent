@@ -1,0 +1,28 @@
+== HEAD/branch/log ==
+b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b
+codex/rust-tauri-migration
+b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b docs(rust-tauri): RR2 handoff git receipt + ALF unblock path (commit e8c0672e5)
+== branch tip refs (local) ==
+46d8d10c55fef64e09471619630e248f881cf16707b0610807662262a4a18071  -
+refs/codex/turn-diffs/checkpoints/df602fe8c52989ea4d4f99b030bdab03/ad083f5b8452d6230a2410e762da9db5/1791267260002/58a8013f-2e7e-4ef8-a0e0-57ad403c5b86 331ca0dec311d490c0969dcc253c1b3ab9b76e58
+refs/heads/codex/rust-tauri-migration b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b
+refs/heads/main 7d1a0c6bc28062ff455adcf8f68c3a80b117e90d
+refs/remotes/origin/HEAD 7d1a0c6bc28062ff455adcf8f68c3a80b117e90d
+refs/remotes/origin/codex/rust-tauri-migration b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b
+refs/remotes/origin/main 7d1a0c6bc28062ff455adcf8f68c3a80b117e90d
+refs/remotes/upstream/HEAD 1d3ef308299e9f630786384e77de45444ea59196
+refs/remotes/upstream/main 1d3ef308299e9f630786384e77de45444ea59196
+== reflog HEAD tail (expect nothing new after commit b3ac0e6a checkout/commit time) ==
+b3ac0e6ae HEAD@{2026-10-07 03:02:15 +0800}: commit: docs(rust-tauri): RR2 handoff git receipt + ALF unblock path (commit e8c0672e5)
+e8c0672e5 HEAD@{2026-10-07 02:59:55 +0800}: commit: fix(rust-tauri): R05 RR2 closeout — 6 items closed + F44, stage review NOT_ACCEPTED on ALF env item only (R06_READY=false)
+ad5ec4e98 HEAD@{2026-10-06 14:28:30 +0800}: checkout: moving from ad5ec4e9853a51ed929f1e2e077b97d41c951572 to codex/rust-tauri-migration
+ad5ec4e98 HEAD@{2026-10-06 10:08:16 +0800}: checkout: moving from codex/rust-tauri-migration to ad5ec4e9853a51ed929f1e2e077b97d41c951572
+ad5ec4e98 HEAD@{2026-10-06 08:38:34 +0800}: commit: fix(rust-tauri): R05 RR1 adversarial repair — F01–F28 closed, stage review NOT_ACCEPTED (R06_READY=false)
+== packed-refs + refs digest ==
+fcb8ae169a9b67d1f389e217c7ca9a15675d438b56ee3efac818e4899417d9e7  -
+== main .git/index mtime/size (observation) ==
+mtime=2026-10-07T03:02:15 size=6139139
+== ORIG_HEAD/MERGE_HEAD absent? ==
+ls: .git/CHERRY_PICK_HEAD: No such file or directory
+ls: .git/MERGE_HEAD: No such file or directory
+.git/ORIG_HEAD

@@ -1,0 +1,7 @@
+pid=70926 bind=0.0.0.0:50288 connect=192.168.3.5:50288
+client connected
+client send=4
+server accepted
+server recv=4
+client recv=4
+PROBE RESULT: ok accepted=True

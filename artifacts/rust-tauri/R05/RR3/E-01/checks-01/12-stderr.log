@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py", line 70, in <module>
+    for p,v in json.loads((E/'protected-before.json').read_text()).items():check(sha(ROOT/p)==v,'protected authority/dispatch/repair-current '+p)
+                                                                           ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py", line 10, in check
+    if not ok:raise AssertionError(label)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: protected authority/dispatch/repair-current artifacts/rust-tauri/R05/RR3/E-01/dispatch/events.jsonl

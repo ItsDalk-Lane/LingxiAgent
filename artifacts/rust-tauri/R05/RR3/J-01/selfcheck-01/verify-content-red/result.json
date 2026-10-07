@@ -1,0 +1,12 @@
+{
+  "status": "FAIL",
+  "startedUtc": "2026-10-07T03:20:10.078200+00:00",
+  "commands": [],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "error": "copy dependencies changed",
+  "finishedUtc": "2026-10-07T03:20:10.421483+00:00"
+}

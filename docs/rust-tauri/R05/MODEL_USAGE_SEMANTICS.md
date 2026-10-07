@@ -1,13 +1,13 @@
 # R05-T07 — 用量、trace 及持久化语义（MODEL_USAGE_SEMANTICS）
 
-版本：2026-10-03。本文是 R05-T07 的实现语义文档：usage 的归一口径、trace 因果、
+版本：2026-10-08／RR3 当前源码核对（stage_readiness=ACCEPTED_OFFLINE_SCOPE_WITH_REGISTERED_LIVE_DEFERRALS，R06_READY=true；RR3/FINAL-04 放行）。本文是 R05-T07 的实现语义文档：usage 的归一口径、trace 因果、
 持久化 schema 与写序契约。机器可读的公式表在
 `rust/crates/lingxi-adapters/src/models/usage.rs` 的 `USAGE_MAPPINGS`（测试
 `r05_t07_usage_families.rs` 逐字段断言，本文与其同源，改一处必须同时改另一处）。
 
 ## 1. 一个 ModelCall 一条台账
 
-每次真实模型请求（物理 HTTP 请求）都在 `model_call_usage` 台账中可追溯：
+每个逻辑 ModelCall 在 `model_call_usage` 台账中记一条结算事实；其实际物理 HTTP 请求次数由 `transport_attempts` 表达（同一次401刷新重试仍是同一行，见§5）。不是每个物理请求另造一行：
 
 - 主对话（chat plane）：run driver 在每个 model call 完成（Final /
   ToolRequests / Continue / Empty / Failed 全部五类终局）时写一行；
@@ -15,7 +15,7 @@
   `LedgerWorkerCallbackTrace` 写一行（写失败=回调显式失败，不静默丢账）；
 - 操作面（embedding / rerank / image / video / speech / transcribe）：
   `OperationService` 在每次 dispatch 得到响应（或失败）后写一行
-  （`origin=operation`，无 session/run 归属——属内部记账，owner 范围查询看不到）。
+  （`origin=operation`）。`embed/rerank` 可选可信宿主 `OperationCallContext` 承接 session/run/attempt/cause_ref；未传上下文才是合法独立根，owner范围不可见。媒体其他入口不可据此宣称同样支持上下文，见§7.2。
 
 行的身份列：`session_id` / `run_id` / `attempt` / `model_call_id`（宿主铸造）
 + `purpose`（`chat` / `auxiliary.{slot}` / 操作名）+ `origin`（`user` /
@@ -260,3 +260,13 @@ worker 不收到成功答案。
   （`r05_t07_rr1_usage_ledger.rs::rr1_f21_worker_parent_join_…`）；
 - LIVE 供应商实测未获授权（RR-BLK-CREDENTIALS，最迟 R10）——本阶段全部
   证据来自离线/受控替身链路。
+
+## 11. RR3 E-02历史消费与证据边界
+
+当前schema为v7（migration `model_call_usage_rr1_f38_attempts_nullable`），与data_epoch=1、wire=1分开；生产worker `LedgerWorkerCallbackTrace`已接线。真实 `EmbeddingRequest`/`OperationCallContext`/`ModelUsageQuery`字段、正常调用及错误/未知处理在[HANDOFF](R05_HANDOFF.json) consumer_contract，正常样例来自 `r05_t07_rr1_usage_ledger::rr1_f21_operation_context_carries_session_run_and_cause` 实际源码，不冒充E新跑。prompt_tokens=5,total_tokens=9缺output不能猜4。
+
+普通取消同实例恢复已有 `subagent_closeout::parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap` 和 `late_result_fence::r03_a07_late_result_after_cancel_and_next_run_pollutes_nothing` 新C定向回执；预算408的60条running在重启后消解属于另一恢复义务，不能混作普通取消证据。最新C-F46-REVIEW-01完整160及普通取消两具名回执均新亲验，联合独立PASS、包级CLOSED（旧自检/FAIL历史保留），原崩溃窗口/脱离尽力写序边界不改变。现行失败/许可见[R05_REPORT §11](R05_REPORT.md#rr3-current)。
+
+## 12. RR3 E-03 当前证据消费
+
+接口和公式保持上述已核语义：schema7/data_epoch1/wire1/event1分轴，LedgerWorkerCallbackTrace已接线，embed/rerank可选宿主context，未知output/attempts不猜值。当前资源与两个普通取消具名回执改消费H-REVIEW-02新实际程序/装备及160原序列；375输入相等限定复用。60预算408后running重启消解仍与普通同实例取消恢复分开。H02 F48诊断/关联保护独立PASS；I11由G-REVIEW-03默认16完整亲跑关闭、I01–I09完整组合由RR3/FINAL-04正常态全链亲跑补齐（workspace 115组1486全绿+r05_stage_suites全绿+R04/R03闭包PASS），I06额外worker-permission仍NOT_OBSERVED（观察项，如实保留）。见[当前报告§13](R05_REPORT.md#rr3-current)与[HANDOFF](R05_HANDOFF.json)。本E04只回填FINAL-04真实结果，不重跑产品，不自签独立PASS；R06_READY=true（离线范围，LIVE/平台延期原边界）。

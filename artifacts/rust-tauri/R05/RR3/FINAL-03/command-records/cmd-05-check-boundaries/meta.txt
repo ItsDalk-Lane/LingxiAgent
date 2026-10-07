@@ -1,0 +1,14 @@
+label: cmd-05-check-boundaries
+argv: /Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-boundaries
+cwd: /Users/study_superior/Desktop/Code/LingxiAgent
+HOME: /Users/study_superior
+user: study_superior
+utcStart: 2026-10-07T13:41:53.608618000Z
+dfBefore: /dev/disk3s5       926  345       556    39% 5096589 5838588120    0%   /System/Volumes/Data
+utcEnd: 2026-10-07T13:41:54.109215000Z
+exit: 0
+stdoutBytes: 1664
+stderrBytes: 128
+stdoutSha256: ceef81ba70b9bf6a90330126461dc5817e9fd2ebec69d4d497c6ca8f1a9962ab
+stderrSha256: f6a94e6d483b18f06a9759f601a04e79e5159716f0f62208a83798478e2cd2a1
+dfAfter: /dev/disk3s5       926  345       556    39% 5096591 5838587840    0%   /System/Volumes/Data

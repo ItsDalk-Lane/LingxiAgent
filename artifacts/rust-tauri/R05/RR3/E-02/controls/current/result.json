@@ -1,0 +1,25 @@
+{
+  "kind": "current",
+  "rows": [
+    {
+      "phase": "normal",
+      "exitCode": 0,
+      "fixtureSha256": "a5635a23be6aa4ea00797ee988f1a4642abe0a6786e77851ee9a75e66b04dc09",
+      "commandLabel": "20-current-normal"
+    },
+    {
+      "phase": "target-red",
+      "exitCode": 1,
+      "fixtureSha256": "484f9262ea51a45c4e6ac11e8ba8d163498ae91f86d60285e49501ec2624d318",
+      "commandLabel": "20-current-target-red"
+    },
+    {
+      "phase": "restored",
+      "exitCode": 0,
+      "fixtureSha256": "a5635a23be6aa4ea00797ee988f1a4642abe0a6786e77851ee9a75e66b04dc09",
+      "commandLabel": "20-current-restored"
+    }
+  ],
+  "normalSha256": "a5635a23be6aa4ea00797ee988f1a4642abe0a6786e77851ee9a75e66b04dc09",
+  "restoredByteEqual": true
+}

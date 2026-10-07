@@ -1,0 +1,1054 @@
+{
+  "utc": "2026-10-07T01:21:16.152834+00:00",
+  "files": {
+    "docs/rust-tauri/R05/repair-current/RR3_D_REVIEW_BRIEF.md": {
+      "sha256": "490ecacee26c01ebc90be7b4dfd1f2d709bbac2e27e08a11c72ece9ae1cba2f7",
+      "bytes": 3185,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_BRIEF.md": {
+      "sha256": "31be412e410ff7be0543c2b9c5ff332ef77540de242070d6d2b1271ab0a6446c",
+      "bytes": 7538,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md": {
+      "sha256": "9395286d8272ba1c841bc7960cc0e06b93affcfbacc2037cf0a8f0df9fcb1fe8",
+      "bytes": 3911,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json": {
+      "sha256": "696b5289e459a116c6768b09f3ddde94cc0125017163d9aed0b4065c0a52eec6",
+      "bytes": 7018,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md": {
+      "sha256": "00730cf148791caff9865ff9204515e1cd8d212be9611126c9272f4ac79a7497",
+      "bytes": 8984,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md": {
+      "sha256": "40734c202e40605038cc62faad1fbc09ca1b8d0b579f084c7e452e88e54dbdf8",
+      "bytes": 2374,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR1_MASTER_PROMPT_2026-10-04.md": {
+      "sha256": "7fc077f1b370660f582d964977685d5a619fa988befd26f8a4915f409529f2bc",
+      "bytes": 70892,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR2_MASTER_PROMPT_2026-10-06.md": {
+      "sha256": "35802f225728954cccedd12ef0453090948afd18db9cb0f8f31cc9d896e92545",
+      "bytes": 8316,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR1_FINAL_REPORT.md": {
+      "sha256": "6bcdff2135a8a93bd3a7e44c98ae663c971fc0e93f5b083495d190621d5c2706",
+      "bytes": 14827,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json": {
+      "sha256": "6196fdd0c6ebe5d3250ab6e3c39931fe734dbefcb260f4c51f9d192b5ac9887b",
+      "bytes": 279575,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR1_PROGRESS.md": {
+      "sha256": "cc51a8db03f30c9aec46201cbffe5c8cab3fbe6ae256485a5a1d9426b9d9111d",
+      "bytes": 27309,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR1_LEAF_DEVIATIONS.md": {
+      "sha256": "3e95ce7cdc958023ceffea7ba0bfbb6742c2dafd7e40e42fd89227b6546b8f05",
+      "bytes": 5202,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR2_BRIEF.md": {
+      "sha256": "1ee083e21a23a69109cb96810377dba2a9615f7df00a89232dc276631808ff98",
+      "bytes": 5166,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR2_ISSUE_MATRIX.json": {
+      "sha256": "c2f0475ebf998ae225ac300393e58a3365419fb07347861ff78f3a5f0d0c8dbd",
+      "bytes": 37720,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR2_PROGRESS.md": {
+      "sha256": "90f1bb1b1cbf0b0cf42114e83e768a4f943723155a7144e061d330a43b649e1e",
+      "bytes": 30484,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/repair-current/RR2_HANDOFF.md": {
+      "sha256": "3560187fb5b114c90a958ef844c204619c5292099d2647fab83e43eca559b044",
+      "bytes": 7454,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/Lingxi_R05_完整执行与验收提示词_2026-10-02.md": {
+      "sha256": "371fffc32310ff7fdd6f8b383d437d327b6ab3b8848f78154011cad3719bdfdb",
+      "bytes": 76252,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/01_通用执行约束.md": {
+      "sha256": "d4f07185735acda91b73a2aa97a42ca7ce5795babf1104968c83671131cf871c",
+      "bytes": 8145,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/02_目标架构与强制契约.md": {
+      "sha256": "53dbf699675d9981b60ea5c982c4d0507afffd5184e6bebac875aae40d173c4d",
+      "bytes": 11718,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R05_模型协议、凭证、流式处理与最小完整闭环.md": {
+      "sha256": "a10490c115d00f1f0c5bbcf1a5e2f6b8740397103d8b8ad5cc029a3427f1a3e0",
+      "bytes": 17336,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/04_阶段依赖与接口交接.md": {
+      "sha256": "940c896508e929ec5f25c2b9020c06c2035c3f9800f43b78b1fd5e303e92bde3",
+      "bytes": 4233,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/06_风险、技术决策与退出条件.md": {
+      "sha256": "6c92962e5bcb739509630eb8c9cf8b96fabf67c0d51315717ae048d9b87786f0",
+      "bytes": 4454,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R06_上下文、会话语义、记忆与知识库.md": {
+      "sha256": "d54e7fcc638b62fc4303ce4af8f01ba8c358fd1a90d0f85a491bfd4a439bbd2e",
+      "bytes": 17423,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/05_验收与性能协议.md": {
+      "sha256": "d86c51f4b8571f94f0e9b457e74e79d9281d5c846e7a37d1f39edfdf47324b61",
+      "bytes": 10299,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/03_功能与所有权矩阵.md": {
+      "sha256": "6e84fc77a9f3124d51fe4d088fda6c8dcb96989e43d280634b94b7fc1d778560",
+      "bytes": 5882,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR2/FINAL-01/STAGE_REVIEW.md": {
+      "sha256": "0489d596b1c5eea78ada9480baca0112041d9608e1d9ba48f00dcab58dcfa0fb",
+      "bytes": 14710,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md": {
+      "sha256": "420e01cb179e2003353c24fbe6e8fc8541739e38accb47d146eec44699fb456f",
+      "bytes": 13070,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md": {
+      "sha256": "e9d6de071aa6f08e56a7f27d8b200fe915a4e9468e81361d778660cb97bd954d",
+      "bytes": 18330,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md": {
+      "sha256": "55e701cd0015c05ac58e1fc5618c4f67f09603d8541d7f781bd1307b133e1147",
+      "bytes": 11745,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/r00-formal-01.json": {
+      "sha256": "a37c27a740ca39d13aae0d9a84643abdc797c46b843b59b5d1753d8cf7d20039",
+      "bytes": 796,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/probe-c-lan.json": {
+      "sha256": "84ffaeebab372054317e0bc1da02f5da7f9d006cb089f929cf319c4511834919",
+      "bytes": 645,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/lan_probe.py": {
+      "sha256": "9bac28fb72f376a6846c460289226e1cf62259713bfe9158103edf683f74f906",
+      "bytes": 1477,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/probe-apple-lan.log": {
+      "sha256": "55ce46732c73cd0912a9cf46aa36c8c2c1fb3400336645b3c03463e7374705e8",
+      "bytes": 161,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/PREPARED-ALLOW.md": {
+      "sha256": "b0f25a7b61b0028650631611044139eba84bd2722697160ab43c9ede450dae0f",
+      "bytes": 3417,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/lan_probe.c": {
+      "sha256": "9d6b3b25bc0d7a363e8c9efceb23cb17da022fd8fd72f2e801135a7d5bc96959",
+      "bytes": 2709,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/prepared-identity-check.json": {
+      "sha256": "7a7f0f8fff095b4a421682695d3c1c6a3921fba10448606b219fdcbc253561ec",
+      "bytes": 692,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/REPORT.md": {
+      "sha256": "5ddc3c80e7e7ad7f88df714c6bb0d3c22502119cbe87fa5c0186eedbdf54be52",
+      "bytes": 9525,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/compile-probe.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/evidence-manifest.json": {
+      "sha256": "79c205209179084fe5bc28b5d2aa470d1bf6b74ce17df93343d0067cdd2dda5d",
+      "bytes": 6296,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/lan_probe": {
+      "sha256": "86d4f4f5fec48a66dfd38278331578e6764bf9edc2592e4315334294ab7b6b65",
+      "bytes": 34632,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/probe-c-lan.log": {
+      "sha256": "b49afda5b6751d4df292e3fe9a37da703452545138c3c9de4421ecfef6126f51",
+      "bytes": 202,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/probe-c-loopback.log": {
+      "sha256": "98e974f6df695899c8588d773f8cee4d5fe3dd36a6b902f4856f0b88bb4fd36f",
+      "bytes": 209,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/r00-formal-01.log": {
+      "sha256": "895a83c72efdb5b1fa9542df1b90d5ac3b5b5e58fcb96e102123783c4f1f894e",
+      "bytes": 3288,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/run_capture.py": {
+      "sha256": "206052c4f8881bac43608b56ee8898bcb28aa83857454b8799cb6266340967b4",
+      "bytes": 2648,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/input-comparison.json": {
+      "sha256": "e9fdcce6fd3750721da67b54426e49b55641761f00cc2a318c539a81e1bc7215",
+      "bytes": 13142,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/prepared-identity-check.log": {
+      "sha256": "b7b020bee5440dc373103d79f3e59ea2dfc5eb6fb0c7c689f460783675fb6bb4",
+      "bytes": 351,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/build-environment.json": {
+      "sha256": "17f09fe2f2c0162c1e3dd625a2c157dd37c930608fa1ed5ffac6d21ee0be19fa",
+      "bytes": 638,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/verify_prepared_identity.py": {
+      "sha256": "3c16a2ce8850249d409e31b4f5c81942e1ca0d0b874129735580b47c10aff2f5",
+      "bytes": 1447,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/probe-apple-lan.json": {
+      "sha256": "b68f217a7a9456fa5479abf34c975e3366b7b8fffa13720d7e62b8f33c73731c",
+      "bytes": 680,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/prebuild-r00.json": {
+      "sha256": "82735de951e514494f1fa4ee964b0b8ccbdefd676043b98ec406555f648571c5",
+      "bytes": 787,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/identity-before.json": {
+      "sha256": "2a5750976bc246c07ac7d2c7dd1edd0a220ab7178d9e0983898c050b0195d301",
+      "bytes": 65083,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/prebuild-r00.log": {
+      "sha256": "35f6b3c18ac7b13b9f36b4390dfea4588a2afe844bc1d759a4a2ac15463d5ec4",
+      "bytes": 196607,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/probe-c-loopback.json": {
+      "sha256": "642290a68f6f56f20a678ebedce98a7a9b99467feb96d2232247c45feaa33ed3",
+      "bytes": 653,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/identity-after.json": {
+      "sha256": "4a3b0cacb972af2532a9e275783bddf4b88cc8c2ccf88139eb15cf91d6c7c6bc",
+      "bytes": 65083,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/snapshot.py": {
+      "sha256": "3cac6314ab1340a7e681c9945a9ae4c7ab7e21ee13404205c12aaba4e58d0169",
+      "bytes": 3230,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/probe-identities.json": {
+      "sha256": "b911a3d9591892d4a2ef0b1c713cb05dbb7b1c4b9af7c1b908a7a60b8f1cd5e0",
+      "bytes": 5049,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/compile-probe.json": {
+      "sha256": "8d648e8447af9af72af09f9d63b069a5e2a6fd731c6538b18f6183c2b0dcaf26",
+      "bytes": 727,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR3/D-01/r00-formal-01-listeners.log": {
+      "sha256": "6faf3b2315428a8820284f138c6f4a04341d7ee7e87a066a4aa0466192dff5fc",
+      "bytes": 23565,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR2/D-R2/probe/zz_lanprobe.c": {
+      "sha256": "016664ce87b705450f19379d73c401d17ac7fcae75565fe5a52eda973ddb8a0d",
+      "bytes": 4250,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR2/D-R2/probe/zz_lanprobe": {
+      "sha256": "b92b587ac9666c9d4c040e15f3eb8f89a292366f9a908e0654e06a86e2961378",
+      "bytes": 51040,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR2/D-R2/probe/zz_lanprobe.py": {
+      "sha256": "9dfdded8763afe98bbcf7afe083ad8818edf677591f433cd80eddcedba1cc6a7",
+      "bytes": 1463,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR2/D-R2/probe/probe-suite.log": {
+      "sha256": "c688090b8b104c5407ffa4f7857d73798d16edfceeb243c1abb5d87a78359c13",
+      "bytes": 2643,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md": {
+      "sha256": "ba6a7c79b0f7776b7d94640888527113eed2a641e135a46b87ee8c3a516eb961",
+      "bytes": 7313,
+      "completeByteRead": true
+    },
+    "artifacts/rust-tauri/R05/RR2/D-R2/REPORT.md": {
+      "sha256": "9895bfde536d002d3b46b5b4a419a593c14bc87782765e667f819af1677023df",
+      "bytes": 5722,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/R05_BLOCKERS.md": {
+      "sha256": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+      "bytes": 11714,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/CREDENTIAL_FLOW_MATRIX.json": {
+      "sha256": "9b19e6e81364acd88a735a1010c1c2e34e475f4c812272dcf4ef1c62e7b0a25f",
+      "bytes": 9587,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/r05_t05_generate_compat_goldens.mjs": {
+      "sha256": "80f9cdc8cd2a4a3630668683ac8f958eff96c334bfa38be61f0418892c29d4d8",
+      "bytes": 22436,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/r05_t04_codemod_delta_sink.py": {
+      "sha256": "b4dcbc86a1d313702ec3e1c8d2a8908e62dc527dcf20a7d13ba72671c78ed95f",
+      "bytes": 3712,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/r05_stage_cids.tsv": {
+      "sha256": "ffffbe56313a1d5e50e7b216499cd851b1efc988da811a57d4fe0b07cc0be556",
+      "bytes": 37255,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/r05_t01_extract_provider_matrix.mjs": {
+      "sha256": "9376dfb9862fd93b31d4fe9d0331eb8ebe70747fef80ef4e58290bb130bc615c",
+      "bytes": 9876,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": {
+      "sha256": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+      "bytes": 12609,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/r05_leaf_case_map.tsv": {
+      "sha256": "a4f5866d11a833a7bbcd7224e898baaaa047a485cf4b2c66c515af25348db64f",
+      "bytes": 8755,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": {
+      "sha256": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+      "bytes": 20415,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": {
+      "sha256": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+      "bytes": 18728,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": {
+      "sha256": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+      "bytes": 67889,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/r05_required_cids.tsv": {
+      "sha256": "1a046aa162d62bc1fdefdd286a6211d37c15852a2683073df9c629d26190676c",
+      "bytes": 3125,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": {
+      "sha256": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+      "bytes": 5656,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/r05_t01_build_scope_matrix.py": {
+      "sha256": "5bb22b63b018b41ee11f20426545834680c3e86397c093a98e121ac489783048",
+      "bytes": 15821,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/R05_TEST_MAP.json": {
+      "sha256": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+      "bytes": 76657,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": {
+      "sha256": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+      "bytes": 11015,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/R05_BASELINE.json": {
+      "sha256": "dd0f3e0cf070dea03a3128e2a9be576bb032c44b0597129056947de2d425aa0b",
+      "bytes": 5866,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/PROVIDER_SUPPORT_MATRIX.json": {
+      "sha256": "c1ddf6301578f0d3ab493a120b95c9edcc9b7c6f304da28c6a7df16b09053d86",
+      "bytes": 44631,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/r05_t01_build_callsite_matrix.py": {
+      "sha256": "a62dabe310b4ace1e9439646464a11f9a654b02cba703abd347e2b0b587d86b6",
+      "bytes": 19820,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/PROTOCOL_WIRE_MATRIX.json": {
+      "sha256": "1407f4bcfae76a3ddef5a174f8b394dc5abf1ed992f4f8ddae39803e1c5fb59c",
+      "bytes": 89848,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/r05_t01_codemod_next_turn.py": {
+      "sha256": "6b728f4c396d92dadd88e830637a7112a7309ab78c3bd4e5589cf40b1d58f4e9",
+      "bytes": 4571,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/R05_HANDOFF.json": {
+      "sha256": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+      "bytes": 40047,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/r05_stage_pins.tsv": {
+      "sha256": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+      "bytes": 10498,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": {
+      "sha256": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+      "bytes": 4039326,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/PROGRESS_LEDGER.json": {
+      "sha256": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+      "bytes": 52626,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/R05_REPORT.md": {
+      "sha256": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+      "bytes": 22823,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": {
+      "sha256": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+      "bytes": 23793,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/R05_SCOPE_MATRIX.json": {
+      "sha256": "222e8e7e54030578c0ce4697d33a98b59ec3ca5cc210642bdc83bdb3b7a72110",
+      "bytes": 117184,
+      "completeByteRead": true
+    },
+    "docs/rust-tauri/R05/MODEL_CALLSITE_MATRIX.json": {
+      "sha256": "ec39ebf839be3fbc3a0311e7164b4e6b996239240c0fa73d08e123366b7776bf",
+      "bytes": 42263,
+      "completeByteRead": true
+    }
+  },
+  "readScope": "权威原文及D完整raw；当前大表按D完整相关记录索引，未对其他包重作判断。",
+  "DRelatedRecords": {
+    "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json": [
+      {
+        "id": "R05-ENV-R00",
+        "workPackage": "D",
+        "title": "确切二进制非回环入站超时",
+        "status": "BLOCKED",
+        "owner": "rr3_d_impl_01",
+        "round": 1,
+        "scope": "本轮身份/过滤/监听及最小差分探针",
+        "evidenceDir": "artifacts/rust-tauri/R05/RR3/D-01/",
+        "independentReview": "rr3_d_review_01 CLI fresh ephemeral / RUNNING / artifacts/rust-tauri/R05/RR3/D-REVIEW-01/",
+        "nextCommand": "F46后最终源码预构建确切r00+一次真实LAN/最小差分/精确操作准备，不改系统",
+        "selfChecks": "D-01 REPORT/28文件manifest完成：真实r00 exit101，0/1/0/0；SHA256 c5975a452505bd4f90fcf87509902f812148f809b21674302e6dbd34886daa6a，CDHash6eadd46c232408547f08e305c792f1c4c2614a94，非回环20s超时。同路径permitted但实测红，C差分LAN红/Apple Python绿。只准备系统操作未执行；非独立PASS。"
+      }
+    ],
+    "docs/rust-tauri/R05/repair-current/RR1_FINAL_REPORT.md": [
+      "live_verification: BLOCKED_NOT_AUTHORIZED（RR-BLK-CREDENTIALS，登记最迟 R10；本轮零真实外发）",
+      "1. `RR1_ISSUE_MATRIX.json`（273KB，1632 行）：亲读 `independentStageReview` 全键、counts（INDEPENDENT_PASS=37 / OPEN=8 / SELF_CHECKED=1 / IMPLEMENTED=0，合计 46 条=F01–F43 + 3 C-ID 行，与逐条枚举一致）、F34/F40/F41/F42/F43 五条 OPEN 条目全文、`baseline`（head=d80737b6、compareBase=c549ff654、1.98.1）、`integritySpotcheck`（22/22 ok）。结论与阶段终审 JSON 逐字段一致（offline FAIL / review FAIL / NOT_ACCEPTED / R06_READY=false / live BLOCKED_NOT_AUTHORIZED / 平台三行）。",
+      "| **F43（新，阶段终审发现）** | **OPEN（rounds=0）** | —（同上） | INDEPENDENT-9/verify-R05/rust_test_workspace/{stdout,stderr}.log + verify-stage-result.json（timedOut=true）+ supplementary/workspace-test-nofailfast.log、isolation-reruns.log |",
+      "| 阶段级 8 项 OPEN 合计 | F34、F40、F41、F42、F43 + 三行 C-ID | — | — |",
+      "  - FAIL：`rust_test_workspace`（timedOut=true——2400s 冷编译耗尽被杀，被杀前 41 套件 0 失败）；`r04_regression_gate`（exit 1——嵌套链 F41/F42 两腿确定性红 + ALF 环境项 fail-fast）。",
+      "- 补充运行（supplementary，同一候选）：workspace `--no-fail-fast` 完整枚举 115 套件/1472 通过/3 失败（r00=ALF 环境项逐字签名、r04_a09 pid 文件 TOCTOU、f24_sigterm 30s 负载期限；后两者隔离+定向复跑全绿=负载敏感非产品缺陷）；`r02_t04_storage_tx.sh` standalone 复现 F41（exit 1，断言逐字）；`r02_t08_legacy_entry_regression.sh` stdout 落 artifacts 内 .log 复现 F42（exit 1，绑定 1107 行）/stdout 置仓库外控制组 E0–E4.5 ALL GREEN（exit 0）——失败条件精确归因为「运行自身输出落在 artifacts/rust-tauri/** 未忽略 .log」（.gitignore 负向规则 `!artifacts/rust-tauri/**/*.log` 为 d80737b6 新增，git show c549ff654 亲核无此行）。",
+      "**资源/性能**：F27 资源采样 2/2 + 160 轮取消/错误负载 + 原始序列 18 点（macOS 重做，替代原容器 BLOCKED 项）；`R05_PERFORMANCE_RESULTS.json` 为 RR1 真值（PENDING 口径未翻写）。",
+      "- LIVE 真实供应商全链：BLOCKED_NOT_AUTHORIZED（RR-BLK-CREDENTIALS，最迟 R10；本轮零真实外发，全部端点为测试自有回环替身）。",
+      "- `rust_test_workspace` 通道：无有效窗口完整通过记录（F43：超时 + ALF 环境项 + 2 负载敏感腿）。",
+      "- ALF 环境项（R05-ENV-ALF-UNSIGNED-TEST-BINARY）：需用户 Allow/socketfilterfw/开发者签名，执行者无法自解。",
+      "2. `docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json`（状态权威；重点 `independentStageReview` 键 + F41/F42/F43/F34/F40 条目的 fact/remaining/evidenceDir）",
+      "5. 修复目标文件：`docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json`（F41 补登 v6/v7）、`.gitignore` × `scripts/rust-tauri/r02_t08_legacy_entry_regression.sh`（F42 修复方向三选一）、`rust/crates/lingxi-adapters/tests/r05_t04_rr1_batch_terminal.rs`（F34 追腿）、r04_a09/f24_sigterm 测试（F43 稳定性）",
+      "**false**。R05 未验收（NOT_ACCEPTED）：在 F41/F42 修复并整链 verify-stage R05 复验通过、F34/F40(+三行)/F43 按矩阵 remaining 关闭或显式归因、且新阶段终审独立复跑 PASS 之前，R06 不得启动。"
+    ],
+    "docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json": [
+      {
+        "fId": "F11",
+        "task": "R05-T04",
+        "origRefs": {
+          "aIds": [
+            "R05-A05",
+            "R05-A07",
+            "R05-A08"
+          ],
+          "cIds": [
+            "R05-T04-C05",
+            "R05-T04-C06",
+            "R05-T04-C07",
+            "R05-T04-C09",
+            "R05-T04-C10"
+          ],
+          "other": [
+            "专项 T04 整批要求"
+          ]
+        },
+        "fact": "同轮 write(正常)+read(path=123) 第一个文件先被写后才发现 schema 错误；两个外部 id=dup 的 write 都实际执行，下一请求含两个同 tool_call_id 结果——副作用先于整批准入发生。",
+        "entry": [
+          "四族 tool-call parser（Codex 共享 Responses）",
+          "rust/crates/lingxi-service/src/runs.rs:1498-1519,1552 起逐工具执行"
+        ],
+        "evidenceDir": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/audit/protocol（PF05）；audit/closed_loop（CL-03，正式二进制双反例）",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T04",
+        "rounds": 1,
+        "candidateSummary": "R1（R05-T04-执行者，2026-10-05）：(1) 四族 parser 共享整批身份准入 models/batch_admission.rs：同 provider_call_id 同形（target+args_digest）完成重发折叠为一次，异形冲突整批响亮 InvalidMessage（原审计断言原文迁移 lingxi-adapters/tests/r05_t04_rr1_batch_terminal.rs，修复前 6 红之 3）；(2) runs.rs ToolRequests 臂在首个副作用前做整批静态准入：provider_call_id 冲突扫描（防直接 double 绕过 adapter）+ 每请求 digest 门 + toolgateway 新增纯校验 validate_from_request（目标/可用性/代次/CURRENT schema/资源规范化/策略裁决，不铸造 handle；由 prepare 抽出 admission_checks 复用），任一失败→整批零派发、逐项结构化拒绝（保留各拒绝自身错误码与 R04 既有 receipt 诊断词汇）回传模型可纠错重试；(3) 每次真正执行前权限/批准/取消/代次复核与完整 prepare 保留（预验证不取代即时授权）。共享文件改动：kernel/src/ports.rs（ProviderTurn::Empty 增加 content 字段，承载过程块供重放）、toolgateway.rs、四族 parser、auxiliary.rs、r05_t03_rr1_replay.rs/goldens/service 若干 R03/R04 测试构造点（机械补 content 字段/模式）；回归范围=kernel+adapters+service 全量。",
+        "testEvidence": "旧红（修复前、当前候选树）：cargo test -p lingxi-adapters --test r05_t04_rr1_batch_terminal → 6 failed/1 passed（duplicate_provider_ids…、identical_resends…、anthropic_open_tool_block…、openai_done_without_finish…、thinking_only…、buffered_bodies_without_normal_stop…）；cargo test -p lingxi-service --test r05_t04_streaming rr1_ → 8 failed/1 passed（zero_side_effects/冲突/重发/reasoning-only/mood-only/unresolved/f13 同源）。修复后（rustup 1.98.1 代理）：adapters r05_t04_rr1_batch_terminal 7/7 绿；service r05_t04_streaming 18/18 绿（含 rr1_f11_* 四腿：合法+schema 非法零副作用 0 started 0 文件、同 ID 冲突响亮零副作用、同参重发执行一次、异 ID 同参分别执行）；kernel+adapters+service 全量 --no-fail-fast 1221 通过/1 失败（r00_management_leaves LAN 腿本机 macOS 防火墙环境项，与 T03 记录同源，非本包缺陷）；fmt --check 干净；clippy --workspace --all-targets -D warnings 0 error。",
+        "independentReview": "R05-T04-独立验收-r1（2026-10-05，R05 RR1 WP-T04 R1 审查轮，全新上下文，未参与实现/修复；rustup 代理 /Users/study_superior/.cargo/bin/cargo→1.98.1）。①亲跑：adapters r05_t04_rr1_batch_terminal 7/7、service r05_t04_streaming 18/18（rr1_f11 四腿全绿：合法write+schema非法read → 0 tool_call_started 且 output.txt 不存在；同ID异参冲突 → failed.provider_error、双文件皆不存在、0 started、无伪造 final；同ID同参重发 → once.txt 恰一次执行、下一请求恰 1 个同 id 结果；异ID同参 → 2 started 2 结果）。②旧红独立复现：隔离 worktree checkout 冻结 HEAD d80737b6 + 同一测试文件逐字节未改 → 6 failed/1 passed（正常对照绿），debug 输出实见冻结 parser 放行两个 provider_call_id=Some(\"same\")，与执行者声明及 PF05 反例一致。③变异验证（候选树隔离副本，未触被审工作树）：仅将 runs.rs 整批准入中性化（batch_failed 置 false + own_refusals 跳过）→ rr1_f11_legal_then_schema_invalid_batch_has_zero_side_effects 红（『the legal sibling must not execute before the batch passes admission』，文件真实落盘），证明该测试真实计数文件副作用而非同义反复；同ID冲突腿此时仍绿（adapter 层 batch_admission.rs 拦截），分层防御成立。④正式入口核对：测试 boot_with_config 与二进制 main.rs:423-458 同构（config 文件→resolve_model_plane→CredentialService::bootstrap→ConfigModelGateway→ServiceDeps::bootstrap），bootstrap lib.rs:1024-1100 在有 plane 且无注入 provider 时装配真实 ToolRegistry+ToolInvocationGateway+CoreFileTools——真实文件工具经真实网关，stub 仅替换 HTTP 远端；toolgateway validate_from_request 复用 prepare 的 admission_checks（不铸 handle），每请求执行时仍走完整 prepare+权限/批准/取消复核。⑤回归：adapters 全量 292/0、kernel 87/0、service 全量 --no-fail-fast 843 绿/1 红（r00_management_leaves LAN 腿，macOS 防火墙拦非环回自地址入站，测试自身 panic 文本即环境归因，非 T04 缺陷）；fmt --all --check exit 0；clippy --workspace --all-targets --locked -D warnings exit 0。",
+        "remaining": "本任务级验收已过；跨包 I04 整批场景与 T08 阶段复验随集成收口。"
+      },
+      {
+        "fId": "F12",
+        "task": "R05-T04",
+        "origRefs": {
+          "aIds": [
+            "R05-A07",
+            "R05-A08",
+            "R05-A15"
+          ],
+          "cIds": [
+            "R05-T04-C05",
+            "R05-T04-C06",
+            "R05-T04-C09",
+            "R05-T04-C11",
+            "R05-T04-C14",
+            "R05-T04-C15",
+            "R05-T04-C16"
+          ]
+        },
+        "fact": "Anthropic 工具 block 未关闭只有 message_stop 仍生成 ToolRequests；OpenAI 仅文本+[DONE] 无正常 finish_reason 仍为 Final；五族仅 Reasoning/Opaque 也判 Final，正式二进制把仅 reasoning 的运行持久化为 completed.with_final；普通首片文本语义未定即标 FinalAnswer。",
+        "entry": [
+          "rust/crates/lingxi-adapters/src/models/anthropic_messages.rs:1073-1120",
+          "rust/crates/lingxi-adapters/src/models/openai_completions.rs:678-730,967-973",
+          "其他族 parse 的 Final 判定",
+          "rust/crates/lingxi-service/src/runs.rs:1431-1462",
+          "rust/crates/lingxi-adapters/src/streaming_norm.rs:888-909"
+        ],
+        "evidenceDir": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/audit/protocol（PF06）；audit/closed_loop（CL-02 反例B process-only-result.json）",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T04",
+        "rounds": 1,
+        "candidateSummary": "R1（R05-T04-执行者，2026-10-05）：传输结束≠协议完成，逐族明确终结条件——openai：finish_reason 缺失或未知值→响亮 InvalidMessage（[DONE]/body 末字节只是传输终点），已知正常终态 stop/tool_calls/function_call；anthropic：stop_reason 缺失/未知→拒；流式 finish 要求全部 content_block 已闭（message_stop 不足以成批）；google：finishReason 缺失/未知→拒；responses/codex：status 缺失/未知→拒，incomplete 未知原因→拒（不再落入内容分类）。正常停止但全部内容为过程块（仅 reasoning/opaque、无答案文本）→ ProviderTurn::Empty（过程语义，content 随行供重放，不丢协议状态如 Google 空文本签名 Part），driver 结算 completed.no_final.process_only，不产生 final_message_committed。driver 侧终态辩护：Final 规范化后无可见文本→no_final（saw_process_content）。live 文本阶段（streaming_norm D5 修订）：文本片段/segment 以 Unresolved 流出（wire 契约禁止未定文本猜成 final_answer），segment END 在调用 terminal 处按 driver 判定解析（真 Final 带可见文本→final_answer，否则保持 unresolved；对齐 incumbent phaseKnownAtEnd 形状）。共享文件：kernel/src/ports.rs（Empty+content）、四族 parser、runs.rs、streaming_norm.rs；接口演进记录 R05_INTERFACE_EVOLUTION.md 第 5/6/12 条。",
+        "testEvidence": "旧红：见 F11 同批（openai_done_without_finish_reason_does_not_make_final、thinking_only_and_opaque_only_do_not_form_final_answers（五族）、anthropic_open_tool_block…、buffered_bodies_without_a_normal_stop_reason_are_loud、rr1_f12_reasoning_only…、rr1_f12_mood_only…、rr1_f12_unclassified_live_text_*、c13/c15 腿）。修复后：adapters r05_t04_rr1_batch_terminal 7/7（含正面对照 normal stop→Final、合法双工具→ToolRequests）；service r05_t04_streaming 18/18（reasoning-only→completed.no_final.process_only 且 0 final_message_committed、mood-only 同、live delta 无 final_answer 而 segment END 解析）；T03/T07 既有套件（r05_t03_rr1_replay 33/33、goldens 3/3、usage_families 14/14，夹具仅补合法 content_block_stop/finish 帧，行为断言未削弱）；全量 1221/1（唯一失败为本机 macOS 防火墙环境项 r00_management_leaves）。",
+        "independentReview": "R05-T04-独立验收-r1（2026-10-05，R05 RR1 WP-T04 R1 审查轮，全新上下文，未参与实现/修复；rustup 代理 /Users/study_superior/.cargo/bin/cargo→1.98.1）。①亲跑：adapters r05_t04_rr1_batch_terminal 7/7（done-without-finish 不成 Final、anthropic 未闭工具块不成批、五族 process-only 不成 Final、四族 buffered 缺终值响亮、正常对照 Final/合法双工具仍通过）；service r05_t04_streaming 18/18（reasoning-only → completed.no_final.process_only 且 final_message_committed=0；mood-only 同；live 文本 delta 无 final_answer 而 segment END 在终态解析 final_answer；pre-terminal 无 final_answer）。②旧红独立复现：冻结 HEAD d80737b6 隔离 worktree 同一测试 → 6 failed/1 passed（PF05 腿2/3、PF06 腿1 均 红），与执行者声明一致。③变异验证（隔离副本）：a) message_has_visible_text→true → mood-only 腿红（completed.with_final）；b) openai_completions has_answer_text→!content.is_empty() → reasoning-only 腿红（completed.with_final）——服务层防线与 adapter 层防线各自被钉。④代码核对：四族 Some(other)→响亮 InvalidMessage、None→响亮拒绝（亲读四处分支）；anthropic finish 要求全部 content_block 已闭+已知 stop_reason；responses 含 unmapped incomplete reason 拒绝；stream 侧经重建 buffered 体走同一 parser；live 首片可见性 c12 腿保持绿。⑤present-but-unmapped 终值无永久测试腿——登记 F33（测试电池缺口，不阻塞本 PASS）。⑥回归同 F11（adapters 292/0、kernel 87/0、service 843绿/1环境红、fmt/clippy exit 0）。",
+        "remaining": "F33（未知终值测试腿）由下一轮补强；跨包 I05 消息终态与 T08 阶段复验随集成收口。"
+      },
+      {
+        "fId": "F14",
+        "task": "R05-T05",
+        "origRefs": {
+          "cIds": [
+            "R05-T05-C12"
+          ],
+          "steps": [
+            "原 T05 步骤1及交付"
+          ],
+          "joint": [
+            "与 T02/T06 联合"
+          ]
+        },
+        "fact": "系统/手动代理、NO_PROXY 与显式私有 CA 未实现：客户端固定 no_proxy()，缺冻结网络策略与附加 CA 配置；台账 C12 为 OFFLINE_LOGIC/NOT_RUN，审查自行延期网络加固（默认 TLS 校验仍开启，不能误报为已关闭 TLS）。",
+        "entry": [
+          "rust/crates/lingxi-adapters/src/models/dispatch.rs:98-105",
+          "rust/crates/lingxi-adapters/src/models/oauth.rs:161-165",
+          "ProviderConfig",
+          "docs/rust-tauri/R05/R05_BLOCKERS.md:18-23"
+        ],
+        "evidenceDir": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/audit/credential_network（CN-F05）；audit/gate（G03）",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T05",
+        "rounds": 2,
+        "candidateSummary": "R05 RR1 WP-T05 R1（2026-10-05）：①新模块 lingxi-adapters/src/models/network.rs——NetworkConfigSection/NetworkProxyConfig（serde camelCase、deny_unknown_fields）镜像现役 shared/network-proxy.ts 契约：mode system|manual|direct（缺省 system）、httpProxy/httpsProxy（http/https/socks/socks5、禁 userinfo/path/query、manual≥1）、noProxy（缺省 'localhost, 127.0.0.1, ::1'）、trustedCaPem（PEM bundle 解析且 ≥1 证书——from_pem_bundle 静默跳过垃圾文本，空列表为响亮配置错误）；运行时 NetworkPolicy{ProxyPolicy, trusted_ca_pem}：System=load 时环境快照（HTTP(S)_PROXY/ALL_PROXY/NO_PROXY 大小写、非法 URL 跳过）、effective_proxy_for_url 完整移植 isNoProxyMatch+resolveProxyForUrl（强制 loopback bypass、*/.suffix/*.suffix/精确/[v6]/逐条 :port、http→http||https、https→https||http，语法逐条单测）；NetworkPlane（AtomicU64 代次+RwLock 策略）+NetworkClientHandle（代次变化懒重建，失败响亮）。②dispatch.rs build_client_under_policy：no-redirect+connect timeout+Proxy::custom 逐 URL 拦截（装显式代理同时禁环境自动探测）+add_root_certificate 叠加于 rustls-platform-verifier（链/主机名/有效期校验不放宽，无 accept-invalid 路径）；reqwest 追加 socks 特性（空 cfg 门，锁内版本不变）。③消费方单一 plane 接线：五 chat family、GatewayedProvider/AuxiliaryExecutor（辅助+worker callback 同喉）、OperationDispatcher、EgressGuard（资源下载）、OAuthHttp/ProductionRefreshDriver（OAuth refresh）；ServiceDeps.network_plane 新字段，main.rs 从校验后 plane 建策略并快照环境，lib.rs 组合根分传，management reload_models 在 gateway 交换后 plane.apply 原子发布新代次（in-flight 用旧 client，下一请求见新策略）。",
+        "testEvidence": "旧红：artifacts/rust-tauri/R05/RR1/WP-T05-E01/old-red-probe（4 断言对未修复树 exit 101：network 段被 deny_unknown_fields 拒、HTTP(S)_PROXY 导出后计数代理 0 连接、CN-F06/CN-F07 两腿均红，old-red-on-unfixed-tree.log）；修复树同断言（green-probe-adapted，仅接口演进适配 client 构造行，断言文本未动）4/4 绿 exit 0（green-on-fixed-tree.log）。永久测试 rust/crates/lingxi-service/tests/r05_t05_network.rs mod rr1_f14（9 测试：配置段解析+userinfo 拒、manual 代理真实改道（计数代理绝对形式收 chat、合成源 0 直连）、强制环回 bypass（空 noProxy 下源直连、代理 0）、direct 显式、system 环境快照（注入 env map 无竞态）、私有 CA 授权成功+未授权默认拒、错误主机名/过期/错误链三负例（rcgen CA+IP SAN+过去有效期）、OAuth refresh+operation 共享同一代理、策略代次发布后下一请求改道）+ network.rs 单测（NO_PROXY 语法、校验负例、代次懒重建）。命令：/Users/study_superior/.cargo/bin/cargo +1.98.1 test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r05_t05_network（21/21 绿）。",
+        "independentReview": "R05 RR1 WP-T05 R1 独立验收 PASS（2026-10-05，R05-T05-独立验收-r1，全新上下文审查者，未参与实现/修复；工具链 rustup 代理 /Users/study_superior/.cargo/bin/cargo→1.98.1，未用 PATH/Homebrew cargo）。①亲跑永久套件 r05_t05_network 21/21 绿（rr1_f14 九腿全过：manual 代理真实改道计数代理=1、强制环回 bypass 空 noProxy 下代理 0/源 1、direct、system 环境快照注入、私有 CA 授权成功+未带 CA 默认拒、错主机名/过期/错链三负例、OAuth+operation 同代理、代次发布后下一请求改道）。②原始反例独立复跑（隔离 crate /tmp path 依赖本树）：审计探针源 SHA256 e7ec004c…核验一致，CN-F06/CN-F07 两腿断言原文未动在固定树绿；审查者另建 F14 环境腿（进程启动前导出 HTTP(S)_PROXY/大小写四变量 + NetworkPlane::from_environment() 即 main.rs bootstrap 同面）实测计数代理收到绝对形式请求（3/3 绿）；同三腿对冻结 HEAD d80737b6（git archive 隔离副本）exit 101 全红（egress 环回连接发生、error body 超 250ms 窗、共享 client 无视导出代理）——旧红/新绿双向独立复现。③冻结 HEAD 源级核对：dispatch.rs:103 与 oauth.rs:164 均固定 .no_proxy()、无 network 模块、admit 无 deadline 参数（CN-F05/F-WU06 旧形状）。④生产接线读码核实：main.rs:445-460 从校验后 plane 构造 NetworkPlane 并传 CredentialService::bootstrap_with_network 与 deps.network_plane；lib.rs:1094/1194/1247 组合根用 GatewayedProvider::new_with_network/AuxiliaryExecutor::new_with_network/OperationService::new_with_network（operations.rs:344 EgressGuard::from_provider_endpoints_and_network、:350 dispatcher 策略化、credentials/mod.rs:410 ProductionRefreshDriver::with_network→OAuthHttp::new_with_network）；五 chat family new_with_timeouts_and_network 持 plane client_handle、send 前 client() 懒重建；management.rs:699-703 reload 在 gateway 交换后 plane.apply 原子发布——正式二进制组合根接线，非测试构造器注入；grep 全 adapters 无裸 build_client() 生产调用（唯 dispatch.rs:92 定义点）。⑤行为边界复核：NO_PROXY 语法/环境快照/代次懒重建均有 network.rs 单测；socks 未实测服务端拨号（执行者已如实登记）；R05_BLOCKERS.md C12 节已更新为已关闭且保留历史。⑥审查发现并登记 F35（LOW）：NO_PROXY 条目解析缺现役 splitNoProxyEntry 的方括号 IPv6 分支，公网 v6 字面量列入 noProxy 仍被代理（环回不受影响，强制 bypass 兜底）——不回滚 F14 主体判定。⑦回归：fmt --all --check exit 0；clippy -p lingxi-adapters -p lingxi-service --all-targets --locked -D warnings exit 0；lingxi-adapters 全量 exit 0（24 测试二进制，含 egress C11B 五测与 r05_t05_compat/timeouts）；lingxi-service 全量 --no-fail-fast 864 绿/1 红（r00_management_leaves LAN 腿：请求 192.168.3.5 POST /lingxi/v1/web-auth/login 0 字节停滞，测试自身 panic 文本即 macOS 应用防火墙对非环回自地址入站的环境归因；隔离复跑同红；与 T03/T04 审查轮同型环境项 R05-ENV-ALF-UNSIGNED-TEST-BINARY，非 T05 缺陷——T05 改动仅出站策略面，该腿为入站监听）。 ‖ R2 复核 PASS（2026-10-05，R05-T05-独立验收-r2，全新上下文审查者）：亲跑 r05_t05_network 21/21 绿；审查者自建 /tmp 隔离探针（CN-F06/CN-F07 断言原文自审计探针源迁入，仅按需裁剪 import）对本树 3/3 绿 exit 0，其中 F14 环境腿以 NetworkPlane::from_environment()（main.rs bootstrap 同面）+ 进程启动前导出 HTTP(S)_PROXY 四变量实测计数代理实收请求；同三腿对冻结 HEAD d80737b6（git archive 隔离副本，F14 腿按该 HEAD 唯一存在的 build_client() 生产面）0 passed/3 failed exit 101——旧红/新绿双向独立复现。生产接线复核：main.rs:445-460 组合根建 plane 并传 bootstrap_with_network；lib.rs:1094/1194/1247 三消费方与 credentials/mod.rs:410 refresh driver 均持 deps.network_plane；management.rs:699-702 reload 后 plane.apply 原子发布；adapters 生产面无裸 build_client() 调用点。回归：fmt exit 0、clippy（-p lingxi-adapters -p lingxi-service --all-targets --locked -D warnings）exit 0、lingxi-adapters 全量 302/0 exit 0（23 测试二进制）、lingxi-service 全量 --no-fail-fast 865/0 exit 0（r00_management_leaves 的 macOS ALF 环境项本轮未复现）。",
+        "remaining": "R1 独立验收 PASS。新登记 F35（NO_PROXY 方括号 IPv6 条目不匹配，LOW，归 WP-T05-R2；R2 已修复为 IMPLEMENTED 待独立验收，见 F35 条目）：不影响 F14 主体（代理/直连/system/CA/强制环回 bypass 均实测成立）。已登记边界继续有效：①system=环境快照（现役语义）；②socks 服务端拨号未实测（语法与构建路径有测）；③代理模式下 egress 解析权威是代理（F15 条目）。rr1_f14 测试名 oauth_operation_and_download_share_the_proxy_policy 实际未驱动 download 腿（下载经代理由 rr1_f15 的 proxied download 腿覆盖，覆盖不缺，名称注记）。"
+      },
+      {
+        "fId": "F15",
+        "task": "R05-T05",
+        "origRefs": {
+          "cIds": [
+            "R05-T05-C11",
+            "R05-T02-C10"
+          ]
+        },
+        "fact": "只授权 authorized.example.invalid 时，下载 https://localhost:<端口>/ 使未授权 127.0.0.1 哨兵仍收到 TCP/TLS 握手——egress 只检查 URL 字面 IP，域名解析到回环仍建立连接（证明未授权连接，不是已读私有 HTTPS 内容）。",
+        "entry": [
+          "rust/crates/lingxi-adapters/src/models/egress.rs:322-379"
+        ],
+        "evidenceDir": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/audit/credential_network（CN-F06）",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T05",
+        "rounds": 2,
+        "candidateSummary": "R05 RR1 WP-T05 R1（2026-10-05）：egress.rs 重写下载边界——①EgressResolver 可注入（默认 tokio lookup_host＝getaddrinfo 同路径；守卫范围判断始终在本模块代码）；②download()：check_parts（同步规则：scheme/userinfo/字面 IP/origin 精确例外）→ 非 same-origin 的 https 主机名走 resolve_candidates：解析失败/空候选集响亮拒；任一候选落入守卫范围拒（含混合公私记录集；v6 候选经 ip_is_guarded 判定、v4-mapped 折叠沿用）；全公开候选集返回后钉住拨打（NetworkClientHandle::pinned_client→ClientBuilder::resolve_to_addrs，SNI/Host/证书校验仍按域名——传输层无法再解析到未判定地址，检查与拨号之间的 DNS 变更结构性失效，解析器恰好被调 1 次有断言钉住）；③代理策略下：本地候选校验照做（守卫名仍 0 拨打，含代理 0 连接），拨打走普通策略 client（CONNECT 隧道，代理为解析权威）；④同源例外与字面 IP 语义未动（同主机名异端口仍拒）；check_url_resolved 供服务层预检；模块头撤销原「DNS rebinding 离线不可判」声明缺口。",
+        "testEvidence": "旧红：old-red-probe domain_resolving_to_loopback_must_not_be_connected（审计 CN-F06 原样迁移，未修复树哨兵收到连接，exit 101）；修复树同断言绿（green-on-fixed-tree.log）。永久测试 r05_t05_network.rs mod rr1_f15（6 测试：localhost 零连接〔默认 OS 解析器〕、私有候选零连接〔受控解析器+哨兵〕、混合公私拒+全公开过判定、钉住拨打不再重解析〔解析器首答 192.0.2.1 后答环回哨兵——哨兵 0 连接且解析器调用数=1〕、同源例外真实字节下载正向+异端口拒、代理下载走 CONNECT 且守卫名仍拒）。命令同 F14 条目（21/21 绿）。",
+        "independentReview": "R05 RR1 WP-T05 R1 独立验收 PASS（2026-10-05，R05-T05-独立验收-r1，全新上下文审查者，未参与实现/修复；工具链同 F14 记录）。①亲跑 rr1_f15 六腿全绿（含本人复跑的 r05_t05_network 21/21）：审计 CN-F06 反例原文（localhost 哨兵零连接+响亮拒）、受控解析器私有候选零连接且解析器恰 1 次、混合公私记录拒/全公开过判定（拒因不含 guarded 证明过的是判定而非拨号）、钉住拨打不重解析（首答 192.0.2.1 后答环回——哨兵 0 连接+调用数=1，重绑定窗口结构性关闭）、同源例外真实字节正向+异端口拒、代理下载 CONNECT 走代理且守卫名连代理都不触达。②CN-F06 反例独立双向复现：断言原文未动（探针源 SHA256 e7ec004c…核验）固定树绿、冻结 HEAD d80737b6 隔离副本红（哨兵实收 TLS 握手字节）。③生产链路读码核实：download() 三段（check_parts→resolve_candidates→pinned/policy client 拨打）在 egress.rs:548-620；pinned_client→build_client_pinned_under_policy 的 resolve_to_addrs+no-redirect+策略 CA（dispatch.rs:134-172）——SNI/Host/证书按域名，仅钉拨打地址；守卫表覆盖 v4 私/环/链本/RFC6598/基准段与 v6 ULA/链本/组播/v4-mapped 折叠/v4-compatible 拒绝（egress.rs:262-299），既有 C11B 十六种拼写负例全部保留且绿（adapters 全量亲跑）；下载不带任何认证头（request 仅为 client.get(url)，读码核实）；3xx 由 no-redirect+classify_error_status 响亮拒（既有 C10 纪律，dispatch 单测）；同源例外 origin 精确（同 host 异端口拒，有腿钉住）。④resolver 为 IO 边界、守卫判定恒在本模块（读码核实）；默认 resolver=tokio lookup_host 与传输同路径。边界如实：公网合法下载的正向仅到判定层（离线套件无真实公网目标，与执行者登记一致）；redirect 每跳不适用（从不跟随）。 ‖ R2 复核 PASS（2026-10-05，R05-T05-独立验收-r2，全新上下文审查者）：亲跑 r05_t05_network 21/21 绿；审查者自建 /tmp 隔离探针（CN-F06/CN-F07 断言原文自审计探针源迁入，仅按需裁剪 import）对本树 3/3 绿 exit 0，其中 F14 环境腿以 NetworkPlane::from_environment()（main.rs bootstrap 同面）+ 进程启动前导出 HTTP(S)_PROXY 四变量实测计数代理实收请求；同三腿对冻结 HEAD d80737b6（git archive 隔离副本，F14 腿按该 HEAD 唯一存在的 build_client() 生产面）0 passed/3 failed exit 101——旧红/新绿双向独立复现。生产接线复核：main.rs:445-460 组合根建 plane 并传 bootstrap_with_network；lib.rs:1094/1194/1247 三消费方与 credentials/mod.rs:410 refresh driver 均持 deps.network_plane；management.rs:699-702 reload 后 plane.apply 原子发布；adapters 生产面无裸 build_client() 调用点。回归：fmt exit 0、clippy（-p lingxi-adapters -p lingxi-service --all-targets --locked -D warnings）exit 0、lingxi-adapters 全量 302/0 exit 0（23 测试二进制）、lingxi-service 全量 --no-fail-fast 865/0 exit 0（r00_management_leaves 的 macOS ALF 环境项本轮未复现）。",
+        "remaining": "R1 独立验收 PASS。已登记边界继续有效：redirect 每跳不适用（egress client 从不跟随重定向，3xx 一律拒）；代理模式下解析权威是代理（本地候选校验为纵深防御）。注记（非缺陷）：check_url_resolved 现无生产调用方（download 内部自走同一判定，预检 API 备用）；公网合法下载正向证据停在判定层（离线可判定范围）。"
+      },
+      {
+        "fId": "F16",
+        "task": "R05-T05",
+        "origRefs": {
+          "cIds": [
+            "R05-T05-C01",
+            "R05-T05-C02",
+            "R05-T05-C03",
+            "R05-T05-C08",
+            "R05-T06-C12"
+          ],
+          "joint": [
+            "与 F20/F21 联合"
+          ]
+        },
+        "fact": "401 头+一字节 body 后停住，总预算 50ms 到 250ms 仍未返回；operation 总预算 25ms 却等待被占用 180ms 的 permit，184ms 才报过期且 HTTP=0——错误 body、配额排队等等待遗漏总期限和大小约束。",
+        "entry": [
+          "rust/crates/lingxi-adapters/src/models/dispatch.rs:138-148",
+          "rust/crates/lingxi-adapters/src/models/operations/mod.rs:326-338",
+          "rust/crates/lingxi-service/src/operations.rs:427-430,546-547 等 admit 前后"
+        ],
+        "evidenceDir": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/audit/credential_network（CN-F07）；audit/worker_usage（F-WU06 P8 排队腿）",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T05",
+        "rounds": 2,
+        "candidateSummary": "R05 RR1 WP-T05 R1（2026-10-05）：绝对 deadline 补齐所有遗漏阶段——①dispatch.rs send_with_timeouts 错误 body：response.text().unwrap_or_default() 改 read_error_body_bounded（剩余绝对预算逐 chunk + 64KiB 硬上限；超时/截断/读失败事实追加进分类错误消息，不再吞错，状态分类与 retryable 语义保持）；②operations/mod.rs classify_error_response 增 deadline 参数（原传 None 且吞读错误），video.rs 两调用点传入；③service/operations.rs admit(lane, deadline)：排队等待包裹剩余预算（8 个 admit 调用点全部传各自 deadline），预算耗尽→BudgetExceeded『admission wait outlived the call budget』；④runs.rs acquire_or_break 增 budget select 臂：模型 permit 排队等待在 deadline 退出，调用方以新鲜时钟读区分 budget_exceeded（ProviderFailed，与 pre-send 检查同形）与 quota_exhausted；工具 lane 显式 None（R03-T03 取消语义不变）；⑤provider.rs 401 协调刷新等待包裹剩余预算（parked refresh 不再越总预算，BudgetExceeded 非重试，F02 代次 fence 语义未动）；⑥oauth.rs token/设备授权 body 读取 256KiB 有界（flow-clock 时间窗保持，超时/截断/传输失败事实随错误保留）。既有各阶段（pre-send 检查、首片窗、SSE 流预算、操作/egress 有界读、backoff 预算否决、worker callback acquire）保持不变。",
+        "testEvidence": "旧红：old-red-probe error_body_must_obey_total_deadline（审计 CN-F07 原样迁移，未修复树 250ms 窗口超时，exit 101）；修复树绿。永久测试 r05_t05_network.rs mod rr1_f16（6 测试：错误 body deadline 反例迁移（返回+deadline 事实保留）、64KiB 截断事实保留（5xx 仍 retryable）、mid-body 读失败保留（403 分类不丢）、operation 排队预算（permit 被停住 sibling 占用：第二 embed 250ms 预算内 BudgetExceeded、物理 HTTP=1 仅停住那次、<2s 不等 30s 配额窗）、chat run 驱动排队预算（真实 RunSupervisor/storage/events/quota + ParkOnceProvider：run B 400ms 预算在队列耗尽→failed.provider_error（budget）而非 quota_exhausted、<2s 落定）、parked 刷新等待预算（401→report_unauthorized 挂起→300ms BudgetExceeded 且消息点名 credential refresh））。命令同 F14 条目（21/21 绿）。",
+        "independentReview": "R05 RR1 WP-T05 R1 独立验收 PASS（2026-10-05，R05-T05-独立验收-r1，全新上下文审查者，未参与实现/修复；工具链同 F14 记录）。①亲跑 rr1_f16 六腿全绿（r05_t05_network 21/21 内）：审计 CN-F07 反例原文迁移腿（401 头+1 字节停住、deadline 50ms、250ms 窗口内返回且 Unauthorized 分类保留+消息含 deadline 事实）、64KiB 截断事实保留（5xx retryable 不变）、mid-body 读失败保留（403 分类不吞错）、operation 排队预算（停住 sibling 占用唯一 permit：第二 embed 250ms 预算内 BudgetExceeded、stub 物理 HTTP=1 仅停住那次、<2s 落定不等 30s 配额窗——审计 F-WU06 排队腿的镜像）、chat run 驱动排队预算（真实组合根 bootstrap_with_deps+storage/events/quota：run B 400ms 预算队列耗尽→failed.provider_error（budget）而非 quota_exhausted、<2s 落定）、parked 刷新等待预算（401→refresh 挂起→300ms BudgetExceeded 且消息点名 credential refresh 阶段）。②CN-F07 反例独立双向复现：断言原文未动固定树绿、冻结 HEAD d80737b6 隔离副本红（250ms 观测窗超时）；冻结 operations.rs:427 admit(&self, lane) 无 deadline 参数（旧形状源级核对）。③生产链路读码核实：dispatch.rs:211-304 send_with_timeouts→read_error_body_bounded（剩余预算逐 chunk+64KiB 硬上限+三类事实保留）；operations/mod.rs:346-355 classify_error_response(deadline) 与 video.rs 两调用点传入；service/operations.rs:468-513 admit(lane, deadline) 包裹剩余预算（8 调用点亲数：624/682/744/868/927/992/1050/1284）；runs.rs:713-750 acquire_or_break budget select 臂+biased cancel 优先（R03-T03 语义保留）+1150-1164 新鲜时钟读区分 budget/quota；provider.rs:384-420 401 刷新等待剩余预算包裹（F02 代次 fence 未动——F02 已过独立验收的语义在本轮全量回归中无红）；oauth.rs:257-300 read_oauth_body_bounded（256KiB+flow-clock 窗口）；workermodel.rs:238-258 callback acquire 由 min(剩余 invocation deadline, 配额窗) 钳制（既有）。④边界如实：OAuth 登录流（管理面）不在 run 预算内（执行者已登记，flow-clock+大小上限）；子进程等待/交付归 F20/F21。⑤回归同 F14 条目（fmt/clippy/adapters 全量/service 全量 864 绿+1 环境项）。 ‖ R2 复核 PASS（2026-10-05，R05-T05-独立验收-r2，全新上下文审查者）：亲跑 r05_t05_network 21/21 绿；审查者自建 /tmp 隔离探针（CN-F06/CN-F07 断言原文自审计探针源迁入，仅按需裁剪 import）对本树 3/3 绿 exit 0，其中 F14 环境腿以 NetworkPlane::from_environment()（main.rs bootstrap 同面）+ 进程启动前导出 HTTP(S)_PROXY 四变量实测计数代理实收请求；同三腿对冻结 HEAD d80737b6（git archive 隔离副本，F14 腿按该 HEAD 唯一存在的 build_client() 生产面）0 passed/3 failed exit 101——旧红/新绿双向独立复现。生产接线复核：main.rs:445-460 组合根建 plane 并传 bootstrap_with_network；lib.rs:1094/1194/1247 三消费方与 credentials/mod.rs:410 refresh driver 均持 deps.network_plane；management.rs:699-702 reload 后 plane.apply 原子发布；adapters 生产面无裸 build_client() 调用点。回归：fmt exit 0、clippy（-p lingxi-adapters -p lingxi-service --all-targets --locked -D warnings）exit 0、lingxi-adapters 全量 302/0 exit 0（23 测试二进制）、lingxi-service 全量 --no-fail-fast 865/0 exit 0（r00_management_leaves 的 macOS ALF 环境项本轮未复现）。",
+        "remaining": "R1 独立验收 PASS。已登记边界继续有效：①连接/TLS/首片/idle 既有纪律由 r05_t05_timeouts.rs（13/13 亲跑绿）钉住；②OAuth 管理面登录流自有时钟+大小上限（非 run 生命周期）；③子进程等待/交付段归 F20/F21 联合验收。"
+      },
+      {
+        "fId": "F17",
+        "task": "R05-T06",
+        "origRefs": {
+          "cIds": [
+            "R05-T06-C03"
+          ],
+          "aIds": [
+            "R05-A11"
+          ],
+          "other": [
+            "原资源交付约束"
+          ]
+        },
+        "fact": "图像和音频均取得授权 _scope 后却 fs::read(原相对路径)，按进程 cwd 读到授权 workspace 外同名合成秘密；20/25MiB 限制在全量读入之后才检查。",
+        "entry": [
+          "rust/crates/lingxi-service/src/operations.rs:1239-1264,1309-1334",
+          "rust/crates/lingxi-service/src/resourceaccess.rs（ResourceScope）"
+        ],
+        "evidenceDir": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/audit/worker_usage（F-WU01，P1）",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T06",
+        "rounds": 2,
+        "candidateSummary": "R1：read_image_reference/read_host_audio 改为共用 read_authorized_bytes_bounded——authorize 返回的 canonical ResourceScope.path 经 filetools 既有 DirFd 组件级 O_NOFOLLOW openat 打开（叶子/父组件授权后换链 ELOOP→重解析→再授权，churn≤8），句柄 metadata 非常规文件拒绝（FIFO/设备不读不阻塞，open 用 O_NONBLOCK 变体 open_attachment_nofollow），读取以 Read::take(max+1) 有界（上限在读中生效，非读完再拒）；filetools.rs 的 fsio 模块由私有改 pub(crate)（共享 no-follow 纪律，见共享文件记录）。",
+        "testEvidence": "旧红：冻结 HEAD 原探针 P1 exit 101（WP-T06-E01/old-red-frozen-head-operations-probe.log）；当前候选（未修复树）15 测 12 红/3 对照绿（old-red-current-tree-f17-f18-f19.log）；修复后 lingxi-service tests/r05_t06_rr1_media_resource.rs 15/15 绿（F17 腿：canonical 路径/合法对照/叶符号链接真目标拒绝/FIFO 有界拒绝/超限拒收词表）。命令：/Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r05_t06_rr1_media_resource（exit 0）。 最终自检（最终候选状态）：lingxi-service 全量 --no-fail-fast 890 通过/0 失败（唯一失败 r00_management_positive_and_negative_branches_on_real_service 为既有 macOS ALF 环境项——非环回自地址 192.168.3.5 入站被本机防火墙拦截，与 T03 R2 独立验收记录同一环境项，非本包缺陷；log=regression-lingxi-service-final.log）；原审计探针断言原文未改、仅隔离布局复跑：冻结 HEAD 3 红 exit 101 → 修复树 3/3 绿 exit 0（green-fixed-tree-operations-probe.log，实发 video_id=provider-vid&model_name=agnes-video、取消胜出后 0 下载 0 登记）；cargo fmt --check 0；clippy --workspace --all-targets --locked -D warnings 0。",
+        "independentReview": "R05-T06-独立验收-r1（2026-10-05，R05 RR1 WP-T06 R1 审查轮，全新上下文，未参与实现/修复；rustup 代理 /Users/study_superior/.cargo/bin/cargo→1.98.1，仓库根 rust-toolchain.toml 锁定核实）。①亲跑：lingxi-service --test r05_t06_rr1_media_resource 15/15 绿——canonical 腿=原审计 P1 断言原文（相对名+进程 cwd 同名合成秘密，PNG/WAV 均只读授权内容）、合法对照（绝对/相对）、叶符号链接真目标拒绝、FIFO 有界拒绝（5s 截止非阻塞）、20/25MiB 上限拒收词表。②原审计探针独立复跑：隔离副本 /tmp/r05t06-accept-r1（当前树完整拷贝，排除 target/.git/node_modules）内原包 audit/worker_usage --test operations_audit 10/10 绿（P1：actual_read_is_outside_workspace=false，png+wav）；冻结 HEAD 旧红核对 old-red-frozen-head-operations-probe.log（P1 双红 exit 101）。③审查者追加探针（隔离副本 zz_accept_probe_f17_extra，不入正式树）：授权路径父目录在 authorize 后换为指向授权根外的符号链接→Forbidden（真目标判定，非原路径跟随）；指向授权根内→读真目标内容；恰好 20MiB→通过。④代码核对：operations.rs read_authorized_bytes_bounded（:1843-2005）——authorize→canonical ResourceScope.path（resourceaccess.rs resolve_real 真目标解析+按组件匹配授权根），DirFd::open 自 / 逐组件 O_NOFOLLOW|O_DIRECTORY（filetools.rs:450-483），叶子 openat O_NOFOLLOW|O_NONBLOCK（:514-534，FIFO 开而不阻塞），ELOOP/ENOTDIR→churn≤8 重解析→再授权，句柄 metadata 非常规文件拒绝，Read::take(max+1) 读中有界（先上限后拒绝，非读完再拒）。⑤filetools.rs diff 亲读：仅 fsio pub(crate) 可见性+O_NONBLOCK 附件变体，既有语义零改动，与 sharedFileLedger 声明一致。⑥回归：r05_t06_operations 7/7；lingxi-service 全量 --no-fail-fast 本人亲跑 890 通过/0 失败（唯一失败 r00_management_positive_and_negative_branches_on_real_service 为既有 macOS 防火墙环境项：非环回自地址 192.168.3.5 入站 stalled，panic 消息自证环境归因，R00 范围非 T06 回归）；cargo fmt --all -- --check exit 0；clippy -p lingxi-service --all-targets --locked -D warnings exit 0。遗留（不阻塞 PASS）：F37——父目录换链腿无永久仓库测试，按 F32/F33/F34 同类登记（LOW）。 R2 复核（独立验收-r2，2026-10-05）：电池 17/17 绿亲跑；冻结 HEAD 旧红亲复现（原审计 P1 双红）；审查者变异 MUT-A（词法 follow-open）下 F37 腿 (a)+叶腿+FIFO 腿红、MUT-B（一律拒链）下腿 (b) 红——F17 防线两向可红性独立证实。",
+        "remaining": "F37（父目录换链腿永久测试缺口，LOW，reviewAppended）交下一轮；F17 行为本体已独立证实。"
+      },
+      {
+        "fId": "F18",
+        "task": "R05-T06",
+        "origRefs": {
+          "cIds": [
+            "R05-T06-C01",
+            "R05-T06-C02",
+            "R05-T06-C12"
+          ],
+          "aIds": [
+            "R05-A11",
+            "R05-A12"
+          ]
+        },
+        "fact": "媒体提交返回 task_id=local-track、provider_task_id=provider-vid，服务查询实际发送 video_id=local-track；只保存裸 ID→Tracking，查询重新解析当前绑定，image/video 共用 map。",
+        "entry": [
+          "rust/crates/lingxi-service/src/operations.rs:173-177,284-288,761-767,868-875,887-917",
+          "rust/crates/lingxi-adapters/src/models/operations/video.rs（Agnes 主/legacy 查询）"
+        ],
+        "evidenceDir": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/audit/worker_usage（F-WU05，P2）",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T06",
+        "rounds": 2,
+        "candidateSummary": "R1：新增 MediaTaskRecord（kind、host_tracker、provider_job_id、legacy_job_id、model_name、提交时 ResolvedModelRoute 快照（含 config_generation 与 CredentialReference，无明文凭证）、tokio settle 互斥、std state fence）；注册表 BTreeMap<host_tracker, Arc<record>>，MEDIA_TASK_REGISTRY_CAP=128（终态先驱逐、全 live 拒绝、同裸 ID live 冲突铸 {bare}-{n} 消歧）；submit 保留双 ID（host tracker=provider task_id，provider job id=video_id），query 用存储路由解析凭证（reload 不改绑、撤销诚实失败）、主查询 provider_job_id、legacy fallback=distinct host tracker（对齐 incumbent agnes.ts:412-435）；query 入口按 kind 查找，跨 kind 拒 not tracked。",
+        "testEvidence": "旧红：原探针 P2 exit 101；未修复树 rr1_f18 5 腿全红；修复后 15/15 绿 + lib 单测 registry_refuses_live_overflow_and_evicts_terminal_records（live 满拒/终态驱逐）。视频主查询 video_id=provider-vid、legacy=/v1/videos/{host tracker}、reload 后旧任务 0 次抵达新 provider、重复裸 ID 消歧、跨 kind 拒绝、dashscope 正例。命令同上 + --lib rr1_f18_registry（exit 0）。 最终自检（最终候选状态）：lingxi-service 全量 --no-fail-fast 890 通过/0 失败（唯一失败 r00_management_positive_and_negative_branches_on_real_service 为既有 macOS ALF 环境项——非环回自地址 192.168.3.5 入站被本机防火墙拦截，与 T03 R2 独立验收记录同一环境项，非本包缺陷；log=regression-lingxi-service-final.log）；原审计探针断言原文未改、仅隔离布局复跑：冻结 HEAD 3 红 exit 101 → 修复树 3/3 绿 exit 0（green-fixed-tree-operations-probe.log，实发 video_id=provider-vid&model_name=agnes-video、取消胜出后 0 下载 0 登记）；cargo fmt --check 0；clippy --workspace --all-targets --locked -D warnings 0。",
+        "independentReview": "R05-T06-独立验收-r1（同 F17 记录的审查轮与环境）。①亲跑：media_resource 15/15 含 F18 五腿——poll 实发 video_id=provider-vid（原审计 P2 断言原文）；主查询 404 后 legacy fallback 走 /v1/videos/local-track（宿主 tracker 身份，且主查先发 video_id=provider-vid）；reload 换绑后旧任务 0 次抵达新 provider（stub_b hits==0）、旧 provider 收 video_id=old-provider-vid；重复裸 ID 消歧（两 receipt task_id 不等，取消第二个不影响第一个 pollable）；视频 id 走图像入口拒 not tracked 且 0 次 /tasks/ 请求；dashscope 异步图任务正例（登记产物+免凭证下载）。lib --lib rr1_f18_registry 1/1（live 满员拒绝/终态驱逐/CAP=128）。②原审计探针 P2 复跑绿（实发 /agnesapi?video_id=provider-vid&model_name=agnes-video）；冻结 HEAD 旧红核对（实发 video_id=local-track）。③代码核对：MediaTaskRecord{kind,host_tracker,provider_job_id,legacy_job_id,model_name,route:ResolvedModelRoute}——ResolvedModelRoute 含 config_generation+endpoint+provider/model/protocol+CredentialReference{provider,auth_kind}（kernel model_exchange.rs:754-778，无明文凭证材料）；query_video/query_media_task 用存储 route 解析凭证（reload 不改绑、撤销诚实失败）+provider_job_id 主查+legacy_job_id 回退（adapters video.rs:394-446 主查 2xx 才解析、非 2xx 且 distinct legacy 才回退）；tracked_task 按 kind 查找；track_media_task 终态驱逐/live 冲突 {bare}-{n} 消歧。④既有 r05_t06_operations 与 r05_t06_worker_model diff 亲读：仅补 F01 所需 capabilities.tools 夹具，无断言削弱。 R2 复核（独立验收-r2，2026-10-05）：原审计 P2 探针对修复树 10/10 绿、冻结 HEAD 3 红均亲跑；r05_t06_worker_model 10/10；adapters video.rs 主查/legacy 回退与 ResolvedModelRoute 无明文凭证复核未变。",
+        "remaining": "已独立验收通过（2026-10-05，r1）。"
+      },
+      {
+        "fId": "F19",
+        "task": "R05-T06",
+        "origRefs": {
+          "cIds": [
+            "R05-T06-C12",
+            "R05-T05-C08",
+            "R05-T05-C09"
+          ],
+          "aIds": [
+            "R05-A12"
+          ]
+        },
+        "fact": "query 请求在途时 cancel 返回 CancelledLocally，随后响应仍触发媒体下载、登记 1 个文件并返回 Completed——迟到 poll 在取消后复活产物。",
+        "entry": [
+          "rust/crates/lingxi-service/src/operations.rs:821-830,892-910,935-948"
+        ],
+        "evidenceDir": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/audit/worker_usage（F-WU05，P3）",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T06",
+        "rounds": 2,
+        "candidateSummary": "R1：settle_poll 重写为三道 fence+单点提交——settle 互斥（并发 poll 一次交付、回执幂等重放）；fence1=poll 响应回到后（取消胜出→不下载）；下载全部入内存；fence2=写盘前；逐个 register_product（失败清理已登记文件）；fence3=提交点（state 互斥内 Tracking→Completed 单一转移；取消先胜→unlink 已登记文件并返回 CancelledLocally）；Failed 仅在 Tracking 时落地；cancel_media_task 同一 state 互斥线性化（完成已提交→返回 Completed 事实，不虚构取消）。",
+        "testEvidence": "旧红：原探针 P3 exit 101（迟到 Completed+1 登记文件）；未修复树 rr1_f19 4 腿全红；修复后 15/15 绿：在途 poll 取消（0 下载 0 登记）、下载中取消（登记清理）、并发双 poll（1 下载 1 文件同回执）、完成先胜（cancel 返回 Completed、回执幂等、不重下载）。 最终自检（最终候选状态）：lingxi-service 全量 --no-fail-fast 890 通过/0 失败（唯一失败 r00_management_positive_and_negative_branches_on_real_service 为既有 macOS ALF 环境项——非环回自地址 192.168.3.5 入站被本机防火墙拦截，与 T03 R2 独立验收记录同一环境项，非本包缺陷；log=regression-lingxi-service-final.log）；原审计探针断言原文未改、仅隔离布局复跑：冻结 HEAD 3 红 exit 101 → 修复树 3/3 绿 exit 0（green-fixed-tree-operations-probe.log，实发 video_id=provider-vid&model_name=agnes-video、取消胜出后 0 下载 0 登记）；cargo fmt --check 0；clippy --workspace --all-targets --locked -D warnings 0。",
+        "independentReview": "R05-T06-独立验收-r1（同 F17 记录的审查轮与环境）。①亲跑：media_resource 15/15 含 F19 四腿——poll 在途时取消（0 下载 0 登记，原审计 P3 断言原文：late_result 非 Completed、registered_products=0）；下载在途取消（已登记清理，0 文件）；并发双 poll（恰好 1 下载/1 文件/两侧同 resource_id 回执）；完成先胜（cancel 返回 Completed、回执幂等重放、不重下载）。②原审计探针 P3 复跑绿（late_result=CancelledLocally、registered_products=0、requests 仅 /v1/videos+/agnesapi 无 /audit-product.mp4）；冻结 HEAD 旧红核对（Completed+1 登记+迟到下载）。③代码核对：settle_poll（operations.rs:1154-1243）——settle 互斥串行化并发 poll；fence1=poll 响应回（取消胜出→不下载）；下载全内存不落盘；fence2=写盘前；register_product 逐个失败清理已登记项；fence3=提交点（状态锁内 Tracking→Completed 单一转移，取消先到→unlink 已登记文件并返回 CancelledLocally）；Failed 仅 Tracking 落地（迟到失败不覆盖已结算态）；cancel_media_task 同一状态锁线性化，已完成任务返回 Completed 事实不虚构取消；query 入口对非 Tracking 提前回放状态。取消/完成以单一状态锁为唯一线性化点，无第二权威、无第二取消系统。 R2 复核（独立验收-r2，2026-10-05）：原审计 P3（迟到 Completed+1 登记）对修复树绿、冻结 HEAD 红亲跑；fence 三点/单点提交/取消清理代码复核未变。",
+        "remaining": "已独立验收通过（2026-10-05，r1）。"
+      },
+      {
+        "fId": "F20",
+        "task": "R05-T06",
+        "origRefs": {
+          "cIds": [
+            "R05-T05-C01",
+            "R05-T05-C02",
+            "R05-T06-C12"
+          ],
+          "aIds": [
+            "R05-A12"
+          ]
+        },
+        "fact": "macOS system speech 在统一 permit 前执行、忽略传入 deadline（固定 120s）、spawn 的 Child 无 drop/cancel 回收纪律——源码已确认，须补实际有效平台证据，不能用 Linux 返回不支持冒充 macOS 通过。",
+        "entry": [
+          "rust/crates/lingxi-service/src/operations.rs:965-969,1060-1064,1102-1147"
+        ],
+        "evidenceDir": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/audit/worker_usage（F-WU06 system-speech 段，源码确认）",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T06",
+        "rounds": 2,
+        "candidateSummary": "R1：synthesize_speech 的 SystemSpeech 分支移到统一 admit 之后（排队在剩余预算内，admit 由 F16 已带 deadline）；system_speech 改用 ProcessSupervisor（spawn OneShot：setsid 进程组/reaper/有界 stdio；ProcessOwnershipGuard RAII——future drop 走 terminate_detached；deadline=min(剩余预算,§29.13 120s cap)，到点 terminate(Timeout) 经 supervisor killpg 链+诚实回执）；中间输出 SayOutputGuard 全路径清理；操作结算 record_operation_usage_with_attempts(speech, unknown, attempts=0)（本地进程不虚构 HTTP）；无 supervisor 时 fail-closed 拒绝；lib.rs 组合根为 operations lane 构造 supervisor（cleanup_timeout=§29.13 1.5s）。同包扫描新发现并修复：say argv 注入（消息文本以 -o 开头会被 getopt 当选项改写输出路径，本机实测 say -o A \"-oB\" 写 B）→ 输入前插入 --（登记 F36）。",
+        "testEvidence": "旧红：未修复树专用探针双红（WP-T06-E01/old-red-current-tree-f20-probe.log：单 permit 被占+150ms 预算下 speech 返回 Ok(RegisteredProduct) 且 say 存活；abort 后 say 存活+中间文件残留），exit 101。修复后（真实 macOS arm64 /usr/bin/say）：tests/r05_t06_rr1_system_speech.rs 10/10 绿（--test-threads=1）——真实合成登记+attempts=0 结算、短 deadline 超时杀进程清产物、future drop 杀进程清中间文件、排队 permit 诚实 BudgetExceeded 且 0 spawn、已耗尽预算 spawn 前拒绝、-- 注入腿、未知 voice 平台事实、只读产物根诚实失败、缺 supervisor fail-closed、空文本 spawn 前拒绝。命令：/Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r05_t06_rr1_system_speech -- --test-threads=1（exit 0）。 最终自检（最终候选状态）：lingxi-service 全量 --no-fail-fast 890 通过/0 失败（唯一失败 r00_management_positive_and_negative_branches_on_real_service 为既有 macOS ALF 环境项——非环回自地址 192.168.3.5 入站被本机防火墙拦截，与 T03 R2 独立验收记录同一环境项，非本包缺陷；log=regression-lingxi-service-final.log）；原审计探针断言原文未改、仅隔离布局复跑：冻结 HEAD 3 红 exit 101 → 修复树 3/3 绿 exit 0（green-fixed-tree-operations-probe.log，实发 video_id=provider-vid&model_name=agnes-video、取消胜出后 0 下载 0 登记）；cargo fmt --check 0；clippy --workspace --all-targets --locked -D warnings 0。",
+        "independentReview": "R05-T06-独立验收-r1（同 F17 记录的审查轮与环境）；真实 macOS arm64 /usr/bin/say 平台证据由审查者本人本机采集亲跑。①亲跑：lingxi-service --test r05_t06_rr1_system_speech -- --test-threads=1 10/10 绿——真实 say 合成（真实非空 m4a+digest 一致+结算 attempts=0+无残留进程/中间文件）；1.2s 短 deadline 超时（BudgetExceeded、pgrep 0 存活、产物根空、结算仍落 attempts=0）；future drop（abort 后 say 进程杀净+中间文件清空+无假结算）；单全局 permit 被网络图像调用占用时排队 150ms 预算→诚实 BudgetExceeded 且 0 spawn（旧形状 permit 旁路返回产物）；已耗尽预算 spawn 前拒；前导破折号文本仅作消息（-- 分隔，注入路径不存在）；未知 voice 平台事实回退；只读产物根诚实 UpstreamUnavailable；缺 supervisor fail-closed 拒绝；空文本 spawn 前拒。②旧红核对 old-red-current-tree-f20-probe.log：双红（permit 被占+150ms 预算下返回 Ok(RegisteredProduct) 且 say 存活；abort 后 2 say 存活+中间文件残留）exit 101。③代码核对：synthesize_speech 的 admit 在 SystemSpeech 分支之前（operations.rs:1398-1405，统一 Model permit，admit 自带 F16 剩余预算包裹）；system_speech（:1507-1767）supervisor 必备 fail-closed、effective_timeout=min(剩余预算,§29.13 120s) 且 Some(0) spawn 前拒（remaining_budget_ms=deadline.saturating_sub(now)，dispatch.rs:75-77）、ProcessSupervisor OneShot spawn（setsid 进程组+reaper）+ProcessOwnershipGuard RAII（exectools.rs:659-684，drop→terminate_detached(CallerDropped)，spawn 返回与 guard 创建之间无 await 间隙）+biased select 到点 supervisor.terminate(Timeout) 经 killpg 链+诚实回执（Terminated/AlreadyTerminal/CleanupTimedOut/UnknownProcess 四态如实入错消息）、SayOutputGuard 全非交付路径清理中间文件、结算 record_operation_usage_with_attempts(…,0)（本地进程不虚构 provider HTTP）。④组合根核对：lib.rs:1246-1297 生产接线 with_process_supervisor（spill=runtime_dir/media-exec-spill、cleanup_timeout=SYSTEM_SPEECH_KILL_GRACE_MS=1.5s）+with_usage_sink(LedgerOperationUsageSink)，链路 main.rs→ServiceDeps(model_gateway/credential_service/network_plane)→bootstrap_with_instance_identity→state.operations()（management reload 消费 refresh_egress_origins），真实正式接线非测试构造器注入。Windows/Linux 平台腿按阶段既有登记继承，不以 macOS 冒充。 R2 复核（独立验收-r2，2026-10-05）：真实 macOS arm64 /usr/bin/say 电池 10/10 亲跑（9.92s）；组合根 main.rs:445-472→lib.rs:1237-1301 正式接线复核（真实 gateway/credential/network plane + supervisor + usage sink，非测试注入）。",
+        "remaining": "已独立验收通过（2026-10-05，r1，真实 macOS arm64 平台证据亲采）；Windows/Linux 平台腿按阶段既有登记处理。"
+      },
+      {
+        "fId": "F21",
+        "task": "R05-T07",
+        "origRefs": {
+          "aIds": [
+            "R05-A12",
+            "R05-A13",
+            "R05-A14"
+          ],
+          "cIds": [
+            "R05-T06-C04",
+            "R05-T07-C01",
+            "R05-T07-C02",
+            "R05-T07-C03",
+            "R05-T07-C05",
+            "R05-T07-C09",
+            "R05-T07-C10"
+          ],
+          "steps": [
+            "原 T07 步骤2/4"
+          ]
+        },
+        "fact": "worker 真实模型 500 产生 HTTP1、usage0；operation queue timeout 产生 HTTP0 却固定 attempts=1；真实 ToolCallId 被丢弃另造 invocation 无持久 join；operations 强制 session/run/parent/cause=null；缺开始/结束/耗时/结果状态/日期筛选和 parent model 字段。",
+        "entry": [
+          "rust/crates/lingxi-service/src/workermodel.rs:269-310",
+          "rust/crates/lingxi-adapters/src/models/auxiliary.rs:149-225",
+          "rust/crates/lingxi-service/src/operations.rs:184-193,247-269",
+          "rust/crates/lingxi-service/src/workerrpc.rs:847-856,947,958",
+          "rust/crates/lingxi-kernel/src/usage.rs:320-372",
+          "rust/crates/lingxi-adapters/src/storage/migrations.rs:251-274",
+          "rust/crates/lingxi-adapters/src/storage/run_store.rs:2863-2882"
+        ],
+        "evidenceDir": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/audit/worker_usage（F-WU02，P4/P8）",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T07",
+        "rounds": 3,
+        "candidateSummary": "R05 RR1 WP-T07 R1（2026-10-05）：①逐物理尝试事实——ProviderTurnResult 新增 mark_not_sent()（ports.rs，与 T04 共享）；provider.rs 五个 pre-dispatch 拒绝位（gateway 解析/逐模型能力/凭证解析/无 adapter）记 attempts=0（not-sent 绝不虚构 1；401 刷新路径保持 1/2——已发出的请求不消失）；②失败调用不漏账——AuxiliaryFailure 携带完整 settle 事实（usage_report/transport_attempts/served_by/served_protocol，全部六类终局），GatewayWorkerModel::complete 在成功与失败路径都先写台账行再回话（P4：worker 500 → HTTP1、行1、usage unknown、attempts1、outcome=failed）；quota 拒绝（排队/预算超时）同样落 attempts=0 行，预算拒绝仍是主事实、台账失败附注不吞；③operation 面——embed/rerank 新增可选 OperationCallContext（session/run/attempt/cause_ref；None=合法独立根），admit 在 deadline 内超时先落 not-sent 行（P8 attempts 半边：HTTP0、行1、attempts=0；deadline 半边 F16 已修）；④父子 JOIN——WorkerModelPort::complete 新增 parent_tool_call 参数（接口演进：执行器把真实 ToolCallId 穿过 RPC，不再丢弃 _call）；台账 v6 迁移（ALTER 追加）加 outcome/started_at/settled_at/parent_tool_call_id/emitted_tool_calls 列；driver（runs.rs）在 ToolRequests 回合把批次 tool call id 写入父 model 行（emitted_tool_calls），child→parent_tool→parent MODEL 两跳 JOIN 全在台账内闭合；⑤查询面——ModelUsageQuery 增加 purpose/model/recorded_from/to 筛选（四种 scope 形状均可组合），返回行携带全部新列（recorded_at 不再在返回时丢弃的等价物：started/settled/outcome 全部可读）。——R2（R05-T07-修复-r1，2026-10-06）：F38 关闭——⑥transport_attempts nullable 化（kernel ModelCallUsageRecord→Option<u32>；migration v7 表重建，旧行原值保留）；⑦runs.rs 两处取消臂（select 竞态臂+fence Stale+cancelled 臂）在 settle_cancellation 前经 persist_model_call_cancelled_in_flight 落行（outcome=cancelled；竞态臂 usage unknown/attempts None+dispatch-moment 身份；fence 臂携带回合真实 usage/attempts/身份）——只写台账行、不写 model_call_completed 事件（A09/C16『取消的 call 不以伪造 completed 收尾』纪律原样保持，cancellation_tree r03_a05 与 r05_t04 c16 两条既有反例零改动通过）；⑧WorkerModelPort::abandoned(fact)（默认 no-op，BoundedWorkerModel 转发）：workerrpc deadline 到期分支确定性 await 落行；run 取消 drop 整个 execute future 时 CallbackAbandonGuard（RAII）把行脱离到运行时（Handle::spawn，无运行时/写失败响亮记日志）；⑨五族 stream parse-Err 路径拾回已观测 usage（各 accumulator 新增 observed_usage_report，finish-Err 分支 with_usage_report 附到 Failed 结果——『意外工具响应有 usage』自检腿揭出的同类缺口，R1 声称『结构上已携带』不成立：adapter parse-Err 把 usage 丢了）。",
+        "testEvidence": "artifacts/rust-tauri/R05/RR1/WP-T07-E01/：old-red-service-ledger.log（修复前 exit=101：P4 rows=0≠1、P8 rows=0、P5 leaked=true 三反例红；适配当时签名的探针编译）；green-service-ledger.log（最终候选 8/8 exit 0）。永久测试 lingxi-service/tests/r05_t07_rr1_usage_ledger.rs（R2 扩至 13 腿：P4 worker 500 漏账→unknown 行+outcome+timing+parent join key；P5 持久泄漏（F22 联合）；P8 queue-timeout not-sent attempts=0；真实 worker 子进程链 JOIN（真实 run driver+真实 ToolInvocationGateway+r04_t07_fixture 子进程+生产 LedgerWorkerCallbackTrace：child.parent_tool_call_id==driver 铸造的 {run}-tc0001，父 model 行 emitted_tool_calls 恰一 Row 认领，aux usage 17/5 随行，stub 物理 3 请求对账）；operation 上下文（session/run/attempt/cause 落行）；查询筛选（purpose/model/日期窗/组合，timing 列 sane）；worker pre-send 拒绝（OAuth 未登录→HTTP0、行1、attempts=0、outcome=failed）；空正文有usage（usage 21/8 随失败行存活）+R2 新五腿：rr1_f38_driver_cancel_of_in_flight_stream_leads_a_cancelled_row_across_restart（屏障 stub 证明物理请求已抵达→cancel_run→行存在 outcome=cancelled/usage unknown/attempts None/started+settled 有值/身份=main，重开 RunDatabase 后仍可查）；rr1_f38_worker_deadline_expiry_of_in_flight_callback_leads_a_cancelled_row（真实子进程链+短 invocation deadline，回调 dispatch 屏障证明在途→行经生产 GatewayWorkerModel.abandoned 落账（unreported 身份、parent_tool_call 可 JOIN、chat 两行正常并行），重启后仍可查；说明：真实 aux 链自带与 invocation 同锚点的自身预算、会在同一瞬间自结算为 Failed 行（同为诚实记账，P4 腿已钉），故 deadline 分支用 parked 模型端口钉『回调在途被 deadline 掐断』的确定性形状，记账全走生产件）；rr1_f38_run_cancel_drop_of_in_flight_callback_leads_a_cancelled_row（run 取消 drop 整个 execute future：长 deadline 下回调 dispatch 屏障→cancel_run→run 结算 cancelled→RAII 守卫脱离落账的行有界轮询到、parent_tool_call 可 JOIN、chat 工具回合行正常、重启可查）；rr1_f21_unexpected_tool_response_failure_keeps_the_reported_usage（无工具 aux 收到工具响应：HTTP1、行1、Failed、usage 30/11 存活——依赖⑨的 parse-Err 拾回）；rr1_f21_partial_usage_survives_a_failed_aux_settlement（空正文+仅输入半 usage：Failed、input=9/output=None/Partial{missing:[output_tokens]}）。r05_t07_persistence.rs 增 v7 迁移腿（真实 v6 库+预 F38 行 attempts=2 → 升 v7 行原值保留+NULL attempts 取消行可写可读）。R2 自检（rustup 1.98.1 代理）：ledger 13/13、persistence 5/5、usage_trace 9/9、worker_model 10/10、cancellation_tree 8/8、r05_t04_streaming 18/18、r05_t03_protocol_adapters 12/12、r04_t07_mcp_and_workers 19/19、late_result_fence 5/5（R3 勘误：此处原文误写 12/12，系从相邻条目串写的文案笔误——套件实为 5 测试，5/5 全绿）、lingxi-adapters 全量（25 测试二进制）ok、lingxi-kernel 87/87、fmt --all --check 0、clippy --workspace --all-targets --locked -D warnings 0；lingxi-service 全量 --no-fail-fast（905 通过/唯一失败 r00_management macOS ALF 环境项）见 R2 证据根 regression-lingxi-service-full-r2.log。",
+        "independentReview": "R05 RR1 WP-T07 R1 独立验收 FAIL（2026-10-06，全新上下文审查者，未参与实现/修复）——已交付面全部实证通过，但 F21 修复义务中明列的『取消（cancel-after-send）携带事实』未交付，且以不准的『既有登记』说辞延期，登记为 F38。【通过项（均亲测）】①P4 旧红形状变异验证：隔离副本（当前树 tar 快照）在 workermodel.rs 失败路径插入『失败即 return 不落台账行』变异后，rr1_f21_worker_failed_physical_request_must_leave_unknown_usage_row 红（rows 0≠1，HTTP 仍=1 证明先抵达物理边界）、rr1_f21_empty_answer_failure_keeps_the_reported_usage 红、rr1_f21_worker_pre_send_refusal_records_zero_attempts 红；变异移除后主树 8/8 绿。②父子 JOIN 变异验证：workerrpc.rs:1277 把真实 ToolCallId 换成伪造 id 后 rr1_f21_worker_parent_join_through_the_real_subprocess_chain 红（child.parent_tool_call_id=…-forged-tc ≠ driver 铸造 run-…-tc0001）——JOIN 确经真实子进程链+真实 driver，非测试端伪造。③读码核对：ProviderTurnResult::mark_not_sent（ports.rs）在 provider.rs 四个真 pre-dispatch 位（gateway 解析:309/逐模型能力:370/凭证 resolve:374/无 adapter:245）记 attempts=0；401 刷新路径 attempts 保持 1/2（c03 既有测试 976 行断言=2）；quota 拒绝落 attempts=0 行；operation admit 超时先落 not-sent 行（operations.rs record_operation_not_sent）；OperationCallContext 贯穿 embed/rerank；台账 v6（outcome/started/settled/parent_tool_call_id/emitted_tool_calls+三索引）经 v4→current 升级腿+migration_idempotency 实测；查询面 purpose/model/日期窗可组合（run_store.rs append 过滤器），driver 在 ToolRequests 回合填 emitted_tool_calls（runs.rs:1639-1642）。④回归亲测：r05_t07_rr1_usage_ledger 8/8、usage_trace 9/9、persistence 4/4、worker_model 10/10、adapters 全量、kernel 87/87、fmt 0、clippy workspace -D warnings 0。【未通过项】取消后（请求可能已发出）不落账：runs.rs:1256-1270 root.cancelled() 竞态在途 model call 时直接 settle_cancellation 返回，persist_model_call_completed 不执行（仅 persist_model_call_started 的 run 事件，非台账行）；workerrpc.rs:1270-1305 invocation deadline 到期/运行取消同样 drop 在途 complete()，无行。总控 F21 自检明列 cancel-before-send/cancel-after-send；原审计 F-WU02 明文『不得仅用崩溃窗口登记覆盖正常取消的对账义务』；矩阵 remaining 称该窗口为『§5/§10 既有登记』不实——冻结 HEAD §10 只登记了崩溃窗口，取消窗口是本次修复新加的延期条目。缺陷清单见 F38。——R2 任务级独立验收（2026-10-06，R05-T07-独立验收-r2，全新上下文，未参与实现/修复）：PASS（含 F38 修复面）。①亲测（均经 /Users/study_superior/.cargo/bin/cargo rustup 1.98.1）：r05_t07_rr1_usage_ledger 13/13（含 rr1_f38_driver/worker_deadline/run_cancel_drop 三取消腿、unexpected_tool_response、partial 两新腿）；r05_t07_persistence 5/5（含 migration_v6_to_v7 真库重建腿：预 F38 行 attempts=2 原值保留+NULL attempts round-trip）；r05_t07_usage_trace 9/9；r05_t06_worker_model 10/10；lingxi-adapters 全量 25 测试二进制全 ok（含 r05_t07_rr1_usage_strict 7/7、r05_t07_usage_families 14/14）；lingxi-kernel 87/87；回归 cancellation_tree 8/8、r05_t04_streaming 18/18、r04_t07_mcp_and_workers 19/19、r05_t03_protocol_adapters 12/12、late_result_fence 5/5（注：矩阵 testEvidence 曾写『late_result_fence 12/12』，实测该套件为 5 测试，系执行者文案笔误，非证据造假——5/5 全绿）；r05_t01_model_plane 24/24、r05_t02_credentials 38/38、r05_t05_network 21/21、r05_t06_operations 7/7、r05_t08_closed_loop 11/11；cargo fmt --all --check 0；clippy（service/kernel/adapters --all-targets --locked -D warnings）0。②变异亲证（隔离 /tmp/r05t07-acc-mut tar 快照，独立 CARGO_TARGET_DIR）：MUT-A 中性化 persist_model_call_cancelled_in_flight→rr1_f38_driver 红（rows 0≠1）；MUT-B 中性化 GatewayWorkerModel::abandoned→worker deadline+run_cancel_drop 双腿红（driver 腿仍绿，证明两腿钉的是 worker 记账路径）；还原后 3/3 绿，副本两文件 diff 与主树一致。③读码核对：取消竞态臂（runs.rs:1319-1365）与 fence Stale+cancelled 臂（runs.rs:1515-1563）都在 settle_cancellation 前经同一 record_model_call_usage 生产写路径落行、不写 completed 事件；workerrpc.rs:1381-1451 deadline 到期确定性 await 落行+CallbackAbandonGuard Drop 脱离（无运行时响亮报错）；workermodel.rs:409-449 abandoned 行 outcome=Cancelled/usage unknown/attempts None/unreported 身份/parent_tool_call 可 JOIN；kernel ModelCallUsageRecord.transport_attempts=Option<u32>（usage.rs:410）；migration v7 表重建保留旧行（migrations.rs:319-373）；run_store 写读 NULL 语义（run_store.rs:2673-2676,2974-2979）；salvage_usage_report（usage.rs:316-335）复用同一严格 decoder，无放宽；MODEL_USAGE_SEMANTICS §10 订正属实（正常取消窗口都有行、唯崩溃窗口无行）。④生产接线核对：三取消腿全走真实 RunSupervisor/存储/事件面；worker 双腿用真实子进程（r04_t07_fixture ask_model）+生产 LedgerWorkerCallbackTrace，仅模型端口按已登记边界②用 parked 形状钉 deadline 分支，记账 100% 生产 GatewayWorkerModel。⑤残留：新登记 F39（fence-Stale+cancelled 臂缺永久钉子，覆盖缺口非产品缺陷，见该条目）。——R3 任务级独立验收（2026-10-06，R05-T07-独立验收-r3，全新上下文，未参与实现/修复）：PASS。证据根 artifacts/rust-tauri/R05/RR1/WP-T07-R3-INDEPENDENT/（REVIEW.md+全套日志+exits.txt，全部经 /Users/study_superior/.cargo/bin/cargo rustup 1.98.1）。①亲测：r05_t07_rr1_usage_ledger 15/15（rr1_f39 过滤另重复 5 次全绿验证确定性）、late_result_fence 5/5、r05_t07_persistence 5/5、r05_t07_usage_trace 9/9、r05_t06_worker_model 10/10、cancellation_tree 8/8、r05_t04_streaming 18/18、r04_t07_mcp_and_workers 19/19、r05_t03_protocol_adapters 12/12、lingxi-adapters 全量 25 二进制 0 failed、lingxi-kernel 87/87、fmt --all --check 0、clippy -p lingxi-service 与 --workspace（--all-targets --locked -D warnings）均 0。②本轮审查者自己的变异（隔离 tar 副本+独立 CARGO_TARGET_DIR，非复述执行者）：MUT-R3B 以 if false{…} 整体中性化 fence 臂（usage: provider_turn.usage.clone() 唯一锚定的调用点）→rr1_f39 双腿红 rows 0≠1 exit 101，对照 rr1_f38_driver 仍绿 exit 0（fence 臂与竞态臂互不代偿）；MUT-R3A 仅把该臂 transport_attempts 降为 None→双腿红在 tests:2944 专用断言（非仅行存在）；还原后 cmp 副本 runs.rs 与主树逐字节一致、15/15 exit 0。③读码复核：persist_model_call_cancelled_in_flight（runs.rs:3612-3626）只写台账行不写 completed 事件；fence_verdict reason 字符串（ports.rs:826-827）与断言一致；workerrpc deadline 分支/CallbackAbandonGuard Drop/workermodel abandoned/kernel Option<u32> 均与登记相符；主树 runs.rs SHA b7b8671a… 与 R3 纯测试侧声明一致。未发现新的 R05 必需缺陷，无新 F-ID。",
+        "remaining": "R3 任务级独立验收 PASS（2026-10-06，R05-T07-独立验收-r3，见 independentReview R3 段与 WP-T07-R3-INDEPENDENT/）：F39 已复验关闭，F21 全路径负控齐备。其余边界不变：②媒体行 outcome 有但 started/settled 为 NULL（R07 补观测）；③正式组合根 worker 工具注册归 F24；④接口演进（+parent_tool_call/+abandoned/台账 v7）记录在 R05_INTERFACE_EVOLUTION §31 待 F28 收口；崩溃窗口仍为 §10 登记的已知边界。"
+      },
+      {
+        "fId": "F28",
+        "task": "R05-T08",
+        "origRefs": {
+          "other": [
+            "T08 整体交付",
+            "原 04 交接规则"
+          ]
+        },
+        "fact": "当前 report/handoff 仍写未提交、independent_review=PENDING，而已有审查 PASS 和实际远程提交——状态收口不一致（不据此单独否定历史源码测试，但修复后不能继续提供矛盾交接）。",
+        "entry": [
+          "docs/rust-tauri/R05/R05_REPORT.md、R05_HANDOFF.json 等全部 R05 交付文档",
+          "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json（current_head 仍停在 R04 时期 0c67b6fc7，R05 stage/tasks 全 PENDING，待收口回填）"
+        ],
+        "evidenceDir": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/audit/gate（信息性/流程收口节）；audit/runtime/runtime-audit-result.json（original_stage_runner_exit=1 保留）",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T08",
+        "rounds": 2,
+        "candidateSummary": "R05 RR1 WP-T08 R1（2026-10-06）：READY_FOR_INDEPENDENT_REVIEW 材料包收口（最终阶段结论/归档回执待阶段 PASS，按总控 §3.3）。已更新为 RR1 真值：R05_REPORT.md（§1 状态=offline_gate PENDING 最终复跑/independent_review PENDING/R06_READY=false；首轮 PASS 按 N16 标注过期不继承，历史记录保留）；R05_HANDOFF.json（基线 d80737b6+未提交 RR1 工作树、接口面含 workers 节/--model-global-permits/v5→v7、延期仅 LIVE+平台、三 TSV+登记册登记、rr1_repair_round 索引）；R05_TEST_MAP.json（12 条目按 F26 登记册重登记：T05-C12/T08-C11 转 cid 实测、10 command 绑定具名）；R05_ACCEPTANCE_LEDGER.json（T05-C12 NOT_RUN→PASS〔r05_t05_network〕、T08-C11 场景级→cid 拥有〔r05_t08_production_tools〕，observed 全新实测描述）；R05_NEGATIVE_GATE_REPORT.md（RR1 节：7 例变异红/恢复绿，原 16 项不降格且标注属首轮候选）；R05_PERFORMANCE_RESULTS.json（F27 负载实测+原始序列机制+旧计数标注）；PROGRESS_LEDGER.json（rr1_repair_round 段）。R05_BLOCKERS.md §3 已由 WP-T05 关闭（核对无误，历史保留）。ORCHESTRATOR_PROGRESS.json 与最终归档回执：按总控规则待阶段独立 PASS 后由收口执行，未预写。共享文件台账已登记（见 sharedFileLedger WP-T08 条目）。",
+        "testEvidence": "文档一致性人工核对（每处状态与矩阵/证据可双向追溯）；本轮全量自检：fmt exit 0、clippy workspace -D warnings exit 0、check-contracts exit 0、check-boundaries exit 0、workspace test 899 绿/1 失败=r00_management LAN 腿（已登记环境项 R05-ENV-ALF-UNSIGNED-TEST-BINARY 同签名：192.168.3.5 停驻、二进制重链后 ALF per-app verdict；隔离复跑两次同样停驻=本窗口持续触发，处理沿台账：不放宽/不改测试/不当回归）；生产者最终实跑见 WP-T08-E01/R05_SUITES。",
+        "independentReview": "R05-T08-独立验收-r1（2026-10-06，同上审查者与工具链）——按总控 §3.3 对 F28 的拆分：READY_FOR_INDEPENDENT_REVIEW 材料包现在收口一致即为 T08 义务；最终阶段结论/归档回执/ORCHESTRATOR_PROGRESS 回执待阶段 PASS 后由收口执行（设计内状态，非缺陷）。逐文档核对：①R05_REPORT.md §1 offline_gate PENDING（最终 verify-stage R05 待跑）/independent_review PENDING/R06_READY=false/stage_readiness=READY_FOR_INDEPENDENT_REVIEW 前置，首轮 PASS 按 N16 标注过期不继承、历史保留；②R05_HANDOFF.json baseline 如实（HEAD d80737b6+未提交 RR1 工作树、零 git 写操作——本人核对 git log HEAD=d80737b6 且 RR1 全部为工作树改动，与声明一致）；③R05_TEST_MAP.json 103 条按 F26 登记册重登记（cid/command 绑定具名生产者，抽核 T01-C01/C12、T05-C04、T08-C13）；④R05_ACCEPTANCE_LEDGER.json T05-C12 NOT_RUN→PASS（r05_t05_network 具名测试）、T08-C11 场景级→cid 拥有（r05_t08_production_tools 具名测试）；⑤R05_NEGATIVE_GATE_REPORT.md RR1 节 7 例变异（本人独立复现其中 6 例红/恢复绿，采样器回退例由正对照机制+MUT 记录覆盖）且首轮 16 项不降格；⑥R05_PERFORMANCE_RESULTS.json 阈值先登记+F27 实测+旧计数标注；⑦PROGRESS_LEDGER rr1_repair_round 段与矩阵状态一致；⑧R05_BLOCKERS §3 C12 延期由 F14 关闭且历史保留；⑨ORCHESTRATOR_PROGRESS.json R05 仍 PENDING/current_head 0c67b6fc 未预写——符合『待阶段独立 PASS 后回填』声明。无『未提交却写已提交』『PENDING 却写 PASS』『核心未做记后续加固』类矛盾。本人在本候选上亲跑 fmt --check exit 0、workspace clippy -D warnings exit 0、check-contracts exit 0、check-boundaries exit 0。",
+        "remaining": "阶段门禁 verify-stage R05（冻结候选）+全新阶段审查者终审 PASS 后：最终结论/R06_READY/归档回执/ORCHESTRATOR_PROGRESS 回填（收口职责，总控 §3.3 设计内）。"
+      },
+      {
+        "fId": "F32",
+        "task": "R05-T03",
+        "origRefs": {
+          "aIds": [
+            "R05-A06"
+          ],
+          "cIds": [
+            "R05-T03-C10"
+          ],
+          "other": [
+            "PROTOCOL_AUDIT.md 收口自检矩阵 Compatible replay 行的『正确 carrier 重放、off/utility 策略』阳性对照；F09 candidateSummary 声称的无 origin 拒绝行为"
+          ]
+        },
+        "fact": "WP-T03 R1 的三个已实现加固腿没有落进永久测试电池（行为本身正确，本轮独立验收以隔离探针亲自证实）：①compat 推理重放的 off/utility 豁免（request_uses_reasoning=false 时不触发 require-carrier 拒绝且剥离载体）与声明非推理（hints.reasoning=false）模型剥离——审计收口矩阵把 off/utility 策略列为必需阳性对照，r05_t03_rr1_replay.rs 与 compat 单测均未钉；②三个门控族（anthropic/google/responses）『携带本族 opaque 且 origin=None→InvalidMessage(\"no recorded serving origin\")』——candidateSummary 明文声称的行为，永久套无腿；③responses 侧重复 function_call_item 锚点拒绝（google 侧重复腿与 responses 无匹配腿已有，responses 重复腿缺失）。未钉住的腿可在未来回归中静默丢失。严重度：LOW（测试电池缺口，非行为缺陷）。",
+        "entry": [
+          "rust/crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs（应追加腿的电池）",
+          "rust/crates/lingxi-adapters/src/models/compat.rs:2760-2945（被钉对象 request_uses_reasoning/normalize_provider_payload/ensure_reasoning_content_for_tool_calls）",
+          "rust/crates/lingxi-adapters/src/models/anthropic_messages.rs:246-268、google_generative_ai.rs:226-247、openai_responses.rs:207-235（被钉对象 enforce_turn_origin 的 None 分支）"
+        ],
+        "evidenceDir": "审查者隔离探针 /tmp/r05-t03-accept-extra（2026-10-05，8/8 绿：f08_thinking_off_does_not_require_the_carrier、f08_declared_non_reasoning_model_strips_the_carrier、f09_no_origin_state_refused_on_all_three_gated_families、f10_responses_duplicated_anchor_fails_loudly 等；私有临时目录未入仓库，形状可按本轮 independentReview 记录重建）",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T03-R2",
+        "rounds": 2,
+        "candidateSummary": "R05 RR1 WP-T03 R2（2026-10-05，修复-r1，F32）：纯测试追加、零生产改动——在 rust/crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs 追加 7 条永久腿钉住 R1 审查轮以隔离探针证实但电池未钉的行为：(a)×4 DeepSeek（deepseek/deepseek-reasoner，契约经 thinking_format 推导链真实成立）工具回合经真实 render_chat_request→apply_for_call 全链——reasoning_level=\"off\" 与 CompatMode::Utility 下，与 rr1_f08 缺载体反例完全相同的交换（同 route/同历史）不再触发 require-carrier 拒绝、绝不伪造空载体且 thinking 置 disabled（a1/a2）；历史携带真实流式 reasoning_content 载体时 off/utility 均剥离载体上 wire（a3/a4，各带同 payload 默认选项保留载体的内联正对照，证明剥离是 off/utility 行为而非一刀切）；(b) 声明 hints.reasoning=false（RouteCompatHints）的视图契约归零→载体入 wire 前被剥离且绝不触发拒绝，内联未声明对照保留载体；(c) anthropic（thinking 签名）/google（thoughtSignature functionCall Part）/responses（encrypted reasoning item）三族各自真实 parse 产本族 opaque、origin=None→render 一律 InvalidMessage(\"…no recorded serving origin…\")、retryable=false，同一回合补记 origin 后渲染成功（内联正对照，证明拒绝恰因缺 origin）；(d) responses 重复 function_call_item 锚点（同 call_id 两个锚点）→InvalidMessage 且消息点名 call id 与 twice（补齐 google 重复腿已有的 responses 半边）。既有 26 腿原样保留，套件 33/33。",
+        "testEvidence": "artifacts/rust-tauri/R05/RR1/WP-T03-E02/：green-adapters-full-f32.log（/Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-adapters，exit 0，23 测试二进制 285/0，含 r05_t03_rr1_replay 33/33＝既有 26+新 7）、green-clippy-f32.log（cargo clippy --manifest-path rust/Cargo.toml --locked -p lingxi-adapters --all-targets -- -D warnings，exit 0）、green-fmt-check-f32.log（cargo fmt --manifest-path rust/Cargo.toml --all --check，exit 0；新腿先按 rustfmt 归一后复检通过）。工具链 rustup 代理 /Users/study_superior/.cargo/bin/cargo→rustc 1.98.1（仓库 rust-toolchain.toml 锁定）。本轮唯一改动文件：rust/crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs（git diff 核实零生产改动）。",
+        "independentReview": "登记人：R05-T03-独立验收-r1（2026-10-05，R05 RR1 WP-T03 R1 审查轮）。不阻塞 F06–F10 的 INDEPENDENT_PASS（行为已验证正确）；作为测试电池缺口交下一轮修复智能体。\n复核人：R05-T03-独立验收-r2（2026-10-05，R05 RR1 WP-T03 R2 审查轮，全新上下文，未参与实现/修复；rustup 代理 /Users/study_superior/.cargo/bin/cargo→1.98.1）。①亲读 7 条新腿源码（r05_t03_rr1_replay.rs:1332-1610）逐断言核对 F32.remaining 三组：a1/a2 用与 rr1_f08 缺载体反例完全相同的交换在 off/utility 下不拒绝、无伪造载体、thinking=disabled（证明经真实模块 dispatch）；a3/a4/b 各带同 payload 默认选项/未声明的内联正对照（载体保留），剥离归因于 off/utility/声明而非一刀切；c 三族 origin=None 一律 InvalidMessage+不可重试+消息点名 no recorded serving origin，同一回合补记 origin 后渲染成功（内联正对照）；d responses 重复锚点名点 call id 与 twice。②亲跑：r05_t03_rr1_replay 33/33、lingxi-adapters 全量 23 二进制 exit 0（111 lib + 全部集成）、lingxi-kernel 87/87 exit 0、lingxi-service r05_t03_protocol_adapters 12/12 exit 0、clippy -p lingxi-adapters -p lingxi-service --all-targets -D warnings exit 0、fmt --all -- --check exit 0；lingxi-service 全量 --no-fail-fast 832 绿/1 红（r00_management_leaves 的 LAN 浏览器腿：本机 macOS 防火墙拦截发往非环回自地址 192.168.3.5 的入站连接，复跑两次同样在 POST /lingxi/v1/web-auth/login 0 字节停滞，测试自身诊断即环境归因；与 R1 证据 green-service-full-nofailfast.log 同一环境项，非 T03 缺陷）。③零生产改动佐证：R1/R2 共用一个未提交 diff 无法用 git 二分，但 mtime 旁证成立（全部生产文件最后修改 Oct 5 01:07＝R1 修复时点；r05_t03_rr1_replay.rs 02:32＝R2 时点），且 E02 日志 23 二进制 285/0 与本人复跑形状一致、kernel/service 生产文件 mtime 均早于 R2。④附带复核（本人隔离探针 /tmp/r05-t03-r2-accept 3/3 绿）：F06 占位从未被 delta 填补→无空签名字段上 wire、缓冲空串签名→不产 opaque、codex 共享渲染器 no-origin 拒绝——三者行为正确但电池未钉；经对照审计收口矩阵与总控 F06/F09 自检清单均非必需腿，判为可选加固不登记新 F-ID（记录于此备查，后续轮次可随手钉住）。判定：F32 复核通过。",
+        "remaining": "R2 独立复核通过（2026-10-05，r2 审查轮）；F32 可由总控流转 CLOSED，F08/F09 条目中『归 F32』的登记缺口就此了结。可选加固（非必需、不阻塞）：F06 占位未填补/缓冲空签名的两腿与 codex no-origin 腿可后续随手钉进电池（行为已由 r2 审查者探针证实正确）。"
+      },
+      {
+        "fId": "F36",
+        "task": "R05-T06",
+        "origRefs": {
+          "cIds": [
+            "R05-T06-C12",
+            "R05-T06-C03"
+          ],
+          "aIds": [
+            "R05-A12"
+          ],
+          "other": [
+            "F20 同类路径扫描新发现"
+          ]
+        },
+        "fact": "system_speech 的 argv 把用户文本放最后且无 -- 分隔：本机实测 /usr/bin/say -o A \"-oB\" 会把 -oB 当选项、输出写到 B——用户消息文本可改写宿主选定输出路径（参数注入），属 F20 修复中的同类路径新发现。",
+        "entry": [
+          "rust/crates/lingxi-service/src/operations.rs（system_speech argv 组装）"
+        ],
+        "evidenceDir": "artifacts/rust-tauri/R05/RR1/WP-T06-E01（本机 say 探针输出见执行记录；永久测试 rr1_f20_leading_dash_text_is_message_not_option）",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T06",
+        "rounds": 1,
+        "candidateSummary": "R1：输入文本前插入 --（end-of-options）；voice 值位于 -v 的值位不受影响。",
+        "testEvidence": "tests/r05_t06_rr1_system_speech.rs::rr1_f20_leading_dash_text_is_message_not_option 绿（文本 -o/tmp/… 合成成功、产物仅 1 个注册文件、注入路径 0 字节未被写）。 最终自检（最终候选状态）：lingxi-service 全量 --no-fail-fast 890 通过/0 失败（唯一失败 r00_management_positive_and_negative_branches_on_real_service 为既有 macOS ALF 环境项——非环回自地址 192.168.3.5 入站被本机防火墙拦截，与 T03 R2 独立验收记录同一环境项，非本包缺陷；log=regression-lingxi-service-final.log）；原审计探针断言原文未改、仅隔离布局复跑：冻结 HEAD 3 红 exit 101 → 修复树 3/3 绿 exit 0（green-fixed-tree-operations-probe.log，实发 video_id=provider-vid&model_name=agnes-video、取消胜出后 0 下载 0 登记）；cargo fmt --check 0；clippy --workspace --all-targets --locked -D warnings 0。",
+        "independentReview": "R05-T06-独立验收-r1（同 F17 记录的审查轮与环境）：rr1_f20_leading_dash_text_is_message_not_option 本人亲跑绿——前导 '-o' 加路径文本被合成为消息、产物根仅 1 文件、注入目标路径不存在、无 say 残留；代码 operations.rs:1594-1606 argv 在输入前插 '--'，voice 位于 -v 的 getopt 实参位消费、输入在 -- 之后。PASS。",
+        "remaining": "已独立验收通过（2026-10-05，r1）。"
+      },
+      {
+        "fId": "F37",
+        "task": "R05-T06",
+        "kind": "reviewAppended",
+        "origRefs": {
+          "cIds": [
+            "R05-T06-C03"
+          ],
+          "aIds": [
+            "R05-A11"
+          ],
+          "other": [
+            "F17 自检清单『父/末端链接替换』"
+          ]
+        },
+        "fact": "F17 修复的『父目录组件授权后被换为符号链接』腿没有永久仓库测试：现有电池只钉了叶子符号链接（rr1_f17_leaf_symlink_to_outside_is_refused_by_real_target）；read_authorized_bytes_bounded 的 DirFd::open ELOOP→churn≤8 重解析→再授权防线未被任何永久测试钉住。行为本体正确——T06 独立验收 r1 以隔离探针亲证（父目录换链指向授权根外→Forbidden 真目标判定；指向授权根内→读真目标内容；恰好等于上限→通过；探针在隔离副本未入正式树）。风险与 F32/F33/F34 同类：未来有人删除 DirFd::open 的 churn/重授权分支或退化为按原路径打开时，现有任何仓库测试不会红。严重度：LOW（测试电池缺口，非行为缺陷，不阻塞 F17 关闭）。",
+        "entry": [
+          "rust/crates/lingxi-service/src/operations.rs（read_authorized_bytes_bounded 的 DirFd::open/churn 分支，约 :1887-1913）",
+          "rust/crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs（R2 已补父目录换链双腿：rr1_f37_parent_dir_swapped_to_outside_symlink_is_refused_by_real_target / rr1_f37_parent_dir_swapped_to_inside_symlink_reads_the_real_target）"
+        ],
+        "evidenceDir": "artifacts/rust-tauri/R05/RR1/WP-T06-E02（R2 永久双腿+变异验证+冻结 HEAD 探针证据；R1 独立验收隔离探针结论记于 F17.independentReview，WP-T06-E01）",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T06-R2",
+        "rounds": 2,
+        "candidateSummary": "R05 RR1 WP-T06 R2（2026-10-05，修复-r1，F37）：纯测试追加、零生产改动——在 rust/crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs 追加 2 条永久腿：(a) rr1_f37_parent_dir_swapped_to_outside_symlink_is_refused_by_real_target（防宽）——先在父目录 nested 为真实目录时显式 authorize 通过（体现『authorize 后换』），再把 ws/nested 改名移走并以符号链接指向授权根外 outside-decoy，read_image_reference 与 read_host_audio 均以真实目标判定拒绝 ErrorCode::Forbidden，且拒绝消息不含越权内容（OUTSIDE_REDIRECT_SECRET 不外溢，png/wav 双读取器）；(b) rr1_f37_parent_dir_swapped_to_inside_symlink_reads_the_real_target（防紧）——同样 authorize 后把 ws/nested 换为指向授权根内 relocated 目录的符号链接，两个读取器都读到真目标内容（REAL_TARGET_INSIDE_PNG/WAV，非被移走的陈旧原文件），image 侧另断言 mime=image/png、filename=leaf.png，audio 侧断言 mime=audio/wav、filename=leaf.wav。既有 15 腿（F17/F18/F19 反例与正负对照）原样保留。",
+        "testEvidence": "artifacts/rust-tauri/R05/RR1/WP-T06-E02/：green-battery-f37.log（/Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r05_t06_rr1_media_resource，exit 0，17/17＝既有 15+新 2）；f37-reg-operations.log（--test r05_t06_operations exit 0，7/7）；f37-reg-speech.log（--test r05_t06_rr1_system_speech exit 0，10/10）；f37-reg-clippy.log（clippy -p lingxi-service --all-targets --locked -- -D warnings exit 0）；f37-reg-fmt.log（fmt --all -- --check exit 0）；mut1-anti-widening-f37.log（隔离 /tmp 副本把 read_authorized_bytes_bounded 退化为 pre-F17 词法 follow-open 形态：exit 101 恰 2 红——新腿 (a) 在 expect_err 断言点红，panic 实见 Ok(Bytes{bytes: OUTSIDE_REDIRECT_SECRET_PNG}) 越权内容被读出；既有叶符号链接腿同点红属同一诚实性防线家族；腿 (b) 与其余 15 腿绿）；mut2-anti-tightening-f37.log（副本在函数头插入『锚目录下任何符号链接组件一律 Forbidden』过紧策略：exit 101 恰 1 红——腿 (b) 在 expect 断言点红，实见 Forbidden: MUT2 … symlink component …/ws/nested；腿 (a) 与其余 16 腿绿）；oldred-frozen-head-f37-probe.log（git archive d80737b6 隔离副本+自包含探针：腿 (b) 红 exit 101——authorize 通过后 std::fs::read 按进程 cwd 解析裸相对路径 No such file or directory，F17 的 P1 类读取分歧，构成真旧红；腿 (a) 在冻结 HEAD 绿——R04 authorize 真目标判定本就拒绝授权根外换链，如实记录腿 (a) 为前瞻契约腿，可红性由 mut1 证明）。副本纪律：rsync 隔离副本+独立 CARGO_TARGET_DIR，变异仅触副本 operations.rs，事后 rsync 复原+diff -q 逐字节一致，仓库生产文件 SHA256 变异前后均 e42c465525e0e777bbe9ef65cf9819bd9ac57023fa31e971919be80fdbc9f42c（零接触）；/tmp 副本已清理。工具链 rustup 代理→1.98.1。本轮唯一改动文件：rust/crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs。",
+        "independentReview": "R05-T06-独立验收-r2（2026-10-05，R05 RR1 WP-T06 R2 审查轮，全新上下文，未参与实现/修复；rustup 代理 /Users/study_superior/.cargo/bin/cargo→1.98.1，rust-toolchain.toml 锁定核实；真实 macOS arm64）。①亲跑指定电池：--test r05_t06_rr1_media_resource 17/17 绿（含 F37 双腿原文断言）；邻近 --test r05_t06_operations 7/7、--test r05_t06_worker_model 10/10、--test r05_t06_rr1_system_speech -- --test-threads=1 10/10（真实 /usr/bin/say，总时长 9.92s 证真实合成）、--lib rr1_f18_registry 1/1。②冻结 HEAD 旧红本人独立复现：git worktree d80737b6 隔离副本 + 审查者自写探针（仅 HEAD 已有 pub API，不入正式树）——腿 (a) 绿（R04 authorize 真目标判定本就拒外，与执行者记录一致，前瞻契约腿）；腿 (b) 红 exit 101（pre-F17 词法 fs::read 按进程 cwd 解析 nested/leaf.png No such file or directory——P1 类读取分歧）。③审查者自做变异（隔离 /tmp 完整树副本，主树 SHA256 e42c4655… 前后不变）：MUT-A 退化为词法 follow-open（不判真目标）→ exit 101 恰 3 红，腿 (a) panic 实见 Ok(Bytes{OUTSIDE_REDIRECT_SECRET_PNG}) 越权内容被读出 + 叶符号链接腿红 + FIFO 腿阻塞红（该变异无 O_NONBLOCK，同一防线家族）；MUT-B 过紧策略（词法链任何符号链接组件一律 Forbidden）→ exit 101，腿 (b) 红（panic 实见 Forbidden: MUT-B … symlink component …/ws/nested；另 3 红为该变异把绝对路径前缀（symlinked /var）也扫入的同类过紧副作用，非测试缺口）；复原后副本电池 17/17 绿。执行者 mut1/mut2 日志与本人结论一致（mut1 2 红/mut2 1 红，其变异更外科）。④E02 证据日志核对：green-battery-f37 17/17、mut1 15+2 红、mut2 16+1 红、oldred 1 过 1 红——与本人独立复跑一致。⑤覆盖说明核实：DirFd::open ELOOP→churn 分支仅在 authorize 与 open 之间真实竞态窗口可达，确定性测试无法不加生产钩子注入——执行者已如实登记，双腿钉住合成契约双向可观测行为，与 F37.remaining 要求一致，接受。⑥回归：fmt --all -- --check exit 0；clippy -p lingxi-service -p lingxi-adapters --all-targets --locked -D warnings exit 0；lingxi-service 全量 --no-fail-fast 892 通过/1 失败（唯一失败 r00_management_positive_and_negative_branches_on_real_service 为既有 macOS ALF 环境项：非环回自地址 192.168.3.5 入站 stalled，panic 消息自证环境归因，R00 范围，与 T03/T05/T06 r1 记录同一环境项）；/tmp 副本与 worktree 已清理（git worktree list 仅主树）。",
+        "remaining": "已独立验收通过（2026-10-05，r2）；CLOSED 由总控流转。"
+      },
+      {
+        "fId": "F38",
+        "task": "R05-T07",
+        "kind": "reviewAppended",
+        "origRefs": {
+          "joint": [
+            "F21 修复义务与自检（RR1_MASTER_PROMPT_2026-10-04.md §4 F21：『…取消…均携带 resolved identity、已知 usage 与真实尝试』；自检含 cancel-before-send/cancel-after-send）"
+          ],
+          "other": [
+            "原审计 F-WU02（INPUT-adversarial-2026-10-04/audit/worker_usage/R05_T06_T07_ADVERSARIAL_REVIEW.md：『因 future drop/取消尚未结算的调用同样没有完成型 row；不得仅用崩溃窗口登记覆盖正常取消的对账义务』）"
+          ]
+        },
+        "fact": "F21 的已测量缺陷（P4/P8/父子JOIN/查询字段/operation 上下文）已修复并经变异验证，但『请求已发出后被取消』的调用仍无台账行：①rust/crates/lingxi-service/src/runs.rs:1256-1270——run 取消与在途 model call 的 select 竞态获胜时直接 settle_cancellation 返回，该 call 的 persist_model_call_completed 不执行（唯一先行事实是 persist_model_call_started 的 run 事件，不是 usage 台账行），一个可能已计费的物理请求从台账消失；②rust/crates/lingxi-service/src/workerrpc.rs:1270-1305——worker invocation deadline 到期（timeout_at drop spec.model.complete）或 run 取消 drop 整个 execute future 时，在途回调的 complete() 被 drop，其台账行（GatewayWorkerModel::complete 内部写入）不会产生。两处均为『取消 fence 抹去已发生计费事实』的形状，且无任何永久测试覆盖 cancel-after-send（F21 自检明列）。另：transport_attempts 为非空 u32，schema 无法表达『drop 后尝试数未知』，需 nullable 化或引入 sent 状态枚举。附带记录（非阻塞，同路径建议）：『意外工具响应有usage』与『partial』两自检腿无专门测试（当前与空正文腿共用同一 fail 闭包，结构上已携带 usage）。",
+        "entry": [
+          "rust/crates/lingxi-service/src/runs.rs:1256-1270（cancel 竞态臂直接 settle 返回，无 usage 行）",
+          "rust/crates/lingxi-service/src/runs.rs:3391-3421（persist_model_call_started 只写 run 事件）",
+          "rust/crates/lingxi-service/src/workerrpc.rs:1270-1305（timeout_at/取消 drop 在途 complete()，无行）",
+          "rust/crates/lingxi-kernel/src/usage.rs（transport_attempts 非 u64 可空，无法表达 unknown-attempts）"
+        ],
+        "evidenceDir": "无持久仓库证据（本项即缺口）。独立审查者 2026-10-06 读码定位：runs.rs 取消臂不经过任何 persist_model_call_completed 调用点（1243/1534/1557/1570/1593/1656/3010/3022/3035 全部在 settled turn 之后）；workerrpc.rs:1289 Err(_)=timeout 分支返回 Unknown 无台账写。",
+        "status": "INDEPENDENT_PASS",
+        "owner": "WP-T07",
+        "rounds": 3,
+        "candidateSummary": "R2（R05-T07-修复-r1，2026-10-06）按 R1 审查者的修复建议逐项交付：①runs.rs root.cancelled() 竞态臂——settle_cancellation 之前为在途 model call 落台账行（outcome=Cancelled、usage unknown、attempts=None 诚实表达『drop 后尝试数未知』，绝不以 0/1 冒充；身份=dispatch-moment descriptor）；同型扫描补 fence Stale+cancelled 臂（回合已结算被取消 fence 拒写）——行携带回合真实 usage/attempts/身份、outcome=Cancelled。两处均只写台账行、不写 model_call_completed 事件（A09/C16『取消的 call 不以伪造 completed 收尾』既有反例零改动保持）。②workerrpc.rs invocation deadline 到期分支——确定性 await 落行；run 取消 drop 整个 execute future 时 CallbackAbandonGuard（RAII）把行脱离到运行时（tokio Handle::spawn 尽力落账，无运行时/写失败响亮记日志绝不静默）；记账经 WorkerModelPort::abandoned(fact)（新 trait 方法，默认 no-op，BoundedWorkerModel 转发，生产实现 GatewayWorkerModel::abandoned 经既有 LedgerWorkerCallbackTrace；身份按 workermodel 既有 unreported 惯例；invocation/cb_id/parent_tool_call 全随行）。③transport_attempts nullable 化：kernel ModelCallUsageRecord→Option<u32>（Some(0)=not-sent、Some(n)=观测计数、None=drop 后未知），migration v7 表重建（SQLite 不能 ALTER 去 NOT NULL；旧行原值保留、索引同构重建），run_store 读写同步。④永久测试（见 F21.testEvidence R2 四新腿）：driver 腿（ParkedSseStub 屏障证明物理请求已抵达→cancel_run→断言行存在/outcome=Cancelled/usage unknown/attempts None/重启后可查）、worker 腿（真实子进程链+短 deadline+回调 dispatch 屏障→行经生产 abandoned 落账+parent_tool_call 可 JOIN+重启可查）、v7 迁移腿（真实 v6 库升 v7 行原值保留+NULL attempts round-trip）。附带（非阻塞建议项）：『意外工具响应有 usage』自检腿揭出真实同类缺口——五族 stream parse-Err 路径把已观测 usage 丢弃（R1 声称『结构上已携带』不成立），本轮一并修复（各 accumulator observed_usage_report+finish-Err 附到 Failed 结果，严格解码无放宽）并补『意外工具响应』『partial』两专门腿。⑤订正记录：F21.remaining 与 MODEL_USAGE_SEMANTICS §10 的『driver 取消窗口无行=既有登记』失实表述已订正（§10 R2 版：正常取消窗口都有行，唯崩溃窗口无行——与冻结 HEAD 登记一致），接口演进登记 R05_INTERFACE_EVOLUTION §31。",
+        "testEvidence": "R2 自检（全部经 /Users/study_superior/.cargo/bin/cargo，rustup 1.98.1）：新腿先红后绿——driver 腿在修复前的行为（取消臂不落行）由 F38.independentReview 读码定位+本轮实现；最终 lingxi-service --test r05_t07_rr1_usage_ledger 13/13（含 rr1_f38_driver_cancel…across_restart、rr1_f38_worker_deadline_expiry…、rr1_f38_run_cancel_drop…、rr1_f21_unexpected_tool_response…、rr1_f21_partial_usage…）；变异验证（隔离 /tmp 副本，mutation-verification-r2.log）：MUT-A 中性化 driver 取消臂落行→driver 腿红（rows 0≠1）；MUT-B 中性化 GatewayWorkerModel::abandoned→worker deadline 腿红（无 Cancelled 行）；一次编译失败的变异桩如实作废重做（编译失败不是变异证明）。r05_t07_persistence 5/5（含 migration_v6_to_v7_makes_attempts_nullable_and_keeps_rows）；受影响面 r05_t07_usage_trace 9/9、r05_t06_worker_model 10/10、cancellation_tree 8/8（既有反例零改动）、r05_t04_streaming 18/18（含 c16 反例零改动）、r05_t03_protocol_adapters 12/12、r04_t07_mcp_and_workers 19/19、late_result_fence 5/5（R3 勘误：此处原文误写 12/12，系从相邻条目串写的文案笔误——套件实为 5 测试，5/5 全绿）；lingxi-adapters 全量（25 测试二进制全 ok）、lingxi-kernel 87/87；cargo fmt --all -- --check 0；clippy --workspace --all-targets --locked -D warnings 0；lingxi-service 全量 --no-fail-fast 905 通过/1 失败（r00_management macOS ALF 环境项，panic 文本自证环境归因，与 T03-T06 记录同一项），regression-lingxi-service-full-r2.log（cargo exit=101 仅因该测试二进制）。",
+        "independentReview": "R05 RR1 WP-T07 R1 独立验收登记（2026-10-06，全新上下文审查者）。修复建议（下一轮修复者可直接执行）：①让取消/超时 drop 前的可记账事实落行——driver 取消臂（runs.rs:1258-1269）在 settle_cancellation 前为在途 call 写一行（outcome=Cancelled、usage unknown、attempts 按可信观测：若 provider 层能在 drop 前暴露已发计数则用之，否则需把 transport_attempts 改为可空或新增 sent 状态以诚实表达 unknown，禁止填 0 或 1 冒充）；workerrpc.rs 的 timeout/cancel 分支同理为在途回调写行（invocation/cb_id/parent_tool_call 已在作用域）。②补永久测试：屏障控制 stub 记录到物理请求后触发 run 取消（driver 腿）与 invocation deadline 到期（worker 腿），断言行存在、outcome=Cancelled/Unknown、usage unknown、attempts 不虚构，重启后仍可查。③订正记录：矩阵 remaining 与 MODEL_USAGE_SEMANTICS §10 不得再把取消窗口写成『既有登记』（冻结 HEAD §10 只有崩溃窗口）；若确要延期，须以显式新边界条目说明为何本阶段不可实现，而不是引用不存在的旧登记。——R2 任务级独立验收（2026-10-06，R05-T07-独立验收-r2）：PASS。MUT-A/MUT-B 变异亲证（隔离副本）+三腿亲测 13/13+重启可查断言读码核对；transport_attempts nullable 化经 v6→v7 真库迁移腿（原值保留+NULL round-trip）；『意外工具响应有usage/partial』两腿实测绿且断言真实 usage 值（30/11、9/None+missing:[output_tokens]）。订正记录核实：MODEL_USAGE_SEMANTICS §10 与 F21.remaining 的失实表述已按建议订正。残留：F39（fence 臂覆盖缺口）。",
+        "remaining": "R2 任务级独立验收 PASS；R3 任务级独立验收（2026-10-06，R05-T07-独立验收-r3）复测 F38 三取消腿全绿，F39 已同轮关闭。已知边界（如实登记，非缺陷）不变：①run-cancel drop 弃置行是脱离到运行时的尽力落账；②真实 aux 链自带同锚点自预算、会在同一瞬间自结算为 Failed 行，deadline 分支服务于无自预算端口形状；③fence Stale 在 LIVE run 下的迟到结果走既有 stale_result_audit（R03-T04），未改。"
+      },
+      {
+        "fId": "F43",
+        "kind": "stageReviewAppended",
+        "task": "R05-T08（rust_test_workspace 门禁通道稳定性）",
+        "origRefs": {
+          "related": [
+            "R05-ENV-ALF-UNSIGNED-TEST-BINARY（既有台账环境项）",
+            "r04_t08_tool_matrix 负载敏感先例（T08 验收登记的既有环境项）",
+            "R05-T05-C04/C06/C09/C10、R05-T08-C10 等 command:rust_test_workspace 绑定"
+          ]
+        },
+        "fact": "rust_test_workspace（注册门禁命令，timeoutSecs=2400）在本审查窗口无法取得一次性完整通过：①我的 verify-stage 首跑冷编译耗尽 2400s 被超时终止（resultJson timedOut=true；被杀前已完成 41 套件 0 失败，杀点在 cancel_terminal_race）；②随后同一候选 --no-fail-fast 完整枚举：115 套件 / 1472 通过 / 3 失败——(a) r00_management_positive_and_negative_branches_on_real_service（既有 ALF 环境项逐字签名，本窗口隔离复跑仍红，R00 套件无 R05 断言）；(b) r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives（测试自身 TOCTOU：被测 bash 以 printf> 先创建 pid 文件后写内容，测试只等文件存在即读，负载下读到空文件使 len==3 得 0；同候选 WP-T06 2026-10-05 全量窗口绿、本次隔离复跑 14/14 绿、定向 2 次绿）；(c) f24_sigterm_with_parked_callback_reaps_the_worker_child（worker 子进程 30s 生成期限在 6 测并行真实服务/子进程负载下超时；producer 单套运行 6/6 绿〔我的门禁内亲跑〕、隔离复跑 6/6 绿、定向 2 次绿）。三者均非 RR1 产品行为缺陷（隔离与 producer 证据均绿），但该门禁命令在本机当前负载形态下不可稳定单发通过，尚无有效窗口的完整 exit 0 记录。",
+        "entry": [
+          "rust/crates/lingxi-service/tests/r04_t05_process_tools.rs:508-537（pid 文件存在性 vs 内容竞态）",
+          "rust/crates/lingxi-service/tests/r05_t08_production_tools.rs:1195-1215（30s 生成期限）",
+          "docs/rust-tauri/R05/PROGRESS_LEDGER.json environment_items（ALF 项与负载敏感先例）"
+        ],
+        "evidenceDir": "artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/rust_test_workspace/{stdout,stderr}.log 与 verify-stage-result.json（timedOut=true）；artifacts/rust-tauri/R05/RR1/INDEPENDENT-9-supplementary/workspace-test-nofailfast.log（115 套件/1472/3 全清单）；…/isolation-reruns.log（隔离复跑 14/14、6/6 及定向重复）",
+        "status": "OPEN",
+        "owner": "待派修复智能体（测试侧稳定性）+ 用户（ALF Allow/签名，执行者无法自解）",
+        "rounds": 0,
+        "candidateSummary": null,
+        "testEvidence": null,
+        "independentReview": "登记人：R05 RR1 独立阶段审查者（2026-10-06）。亲证：超时事实（resultJson timedOut 字段+日志时间线 02:25→03:06）；完整枚举与 3 失败逐一定位（含读测试源码确认 (b) 的存在性-内容竞态与 (c) 的期限机制）；(b)(c) 隔离/定向复跑全绿；(a) 与台账环境项签名逐字匹配且隔离复跑仍红（本窗口 ALF 活跃）。",
+        "remaining": "修复/收口（按实择项）：测试侧消除 r04_a09 的存在性-内容竞态（屏障改为等到内容可解析且数量到位）与 f24_sigterm 的负载期限（延长期限或该套件串行化）；ALF 项按台账环境项处理（需用户 Allow/socketfilterfw/开发者签名）。之后需要一个有效窗口内完整 rust_test_workspace exit 0 记录（或按台账环境项+稳定性登记的显式归因）才能满足 §6.1(5) 的该通道义务。"
+      }
+    ],
+    "docs/rust-tauri/R05/repair-current/RR1_PROGRESS.md": [
+      "- 维护纪律：每完成一步立即更新本表（状态 + 执行者/审查者 + 证据根 + 日期），上下文中断后从本表第一个非 DONE 行续跑；状态词汇与 `RR1_ISSUE_MATRIX.json` 一致（TODO → OPEN → IMPLEMENTED → SELF_CHECKED → INDEPENDENT_PASS → CLOSED，行级状态另用 DONE/BLOCKED）。",
+      "| 3 | WP-T03：现役协议、真实状态重放与顺序 | **R2 审查 PASS：F06/F07/F08/F09/F10/F32 全部 INDEPENDENT_PASS**（R05-T03-独立验收-r2，2026-10-05） | R05-T03-执行者（R1）/ R05-T03-独立验收-r1（R1 审查）/ R05-T03-修复-r1（R2）/ R05-T03-独立验收-r2（R2 审查） | F06、F07、F08、F09、F10、F32 | R1：旧红双证（未改断言的原始探针对修复前候选树 exit 101 本包 7 腿红；仓库永久反例套 `lingxi-adapters/tests/r05_t03_rr1_replay.rs` 6 绿/18 红）→ 修复（Anthropic 占位签名/空文本签名、Google functionCallPart 锚点+签名+并行分组、completions reasoning_content 载体+compat 中心 fail-closed、TurnOrigin 源绑定三入口强制、Responses/Codex 原位顺序+锚点）→ 同类路径扫描（五族 Opaque 站点、四家 replay 契约、锚点无匹配/重复拒绝）→ 自检绿（证据根 `WP-T03-E01/`）。R1 独立验收 PASS（2026-10-05）：原始探针逐字复跑本包 7 腿+对照全绿、永久套 26/26、补充隔离探针 8/8、adapters 全量/clippy/fmt 净；审查者登记 F32（三组加固腿未进永久电池的测试缺口，行为本体正确）。R2（`WP-T03-E02/`，纯测试追加零生产改动）：F32 四组腿落地为永久测试（off/utility 豁免缺载体+剥离实载体×2 各带内联正对照、hints.reasoning=false 剥离、三族 no-origin 拒绝+补记 origin 正对照、responses 重复锚点拒绝），r05_t03_rr1_replay 33/33＝既有 26+新 7。R2 独立验收 PASS（2026-10-05，全新审查者亲跑，rustup 代理 1.98.1）：原始审计探针断言原文复跑（仅按 F09 接口演进补 TurnOrigin 合法前置，diff 复核仅头部注释/origin/空白差异）13 测 8 绿 5 红——本包 7 腿+对照全绿，余 5 红均属 WP-T04 的 PF05/PF06（预期）；永久套 33/33；补充隔离探针 3/3（F06 占位未填补不上空签名、缓冲空串签名不产 opaque、codex 共享渲染器 no-origin 拒绝——行为正确，经对照审计收口矩阵与总控自检清单判为非必需腿不登记 F-ID，记于 F32.independentReview）；lingxi-adapters 全量 exit 0、lingxi-kernel 87/87 exit 0、lingxi-service r05_t03_protocol_adapters 12/12 exit 0、service 全量 --no-fail-fast 832 绿/1 环境项（r00_management_leaves LAN 浏览器腿被本机 macOS 防火墙拦截发往非环回自地址 192.168.3.5 的入站连接，复跑两次同样停滞、与 R1 证据同一环境项，非 T03 缺陷）、clippy -D warnings exit 0、fmt --check exit 0；R2 零生产改动以 mtime 旁证（生产文件 01:07＝R1 vs 测试文件 02:32＝R2）+E02 日志与复跑形状一致。共享文件：kernel/model_exchange.rs（TurnOrigin）、service/runs.rs（origin 记录两处）、compat.rs/四 adapter + 2 golden JSON + c03/google 单测夹具同步（并行分组、reasoning 载体） |",
+      "| 5 | WP-T05：统一网络策略、解析后边界与全过程预算 | **R2 审查 PASS：F14/F15/F16/F35 全部 INDEPENDENT_PASS**（R05-T05-独立验收-r2，2026-10-05） | R05-T05-执行者（R1）/ R05-T05-独立验收-r1（R1 审查）/ R05-T05-修复-r1（R2）/ R05-T05-独立验收-r2（R2 审查） | F14、F15、F16、F35、R05-T05-C11B、R05-T05-C13 | R1：旧红双证（隔离 probe 4 断言对未修复树 exit 101：network 段拒/系统代理 0 连接/CN-F06 环回连接/CN-F07 错误 body 越期，`WP-T05-E01/old-red-on-unfixed-tree.log`；同断言接口演进适配后对修复树 4/4 绿 exit 0，`green-on-fixed-tree.log`）→ 修复（network.rs 统一策略〔现役 network-proxy.ts 契约镜像：system/manual/direct、NO_PROXY 语法+强制环回 bypass、显式 CA 叠加 rustls-platform-verifier〕+全消费方单一 plane 接线+management reload 代次发布；egress 解析候选校验+resolve_to_addrs 钉住+代理边界；错误 body 有界+admit/排队/刷新 deadline）→ 永久测试 `lingxi-service/tests/r05_t05_network.rs` 21/21 绿 + network.rs 单测；adapters 全量绿（R1 审查 PASS 详见矩阵 F14/F15/F16 independentReview）。R2（`WP-T05-E02/`，生产改动仅 network.rs 条目解析）：F35 修复——split_no_proxy_entry 移植现役 splitNoProxyEntry 方括号分支（[v6]/[v6]:port 剥括号+可选端口）+裸多冒号条目整条作 host，逐条 :port 语义不变；pick_proxy 改走 no_proxy_list_matches 使条目级匹配可单测（[::1]:9443 不再被强制环回 bypass 掩盖，断言空缺③闭合）；旧红 exit 101 → network 8/8、r05_t05_network 21/21（fmt 后终态复跑）、adapters 全量 24 二进制、fmt/clippy 全 exit 0 → 变异验证（隔离 /tmp 副本仅移除方括号分支：两条 F35 腿红、6 既有腿绿，工作树 SHA 零变化）。R2 独立验收 PASS（2026-10-05，全新审查者亲跑，rustup 代理 1.98.1）：r05_t05_network 21/21、network 单测 8/8、r05_t05_timeouts 9/9、审查者自建 /tmp 隔离探针（CN-F06/CN-F07 断言原文自审计探针迁入＋F14 环境腿走 NetworkPlane::from_environment 同 main.rs bootstrap 面，进程启动前导出 HTTP(S)_PROXY）对本树 3/3 绿 exit 0、同三腿对冻结 HEAD d80737b6（git archive 隔离副本）0/3 exit 101 旧红双向独立复现；F35 独立探针绿＋隔离变异（移除方括号分支）恰两腿红/六腿绿＋探针红 exit 101、并对照 shared/network-proxy.ts:139-164 核对移植保真；生产接线复核（main.rs:445-460、lib.rs:1094/1194/1247、credentials/mod.rs:410、management.rs:699-702，adapters 生产面无裸 build_client() 调用点）；回归 fmt exit 0、clippy（两 crate --all-targets -D warnings）exit 0、adapters 全量 302/0 exit 0、service 全量 --no-fail-fast 865/0 exit 0（r00_management_leaves 的 macOS ALF 环境项本轮未复现）；r2 注记（非缺陷）：单冒号空尾 NO_PROXY 条目（'host:'）与 incumbent 任意端口 bypass 存在 fail-closed 方向偏差，沿用 R1 已验收语义记录在案，未另立 F-ID |",
+      "| 6 | WP-T06：资源授权、媒体任务与受监督操作 | **R1 独立验收 PASS（F17/F18/F19/F20/F36 INDEPENDENT_PASS；审查者登记 F37）→ R2 F37 IMPLEMENTED 待独立审查**（R05-T06-修复-r1，2026-10-05） | R05-T06-执行者（R1）/ R05-T06-独立验收-r1（R1 审查）/ R05-T06-修复-r1（R2） | F17、F18、F19、F20、F36、F37、R05-T06-C11B | R1（证据根 `WP-T06-E01/`）：旧红双证——冻结 HEAD d80737b6 /tmp worktree 原审计探针 P1/P2/P3 复跑 exit 101（`old-red-frozen-head-operations-probe.log`）；未修复当前树新永久反例 15 测 12 红/3 对照绿 + F20 专用探针双红（permit 旁路返回 Ok(RegisteredProduct)、abort 后 say 存活+中间文件残留，exit 101）。修复：F17 附件读取走 canonical ResourceScope.path + filetools DirFd no-follow openat（O_NONBLOCK 变体）+ 句柄级常规文件校验 + Read::take(cap+1) 读中有界（filetools.rs fsio 改 pub(crate)，共享文件已登记）；F18 MediaTaskRecord 双身份（host tracker/provider job id/legacy）+ 提交时路由快照（poll 不改绑、撤销诚实失败）+ kind 区分 + 有界注册表（CAP=128、终态驱逐、裸 ID 消歧）；F19 settle 三 fence + 单点提交 + settle 互斥一次交付 + 取消清理已登记文件 + 完成事实不虚构取消；F20 system-speech 移入统一 admit/deadline（min(剩余预算,120s)）+ ProcessSupervisor（进程组/reaper/ProcessOwnershipGuard RAII/killpg 链）+ 中间输出全路径清理 + 结算 attempts=0 + lib.rs 组合根接线 + 无 supervisor fail-closed；新发现 F36（say argv 注入：实测 `say -o A \"-oB\"` 写 B）→ `--` 分隔修复。修复后：r05_t06_rr1_media_resource 15/15、r05_t06_rr1_system_speech 10/10（真实 macOS arm64 /usr/bin/say）、lib rr1_f18_registry 1/1、lingxi-service 全量回归见 `regression-lingxi-service-full.log`。R05-T06-C11B：F15 重写后 egress 五测仍在 lib-adapters models::egress（T05 R2 已复验该组），间接绑定不悬空。终态自检：lingxi-service 全量 --no-fail-fast 890/0（唯一失败 r00_management 为既有 macOS ALF 环境项，非本包缺陷，`regression-lingxi-service-final.log`）；原审计探针断言原文未改于隔离布局双向复现：冻结 HEAD 3 红 exit 101 → 修复树 3/3 绿 exit 0（`green-fixed-tree-operations-probe.log`）；fmt --check 0、clippy --workspace --all-targets -D warnings 0；/tmp 临时 worktree 已清理（git worktree list 仅主树）。共享文件改动登记见矩阵 sharedFileLedger（operations.rs 本包独占；filetools.rs 仅 fsio pub(crate)+O_NONBLOCK 变体零语义改动；lib.rs 仅 operations 构造块加 supervisor 接线，供 F24 仲裁共享实例）。R2（`WP-T06-E02/`，纯测试追加零生产改动）：F37 落地为 2 条永久腿——(a) 父目录 authorize 后换为指向授权根外的符号链接→read_image_reference/read_host_audio 均 Forbidden 且越权内容不外溢；(b) 换为指向授权根内目录的符号链接→两读取器读到真目标内容（防宽防紧双向）。指定电池命令 17/17 exit 0（既有 15+新 2）；邻近 battery 7/7、10/10；clippy -D warnings 0、fmt --check 0。变异验证（隔离 /tmp 副本、仓库 operations.rs SHA 前后不变）：mut1 退化 pre-F17 词法 follow-open → 恰腿 (a)+既有叶腿 2 红（panic 实见越权内容被读出）；mut2 过紧一刀切拒链 → 恰腿 (b) 1 红；冻结 HEAD 探针：腿 (b) 真 旧红（裸相对路径读取分歧）、腿 (a) 绿（R04 authorize 本就拒外，可红性由 mut1 证）。待全新审查者复核 F37 → INDEPENDENT_PASS |",
+      "| 7 | WP-T07：完整调用事实、因果链与正确 usage | **R1 审查：F22/F23 INDEPENDENT_PASS、F21 FAIL 登记 F38 → R2 修复-r1（F38 关闭+F21 同路径 usage 拾回）F21/F38 INDEPENDENT_PASS（R2 任务级验收，残留 F39）→ R3 修复-r2（F39 fence 臂永久钉子，纯测试侧）F39 IMPLEMENTED 待独立复验**（R05-T07-修复-r2，2026-10-06） | R05-T07-执行者（R1）/ R05-T07-独立验收-r1 / R05-T07-修复-r1（R2）/ R05-T07-独立验收-r2 / R05-T07-修复-r2（R3） | F21、F22、F23、F38、F39 | R1（证据根 `WP-T07-E01/`）：旧红双证先行——adapters 探针 5 红/2 对照绿（P6 billed=10≠50、P7 Reported 0/7、P5 凭证入 invalid_detail、MiniMax 强转、thoughts>candidate，exit=101）；service 探针 3 红（P4 worker 500 rows=0、P5 持久泄漏、P8 attempts 虚记，exit=101）。修复：F23=Google 统一 output 口径；F22=rerank/MiniMax 原样透传+严格解码+诊断类型化不回显；F21=not-sent attempts=0（五位 pre-dispatch+quota/队列拒绝）、worker 失败全路径记账、WorkerModelPort::complete +parent_tool_call、台账 v6 五列、driver emitted_tool_calls、operation 可选上下文、查询 purpose/model/日期窗筛选；电池 15 腿全绿。R1 独立验收（2026-10-06）：F22/F23 PASS（旧红独立复现+读码核对+服务级持久化半边亲测）；F21 FAIL——cancel-after-send 不落账（runs.rs:1256-1270 取消竞态臂、workerrpc.rs:1270-1305 deadline/drop），且 remaining 把该窗口误称『§5/§10 既有登记』（冻结 HEAD §10 只有崩溃窗口），登记 F38。R2（`WP-T07-E02/`）：①runs.rs 两处取消臂 settle_cancellation 前落台账行（outcome=cancelled、usage unknown/真实、attempts=None 诚实表达未知；只写行不写 completed 事件——A09/C16 锚点 cancellation_tree r03_a05 与 r05_t04 c16 零改动通过）；②workerrpc deadline 分支确定性落行+CallbackAbandonGuard RAII 脱离落账（run-cancel drop 路径），经 WorkerModelPort::abandoned（新 trait 方法，BoundedWorkerModel 转发，GatewayWorkerModel 生产实现经 LedgerWorkerCallbackTrace，unreported 身份）；③transport_attempts nullable 化（kernel Option<u32> + migration v7 表重建，旧行原值保留）+v6→v7 迁移腿；④同路径扫描发现五族 stream parse-Err 丢已观测 usage（『意外工具响应有usage』自检腿揭出，R1『结构上已携带』声称不成立）——各 accumulator observed_usage_report+finish-Err 附到 Failed 结果，补 unexpected-tool/partial 两专门腿；⑤订正 F21.remaining 与 MODEL_USAGE_SEMANTICS §10 失实登记（§10 R2 版：正常取消窗口都有行，唯崩溃窗口无行），R05_INTERFACE_EVOLUTION §31 登记。R2 自检（rustup 1.98.1 代理）：ledger 13/13（新增 F38 三腿：driver 取消+重启、worker deadline+重启、run-cancel drop+重启）、persistence 5/5、usage_trace 9/9、worker_model 10/10、cancellation_tree 8/8、r05_t04_streaming 18/18、r05_t03_protocol_adapters 12/12、r04_t07_mcp_and_workers 19/19、late_result_fence 5/5（R3 勘误：此处原文误写 12/12，系串写笔误，套件实为 5 测试）、adapters 全量 25 二进制 ok、kernel 87/87、fmt 0、clippy workspace -D warnings 0、service 全量 --no-fail-fast 905 通过/1 失败（r00_management macOS ALF 环境项，与 T03-T06 同一项）；变异验证（隔离 /tmp 副本）：MUT-A 中性化 driver 取消臂落行→driver 腿红、MUT-B 中性化 abandoned→worker 腿红（mutation-verification-r2.log）。R2 任务级独立验收-r2 PASS（F21/F38 INDEPENDENT_PASS，登记 F39：fence-Stale+cancelled 臂缺永久钉子——覆盖缺口非产品缺陷）。R3（修复-r2，纯测试侧零生产改动，runs.rs SHA b7b8671a… 动手前后一致）：F39 落地为 rr1_f39 两腿——主腿 CancelledBeforeWrite（测试侧 GatedStorage 委托式 StoragePort 包装 16 方法全转发真实 RunDatabase：先 park model_call_started 写把 driver 拦在 biased select 外→脚本 provider（单 delta+正确 fence+Known usage 411/239+attempts=1+显式 resolved served_by）完整 resolve→释放后 exit 臂确定性先于 tick 臂→park 排空 delta 批写＝runs.rs:1374-1385 真实窗口→cancel_run 在 park 内触发→fence 臂）；变体腿 FenceMismatch+cancelled（错 fence 恒 mismatch，park record_stale_result 审计写＝is_cancelled 检查前的更宽窗口，审计按 CLAIMED fence 落外国 run 名下）。断言：行存在/outcome=Cancelled/usage=真实 411-239 Reported/attempts=Some(1)/身份=resolved served_by 胜过 dispatch 描述符/无 model_call_completed 事件/恰一条 cancelled_before_write（或 fence_mismatch）审计行（竞态臂不写审计——两臂内置区分器）/重启后真实库可查。臂粒度变异（隔离 /tmp 副本、独立 CARGO_TARGET_DIR）：MUT-F39 只中性化 fence 臂调用点（runs.rs:1527）→rr1_f39 双腿红 exit 101、rr1_f38_driver 腿绿 exit 0（两臂各自被钉）；还原后副本 15/15 绿、runs.rs 与主树逐字节一致。R3 自检（rustup 1.98.1 代理）：ledger 15/15（新腿 8 次重复全绿）、late_result_fence 5/5、cancellation_tree 8/8、r05_t04_streaming 18/18、fmt --all --check 0、clippy -p lingxi-service --all-targets -D warnings 0。同轮勘误（G2）：R2 文案四处『late_result_fence 12/12』订正为『5/5』（矩阵 F21.testEvidence/F38.testEvidence/sharedFileLedger R2 runs.rs 条+本表本行；F21.independentReview 审查者勘误引文保留不动；r05_t03 12/12 真实计数未动）。待全新独立审查者复验 F39＋重跑 r05_t07_rr1_usage_ledger/late_result_fence → **R3 任务级独立验收-r3 PASS（2026-10-06，全新上下文，证据根 `WP-T07-R3-INDEPENDENT/`）：亲测 ledger 15/15（rr1_f39 另 5 次重复全绿）、late_result_fence 5/5、persistence/usage_trace/worker_model/cancellation_tree/streaming/mcp/protocol_adapters 全绿、adapters 全量与 kernel 87/87、fmt 0、clippy workspace -D warnings 0；本轮自己的臂粒度变异双证（MUT-R3B 整体中性化 fence 臂→rr1_f39 双腿红 exit 101 且 rr1_f38_driver 对照绿 exit 0；MUT-R3A 事实降级→红在 attempts 专用断言）；F39 关闭、F21/F22/F23 维持 INDEPENDENT_PASS，无新缺陷登记** |",
+      "| 10 | 阶段门禁（冻结候选全量） | **已执行 → FAIL（exit 1）**：独立阶段审查者亲跑首次完整 verify-stage R05（2026-10-05T18:25:34Z–19:52:10Z，rustup 代理 1.98.1）；7 命令中 5 绿（r05_stage_suites 91 runs/fmt/clippy/contracts/boundaries）、rust_test_workspace FAIL（timedOut=true，2400s 冷编译超时；补充 --no-fail-fast 枚举 115 套件/1472 通过/3 失败=ALF 环境项+2 负载敏感腿，隔离全绿）、r04_regression_gate FAIL（F41/F42 确定性）；130/130 叶 PASS | 独立阶段审查者亲跑（INDEPENDENT-9） | §6.1(5) | `artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/verify-stage-result.json` + `INDEPENDENT-9-supplementary/` |",
+      "| 11 | 独立终审（全新阶段审查者亲跑） | **已执行 → FAIL**：independent_review=FAIL / offline_gate=FAIL / stage_readiness=NOT_ACCEPTED / R06_READY=false / live=BLOCKED_NOT_AUTHORIZED；结论为审查者唯一可写追加至 `RR1_ISSUE_MATRIX.json` → `independentStageReview` 键（含新登记 F41/F42/F43；counts OPEN=8）；任务级 F01–F39 的 INDEPENDENT_PASS 记录不作废 | 独立阶段审查者（阶段终审 r1，全新上下文，2026-10-06） | 放行条件 §6.1 全项（5)(1) 等未满足 | `RR1_ISSUE_MATRIX.json` → `independentStageReview`；正式报告 `RR1_FINAL_REPORT.md`（RR1 版终审结论以矩阵键为权威，未另建 R05_INDEPENDENT_REVIEW 新文件） |",
+      "4. 环境受限项如实登记：T08-C12 资源采样在原审查容器因 PID namespace/proc 不一致 BLOCKED（不证明泄漏）；本机 macOS arm64 需重新采样并留原始时间序列；LIVE/真实付费供应商默认禁止。"
+    ],
+    "docs/rust-tauri/R05/repair-current/RR1_LEAF_DEVIATIONS.md": [],
+    "docs/rust-tauri/R05/repair-current/RR2_ISSUE_MATRIX.json": [
+      {
+        "fId": "F43",
+        "wp": "D",
+        "title": "rust_test_workspace 无有效全绿窗口",
+        "factShort": "1472 通过/3 失败：r00_management（ALF 环境项）、r04_a09（pid 文件 TOCTOU）、f24_sigterm（worker 30s 就绪期限）；首跑冷编译 2400s 超时。",
+        "status": "INDEPENDENT_PASS",
+        "rounds": 1,
+        "evidenceDir": "artifacts/rust-tauri/R05/RR2/D-R2/",
+        "remaining": "(b)(c) 修复与完整 workspace 绿窗均独立验收 PASS（2026-10-06）——实施期『绿窗 BLOCKED 待用户 ALF Allow』文案已滞后于事实，本行据此刷新。环境边界保留：R05-ENV-ALF-UNSIGNED-TEST-BINARY 仍在册（PROGRESS_LEDGER.json environment_items）——本轮绿窗（1476/0，exit 0）中 r00_management_leaves 以 170.25s held 后放行形态通过，依赖当刻二进制实例（590de196dceb15ce，未重链）已存在/被授予的 ALF Allow 判定；ALF 按(路径,cdhash)逐实例拦截且判定不跨 relink（审查者同刻全新无判定探针对 192.168.3.5 仍 stalled、Apple 签名 python3 ok 为双向对照），未来重链接产生的新 r00 测试二进制实例可能需用户再次 Allow（或 sudo socketfilterfw --add/临时关防火墙/Developer ID 签名）。r00_management_leaves.rs 全程零改动。",
+        "candidateSummary": "RR2 WP-D（2026-10-06）：(a) 真实环境亲测复证非防火墙文字断言——ALF 按(路径,cdhash)拦截未授权二进制的非回环入站流（connect+write 成功、accept 永不触发、读超时；对照/差分/重签/地址族/路径复用五组探针全记录于 D-R2/probe/），(a) 不改测试文件、登记环境项；r04_a09 将 pid 屏障从『文件存在』改为『轮询读完整可解析内容』（complete_pid_file：非空+逐 token 可解析+数量齐 3；20s 有界），子孙回收/sentinel 存活断言逐字保留；f24_sigterm 真实根因是 nonce purpose 永不映射辅助插槽（宿主 from_purpose 只认 title/summarize/memory/vision/approval/guard，防御性拒绝 model_purpose_not_granted→32 次瞬时失败→failed.turn_budget_exceeded，worker 从未停驻；RR1『30s 就绪期限』表象即此风暴，历史绿为 pgrep 偶然命中风暴中短命进程的虚假通过）——修复：fixture 新增 ask_model_tagged 模式（purpose=真实插槽 summarize、唯一 tag 走 argv/prompt；fixture 为测试支撑件非生产入口，additive 不动既有模式），就绪屏障改为『stub 记录到 summarize-model-f24 回调请求 且 pgrep 见 worker』（90s 诚实上界），SIGTERM 断言更新为生产真实有界契约（exit 0 或 shutdown.rs 文档化 code 6 transport-drain 溢出并钉住 transport_drain_timed_out=true 标记；8000ms/30s/15s 预算全未放宽、无盲 sleep），worker 回收断言原语义保留并首次真正生效。",
+        "testEvidence": "artifacts/rust-tauri/R05/RR2/D-R2/：REPORT.md（汇总）；a-rootcause-conclusion.md + probe/probe-suite.log + rerun-current-binary.log（(a) 根因五组探针与复跑逐字签名）；isolated-b-c-tests.log（(b) 隔离绿 exit 0；(c) 修复前隔离跑=32×dispatch+turn_budget_exceeded+model_purpose_not_granted 证据）；isolated-c-green-2.log（中间证：真实停驻后 exit 6 transport-drain 溢出）；neg-b-incomplete-pids.log（(b) 负例：2 pid 发布→屏障 20s 精确失败 exit 101）；neg-c-nonce-purpose.log（(c) 负例：还原 nonce purpose→屏障 90s 精确失败 exit 101）；suites-green-restored.log（还原后 r04_t05 14/14、r05_t08 6/6 各 exit 0）；prebuild-workspace.log（--all-targets 预构建 exit 0）；clippy-selfcheck.log（workspace clippy -D warnings exit 0）；workspace-test-full.log（16:53 首次正式命令：r00 通过[用户当刻点 Allow]后被并发 B 负例轮终止，无退出码，不作绿窗证据）；workspace-test-full-r2.log（17:57 正式命令：exit 101，唯一失败 r00 环境项，55.77s stall）；r00-standalone-3.log（18:2x 独立复跑 exit 101，用户不在位）；workspace-test-nofailfast.log（完整 no-fail-fast 全景真实记录）。",
+        "independentReview": "登记人：RR2 WP-D 独立验收 REVIEW-r1（独立上下文验收智能体，未参与实施，2026-10-06；验收文件 artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md）。verdict：(b) r04_a09 pid 屏障 PASS、(c) f24_sigterm 就绪屏障/SIGTERM 契约 PASS、(a) ALF 根因归因成立（审查者重编零 Lingxi 探针差分复现，非采信诊断文字）；无阻断 mustFix。关键结论：①(b) 正例 14/14 exit 0、审查者负例（临时只发布 2 pid，sha256 备份/还原复核）→屏障 20.08s 精确失败 exit 101；(c) 正例 6/6 exit 0（跑后 pgrep fixture 为空）、审查者负例（还原 nonce purpose）→屏障 90.80s 精确失败 exit 101，日志 32×dispatch+failed.turn_budget_exceeded 与执行者 pre-fix 证据逐量一致；static 核对 r00_management_leaves.rs 零改动、pid 断言逐字保留、SIGTERM 断言收紧为 code 0|6 且 code 6 须钉 transport_drain_timed_out=true、8000/30000/15000ms 预算未放宽。②workspace 复跑 exit 0（首次完整绿窗）：115 个 test result: ok、1476 passed/0 failed（含 Doc-tests），其中 r04_t05 14/14、r05_t08_production_tools 6/6、r00_management_leaves 1/1（170.25s held 后通过）；归档日志 artifacts/rust-tauri/R05/RR2/D-R2/workspace-green-window-REVIEW-r1.log（末行 WORKSPACE_EXIT=0）。③根因双向确认：同刻全新 adhoc 无判定二进制对 127.0.0.1 ok 而对 192.168.3.5 stalled（connect+write 成功、accept 永不触发）、Apple 签名 /usr/bin/python3 同地址 ok——按二进制实例过滤成立。"
+      },
+      {
+        "fId": "F31",
+        "wp": "E",
+        "title": "OAuth 列表面非 OAuth 应恢复 404",
+        "factShort": "原叶 LA-CFEC64F68DDE 要求非 OAuth=404；现实现 409+oauth_only_surface（RR1 登记为有意偏差）。RR2 指令：无有效需求变更依据则恢复 404。",
+        "status": "INDEPENDENT_PASS",
+        "rounds": 1,
+        "evidenceDir": "artifacts/rust-tauri/R05/RR2/E-R2/",
+        "remaining": "无任务级遗留（独立验收 r1 PASS；叶/测试/偏差登记三方对齐已由验收者复核）。",
+        "candidateSummary": "R05 RR2 WP-E（2026-10-06，按 RR2_MASTER_PROMPT §四E）恢复列表面原叶边界：management.rs list_oauth_models 将 CredentialError::NotOAuth 与 NotConfigured 合并映射为与未知 provider 完全相同的最小 404（reason=model_provider_unknown，cause=models.provider_unknown，body 不含 provider 名/凭证类型/秘密——刻意不格式化 err 以免泄露 auth kind 与存在性），实现区分方式=列表路由专属 match 臂，credential_surface_error 及其余 OAuth 面（login/callback/poll/logout/add/remove）零改动维持 409+oauth_only_surface。钉住测试 rr1_f04_oauth_model_listing_and_non_oauth_rejection 同步：非 OAuth 列表=404 且 body 无 apiKey/authHeader/秘密字样、未知=404 且两 body 除 requestId 外逐字一致（无存在性 oracle）、被拒前后 credentials.json 字节不变（零写入）、合法 OAuth 列表=200+去重并集清单保留；套内其余 409 面断言逐字未动。",
+        "testEvidence": "artifacts/rust-tauri/R05/RR2/E-R2/：green-r05t02-credentials-full.log（38/38 exit 0）；baseline-r00-management-leaves-before-e-changes.log 与 after-r00-management-leaves-post-e-changes.log（改动前后 r00_management_leaves 失败集合一致：同一环境性 stall @web-auth/login，无新增红项）；clippy-lingxi-service-tests.log（-p lingxi-service --tests -D warnings exit 0）+ fmt --check exit 0；green-xtask-tests-post-stagemap-sync.log（stage_maps/R05.json evidenceRequired 最小同步后 117/117 exit 0）；red.log/green-restored.log（/tmp 隔离副本变异：列表 404 改回 409 → 新断言腿红 left=409 right=404，还原绿）。",
+        "independentReview": "登记人：RR2 WP-E 独立验收 REVIEW-r1（全新上下文独立审查智能体，未参与实施；验收文件 artifacts/rust-tauri/R05/RR2/E-R2/REVIEW-r1.md，文件头日期 2026-10-04 为审查者本地时钟）。verdict=PASS（F31 关闭，无 mustFix）。关键结论：①亲跑 r05_t02_credentials 38/38 exit 0、具名测试 --exact 1/1 exit 0；断言核验：非 OAuth 列表=404 且 body 无 apikey/authheader 字样与 sk-rr1-f04-aux 秘密、未知与非 OAuth 两 404 body 剥离 requestId 后 assert_eq! 逐字相等（无存在性 oracle）、被拒前后 credentials.json 字节不变（零写入）、合法 OAuth 列表 200+去重并集保留。②范围核验（读 git diff）：management.rs 非注释代码改动仅 list_oauth_models 一处 match 臂；credential_surface_error 的 NotOAuth→409 分支与其余 OAuth 面逐字未动；R00 叶文本零 diff；RR1_LEAF_DEVIATIONS.md 条目 1 追加的状态变更、stage_maps/R05.json evidenceRequired 最小同步均与事实相符；r05_t02_credentials.rs 套内其余 13 处 409 断言逐字未动。③隔离变异（/tmp 副本，主树零接触）：404 改回 409（精确复现 RR1 形态）→具名测试红 left:409/right:404 exit 101，还原绿 exit 0。"
+      },
+      {
+        "fId": "F40",
+        "wp": "F",
+        "title": "三追加 C-ID 行状态收口 + 文档统一",
+        "factShort": "T05-C11B/C13、T06-C11B 三行义务已有独立证据但行状态 OPEN；矩阵/报告/账本/进度/HANDOFF 待统一。",
+        "status": "INDEPENDENT_PASS",
+        "rounds": 1,
+        "evidenceDir": "docs/rust-tauri/R05/repair-current/",
+        "remaining": "无任务级遗留；待 FINAL-01 阶段终审（候选冻结后全新审查者亲跑 cargo run … verify-stage R05 --evidence artifacts/rust-tauri/R05/RR2/FINAL-01/verify-R05，入口目录须未存在）。",
+        "candidateSummary": "R05 RR2 WP-F 收口（2026-10-06/07，按 RR2_MASTER_PROMPT §四F）：①T05-C11B/T05-C13 两行按 RR1 矩阵 F40 行所列闭证依据（F14/F15/F16 与 F08/F10/F14/F35 的 independentReview）补 candidateSummary/testEvidence 后翻 INDEPENDENT_PASS——RR2 轮 E/D 改动未触及 egress.rs/compat.rs/golden 输入（RR2 改动面=management.rs 列表臂、三个测试文件、r04_t07_fixture、stage_map/TSV、R02 登记册与 r02 脚本），证据未过期；②T06-C11B 以 D-R2 REVIEW-r1 的 rust_test_workspace 完整绿窗（exit 0，1476/0）+归档日志关闭；③F41/F42/F34/F43/F31/F44 与 G-INT/G-NEG 的独立验收结果登记于各 independentReview；④RR2/R05 全套文档统一（矩阵/进度/验收账本/报告/HANDOFF/PROGRESS_LEDGER/ORCHESTRATOR_PROGRESS/BLOCKERS/RR2_HANDOFF）。资源口径按总控 §四F 写入：资源原始记录=160 混合轮（60 预算取消+60 错误+40 其他；40 其他=15 正常+10 长响应+15 worker），恢复前 active≠已终结、重启已消解≠永久泄漏（原始序列 artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/R05_SUITES/f27-resource-series.json：load cancelCycles=60/errorCycles=60/okCycles=15/longResponseCycles=10/workerCycles=15、stubDroppedConnections=60；RR2 未改 r05_t08_resources.rs，该套件于 D-R2 REVIEW 绿窗内全绿复验，最终冻结 verify-stage 将重产序列）。",
+        "testEvidence": "RR1_ISSUE_MATRIX.json F14/F15/F16（T05-C11B）、F08/F10/F14/F35（T05-C13）、F26（103 登记册权威性变异复验）各 independentReview；RR2 本轮：A-R2/REVIEW-r1.md、B-R2/R2/REVIEW-r2.md（F42/F44/B-r2/B-r3）、B-R2/R2/s5-full-5/run-root/stdout.log（r02_t08 完整链 GREEN）、C-R2/REVIEW-r1.md、D-R2/REVIEW-r1.md+D-R2/workspace-green-window-REVIEW-r1.log（WORKSPACE_EXIT=0）、E-R2/REVIEW-r1.md、G-R2/I-MAPPING.md+G-R2/NEG-GATE-RR2.md（16/16+6/6）。",
+        "independentReview": "本行为台账收口行，无新实现：三追加 C 行与六工作包/G/F44 的闭证全部引用既有独立验收记录（R05-T08-独立验收-r1 于 RR1 矩阵 F40 行预登记的核对结论+F26 登记册权威性复验+本轮 A/B/C/D/E/G 各 REVIEW 文件），无自验成分。任务级口径=INDEPENDENT_PASS；阶段级终审（FINAL-01，全新阶段审查者亲跑 §5.3）尚未执行——阶段状态=READY_FOR_INDEPENDENT_REVIEW，终审前不写 accepted/R06_READY=true。"
+      },
+      {
+        "fId": "R05-T06-C11B",
+        "wp": "F（核对）",
+        "title": "追加 C：egress 边界引用（command:rust_test_workspace 绑定）",
+        "factShort": "间接绑定已被 F26 权威登记册收录；其 gate 命令 rust_test_workspace 尚无有效全绿记录。",
+        "status": "INDEPENDENT_PASS",
+        "rounds": 1,
+        "evidenceDir": "docs/rust-tauri/R05/r05_required_cids.tsv",
+        "remaining": "无任务级遗留。环境边界同 F43 行：绿窗依赖当刻二进制实例的 ALF Allow 判定，重链接后的新 r00 测试二进制实例可能需用户再次 Allow。",
+        "candidateSummary": "闭证：本 C-ID 为 egress 五测组的间接绑定（command:rust_test_workspace；与 R05-T05-C11B 同组，cid 归属唯一化后测试归 C11B，本行以 command 绑定+additionalCitations 收录，F26 权威登记册 r05_required_cids.tsv 103=93 cid+10 command 之内）。其 gate 命令 rust_test_workspace 此前无有效全绿记录（RR1 INDEPENDENT-9：冷编译 2400s 超时+no-fail-fast 枚举 1472/3），RR2 F43 (b)(c) 修复并经 D-R2 REVIEW-r1 独立验收后，审查者亲跑 cargo test --manifest-path rust/Cargo.toml --locked --workspace 取得首次完整绿窗：exit 0、115 个 test result: ok、1476 passed/0 failed（含 r00_management_leaves 1/1 与 adapters 全部 egress 测）——command 绑定自此指向有效执行，引用不悬空。",
+        "testEvidence": "artifacts/rust-tauri/R05/RR2/D-R2/workspace-green-window-REVIEW-r1.log（WORKSPACE_EXIT=0 完整日志）；artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md（§2 亲跑表+§4 绿窗现状：与执行者 17:57/18:2x 两轮 exit 101 的差异如实报告）；docs/rust-tauri/R05/r05_required_cids.tsv（reqcid R05-T06-C11B command:rust_test_workspace 绑定在册）；docs/rust-tauri/R05/R05_TEST_MAP.json R05-T06-C11B 行。",
+        "independentReview": "闭证证据由 RR2 WP-D 独立验收 REVIEW-r1（2026-10-06，全新上下文审查者亲跑，非执行者）提供：绿窗为审查者本人执行并归档；该 REVIEW §4 明确『T06-C11B 的关闭属治理动作，由维护者按证据推进（本 REVIEW 即证据之一）』——本行即按该证据推进的登记，无自验成分。"
+      }
+    ],
+    "docs/rust-tauri/R05/PROGRESS_LEDGER.json": [
+      {
+        "id": "R05-ENV-ALF-UNSIGNED-TEST-BINARY",
+        "summary": "macOS Application Firewall holds inbound LAN flows to freshly relinked adhoc-signed test binaries (new metadata-hash filename = new per-app verdict). Symptom: TCP connect + write succeed at kernel level, application accept() never fires, client reads 0 bytes until the test's honest bounded stall panic.",
+        "affected": [
+          "r00_management_leaves (R00 suite LAN section; contains no R05 assertions)",
+          "workspace-level cargo test and verify-stage rust_test_workspace/r03_regression_gate on any tree whose dependency graph relinks that test binary (reproduced on the R05-T02 terminal tree: 1043 passed / 1 failed, same 192.168.3.5 stalled-write signature)"
+        ],
+        "decisive_evidence": "artifacts/rust-tauri/R05/T01/alf-investigation/ (zero-Lingxi-code probe zz_probe2 stalls identically; ALF log correlates every failing binary; baseline binary 812df2ee793b5dda passes via a historical user-granted Allow verdict)",
+        "not_a_code_regression": "all loopback requests in the failing test succeed including the same web-auth/login handler and a loopback request to the very same 0.0.0.0-bound server instance immediately before the stalled LAN request; the R05 diffs touch no bind/accept/NetworkMode path",
+        "remediation_requires_user": [
+          "click Allow on the ALF dialog for the test binary (recurs on every relink)",
+          "sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add <test-binary> [--unblockapp <test-binary>]",
+          "temporarily disable the macOS firewall for the gate run",
+          "sign test binaries with a Developer ID identity (auto-allow covers validly signed apps)"
+        ],
+        "executor_self_unblock": "impossible: no passwordless sudo; kimi-cu service unavailable; osascript blocked on AX authorization",
+        "r04_precedent": "docs/rust-tauri/R04/R04-T05_REPORT.md and R04-T07_REPORT.md registered the same environment class"
+      }
+    ]
+  }
+}

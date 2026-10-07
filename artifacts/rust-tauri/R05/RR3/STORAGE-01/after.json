@@ -1,0 +1,31 @@
+{
+  "startedAt": "2026-10-07T03:12:28.513494+00:00",
+  "finishedAt": "2026-10-07T03:12:29.472576+00:00",
+  "operation": "unlink only prelisted unreferenced non-executable incremental or deps .rlib/.rmeta/.o intermediate files",
+  "stopReason": "ALL_SAFE_CANDIDATES_EXHAUSTED",
+  "deletedFileCount": 3236,
+  "deletedLogicalBytes": 486645765,
+  "deletedUniqueInodeAllocatedBytes": 256249856,
+  "freeBytesImmediatelyBefore": 2684772352,
+  "freeBytesImmediatelyAfterDeletion": 2943180800,
+  "observedFreeDeltaBytes": 258408448,
+  "observedFreeDeltaCaveat": "其他并行工作也在同一磁盘写入；净可用空间差值不是缓存独占物理释放量。APFS共享块与硬链接也使文件长度不等于实际释放。",
+  "freeBytesAfterVerification": 2941267968,
+  "cloneRequiredBytes": 3758096384,
+  "desiredFreeBytes": 4831838208,
+  "cloneShortfallBytes": 816828416,
+  "desiredShortfallBytes": 1890570240,
+  "safeToStartNextClone": false,
+  "preservedFileCount": 5341,
+  "preservedMismatches": [],
+  "excluded": [
+    "rust/target",
+    "/Users/study_superior/.cache/lingxi-r05-neg-target",
+    "all G packages",
+    "all H-REVIEW-02",
+    "all I-01 cache files named in I-01/manifest.json",
+    "all RR1/RR2/user/system data"
+  ],
+  "allDeletedPathsAbsent": true,
+  "reportState": "SPACE_INSUFFICIENT"
+}

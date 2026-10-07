@@ -1,0 +1,543 @@
+{
+  "utc": "2026-10-07T01:04:58.513990+00:00",
+  "checks": {
+    "libPins64": true,
+    "integration27": true,
+    "resourcesStill2": true,
+    "allLibCountsExactly1": true,
+    "producerUsesExact": true,
+    "pinsUnchangedAgainstHEAD": true,
+    "cidUnchangedAgainstHEAD": true,
+    "libNamesExistInActualLists": true,
+    "loggingNotGlobalLibraryTotalPin": true,
+    "loggingNineActuallyRan": true,
+    "all64UniqueCidOwnership": true
+  },
+  "actualListedCounts": {
+    "service": 358,
+    "kernel": 87,
+    "adapters": 119
+  },
+  "libPins": [
+    {
+      "run": "lib-adapters/models::anthropic_messages::tests::cross_family_opaque_state_is_never_echoed",
+      "test": "models::anthropic_messages::tests::cross_family_opaque_state_is_never_echoed",
+      "cidRows": [
+        "cid R05-T03-C10 lib-adapters/models::anthropic_messages::tests::cross_family_opaque_state_is_never_echoed models::anthropic_messages::tests::cross_family_opaque_state_is_never_echoed"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::anthropic_messages::tests::thinking_and_signature_roundtrip_as_state_never_text",
+      "test": "models::anthropic_messages::tests::thinking_and_signature_roundtrip_as_state_never_text",
+      "cidRows": [
+        "cid R05-T03-C10 lib-adapters/models::anthropic_messages::tests::thinking_and_signature_roundtrip_as_state_never_text models::anthropic_messages::tests::thinking_and_signature_roundtrip_as_state_never_text"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::compat::tests::anthropic_marks_system_and_two_recent_user_messages",
+      "test": "models::compat::tests::anthropic_marks_system_and_two_recent_user_messages",
+      "cidRows": [
+        "cid R05-T05-C13 lib-adapters/models::compat::tests::anthropic_marks_system_and_two_recent_user_messages models::compat::tests::anthropic_marks_system_and_two_recent_user_messages"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::compat::tests::anthropic_max_effort_raises_the_implicit_one_third_cap",
+      "test": "models::compat::tests::anthropic_max_effort_raises_the_implicit_one_third_cap",
+      "cidRows": [
+        "cid R05-T05-C13 lib-adapters/models::compat::tests::anthropic_max_effort_raises_the_implicit_one_third_cap models::compat::tests::anthropic_max_effort_raises_the_implicit_one_third_cap"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::compat::tests::codex_strips_budget_and_temperature_fields",
+      "test": "models::compat::tests::codex_strips_budget_and_temperature_fields",
+      "cidRows": [
+        "cid R05-T05-C13 lib-adapters/models::compat::tests::codex_strips_budget_and_temperature_fields models::compat::tests::codex_strips_budget_and_temperature_fields"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::compat::tests::dispatch_is_first_match_in_incumbent_order",
+      "test": "models::compat::tests::dispatch_is_first_match_in_incumbent_order",
+      "cidRows": [
+        "cid R05-T05-C13 lib-adapters/models::compat::tests::dispatch_is_first_match_in_incumbent_order models::compat::tests::dispatch_is_first_match_in_incumbent_order"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::compat::tests::ollama_bridges_response_format_and_num_ctx",
+      "test": "models::compat::tests::ollama_bridges_response_format_and_num_ctx",
+      "cidRows": [
+        "cid R05-T05-C13 lib-adapters/models::compat::tests::ollama_bridges_response_format_and_num_ctx models::compat::tests::ollama_bridges_response_format_and_num_ctx"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::compat::tests::openrouter_adaptive_disable_is_a_loud_refusal",
+      "test": "models::compat::tests::openrouter_adaptive_disable_is_a_loud_refusal",
+      "cidRows": [
+        "cid R05-T05-C13 lib-adapters/models::compat::tests::openrouter_adaptive_disable_is_a_loud_refusal models::compat::tests::openrouter_adaptive_disable_is_a_loud_refusal"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::compat::tests::volcengine_disable_guard_passes_through_without_controls",
+      "test": "models::compat::tests::volcengine_disable_guard_passes_through_without_controls",
+      "cidRows": [
+        "cid R05-T05-C13 lib-adapters/models::compat::tests::volcengine_disable_guard_passes_through_without_controls models::compat::tests::volcengine_disable_guard_passes_through_without_controls"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::config::tests::credential_is_explicit_and_never_defaulted",
+      "test": "models::config::tests::credential_is_explicit_and_never_defaulted",
+      "cidRows": [
+        "cid R05-T01-C11 lib-adapters/models::config::tests::credential_is_explicit_and_never_defaulted models::config::tests::credential_is_explicit_and_never_defaulted"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::dispatch::tests::error_status_classification_matches_the_incumbent",
+      "test": "models::dispatch::tests::error_status_classification_matches_the_incumbent",
+      "cidRows": [
+        "cid R05-T05-C11 lib-adapters/models::dispatch::tests::error_status_classification_matches_the_incumbent models::dispatch::tests::error_status_classification_matches_the_incumbent"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception",
+      "test": "models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception",
+      "cidRows": [
+        "cid R05-T05-C11B lib-adapters/models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only",
+      "test": "models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only",
+      "cidRows": [
+        "cid R05-T05-C11B lib-adapters/models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide",
+      "test": "models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide",
+      "cidRows": [
+        "cid R05-T05-C11B lib-adapters/models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::egress::tests::scheme_userinfo_and_host_shapes_refuse",
+      "test": "models::egress::tests::scheme_userinfo_and_host_shapes_refuse",
+      "cidRows": [
+        "cid R05-T05-C11B lib-adapters/models::egress::tests::scheme_userinfo_and_host_shapes_refuse models::egress::tests::scheme_userinfo_and_host_shapes_refuse"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through",
+      "test": "models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through",
+      "cidRows": [
+        "cid R05-T05-C11B lib-adapters/models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::gateway::tests::a_family_outside_the_operations_matrix_is_loud",
+      "test": "models::gateway::tests::a_family_outside_the_operations_matrix_is_loud",
+      "cidRows": [
+        "cid R05-T01-C06 lib-adapters/models::gateway::tests::a_family_outside_the_operations_matrix_is_loud models::gateway::tests::a_family_outside_the_operations_matrix_is_loud"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::gateway::tests::chat_and_auxiliary_routes_resolve_independently",
+      "test": "models::gateway::tests::chat_and_auxiliary_routes_resolve_independently",
+      "cidRows": [
+        "cid R05-T01-C07 lib-adapters/models::gateway::tests::chat_and_auxiliary_routes_resolve_independently models::gateway::tests::chat_and_auxiliary_routes_resolve_independently"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::gateway::tests::reload_swaps_atomically_and_bumps_the_generation",
+      "test": "models::gateway::tests::reload_swaps_atomically_and_bumps_the_generation",
+      "cidRows": [
+        "cid R05-T01-C05 lib-adapters/models::gateway::tests::reload_swaps_atomically_and_bumps_the_generation models::gateway::tests::reload_swaps_atomically_and_bumps_the_generation"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::gateway::tests::the_pin_pair_rule_never_guesses_a_provider_from_a_model",
+      "test": "models::gateway::tests::the_pin_pair_rule_never_guesses_a_provider_from_a_model",
+      "cidRows": [
+        "cid R05-T01-C04 lib-adapters/models::gateway::tests::the_pin_pair_rule_never_guesses_a_provider_from_a_model models::gateway::tests::the_pin_pair_rule_never_guesses_a_provider_from_a_model"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::gateway::tests::unconfigured_operations_are_loud_route_gaps",
+      "test": "models::gateway::tests::unconfigured_operations_are_loud_route_gaps",
+      "cidRows": [
+        "cid R05-T01-C06 lib-adapters/models::gateway::tests::unconfigured_operations_are_loud_route_gaps models::gateway::tests::unconfigured_operations_are_loud_route_gaps"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::google_generative_ai::tests::thoughts_signatures_and_function_calls_parse_in_order",
+      "test": "models::google_generative_ai::tests::thoughts_signatures_and_function_calls_parse_in_order",
+      "cidRows": [
+        "cid R05-T03-C10 lib-adapters/models::google_generative_ai::tests::thoughts_signatures_and_function_calls_parse_in_order models::google_generative_ai::tests::thoughts_signatures_and_function_calls_parse_in_order"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::openai_codex_responses::tests::codex_body_pins_store_stream_and_instructions",
+      "test": "models::openai_codex_responses::tests::codex_body_pins_store_stream_and_instructions",
+      "cidRows": [
+        "cid R05-T03-C11 lib-adapters/models::openai_codex_responses::tests::codex_body_pins_store_stream_and_instructions models::openai_codex_responses::tests::codex_body_pins_store_stream_and_instructions"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::openai_completions::tests::a_history_target_missing_from_the_snapshot_fails_loudly",
+      "test": "models::openai_completions::tests::a_history_target_missing_from_the_snapshot_fails_loudly",
+      "cidRows": [
+        "cid R05-T01-C09 lib-adapters/models::openai_completions::tests::a_history_target_missing_from_the_snapshot_fails_loudly models::openai_completions::tests::a_history_target_missing_from_the_snapshot_fails_loudly"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::openai_completions::tests::final_answer_identity_comes_from_the_driver_not_the_response",
+      "test": "models::openai_completions::tests::final_answer_identity_comes_from_the_driver_not_the_response",
+      "cidRows": [
+        "cid R05-T01-C10 lib-adapters/models::openai_completions::tests::final_answer_identity_comes_from_the_driver_not_the_response models::openai_completions::tests::final_answer_identity_comes_from_the_driver_not_the_response"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::openai_completions::tests::parses_tool_calls_with_usage_and_identity_from_the_driver",
+      "test": "models::openai_completions::tests::parses_tool_calls_with_usage_and_identity_from_the_driver",
+      "cidRows": [
+        "cid R05-T01-C10 lib-adapters/models::openai_completions::tests::parses_tool_calls_with_usage_and_identity_from_the_driver models::openai_completions::tests::parses_tool_calls_with_usage_and_identity_from_the_driver"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::openai_completions::tests::unknown_wire_names_are_protocol_violations_never_guesses",
+      "test": "models::openai_completions::tests::unknown_wire_names_are_protocol_violations_never_guesses",
+      "cidRows": [
+        "cid R05-T03-C09 lib-adapters/models::openai_completions::tests::unknown_wire_names_are_protocol_violations_never_guesses models::openai_completions::tests::unknown_wire_names_are_protocol_violations_never_guesses"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::openai_responses::tests::reasoning_items_roundtrip_verbatim_with_summary_as_reasoning",
+      "test": "models::openai_responses::tests::reasoning_items_roundtrip_verbatim_with_summary_as_reasoning",
+      "cidRows": [
+        "cid R05-T03-C10 lib-adapters/models::openai_responses::tests::reasoning_items_roundtrip_verbatim_with_summary_as_reasoning models::openai_responses::tests::reasoning_items_roundtrip_verbatim_with_summary_as_reasoning"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::openai_responses::tests::request_shape_instructions_tools_and_no_server_state",
+      "test": "models::openai_responses::tests::request_shape_instructions_tools_and_no_server_state",
+      "cidRows": [
+        "cid R05-T03-C11 lib-adapters/models::openai_responses::tests::request_shape_instructions_tools_and_no_server_state models::openai_responses::tests::request_shape_instructions_tools_and_no_server_state"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::streaming::tests::a_leading_bom_is_stripped_once",
+      "test": "models::streaming::tests::a_leading_bom_is_stripped_once",
+      "cidRows": [
+        "cid R05-T04-C03 lib-adapters/models::streaming::tests::a_leading_bom_is_stripped_once models::streaming::tests::a_leading_bom_is_stripped_once"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::streaming::tests::comments_and_id_and_retry_fields_are_ignored",
+      "test": "models::streaming::tests::comments_and_id_and_retry_fields_are_ignored",
+      "cidRows": [
+        "cid R05-T04-C03 lib-adapters/models::streaming::tests::comments_and_id_and_retry_fields_are_ignored models::streaming::tests::comments_and_id_and_retry_fields_are_ignored"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::streaming::tests::multi_line_data_joins_and_chunks_may_split_anywhere",
+      "test": "models::streaming::tests::multi_line_data_joins_and_chunks_may_split_anywhere",
+      "cidRows": [
+        "cid R05-T04-C03 lib-adapters/models::streaming::tests::multi_line_data_joins_and_chunks_may_split_anywhere models::streaming::tests::multi_line_data_joins_and_chunks_may_split_anywhere"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::streaming::tests::simple_frames_dispatch_on_blank_lines",
+      "test": "models::streaming::tests::simple_frames_dispatch_on_blank_lines",
+      "cidRows": [
+        "cid R05-T04-C03 lib-adapters/models::streaming::tests::simple_frames_dispatch_on_blank_lines models::streaming::tests::simple_frames_dispatch_on_blank_lines"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::streaming::tests::the_buffer_bound_is_loud",
+      "test": "models::streaming::tests::the_buffer_bound_is_loud",
+      "cidRows": [
+        "cid R05-T04-C04 lib-adapters/models::streaming::tests::the_buffer_bound_is_loud models::streaming::tests::the_buffer_bound_is_loud"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::streaming::tests::the_per_frame_bound_is_loud_across_lines_and_chunks",
+      "test": "models::streaming::tests::the_per_frame_bound_is_loud_across_lines_and_chunks",
+      "cidRows": [
+        "cid R05-T04-C04 lib-adapters/models::streaming::tests::the_per_frame_bound_is_loud_across_lines_and_chunks models::streaming::tests::the_per_frame_bound_is_loud_across_lines_and_chunks"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest",
+      "test": "models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest",
+      "cidRows": [
+        "cid R05-T03-C07 lib-adapters/models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::tool_render::tests::success_renders_resources_status_and_truncation_last",
+      "test": "models::tool_render::tests::success_renders_resources_status_and_truncation_last",
+      "cidRows": [
+        "cid R05-T03-C07 lib-adapters/models::tool_render::tests::success_renders_resources_status_and_truncation_last models::tool_render::tests::success_renders_resources_status_and_truncation_last"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-adapters/models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary",
+      "test": "models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary",
+      "cidRows": [
+        "cid R05-T03-C07 lib-adapters/models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-kernel/model_exchange::tests::empty_snapshot_is_generation_zero",
+      "test": "model_exchange::tests::empty_snapshot_is_generation_zero",
+      "cidRows": [
+        "cid R05-T01-C08 lib-kernel/model_exchange::tests::empty_snapshot_is_generation_zero model_exchange::tests::empty_snapshot_is_generation_zero"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-kernel/model_exchange::tests::snapshot_declares_only_callable_resident_targets_at_the_pinned_generation",
+      "test": "model_exchange::tests::snapshot_declares_only_callable_resident_targets_at_the_pinned_generation",
+      "cidRows": [
+        "cid R05-T01-C08 lib-kernel/model_exchange::tests::snapshot_declares_only_callable_resident_targets_at_the_pinned_generation model_exchange::tests::snapshot_declares_only_callable_resident_targets_at_the_pinned_generation"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-kernel/model_exchange::tests::wire_name_collisions_resolve_deterministically_or_fail_loudly",
+      "test": "model_exchange::tests::wire_name_collisions_resolve_deterministically_or_fail_loudly",
+      "cidRows": [
+        "cid R05-T01-C08 lib-kernel/model_exchange::tests::wire_name_collisions_resolve_deterministically_or_fail_loudly model_exchange::tests::wire_name_collisions_resolve_deterministically_or_fail_loudly"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-kernel/model_exchange::tests::wire_name_sanitization_fits_the_strictest_protocol_face",
+      "test": "model_exchange::tests::wire_name_sanitization_fits_the_strictest_protocol_face",
+      "cidRows": [
+        "cid R05-T01-C08 lib-kernel/model_exchange::tests::wire_name_sanitization_fits_the_strictest_protocol_face model_exchange::tests::wire_name_sanitization_fits_the_strictest_protocol_face"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-kernel/toolcatalog::tests::aliases_resolve_to_the_authoritative_identity_and_share_permissions",
+      "test": "toolcatalog::tests::aliases_resolve_to_the_authoritative_identity_and_share_permissions",
+      "cidRows": [
+        "cid R05-T01-C08 lib-kernel/toolcatalog::tests::aliases_resolve_to_the_authoritative_identity_and_share_permissions toolcatalog::tests::aliases_resolve_to_the_authoritative_identity_and_share_permissions"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-kernel/toolcatalog::tests::disable_and_uninstall_change_callability_and_generation",
+      "test": "toolcatalog::tests::disable_and_uninstall_change_callability_and_generation",
+      "cidRows": [
+        "cid R05-T01-C09 lib-kernel/toolcatalog::tests::disable_and_uninstall_change_callability_and_generation toolcatalog::tests::disable_and_uninstall_change_callability_and_generation"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-kernel/toolcatalog::tests::same_name_two_sources_never_overwrites_and_name_only_is_ambiguous",
+      "test": "toolcatalog::tests::same_name_two_sources_never_overwrites_and_name_only_is_ambiguous",
+      "cidRows": [
+        "cid R05-T01-C08 lib-kernel/toolcatalog::tests::same_name_two_sources_never_overwrites_and_name_only_is_ambiguous toolcatalog::tests::same_name_two_sources_never_overwrites_and_name_only_is_ambiguous"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-kernel/toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh",
+      "test": "toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh",
+      "cidRows": [
+        "cid R05-T01-C09 lib-kernel/toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-kernel/toolcatalog::tests::update_cannot_change_the_target_identity",
+      "test": "toolcatalog::tests::update_cannot_change_the_target_identity",
+      "cidRows": [
+        "cid R05-T01-C09 lib-kernel/toolcatalog::tests::update_cannot_change_the_target_identity toolcatalog::tests::update_cannot_change_the_target_identity"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/credentials::store::tests::a_failed_write_keeps_the_previous_state_and_reports",
+      "test": "credentials::store::tests::a_failed_write_keeps_the_previous_state_and_reports",
+      "cidRows": [
+        "cid R05-T02-C06 lib-service/credentials::store::tests::a_failed_write_keeps_the_previous_state_and_reports credentials::store::tests::a_failed_write_keeps_the_previous_state_and_reports"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/credentials::store::tests::a_version_conflict_is_loud",
+      "test": "credentials::store::tests::a_version_conflict_is_loud",
+      "cidRows": [
+        "cid R05-T02-C11 lib-service/credentials::store::tests::a_version_conflict_is_loud credentials::store::tests::a_version_conflict_is_loud"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/credentials::store::tests::missing_file_loads_empty_and_round_trips",
+      "test": "credentials::store::tests::missing_file_loads_empty_and_round_trips",
+      "cidRows": [
+        "cid R05-T02-C11 lib-service/credentials::store::tests::missing_file_loads_empty_and_round_trips credentials::store::tests::missing_file_loads_empty_and_round_trips"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/credentials::store::tests::unknown_fields_survive_a_write",
+      "test": "credentials::store::tests::unknown_fields_survive_a_write",
+      "cidRows": [
+        "cid R05-T02-C11 lib-service/credentials::store::tests::unknown_fields_survive_a_write credentials::store::tests::unknown_fields_survive_a_write"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/credentials::tests::a_cancelled_waiter_does_not_disturb_the_flight",
+      "test": "credentials::tests::a_cancelled_waiter_does_not_disturb_the_flight",
+      "cidRows": [
+        "cid R05-T02-C04 lib-service/credentials::tests::a_cancelled_waiter_does_not_disturb_the_flight credentials::tests::a_cancelled_waiter_does_not_disturb_the_flight"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/credentials::tests::a_reload_replacing_the_cell_discards_the_late_writeback",
+      "test": "credentials::tests::a_reload_replacing_the_cell_discards_the_late_writeback",
+      "cidRows": [
+        "cid R05-T02-C05 lib-service/credentials::tests::a_reload_replacing_the_cell_discards_the_late_writeback credentials::tests::a_reload_replacing_the_cell_discards_the_late_writeback"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/credentials::tests::a_rotated_credential_is_reused_without_a_second_refresh",
+      "test": "credentials::tests::a_rotated_credential_is_reused_without_a_second_refresh",
+      "cidRows": [
+        "cid R05-T02-C02 lib-service/credentials::tests::a_rotated_credential_is_reused_without_a_second_refresh credentials::tests::a_rotated_credential_is_reused_without_a_second_refresh"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/credentials::tests::an_expired_handle_is_refused",
+      "test": "credentials::tests::an_expired_handle_is_refused",
+      "cidRows": [
+        "cid R05-T02-C12 lib-service/credentials::tests::an_expired_handle_is_refused credentials::tests::an_expired_handle_is_refused"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/credentials::tests::concurrent_401s_merge_into_one_refresh",
+      "test": "credentials::tests::concurrent_401s_merge_into_one_refresh",
+      "cidRows": [
+        "cid R05-T02-C02 lib-service/credentials::tests::concurrent_401s_merge_into_one_refresh credentials::tests::concurrent_401s_merge_into_one_refresh"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/credentials::tests::forged_handles_and_provider_references_are_refused",
+      "test": "credentials::tests::forged_handles_and_provider_references_are_refused",
+      "cidRows": [
+        "cid R05-T02-C12 lib-service/credentials::tests::forged_handles_and_provider_references_are_refused credentials::tests::forged_handles_and_provider_references_are_refused"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/credentials::tests::handle_refusal_texts_carry_no_material",
+      "test": "credentials::tests::handle_refusal_texts_carry_no_material",
+      "cidRows": [
+        "cid R05-T02-C12 lib-service/credentials::tests::handle_refusal_texts_carry_no_material credentials::tests::handle_refusal_texts_carry_no_material"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/credentials::tests::resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit",
+      "test": "credentials::tests::resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit",
+      "cidRows": [
+        "cid R05-T02-C07 lib-service/credentials::tests::resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit credentials::tests::resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/credentials::tests::resolve_refreshes_at_most_once_when_every_mint_is_already_expired",
+      "test": "credentials::tests::resolve_refreshes_at_most_once_when_every_mint_is_already_expired",
+      "cidRows": [
+        "cid R05-T02-C07 lib-service/credentials::tests::resolve_refreshes_at_most_once_when_every_mint_is_already_expired credentials::tests::resolve_refreshes_at_most_once_when_every_mint_is_already_expired"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/credentials::tests::revoke_fences_a_late_writeback",
+      "test": "credentials::tests::revoke_fences_a_late_writeback",
+      "cidRows": [
+        "cid R05-T02-C05 lib-service/credentials::tests::revoke_fences_a_late_writeback credentials::tests::revoke_fences_a_late_writeback"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/redaction::tests::r05_provider_api_key_shapes_are_redacted",
+      "test": "redaction::tests::r05_provider_api_key_shapes_are_redacted",
+      "cidRows": [
+        "cid R05-T01-C11 lib-service/redaction::tests::r05_provider_api_key_shapes_are_redacted redaction::tests::r05_provider_api_key_shapes_are_redacted"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/redaction::tests::r05_secret_key_words_match_case_insensitively",
+      "test": "redaction::tests::r05_secret_key_words_match_case_insensitively",
+      "cidRows": [
+        "cid R05-T01-C11 lib-service/redaction::tests::r05_secret_key_words_match_case_insensitively redaction::tests::r05_secret_key_words_match_case_insensitively"
+      ],
+      "exactListMatch": true
+    },
+    {
+      "run": "lib-service/redaction::tests::r05_t02_base64_tokens_with_slash_and_padding_are_redacted",
+      "test": "redaction::tests::r05_t02_base64_tokens_with_slash_and_padding_are_redacted",
+      "cidRows": [
+        "cid R05-T02-C09 lib-service/redaction::tests::r05_t02_base64_tokens_with_slash_and_padding_are_redacted redaction::tests::r05_t02_base64_tokens_with_slash_and_padding_are_redacted"
+      ],
+      "exactListMatch": true
+    }
+  ],
+  "tableHashes": {
+    "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+    "docs/rust-tauri/R05/r05_stage_cids.tsv": "ffffbe56313a1d5e50e7b216499cd851b1efc988da811a57d4fe0b07cc0be556",
+    "docs/rust-tauri/R05/r05_required_cids.tsv": "1a046aa162d62bc1fdefdd286a6211d37c15852a2683073df9c629d26190676c",
+    "scripts/rust-tauri/r05_t08_stage_suites.sh": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e"
+  },
+  "status": "PASS",
+  "boundary": "lists prove named --exact relationship; listing is not execution of all 64 pins; no empty filter counted PASS"
+}

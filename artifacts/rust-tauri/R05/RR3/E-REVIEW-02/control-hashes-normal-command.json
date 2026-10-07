@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+    "hashes",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-hashes.json"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startUTC": "2026-10-07T02:06:21.635783+00:00",
+  "endUTC": "2026-10-07T02:06:21.924955+00:00",
+  "exitCode": 0,
+  "logs": {
+    "stdout": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-hashes-normal-stdout.log",
+      "sha256": "bf2f875e5339831f78f53f76080e262ccba25cb8731016812c44a85b664e64f6",
+      "bytes": 49
+    },
+    "stderr": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-hashes-normal-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

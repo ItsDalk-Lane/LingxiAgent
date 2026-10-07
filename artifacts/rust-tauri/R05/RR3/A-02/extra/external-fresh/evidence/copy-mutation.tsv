@@ -1,0 +1,10 @@
+# binding-exclusion: artifacts/rust-tauri/R05/run001/child/child/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)
+# binding-exclusion: artifacts/rust-tauri/R05/run001/child/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)
+# binding-exclusion: artifacts/rust-tauri/R05/run001/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)
+8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd  A   .gitignore
+d67e2e944994496c8d8ec76eed0cf9f09679448d584b532bebf941852a37f5ed  ??  artifacts/rust-tauri/R05/static-old.json
+0682c5f2076f099c34cfdd15a9e063849ed437a49677e6fcc5b4198c76575be5  A   config.json
+0682c5f2076f099c34cfdd15a9e063849ed437a49677e6fcc5b4198c76575be5  A   scripts/check.sh
+9d1d83725bef0ed9ec4135c8658515b72e12055b1e2b4bcca9e9c5f16549312b  AM  source.rs
+0682c5f2076f099c34cfdd15a9e063849ed437a49677e6fcc5b4198c76575be5  A   stage-map.json
+b44a4338c368839a81f95613ce9d9cf3ba726a8c53eaa6010b5a0d33661f706f  ??  untracked-dirty.txt

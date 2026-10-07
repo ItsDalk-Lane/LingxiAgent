@@ -1,0 +1,73 @@
+{
+  "capturedAt": "2026-10-07T00:22:43.714084+00:00",
+  "servicePid": 27653,
+  "binaryCommand": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-home-27311-1791332507830723000 --config /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-cfg-27311-1791332507830921000/service.json --bind 127.0.0.1:0 --log-max-bytes 65536 --log-max-files 3 --http-request-budget-ms 1500",
+  "hashes": {
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-cfg-27311-1791332507830921000/service.json": "23c6e790354cc820ea03fb66dcc4cd724a94d08b2fc756ee85e7e768d30e7dea",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service": "9628ba09d14e66ab9ba7824b4f3afeb1844e568ae1d66b88f95a57a8a02d119b",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/r04_t07_fixture": "231b3fc53d8150d617fa8a63ab7b9e1a85ea2644daf8f020b3232e55477ae06f",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r05_t08_resources-f66968a3ba499b0b": "ca5759489586aebfc83c541d74665dac9e2708d690902b950db0ef3f861eb7e2"
+  },
+  "configFixture": {
+    "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-home-27311-1791332507830723000",
+    "workspace": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-ws-27311-1791332507830846000",
+    "providers": {
+      "main": {
+        "protocol": "openai-completions",
+        "endpoint": "http://127.0.0.1:64864/v1",
+        "auth": {
+          "kind": "apiKey",
+          "fixtureMaterial": "synthetic, redacted"
+        }
+      },
+      "aux": {
+        "protocol": "openai-completions",
+        "endpoint": "http://127.0.0.1:64864/v1",
+        "auth": {
+          "kind": "apiKey",
+          "fixtureMaterial": "synthetic, redacted"
+        }
+      }
+    },
+    "models": {
+      "chat": {
+        "provider": "main",
+        "model": "stub-model-f27",
+        "capabilities": {
+          "tools": true
+        }
+      },
+      "summarize": {
+        "provider": "aux",
+        "model": "summarize-model-f27"
+      }
+    },
+    "workers": {
+      "localName": "probe",
+      "op": "probe",
+      "description": "F27 load worker",
+      "argv": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/r04_t07_fixture",
+        "ask_model"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "input"
+        ],
+        "additionalProperties": false
+      },
+      "pathArgs": [
+        "input"
+      ],
+      "allowedModelPurposes": [
+        "summarize"
+      ]
+    }
+  }
+}

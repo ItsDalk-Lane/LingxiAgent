@@ -1,0 +1,242 @@
+[
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:07:13.852076+00:00",
+    "endUTC": "2026-10-07T02:07:13.858740+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "environment-00-stdout.log",
+        "sha256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552"
+      },
+      "stderr": {
+        "path": "environment-00-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "refs/remotes/origin/codex/rust-tauri-migration"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:07:13.859082+00:00",
+    "endUTC": "2026-10-07T02:07:13.865361+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "environment-01-stdout.log",
+        "sha256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552"
+      },
+      "stderr": {
+        "path": "environment-01-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:07:13.865684+00:00",
+    "endUTC": "2026-10-07T02:07:13.871983+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "environment-02-stdout.log",
+        "sha256": "2ad51d278d71d6840dbe83cfd1e80739413fdca39a745d2742603709273fe1fa"
+      },
+      "stderr": {
+        "path": "environment-02-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:07:13.872290+00:00",
+    "endUTC": "2026-10-07T02:07:14.098170+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "environment-03-stdout.log",
+        "sha256": "db05dc7a25a6431c83faadb52b4721ad73b9415cc14aab65c292a5948177484f"
+      },
+      "stderr": {
+        "path": "environment-03-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/rustc",
+      "--version"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:07:14.098590+00:00",
+    "endUTC": "2026-10-07T02:07:14.138080+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "environment-04-stdout.log",
+        "sha256": "2073de5abf149185c2f4d7473dc833bc921b99135560d24ae7b2293f33a9c376"
+      },
+      "stderr": {
+        "path": "environment-04-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "--version"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:07:14.138453+00:00",
+    "endUTC": "2026-10-07T02:07:14.162572+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "environment-05-stdout.log",
+        "sha256": "9950bbb2d5c3417b1a068f0e81f6d3cac991a363193bdf2a22d447f5acf8b503"
+      },
+      "stderr": {
+        "path": "environment-05-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  {
+    "argv": [
+      "node",
+      "--version"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:07:14.162898+00:00",
+    "endUTC": "2026-10-07T02:07:14.178351+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "environment-06-stdout.log",
+        "sha256": "a8f8f7ba69d43285857a0ea34017ef8dadd3ba012404bb7dd188fc773cf63ee2"
+      },
+      "stderr": {
+        "path": "environment-06-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  {
+    "argv": [
+      "npm",
+      "--version"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:07:14.178703+00:00",
+    "endUTC": "2026-10-07T02:07:14.253176+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "environment-07-stdout.log",
+        "sha256": "3dbc807e13de125e909bea5877613d5d67989a43fb8e982fd79ba0efa46ac952"
+      },
+      "stderr": {
+        "path": "environment-07-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  {
+    "argv": [
+      "python3",
+      "--version"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:07:14.253610+00:00",
+    "endUTC": "2026-10-07T02:07:14.265152+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "environment-08-stdout.log",
+        "sha256": "25c3049ed7f825e0565baa3279c7e5218335801d85737ffddce1b39e394d8793"
+      },
+      "stderr": {
+        "path": "environment-08-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  {
+    "argv": [
+      "uname",
+      "-sm"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:07:14.265505+00:00",
+    "endUTC": "2026-10-07T02:07:14.269080+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "environment-09-stdout.log",
+        "sha256": "16b8cd028eb757aab907ab404e1656e01783846457156eec99372a91fc1b104d"
+      },
+      "stderr": {
+        "path": "environment-09-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check",
+      "--",
+      "docs/rust-tauri/R05/R05_REPORT.md",
+      "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "docs/rust-tauri/R05/R05_HANDOFF.json",
+      "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+      "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+      "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:07:14.269412+00:00",
+    "endUTC": "2026-10-07T02:07:14.323698+00:00",
+    "exitCode": 0,
+    "logs": {
+      "stdout": {
+        "path": "environment-10-stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "environment-10-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  }
+]

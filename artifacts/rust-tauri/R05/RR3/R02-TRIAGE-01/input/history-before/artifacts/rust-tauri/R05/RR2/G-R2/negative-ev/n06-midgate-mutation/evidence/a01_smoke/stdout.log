@@ -1,0 +1,19 @@
+== toolchain: rustup run 1.98.1 (rustc 1.98.1 (48a229cea 2026-09-01))
+== [1/5] build the service binary (locked, offline, isolated target dir)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy/rust/crates/lingxi-service)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.06s
+== [2/5] dependency-tree desktop proof (cargo metadata resolve graph)
+workspace members (7): ['lingxi-adapters', 'lingxi-browser-spike', 'lingxi-kernel', 'lingxi-protocol', 'lingxi-service', 'lingxi-spike', 'xtask']
+resolve-graph packages: 315
+desktop dependency scan: 0 hits for patterns ['tauri', 'electron', 'tao', 'wry', 'webkit2gtk', 'winit', 'webview']
+== [3/5] start real service process (synthetic /tmp home, loopback, ephemeral port)
+service ready: pid=74004 addr=127.0.0.1:49750 home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02-t01-smoke-home.AiTObt
+== [4/5] health check
+health validation: OK (minimal surface, protocol-sourced versions)
+== [5/5] clean shutdown (SIGTERM, exit 0, port freed, no children)
+service exit code after SIGTERM: 0
+no leftover child processes (pre-TERM snapshot, birth-time verified): OK
+port closed after shutdown: OK
+== [6/6] startup refusal and newer data version: explicit error, no fallback root ==
+a01-leaf-cases.json: 17 cases, 0 failing
+A01 RESULT: PASS (build, desktop-free dep tree, real-process start, health 200, clean SIGTERM shutdown)

@@ -1,0 +1,21 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.63s
+     Running tests/r00_management_leaves.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r00_management_leaves-294787929158efb0)
+LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58048
+LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/access/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58052
+LINGXI_AUTH_REJECTED [token] method=PUT path=/lingxi/v1/access/account/profile status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58057
+LINGXI_AUTH_REJECTED [token] method=PUT path=/lingxi/v1/access/network status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58060
+LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/access/mobile-qr.svg status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58062
+LINGXI_AUTH_REJECTED [token] method=PUT path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58068
+LINGXI_AUTH_REJECTED [token] method=DELETE path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58075
+LINGXI_AUTH_REJECTED [token] method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58108
+LINGXI_AUTH_REJECTED [token] method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58110
+LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/devices status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58113
+LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:58116
+LINGXI_AUTH_REJECTED [token] method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58119
+LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:58157
+LINGXI_AUTH_REJECTED [token] method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58160
+LINGXI_AUTH_REJECTED [token] method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58162
+LINGXI_AUTH_REJECTED [token] method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58171
+LINGXI_TRANSPORT_REJECTED [token] method=POST path=/lingxi/v1/web-auth/login status=403 reason=bad_origin origin=http://evil.example host=192.168.3.5:58216 remote=192.168.3.5:58218
+LINGXI_TRANSPORT_REJECTED [token] method=POST path=/lingxi/v1/web-auth/login status=403 reason=bad_origin origin=https://192.168.3.5:58216 host=192.168.3.5:58216 remote=192.168.3.5:58225

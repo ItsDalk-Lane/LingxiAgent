@@ -1,0 +1,12 @@
+{
+  "startedAt": "2026-10-07T00:22:52.749582+00:00",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "branch": "codex/rust-tauri-migration",
+  "gitStatus": " M rust/crates/lingxi-service/tests/r05_t08_resources.rs\n M rust/crates/xtask/src/candidate.rs\n M rust/crates/xtask/src/candidate/tests.rs\n M rust/crates/xtask/src/main.rs\n M rust/crates/xtask/src/runner_identity.rs\n M rust/crates/xtask/src/verify/runner_tests.rs\n M scripts/rust-tauri/r02_t08_legacy_entry_regression.sh\n M scripts/rust-tauri/r05_t08_negative_gate.sh\n?? artifacts/rust-tauri/R05/RR3/\n?? docs/rust-tauri/R05/repair-current/RR3_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md\n?? docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json\n?? docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md\n?? docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md\n?? rust/crates/lingxi-service/tests/support/\n?? scripts/rust-tauri/r02_run_output_regression.py\n?? scripts/rust-tauri/r05_t08_mutate_pin.py\n?? scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py\n?? scripts/rust-tauri/run_output_sinks.py\n",
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "os": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+  "node": "v24.16.0",
+  "npm": "11.13.0",
+  "boundary": "主树只读；官方脚本本地 clone 写自己的新隔离副本，不写主树 Git；仅本目录保存验收材料。其他包并发修改，不代表总树冻结。"
+}

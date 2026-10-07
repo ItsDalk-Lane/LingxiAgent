@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-07T04:40:57.070189+00:00",
+  "filesScanned": 40750,
+  "matches": [
+    {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-02/metadata/owned-cache-boundary.json",
+      "sha256": "25dd2c48430e85d063037c33e11191bdd6f19450798d53168143a0ff0923febd",
+      "classification": "CACHE_INVENTORY_ONLY"
+    },
+    {
+      "path": "/private/tmp/rr3-g-review-02-20261007/owned-cache-boundary.json",
+      "sha256": "25dd2c48430e85d063037c33e11191bdd6f19450798d53168143a0ff0923febd",
+      "classification": "CACHE_INVENTORY_ONLY"
+    }
+  ],
+  "otherReferences": []
+}

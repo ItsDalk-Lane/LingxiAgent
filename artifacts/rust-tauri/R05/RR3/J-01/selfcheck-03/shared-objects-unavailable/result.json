@@ -1,0 +1,83 @@
+{
+  "status": "FAIL",
+  "startedUtc": "2026-10-07T03:23:54.730817+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/source",
+      "startedUtc": "2026-10-07T03:23:54.731111+00:00",
+      "finishedUtc": "2026-10-07T03:23:54.738187+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "339d9c6ea2edb915dedf8839297a9d8eb397cc878a6540043ab42c1498bee03c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/shared-object-check",
+      "startedUtc": "2026-10-07T03:23:54.738363+00:00",
+      "finishedUtc": "2026-10-07T03:23:54.745076+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "0cc8e5c076ccb31408ab37313b91afdc64a9d85be25ba8f5c2ba3edc6898438f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/source",
+      "startedUtc": "2026-10-07T03:23:54.745208+00:00",
+      "finishedUtc": "2026-10-07T03:23:54.751669+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "7add86c2127231561d4808ce813bffab278e95aabce1600ece63fccc4c2e348b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/shared-object-check",
+      "startedUtc": "2026-10-07T03:23:54.751810+00:00",
+      "finishedUtc": "2026-10-07T03:23:54.758526+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "7add86c2127231561d4808ce813bffab278e95aabce1600ece63fccc4c2e348b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/shared-object-check",
+      "startedUtc": "2026-10-07T03:23:54.758659+00:00",
+      "finishedUtc": "2026-10-07T03:23:54.783695+00:00",
+      "exitCode": 10,
+      "stdoutSha256": "9972695aaf4b22e3523f7b878fecfa4e7d5f549303d5559fc0bc9ee4c43caa32",
+      "stderrSha256": "251d6ab36a47898632923784875ff34a08674bd6aec46dbcce0a10e4de0f3857"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "source": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/source",
+  "copy": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/shared-object-check",
+  "sourceHead": "cdb10403f4836041638798c7bebe6d6b24d4b3e0",
+  "copyHead": "cdb10403f4836041638798c7bebe6d6b24d4b3e0",
+  "error": "command failed (10): ['git', 'fsck', '--connectivity-only', '--no-dangling']; see /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-01/selfcheck-03/shared-objects-unavailable/command-04.stderr.log",
+  "finishedUtc": "2026-10-07T03:23:54.783844+00:00"
+}

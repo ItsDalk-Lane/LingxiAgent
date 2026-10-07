@@ -1,0 +1,1766 @@
+{
+  "mode": "hashes",
+  "checks": [
+    {
+      "name": "真实锁 rust/Cargo.lock",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "真实锁 rust-toolchain.toml",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "真实锁 package-lock.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR2/FINAL-01/STAGE_REVIEW.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/A-02/REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/C-01/REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/F46-01/resources-01/f27-resource-series.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/F46-01/resources-01/runtime-binding.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/result.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/D-01/REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR3/D-01/PREPARED-ALLOW.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-binding-exclusions.txt",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "实际artifact artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-run-output-sinks.txt",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "层结果hash R05",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "层结果hash R04",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "层结果hash R03",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest READING.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest add-r02.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before/docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before/docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before/docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before/docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before/docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before/docs/rust-tauri/R05/R05_HANDOFF.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before/docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before/docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before/docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before/docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before/docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before/docs/rust-tauri/R05/R05_REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before/docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest before/docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest changed-files.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/01-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/01-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/01-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/02-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/02-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/02-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/03-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/03-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/03-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/04-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/04-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/04-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/05-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/05-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/05-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/06-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/06-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/06-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/07-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/07-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/07-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/08-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/08-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/08-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/09-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/09-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/09-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/10-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/10-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/10-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/11-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/11-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/11-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/12-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/12-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/12-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/13-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/13-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/13-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/14-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/14-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/14-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/15-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/15-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-01/15-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/01-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/01-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/01-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/02-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/02-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/02-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/03-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/03-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/03-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/04-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/04-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/04-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/05-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/05-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/05-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/06-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/06-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/06-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/07-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/07-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/07-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/08-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/08-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/08-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/09-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/09-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/09-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/10-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/10-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/10-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/11-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/11-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/11-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/12-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/12-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/12-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/13-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/13-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/13-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/14-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/14-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/14-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/15-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/15-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-02/15-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/01-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/01-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/01-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/02-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/02-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/02-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/03-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/03-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/03-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/04-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/04-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/04-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/05-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/05-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/05-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/06-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/06-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/06-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/07-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/07-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/07-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/08-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/08-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/08-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/09-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/09-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/09-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/10-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/10-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/10-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/11-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/11-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/11-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/12-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/12-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/12-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/13-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/13-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/13-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/14-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/14-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/14-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/15-command.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/15-stderr.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest checks-03/15-stdout.log",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest commands-02.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest commands-03.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest commands.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest current-state.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest delivery-check.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest finish.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest implement.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest implementation.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest inputhash-after.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest inputhash-before.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest protected-before.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest run-checks.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest source-evidence.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "冻结E包manifest verify.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/1 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/1 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/2 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/2 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/3 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/3 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/4 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/4 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/5 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/5 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/6 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/6 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/7 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/7 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/8 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/8 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/9 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/9 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/10 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/10 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/11 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/11 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/12 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/12 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/13 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/13 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/14 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/14 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/15 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands.json/15 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/1 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/1 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/2 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/2 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/3 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/3 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/4 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/4 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/5 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/5 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/6 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/6 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/7 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/7 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/8 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/8 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/9 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/9 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/10 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/10 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/11 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/11 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/12 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/12 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/13 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/13 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/14 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/14 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/15 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-02.json/15 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/1 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/1 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 1",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "/Users/study_superior/.cargo/bin/rustc",
+          "--version"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "commands-03.json/2 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/2 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 2",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "--version"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "commands-03.json/3 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/3 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 3",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "node",
+          "--version"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "commands-03.json/4 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/4 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 4",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "npm",
+          "--version"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "commands-03.json/5 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/5 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 5",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "python3",
+          "--version"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "commands-03.json/6 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/6 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 6",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "uname",
+          "-sm"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "commands-03.json/7 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/7 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 7",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "commands-03.json/8 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/8 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 8",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "git",
+          "rev-parse",
+          "origin/codex/rust-tauri-migration"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "commands-03.json/9 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/9 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 9",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py",
+          "json"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "commands-03.json/10 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/10 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 10",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py",
+          "links"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "commands-03.json/11 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/11 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 11",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py",
+          "consistency"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "commands-03.json/12 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/12 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 12",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py",
+          "history"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "commands-03.json/13 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/13 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 13",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py",
+          "source"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "commands-03.json/14 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/14 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 14",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py",
+          "evidence"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "commands-03.json/15 stdout",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "commands-03.json/15 stderr",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "作者03真实exit 15",
+      "pass": true,
+      "detail": {
+        "argv": [
+          "git",
+          "diff",
+          "--check",
+          "--",
+          "docs/rust-tauri/R05/R05_REPORT.md",
+          "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+          "docs/rust-tauri/R05/R05_BLOCKERS.md",
+          "docs/rust-tauri/R05/R05_HANDOFF.json",
+          "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+          "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+          "docs/rust-tauri/R05/R05_TEST_MAP.json",
+          "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+          "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+          "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+          "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+          "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+          "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+          "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json"
+        ],
+        "exit": 0
+      }
+    },
+    {
+      "name": "423输入数量",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "摘要独立重算",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "E输入前后原记录相等",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "当前限定生产输入仍相等",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-kernel/src/model_exchange.rs:785",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-kernel/src/model_exchange.rs:310",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-kernel/src/model_exchange.rs:279",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-kernel/src/model_exchange.rs:264",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-kernel/src/lib.rs:35",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-kernel/src/usage.rs:441",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-kernel/src/ports.rs:1211",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-kernel/src/ports.rs:499",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-adapters/src/models/credentials.rs:192",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-adapters/src/models/auxiliary.rs:41",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-adapters/src/models/auxiliary.rs:166",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-service/src/operations.rs:213",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-service/src/operations.rs:973",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-service/src/operations.rs:1065",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-adapters/src/models/operations/embedding.rs:63",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-service/src/lib.rs:1293",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-service/src/runs.rs:1178",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs:964",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-adapters/src/storage/migrations.rs:410",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-protocol/src/handshake.rs:21",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "源摘录字节 rust/crates/lingxi-protocol/src/wire.rs:26",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "passed": 329,
+  "failed": 0
+}

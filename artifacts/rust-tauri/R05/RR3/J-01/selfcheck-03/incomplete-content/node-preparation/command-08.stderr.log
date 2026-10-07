@@ -1,0 +1,20 @@
+node:internal/modules/cjs/loader:1537
+  const err = new Error(`Cannot find module '${request}'`);
+              ^
+
+Error: Cannot find module '/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/incomplete-content/node_modules/ws/index.js'
+    at createEsmNotFoundErr (node:internal/modules/cjs/loader:1537:15)
+    at finalizeEsmResolution (node:internal/modules/cjs/loader:1526:9)
+    at resolveExports (node:internal/modules/cjs/loader:707:14)
+    at Module._findPath (node:internal/modules/cjs/loader:774:31)
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1485:27)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1071:27)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1116:12)
+    at require.resolve (node:internal/modules/helpers:171:31)
+    at file:///private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/incomplete-content/[eval1]:1:156
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25) {
+  code: 'MODULE_NOT_FOUND',
+  path: '/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/incomplete-content/node_modules/ws'
+}
+
+Node.js v24.16.0

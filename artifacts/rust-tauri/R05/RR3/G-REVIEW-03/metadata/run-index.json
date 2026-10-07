@@ -1,0 +1,31 @@
+{
+ "at": "2026-10-07T11:06:04.017305+00:00",
+ "kind": "three-attempts-index",
+ "runs": [
+  {
+   "run": "default16-01",
+   "consoleSha256": "22379f365c0e39c613c37cff3bd88fa762f19f5f4ea591d49b11740c271152dc",
+   "caseRows": 15,
+   "exitFile": "NOT-PERSISTED",
+   "summary": "interrupted by host task kill during N16 run-b; N01-N15 valid; wrapper exit not persisted (process group killed)"
+  },
+  {
+   "run": "default16-02",
+   "consoleSha256": "479889fabdd9ffa2120a988779946cdc9082e850e594c7067dad4d933904497d",
+   "caseRows": 0,
+   "exitFile": [
+    "1"
+   ],
+   "summary": "control-xtask FAILED via stale mutated xtask binary reused from polluted shared NEG_TARGET (rsync -a old mtime judged fresh); exit 1 persisted"
+  },
+  {
+   "run": "default16-03",
+   "consoleSha256": "cfeeba633aa9fec2fb1333d2714effef0aacdc05a979f26cfe6160b45d198c2c",
+   "caseRows": 16,
+   "exitFile": [
+    "0"
+   ],
+   "summary": "complete valid run: 16/16 fail-closed named, controls green, node verify PASS, final reset verified, exit 0 persisted"
+  }
+ ]
+}

@@ -1,0 +1,14 @@
+{
+  "httpStatus": 401,
+  "requestId": "req-90aad09f57adf29b55d5efc12f55e5a6",
+  "requestIdBytes": 36,
+  "assignmentBytes": 47,
+  "stderrMarkers": [
+    "LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:55356"
+  ],
+  "correlationPresent": false,
+  "traceCorrelationPresent": false,
+  "exit": 0,
+  "binarySHA256": "7d9190d27d1b6a019abfbe97049d6855a3f225494124fee43ef8988e032ae78b",
+  "noProviderConfigured": true
+}

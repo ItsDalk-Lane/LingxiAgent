@@ -1,0 +1,17 @@
+{
+  "case": "signed",
+  "command": [
+    "python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial-with-times/signed/input.tsv",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial-with-times/signed/mutation.json"
+  ],
+  "startedAt": "2026-10-07T00:24:35.958991+00:00",
+  "endedAt": "2026-10-07T00:24:35.983641+00:00",
+  "exitCode": 1,
+  "expectedExit": 1,
+  "beforeSha256": "128b2d8f03b9a72e2a48b1fbebe1de10a25653cbb97702d279496dfbff367398",
+  "afterSha256": "128b2d8f03b9a72e2a48b1fbebe1de10a25653cbb97702d279496dfbff367398",
+  "receiptPresent": false,
+  "status": "PASS"
+}

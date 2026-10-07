@@ -1,0 +1,43 @@
+{
+  "verificationStartUTC": "2026-10-07T03:23:59.110423+00:00",
+  "verificationEndUTC": "2026-10-07T03:25:13.086023+00:00",
+  "state": "MINIMUM_RECLAIM_COMPLETE_WITH_EXTERNAL_OBSERVER_CHANGE",
+  "stopReason": "CONTROLLER_REDUCED_SPACE_REQUIREMENT; deletion had already finished before message; immediately interrupted running verifier then resumed verification-only",
+  "firstDeletedAtUTC": "2026-10-07T03:22:51.360150+00:00",
+  "lastDeletedAtUTC": "2026-10-07T03:23:02.755498+00:00",
+  "deletedFiles": 15746,
+  "deletedLogicalBytes": 5230874480,
+  "deletedUniqueInodeAllocatedBytes": 4272488448,
+  "allocatedBytesOfFullyUnlinkedInodes": 2656718848,
+  "preparedSnapshotFreeBytes": 1456541696,
+  "preparedSnapshotAtUTC": "2026-10-07T03:21:14.887554+00:00",
+  "freeBytesAtVerificationRestart": 4132417536,
+  "freeBytesAfterVerification": 4069494784,
+  "observedOverallDiskFreeDeltaBytes": 2612953088,
+  "diskDeltaCaveat": "准备末尾空间快照后压缩了本任务自建大型回执，另有主target并行编译；立即删除前/后数值在中断时尚未落盘，不能把总体净差冒称删除独占物理释放。逻辑长度、st_blocks受硬链接/APFS共享块影响。",
+  "originalDesiredFreeBytes": 6442450944,
+  "originalGoalReached": false,
+  "preservedFiles": 531567,
+  "preservedMismatches": [
+    {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplement-live-binary-observations.json",
+      "beforeSHA256": "91492b0afd5f987ed3fd05e78b8915fb50600b1a356e16ae53d4e05945100565",
+      "bytes": 5661079,
+      "sha256": "acf6f5616e1a103a752c8005bf5ffeaa03a489a5f10d88454fededa0b0a1bd07",
+      "unchanged": false
+    }
+  ],
+  "allDeletedPathsAbsent": true,
+  "verificationOnlyAfterStop": true,
+  "refinedSelection": {
+    "candidateFiles": 15746,
+    "candidateLogicalBytes": 5230874480,
+    "uniqueInodeAllocatedBytes": 4272488448,
+    "protectedCandidateFiles": 780,
+    "compressedOriginalReceipt": "artifacts/rust-tauri/R05/RR3/STORAGE-02/all-before.json.gz",
+    "referenceRule": "路径/完整crate-session-file后缀/明确单独文件名/不通用.o对象文件名/内容SHA；其他会话中相同query-cache.bin等通用名不代表本原件"
+  },
+  "preservedUnchangedFiles": 531566,
+  "observerException": "旧G孤儿观察器自行追加本次lsof记录；总控另行SIGTERM停止。前摘要原字节已从未变事件前缀恢复并匹配SHA，旧路径没有回填。",
+  "observerChangeReceipt": "observer-change.json"
+}

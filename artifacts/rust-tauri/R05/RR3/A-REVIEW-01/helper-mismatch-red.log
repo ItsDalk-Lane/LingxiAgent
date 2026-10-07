@@ -1,0 +1,15 @@
+
+running 1 test
+
+thread 'verify::runner_tests::rr3_nested_process_probe' (20218087) panicked at crates/xtask/src/verify/runner_tests.rs:2417:50:
+called `Result::unwrap()` on an `Err` value: "stale xtask binary: compiled \"scripts/rust-tauri/run_output_sinks.py\" differs from current disk bytes; rebuild this runner from the candidate before stage verification"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test verify::runner_tests::rr3_nested_process_probe ... FAILED
+
+failures:
+
+failures:
+    verify::runner_tests::rr3_nested_process_probe
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s
+

@@ -1,0 +1,1425 @@
+
+FILE commands-03.json
+{
+  "kind": "E_SELF_CHECK_NOT_INDEPENDENT",
+  "recordedAt": "2026-10-07T01:19:07.997097+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/Users/study_superior/.cargo/bin/rustc",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.422947+00:00",
+      "endedAt": "2026-10-07T01:19:07.463743+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/01-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/01-stderr.log",
+      "stdoutSha256": "2073de5abf149185c2f4d7473dc833bc921b99135560d24ae7b2293f33a9c376",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.467001+00:00",
+      "endedAt": "2026-10-07T01:19:07.492613+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/02-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/02-stderr.log",
+      "stdoutSha256": "9950bbb2d5c3417b1a068f0e81f6d3cac991a363193bdf2a22d447f5acf8b503",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "node",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.495510+00:00",
+      "endedAt": "2026-10-07T01:19:07.513141+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/03-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/03-stderr.log",
+      "stdoutSha256": "a8f8f7ba69d43285857a0ea34017ef8dadd3ba012404bb7dd188fc773cf63ee2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "npm",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.516165+00:00",
+      "endedAt": "2026-10-07T01:19:07.582427+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/04-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/04-stderr.log",
+      "stdoutSha256": "3dbc807e13de125e909bea5877613d5d67989a43fb8e982fd79ba0efa46ac952",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "python3",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.585849+00:00",
+      "endedAt": "2026-10-07T01:19:07.598726+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/05-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/05-stderr.log",
+      "stdoutSha256": "25c3049ed7f825e0565baa3279c7e5218335801d85737ffddce1b39e394d8793",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "uname",
+        "-sm"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.601716+00:00",
+      "endedAt": "2026-10-07T01:19:07.606817+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/06-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/06-stderr.log",
+      "stdoutSha256": "16b8cd028eb757aab907ab404e1656e01783846457156eec99372a91fc1b104d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.609739+00:00",
+      "endedAt": "2026-10-07T01:19:07.618386+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/07-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/07-stderr.log",
+      "stdoutSha256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "origin/codex/rust-tauri-migration"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.621208+00:00",
+      "endedAt": "2026-10-07T01:19:07.630023+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/08-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/08-stderr.log",
+      "stdoutSha256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py",
+        "json"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.632902+00:00",
+      "endedAt": "2026-10-07T01:19:07.677763+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/09-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/09-stderr.log",
+      "stdoutSha256": "d4892cf203cbb9fd839e6948155b4c1a3415ea1a93a9dc2b00fdde126ff9e8cb",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py",
+        "links"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.680755+00:00",
+      "endedAt": "2026-10-07T01:19:07.716112+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/10-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/10-stderr.log",
+      "stdoutSha256": "ea8f8927b7f94bf641c10fde6e5b8c1a7dee0a21ecb38c9e7bceb282bb58f8d3",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py",
+        "consistency"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.719201+00:00",
+      "endedAt": "2026-10-07T01:19:07.765332+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/11-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/11-stderr.log",
+      "stdoutSha256": "6c890221293b7853ab9c0af302b528abfc85b775a5ce39a75454c7d88e34a68f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py",
+        "history"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.768247+00:00",
+      "endedAt": "2026-10-07T01:19:07.854783+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/12-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/12-stderr.log",
+      "stdoutSha256": "5cd24bd530b1989bd246536dcecd58aba64bf3b06e0d236113c7167877a6ec47",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py",
+        "source"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.858157+00:00",
+      "endedAt": "2026-10-07T01:19:07.892874+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/13-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/13-stderr.log",
+      "stdoutSha256": "f258ff9f218b7daad8d672435cf8a176f31427a052898e5b6923a72faebad8d9",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py",
+        "evidence"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.895858+00:00",
+      "endedAt": "2026-10-07T01:19:07.936305+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/14-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/14-stderr.log",
+      "stdoutSha256": "324ed2858eed46c71a220f321b70f514196be7b889748716247d94ec5898ce1c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check",
+        "--",
+        "docs/rust-tauri/R05/R05_REPORT.md",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md",
+        "docs/rust-tauri/R05/R05_HANDOFF.json",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedAt": "2026-10-07T01:19:07.939375+00:00",
+      "endedAt": "2026-10-07T01:19:07.994074+00:00",
+      "exitCode": 0,
+      "inputHashesBefore": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputHashesAfter": {
+        "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+        "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+        "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+        "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+        "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+        "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+        "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+        "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+        "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+        "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+        "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+      },
+      "inputsEqual": true,
+      "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/15-stdout.log",
+      "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/15-stderr.log",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "allExitZero": true
+}
+
+
+FILE checks-03/13-command.json
+{
+  "argv": [
+    "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-01/verify.py",
+    "source"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedAt": "2026-10-07T01:19:07.858157+00:00",
+  "endedAt": "2026-10-07T01:19:07.892874+00:00",
+  "exitCode": 0,
+  "inputHashesBefore": {
+    "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+    "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+    "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+    "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+    "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+    "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+    "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+    "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+    "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+    "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+    "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+    "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+    "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+    "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+    "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+    "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+  },
+  "inputHashesAfter": {
+    "docs/rust-tauri/R05/R05_REPORT.md": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+    "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+    "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+    "docs/rust-tauri/R05/R05_HANDOFF.json": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+    "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+    "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+    "docs/rust-tauri/R05/R05_TEST_MAP.json": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+    "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+    "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+    "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+    "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+    "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+    "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+    "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+    "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "6e7c728044d9cabc8edb5dccd18115bf4256f2ad18d4666ec0e3da262b38de03",
+    "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+  },
+  "inputsEqual": true,
+  "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/13-stdout.log",
+  "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-03/13-stderr.log",
+  "stdoutSha256": "f258ff9f218b7daad8d672435cf8a176f31427a052898e5b6923a72faebad8d9",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}
+
+
+FILE checks-03/13-stdout.log
+{"check": "source", "assertions": 38, "status": "PASS", "boundary": "E文档自检，不是独立签收或cargo/正式门禁执行"}
+
+
+FILE checks-03/13-stderr.log
+
+
+FILE source-evidence.json
+{
+  "capturedAt": "2026-10-07T01:19:08.045721+00:00",
+  "sources": [
+    {
+      "path": "rust/crates/lingxi-kernel/src/model_exchange.rs",
+      "line": 785,
+      "endLine": 799,
+      "sha256": "62bb3b1b3ad42f5ea46961ab5c5b1d98d54f22c0a359f8d099ad1e323a6d4c6b",
+      "excerpt": "pub struct ModelRouteRequest {\n    pub operation: ModelOperation,\n    /// Explicit provider id (`None` = the operation's configured default).\n    pub provider: Option<String>,\n    /// Explicit model id (legal only together with `provider`).\n    pub model: Option<String>,\n}\n\nimpl ModelRouteRequest {\n    pub fn for_operation(operation: ModelOperation) -> Self {\n        Self {\n            operation,\n            provider: None,\n            model: None,\n        }",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/model_exchange.rs",
+      "line": 310,
+      "endLine": 355,
+      "sha256": "62bb3b1b3ad42f5ea46961ab5c5b1d98d54f22c0a359f8d099ad1e323a6d4c6b",
+      "excerpt": "pub struct ModelTurnInput {\n    /// The user submission that opened the run, with any steering text\n    /// drained before THIS turn appended under the frozen\n    /// `[steering]` convention (the incumbent semantics: steered text\n    /// reaches the next model call's input; the loop never interrupts).\n    pub submission: String,\n    /// The system prompt the host layer resolved for this run (R05-T03:\n    /// the contract anchor the persona/system layer lands on). `None`\n    /// today — the driver passes `None` and every adapter omits the\n    /// family-specific system slot entirely (except codex, whose protocol\n    /// demands an `instructions` string and falls back to its documented\n    /// constant); persona wiring is a later stage's decision, never an\n    /// adapter-local guess.\n    pub system_prompt: Option<String>,\n    /// 1-based turn index of the run drive (matches the model call id's\n    /// sequence; monotonic across the attempts of one run — a retried\n    /// attempt keeps numbering its calls after the failed attempt's).\n    pub turn: u32,\n    /// The run's prior exchange, oldest first (empty on turn 1 of a\n    /// run). R05-T03 C12: a retried attempt CONTINUES this exchange — the\n    /// confirmed assistant/tool exchanges of the failed attempt are REAL\n    /// history the next call must see (a retry never rebuilds from the\n    /// bare submission, never re-executes a confirmed write); only the\n    /// failed call itself leaves no assistant turn behind.\n    pub prior: Vec<ExchangeItem>,\n    /// The tool declaration snapshot at send time (C08).\n    pub tools: ToolDeclarationSnapshot,\n    /// Absolute deadline of the call when one exists (None today: the\n    /// run-level cancellation tree is the cancel authority; the field is\n    /// the contract anchor budget wiring lands on).\n    pub deadline_unix_ms: Option<u64>,\n    /// R05-T06 (auxiliary vision slot / media-capable aux calls): image\n    /// inputs the HOST authorized and read (bytes + MIME, bounded) — the\n    /// model-facing request renders them per family (openai `image_url`\n    /// data URLs, anthropic `image` blocks, google `inlineData`,\n    /// responses `input_image`). The main chat path never sets this\n    /// (empty), so the incumbent chat wire is byte-identical.\n    pub images: Vec<InputImage>,\n    /// R05-T06: the host-decided output-token bound of THIS call (worker\n    /// callbacks / aux slots). `None` = the family default (the incumbent\n    /// chat path behavior; anthropic keeps its required 16384 constant).\n    pub max_output_tokens: Option<u32>,\n}\n\n/// One host-authorized image input of a model call (R05-T06). The bytes\n/// were read through the resource-authorization boundary with a size",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/model_exchange.rs",
+      "line": 279,
+      "endLine": 302,
+      "sha256": "62bb3b1b3ad42f5ea46961ab5c5b1d98d54f22c0a359f8d099ad1e323a6d4c6b",
+      "excerpt": "pub enum ExchangeItem {\n    /// One completed assistant turn: the model's content blocks (text /\n    /// reasoning / provider-opaque, in the order they arrived — a mixed\n    /// response keeps EVERY block) plus the tool calls it asked for.\n    AssistantTurn {\n        call: ModelCallId,\n        content: Vec<ContentBlock>,\n        tool_calls: Vec<RequestedToolCall>,\n        /// The provider/model that served this turn (R05 RR1 F09 source\n        /// binding; see [`TurnOrigin`]). The driver records it from the\n        /// serving adapter's result.\n        origin: Option<TurnOrigin>,\n    },\n    /// The REAL outcome of one executed tool call — all four\n    /// [`ToolOutcome`] states with content blocks, resource refs,\n    /// truncation and process status intact (the adapter renders it into\n    /// the protocol's tool-result shape; nothing is flattened to a bare\n    /// digest or a fabricated success).\n    ToolResult {\n        tool_call_id: ToolCallId,\n        provider_call_id: Option<String>,\n        outcome: ToolOutcome,\n    },\n}",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/model_exchange.rs",
+      "line": 264,
+      "endLine": 278,
+      "sha256": "62bb3b1b3ad42f5ea46961ab5c5b1d98d54f22c0a359f8d099ad1e323a6d4c6b",
+      "excerpt": "pub struct TurnOrigin {\n    pub provider: String,\n    pub model: String,\n}\n\nimpl TurnOrigin {\n    /// Whether this origin authorizes replay onto the given route identity\n    /// (exact provider AND model match — anything else is a source change).\n    pub fn authorizes(&self, provider: &str, model: &str) -> bool {\n        self.provider == provider && self.model == model\n    }\n}\n\n/// One item of the run's prior model exchange, in the order it happened.\n#[derive(Debug, Clone, PartialEq)]",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/lib.rs",
+      "line": 35,
+      "endLine": 47,
+      "sha256": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+      "excerpt": "pub struct RunContext {\n    /// Authenticated principal resolved by the service auth layer.\n    /// Never a model-supplied or frontend-supplied claim.\n    pub principal: Principal,\n    pub session_id: SessionId,\n    pub run_id: RunId,\n    /// Attempt/generation fence: results from an older attempt must never\n    /// overwrite a newer one.\n    pub attempt: AttemptId,\n    /// Registry generation the tool/model snapshots were taken at.\n    pub generation: u64,\n}\n",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/usage.rs",
+      "line": 441,
+      "endLine": 454,
+      "sha256": "209bc2f127595674ed86c64cbf92d7fc1632bcbbfcc446909cd0f632cf470f3b",
+      "excerpt": "pub struct ModelUsageQuery {\n    /// Owner scoping (`None` = internal diagnostics over all rows).\n    pub owner_user_id: Option<String>,\n    pub session_id: Option<String>,\n    pub run_id: Option<String>,\n    /// Category filter — exact match on the row's `purpose`\n    /// (`chat`, `auxiliary.{slot}`, an operation name, …).\n    pub purpose: Option<String>,\n    /// Model filter — exact match on the row's `model`.\n    pub model: Option<String>,\n    /// Date-window filter (inclusive bounds on `recorded_at_unix_ms`).\n    pub recorded_from_unix_ms: Option<u64>,\n    pub recorded_to_unix_ms: Option<u64>,\n}",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/ports.rs",
+      "line": 1211,
+      "endLine": 1219,
+      "sha256": "3f32e8c7c0a617d6bcb73ed11ab5eb468acfbb383ac844964a9ad52a75fa3936",
+      "excerpt": "    fn next_turn<'a>(\n        &'a self,\n        ctx: &'a RunContext,\n        call: &'a ModelCallId,\n        input: &'a ModelTurnInput,\n        deltas: &'a dyn TurnDeltaSink,\n    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>>;\n}\n",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/ports.rs",
+      "line": 499,
+      "endLine": 505,
+      "sha256": "3f32e8c7c0a617d6bcb73ed11ab5eb468acfbb383ac844964a9ad52a75fa3936",
+      "excerpt": "    fn query_model_call_usage(\n        &self,\n        query: crate::usage::ModelUsageQuery,\n    ) -> impl std::future::Future<\n        Output = Result<Vec<crate::usage::ModelCallUsageRecord>, StorageError>,\n    > + Send;\n}",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/credentials.rs",
+      "line": 192,
+      "endLine": 200,
+      "sha256": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+      "excerpt": "pub trait ProviderCredentialPort: Send + Sync {\n    /// Resolves the CURRENT material for one dispatch of one resolved\n    /// route. For OAuth providers a locally-expired token triggers the\n    /// coordinated refresh here (same single-flight as the 401 path).\n    fn resolve<'a>(\n        &'a self,\n        route: &'a ResolvedModelRoute,\n    ) -> std::pin::Pin<\n        Box<dyn std::future::Future<Output = Result<ApplicableAuth, CredentialError>> + Send + 'a>,",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/auxiliary.rs",
+      "line": 41,
+      "endLine": 50,
+      "sha256": "504cc229598a737f260eb09b308b052aa9c9d196acaa471a8fd21281cdc46c04",
+      "excerpt": "pub struct AuxiliaryRequest {\n    pub prompt: String,\n    /// Host-authorized image inputs (vision slot) — read + bounded\n    /// host-side before they reach here.\n    pub images: Vec<InputImage>,\n    /// Host-decided output-token cap (None = the family default).\n    pub max_output_tokens: Option<u32>,\n    /// Host-computed absolute deadline clamping the call's network budget.\n    pub deadline_unix_ms: Option<u64>,\n}",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/auxiliary.rs",
+      "line": 166,
+      "endLine": 183,
+      "sha256": "504cc229598a737f260eb09b308b052aa9c9d196acaa471a8fd21281cdc46c04",
+      "excerpt": "    pub async fn complete(\n        &self,\n        ctx: &RunContext,\n        slot: AuxiliarySlot,\n        call: &ModelCallId,\n        request: &AuxiliaryRequest,\n    ) -> Result<AuxiliaryOutcome, AuxiliaryFailure> {\n        let input = ModelTurnInput {\n            submission: request.prompt.clone(),\n            system_prompt: None,\n            turn: 1,\n            prior: Vec::new(),\n            tools: ToolDeclarationSnapshot::empty(),\n            deadline_unix_ms: request.deadline_unix_ms,\n            images: request.images.clone(),\n            max_output_tokens: request.max_output_tokens,\n        };\n        let result = self",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/operations.rs",
+      "line": 213,
+      "endLine": 220,
+      "sha256": "bbb2054886f6e08093aeba416570ecadee866891db06e59a6d5406815b965639",
+      "excerpt": "pub struct OperationCallContext {\n    pub session_id: String,\n    pub run_id: String,\n    pub attempt: Option<String>,\n    /// The causal anchor inside the run (e.g. the tool call id that\n    /// triggered this operation).\n    pub cause_ref: Option<String>,\n}",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/operations.rs",
+      "line": 973,
+      "endLine": 980,
+      "sha256": "bbb2054886f6e08093aeba416570ecadee866891db06e59a6d5406815b965639",
+      "excerpt": "    pub async fn embed(\n        &self,\n        request: dialects::embedding::EmbeddingRequest,\n        deadline_unix_ms: Option<u64>,\n        context: Option<&OperationCallContext>,\n    ) -> Result<dialects::embedding::EmbeddingOutcome, OperationFailure> {\n        let started_at = lingxi_adapters::models::dispatch::unix_ms_now();\n        dialects::embedding::validate_embedding_request(&request)",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/operations.rs",
+      "line": 1065,
+      "endLine": 1072,
+      "sha256": "bbb2054886f6e08093aeba416570ecadee866891db06e59a6d5406815b965639",
+      "excerpt": "    pub async fn rerank(\n        &self,\n        request: RerankRequest,\n        deadline_unix_ms: Option<u64>,\n        context: Option<&OperationCallContext>,\n    ) -> Result<dialects::rerank::RerankOutcome, OperationFailure> {\n        let started_at = lingxi_adapters::models::dispatch::unix_ms_now();\n        let top_n = dialects::rerank::validate_rerank_request(&request)",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/operations/embedding.rs",
+      "line": 63,
+      "endLine": 73,
+      "sha256": "b410cfe1bddcad6ba82506ff0cda702741bab7588f13d2c6ab9c86cbcb613e47",
+      "excerpt": "pub struct EmbeddingRequest {\n    pub inputs: Vec<String>,\n    /// Requested output dimensionality (openai `dimensions`, ollama\n    /// `dimensions`, gemini `outputDimensionality`, voyage `dimensions`);\n    /// absent = the model default. MiniMax does NOT carry it (embo-01 is\n    /// fixed 1536 — the incumbent omits the field).\n    pub dimensions: Option<u32>,\n    /// The ollama num_ctx DECLARED value (the incumbent contextWindow\n    /// parameter); the dialect clamps/derives per the incumbent rule.\n    pub context_window: Option<u32>,\n    pub input_type: EmbeddingInputType,",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "line": 1293,
+      "endLine": 1298,
+      "sha256": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756",
+      "excerpt": "                        Arc::new(workermodel::LedgerWorkerCallbackTrace::new(\n                            std::sync::Arc::clone(&storage),\n                            deps.clock.clone(),\n                        )),\n                    );\n                    Some(workerrpc::BoundedWorkerModel::new(",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "line": 1178,
+      "endLine": 1190,
+      "sha256": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+      "excerpt": "            let turn_input = ModelTurnInput {\n                submission,\n                system_prompt: None,\n                turn,\n                prior: exchange.clone(),\n                tools: tool_snapshot,\n                deadline_unix_ms: call_deadline,\n                // R05-T06: the chat path never carries aux-slot image\n                // inputs or a per-call output-token bound (the family\n                // defaults hold) — the incumbent wire is unchanged.\n                images: Vec::new(),\n                max_output_tokens: None,\n            };",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs",
+      "line": 964,
+      "endLine": 1016,
+      "sha256": "395ac7a42923d4f85a22eff80fe571ab71dec0ddd225fe354c8f90379ecc9f5f",
+      "excerpt": "async fn rr1_f21_operation_context_carries_session_run_and_cause() {\n    let stub = StubServer::start(vec![(\n        \"/v1/embeddings\",\n        vec![StubResponse::immediate(\n            200,\n            serde_json::json!({\n                \"data\":[{\"index\":0,\"embedding\":[0.25,0.75]}],\n                \"usage\":{\"prompt_tokens\":5,\"total_tokens\":9}\n            })\n            .to_string(),\n        )],\n    )])\n    .await;\n    let boot_res = boot(\n        \"rr1-f21-op-context\",\n        &plane_with_embedding(&stub.endpoint(), \"RR1_T07_EMBED_KEY\"),\n    )\n    .await;\n    let context = lingxi_service::operations::OperationCallContext {\n        session_id: \"sess_rr1_ctx\".to_string(),\n        run_id: \"run-rr1-ctx\".to_string(),\n        attempt: Some(\"run-rr1-ctx#a1\".to_string()),\n        cause_ref: Some(\"run-rr1-ctx-tc0007\".to_string()),\n    };\n    let result = boot_res\n        .state\n        .operations()\n        .unwrap()\n        .embed(\n            lingxi_adapters::models::operations::embedding::EmbeddingRequest {\n                inputs: vec![\"context-bound input\".into()],\n                dimensions: Some(2),\n                context_window: None,\n                input_type: Default::default(),\n            },\n            None,\n            Some(&context),\n        )\n        .await;\n    assert!(result.is_ok(), \"embedding succeeds: {result:?}\");\n    let rows = usage_rows(&boot_res.state, ModelUsageQuery::default()).await;\n    teardown(boot_res).await;\n    stub.stop().await;\n    assert_eq!(rows.len(), 1);\n    let row = &rows[0];\n    assert_eq!(row.session_id.as_deref(), Some(\"sess_rr1_ctx\"));\n    assert_eq!(row.run_id.as_deref(), Some(\"run-rr1-ctx\"));\n    assert_eq!(row.attempt.as_deref(), Some(\"run-rr1-ctx#a1\"));\n    assert_eq!(row.cause_ref.as_deref(), Some(\"run-rr1-ctx-tc0007\"));\n    assert_eq!(row.outcome, CallOutcome::Succeeded);\n    assert!(row.started_at_unix_ms.is_some() && row.settled_at_unix_ms.is_some());\n    assert!(row.settled_at_unix_ms.unwrap() >= row.started_at_unix_ms.unwrap());\n    // The usage fact itself decodes (the plane-root independence is the",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/migrations.rs",
+      "line": 410,
+      "endLine": 413,
+      "sha256": "df9519611c4020c5eed3acccedc92287feeb9f6b0af477ee69e1317ef089859d",
+      "excerpt": "        version: 7,\n        name: V7_NAME,\n        sql: V7_SQL,\n    },",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/handshake.rs",
+      "line": 21,
+      "endLine": 27,
+      "sha256": "17bb9902607d3d94fa2356cd2b55a32ad76b6eda38377b8d181be931af25d51d",
+      "excerpt": "pub const WIRE_PROTOCOL_MIN_SUPPORTED: u32 = 1;\n/// Highest wire protocol version this implementation can serve.\npub const WIRE_PROTOCOL_MAX_SUPPORTED: u32 = 1;\n\n/// Wire name of the protocol family, carried in handshake diagnostics.\npub const WIRE_PROTOCOL_NAME: &str = \"lingxi.wire\";\n",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/wire.rs",
+      "line": 26,
+      "endLine": 26,
+      "sha256": "a3509c6d31fe584980bef21cc615e21a56afe44ab57266108b3f5d2d7c71d3ff",
+      "excerpt": "pub const EVENT_SCHEMA_VERSION: u32 = 1;",
+      "role": "SOURCE_INSPECTED_NOT_NEW_TEST_EXECUTION"
+    }
+  ],
+  "boundary": "接口按当前声明及实际生产调用核对；ModelTurnInput旧注释None today与当前runtime不同，以runs.rs实际deadline接线为准。样例摘自原受控测试，本E未编译或执行它。"
+}
+
+
+FILE before.json
+{
+  "time": "2026-10-07T00:58:46.112293+00:00",
+  "owned": {
+    "docs/rust-tauri/R05/R05_REPORT.md": "a13ca7342991da5725a721e93fa8dade0437b600a06e64814206254872a23907",
+    "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "edaefa5b5a1d0f5afaa3c75760c264269fecadaa54acb2915793052e99557d2c",
+    "docs/rust-tauri/R05/R05_BLOCKERS.md": "de950b466ac930d201f61bbb464a66a49a7b69afd79295931a7d753a637ae563",
+    "docs/rust-tauri/R05/R05_HANDOFF.json": "41eb3ad1a91a577511402736b80b38cc5529b937ca6574bbc074acc7d01376b1",
+    "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "2c431b2bf9fa6ad83ca010f4392cc262844eca2e2366a6e6aa204e14b280f108",
+    "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "6fc4c7096145a3bfa3d6f318b32721ad520f064162d34f007080a41a524c73d1",
+    "docs/rust-tauri/R05/R05_TEST_MAP.json": "c6b5da4a74938e66b6962b733a46a1d9ef8401cab36dc816ccbdb2de553bec99",
+    "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "0cfd02db2ab41fd1b876b694d705410dd90564265d56917413e98d28508a61f2",
+    "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "c1fd4b03b677d033ddc6a19df1cae2e41be7ea46d3dfd3f4424b7bb2aea0801a",
+    "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "11afe718db1c1c251fe915f77b378fe54450ed76a01966939b8df83b2bc5102b",
+    "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "027afa74e452e5839885ccd6d1412301b7ffcc19812fffaaea9ffd9bdd3f35c4",
+    "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "c219180aab39823c647f8758028fe91150bd2e5e76d735b3dd9000ab99ec7b37",
+    "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+    "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "43419656975bc810639fbe5e4b4870c3a460fdc6d9a65fabe14a45dbb75b8429"
+  },
+  "authority": {
+    "docs/rust-tauri/R05/r05_stage_cids.tsv": "ffffbe56313a1d5e50e7b216499cd851b1efc988da811a57d4fe0b07cc0be556",
+    "docs/rust-tauri/R05/r05_leaf_case_map.tsv": "a4f5866d11a833a7bbcd7224e898baaaa047a485cf4b2c66c515af25348db64f",
+    "docs/rust-tauri/R05/r05_required_cids.tsv": "1a046aa162d62bc1fdefdd286a6211d37c15852a2683073df9c629d26190676c",
+    "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+    "docs/rust-tauri/R05/R05_SCOPE_MATRIX.json": "222e8e7e54030578c0ce4697d33a98b59ec3ca5cc210642bdc83bdb3b7a72110"
+  },
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "remote_tracking_head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "branch": "codex/rust-tauri-migration",
+  "status": " M rust/crates/lingxi-service/src/logging.rs\n M rust/crates/lingxi-service/tests/r05_t08_resources.rs\n M rust/crates/xtask/src/candidate.rs\n M rust/crates/xtask/src/candidate/tests.rs\n M rust/crates/xtask/src/main.rs\n M rust/crates/xtask/src/runner_identity.rs\n M rust/crates/xtask/src/verify/runner_tests.rs\n M scripts/rust-tauri/r02_t08_legacy_entry_regression.sh\n M scripts/rust-tauri/r05_t08_negative_gate.sh\n?? artifacts/rust-tauri/R05/RR3/\n?? docs/rust-tauri/R05/repair-current/RR3_A_R2_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_CF46_REVIEW_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_E_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_G_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md\n?? docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json\n?? docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md\n?? docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md\n?? rust/crates/lingxi-service/tests/support/\n?? scripts/rust-tauri/r02_run_output_regression.py\n?? scripts/rust-tauri/r05_t08_mutate_pin.py\n?? scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py\n?? scripts/rust-tauri/run_output_sinks.py\n"
+}
+
+FILE changed-files.json
+{
+  "recordedAt": "2026-10-07T01:19:08.051350+00:00",
+  "owned_changes": [
+    {
+      "path": "docs/rust-tauri/R05/R05_REPORT.md",
+      "beforeSha256": "a13ca7342991da5725a721e93fa8dade0437b600a06e64814206254872a23907",
+      "afterSha256": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "beforeSha256": "edaefa5b5a1d0f5afaa3c75760c264269fecadaa54acb2915793052e99557d2c",
+      "afterSha256": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "beforeSha256": "de950b466ac930d201f61bbb464a66a49a7b69afd79295931a7d753a637ae563",
+      "afterSha256": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_HANDOFF.json",
+      "beforeSha256": "41eb3ad1a91a577511402736b80b38cc5529b937ca6574bbc074acc7d01376b1",
+      "afterSha256": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58"
+    },
+    {
+      "path": "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "beforeSha256": "2c431b2bf9fa6ad83ca010f4392cc262844eca2e2366a6e6aa204e14b280f108",
+      "afterSha256": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "beforeSha256": "6fc4c7096145a3bfa3d6f318b32721ad520f064162d34f007080a41a524c73d1",
+      "afterSha256": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "beforeSha256": "c6b5da4a74938e66b6962b733a46a1d9ef8401cab36dc816ccbdb2de553bec99",
+      "afterSha256": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "beforeSha256": "0cfd02db2ab41fd1b876b694d705410dd90564265d56917413e98d28508a61f2",
+      "afterSha256": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "beforeSha256": "c1fd4b03b677d033ddc6a19df1cae2e41be7ea46d3dfd3f4424b7bb2aea0801a",
+      "afterSha256": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "beforeSha256": "11afe718db1c1c251fe915f77b378fe54450ed76a01966939b8df83b2bc5102b",
+      "afterSha256": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b"
+    },
+    {
+      "path": "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+      "beforeSha256": "027afa74e452e5839885ccd6d1412301b7ffcc19812fffaaea9ffd9bdd3f35c4",
+      "afterSha256": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86"
+    },
+    {
+      "path": "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "beforeSha256": "c219180aab39823c647f8758028fe91150bd2e5e76d735b3dd9000ab99ec7b37",
+      "afterSha256": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4"
+    },
+    {
+      "path": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "beforeSha256": "43419656975bc810639fbe5e4b4870c3a460fdc6d9a65fabe14a45dbb75b8429",
+      "afterSha256": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2"
+    }
+  ],
+  "optional_interface_evolution": "未改变接口，无必要新增演进项，保留原文件。",
+  "write_boundary": "本E全部写入是上述13份现行文档及E-01自身非dispatch；总控RR3台账/生产/pins/历史任务书/系统/Git未写。"
+}
+
+
+FILE READING.json
+{
+  "recordedAt": "2026-10-07T01:19:08.048499+00:00",
+  "entries": [
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_E_BRIEF.md",
+      "sha256": "83db95a21fe67ecaca2fa289aa3577623c8d93f616fadd8ea95616cb56448d9c",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_BRIEF.md",
+      "sha256": "31be412e410ff7be0543c2b9c5ff332ef77540de242070d6d2b1271ab0a6446c",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md",
+      "sha256": "9395286d8272ba1c841bc7960cc0e06b93affcfbacc2037cf0a8f0df9fcb1fe8",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_MASTER_PROMPT_2026-10-04.md",
+      "sha256": "7fc077f1b370660f582d964977685d5a619fa988befd26f8a4915f409529f2bc",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_MASTER_PROMPT_2026-10-06.md",
+      "sha256": "35802f225728954cccedd12ef0453090948afd18db9cb0f8f31cc9d896e92545",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_BRIEF.md",
+      "sha256": "89c312ff936cc582b944c97d6166e7c6ffc6a57f8481aee0653d1bc9815b05fb",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_FINAL_REPORT.md",
+      "sha256": "6bcdff2135a8a93bd3a7e44c98ae663c971fc0e93f5b083495d190621d5c2706",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_PROGRESS.md",
+      "sha256": "cc51a8db03f30c9aec46201cbffe5c8cab3fbe6ae256485a5a1d9426b9d9111d",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_LEAF_DEVIATIONS.md",
+      "sha256": "3e95ce7cdc958023ceffea7ba0bfbb6742c2dafd7e40e42fd89227b6546b8f05",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_BRIEF.md",
+      "sha256": "1ee083e21a23a69109cb96810377dba2a9615f7df00a89232dc276631808ff98",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_ISSUE_MATRIX.json",
+      "sha256": "c2f0475ebf998ae225ac300393e58a3365419fb07347861ff78f3a5f0d0c8dbd",
+      "method": "全文/分段阅读；JSON为完整顶层及10条issue全字段"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_PROGRESS.md",
+      "sha256": "90f1bb1b1cbf0b0cf42114e83e768a4f943723155a7144e061d330a43b649e1e",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_HANDOFF.md",
+      "sha256": "3560187fb5b114c90a958ef844c204619c5292099d2647fab83e43eca559b044",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/Lingxi_R05_完整执行与验收提示词_2026-10-02.md",
+      "sha256": "371fffc32310ff7fdd6f8b383d437d327b6ab3b8848f78154011cad3719bdfdb",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/01_通用执行约束.md",
+      "sha256": "d4f07185735acda91b73a2aa97a42ca7ce5795babf1104968c83671131cf871c",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/02_目标架构与强制契约.md",
+      "sha256": "53dbf699675d9981b60ea5c982c4d0507afffd5184e6bebac875aae40d173c4d",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R05_模型协议、凭证、流式处理与最小完整闭环.md",
+      "sha256": "a10490c115d00f1f0c5bbcf1a5e2f6b8740397103d8b8ad5cc029a3427f1a3e0",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/04_阶段依赖与接口交接.md",
+      "sha256": "940c896508e929ec5f25c2b9020c06c2035c3f9800f43b78b1fd5e303e92bde3",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/06_风险、技术决策与退出条件.md",
+      "sha256": "6c92962e5bcb739509630eb8c9cf8b96fabf67c0d51315717ae048d9b87786f0",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R06_上下文、会话语义、记忆与知识库.md",
+      "sha256": "d54e7fcc638b62fc4303ce4af8f01ba8c358fd1a90d0f85a491bfd4a439bbd2e",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/05_验收与性能协议.md",
+      "sha256": "d86c51f4b8571f94f0e9b457e74e79d9281d5c846e7a37d1f39edfdf47324b61",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/03_功能与所有权矩阵.md",
+      "sha256": "6e84fc77a9f3124d51fe4d088fda6c8dcb96989e43d280634b94b7fc1d778560",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+      "sha256": "a41f1108e6eb6cdbc56c90b3f50df5daaf6709a552fb73d49b2271d2719de161",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+      "sha256": "0f5911462089380b8eb94d137b98f8d2382d062564c43d54cd84338b0852191e",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/STAGE_REVIEW.md",
+      "sha256": "0489d596b1c5eea78ada9480baca0112041d9608e1d9ba48f00dcab58dcfa0fb",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md",
+      "sha256": "b9faa6a18136982a90e0e169a8092e9c1d97228012abc18c3bb3ebe64b42e629",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md",
+      "sha256": "f12ec6e1f7aba629f244e6c42a3ba25b6128fed4d6e5fda784c1dbd967960008",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+      "sha256": "8e83638b0b24ed5d98a8bd9acc2d632d5eb07fcba0df431350f20108777c72a1",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/C-01/REPORT.md",
+      "sha256": "07e42bdaa5d332edeb9028a399c227f01f97f9cc11d996f8f26d4f6623d6192e",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+      "sha256": "c67fb4795cd3934283ec8ce319e428127c95557584d487f9dae405c3dd31787d",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json",
+      "sha256": "7394927e21e332f9a151d999a9e740bbcb6c466758c7378125a5387ac806931b",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json",
+      "sha256": "7740090dcefd823fea5126cc8bfcab1a7d23e9cf2b9779db97a4e2db1be86656",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md",
+      "sha256": "75fe8d084c6524c2a2390f6f6eb48db1510eddb082bb1e1c4fc111e16c78e91b",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json",
+      "sha256": "0f2d2aab36ba252c429ac8bebfa042a69215c552b7e8036f32d1cb1817780af3",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/f27-resource-series.json",
+      "sha256": "bcc0620794f4384196d74b7844098c063a96947147be48897a1076b9d6a50b7b",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/runtime-binding.json",
+      "sha256": "7be7185c83ee92a6834da5e73f5503767a4b99a9692ec938d6f303b25463bbd3",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/result.json",
+      "sha256": "6bd69752fb4e9aabc8cbbc17cc0df0d65185b53bd731c255fe65cc674a480a87",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/D-01/REPORT.md",
+      "sha256": "5ddc3c80e7e7ad7f88df714c6bb0d3c22502119cbe87fa5c0186eedbdf54be52",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/D-01/PREPARED-ALLOW.md",
+      "sha256": "b0f25a7b61b0028650631611044139eba84bd2722697160ab43c9ede450dae0f",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
+      "sha256": "420e01cb179e2003353c24fbe6e8fc8541739e38accb47d146eec44699fb456f",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md",
+      "sha256": "ba6a7c79b0f7776b7d94640888527113eed2a641e135a46b87ee8c3a516eb961",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md",
+      "sha256": "e9d6de071aa6f08e56a7f27d8b200fe915a4e9468e81361d778660cb97bd954d",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md",
+      "sha256": "55e701cd0015c05ac58e1fc5618c4f67f09603d8541d7f781bd1307b133e1147",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+      "sha256": "c3564b891ceeb29fe356b879d7b1728f2a810e7614e462af4ab1a40d7e0647ad",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log",
+      "sha256": "c4e121c337d4a069d4ba1c6b1750cbb6eba76f49b1d410eaffa3fa2837a1ce09",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-binding-exclusions.txt",
+      "sha256": "54d86880869d15a7272dc1c6d8d5316531a38bf723e5812d7f4c95e8ab9995ec",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-run-output-sinks.txt",
+      "sha256": "3c7c4003c7a6d5dad0c9837cbb2e6758411b9a3b53714139488dcc1919ba8da6",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/D-R2/probe/zz_lanprobe.c",
+      "sha256": "016664ce87b705450f19379d73c401d17ac7fcae75565fe5a52eda973ddb8a0d",
+      "method": "全文只读"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/D-R2/probe/zz_lanprobe.py",
+      "sha256": "9dfdded8763afe98bbcf7afe083ad8818edf677591f433cd80eddcedba1cc6a7",
+      "method": "全文只读"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/D-R2/probe/probe-suite.log",
+      "sha256": "c688090b8b104c5407ffa4f7857d73798d16edfceeb243c1abb5d87a78359c13",
+      "method": "全文只读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json",
+      "sha256": "6196fdd0c6ebe5d3250ab6e3c39931fe734dbefcb260f4c51f9d192b5ac9887b",
+      "method": "顶层基线/计数/独立终审及E相关F27/F28/F40/F42、继承关闭与证据入口全字段；未冒称全文逐条人工重新验收所有F-ID"
+    }
+  ],
+  "owned_before_refs": [
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_REPORT.md",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_BLOCKERS.md",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_HANDOFF.json",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_TEST_MAP.json",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/ORCHESTRATOR_PROGRESS.json"
+  ],
+  "large_ledger_method": "现行大型账本完整JSON解析，历史字段/字节前缀全量比对；语义只查本E相关当前块及引用，不重新验收全部旧用例。"
+}
+

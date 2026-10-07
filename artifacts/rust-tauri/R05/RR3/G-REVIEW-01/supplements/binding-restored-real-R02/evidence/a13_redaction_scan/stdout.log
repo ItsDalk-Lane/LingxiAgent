@@ -1,0 +1,31 @@
+== R02-T07 / R02-A13 redaction scan (toolchain 1.98.1, target /Users/study_superior/.cache/lingxi-r05-neg-target) ==
+== building lingxi-service (--locked, offline) ==
+PASS build
+== P1/P2: normal + error traffic ==
+PASS P1 GET /me -> 200
+PASS P1 execute -> 200 (runId minted; input carried preset secret material)
+PASS P1 issue credential -> 201 (201 issuance body = sanctioned surface, scan-excluded)
+PASS P1 ws-ticket minted -> 200
+PASS P2 401 bad bearer
+PASS P2 401 missing credential
+PASS P2 401 bad query token
+PASS P2 403 cross-principal
+PASS P2 404 unknown session
+PASS P2 WS rejections (bad bearer upgrade 401; malformed frame -> invalid_message + close)
+== P3: storage error via externally-held WAL write lock (busy timeout) ==
+P3 burst results: 200x0, 503x1
+PASS P3 storage error: 1 explicit 503 db_busy (retryable) responses; no fake success
+== P4: epoch gate refusal diagnostics ==
+PASS P4 epoch refusal exit 2 with marker
+== RETAIN: copy the run's REAL rotating logs into the evidence set ==
+retained 3 real rotating log file(s) under service-logs/ — fresh-root, source-bound to THIS round (UTC 2026-10-07T02:48:53Z, pid 35115), set-equal and per-file sha256-identical (retention-manifest.txt); in the scan below; sha256 in inventory.txt
+== SCAN: preset sensitive values across REAL logs + stderr/stdout + error bodies ==
+SCAN api_key: clean (0 files)
+SCAN device_secret: clean (0 files)
+SCAN oauth_bearer: clean (0 files)
+SCAN query_token: clean (0 files)
+SCAN local_token: clean (0 files)
+SCAN ws_ticket: clean (0 files)
+SCAN RESULT: PASS (0 occurrences of 6 preset/minted secrets across 246/41 read evidence files incl. the retained real rotating logs)
+PASS SCAN: preset + minted sensitive values absent from the REAL rotating logs, stderr/stdout captures, error bodies and WS transcripts (every target read; unreadable would have failed)
+== CORRELATION: 关联 ID 保留 ==

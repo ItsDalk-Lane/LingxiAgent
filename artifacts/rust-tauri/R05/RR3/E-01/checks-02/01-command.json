@@ -1,0 +1,51 @@
+{
+  "argv": [
+    "/Users/study_superior/.cargo/bin/rustc",
+    "--version"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedAt": "2026-10-07T01:15:02.025561+00:00",
+  "endedAt": "2026-10-07T01:15:02.064391+00:00",
+  "exitCode": 0,
+  "inputHashesBefore": {
+    "docs/rust-tauri/R05/R05_REPORT.md": "33a7a068130cdba05cdc24db0cc603330167489156edda3b60719cc4483d0286",
+    "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+    "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+    "docs/rust-tauri/R05/R05_HANDOFF.json": "805387b28623666ffc203df1c5a4cded061d22f59e09675e10c60f3d1b8717de",
+    "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "5a1b2231346c7e56645baf90da7f268e93df0d0cf35b492229e63a1241b818c5",
+    "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "74e771445efbb5626e808b0f9829988af8c0973cedfdae723991bfc6bdca8580",
+    "docs/rust-tauri/R05/R05_TEST_MAP.json": "141da9d3459bb2c71e62275e22514bbbc261470f40b71074f05e68a168e2ea2b",
+    "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+    "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "4c22ac6bd1e92929a8bd71d8aaf1b875262bd222753c232e4c8cb30a9d5111c4",
+    "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "457b1b948b81814d475e7f5dba055f517aa906c515e8a42940f462f6a4d2d55b",
+    "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+    "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+    "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+    "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "650c7f665a5d6f426fbe39adf1b862b8085a7c627068c94be3c64742f68bb3ec",
+    "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "812ad052270a615cf052be987434664d09a1ea1e9e3377016952ca8bd5ee6d4f",
+    "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+  },
+  "inputHashesAfter": {
+    "docs/rust-tauri/R05/R05_REPORT.md": "33a7a068130cdba05cdc24db0cc603330167489156edda3b60719cc4483d0286",
+    "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+    "docs/rust-tauri/R05/R05_BLOCKERS.md": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+    "docs/rust-tauri/R05/R05_HANDOFF.json": "805387b28623666ffc203df1c5a4cded061d22f59e09675e10c60f3d1b8717de",
+    "docs/rust-tauri/R05/PROGRESS_LEDGER.json": "5a1b2231346c7e56645baf90da7f268e93df0d0cf35b492229e63a1241b818c5",
+    "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": "74e771445efbb5626e808b0f9829988af8c0973cedfdae723991bfc6bdca8580",
+    "docs/rust-tauri/R05/R05_TEST_MAP.json": "141da9d3459bb2c71e62275e22514bbbc261470f40b71074f05e68a168e2ea2b",
+    "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+    "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": "4c22ac6bd1e92929a8bd71d8aaf1b875262bd222753c232e4c8cb30a9d5111c4",
+    "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": "457b1b948b81814d475e7f5dba055f517aa906c515e8a42940f462f6a4d2d55b",
+    "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+    "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+    "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+    "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": "650c7f665a5d6f426fbe39adf1b862b8085a7c627068c94be3c64742f68bb3ec",
+    "artifacts/rust-tauri/R05/RR3/E-01/verify.py": "812ad052270a615cf052be987434664d09a1ea1e9e3377016952ca8bd5ee6d4f",
+    "source_scope_manifest": "c05d6eb17c59548d8f0263564089d7d347b80f4779e7e31701856dd7b4555dc6"
+  },
+  "inputsEqual": true,
+  "stdout": "artifacts/rust-tauri/R05/RR3/E-01/checks-02/01-stdout.log",
+  "stderr": "artifacts/rust-tauri/R05/RR3/E-01/checks-02/01-stderr.log",
+  "stdoutSha256": "2073de5abf149185c2f4d7473dc833bc921b99135560d24ae7b2293f33a9c376",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

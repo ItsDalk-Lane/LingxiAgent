@@ -1,0 +1,437 @@
+{
+ "at": "2026-10-07T07:13:53.784153+00:00",
+ "kind": "overlay-dirty-manifest",
+ "count": 72,
+ "entries": [
+  {
+   "status": "M",
+   "path": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+   "sha256": "e48fd59d0294dd9349175d3e21cac7e4d6e32684b581a9a2bdc9f346893bb87b",
+   "size": 280355
+  },
+  {
+   "status": "M",
+   "path": "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+   "sha256": "8b2b592db1c70f082a4f7eb0ea5031fd7a2356ab5311a8bacd8f0941fe5ca0f9",
+   "size": 21257
+  },
+  {
+   "status": "M",
+   "path": "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+   "sha256": "384a3875c5d97d8032a07f1523c40a243e7383bf678fdec326198a5e85f68f43",
+   "size": 92496
+  },
+  {
+   "status": "M",
+   "path": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+   "sha256": "dab66326ef8989cd8b2fe5b3d29b40008cae114dd3182208e777ad5d59b00565",
+   "size": 4079196
+  },
+  {
+   "status": "M",
+   "path": "docs/rust-tauri/R05/R05_BLOCKERS.md",
+   "sha256": "6d6a11274f56c53070112301cd5c5bd262cd3e0e98f8da63213f4e3c7f28b10b",
+   "size": 13493
+  },
+  {
+   "status": "M",
+   "path": "docs/rust-tauri/R05/R05_HANDOFF.json",
+   "sha256": "37e546d074cceda8fee977fcca815073c8c7577a007c08deea1453e167e78b6d",
+   "size": 93786
+  },
+  {
+   "status": "M",
+   "path": "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+   "sha256": "f25410b6b54c0aa23eee9168b47d155ed09d897af10ab49362b2816cb4c3f087",
+   "size": 25368
+  },
+  {
+   "status": "M",
+   "path": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+   "sha256": "76f81d2bc5a6adafe5a5864d8ccf0d95bf4edbfb758e28e2c6eef7ad2cb21e59",
+   "size": 52595
+  },
+  {
+   "status": "M",
+   "path": "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+   "sha256": "f645789eba97821a00a66ee007889969ecd6b1afadbbc4efa83eb7a0a52f69d7",
+   "size": 13088
+  },
+  {
+   "status": "M",
+   "path": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+   "sha256": "a63bf246bb9725f71b9ef6f6e712c8ec1bb009a6a29b25f4b9f5bdd3cb80e309",
+   "size": 69886
+  },
+  {
+   "status": "M",
+   "path": "docs/rust-tauri/R05/R05_REPORT.md",
+   "sha256": "231b0421f270f16ceac50c879738d402d29ab7597e2eaefc497948857f7fed7c",
+   "size": 31894
+  },
+  {
+   "status": "M",
+   "path": "docs/rust-tauri/R05/R05_TEST_MAP.json",
+   "sha256": "b29c486cee16797ceaf27e291563058c6b53b27860d22131a34373dd2d771368",
+   "size": 121073
+  },
+  {
+   "status": "M",
+   "path": "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+   "sha256": "2e36bfa19d2efab9c16080461a1bfb252df1566cba497ced6b9c2099d0949b17",
+   "size": 6992
+  },
+  {
+   "status": "M",
+   "path": "rust/crates/lingxi-service/src/lib.rs",
+   "sha256": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+   "size": 203323
+  },
+  {
+   "status": "M",
+   "path": "rust/crates/lingxi-service/src/logging.rs",
+   "sha256": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+   "size": 22354
+  },
+  {
+   "status": "M",
+   "path": "rust/crates/lingxi-service/src/redaction.rs",
+   "sha256": "5b192ab43df13d6add0705a9f1eb2ead45da1131f012c3afb61dd9f90ac10b7a",
+   "size": 41935
+  },
+  {
+   "status": "M",
+   "path": "rust/crates/lingxi-service/tests/r05_t08_resources.rs",
+   "sha256": "23b03f56bef900fc0563b3348596e61437995f7c05cc25a5173455f11a23e33f",
+   "size": 70474
+  },
+  {
+   "status": "M",
+   "path": "rust/crates/xtask/src/candidate.rs",
+   "sha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+   "size": 23258
+  },
+  {
+   "status": "M",
+   "path": "rust/crates/xtask/src/candidate/tests.rs",
+   "sha256": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+   "size": 12443
+  },
+  {
+   "status": "M",
+   "path": "rust/crates/xtask/src/main.rs",
+   "sha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+   "size": 20978
+  },
+  {
+   "status": "M",
+   "path": "rust/crates/xtask/src/runner_identity.rs",
+   "sha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+   "size": 6854
+  },
+  {
+   "status": "M",
+   "path": "rust/crates/xtask/src/verify/runner_tests.rs",
+   "sha256": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69",
+   "size": 96139
+  },
+  {
+   "status": "M",
+   "path": "scripts/rust-tauri/r02_t01_service_smoke.sh",
+   "sha256": "76f3e9fd143842b4f9ef7577bf3c857ddaee29e02ec849b9b93d2cc14afede1c",
+   "size": 22014
+  },
+  {
+   "status": "M",
+   "path": "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+   "sha256": "171eaa1f7f24635d736afe1abf6f5dc8a8d563f1f21c52655fa8ddc37995cde4",
+   "size": 207199
+  },
+  {
+   "status": "M",
+   "path": "scripts/rust-tauri/r05_t08_negative_gate.sh",
+   "sha256": "7ca614a77b2e4f0613ed82c3df171776dbb5f5866c77c54a07c10e16bcd931b6",
+   "size": 36137
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_A_R2_BRIEF.md",
+   "sha256": "2223620df3a6652e546eb2b183329f29c8ddef3f926e8588d7d0cb6198d5f75d",
+   "size": 2414
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_BRIEF.md",
+   "sha256": "31be412e410ff7be0543c2b9c5ff332ef77540de242070d6d2b1271ab0a6446c",
+   "size": 7538
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_CF46_REVIEW_BRIEF.md",
+   "sha256": "e6562f92b20c6858765b6b5e6067db098f3ba7ceb55f6dd24a5aa6b92d0cd57d",
+   "size": 3093
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_DELIVERY_FINAL_BRIEF.md",
+   "sha256": "9f425c1eee49c84e26d136b217b121ff502d94087fd545d69efe9f5c91c2c7c6",
+   "size": 4729
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_DELIVERY_FINAL_REVIEW_BRIEF.md",
+   "sha256": "3be46a8ee2d5d40a6f7b4e7a3560dac0a026f85ee9faf0ea8c6393ebe12dd664",
+   "size": 3958
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_DELIVERY_PREP_BRIEF.md",
+   "sha256": "34b2da78107dfc2452218cca2d180396008fdc18fa93ff5eff4a8de6959211e1",
+   "size": 2195
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_DELIVERY_REVIEW_BRIEF.md",
+   "sha256": "46a06da0ce9063627d10c0742c855e616536d4971ab27162e67b8772224da9a6",
+   "size": 2393
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_D_REVIEW_BRIEF.md",
+   "sha256": "490ecacee26c01ebc90be7b4dfd1f2d709bbac2e27e08a11c72ece9ae1cba2f7",
+   "size": 3185
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_E_BRIEF.md",
+   "sha256": "83db95a21fe67ecaca2fa289aa3577623c8d93f616fadd8ea95616cb56448d9c",
+   "size": 4037
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_E_R2_BRIEF.md",
+   "sha256": "28fc2df66c6db57e49391df8855b2ada0e9b6f5a01b32a6deae4e992743a7276",
+   "size": 2502
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_E_R2_REVIEW_BRIEF.md",
+   "sha256": "f1b12543094179fdb079e8dc39e5a305380f27069cfb7545a71bd37f8531efc4",
+   "size": 2483
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_BRIEF.md",
+   "sha256": "04121285aa6bb2a9bbc81c21b00e222b7027a5170a7171b510d946b3444ac4a5",
+   "size": 6192
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_REVIEW_BRIEF.md",
+   "sha256": "a5a58474633d05ae020cad73b9d837c9a8e2e9beb56f4a5d4e510d1a34251654",
+   "size": 2085
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_E_R4_REVIEW_BRIEF.md",
+   "sha256": "9ddd9dd019b28582fcf43ad180df88320103768a59bcfd47b728460f9181ca77",
+   "size": 4932
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md",
+   "sha256": "0119a821a8ece1516a7fd807b55f8df9c08f8f2e356126db7d467097e303ee54",
+   "size": 2610
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_FINAL_BRIEF.md",
+   "sha256": "47ef75f6021b1079596ba115c20501ead3c08cdf08188569c67ab29a6ebded3a",
+   "size": 5826
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_G_BRIEF.md",
+   "sha256": "8f05e0ee2e9ebe2506d247fd7904d5cb48134ce6697a5d0a3a130b7e4bb148a3",
+   "size": 3115
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_G_INTERRUPTION_BRIEF.md",
+   "sha256": "bb8e0719ac5762439dd5ae00548fce23c2c49b8797403f7269eafaef8592b938",
+   "size": 1935
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_G_R2_BRIEF.md",
+   "sha256": "a3c647f6adb5e14fa221d8dae2190e8286d64709b9baaa3e158798e2c1781864",
+   "size": 7477
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_G_R3_BRIEF.md",
+   "sha256": "6c87cef11e090a122a3275ab6174059434cca6320cb0656d85c91fae647b75b9",
+   "size": 5898
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+   "sha256": "9a8e15a030ca3dd2f9a4de0a76e4b00b5a848b1507f4e8bf38245ffe2c4ff0fc",
+   "size": 13418
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_H_BRIEF.md",
+   "sha256": "3d4373b01288452167b0f6d674034d4793b9d9e3f596668be70e52614376157f",
+   "size": 4503
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_H_R2_REVIEW_BRIEF.md",
+   "sha256": "79176935f784fe867f4dba97b00e2eb355679863ce2aa5b8e2257f381c70669d",
+   "size": 5474
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_H_REVIEW_BRIEF.md",
+   "sha256": "06b825cc1d96c7e7ceb9ae999c76c1a34f9e036d105a0f5a6612f88ddfaa2d08",
+   "size": 4617
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+   "sha256": "cff7aae01601d965d8cb466dc52315cf86478d8fd0ce4dadc6209f297b852276",
+   "size": 20809
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_I_BRIEF.md",
+   "sha256": "a209e3a2895ffbab097213a5c4bcf6aebf966cde62fe5eb7c2cb86f7f15aed26",
+   "size": 3967
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_I_REVIEW_BRIEF.md",
+   "sha256": "413879fa2f7d4ee10687b0a9d1b5a9124eeee3cea86e25951653e09bc65098ad",
+   "size": 3068
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_J_BRIEF.md",
+   "sha256": "9925e522b05d3f30ebe5c39168e78f6fd4d329c0b41c1916a421ec60ceebb23f",
+   "size": 4205
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_J_R2_BRIEF.md",
+   "sha256": "891c6bdc05a9e75c797376e4f4602504e218a4c31b8ce39d24f7d0576c7c1d17",
+   "size": 5351
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_J_R2_REVIEW_BRIEF.md",
+   "sha256": "a43794053463cd0893e73e3f4f285f562e4be354d1fbb12f11f3b34146e9660d",
+   "size": 3815
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_J_REVIEW_BRIEF.md",
+   "sha256": "d40662f19a04418c917b813c6feb931c8586674aebab8fbf416e86e3f805f140",
+   "size": 3102
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+   "sha256": "efd45f4dae45e5446878f2c555086a78d2832336bafccc6feb0ce0c632024e31",
+   "size": 17406
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_R02_TRIAGE_BRIEF.md",
+   "sha256": "2da7ed2e71c731afd696aa60e799337366ce6e01730cd2c40f6bb03689477aa1",
+   "size": 2533
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md",
+   "sha256": "9395286d8272ba1c841bc7960cc0e06b93affcfbacc2037cf0a8f0df9fcb1fe8",
+   "size": 3911
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_STORAGE_BRIEF.md",
+   "sha256": "574ec36f45a05fe9242ea0102f9ae02f4957572fd682840d4e82722d8d881d6b",
+   "size": 1769
+  },
+  {
+   "status": "??",
+   "path": "docs/rust-tauri/R05/repair-current/RR3_STORAGE_R2_BRIEF.md",
+   "sha256": "d36d36b051f7d25032f3fba2277544f8accb4dc1b925871b1e5ad23ba250627d",
+   "size": 1911
+  },
+  {
+   "status": "??",
+   "path": "rust/crates/lingxi-service/tests/support/"
+  },
+  {
+   "status": "??",
+   "path": "scripts/rust-tauri/prepare_git_copy.py",
+   "sha256": "37f4246a11f54826f2a31a772c1db0b5e3422c0261ea56c9872c3a3b75c9cb24",
+   "size": 14002
+  },
+  {
+   "status": "??",
+   "path": "scripts/rust-tauri/prepare_git_copy_selfcheck.py",
+   "sha256": "5dc5e9486c9cf18b2c856082b611d2c64f5433cc4e0dafa5c0635e7fa527fc6f",
+   "size": 14363
+  },
+  {
+   "status": "??",
+   "path": "scripts/rust-tauri/r02_run_output_regression.py",
+   "sha256": "fcee14b8c529d502d9885a4b7a31e8c5f90ade22ab92e149402d52585272fd99",
+   "size": 15852
+  },
+  {
+   "status": "??",
+   "path": "scripts/rust-tauri/r02_t01_log_level_regression.py",
+   "sha256": "02bde1c1f2e2519739aa229d7135f44b0ffe90966f66836052399fcd99f4082d",
+   "size": 3625
+  },
+  {
+   "status": "??",
+   "path": "scripts/rust-tauri/r05_t08_mutate_pin.py",
+   "sha256": "7785b41ebadfdc6d6415ee1d337ea48621e25d1bbb1ed1c16456004545279609",
+   "size": 2526
+  },
+  {
+   "status": "??",
+   "path": "scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py",
+   "sha256": "f94f76721e77bf5a738b1270bd875569fd3f9ba3cc552795033ac057a8ee1867",
+   "size": 5131
+  },
+  {
+   "status": "??",
+   "path": "scripts/rust-tauri/r05_t08_node_selfcheck.py",
+   "sha256": "0429d60f3a32370377bd9c6864f5c81e2329d1f41ee2a3caab35db545f120614",
+   "size": 14991
+  },
+  {
+   "status": "??",
+   "path": "scripts/rust-tauri/r05_t08_prepare_node.py",
+   "sha256": "51abc64c8be5e90b1af7e35a475f3ea9e37cbb37033b9c256b5093333fd8c082",
+   "size": 13339
+  },
+  {
+   "status": "??",
+   "path": "scripts/rust-tauri/r05_t08_restore_selfcheck.py",
+   "sha256": "0cd24624bf7d6079e3cf7b4e6cf693222026db8261ffc60691bdc77fde0f57a4",
+   "size": 17026
+  },
+  {
+   "status": "??",
+   "path": "scripts/rust-tauri/run_output_sinks.py",
+   "sha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+   "size": 5875
+  }
+ ]
+}

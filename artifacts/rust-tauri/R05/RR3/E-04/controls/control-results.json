@@ -1,0 +1,41 @@
+{
+  "control_root": "/private/tmp/rr3-e04-controls",
+  "cases": [
+    {
+      "case": "阳性对照：字节相同副本六元组检查PASS",
+      "expect": "PASS",
+      "got": "PASS",
+      "ok": true,
+      "detail": "六元组核验通过"
+    },
+    {
+      "case": "阳性对照：字节相同副本严格解析PASS",
+      "expect": "PASS",
+      "got": "PASS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "case": "阴性对照1：R06_READY翻false被六元组检查FLAG",
+      "expect": "FLAG",
+      "got": "FLAG",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "case": "阴性对照2：真重复键被严格解析器FLAG（naive 静默 last-wins 佐证）",
+      "expect": "FLAG",
+      "got": "FLAG",
+      "ok": true,
+      "detail": "duplicate key 'schemaVersion'"
+    },
+    {
+      "case": "阴性对照3：pins TSV单字节变异被输入相等检查FLAG",
+      "expect": "FLAG",
+      "got": "FLAG",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "method_validated": true
+}

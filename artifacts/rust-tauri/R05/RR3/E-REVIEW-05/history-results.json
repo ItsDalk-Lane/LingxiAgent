@@ -1,0 +1,157 @@
+[
+ {
+  "name": "FINAL-01 FAIL(56 嵌套.git 夹具→绑定器拒收) 可寻且标历史",
+  "ok": true,
+  "detail": "matched_in=4 doc(s)"
+ },
+ {
+  "name": "FINAL-02 FAIL(唯一 symlink 条目) 可寻且标历史",
+  "ok": true,
+  "detail": "matched_in=2 doc(s)"
+ },
+ {
+  "name": "FINAL-03 FAIL(F53 flake+F54 46叶分类) 可寻且标历史",
+  "ok": true,
+  "detail": "matched_in=2 doc(s)"
+ },
+ {
+  "name": "G01 真实默认失败(exit2/15目标红) 保留",
+  "ok": true,
+  "detail": "matched_in=2 doc(s)"
+ },
+ {
+  "name": "G02 ENOSPC 空间阻断历史保留(BLOCKED_BY_STORAGE)",
+  "ok": true,
+  "detail": "matched_in=4 doc(s)"
+ },
+ {
+  "name": "E-REVIEW-01 FAIL(MF-E01/MF-E02) 保留",
+  "ok": true,
+  "detail": "matched_in=3 doc(s)"
+ },
+ {
+  "name": "A-REVIEW-01 FAIL 保留",
+  "ok": true,
+  "detail": "matched_in=3 doc(s)"
+ },
+ {
+  "name": "RR2 层不稳(R04 8/8、R03 15/15 checkpoint 不稳) 保留",
+  "ok": true,
+  "detail": "matched_in=4 doc(s)"
+ },
+ {
+  "name": "RR3/FINAL-01/02/03 三轮 offline_gate=FAIL 原样保留(报告历史层表)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "禁语「只剩ALF」不复现于 REPORT（否定引用除外）",
+  "ok": true,
+  "detail": "occurrences=1 ctx=['历史。最新**已完成**正式终审仍 RR2/FINAL-01 FAIL，不能说“只剩 ALF”。RR3 FINAL **NOT RUN**，没有新结果路径或最终']"
+ },
+ {
+  "name": "禁语「只剩ALF」不复现于 REVIEW（否定引用除外）",
+  "ok": true,
+  "detail": "occurrences=0 ctx=[]"
+ },
+ {
+  "name": "禁语「只剩ALF」不复现于 BLOCKERS（否定引用除外）",
+  "ok": true,
+  "detail": "occurrences=1 ctx=['独立CLOSED，原E两mustFix也已独立关闭；仍有以下实际必需事项，不写“只剩ALF”：  - G02 N02真实构建ENOSPC，未达负测目标；STOR']"
+ },
+ {
+  "name": "禁语「只剩ALF」不复现于 NEG（否定引用除外）",
+  "ok": true,
+  "detail": "occurrences=0 ctx=[]"
+ },
+ {
+  "name": "禁语「只剩ALF」不复现于 MUS（否定引用除外）",
+  "ok": true,
+  "detail": "occurrences=0 ctx=[]"
+ },
+ {
+  "name": "禁语「只剩ALF」不复现于 HANDOFF（否定引用除外）",
+  "ok": true,
+  "detail": "occurrences=0"
+ },
+ {
+  "name": "raw npm 登记 red 不写全绿保留于 REPORT",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "raw npm 登记 red 不写全绿保留于 NEG",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "directed(E0–E4.5)与 E5 BY SCOPE SKIP 原许可保留",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "LIVE BLOCKED_NOT_AUTHORIZED(RR-BLK-CREDENTIALS 最迟 R10) 保留于 REPORT",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "LIVE BLOCKED_NOT_AUTHORIZED(RR-BLK-CREDENTIALS 最迟 R10) 保留于 BLOCKERS",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "平台边界(Linux 继承未复验/Windows 未验证) 保留于 REPORT",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "平台边界(Linux 继承未复验/Windows 未验证) 保留于 BLOCKERS",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "源事实: D-01 c5975a45/D-R1 9f748902 曾被拦(FINAL-01 记「均被 ALF 阻断(20s 0 字节)」、D-R1 记 20s 内读取 0 字节)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "源事实: 43d95970 连续三轮(FINAL-01/02/03)放行、无用户操作证据",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "源事实: FINAL-04 cf9bce2f+d57ea731/CDHash 364514be 两新对象 6 次 LAN 全过、ALF 放行",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "源事实: 各 STAGE_REVIEW 均保留按实例观察属性措辞(非永久解除)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "现行文档: 四对象 SHA(c5975a45/9f748902/43d95970/cf9bce2f+d57ea731) 全部可寻",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "现行文档: 9f748902 明确标历史被拦、未写成放行",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "现行文档: 「无证据需要用户防火墙操作」与 D 终审口径一致",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "现行文档: 观察属性未写成永久解除（每处「永久解除」均为否定式）",
+  "ok": true,
+  "detail": "occurrences=3"
+ },
+ {
+  "name": "BLOCKERS 当前段: RR3 无未关闭必需缺口 + 登记项(RR-BLK-CREDENTIALS/平台/R05-ENV-R00 观察属性)",
+  "ok": true,
+  "detail": ""
+ }
+]

@@ -1,0 +1,72 @@
+{
+  "recordedAt": "2026-10-07T01:19:08.051350+00:00",
+  "owned_changes": [
+    {
+      "path": "docs/rust-tauri/R05/R05_REPORT.md",
+      "beforeSha256": "a13ca7342991da5725a721e93fa8dade0437b600a06e64814206254872a23907",
+      "afterSha256": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "beforeSha256": "edaefa5b5a1d0f5afaa3c75760c264269fecadaa54acb2915793052e99557d2c",
+      "afterSha256": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "beforeSha256": "de950b466ac930d201f61bbb464a66a49a7b69afd79295931a7d753a637ae563",
+      "afterSha256": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_HANDOFF.json",
+      "beforeSha256": "41eb3ad1a91a577511402736b80b38cc5529b937ca6574bbc074acc7d01376b1",
+      "afterSha256": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58"
+    },
+    {
+      "path": "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "beforeSha256": "2c431b2bf9fa6ad83ca010f4392cc262844eca2e2366a6e6aa204e14b280f108",
+      "afterSha256": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "beforeSha256": "6fc4c7096145a3bfa3d6f318b32721ad520f064162d34f007080a41a524c73d1",
+      "afterSha256": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "beforeSha256": "c6b5da4a74938e66b6962b733a46a1d9ef8401cab36dc816ccbdb2de553bec99",
+      "afterSha256": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "beforeSha256": "0cfd02db2ab41fd1b876b694d705410dd90564265d56917413e98d28508a61f2",
+      "afterSha256": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "beforeSha256": "c1fd4b03b677d033ddc6a19df1cae2e41be7ea46d3dfd3f4424b7bb2aea0801a",
+      "afterSha256": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "beforeSha256": "11afe718db1c1c251fe915f77b378fe54450ed76a01966939b8df83b2bc5102b",
+      "afterSha256": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b"
+    },
+    {
+      "path": "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+      "beforeSha256": "027afa74e452e5839885ccd6d1412301b7ffcc19812fffaaea9ffd9bdd3f35c4",
+      "afterSha256": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86"
+    },
+    {
+      "path": "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "beforeSha256": "c219180aab39823c647f8758028fe91150bd2e5e76d735b3dd9000ab99ec7b37",
+      "afterSha256": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4"
+    },
+    {
+      "path": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "beforeSha256": "43419656975bc810639fbe5e4b4870c3a460fdc6d9a65fabe14a45dbb75b8429",
+      "afterSha256": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2"
+    }
+  ],
+  "optional_interface_evolution": "未改变接口，无必要新增演进项，保留原文件。",
+  "write_boundary": "本E全部写入是上述13份现行文档及E-01自身非dispatch；总控RR3台账/生产/pins/历史任务书/系统/Git未写。"
+}

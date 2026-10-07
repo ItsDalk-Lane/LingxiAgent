@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "startedUtc": "2026-10-07T04:05:40.649289+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/j02-default-zr71fcjm",
+      "startedUtc": "2026-10-07T04:06:04.427553+00:00",
+      "finishedUtc": "2026-10-07T04:06:04.706146+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "receipt": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-02/actual-final-02/full-default-01/node-preparation/result.json",
+  "receiptSha256": "5b839dc6e235f9ec846eb89d385dee94dba6e78531f59323a738dcb48c5de3b6",
+  "checkedFiles": 64760,
+  "finishedUtc": "2026-10-07T04:06:04.760448+00:00"
+}

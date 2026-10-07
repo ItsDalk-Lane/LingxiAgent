@@ -1,0 +1,191 @@
+[
+  {
+    "caseId": "fmt",
+    "fId": "F42",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "fmt",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:30:53.300193+00:00",
+    "finishedAt": "2026-10-07T00:30:54.295898+00:00",
+    "durationSeconds": 0.9955975419143215,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "matchesExpected": true,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "caseId": "clippy-xtask",
+    "fId": "F42",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "clippy",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:30:54.296521+00:00",
+    "finishedAt": "2026-10-07T00:30:58.859259+00:00",
+    "durationSeconds": 4.562737499945797,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "matchesExpected": true,
+    "logSha256": "bc2e47d17a05bbd928aa4adb0500f5fa5e8a2e003e932150443d3c550c5d5bcb"
+  },
+  {
+    "caseId": "build-xtask",
+    "fId": "F42",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "build",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask"
+    ],
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:30:58.859913+00:00",
+    "finishedAt": "2026-10-07T00:31:01.230136+00:00",
+    "durationSeconds": 2.3702480420470238,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "matchesExpected": true,
+    "logSha256": "35f12dc9bc68190679c71abe3901ad29d0e9bc02e3a30af54449ad3deca2d9b3"
+  },
+  {
+    "caseId": "xtask-all",
+    "fId": "F42",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask"
+    ],
+    "envOverrides": {
+      "LINGXI_NESTED_ARCHIVE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-01/final-selfcheck-02/nested-internal"
+    },
+    "startedAt": "2026-10-07T00:31:01.230671+00:00",
+    "finishedAt": "2026-10-07T00:31:20.114837+00:00",
+    "durationSeconds": 18.884097083006054,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "matchesExpected": true,
+    "logSha256": "472a563333f9fed9b65736fbac5e257336218771259548c3d5e7ad13c189fa68"
+  },
+  {
+    "caseId": "nested-external",
+    "fId": "F42",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "rr3_real_fd_standard_nested_layout",
+      "--",
+      "--nocapture"
+    ],
+    "envOverrides": {
+      "LINGXI_NESTED_EXTERNAL": "1",
+      "LINGXI_NESTED_ARCHIVE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-01/final-selfcheck-02/nested-external"
+    },
+    "startedAt": "2026-10-07T00:31:20.115414+00:00",
+    "finishedAt": "2026-10-07T00:31:28.078667+00:00",
+    "durationSeconds": 7.9632429159246385,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "matchesExpected": true,
+    "logSha256": "a695d94e1c65e0c25a0b24a32e043b8bf205f203fb175daffc7757a6c2d60aec"
+  },
+  {
+    "caseId": "discovery-green",
+    "fId": "F42",
+    "command": [
+      "python3",
+      "scripts/rust-tauri/r02_run_output_regression.py",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-01/final-selfcheck-02/discovery-green"
+    ],
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:31:28.079267+00:00",
+    "finishedAt": "2026-10-07T00:31:34.491598+00:00",
+    "durationSeconds": 6.412331499974243,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "matchesExpected": true,
+    "logSha256": "fba7a9e8b4f9901358b6cc2eb7d35fc9f21fc638e5ec316cd1e10c0b0177390a"
+  },
+  {
+    "caseId": "discovery-old-red",
+    "fId": "F42",
+    "command": [
+      "python3",
+      "scripts/rust-tauri/r02_run_output_regression.py",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-01/final-selfcheck-02/discovery-old-red",
+      "--discovery",
+      "artifacts/rust-tauri/R05/RR3/A-01/discover-before.py"
+    ],
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:31:34.492234+00:00",
+    "finishedAt": "2026-10-07T00:31:35.426817+00:00",
+    "durationSeconds": 0.9346052909968421,
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "matchesExpected": true,
+    "logSha256": "4ba9c6a0e45ef8dced431f7e64a4d8e25ab6382ede72f3a14d6a299dd6d26168"
+  },
+  {
+    "caseId": "shell-syntax",
+    "fId": "F42",
+    "command": [
+      "bash",
+      "-n",
+      "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh"
+    ],
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:31:35.427321+00:00",
+    "finishedAt": "2026-10-07T00:31:35.435225+00:00",
+    "durationSeconds": 0.00793625006917864,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "matchesExpected": true,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "caseId": "diff-check",
+    "fId": "F42",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:31:35.435902+00:00",
+    "finishedAt": "2026-10-07T00:31:35.521700+00:00",
+    "durationSeconds": 0.08583050000015646,
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "matchesExpected": true,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

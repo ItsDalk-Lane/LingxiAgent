@@ -1,0 +1,443 @@
+{
+  "utc": "2026-10-07T01:24:44.687567+00:00",
+  "runs": [
+    {
+      "name": "prebuild-r00",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "+1.98.1",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r00_management_leaves",
+        "--no-run",
+        "--message-format=json"
+      ],
+      "timeout": 600,
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startUTC": "2026-10-07T01:15:56.590357+00:00",
+      "endUTC": "2026-10-07T01:17:34.931775+00:00",
+      "elapsedSeconds": 98.340723834,
+      "parentPID": 83944,
+      "actualExitCode": 0,
+      "supervisorTimedOut": false,
+      "supervisorExitCode": 0,
+      "signalsSent": [],
+      "observedBinaryProcesses": [],
+      "counts": null,
+      "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/prebuild-r00.log",
+      "logSha256": "36df4e05db7f195c6859fb5730403425acee732f76418d96cd2bec5e01aa925c"
+    },
+    {
+      "name": "r00-formal-01",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "+1.98.1",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r00_management_leaves",
+        "--",
+        "--nocapture"
+      ],
+      "timeout": 180,
+      "monitor": true,
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startUTC": "2026-10-07T01:18:32.963893+00:00",
+      "endUTC": "2026-10-07T01:19:36.114671+00:00",
+      "elapsedSeconds": 63.150283542,
+      "parentPID": 86486,
+      "actualExitCode": 101,
+      "supervisorTimedOut": false,
+      "supervisorExitCode": 101,
+      "signalsSent": [],
+      "observedBinaryProcesses": [
+        {
+          "pid": 86488,
+          "parentPID": 86486,
+          "firstUTC": "2026-10-07T01:18:34.137971+00:00",
+          "identity": {
+            "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0",
+            "resolvedPath": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0",
+            "isSymlink": false,
+            "sha256": "9f7489029c91d1c232e3c204236854bd53c69cee2fef33d6fd778a27f44696d3",
+            "stat": {
+              "inode": 276472675,
+              "size": 57416312,
+              "mtimeNS": 1791335854843565972
+            },
+            "cdhash": "d9676388f524872f1269c13f61f413458c0e9e52",
+            "signature": {
+              "argv": [
+                "/usr/bin/codesign",
+                "-d",
+                "--verbose=4",
+                "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0"
+              ],
+              "startUTC": "2026-10-07T01:18:34.138038+00:00",
+              "endUTC": "2026-10-07T01:18:39.386533+00:00",
+              "exitCode": 0,
+              "output": "Executable=/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0\nIdentifier=r00_management_leaves-294787929158efb0\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=445215 flags=0x20002(adhoc,linker-signed) hashes=13909+0 location=embedded\nVersionPlatform=1\nVersionMin=720896\nVersionSDK=1769472\nHash type=sha256 size=32\nCandidateCDHash sha256=d9676388f524872f1269c13f61f413458c0e9e52\nCandidateCDHashFull sha256=d9676388f524872f1269c13f61f413458c0e9e5246adbc3b7ccb9da04054687d\nHash choices=sha256\nCMSDigest=d9676388f524872f1269c13f61f413458c0e9e5246adbc3b7ccb9da04054687d\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=18457440\nExecutable Segment flags=0x1\nPage size=4096\nCDHash=d9676388f524872f1269c13f61f413458c0e9e52\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements=none\n"
+            },
+            "verification": {
+              "argv": [
+                "/usr/bin/codesign",
+                "--verify",
+                "--verbose=4",
+                "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0"
+              ],
+              "startUTC": "2026-10-07T01:18:39.412947+00:00",
+              "endUTC": "2026-10-07T01:18:47.461847+00:00",
+              "exitCode": 0,
+              "output": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0: valid on disk\n/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0: satisfies its Designated Requirement\n"
+            }
+          }
+        }
+      ],
+      "counts": [
+        {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 0
+        }
+      ],
+      "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/r00-formal-01.log",
+      "logSha256": "e7eef5354356ded2c3c09d03602be1365caef9e48d48012aee02771ba4954dc7",
+      "listenerLogSha256": "a1438c1c63e83710e37da32f45393e7aded319d3733078d764f5374f8bcd9a9a"
+    },
+    {
+      "name": "compile-probe",
+      "argv": [
+        "/usr/bin/clang",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe.c",
+        "-o",
+        "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe"
+      ],
+      "timeout": 30,
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startUTC": "2026-10-07T01:18:06.911315+00:00",
+      "endUTC": "2026-10-07T01:18:07.130867+00:00",
+      "elapsedSeconds": 0.2194285,
+      "parentPID": 85768,
+      "actualExitCode": 0,
+      "supervisorTimedOut": false,
+      "supervisorExitCode": 0,
+      "signalsSent": [],
+      "observedBinaryProcesses": [],
+      "counts": null,
+      "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/compile-probe.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "probe-c-loopback",
+      "argv": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe",
+        "127.0.0.1"
+      ],
+      "timeout": 15,
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startUTC": "2026-10-07T01:18:44.979427+00:00",
+      "endUTC": "2026-10-07T01:18:45.311947+00:00",
+      "elapsedSeconds": 0.332390084,
+      "parentPID": 86498,
+      "actualExitCode": 0,
+      "supervisorTimedOut": false,
+      "supervisorExitCode": 0,
+      "signalsSent": [],
+      "observedBinaryProcesses": [],
+      "counts": null,
+      "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/probe-c-loopback.log",
+      "logSha256": "e19266b64672bb012142afb97b6d0ccbca5e2eaa4a120932a33ec8f6962de8ef"
+    },
+    {
+      "name": "probe-c-lan",
+      "argv": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe",
+        "192.168.3.5"
+      ],
+      "timeout": 15,
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startUTC": "2026-10-07T01:18:45.358850+00:00",
+      "endUTC": "2026-10-07T01:18:51.462271+00:00",
+      "elapsedSeconds": 6.103256541,
+      "parentPID": 86500,
+      "actualExitCode": 1,
+      "supervisorTimedOut": false,
+      "supervisorExitCode": 1,
+      "signalsSent": [],
+      "observedBinaryProcesses": [],
+      "counts": null,
+      "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/probe-c-lan.log",
+      "logSha256": "84acc61ec8e41e0e2a5fa9b7ea1d51599dc99d476dd6f88488426f3a3b148082"
+    },
+    {
+      "name": "probe-apple-lan",
+      "argv": [
+        "/usr/bin/python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe.py",
+        "192.168.3.5"
+      ],
+      "timeout": 15,
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startUTC": "2026-10-07T01:18:51.513502+00:00",
+      "endUTC": "2026-10-07T01:18:51.619924+00:00",
+      "elapsedSeconds": 0.106284167,
+      "parentPID": 86542,
+      "actualExitCode": 0,
+      "supervisorTimedOut": false,
+      "supervisorExitCode": 0,
+      "signalsSent": [],
+      "observedBinaryProcesses": [],
+      "counts": null,
+      "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/probe-apple-lan.log",
+      "logSha256": "773b3e938fa81129aa4eab6cece139e54f2139a79543c66de8cd0704d53def7b"
+    },
+    {
+      "name": "prepared-identity-check",
+      "argv": [
+        "/usr/bin/python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/identity_check.py"
+      ],
+      "timeout": 30,
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startUTC": "2026-10-07T01:20:45.049516+00:00",
+      "endUTC": "2026-10-07T01:20:52.383277+00:00",
+      "elapsedSeconds": 7.333607000000001,
+      "parentPID": 87448,
+      "actualExitCode": 0,
+      "supervisorTimedOut": false,
+      "supervisorExitCode": 0,
+      "signalsSent": [],
+      "observedBinaryProcesses": [],
+      "counts": null,
+      "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/prepared-identity-check.log",
+      "logSha256": "8d81a918646a4c14fee4f16f3578f6885ae354fe6564d1fa998921218e111690"
+    }
+  ],
+  "readOnlyCommands": [
+    {
+      "evidence": "build-environment.json",
+      "commands": [
+        {
+          "argv": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "+1.98.1",
+            "--version"
+          ],
+          "startUTC": "2026-10-07T01:15:49.093285+00:00",
+          "endUTC": "2026-10-07T01:15:49.109729+00:00",
+          "exitCode": 0,
+          "output": "cargo 1.98.1 (797e8a9bc 2026-08-05)\n"
+        },
+        {
+          "argv": [
+            "/Users/study_superior/.cargo/bin/rustc",
+            "+1.98.1",
+            "-vV"
+          ],
+          "startUTC": "2026-10-07T01:15:49.109759+00:00",
+          "endUTC": "2026-10-07T01:15:49.143727+00:00",
+          "exitCode": 0,
+          "output": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: aarch64-apple-darwin\nrelease: 1.98.1\nLLVM version: 22.1.8\n"
+        },
+        {
+          "argv": [
+            "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+            "--version"
+          ],
+          "startUTC": "2026-10-07T01:15:49.143746+00:00",
+          "endUTC": "2026-10-07T01:15:49.157711+00:00",
+          "exitCode": 0,
+          "output": "v24.16.0\n"
+        },
+        {
+          "argv": [
+            "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/npm",
+            "--version"
+          ],
+          "startUTC": "2026-10-07T01:15:49.157727+00:00",
+          "endUTC": "2026-10-07T01:15:49.217651+00:00",
+          "exitCode": 0,
+          "output": "11.13.0\n"
+        },
+        {
+          "argv": [
+            "/usr/bin/sw_vers"
+          ],
+          "startUTC": "2026-10-07T01:15:49.217674+00:00",
+          "endUTC": "2026-10-07T01:15:49.227244+00:00",
+          "exitCode": 0,
+          "output": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434\n"
+        },
+        {
+          "argv": [
+            "/usr/bin/uname",
+            "-m"
+          ],
+          "startUTC": "2026-10-07T01:15:49.227263+00:00",
+          "endUTC": "2026-10-07T01:15:49.229722+00:00",
+          "exitCode": 0,
+          "output": "arm64\n"
+        },
+        {
+          "argv": [
+            "/usr/bin/xcrun",
+            "--find",
+            "python3"
+          ],
+          "startUTC": "2026-10-07T01:15:49.229734+00:00",
+          "endUTC": "2026-10-07T01:15:49.235241+00:00",
+          "exitCode": 0,
+          "output": "/Library/Developer/CommandLineTools/usr/bin/python3\n"
+        },
+        {
+          "argv": [
+            "/usr/bin/python3",
+            "-c",
+            "import sys; print(sys.executable)"
+          ],
+          "startUTC": "2026-10-07T01:15:49.235259+00:00",
+          "endUTC": "2026-10-07T01:15:49.251760+00:00",
+          "exitCode": 0,
+          "output": "/Library/Developer/CommandLineTools/usr/bin/python3\n"
+        },
+        {
+          "argv": [
+            "/usr/libexec/ApplicationFirewall/socketfilterfw",
+            "--help"
+          ],
+          "startUTC": "2026-10-07T01:15:49.251777+00:00",
+          "endUTC": "2026-10-07T01:15:49.257835+00:00",
+          "exitCode": 255,
+          "output": "usage: /usr/libexec/ApplicationFirewall/socketfilterfw [-h] [--getglobalstate] [--setglobalstate on | off] [--getblockall] [--setblockall on | off] [--listapps] [--getappblocked <path>] [--blockapp <path>] [--unblockapp <path>] [--add <path>] [--remove <path>] [--getallowsigned] [--setallowsigned on | off] [--setallowsignedapp on | off] [--getstealthmode] [--setstealthmode on | off]\n"
+        }
+      ]
+    },
+    {
+      "evidence": "identity-before.json",
+      "commands": [
+        {
+          "argv": [
+            "/usr/libexec/ApplicationFirewall/socketfilterfw",
+            "--getglobalstate"
+          ],
+          "startUTC": "2026-10-07T01:18:28.324346+00:00",
+          "endUTC": "2026-10-07T01:18:28.329960+00:00",
+          "exitCode": 0,
+          "output": "Firewall is enabled. (State = 1)\n"
+        },
+        {
+          "argv": [
+            "/usr/libexec/ApplicationFirewall/socketfilterfw",
+            "--getblockall"
+          ],
+          "startUTC": "2026-10-07T01:18:28.329990+00:00",
+          "endUTC": "2026-10-07T01:18:28.334666+00:00",
+          "exitCode": 0,
+          "output": "Firewall has block all state set to disabled.\n"
+        },
+        {
+          "argv": [
+            "/usr/libexec/ApplicationFirewall/socketfilterfw",
+            "--getallowsigned"
+          ],
+          "startUTC": "2026-10-07T01:18:28.334694+00:00",
+          "endUTC": "2026-10-07T01:18:28.339346+00:00",
+          "exitCode": 0,
+          "output": "Automatically allow built-in signed software ENABLED.\nAutomatically allow downloaded signed software ENABLED.\n"
+        },
+        {
+          "argv": [
+            "/usr/libexec/ApplicationFirewall/socketfilterfw",
+            "--listapps"
+          ],
+          "startUTC": "2026-10-07T01:18:28.339377+00:00",
+          "endUTC": "2026-10-07T01:18:28.344624+00:00",
+          "exitCode": 0,
+          "output": "Total number of apps = 66 \n1 : /private/tmp/rv-d-zz_lanprobe \n             (Allow incoming connections)\n2 : /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR2/D-R2/probe/zz_lanprobe \n             (Allow incoming connections)\n3 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-590de196dceb15ce \n             (Allow incoming connections)\n4 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0 \n             (Allow incoming connections)\n5 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-5157cc4418760324 \n             (Allow incoming connections)\n6 : /Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r00_management_leaves-7b8b542089a2bf2d \n             (Allow incoming connections)\n7 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-fd0d0f76ea681df4 \n             (Allow incoming connections)\n8 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-b9fccc090dcebec7 \n             (Allow incoming connections)\n9 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-df89de28f5a4e670 \n             (Allow incoming connections)\n10 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-0572a12c59db4eee \n             (Allow incoming connections)\n11 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-9c85835226ce2b3b \n             (Allow incoming connections)\n12 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-d66e3eae016b960b \n             (Allow incoming connections)\n13 : /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/REVIEW-T01/alf-reverify/zz_alfprobe_r1 \n             (Allow incoming connections)\n14 : /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/REVIEW-T01/alf-reverify/zz_probe2_review \n             (Allow incoming connections)\n15 : /private/tmp/zz_probe2 \n             (Allow incoming connections)\n16 : /private/tmp/lingxi-baseline-c549ff65/rust/target/debug/deps/zz_probe-a4a4742ec5b1728f \n             (Allow incoming connections)\n17 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/zz_probe-d9f29d67af4db97a \n             (Allow incoming connections)\n18 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-8c4c14e6013d6767 \n             (Allow incoming connections)\n19 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-da34472139e195c5 \n             (Allow incoming connections)\n20 : /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app \n             (Allow incoming connections)\n21 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-812df2ee793b5dda \n             (Allow incoming connections)\n22 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-b054bdef3d6e9085 \n             (Allow incoming connections)\n23 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-e69473e77d8869c9 \n             (Allow incoming connections)\n24 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-d836ea744c3a228b \n             (Allow incoming connections)\n25 : /private/tmp/r04t01-review/probe/target/debug/fwprobe \n             (Allow incoming connections)\n26 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-d526ac2b37097156 \n             (Allow incoming connections)\n27 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-47b9513afc4ca863 \n             (Block incoming connections)\n28 : /private/tmp/r03-t02-target/debug/deps/r00_management_leaves-8281bf9ad555a658 \n             (Allow incoming connections)\n29 : /private/tmp/r03-t02-target/debug/deps/r00_management_leaves-49e90c90ba02f5c1 \n             (Allow incoming connections)\n30 : /usr/bin/nc \n             (Allow incoming connections)\n31 : /private/tmp/r03-t01-target/debug/deps/r00_management_leaves-26c371207cef699e \n             (Allow incoming connections)\n32 : /private/tmp/r03-t01-target/debug/deps/r00_management_leaves-abd5dfc9efc552de \n             (Allow incoming connections)\n33 : /private/tmp/r02-final/minilistener \n             (Allow incoming connections)\n34 : /private/tmp/rust-target-r02-final/debug/lingxi-service \n             (Allow incoming connections)\n35 : /private/tmp/rust-target-r02-final/debug/deps/r00_management_leaves-123611678ad8402e \n             (Allow incoming connections)\n36 : /Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app \n             (Allow incoming connections)\n37 : /private/tmp/rust-target-r02-final/debug/deps/r00_management_leaves-44741794072b2374 \n             (Allow incoming connections)\n38 : /Library/Input Methods/DoubaoIme.app/Contents/MacOS/DoubaoIme \n             (Allow incoming connections)\n39 : /Applications/Hermes Studio.app \n             (Allow incoming connections)\n40 : /Applications/Claude Code Haha.app/Contents/Resources/app.asar.unpacked/src-tauri/binaries/claude-sidecar-aarch64-apple-darwin \n             (Allow incoming connections)\n41 : /usr/libexec/audioclocksyncd \n             (Allow incoming connections)\n42 : /usr/libexec/ContinuityCaptureAgent \n             (Allow incoming connections)\n43 : /Applications/CuteCloud.app/Contents/MacOS/FlClashCore \n             (Allow incoming connections)\n44 : /Users/study_superior/.config/com.vortex.helper/com.vortex.helper \n             (Allow incoming connections)\n45 : /Applications/Clash Verge.app/Contents/MacOS/verge-mihomo \n             (Allow incoming connections)\n46 : /usr/libexec/timed \n             (Allow incoming connections)\n47 : /usr/sbin/syslogd \n             (Allow incoming connections)\n48 : /Applications/Google Chrome.app \n             (Allow incoming connections)\n49 : /Applications/ChatGPT Atlas.app/Contents/Support/ChatGPT Atlas.app/Contents/Frameworks/ChatGPT Atlas Framework.framework/Versions/146.0.7680.80/Helpers/ChatGPT Atlas (Service).app \n             (Allow incoming connections)\n50 : /Applications/WeChat.app/Contents/MacOS/WeChatAppEx.app/Contents/Frameworks/WeChatAppEx Framework.framework/Versions/C/Helpers/WeChatAppEx Helper.app \n             (Allow incoming connections)\n51 : /System/Library/CoreServices/ControlCenter.app/Contents/MacOS/ControlCenter \n             (Allow incoming connections)\n52 : /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/144.0.3719.115/Helpers/Microsoft Edge Helper.app \n             (Allow incoming connections)\n53 : /System/Library/CoreServices/NetAuthAgent.app/Contents/MacOS/NetAuthSysAgent \n             (Allow incoming connections)\n54 : /Applications/Doubao.app/Contents/Helpers/Doubao Browser.app/Contents/Frameworks/Doubao Browser Framework.framework/Versions/135.0.7049.72/Helpers/Doubao Browser Helper.app \n             (Allow incoming connections)\n55 : /System/Library/PrivateFrameworks/ReplicatorCore.framework/Support/replicatord \n             (Allow incoming connections)\n56 : /usr/libexec/rapportd \n             (Allow incoming connections)\n57 : /Applications/Nutstore.app \n             (Allow incoming connections)\n58 : /Applications/LocalSend.app/Contents/MacOS/LocalSend \n             (Allow incoming connections)\n59 : /usr/local/libexec/remotepairingdeviced \n             (Allow incoming connections)\n60 : /usr/libexec/remoted \n             (Allow incoming connections)\n61 : /usr/bin/python3 \n             (Allow incoming connections)\n62 : /usr/bin/ruby \n             (Allow incoming connections)\n63 : /usr/sbin/cupsd \n             (Allow incoming connections)\n64 : /usr/libexec/sharingd \n             (Allow incoming connections)\n65 : /usr/libexec/sshd-keygen-wrapper \n             (Allow incoming connections)\n66 : /usr/sbin/smbd \n             (Allow incoming connections)\n"
+        },
+        {
+          "argv": [
+            "/usr/libexec/ApplicationFirewall/socketfilterfw",
+            "--getappblocked",
+            "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0"
+          ],
+          "startUTC": "2026-10-07T01:18:28.344656+00:00",
+          "endUTC": "2026-10-07T01:18:28.349080+00:00",
+          "exitCode": 0,
+          "output": "Incoming connection to /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0 is permitted.\n"
+        }
+      ]
+    },
+    {
+      "evidence": "identity-after.json",
+      "commands": [
+        {
+          "argv": [
+            "/usr/libexec/ApplicationFirewall/socketfilterfw",
+            "--getglobalstate"
+          ],
+          "startUTC": "2026-10-07T01:19:50.343827+00:00",
+          "endUTC": "2026-10-07T01:19:50.348732+00:00",
+          "exitCode": 0,
+          "output": "Firewall is enabled. (State = 1)\n"
+        },
+        {
+          "argv": [
+            "/usr/libexec/ApplicationFirewall/socketfilterfw",
+            "--getblockall"
+          ],
+          "startUTC": "2026-10-07T01:19:50.348751+00:00",
+          "endUTC": "2026-10-07T01:19:50.352891+00:00",
+          "exitCode": 0,
+          "output": "Firewall has block all state set to disabled.\n"
+        },
+        {
+          "argv": [
+            "/usr/libexec/ApplicationFirewall/socketfilterfw",
+            "--getallowsigned"
+          ],
+          "startUTC": "2026-10-07T01:19:50.352907+00:00",
+          "endUTC": "2026-10-07T01:19:50.356952+00:00",
+          "exitCode": 0,
+          "output": "Automatically allow built-in signed software ENABLED.\nAutomatically allow downloaded signed software ENABLED.\n"
+        },
+        {
+          "argv": [
+            "/usr/libexec/ApplicationFirewall/socketfilterfw",
+            "--listapps"
+          ],
+          "startUTC": "2026-10-07T01:19:50.356968+00:00",
+          "endUTC": "2026-10-07T01:19:50.361759+00:00",
+          "exitCode": 0,
+          "output": "Total number of apps = 66 \n1 : /private/tmp/rv-d-zz_lanprobe \n             (Allow incoming connections)\n2 : /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR2/D-R2/probe/zz_lanprobe \n             (Allow incoming connections)\n3 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-590de196dceb15ce \n             (Allow incoming connections)\n4 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0 \n             (Allow incoming connections)\n5 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-5157cc4418760324 \n             (Allow incoming connections)\n6 : /Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r00_management_leaves-7b8b542089a2bf2d \n             (Allow incoming connections)\n7 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-fd0d0f76ea681df4 \n             (Allow incoming connections)\n8 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-b9fccc090dcebec7 \n             (Allow incoming connections)\n9 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-df89de28f5a4e670 \n             (Allow incoming connections)\n10 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-0572a12c59db4eee \n             (Allow incoming connections)\n11 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-9c85835226ce2b3b \n             (Allow incoming connections)\n12 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-d66e3eae016b960b \n             (Allow incoming connections)\n13 : /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/REVIEW-T01/alf-reverify/zz_alfprobe_r1 \n             (Allow incoming connections)\n14 : /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/REVIEW-T01/alf-reverify/zz_probe2_review \n             (Allow incoming connections)\n15 : /private/tmp/zz_probe2 \n             (Allow incoming connections)\n16 : /private/tmp/lingxi-baseline-c549ff65/rust/target/debug/deps/zz_probe-a4a4742ec5b1728f \n             (Allow incoming connections)\n17 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/zz_probe-d9f29d67af4db97a \n             (Allow incoming connections)\n18 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-8c4c14e6013d6767 \n             (Allow incoming connections)\n19 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-da34472139e195c5 \n             (Allow incoming connections)\n20 : /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app \n             (Allow incoming connections)\n21 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-812df2ee793b5dda \n             (Allow incoming connections)\n22 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-b054bdef3d6e9085 \n             (Allow incoming connections)\n23 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-e69473e77d8869c9 \n             (Allow incoming connections)\n24 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-d836ea744c3a228b \n             (Allow incoming connections)\n25 : /private/tmp/r04t01-review/probe/target/debug/fwprobe \n             (Allow incoming connections)\n26 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-d526ac2b37097156 \n             (Allow incoming connections)\n27 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-47b9513afc4ca863 \n             (Block incoming connections)\n28 : /private/tmp/r03-t02-target/debug/deps/r00_management_leaves-8281bf9ad555a658 \n             (Allow incoming connections)\n29 : /private/tmp/r03-t02-target/debug/deps/r00_management_leaves-49e90c90ba02f5c1 \n             (Allow incoming connections)\n30 : /usr/bin/nc \n             (Allow incoming connections)\n31 : /private/tmp/r03-t01-target/debug/deps/r00_management_leaves-26c371207cef699e \n             (Allow incoming connections)\n32 : /private/tmp/r03-t01-target/debug/deps/r00_management_leaves-abd5dfc9efc552de \n             (Allow incoming connections)\n33 : /private/tmp/r02-final/minilistener \n             (Allow incoming connections)\n34 : /private/tmp/rust-target-r02-final/debug/lingxi-service \n             (Allow incoming connections)\n35 : /private/tmp/rust-target-r02-final/debug/deps/r00_management_leaves-123611678ad8402e \n             (Allow incoming connections)\n36 : /Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app \n             (Allow incoming connections)\n37 : /private/tmp/rust-target-r02-final/debug/deps/r00_management_leaves-44741794072b2374 \n             (Allow incoming connections)\n38 : /Library/Input Methods/DoubaoIme.app/Contents/MacOS/DoubaoIme \n             (Allow incoming connections)\n39 : /Applications/Hermes Studio.app \n             (Allow incoming connections)\n40 : /Applications/Claude Code Haha.app/Contents/Resources/app.asar.unpacked/src-tauri/binaries/claude-sidecar-aarch64-apple-darwin \n             (Allow incoming connections)\n41 : /usr/libexec/audioclocksyncd \n             (Allow incoming connections)\n42 : /usr/libexec/ContinuityCaptureAgent \n             (Allow incoming connections)\n43 : /Applications/CuteCloud.app/Contents/MacOS/FlClashCore \n             (Allow incoming connections)\n44 : /Users/study_superior/.config/com.vortex.helper/com.vortex.helper \n             (Allow incoming connections)\n45 : /Applications/Clash Verge.app/Contents/MacOS/verge-mihomo \n             (Allow incoming connections)\n46 : /usr/libexec/timed \n             (Allow incoming connections)\n47 : /usr/sbin/syslogd \n             (Allow incoming connections)\n48 : /Applications/Google Chrome.app \n             (Allow incoming connections)\n49 : /Applications/ChatGPT Atlas.app/Contents/Support/ChatGPT Atlas.app/Contents/Frameworks/ChatGPT Atlas Framework.framework/Versions/146.0.7680.80/Helpers/ChatGPT Atlas (Service).app \n             (Allow incoming connections)\n50 : /Applications/WeChat.app/Contents/MacOS/WeChatAppEx.app/Contents/Frameworks/WeChatAppEx Framework.framework/Versions/C/Helpers/WeChatAppEx Helper.app \n             (Allow incoming connections)\n51 : /System/Library/CoreServices/ControlCenter.app/Contents/MacOS/ControlCenter \n             (Allow incoming connections)\n52 : /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/144.0.3719.115/Helpers/Microsoft Edge Helper.app \n             (Allow incoming connections)\n53 : /System/Library/CoreServices/NetAuthAgent.app/Contents/MacOS/NetAuthSysAgent \n             (Allow incoming connections)\n54 : /Applications/Doubao.app/Contents/Helpers/Doubao Browser.app/Contents/Frameworks/Doubao Browser Framework.framework/Versions/135.0.7049.72/Helpers/Doubao Browser Helper.app \n             (Allow incoming connections)\n55 : /System/Library/PrivateFrameworks/ReplicatorCore.framework/Support/replicatord \n             (Allow incoming connections)\n56 : /usr/libexec/rapportd \n             (Allow incoming connections)\n57 : /Applications/Nutstore.app \n             (Allow incoming connections)\n58 : /Applications/LocalSend.app/Contents/MacOS/LocalSend \n             (Allow incoming connections)\n59 : /usr/local/libexec/remotepairingdeviced \n             (Allow incoming connections)\n60 : /usr/libexec/remoted \n             (Allow incoming connections)\n61 : /usr/bin/python3 \n             (Allow incoming connections)\n62 : /usr/bin/ruby \n             (Allow incoming connections)\n63 : /usr/sbin/cupsd \n             (Allow incoming connections)\n64 : /usr/libexec/sharingd \n             (Allow incoming connections)\n65 : /usr/libexec/sshd-keygen-wrapper \n             (Allow incoming connections)\n66 : /usr/sbin/smbd \n             (Allow incoming connections)\n"
+        },
+        {
+          "argv": [
+            "/usr/libexec/ApplicationFirewall/socketfilterfw",
+            "--getappblocked",
+            "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0"
+          ],
+          "startUTC": "2026-10-07T01:19:50.361777+00:00",
+          "endUTC": "2026-10-07T01:19:50.365909+00:00",
+          "exitCode": 0,
+          "output": "Incoming connection to /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0 is permitted.\n"
+        }
+      ]
+    }
+  ],
+  "scope": "one formal r00 suite; workspace, full S5.3 and other packages NOT RUN; probes separate; every actual exit retained"
+}

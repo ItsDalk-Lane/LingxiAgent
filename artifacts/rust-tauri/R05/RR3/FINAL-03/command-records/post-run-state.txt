@@ -1,0 +1,23 @@
+utc: 2026-10-07T15:54:22.553681000Z
+HEAD: b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b
+branch: codex/rust-tauri-migration
+remote-HEAD(origin/codex/rust-tauri-migration): b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b
+git version: git version 2.53.0
+-- git diff HEAD sha256 --
+8c23d0d944b66d76f1c65e6a8883d7782a7509d434b10bc13dda2ab5bc393361  -
+-- git ls-files -s sha256 --
+3016f7ae9d18d93951f05a77adb68946cab99a92d0a122294d4c5cf096407d47  -
+-- status counts --
+modified_tracked: 25
+untracked: 52
+staged: 0
+-- reflog head -3 --
+b3ac0e6ae HEAD@{0}: commit: docs(rust-tauri): RR2 handoff git receipt + ALF unblock path (commit e8c0672e5)
+e8c0672e5 HEAD@{1}: commit: fix(rust-tauri): R05 RR2 closeout — 6 items closed + F44, stage review NOT_ACCEPTED on ALF env item only (R06_READY=false)
+ad5ec4e98 HEAD@{2}: checkout: moving from ad5ec4e9853a51ed929f1e2e077b97d41c951572 to codex/rust-tauri-migration
+-- .git/index --
+-rw-r--r--@ 1 study_superior  staff  6139139 Oct  7 03:02 /Users/study_superior/Desktop/Code/LingxiAgent/.git/index
+-- diff stat --
+ .../rust-tauri/r02_t08_legacy_entry_regression.sh  |  253 ++--
+ scripts/rust-tauri/r05_t08_negative_gate.sh        |  294 +++--
+ 25 files changed, 8878 insertions(+), 370 deletions(-)

@@ -1,0 +1,13 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r05_t08_production_tools.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t08_production_tools-a75678f8fef0bf0b)
+
+running 6 tests
+test f24_exec_command_workdir_outside_the_workspace_is_refused ... ok
+test f24_exec_command_runs_a_real_subprocess_end_to_end ... ok
+test f24_production_wire_declares_the_four_tools ... ok
+test f24_worker_child_environment_carries_no_credential_material ... ok
+test f24_worker_nested_chain_under_global_permit_one ... ok
+test f24_sigterm_with_parked_callback_reaps_the_worker_child ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.15s
+

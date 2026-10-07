@@ -1,0 +1,4 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.41s
+     Running tests/r05_t08_resources.rs (rust/target/debug/deps/r05_t08_resources-f66968a3ba499b0b)
+F27 cancel phase: hits=62 dropped=60 settled=0 dangling=60

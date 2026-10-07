@@ -1,0 +1,141 @@
+{
+  "utc": "2026-10-07T01:18:15.509068+00:00",
+  "objects": [
+    {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe",
+      "resolvedPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe",
+      "isSymlink": false,
+      "sha256": "bae663f002198af37ca27b1c6886dd377aabf17f5eb026dfc3fae0e7193bfe2b",
+      "stat": {
+        "inode": 276472712,
+        "size": 34600,
+        "mtimeNS": 1791335887039749711
+      },
+      "cdhash": "19a9ba45d913110977ef8c88a59e77d8b04aedd5",
+      "signature": {
+        "argv": [
+          "/usr/bin/codesign",
+          "-d",
+          "--verbose=4",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe"
+        ],
+        "startUTC": "2026-10-07T01:18:15.509325+00:00",
+        "endUTC": "2026-10-07T01:18:15.520375+00:00",
+        "exitCode": 0,
+        "output": "Executable=/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe\nIdentifier=lan_probe\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=386 flags=0x20002(adhoc,linker-signed) hashes=9+0 location=embedded\nVersionPlatform=1\nVersionMin=1769472\nVersionSDK=1769472\nHash type=sha256 size=32\nCandidateCDHash sha256=19a9ba45d913110977ef8c88a59e77d8b04aedd5\nCandidateCDHashFull sha256=19a9ba45d913110977ef8c88a59e77d8b04aedd570c720a887c8030ece33d1b9\nHash choices=sha256\nCMSDigest=19a9ba45d913110977ef8c88a59e77d8b04aedd570c720a887c8030ece33d1b9\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=1960\nExecutable Segment flags=0x1\nPage size=4096\nCDHash=19a9ba45d913110977ef8c88a59e77d8b04aedd5\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements=none\n"
+      },
+      "verification": {
+        "argv": [
+          "/usr/bin/codesign",
+          "--verify",
+          "--verbose=4",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe"
+        ],
+        "startUTC": "2026-10-07T01:18:15.520687+00:00",
+        "endUTC": "2026-10-07T01:18:15.528837+00:00",
+        "exitCode": 0,
+        "output": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe: valid on disk\n/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe: satisfies its Designated Requirement\n"
+      }
+    },
+    {
+      "path": "/usr/bin/python3",
+      "resolvedPath": "/usr/bin/python3",
+      "isSymlink": false,
+      "sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+      "stat": {
+        "inode": 1152921500312607511,
+        "size": 200560,
+        "mtimeNS": 1790233837000000000
+      },
+      "cdhash": "0b5ceae04228eecab447d34d153562e1f64c1756",
+      "signature": {
+        "argv": [
+          "/usr/bin/codesign",
+          "-d",
+          "--verbose=4",
+          "/usr/bin/python3"
+        ],
+        "startUTC": "2026-10-07T01:18:15.528893+00:00",
+        "endUTC": "2026-10-07T01:18:15.543872+00:00",
+        "exitCode": 0,
+        "output": "Executable=/usr/bin/python3\nIdentifier=com.apple.dt.xcode_select.tool-shim-public\nFormat=Mach-O universal (x86_64 arm64e arm64e.x1)\nCodeDirectory v=20400 size=323 flags=0x0(none) hashes=4+2 location=embedded\nPlatform identifier=26\nVersionPlatform=1\nVersionMin=1769472\nVersionSDK=1769472\nHash type=sha256 size=32\nCandidateCDHash sha256=0b5ceae04228eecab447d34d153562e1f64c1756\nCandidateCDHashFull sha256=0b5ceae04228eecab447d34d153562e1f64c175687c47eddee3a5f2547375a94\nHash choices=sha256\nCMSDigest=0b5ceae04228eecab447d34d153562e1f64c175687c47eddee3a5f2547375a94\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=16384\nExecutable Segment flags=0x1\nPage size=16384\nCDHash=0b5ceae04228eecab447d34d153562e1f64c1756\nSignature size=4202\nAuthority=macOS Software Signing\nAuthority=Apple Code Signing Certification Authority\nAuthority=Apple Root CA\nSigned Time=Aug 9, 2026 at 08:36:33\nInfo.plist entries=17\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=1 size=92\nTotal signatures=1\nChosen signature=1\n"
+      },
+      "verification": {
+        "argv": [
+          "/usr/bin/codesign",
+          "--verify",
+          "--verbose=4",
+          "/usr/bin/python3"
+        ],
+        "startUTC": "2026-10-07T01:18:15.544194+00:00",
+        "endUTC": "2026-10-07T01:18:15.559279+00:00",
+        "exitCode": 0,
+        "output": "/usr/bin/python3: valid on disk\n/usr/bin/python3: satisfies its Designated Requirement\n"
+      }
+    },
+    {
+      "path": "/Library/Developer/CommandLineTools/usr/bin/python3",
+      "resolvedPath": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/bin/python3.9",
+      "isSymlink": true,
+      "sha256": "6e7ae61f68a3838094fc56590f84c52069a97d7816f6bb79e0e85995b340e464",
+      "stat": {
+        "inode": 76722319,
+        "size": 53200,
+        "mtimeNS": 1787720187000000000
+      },
+      "cdhash": "01f9566bbbf6c1e4210ad0b6802acfcb7dd76165",
+      "signature": {
+        "argv": [
+          "/usr/bin/codesign",
+          "-d",
+          "--verbose=4",
+          "/Library/Developer/CommandLineTools/usr/bin/python3"
+        ],
+        "startUTC": "2026-10-07T01:18:15.559356+00:00",
+        "endUTC": "2026-10-07T01:18:15.571103+00:00",
+        "exitCode": 0,
+        "output": "Executable=/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/bin/python3.9\nIdentifier=com.apple.python3\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=629 flags=0x0(none) hashes=9+7 location=embedded\nVersionPlatform=1\nVersionMin=917504\nVersionSDK=1769472\nHash type=sha256 size=32\nCandidateCDHash sha256=01f9566bbbf6c1e4210ad0b6802acfcb7dd76165\nCandidateCDHashFull sha256=01f9566bbbf6c1e4210ad0b6802acfcb7dd76165def0df689a6317d21716b286\nHash choices=sha256\nCMSDigest=01f9566bbbf6c1e4210ad0b6802acfcb7dd76165def0df689a6317d21716b286\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=16384\nExecutable Segment flags=0x1\nPage size=4096\nCDHash=01f9566bbbf6c1e4210ad0b6802acfcb7dd76165\nSignature size=4442\nAuthority=Software Signing\nAuthority=Apple Code Signing Certification Authority\nAuthority=Apple Root CA\nSigned Time=Aug 26, 2026 at 12:56:27\nInfo.plist=not bound\nTeamIdentifier=59GAB85EFG\nSealed Resources=none\nInternal requirements count=1 size=68\nTotal signatures=1\nChosen signature=1\n"
+      },
+      "verification": {
+        "argv": [
+          "/usr/bin/codesign",
+          "--verify",
+          "--verbose=4",
+          "/Library/Developer/CommandLineTools/usr/bin/python3"
+        ],
+        "startUTC": "2026-10-07T01:18:15.571359+00:00",
+        "endUTC": "2026-10-07T01:18:15.582570+00:00",
+        "exitCode": 0,
+        "output": "/Library/Developer/CommandLineTools/usr/bin/python3: valid on disk\n/Library/Developer/CommandLineTools/usr/bin/python3: satisfies its Designated Requirement\n"
+      }
+    }
+  ],
+  "sources": {
+    "lan_probe.c": "159ca492af1e020724a83ea1456113d1e9be8c10c893da48fbbddf317ccbcd44",
+    "lan_probe.py": "8b78faa4210169e510641db6a7d32a963cff645d3d3f3d3aa585f7adb9b95621"
+  },
+  "alf": [
+    {
+      "argv": [
+        "/usr/libexec/ApplicationFirewall/socketfilterfw",
+        "--getappblocked",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe"
+      ],
+      "startUTC": "2026-10-07T01:18:15.582777+00:00",
+      "endUTC": "2026-10-07T01:18:15.587600+00:00",
+      "exitCode": 0,
+      "output": "Incoming connection to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe is permitted.\n"
+    },
+    {
+      "argv": [
+        "/usr/libexec/ApplicationFirewall/socketfilterfw",
+        "--getappblocked",
+        "/Library/Developer/CommandLineTools/usr/bin/python3"
+      ],
+      "startUTC": "2026-10-07T01:18:15.587635+00:00",
+      "endUTC": "2026-10-07T01:18:15.592236+00:00",
+      "exitCode": 0,
+      "output": "Incoming connection to /Library/Developer/CommandLineTools/usr/bin/python3 is permitted.\n"
+    }
+  ]
+}

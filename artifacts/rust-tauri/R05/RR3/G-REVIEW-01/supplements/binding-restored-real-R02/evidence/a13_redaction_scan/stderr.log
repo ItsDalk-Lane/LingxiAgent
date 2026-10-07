@@ -1,0 +1,3 @@
+Traceback (most recent call last):
+  File "<stdin>", line 15, in <module>
+AssertionError: requestId req-7d12a73acf2eafe080a98d4077c573c8 from the error body not found in an auth marker line

@@ -1,0 +1,4 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.90s
+     Running `/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R04 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n13-r04-deferred-regrade/evidence`
+error: invalid stage map for R04: stage map invalid: supplemental leaf "R00-T02-LA-00C88B996AA0" missing basisKind

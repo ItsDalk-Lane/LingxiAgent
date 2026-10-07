@@ -1,0 +1,3 @@
+run lib-adapters/models::streaming::tests::the_buffer_bound_is_loud_XYZ: filter matched 0 tests (running=0, pinned=1) — empty test collections must not pass
+run lib-adapters/models::streaming::tests::the_buffer_bound_is_loud_XYZ: executed 0 tests but the stage pin is 1 (filtered subset / renamed or deleted tests)
+run lib-adapters/models::streaming::tests::the_buffer_bound_is_loud_XYZ: passed 0 but the stage pin is 1

@@ -1,0 +1,3 @@
+service exit code after SIGTERM: 0
+no leftover child processes (pre-TERM snapshot, birth-time verified): OK
+port closed after shutdown: OK

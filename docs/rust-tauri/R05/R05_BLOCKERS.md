@@ -1,5 +1,7 @@
 # R05_BLOCKERS — 缺口、负责人、最迟解除阶段
 
+> **RR3 E-04 生成截点（2026-10-08）：stage_readiness=ACCEPTED_OFFLINE_SCOPE_WITH_REGISTERED_LIVE_DEFERRALS / R06_READY=true / offline_gate=PASS / independent_review=PASS。** 依据 RR3/FINAL-04 全新独立终审亲跑：§5.3 六条命令全部真实 exit=0，verify-stage R05 三层（R05/R04/R03）overall=PASS、stable=true、checkpoint 全稳、runner 全 PASS、testedSha=b3ac0e6a+真实工作树，失败清单为空；F42–F54 全部独立 CLOSED；r00 两新对象 cf9bce2f…/d57ea731… LAN 6 次实测通过且 ALF 放行（无证据需要用户操作）。LIVE=BLOCKED_NOT_AUTHORIZED（原许可最迟 R10）、Linux x86_64 继承未复验/Windows 未验证（R09/R10）原边界不变；raw npm 历史 candidate红保持登记不写全绿。Git 至今零暂存/零提交/零推送（FINAL-04 亲核），本 E04 不预写提交回执。本 E04 仅 SELF_CHECKED，待全新 E-REVIEW-05；现行范围见[R05_REPORT §13](R05_REPORT.md#rr3-current)，此前各轮原文（含 §12 E-03 截点）均保留为历史。
+
 - 生成：EXECUTOR-R05-T08，2026-10-04。范围：R05 阶段终态仍未解除的缺口（阻塞/延期/环境项）。
 - 规则：只有真实阻塞才登记；已关闭的修复轮不在此重复（见 `R05_ACCEPTANCE_LEDGER.json` 的 fix_rounds 与各 REVIEW-T0x）。
 
@@ -56,3 +58,34 @@
 ## 无其他已知阻塞
 
 R05-T08 终树五门禁与 verify-stage R05 的真实结果见 `R05_REPORT.md`；如门禁失败，失败项按实登记，不以本文件预告。〔2026-10-06 已按此承诺登记 §6：RR1 候选正式门禁 FAIL，首轮（c549ff654 候选）的 T08-E01/FINAL-WFR2-1 PASS 记录为历史事实、按 N16 不继承。〕
+
+## 8. RR3 E-02历史阻断截点（2026-10-07）
+
+stage_readiness=NOT_ACCEPTED／R06_READY=false。A/F42、B/F45、C/F27及F46均新独立PASS、包级CLOSED，无包级mustFix；不列为待验阻断。正式全链stable与全部checkpoint仍待新FINAL，历史RR2 FINAL的R04 8/8、R03 15/15来源漂移FAIL不覆盖。当前阻断为：D-REVIEW-01定位/精确准备PASS但必需r00自然101、非回环BLOCKED；E-REVIEW-01独立FAIL后E-02仅修后SELF_CHECKED，待另一新独立验收；G默认16 RUNNING无完整结论；RR3 FINAL NOT RUN。C旧4日志超3及F46旧红永久保留，已由C-F46-REVIEW-01联合独立关闭。不得把包级PASS推成阶段accepted。
+
+§5旧invalid usage缺口归属为历史，后由RR1 F21/F22完成持久记账及诊断安全，不再把必需功能挪R06；WORKER生产trace已接Ledger，usage当前v7。I10普通同实例取消恢复与预算408重启消解分别引用现行报告§11.2。raw npm登记红、合法directed/E5、LIVE/平台原许可保持；新义务不得扩大延期。D具体真实身份、限制、未执行准备及当前跨层失败见[R05_REPORT §11](R05_REPORT.md#rr3-current)。
+
+## 9. RR3 E-03 当前必需阻断（2026-10-07；已由§10取代，历史截点）
+
+**NOT_ACCEPTED / R06_READY=false。** A/B/C-F46/H/I/J包级独立CLOSED，原E两mustFix也已独立关闭；仍有以下实际必需事项，不写“只剩ALF”：
+
+- G02 N02真实构建ENOSPC，未达负测目标；STORAGE03精确回收后约265MB，完整构建空间未获证。保持构建停止，先恢复足够空间。
+- 当前默认N01–N16仅N01有效，N02无效、N03–N16及终末恢复未跑；full R02/full E5未执行。I01–I09当前组合和I06额外worker-permission待验，I11未完成；I10仅按H02 375输入相等复用。
+- D历史r00真实101、0过1败和LAN超时未解除；旧9f7489对象不代表未来FINAL，不据其旧准备要求用户改系统。未来确切对象需重新核验。
+- E03本轮回填SELF_CHECKED待另全新E审；RR3 FINAL从未执行，原§5.3、全部来源/checkpoint/依赖要求仍须新独立审亲跑。最近真实正式RR2/FINAL历史FAIL保留。
+- 实际交付新枚举/秘密与引用核验/精确Git收据尚未完成，本截点未提交推送；PREP02旧清单不能当最终名单，部分历史原件仅本地。
+
+证据与具体下一步骤见[R05_REPORT §12](R05_REPORT.md#rr3-current)、[G02](../../../artifacts/rust-tauri/R05/RR3/G-REVIEW-02/REVIEW.md)及[STORAGE03](../../../artifacts/rust-tauri/R05/RR3/STORAGE-03/REPORT.md)。raw npm历史红、directed/E5原合法范围、LIVE未授权与Windows/Linux原平台义务完整保留；没有新延期豁免。
+
+
+## 10. RR3 E-04 当前缺口（2026-10-08）
+
+**stage_readiness=ACCEPTED_OFFLINE_SCOPE_WITH_REGISTERED_LIVE_DEFERRALS / R06_READY=true（[RR3/FINAL-04](../../../artifacts/rust-tauri/R05/RR3/FINAL-04/STAGE_REVIEW.md)）。RR3 无未关闭的必需缺口**：F42–F54 全部独立 CLOSED（§9 及更早各节的历史阻断均为截点事实，保留不改写）；G-REVIEW-03 默认 16+full R02/E5 包级 PASS（G02 空间阻断经总控 cargo clean 解除，阻断与解除均按时间线保留）；FINAL-01/02/03 历史 FAIL 已由 F51/F52/F53/F54 修复关闭。当前仅存以下登记项（原边界，无新增豁免）：
+
+- **RR-BLK-CREDENTIALS（§1，延期）**：LIVE 真实供应商验证未授权，最迟 R10；负责人=用户（凭证/预算）。不影响已接受的离线范围。
+- **平台验证缺口（§4，继承）**：Linux x86_64 继承原登记未复验、Windows 未验证（R09/R10）；macOS arm64 本轮全部真实执行。不因离线放行清零。
+- **R05-ENV-R00（原 §2 同族，观察属性）**：按二进制实例偶发——历史 9f748902… 曾被 ALF 拦；FINAL-01/02/03 43d95970… 与 FINAL-04 cf9bce2f…/d57ea731…（CDHash 364514be…）连续放行，**本轮无证据需要用户防火墙操作，也不能写成永久解除**；未来重链接实例若再被拦按台账逐实例登记。
+- **观察项（非阻断）**：I06 额外 worker-permission NOT_OBSERVED（沿 G-INTERRUPTION→G-REVIEW-03 结论如实保留，不补造）；raw npm 历史 candidate 登记红保持 registered-not-formal-green。
+- **流程收口（非产品阻断）**：E-REVIEW-05 全新独立文档审查 → DELIVERY-FINAL-02/DELIVERY-REVIEW-01 → 总控按既有授权精确 Git 提交/推送并归档真实回执（截至本截点零暂存/零提交/零推送，FINAL-04 亲核，不预写）。
+
+除此以外无其他已知阻塞。raw npm 红、directed/E5 原许可范围、LIVE/平台延期的完整边界见 [R05_REPORT §13](R05_REPORT.md#rr3-current)；负测状态见 [R05_NEGATIVE_GATE_REPORT](R05_NEGATIVE_GATE_REPORT.md) 的 RR3 E-04 节。

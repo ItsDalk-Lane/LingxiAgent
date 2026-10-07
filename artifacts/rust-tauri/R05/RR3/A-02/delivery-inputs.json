@@ -1,0 +1,7 @@
+{
+  "inputManifestSha256": "36400c2e385c20237dd2ea6df6c9f8c47b248eb225e5c8f0fff2a028e378a0e6",
+  "allInputsUnchangedSinceManifest": true,
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "wholeTreeFrozen": false,
+  "reason": "仅A归属输入逐项绑定；其他包并行写入，不宣称全树冻结"
+}

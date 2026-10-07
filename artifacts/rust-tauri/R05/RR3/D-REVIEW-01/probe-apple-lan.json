@@ -1,0 +1,22 @@
+{
+  "name": "probe-apple-lan",
+  "argv": [
+    "/usr/bin/python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe.py",
+    "192.168.3.5"
+  ],
+  "timeout": 15,
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startUTC": "2026-10-07T01:18:51.513502+00:00",
+  "endUTC": "2026-10-07T01:18:51.619924+00:00",
+  "elapsedSeconds": 0.106284167,
+  "parentPID": 86542,
+  "actualExitCode": 0,
+  "supervisorTimedOut": false,
+  "supervisorExitCode": 0,
+  "signalsSent": [],
+  "observedBinaryProcesses": [],
+  "counts": null,
+  "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/probe-apple-lan.log",
+  "logSha256": "773b3e938fa81129aa4eab6cece139e54f2139a79543c66de8cd0704d53def7b"
+}

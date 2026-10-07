@@ -1,0 +1,27 @@
+{
+  "cliCaseCount": 3,
+  "sharingExit": 0,
+  "sharingError": null,
+  "sharingCleanupError": null,
+  "caseCount": 7,
+  "startUtc": "2026-10-07T10:35:33.250654+00:00",
+  "endUtc": "2026-10-07T10:35:35.825596+00:00",
+  "sourceSha256": {
+    "scripts/rust-tauri/r02_client_leaf_matrix.py": "028c84350bd7bb3b549a14c04436a5e1c213870a5bd5305b719a451189e2af70",
+    "scripts/rust-tauri/r02_owned_process_group.py": "6526fb08c8cfaf67f498a067b7d3213c1d88425ffd167604a3cf26b42353ea81",
+    "cli/args.ts": "7ea449b5b3a6d0448357d7b23116259aa4d8b71f2ce31cb2f29dca2d90fc04ef",
+    "cli/entry.ts": "c3e720e6b6d9a2c5aca82e8616849280e130186e0d7d6d7efcaf3dfe3a1bf9be",
+    "cli/chat.ts": "ea981a843a94495e63e4b2dfa3e337284329a41b5c3943b7ec80bef4fae34c1f",
+    "cli/rust-service.ts": "5215855a4bac180adddc098516d460ee63c063973ac3f6450064eb1510d8184c",
+    "cli/server-runner.ts": "357b9b2542eca630c2776525f3457fe5bb7596ca2be620c2f4734c37072d87b3",
+    "desktop/src/react/settings/tabs/SharingTab.tsx": "f967d67bd8848caf80126fd2ae08db9457a8f3ef4db581140e2b73f98220e317",
+    "desktop/src/react/settings/SettingsContent.tsx": "ede74c82e327b85b4f012487b14c0a8d8b900d14be13e2d8bb8b9dc76fcd9e81",
+    "desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx": "ede027fe24ad5964231d559f10ac0b3c60f292ed3b59e694716142d1d7906a22",
+    "desktop/src/react/utils/font-presets.ts": "a6ba339cb216b8f0184dd05470d85f53b568fcd80fe2fec9159f5abe3333f72e",
+    "desktop/src/react/utils/screenshot-segments.ts": "1c9e1cb75e4a9ae41936b6fb07e81d11c7e8624fb833c44eecb435b42a54809a",
+    "package.json": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+    "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b"
+  },
+  "sourceChangedDuringRun": false,
+  "allCasesPass": true
+}

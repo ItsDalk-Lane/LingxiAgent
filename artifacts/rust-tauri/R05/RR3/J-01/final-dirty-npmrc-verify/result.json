@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "startedUtc": "2026-10-07T03:27:05.500613+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/final-dirty-npmrc-copy",
+      "startedUtc": "2026-10-07T03:27:05.804412+00:00",
+      "finishedUtc": "2026-10-07T03:27:05.844985+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "receipt": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-01/final-dirty-npmrc-prepare/result.json",
+  "receiptSha256": "17a6a2fddf61e7500622859d0cf35ea5874a694b8089f28e3481eef70847574b",
+  "checkedFiles": 2902,
+  "finishedUtc": "2026-10-07T03:27:05.892497+00:00"
+}

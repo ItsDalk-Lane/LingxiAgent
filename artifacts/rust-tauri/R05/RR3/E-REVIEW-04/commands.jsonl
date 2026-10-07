@@ -1,0 +1,34 @@
+{"no":1,"argv":["mkdir -p artifacts/rust-tauri/R05/RR3/E-REVIEW-04 && date -u +%Y-%m-%dT%H:%M:%SZ"],"exit":0,"utc":"2026-10-07T06:52:04Z","note":"create sole write directory"}
+{"no":2,"argv":["df -h /System/Volumes/Data; ls rust/target; du -sh ~/.cache/lingxi-r05-neg-target"],"exit":0,"utc":"2026-10-07T06:52:09Z","note":"df matched receipt final state exactly (926Gi/317Gi/585Gi/36%); rust/target absent (ls exit 1 inside compound); neg-target du empty"}
+{"no":3,"argv":["ls -d ~/.cache/lingxi-r05-neg-target; ls /root/.cache/lingxi-r05-neg-target; ls /var/root/.cache"],"exit":1,"utc":"2026-10-07T06:52-06Z..06:53Z","note":"NEG_TARGET not visible to this account; /var/root/.cache permission denied; recorded as environment observation"}
+{"no":4,"argv":["python3 (verify 14 docs sha256+bytes vs E-03 MANIFEST documents_after)"],"exit":0,"utc":"~06:53Z","stdout_summary":"14/14 MATCH; ALL_MATCH"}
+{"no":5,"argv":["python3 (verify E-03 47 evidence files vs its MANIFEST)"],"exit":0,"utc":"~06:54Z","stdout_summary":"E03_EVIDENCE_ALL_MATCH"}
+{"no":6,"argv":["python3 (naive digest recompute attempt, bytes.fromhex variant)"],"exit":0,"utc":"~06:55Z","stdout_summary":"NEQ — algorithm string uses hex text; corrected later"}
+{"no":7,"argv":["python3 (recompute protected semantic digest from current disk, 9369 entries)"],"exit":0,"utc":"~06:56Z","stdout_summary":"recomputed-now 5c593745… vs claim dee0f52b…; diff isolated to root .DS_Store only"}
+{"no":8,"argv":["python3 (diff current inputs vs sealed semantic-inputs-after.json)"],"exit":0,"utc":"~06:57Z","stdout_summary":"1 difference: .DS_Store CONTENT (Finder artifact, not production input)"}
+{"no":9,"argv":["python3 (substitute sealed .DS_Store record, recompute digest)"],"exit":0,"utc":"~06:58Z","stdout_summary":"EQ dee0f52b… — algorithm and claim both validated"}
+{"no":10,"argv":["python3 (H02 FINAL_SOURCE_BINDING 375 inputs rehash vs current disk)"],"exit":0,"utc":"~06:58Z","stdout_summary":"375/375 equal, 0 diffs"}
+{"no":11,"argv":["python3 (G02 before/after comparison json inspection)"],"exit":0,"utc":"~06:59Z","stdout_summary":"before changed=5 coordination; after changed=17 (5+12 E docs)"}
+{"no":12,"argv":["cat G-REVIEW-02/STOPPED.json; cat STORAGE-03/REPORT.md head; grep I-MAPPING"],"exit":0,"utc":"~07:00Z","stdout_summary":"defaultRawExit UNKNOWN recorder1 observer143; 33/136063856/1450/37; I01-I09 pending I06 NOT_OBSERVED I10 reuse I11 incomplete"}
+{"no":13,"argv":["python3 (HANDOFF top fields, rr3_current packages, consumer_contract dump)"],"exit":0,"utc":"~07:01Z","stdout_summary":"accepted_tasks=[]; stage NOT_ACCEPTED; all packages consistent"}
+{"no":14,"argv":["grep resolve_route/ModelTurnInput/workerrpc callback/LedgerWorkerCallbackTrace/migrations v7/r05_t07 usage sample"],"exit":0,"utc":"~07:02Z","stdout_summary":"all §6.2 source spot-checks match docs"}
+{"no":15,"argv":["python3 (PERFORMANCE rr3_resource_independent_review vs H02 raw series sha)"],"exit":0,"utc":"~07:02Z","stdout_summary":"raw_sha256 e298d897… recomputed equal; ranges/phases match"}
+{"no":16,"argv":["python3 (TEST_MAP I10 receipts vs H02 command.json)"],"exit":0,"utc":"~07:03Z","stdout_summary":"1/7, 1/4, 2 passed 336.02s all match"}
+{"no":17,"argv":["python3 (ORCHESTRATOR rr3_current == HANDOFF rr3_current; top-level R06_READY)"],"exit":0,"utc":"~07:03Z","stdout_summary":"True; R06_READY False, status NOT_ACCEPTED, verdict FAIL"}
+{"no":18,"argv":["python3 (LIVE_VERIFICATION platform/raw npm fields)"],"exit":0,"utc":"~07:03Z","stdout_summary":"4-platform split, BLOCKED_NOT_AUTHORIZED retained"}
+{"no":19,"argv":["python3 (strict duplicate-key parse of 7 owned JSON docs)"],"exit":0,"utc":"~07:04Z","stdout_summary":"all OK, no duplicate keys"}
+{"no":20,"argv":["python3 (relative link check, 5 markdown docs)"],"exit":0,"utc":"~07:04Z","stdout_summary":"51 links checked, ALL_OK"}
+{"no":21,"argv":["python3 (historical preservation: unchanged docs, ledger byte prefixes, non-allowed keys)"],"exit":0,"utc":"~07:04Z","stdout_summary":"all True/empty"}
+{"no":22,"argv":["python3 (E-REVIEW-03 inspection: audit-results 250 checks passed=null, no REVIEW.md)"],"exit":0,"utc":"~07:05Z","stdout_summary":"raw interrupted capture only"}
+{"no":23,"argv":["git rev-parse HEAD/--abbrev-ref/origin; git status --short; git diff --cached --stat"],"exit":0,"utc":"~07:05Z","stdout_summary":"HEAD b3ac0e6a both sides; 72 dirty entries; staged empty"}
+{"no":24,"argv":["python3 (E-03 SELF_CHECK summary; RR2 FINAL layer result; G02 digest naive variants)"],"exit":0,"utc":"~07:05Z","stdout_summary":"378/0/9369; 7 cmds exits [101,0,0,0,0,0,1]=5/7 FAIL; G02 digest variant search inconclusive -> resolved in no.26"}
+{"no":25,"argv":["python3 (G02 files entry equality before/after; driver.py digest formula found)"],"exit":0,"utc":"~07:05Z","stdout_summary":"files arrays equal; digest = sha256(json.dumps(rows,sort_keys=True))"}
+{"no":26,"argv":["python3 (reproduce G02 digest 878533ef… before and after)"],"exit":0,"utc":"~07:05Z","stdout_summary":"True/True"}
+{"no":27,"argv":["python3 (git index sha vs STOPPED; historical-dispatch-differences inspection)"],"exit":0,"utc":"~07:05Z","stdout_summary":"index e65fd8f9… unchanged; 3 dispatch diffs listed honestly"}
+{"no":28,"argv":["python3 control run 1 (isolated seeds, broken top-level R06_READY probe)"],"exit":1,"utc":"~07:06Z","note":"METHOD_BLIND caused by wrong probe location — control-of-the-control, fixed"}
+{"no":29,"argv":["python3 control run 2 (duplicate-key injection malformed, parse crash)"],"exit":1,"utc":"~07:07Z","note":"seed shape corrected to true duplicate key (valid JSON, silent last-wins)"}
+{"no":30,"argv":["python3 control run 3 (corrected probes: strict dup-key, fact, hash, digest)"],"exit":0,"utc":"~07:08Z","stdout_summary":"positive 4/4 PASS; negative 5/5 FLAG; METHOD_VALIDATED"}
+{"no":31,"argv":["python3 (historical_layers R04 0/8 / R03 0/15; G02 case-results.tsv)"],"exit":0,"utc":"~07:09Z","stdout_summary":"matches docs; N01 101 OK, N02 1 BAD MISSING"}
+{"no":32,"argv":["python3 (HANDOFF artifact refs existence walk; read-inputs/authority-reading summary; initial 2267 scope; .git/index rehash)"],"exit":0,"utc":"~07:10Z","stdout_summary":"no missing refs; 133+11 read records; 2267 initial scope; index unchanged"}
+{"no":33,"argv":["date -u; df -k /System/Volumes/Data"],"exit":0,"utc":"2026-10-07T07:05:41Z","note":"avail 612Gi (APFS background reconciliation; no writes by this review beyond small files)"}
+{"no":34,"argv":["write REVIEW.md / commands.jsonl / inputs-read.json"],"exit":0,"utc":"2026-10-07T07:06-07:20Z","note":"sole outputs in artifacts/rust-tauri/R05/RR3/E-REVIEW-04/"}

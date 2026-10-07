@@ -1,0 +1,13 @@
+# binding-exclusion: artifacts/rust-tauri/R05/run-review/child/child/stderr.log/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)
+# binding-exclusion: artifacts/rust-tauri/R05/run-review/child/child/stdout.log/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)
+# binding-exclusion: artifacts/rust-tauri/R05/run-review/child/stderr.log/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)
+# binding-exclusion: artifacts/rust-tauri/R05/run-review/child/stdout.log/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)
+# binding-exclusion: artifacts/rust-tauri/R05/run-review/stderr.log/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)
+# binding-exclusion: artifacts/rust-tauri/R05/run-review/stdout.log/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)
+8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd  A   .gitignore
+cba06b5736faf67e54b07b561eae94395e774c517a7d910a54369e1263ccfbd4  A   artifacts/rust-tauri/R05/run-review/child/child/old-evidence.json
+0682c5f2076f099c34cfdd15a9e063849ed437a49677e6fcc5b4198c76575be5  A   config.json
+0682c5f2076f099c34cfdd15a9e063849ed437a49677e6fcc5b4198c76575be5  A   scripts/run.sh
+9f91df74073638258f899c4c9c29191b7f868502bfbceeb2a45c61cc67e5c563  AM  source.rs
+0682c5f2076f099c34cfdd15a9e063849ed437a49677e6fcc5b4198c76575be5  A   stage-map.json
+977f7293af016943704f4065ab83e46382cfd2b86c16c29d2da16133586ef92e  ??  untracked-dirty.txt

@@ -1,0 +1,17 @@
+{
+  "case": "duplicate",
+  "command": [
+    "python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-new/duplicate/input.tsv",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-new/duplicate/mutation.json"
+  ],
+  "startedAt": "2026-10-07T02:30:17.839689+00:00",
+  "endedAt": "2026-10-07T02:30:17.896800+00:00",
+  "exitCode": 1,
+  "expectedExit": 1,
+  "beforeSha256": "05f423e6b8ee776d2a7d9ad0bfdfd1c0a2efe8dfac246f78b467ea08847deec7",
+  "afterSha256": "05f423e6b8ee776d2a7d9ad0bfdfd1c0a2efe8dfac246f78b467ea08847deec7",
+  "receiptPresent": false,
+  "status": "PASS"
+}

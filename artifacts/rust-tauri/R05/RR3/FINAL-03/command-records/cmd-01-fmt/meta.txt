@@ -1,0 +1,14 @@
+label: cmd-01-fmt
+argv: /Users/study_superior/.cargo/bin/cargo fmt --manifest-path rust/Cargo.toml --all -- --check
+cwd: /Users/study_superior/Desktop/Code/LingxiAgent
+HOME: /Users/study_superior
+user: study_superior
+utcStart: 2026-10-07T13:28:17.441921000Z
+dfBefore: /dev/disk3s5       926  344       556    39% 5095517 5839319840    0%   /System/Volumes/Data
+utcEnd: 2026-10-07T13:28:18.618092000Z
+exit: 0
+stdoutBytes: 0
+stderrBytes: 0
+stdoutSha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+stderrSha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+dfAfter: /dev/disk3s5       926  344       556    39% 5095519 5839319840    0%   /System/Volumes/Data

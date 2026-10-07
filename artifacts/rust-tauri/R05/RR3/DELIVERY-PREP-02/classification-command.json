@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "python3",
+    "artifacts/rust-tauri/R05/RR3/DELIVERY-PREP-02/classify.py"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startUTC": "2026-10-07T03:57:55.368923+00:00",
+  "endUTC": "2026-10-07T03:57:56.235939+00:00",
+  "exitCode": 0,
+  "stdout": "classification.stdout",
+  "stdoutSHA256": "ea46170222e108201ccd5bdd5f9b1e4d5816011196bfb0f4b842d52f97b56726",
+  "stderr": "classification.stderr",
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,17 @@
+{
+  "reviewer": "rr3_e_review_01",
+  "argv": [
+    "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-01/fixture-check.py",
+    "current",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-01/isolated-current.json"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "utc_start": "2026-10-07T01:29:50.436701+00:00",
+  "utc_end": "2026-10-07T01:29:50.464098+00:00",
+  "exit_code": 1,
+  "stdout": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-current-mutated-stdout.log",
+  "stderr": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/control-current-mutated-stderr.log",
+  "stdout_sha256": "c8e79b4d2a1bf88c25fb88253f3b2f6f7b72c7a25e64ad4c92347963d80b033e",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

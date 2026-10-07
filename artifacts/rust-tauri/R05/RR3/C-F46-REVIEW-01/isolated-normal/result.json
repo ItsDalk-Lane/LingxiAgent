@@ -1,0 +1,255 @@
+{
+  "caseId": "R05-T08-C12",
+  "finding": "F46",
+  "mode": "six",
+  "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/build/lingxi-service",
+  "binarySha256": "7d9190d27d1b6a019abfbe97049d6855a3f225494124fee43ef8988e032ae78b",
+  "rows": [
+    {
+      "command": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/build/lingxi-service",
+        "--home",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated-normal/home",
+        "--bind",
+        "127.0.0.1:0",
+        "--log-max-files",
+        "3",
+        "--log-max-bytes",
+        "65536"
+      ],
+      "pid": 50835,
+      "startedAt": "2026-10-07T01:01:36.488599+00:00",
+      "endedAt": "2026-10-07T01:01:37.942627+00:00",
+      "ready": true,
+      "exitCode": 0,
+      "reaped": true,
+      "filesAtReady": [
+        {
+          "name": "service-000001.log",
+          "isDirectory": false,
+          "bytes": 950,
+          "sha256": "34aeb81385cc01259c29cc6fab74d869977dd47da31af9d9d0acf0b6c19ce7df"
+        }
+      ],
+      "count": 1,
+      "preservedPrior2And3": null,
+      "explicitError": false,
+      "assertionPass": true
+    },
+    {
+      "command": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/build/lingxi-service",
+        "--home",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated-normal/home",
+        "--bind",
+        "127.0.0.1:0",
+        "--log-max-files",
+        "3",
+        "--log-max-bytes",
+        "65536"
+      ],
+      "pid": 50851,
+      "startedAt": "2026-10-07T01:01:37.942651+00:00",
+      "endedAt": "2026-10-07T01:01:37.976174+00:00",
+      "ready": true,
+      "exitCode": 0,
+      "reaped": true,
+      "filesAtReady": [
+        {
+          "name": "service-000001.log",
+          "isDirectory": false,
+          "bytes": 1426,
+          "sha256": "97ea3cf5494ace7006fd144b7ca0bb7dbce543c9acfd8d23a656437b89d674fa"
+        },
+        {
+          "name": "service-000002.log",
+          "isDirectory": false,
+          "bytes": 770,
+          "sha256": "931510cf39394f6192143803cd005e7acea6364f0b6f3dac42e77e44f694f2ff"
+        }
+      ],
+      "count": 2,
+      "preservedPrior2And3": null,
+      "explicitError": false,
+      "assertionPass": true
+    },
+    {
+      "command": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/build/lingxi-service",
+        "--home",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated-normal/home",
+        "--bind",
+        "127.0.0.1:0",
+        "--log-max-files",
+        "3",
+        "--log-max-bytes",
+        "65536"
+      ],
+      "pid": 50853,
+      "startedAt": "2026-10-07T01:01:37.976187+00:00",
+      "endedAt": "2026-10-07T01:01:38.015762+00:00",
+      "ready": true,
+      "exitCode": 0,
+      "reaped": true,
+      "filesAtReady": [
+        {
+          "name": "service-000001.log",
+          "isDirectory": false,
+          "bytes": 1426,
+          "sha256": "97ea3cf5494ace7006fd144b7ca0bb7dbce543c9acfd8d23a656437b89d674fa"
+        },
+        {
+          "name": "service-000002.log",
+          "isDirectory": false,
+          "bytes": 1246,
+          "sha256": "2b3b2553857da6108a046dc18fbc35ed24c4355d6bb0b0f378aa9d4f36a868c2"
+        },
+        {
+          "name": "service-000003.log",
+          "isDirectory": false,
+          "bytes": 770,
+          "sha256": "bbb0ca7a0ff8ccff06cf5584c6a7000497c396923bfa9a13a9172bc672319eea"
+        }
+      ],
+      "count": 3,
+      "preservedPrior2And3": null,
+      "explicitError": false,
+      "assertionPass": true
+    },
+    {
+      "command": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/build/lingxi-service",
+        "--home",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated-normal/home",
+        "--bind",
+        "127.0.0.1:0",
+        "--log-max-files",
+        "3",
+        "--log-max-bytes",
+        "65536"
+      ],
+      "pid": 50855,
+      "startedAt": "2026-10-07T01:01:38.015787+00:00",
+      "endedAt": "2026-10-07T01:01:38.063671+00:00",
+      "ready": true,
+      "exitCode": 0,
+      "reaped": true,
+      "filesAtReady": [
+        {
+          "name": "service-000002.log",
+          "isDirectory": false,
+          "bytes": 1246,
+          "sha256": "2b3b2553857da6108a046dc18fbc35ed24c4355d6bb0b0f378aa9d4f36a868c2"
+        },
+        {
+          "name": "service-000003.log",
+          "isDirectory": false,
+          "bytes": 1246,
+          "sha256": "24f246a479f49fd7b0bd004473c03f5da8f85a0ca9333641fe4eb37b39bda1ca"
+        },
+        {
+          "name": "service-000004.log",
+          "isDirectory": false,
+          "bytes": 770,
+          "sha256": "c73af8b6c083057e813df6e7ab373b761e3bf11c93e066788a1c326be6b50e88"
+        }
+      ],
+      "count": 3,
+      "preservedPrior2And3": null,
+      "explicitError": false,
+      "assertionPass": true
+    },
+    {
+      "command": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/build/lingxi-service",
+        "--home",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated-normal/home",
+        "--bind",
+        "127.0.0.1:0",
+        "--log-max-files",
+        "3",
+        "--log-max-bytes",
+        "65536"
+      ],
+      "pid": 50856,
+      "startedAt": "2026-10-07T01:01:38.063685+00:00",
+      "endedAt": "2026-10-07T01:01:38.095222+00:00",
+      "ready": true,
+      "exitCode": 0,
+      "reaped": true,
+      "filesAtReady": [
+        {
+          "name": "service-000003.log",
+          "isDirectory": false,
+          "bytes": 1246,
+          "sha256": "24f246a479f49fd7b0bd004473c03f5da8f85a0ca9333641fe4eb37b39bda1ca"
+        },
+        {
+          "name": "service-000004.log",
+          "isDirectory": false,
+          "bytes": 1246,
+          "sha256": "7b8b01ff2b7121e9fc5db45c8b3c2c99bc3d7dfc53528e8f202923f7e14959a8"
+        },
+        {
+          "name": "service-000005.log",
+          "isDirectory": false,
+          "bytes": 770,
+          "sha256": "83812845bb5c08826ee7100a5e894d4fa4be22b7b8bc284777d64506cd232874"
+        }
+      ],
+      "count": 3,
+      "preservedPrior2And3": null,
+      "explicitError": false,
+      "assertionPass": true
+    },
+    {
+      "command": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/build/lingxi-service",
+        "--home",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated-normal/home",
+        "--bind",
+        "127.0.0.1:0",
+        "--log-max-files",
+        "3",
+        "--log-max-bytes",
+        "65536"
+      ],
+      "pid": 50857,
+      "startedAt": "2026-10-07T01:01:38.095232+00:00",
+      "endedAt": "2026-10-07T01:01:38.126173+00:00",
+      "ready": true,
+      "exitCode": 0,
+      "reaped": true,
+      "filesAtReady": [
+        {
+          "name": "service-000004.log",
+          "isDirectory": false,
+          "bytes": 1246,
+          "sha256": "7b8b01ff2b7121e9fc5db45c8b3c2c99bc3d7dfc53528e8f202923f7e14959a8"
+        },
+        {
+          "name": "service-000005.log",
+          "isDirectory": false,
+          "bytes": 1246,
+          "sha256": "29315312c868a8e1f1228fc6b7df901e9aa9bbf8651bd6fed6d065bdae8f646e"
+        },
+        {
+          "name": "service-000006.log",
+          "isDirectory": false,
+          "bytes": 770,
+          "sha256": "689d6dc57594ee3cb73a46edd058737c151f806c0b637dfb733dafafbab1d4f0"
+        }
+      ],
+      "count": 3,
+      "preservedPrior2And3": null,
+      "explicitError": false,
+      "assertionPass": true
+    }
+  ],
+  "threshold": 3,
+  "cleanup": {
+    "homeRemoved": true,
+    "allReaped": true
+  },
+  "status": "PASS"
+}

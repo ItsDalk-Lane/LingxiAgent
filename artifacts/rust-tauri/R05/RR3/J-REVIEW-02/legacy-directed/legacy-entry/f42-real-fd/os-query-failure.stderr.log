@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/r05t08-work/j-review02-gvphliks/scripts/rust-tauri/run_output_sinks.py", line 47, in <module>
+    raise RuntimeError("lsof failed: " + query.stderr.strip())
+RuntimeError: lsof failed: controlled OS query failure
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/study_superior/r05t08-work/j-review02-gvphliks/scripts/rust-tauri/run_output_sinks.py", line 50, in <module>
+    raise RuntimeError("cannot query real OS output descriptors") from exc
+RuntimeError: cannot query real OS output descriptors

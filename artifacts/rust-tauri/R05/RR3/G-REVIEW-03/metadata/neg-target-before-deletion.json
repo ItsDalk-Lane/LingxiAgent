@@ -1,0 +1,79 @@
+{
+ "at": "2026-10-07T09:43:26.828798+00:00",
+ "kind": "stale-mutant-xtask-artifacts-in-NEG_TARGET-before-deletion",
+ "artifacts": [
+  {
+   "path": "debug/deps/xtask-2ada07f2097522dd",
+   "sha256": "66c0206fa7961fd2bac1ed4011ad9fd01f701c6c10988008b0401e01a7a0f19e",
+   "size": 8240584,
+   "mtime": "2026-10-07T07:52:41.990822+00:00"
+  },
+  {
+   "path": "debug/deps/xtask-2ada07f2097522dd.d",
+   "sha256": "614fd19415edbdbbebeb6bdcdf849fd3c2a323eb6f13d0848a362edaf876ee83",
+   "size": 2110,
+   "mtime": "2026-10-07T07:52:40.938673+00:00"
+  },
+  {
+   "path": "debug/deps/xtask-2ada07f2097522dd.xtask.38d5d527d3e7bc9f-cgu.00.rcgu.o",
+   "sha256": "c26f33fa9182c722295b902ecc12987473d97362405b2d880da5a024037c55f6",
+   "size": 988120,
+   "mtime": "2026-10-07T07:52:41.677931+00:00"
+  },
+  {
+   "path": "debug/deps/xtask-2ada07f2097522dd.xtask.38d5d527d3e7bc9f-cgu.01.rcgu.o",
+   "sha256": "e8eebf28616baef51a8838b51e03f8b191a644aca81af1ad97d7df7a17fbde5f",
+   "size": 1350784,
+   "mtime": "2026-10-07T07:52:41.630390+00:00"
+  },
+  {
+   "path": "debug/deps/xtask-2ada07f2097522dd.xtask.38d5d527d3e7bc9f-cgu.02.rcgu.o",
+   "sha256": "94038ca4ae956537e5cfd65fc35559e3d58f7bc1854c9668c335f39bde884223",
+   "size": 1655504,
+   "mtime": "2026-10-07T07:52:41.728472+00:00"
+  },
+  {
+   "path": "debug/deps/xtask-2ada07f2097522dd.xtask.38d5d527d3e7bc9f-cgu.03.rcgu.o",
+   "sha256": "d1a79d1325b3befcddbbbe4eb8dc0d59f9843956203383d632dc56f680bac214",
+   "size": 1854536,
+   "mtime": "2026-10-07T07:52:41.770552+00:00"
+  },
+  {
+   "path": "debug/deps/xtask-2ada07f2097522dd.xtask.38d5d527d3e7bc9f-cgu.04.rcgu.o",
+   "sha256": "57b2329d0c4c2466b7fbb89a9cfed235538b3e9029fdc77316530191d2a4a6f1",
+   "size": 1491272,
+   "mtime": "2026-10-07T07:52:41.813386+00:00"
+  },
+  {
+   "path": "debug/deps/xtask-2ada07f2097522dd.xtask.38d5d527d3e7bc9f-cgu.05.rcgu.o",
+   "sha256": "d678c6daed55969cd4f58b9c1a4b8f7b22297616c8505d5302f281516b6c7182",
+   "size": 1350080,
+   "mtime": "2026-10-07T07:52:41.850217+00:00"
+  },
+  {
+   "path": "debug/deps/xtask-2ada07f2097522dd.xtask.38d5d527d3e7bc9f-cgu.06.rcgu.o",
+   "sha256": "30efa478b733ca12cf4528f9eac0c874999a6dbf2fa0b22da0b0450a592a7f91",
+   "size": 964464,
+   "mtime": "2026-10-07T07:52:41.874334+00:00"
+  },
+  {
+   "path": "debug/deps/xtask-2ada07f2097522dd.xtask.38d5d527d3e7bc9f-cgu.07.rcgu.o",
+   "sha256": "fb94b4c4f2ab109b03fa55e5ba050bdb7711f72ee4606dcfed787f0b5dcc857a",
+   "size": 554464,
+   "mtime": "2026-10-07T07:52:41.903569+00:00"
+  },
+  {
+   "path": "debug/deps/xtask-2ada07f2097522dd.xtask.38d5d527d3e7bc9f-cgu.08.rcgu.o",
+   "sha256": "feb5011b86f1f29d7de9ad7d09e1739e38cd663bb7d0005fe94e495862dbcec9",
+   "size": 1756768,
+   "mtime": "2026-10-07T07:52:41.931939+00:00"
+  },
+  {
+   "path": "debug/deps/xtask-2ada07f2097522dd.xtask.38d5d527d3e7bc9f-cgu.09.rcgu.o",
+   "sha256": "63afbedd0159ea5d75c0f7bda88cf517ddeec3da70d2013a37d2033329f55ee1",
+   "size": 643168,
+   "mtime": "2026-10-07T07:52:41.885163+00:00"
+  }
+ ],
+ "note": "NEG_TARGET was created cold by G-REVIEW-03 default16-01 (it did not exist at round start; brief claimed a 21G warm cache that was absent). Deleting this round-created cache removes only rebuildable build artifacts polluted by mutated builds, not any user content or historical evidence."
+}

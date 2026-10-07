@@ -1,0 +1,13 @@
+{
+ "marker": "RELOCATED-F51",
+ "receipt": "artifacts/rust-tauri/R05/RR3/F51-01/RELOCATION-RECEIPT.json",
+ "relocated_children": [
+  {
+   "name": "repo/",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_internal-old-tracked-grandchild_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-tracked-grandchild/repo/"
+  }
+ ],
+ "task": "RR3 F51: nested-.git untracked fixture directories relocated out of the main tree",
+ "written_utc": "2026-10-07T11:54:56.503475Z"
+}

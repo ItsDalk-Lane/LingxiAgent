@@ -1,0 +1,3 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.03s
+     Running `rust/target/debug/xtask verify-stage R05 --evidence artifacts/rust-tauri/R05/RR3/FINAL-02/verify-R05`
+error: cannot snapshot candidate before stage gate: candidate path /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-validator-bin/python3 crosses a symlink or reparse point

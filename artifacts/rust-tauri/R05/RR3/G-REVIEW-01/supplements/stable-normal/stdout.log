@@ -1,0 +1,6 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.20s
+     Running `/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R02 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-normal/evidence`
+xtask: verify-stage RX [python3 -c import os,pathlib; p=pathlib.Path('rust/crates/lingxi-kernel/src/lib.rs'); p.write_bytes(p.read_bytes()+b'\n// G controlled mid-command byte change\n') if os.environ.get('LINGXI_G_MUTATE')=='1' else None; print('controlled command exit zero')] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-normal/evidence/binding-control
+xtask: verify-stage RX [binding-control] PASS
+xtask: verify-stage R02 result written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-normal/evidence/verify-stage-result.json (overall: "PASS")

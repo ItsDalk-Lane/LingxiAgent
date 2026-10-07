@@ -1,0 +1,9 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.50s
+     Running tests/subagent_closeout.rs (rust/target/debug/deps/subagent_closeout-3d7d475bfec390ca)
+
+running 1 test
+test parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.10s
+

@@ -1,0 +1,142 @@
+{
+  "utc": "2026-10-07T01:07:02.529413+00:00",
+  "priorManifestSha256": "c378584ca7db2cb17d13cf69fdc312d18da78a92924d7f42c5d91ba4c80bf794",
+  "actual": 27,
+  "files": [
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/nested-internal/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/verify-stage-result.json",
+      "sha256": "042cca518c83bea61740720d8111c5280f342013201ee29dc489598853fcadd3",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/nested-internal/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+      "sha256": "2c703251ab1941997a94d409e96c8ea33f2308beac99dbab875e585ff1de34ca",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/nested-internal/run001/verify-R05/R04_REGRESSION/verify-stage-result.json",
+      "sha256": "00039968c4a9d3b4621477d177e6514d25e5bbacd4a51abfcc44cf4934de3c38",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/nested-internal/run001/verify-R05/verify-stage-result.json",
+      "sha256": "3d3cf42c58b28d4fe875862ae56967c970feb1d1e5bfe1ce05ce27c9850edf23",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/nested-external/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/verify-stage-result.json",
+      "sha256": "ce845404ed049d601b27c71456bd34d648ba6011bf11a156c09b6ec17fe54467",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/nested-external/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+      "sha256": "055106f10a2b906a02b51dfc851b3c0d4f3f7daaeb325f447a4368cf696d48df",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/nested-external/run001/verify-R05/R04_REGRESSION/verify-stage-result.json",
+      "sha256": "67ccd4ed15da3652b827b0befc9853a79dd0c0c82f954117b5160b0bdd610a8a",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/nested-external/run001/verify-R05/verify-stage-result.json",
+      "sha256": "45dba59d8b95c78fdd89f3e07e09ed82bae133ef197a06e025412434ef11b812",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/scope-old-red-artifacts-0/rust-tauri/R05/run001/verify-R05/verify-stage-result.json",
+      "sha256": "da0efd04433f38db59b886d555242481888d3cae76acf5cebf347a1dbfc3f1ec",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/scope-old-red-artifacts-0/rust-tauri/R05/run001/verify-R05/R04_REGRESSION/verify-stage-result.json",
+      "sha256": "7503092a07e0d3327b112d613ab3d948d3bec3fba2705985a02283aae58c46cb",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/scope-old-red-artifacts-0/rust-tauri/R05/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+      "sha256": "ecda058c8e26c03f478b733213fc7d9e22195caf26d79145efc39ed41a14e135",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/scope-old-red-artifacts-0/rust-tauri/R05/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/verify-stage-result.json",
+      "sha256": "53a53e91faefbd936c4a56b81e9b035c0da359f60278d5d7e68f198b8827ccb3",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/scope-restored-nested-02/run001/verify-R05/verify-stage-result.json",
+      "sha256": "a7d84aca4549935cd4a28c94337ff7fdc63aab4759c9e6520b696efcb8fac3aa",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/scope-restored-nested-02/run001/verify-R05/R04_REGRESSION/verify-stage-result.json",
+      "sha256": "fe3371512df7d66bba492bf2a7afee0ae8109eccfdd9e61ef4ef4c99b6de8b9c",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/scope-restored-nested-02/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+      "sha256": "2fc2e817d91e066f7fd811f46ea6ddb4103bffeb17b21439970999bfa2221663",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/scope-restored-nested-02/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/verify-stage-result.json",
+      "sha256": "b5c680224002be971d1196c098b0f92b2e54cc3e5b5c68c3be21812e9d507297",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/xtask-all.log",
+      "sha256": "b0774cd35e192b48ee95f70a1a928734b5d9cb66775b863e9bbb93bc9fc73c11",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/nested-external.log",
+      "sha256": "b97ea090f3a17c02012bdae783984768248e0977a5d0567dd2590418366b448e",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/helper-baseline-02.log",
+      "sha256": "21617496e6a0b1026e7461538b95579b172a0a0cab774439b2bebfab7601f983",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/helper-mismatch-red.log",
+      "sha256": "835fb4eb3b609ed8a4cbd7380e69536d96e89c1df192f2d3075ba124965e0043",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/helper-restored-green.log",
+      "sha256": "21617496e6a0b1026e7461538b95579b172a0a0cab774439b2bebfab7601f983",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/helper-mutation.json",
+      "sha256": "ed08ed4530a6040e545df46ba9d97d08245c2476883851beab67321576af4636",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/scope-mutation.json",
+      "sha256": "e870893e52b76a5f6febb7db8b6788d3f285a73d3a56a72385e41c01ae1b147b",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/binary-manifest-before.json",
+      "sha256": "b6aaf3aadb50ae0a385ad50431ca5c79ee57bc3a4d9d0edce96f252cb2e63f13",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/scope-binary-identities.json",
+      "sha256": "7542bbc5b38a46f1baaea4c53f71038c78f037e7e1f8757fe2725fa71f5de9ef",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/commands.json",
+      "sha256": "cac730eb34805994f392c8a1492b72fbe03f60934b369c914315d11611d401da",
+      "matchesPriorManifest": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/input-manifest.json",
+      "sha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+      "matchesPriorManifest": true
+    }
+  ]
+}

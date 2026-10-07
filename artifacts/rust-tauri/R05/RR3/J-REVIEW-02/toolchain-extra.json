@@ -1,0 +1,62 @@
+[
+  {
+    "argv": [
+      "git",
+      "--version"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startedUtc": "2026-10-07T04:19:52.137741+00:00",
+    "finishedUtc": "2026-10-07T04:19:52.145239+00:00",
+    "exitCode": 0,
+    "stdout": "git version 2.53.0\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "--version"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startedUtc": "2026-10-07T04:19:52.145260+00:00",
+    "finishedUtc": "2026-10-07T04:19:52.155741+00:00",
+    "exitCode": 0,
+    "stdout": "Python 3.14.3\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "uname",
+      "-a"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startedUtc": "2026-10-07T04:19:52.155760+00:00",
+    "finishedUtc": "2026-10-07T04:19:52.159011+00:00",
+    "exitCode": 0,
+    "stdout": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64\n",
+    "stderr": ""
+  },
+  {
+    "tool": "git",
+    "path": "/opt/homebrew/bin/git",
+    "resolved": "/opt/homebrew/Cellar/git/2.53.0/bin/git",
+    "sha256": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537"
+  },
+  {
+    "tool": "python3",
+    "path": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+    "resolved": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+    "sha256": "1192b994fbb50303c9df2cc97c9d63797d454c7f57f20ca682877c9e770429aa"
+  },
+  {
+    "tool": "node",
+    "path": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+    "resolved": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+    "sha256": "1ee75375e33b94fc34b3b19aede049e11dae90efb63b374dc96d6bdace70c4b8"
+  },
+  {
+    "tool": "npm",
+    "path": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/npm",
+    "resolved": "/Users/study_superior/.nvm/versions/node/v24.16.0/lib/node_modules/npm/bin/npm-cli.js",
+    "sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7"
+  }
+]

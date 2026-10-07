@@ -1,0 +1,517 @@
+{
+  "time": "2026-10-07T02:14:51.652808+00:00",
+  "records": [
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/exit-code.txt",
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "bytes": 2,
+        "mtime_ns": 1791338430982837530
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/exit-code.txt",
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "bytes": 2,
+        "mtime_ns": 1791338430982837530
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/named-check.txt",
+        "sha256": "4b8ff953d2144cc16dbec5210bab08e1063aea5ce0252555491ac74e0fa2c9b7",
+        "bytes": 153,
+        "mtime_ns": 1791338431005201661
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/named-check.txt",
+        "sha256": "4b8ff953d2144cc16dbec5210bab08e1063aea5ce0252555491ac74e0fa2c9b7",
+        "bytes": 153,
+        "mtime_ns": 1791338431005201661
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/verify-stage-result.json",
+        "sha256": "b35306cc22a5edf077606aa714ae97aab8315770bb8ca1dcae405b257961a2a7",
+        "bytes": 176126,
+        "mtime_ns": 1791338430922397298
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/verify-stage-result.json",
+        "sha256": "b35306cc22a5edf077606aa714ae97aab8315770bb8ca1dcae405b257961a2a7",
+        "bytes": 176126,
+        "mtime_ns": 1791338430922397298
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s1-counts-after-stop.json",
+        "sha256": "d713b4d2f2123afe9c6c7fc9f2e89746849192a9276c9c9383b94d4ab7fd0c66",
+        "bytes": 136,
+        "mtime_ns": 1791337836378238486
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s1-counts-after-stop.json",
+        "sha256": "d713b4d2f2123afe9c6c7fc9f2e89746849192a9276c9c9383b94d4ab7fd0c66",
+        "bytes": 136,
+        "mtime_ns": 1791337836378238486
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s2-counts-after-crash.json",
+        "sha256": "347987f9452c382b32e905cd01a47510e5b5052b9177d6711a0828ded331f07a",
+        "bytes": 136,
+        "mtime_ns": 1791337836726501166
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s2-counts-after-crash.json",
+        "sha256": "347987f9452c382b32e905cd01a47510e5b5052b9177d6711a0828ded331f07a",
+        "bytes": 136,
+        "mtime_ns": 1791337836726501166
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s4-migrations-round1.json",
+        "sha256": "dd51ba6d008c91db937a4588138a90bb0a14b7d2eb519b02c2945bc10b20765d",
+        "bytes": 2986,
+        "mtime_ns": 1791337837074476636
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s4-migrations-round1.json",
+        "sha256": "dd51ba6d008c91db937a4588138a90bb0a14b7d2eb519b02c2945bc10b20765d",
+        "bytes": 2986,
+        "mtime_ns": 1791337837074476636
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s4-migrations-round2.json",
+        "sha256": "dd51ba6d008c91db937a4588138a90bb0a14b7d2eb519b02c2945bc10b20765d",
+        "bytes": 2986,
+        "mtime_ns": 1791337837195891144
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s4-migrations-round2.json",
+        "sha256": "dd51ba6d008c91db937a4588138a90bb0a14b7d2eb519b02c2945bc10b20765d",
+        "bytes": 2986,
+        "mtime_ns": 1791337837195891144
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s4-migrations-round3.json",
+        "sha256": "dd51ba6d008c91db937a4588138a90bb0a14b7d2eb519b02c2945bc10b20765d",
+        "bytes": 2986,
+        "mtime_ns": 1791337837313473129
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s4-migrations-round3.json",
+        "sha256": "dd51ba6d008c91db937a4588138a90bb0a14b7d2eb519b02c2945bc10b20765d",
+        "bytes": 2986,
+        "mtime_ns": 1791337837313473129
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A11/backup-restore/s1-restore-outcome.json",
+        "sha256": "0eb22c772198f3b93ce25de4a50cac99257bfadfae7ba53dfd22bfbb01b60245",
+        "bytes": 263,
+        "mtime_ns": 1791337944551416666
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A11/backup-restore/s1-restore-outcome.json",
+        "sha256": "0eb22c772198f3b93ce25de4a50cac99257bfadfae7ba53dfd22bfbb01b60245",
+        "bytes": 263,
+        "mtime_ns": 1791337944551416666
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A11/backup-restore/s1-backup-outcome.json",
+        "sha256": "6435f5426aa3b752fe13f750eed488f53c8d65dfcdd9f15cebe36c34a5af1084",
+        "bytes": 245,
+        "mtime_ns": 1791337944498943023
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A11/backup-restore/s1-backup-outcome.json",
+        "sha256": "6435f5426aa3b752fe13f750eed488f53c8d65dfcdd9f15cebe36c34a5af1084",
+        "bytes": 245,
+        "mtime_ns": 1791337944498943023
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A11/backup-restore/s3-backup-out.json",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "mtime_ns": 1791337944708110549
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A11/backup-restore/s3-backup-out.json",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "mtime_ns": 1791337944708110549
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A11/backup-restore/s4-ws-probe.json",
+        "sha256": "9b33c4d50a9f7a0434980244454a85ce4288c7323241cf9ff22c50e6b8f8dd85",
+        "bytes": 30,
+        "mtime_ns": 1791337945843037287
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A11/backup-restore/s4-ws-probe.json",
+        "sha256": "9b33c4d50a9f7a0434980244454a85ce4288c7323241cf9ff22c50e6b8f8dd85",
+        "bytes": 30,
+        "mtime_ns": 1791337945843037287
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/cli-rust-cases.json",
+        "sha256": "b099353d2ed5bc8d7d7d1617aae3ea3fd7cd90a254e0c7f0053ebec82e767e86",
+        "bytes": 28972,
+        "mtime_ns": 1791338199653924873
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/cli-rust-cases.json",
+        "sha256": "b099353d2ed5bc8d7d7d1617aae3ea3fd7cd90a254e0c7f0053ebec82e767e86",
+        "bytes": 28972,
+        "mtime_ns": 1791338199653924873
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default-console.log",
+        "sha256": "a969474f2af39a19a093b73054275d6ecb0288509a9388041ef8d35a22127c49",
+        "bytes": 3926,
+        "mtime_ns": 1791338531138916077
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default-console.log",
+        "sha256": "a969474f2af39a19a093b73054275d6ecb0288509a9388041ef8d35a22127c49",
+        "bytes": 3926,
+        "mtime_ns": 1791338531138916077
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/summary.txt",
+        "sha256": "2f2423396c950712f70bc9dcaa267b0160121920aeeaa2b68fd95b8d6cd0e66e",
+        "bytes": 3899,
+        "mtime_ns": 1791338531138903827
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/summary.txt",
+        "sha256": "2f2423396c950712f70bc9dcaa267b0160121920aeeaa2b68fd95b8d6cd0e66e",
+        "bytes": 3899,
+        "mtime_ns": 1791338531138903827
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/case-results.tsv",
+        "sha256": "82ded6e0fb8b85c7effe376fa920f13dd1229656f7b91e51aea35a5dafcd6368",
+        "bytes": 1176,
+        "mtime_ns": 1791338531102902573
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/case-results.tsv",
+        "sha256": "82ded6e0fb8b85c7effe376fa920f13dd1229656f7b91e51aea35a5dafcd6368",
+        "bytes": 1176,
+        "mtime_ns": 1791338531102902573
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/mutation-state-008.json",
+        "sha256": "6c72f7a6bfebe0efc4bc1e7c2c140cfd3444329ede969204450b70482c74220d",
+        "bytes": 1840,
+        "mtime_ns": 1791337694873362844
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/mutation-state-008.json",
+        "sha256": "6c72f7a6bfebe0efc4bc1e7c2c140cfd3444329ede969204450b70482c74220d",
+        "bytes": 1840,
+        "mtime_ns": 1791337694873362844
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/source-midrun-observation.json",
+        "sha256": "f03de2761fba9b8c70dfccc58ae07aa0bc1e5eb54e26b9998558546a12d6505c",
+        "bytes": 4577,
+        "mtime_ns": 1791337631922025157
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/source-midrun-observation.json",
+        "sha256": "f03de2761fba9b8c70dfccc58ae07aa0bc1e5eb54e26b9998558546a12d6505c",
+        "bytes": 4577,
+        "mtime_ns": 1791337631922025157
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/summary.txt",
+        "sha256": "1a092b19a32a137042931d0c6158f6b69bfc4532fe5a080626590da95373eea8",
+        "bytes": 1694,
+        "mtime_ns": 1790603296329447486
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/summary.txt",
+        "sha256": "1a092b19a32a137042931d0c6158f6b69bfc4532fe5a080626590da95373eea8",
+        "bytes": 1694,
+        "mtime_ns": 1790603296329447486
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-p1.err",
+        "sha256": "863ba6803a55b0961ecd4318051990382ff2dff1fbcb4fa4bf94f25b2c756bc5",
+        "bytes": 5148,
+        "mtime_ns": 1790603296328672232
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-p1.err",
+        "sha256": "863ba6803a55b0961ecd4318051990382ff2dff1fbcb4fa4bf94f25b2c756bc5",
+        "bytes": 5148,
+        "mtime_ns": 1790603296328672232
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p2-me-bad-bearer.body",
+        "sha256": "4a563fb5afb25b506e641b3ea566b0559ac2da8598c0764e448ef3fb460d78da",
+        "bytes": 206,
+        "mtime_ns": 1790603296326162677
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p2-me-bad-bearer.body",
+        "sha256": "4a563fb5afb25b506e641b3ea566b0559ac2da8598c0764e448ef3fb460d78da",
+        "bytes": 206,
+        "mtime_ns": 1790603296326162677
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/build.log",
+        "sha256": "a595e4abbde4cfd7bce822c30aa8dccee1e96490ee28a55d65881050dd7fe8a5",
+        "bytes": 3435,
+        "mtime_ns": 1790577351926782347
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/build.log",
+        "sha256": "a595e4abbde4cfd7bce822c30aa8dccee1e96490ee28a55d65881050dd7fe8a5",
+        "bytes": 3435,
+        "mtime_ns": 1790577351926782347
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/inventory.txt",
+        "sha256": "ae9cdd957353fd7a5a1a26d0b54377c4d16d502b0b1473672e05a66870d1cd8f",
+        "bytes": 4768,
+        "mtime_ns": 1790603296324946462
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/inventory.txt",
+        "sha256": "ae9cdd957353fd7a5a1a26d0b54377c4d16d502b0b1473672e05a66870d1cd8f",
+        "bytes": 4768,
+        "mtime_ns": 1790603296324946462
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/retention-manifest.txt",
+        "sha256": "82cbba6e9687250aec1aa20e7596ffd69043dfbe39b64a603a1cf0585d9634d8",
+        "bytes": 464,
+        "mtime_ns": 1790603296328447314
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/retention-manifest.txt",
+        "sha256": "82cbba6e9687250aec1aa20e7596ffd69043dfbe39b64a603a1cf0585d9634d8",
+        "bytes": 464,
+        "mtime_ns": 1790603296328447314
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000002.log",
+        "sha256": "2fea1d2428d154253a187049b8a305b97abbb73da4db4b26234d128ab4b092a1",
+        "bytes": 4410,
+        "mtime_ns": 1790577361133699262
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000002.log",
+        "sha256": "2fea1d2428d154253a187049b8a305b97abbb73da4db4b26234d128ab4b092a1",
+        "bytes": 4410,
+        "mtime_ns": 1790577361133699262
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000003.log",
+        "sha256": "fe2ce7dd6a102803297b998d7044725cde97d4d1180bd4235170cbfb1be6ebcb",
+        "bytes": 201,
+        "mtime_ns": 1790577361133921304
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000003.log",
+        "sha256": "fe2ce7dd6a102803297b998d7044725cde97d4d1180bd4235170cbfb1be6ebcb",
+        "bytes": 201,
+        "mtime_ns": 1790577361133921304
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000001.log",
+        "sha256": "d96d2a17d21da3472297b8e3e7f05c1416bc236a88346f6cf891d0cf06c57eb6",
+        "bytes": 3651,
+        "mtime_ns": 1790577361134092847
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000001.log",
+        "sha256": "d96d2a17d21da3472297b8e3e7f05c1416bc236a88346f6cf891d0cf06c57eb6",
+        "bytes": 3651,
+        "mtime_ns": 1790577361134092847
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+        "sha256": "0f5911462089380b8eb94d137b98f8d2382d062564c43d54cd84338b0852191e",
+        "bytes": 438586,
+        "mtime_ns": 1791312530913517602
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+        "sha256": "0f5911462089380b8eb94d137b98f8d2382d062564c43d54cd84338b0852191e",
+        "bytes": 438586,
+        "mtime_ns": 1791312530913517602
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/verify-stage-result.json",
+        "sha256": "b9c115415225b03d19929708095bc3cd3cfae6c8677804a541a6a909ff732d40",
+        "bytes": 366788,
+        "mtime_ns": 1791312491372421945
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/verify-stage-result.json",
+        "sha256": "b9c115415225b03d19929708095bc3cd3cfae6c8677804a541a6a909ff732d40",
+        "bytes": 366788,
+        "mtime_ns": 1791312491372421945
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+        "sha256": "157d8cd5e1f03d19f57f5d35ce0041904503c5809964ae1b2900abcd292d6803",
+        "bytes": 162120,
+        "mtime_ns": 1791312393240903834
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+        "sha256": "157d8cd5e1f03d19f57f5d35ce0041904503c5809964ae1b2900abcd292d6803",
+        "bytes": 162120,
+        "mtime_ns": 1791312393240903834
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A07_A08/s4-migrations-round1.json",
+        "sha256": "fc75ba8d86322698e73a9edd50e2d0b7e9e00e622d907ecebc457e257dee72cd",
+        "bytes": 2986,
+        "mtime_ns": 1791311383636568266
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A07_A08/s4-migrations-round1.json",
+        "sha256": "fc75ba8d86322698e73a9edd50e2d0b7e9e00e622d907ecebc457e257dee72cd",
+        "bytes": 2986,
+        "mtime_ns": 1791311383636568266
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    },
+    {
+      "initial": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R05_SUITES/f27-resource-series.json",
+        "sha256": "f3d2f23cf5061e557f129a65a8abd843951b80973c0161d171937aa438aa579b",
+        "bytes": 2864,
+        "mtime_ns": 1791309903324884240
+      },
+      "current": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R05_SUITES/f27-resource-series.json",
+        "sha256": "f3d2f23cf5061e557f129a65a8abd843951b80973c0161d171937aa438aa579b",
+        "bytes": 2864,
+        "mtime_ns": 1791309903324884240
+      },
+      "observed_changed": false,
+      "bytesChanged": false
+    }
+  ]
+}

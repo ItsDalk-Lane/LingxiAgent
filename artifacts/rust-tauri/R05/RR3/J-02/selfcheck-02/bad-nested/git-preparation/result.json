@@ -1,0 +1,21 @@
+{
+  "status": "FAIL",
+  "startedUtc": "2026-10-07T03:57:12.751035+00:00",
+  "commands": [],
+  "platform": "darwin",
+  "argv": [
+    "/private/tmp/lingxi-git-copy-mh6avrgm/source/scripts/rust-tauri/prepare_git_copy.py",
+    "--source",
+    "/private/tmp/lingxi-git-copy-mh6avrgm/source",
+    "--copy",
+    "/private/tmp/lingxi-git-copy-mh6avrgm/source/new",
+    "--revision",
+    "82333d7dd86182aa2037befa0998448c13f4a7bb",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-02/selfcheck-02/bad-nested/git-preparation"
+  ],
+  "cwd": "/private/tmp/lingxi-git-copy-mh6avrgm",
+  "spaceNote": "\u5b9e\u9645\u6587\u4ef6\u7cfb\u7edf\u53ef\u7528\u7a7a\u95f4\u622a\u70b9\uff0c\u4e0d\u80fd\u89e3\u91ca\u4e3a\u6b64\u526f\u672c\u72ec\u5360\u7269\u7406\u5757",
+  "error": "source and copy must be disjoint",
+  "finishedUtc": "2026-10-07T03:57:12.751477+00:00"
+}

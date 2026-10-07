@@ -1,0 +1,1788 @@
+{
+  "status": "PASS",
+  "startedUtc": "2026-10-07T15:36:50.318716+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T15:36:50.319276+00:00",
+      "finishedUtc": "2026-10-07T15:36:50.329187+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "82d8b685ab806b27b5cf0c3b770f86661adcb8958e59de111a5b9c73918573fc",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0000.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T15:36:50.329546+00:00",
+      "finishedUtc": "2026-10-07T15:36:50.338138+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0001.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "rev-parse",
+        "--verify",
+        "201584f2917a7fd96d6ea603bdeddbd420082cfe^{commit}"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T15:36:50.342473+00:00",
+      "finishedUtc": "2026-10-07T15:36:50.353238+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "160c49a76ec7d5440db69ddfb8b549c259beb5bd713551c496c086d39ab9ca8c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0002.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "rev-parse",
+        "--show-object-format"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T15:36:50.353472+00:00",
+      "finishedUtc": "2026-10-07T15:36:50.360634+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "335277ee77cfc8d51d6602e4137232cf6041aac2bc663777e384b90d5ae74d51",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0003.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "ls-tree",
+        "-rlz",
+        "201584f2917a7fd96d6ea603bdeddbd420082cfe"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T15:36:50.360852+00:00",
+      "finishedUtc": "2026-10-07T15:36:50.710098+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e59238e74722cf8c15e9349a0a54bb292af9b64dd145e73db9d49608f0b1c96e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0004.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "clone",
+        "--shared",
+        "--no-checkout",
+        "--quiet",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T15:36:53.483932+00:00",
+      "finishedUtc": "2026-10-07T15:36:53.519242+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0005.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "update-ref",
+        "--no-deref",
+        "HEAD",
+        "201584f2917a7fd96d6ea603bdeddbd420082cfe"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:53.519467+00:00",
+      "finishedUtc": "2026-10-07T15:36:53.526819+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0006.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "read-tree",
+        "201584f2917a7fd96d6ea603bdeddbd420082cfe"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:53.527007+00:00",
+      "finishedUtc": "2026-10-07T15:36:53.543224+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0007.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:53.543418+00:00",
+      "finishedUtc": "2026-10-07T15:36:53.881808+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0008.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:53.882043+00:00",
+      "finishedUtc": "2026-10-07T15:36:53.888763+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "78dd4b0712425ea6d68f95ceb17465fefe10ee54ef86ac7bc619e80cdc998bab",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0009.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "65e82699d6adff6e0e42b65810905081be09cbbb"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:53.892587+00:00",
+      "finishedUtc": "2026-10-07T15:36:53.899721+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "7e1fe851a789739c9693e3c3e3b5010985f63beef3d462066384fdd12c3dce58",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/.github/workflows/build.yml"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "455811eae6ef1eb918c8f28cdfcb0e712971aea4"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:53.901872+00:00",
+      "finishedUtc": "2026-10-07T15:36:53.908554+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "6643ee3d89e887b88fdde28ad871e17f1ee01e9dcb613773d2f9cb5529dc26ad",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/.gitignore"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "ea3922152d54b2e65a0273cf6c1c9f81d9c09d0a"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:53.912929+00:00",
+      "finishedUtc": "2026-10-07T15:36:53.919705+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "f53088951c569a6df2708f4751692b3f0114d932a37b53e169c6da7f1f2e26de",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/.sync-audit/verify-post-verification-diff.mjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "5f963a983bbf8f8d0333b4e8920aa829410a8731"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:57.689382+00:00",
+      "finishedUtc": "2026-10-07T15:36:57.717512+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "9e8244345130d5d4fc81024b0570d6eae990d5ac117baee6a41184bc87556456",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/build/cli-runtime-closure.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "0268b5efe0f32e813c792b3f52e8e88eb8c11d6b"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:57.722830+00:00",
+      "finishedUtc": "2026-10-07T15:36:57.730389+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "f4eb0b414327a0ba889651b3c217e8a73165a2ada5e05dd5889f54a9a554b8dc",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/build/persistence-schema-fingerprint.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "13ca2fd3d0b1aad74d687be08c26b6069ae64968"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:57.733133+00:00",
+      "finishedUtc": "2026-10-07T15:36:57.739899+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "8ec7cfccaa98a33d7c2d202e69eb0edc0e7f4651a8f3cc557641b1faf6e11502",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/build/shell-surface-manifest.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "cf83cc031bb941a2882c7b8b44b8a362e4f57da4"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:57.740335+00:00",
+      "finishedUtc": "2026-10-07T15:36:57.747113+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "8e5fc1abfde60583a0091a88c59ea940a3f81789699ac446b810849624a00365",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/cli/args.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "21301d19ac8ff689fb77b95671f578835ad0cae9"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:57.748023+00:00",
+      "finishedUtc": "2026-10-07T15:36:57.754750+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "f17cf33051f987e021f5943cd1029f746922cf5f834c162e420b1da03bd17440",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/cli/chat.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "25af547466b79a1e05e7240ce1d47e84a22f1577"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:57.755903+00:00",
+      "finishedUtc": "2026-10-07T15:36:57.762438+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "5c11d603baa796d64bac3cdc3ffe8abb2945c7bb1505a6f37b2250678de6c916",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/cli/entry.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "3a5781126b0180a5f06b75cae201cf3c8d151a87"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:57.763243+00:00",
+      "finishedUtc": "2026-10-07T15:36:57.769659+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "1b881df9bc9458a86edea977f2adef5c60de93041a50aa97b39da4c938faa2ee",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/cli/server-runner.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "8c77ffff4c520476c4f0a5c26f8c0fbaac9c2457"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:57.882743+00:00",
+      "finishedUtc": "2026-10-07T15:36:57.890330+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "533d468df2b02e95f8f11d5c3f965a3af2afc8e15a38caa9c1e532b5af17a319",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/main.cjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "bc71b1da404896e297177a562c2de007856638fc"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:57.896432+00:00",
+      "finishedUtc": "2026-10-07T15:36:57.902943+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "19fb7dd910ac3eec8d36bd7bdd67f079e9fda7d3bbf2a1d71553edd877788ed7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/preload.cjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "968be84fddf33d57581ec33ad40def2e410aee85"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:57.988728+00:00",
+      "finishedUtc": "2026-10-07T15:36:57.996402+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "93615091fd7db5c02ae608dd2e54535c15eb2f0d48ec72377f45715a214a118f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/locales/en.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "14de19472cb784b895f6579fe2e964f441ac2cba"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:57.997304+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.004510+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "19942618899c706baad71b028bd0c5aa2ecd538906e9c8971806f51a0ff88467",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/locales/ja.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "4e3b52497dfcd2211c387d892ebd7646e91f0ce1"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.005452+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.012399+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e0451e58c48dca65337242812c7982b0c7d689e1b6c476643e6fe4d6a70f8ed0",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/locales/ko.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "6aa2d413e84f0ca3788675e63ccae938e168ee69"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.013278+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.020204+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "cbc9ddcfd781c5433bd2b11944509bebef9534d860e78915884b20f44de075e7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/locales/zh-TW.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "fec56b9d412edafbf61d090a0228b94c857c5a74"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.021047+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.027979+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "d0d08780a63b04135585a002ba8a5557a443cf5b10122d0bf950b94d09c5e053",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/locales/zh.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "65c2f70348e5aab0f47169acc308bcb9a6400cfe"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.036378+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.043264+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "67cf317ab41aea715fcbb317a72bb385756d2e1979b096fcf8c629b02c5f4c94",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/__tests__/app-init.test.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "cef90a9d48c1b55c25be537fe26130e6fc8fee47"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.098934+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.105643+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "21535916b065e9051c2cac16652f7939956b95ff99bd4c4845706aabb5551d88",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/__tests__/components/composer-send.transaction.test.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "528c3bf14e4d084dd0e0fcc245095c630abc84ae"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.128576+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.135267+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "a8ac9a7c37dbcf60107aa5f4e566b002a1ac043b800e08fa389abf519831765d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/__tests__/mobile/MobileApp.test.tsx"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "3d95c99881e6e849017971317d18768c5f338ca4"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.141187+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.147716+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "65f82c98545340859a6a2f975b88d6969a94e0d3995872fd0ffdded16a5ed1a8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/__tests__/services/server-connection.test.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "e830a7e6deb5a1454f9d1bb1022d8b23b65c1718"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.158162+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.164484+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "b56fd7e789dfaec09944680a04b5ace8ff4b4fb5a9f59cbe878a2ee857d1ae50",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/__tests__/settings/SettingsContent.test.tsx"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "d99b1127db531ed58a61cad681625e55687d3a0c"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.209763+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.216505+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "73ef50a5a07d4d6c8c69eafa0d9df8121bc63e140853305ebcd8fd5bf007c30d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/app-init.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "0cf38c2b4bfb241fb5941e319a0a1c7e2f8fda08"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.229893+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.236734+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "555b95589fb177836b25bc8c8078f2163dd0c64047ff92ac1ba77a63987eca53",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/components/StatusBar.tsx"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "ee207078d79353aecac6f6376aba45eb611a5444"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.289455+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.296011+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "afc030053d9399010598bfa58b5fcf668eb57aba11deda72443b4fc9cdf8f560",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/components/input/composer-send.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "5c9e0d41edf6a5d8eed218e2d89d9458f14e9696"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.345561+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.352404+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "82b1aacaf087de5178ff62e6fdc50015b14acd9d54923acb74ef6799b6d904d6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/mobile/MobileApp.tsx"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "602449dce495f2e864f3f7b7c59c75d162be8da9"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.353310+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.359825+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e6fc4bd94b19944b7a284739a4078b5513116df7ec0ff317dafbf9b9af2d7642",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/mobile/mobile-init.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "939e0a8cd6fd15effc49fbbf5c508914f8854012"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.360542+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.367105+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "32596dd3cf11e7557534a7401762f4843dc09df52a0938ee9a0b39cfde9ac453",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/onboarding/OnboardingApp.tsx"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "693757ef9e5a1521cd6e2ab694900384501fa754"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.367496+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.373578+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "307b0d14cd1f1ef157670f9bd58db7c51b1dabc23609ba78f4b062b63734d67a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/onboarding/__tests__/OnboardingApp.test.tsx"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "6a96861caad668bc01d7796be4c1766966d366e0"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.379836+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.386453+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "daa983aa53f4df49cfacd90a7a5aac59e88006d45a2417b2d15d625dcf346c6f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/quick-chat/QuickChatApp.tsx"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "acd545c8a1fba5a2e34d46f4fc37de5b196316fe"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.395172+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.402035+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "0f1a81e0991ab1ceb5048673c5750d76bce62616993b126defcebba62869f328",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/services/server-connection.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "126bfb5836ea687464bd4d2e10d5fda98d1116bf"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.404782+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.411269+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "6c5472f0c9e1fc4b84c87008d79a3cd3cbb7492c581430fc9160fda1966188de",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/services/websocket.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "9dd445b68dbcf567273ff4b15ab476b2b549dafb"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.413645+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.419951+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "b79bdeaea30bd72af08e01c28f16949854d186aff1e7041a5bd3576852a7c7ef",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/settings/SettingsContent.tsx"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "8242f1b05021697ab4aafcb59bb8c2c5d4266cac"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.421252+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.427760+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "34e59097f99c9ba6f1997911b0128414b036781ec61b638ed2166f70ab1e8589",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/settings/__tests__/SettingsContent.test.tsx"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "fb84d4f803c797b9b19133349fb106ecaf49016a"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.430451+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.436620+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "d6c1ed6c783f7eb23185f170a89cc90bc1458970a7b3931ea30dd81d858433f0",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/settings/api.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "3d3def162a2d7dbc94067c74295a9ba285b27ae6"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.445784+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.452379+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "5a5ad3f00920c9ac857c590ab62c14cce6bc7f71f55c09d64bc0f4890b57979b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/settings/store.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "a52adc2ef15a33d4ea3b14df0251d862385e6b8a"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.453316+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.459624+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "90d9737ed85db0e6b1301562ba8f394cb20fd0bb3f88b616b6221215072de2ee",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/settings/tabs/AccessTab.tsx"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "07a8d6f3b6919b69ec0de901b64b6e119d27393a"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.466693+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.473164+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "da234935189a3b4a31094c26aa15e7e17a3ed917fc71441f6bcef5ab3b9b9a5f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/settings/tabs/SharingTab.tsx"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "dffdfaf46cab75dd5fc16b4f5e2a1c2b6c10f499"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.535015+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.541604+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "a86e1944faeeb0c947a8915549f4554efc019d5cc42000220a61f45143e7ec73",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/stores/connection-slice.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "a01d20845303734408c834f1731772032559e663"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.556087+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.562560+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "7c290e67fe966458f2be3099273aa4aff85e5e7ac9b23df0088f22bb1127c372",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/react/types.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "1c4a17a48d27747bce69d76b7bc92c72980a1a98"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.606118+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.612510+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "44796ea335a6cc68e1d811f7016ed884d15395b7ba080f43ded3f245e7c8cf70",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/shared/artifact-boot.cjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "6f99e0727cf468d3b553a6977e40e3fc6bde256f"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.613830+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.620474+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c0d60d5210f4c1f0ac13ce6fa1b2635ed8660ea49c7c9ef47621975c4933e7df",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/desktop/src/shared/artifact-ota.cjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "e328743bd91bcc4e6c02022cf0e318bd4a0e3228"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.694013+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.700768+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "28714a25388c73af437ed8690a0fd730aa3a1b87fe9eaf495566146d08b25485",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/docs/README.md"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "a41dd042aec7d88df8eff6bab114b9438feb1174"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.760637+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.767561+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "115c3cad5462a3c73a81185fbe449728681c77026fec9470ce645309b374b68e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/docs/rust-tauri/ORCHESTRATOR_PROGRESS.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "f86e70086450368afc73393c9d00173d76e108a6"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.863856+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.871180+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "6f7a34244b23f94e6300fbd777f0c834fa2d233bfb8ca2e963a9fe068cb2af06",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/docs/rust-tauri/R01/API_COMPAT_MATRIX.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "947f7d28ba5a6bb8d5e90bea3cfb6f8d936e7b77"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.874935+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.881408+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ec9adc81b44334787e0ffce141f23dc95383c7978537e5737708d3de83a89d06",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/docs/rust-tauri/R01/DEPENDENCY_RULES.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "2195bddbe8b49c7b177837b4d9e593ffa511e79f"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.883601+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.889937+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "6f3f9caf786481b44421a8d91c744356f7aacdaff9963f40e3f0bc63cb40245d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/docs/rust-tauri/R01/PROTOCOL_SPEC.md"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "5414012515727c5204347cbb64093684f684d123"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.915372+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.921962+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "873094a097610bda0c8b118ad7c426143f4f63e774fe6aa9fe8067dac4116cbf",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/docs/rust-tauri/R01/r01_t01_check_ownership.py"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "23e2eba7ae0cb93cda742e768e1eb0b2ab5a3532"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:58.926516+00:00",
+      "finishedUtc": "2026-10-07T15:36:58.932924+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "59f30faa77045551c643ed94d39ec6c89bd89e5e7c26135ecc6409684dd94363",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/export-manifest.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "bb842fa9f6755d4556c91cca5144437d1a7ed76f"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.121258+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.128888+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "473d36a785d6d16db7b08a684e65855823cb15e1c7fb21003a63dd5c7cc4acfc",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/package.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "65eea33d2a14977d687a5d3f6d9dd5d6a3ad6f4a"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.140758+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.147564+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "d1d8b4a99c4937f86176e2e715da8f7ab88e71467919d7c2c1c327bab7214cb8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/rust/Cargo.lock"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "b08a1f69d3e04ae3d65464f3775e07423048b438"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.147990+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.154207+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "473a3e58f3b7c7a785fc239a8271292aca943cf2687775292f86c2aeb10dfa5a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/rust/Cargo.toml"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "6aeebb2e8bda858d47e207777777ff57d284fe93"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.158444+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.164931+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "604e27758d4b9e07d52e6526bc8adc2e0eaaed71fa6128857fb41956a64a33ca",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/rust/crates/lingxi-kernel/Cargo.toml"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "07b211c52c1360f8b6a719abf76aedcb0f02008b"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.165352+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.173324+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "cd5e89d09894352b9b9ae0a85003a5f23bc949f6a9668a0cdc0b94e0d972213e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/rust/crates/lingxi-kernel/src/lib.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "a201d6943f5b30b2fba240ab1be3f6abc8ba6e1b"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.173802+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.180638+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e677941035a46a430e1a01925c3d936f523621595bcf7d85c72486d08cf325c0",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/rust/crates/lingxi-kernel/src/ports.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "bf792920b1b020dee22459514eef92f9ba2da1e5"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.182481+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.191504+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "f28a07e5963bdc47b93ed02bae4cf93f4e90f5cde9ab29b177b9694630f354ad",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "bd6b3cdf1365d29bd4205007c317e30ac40315ea"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.191931+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.198260+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "81bfbc58dc3221ccc5b5987228856b105a09965038ea9aba4fa61bff8812adaf",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/rust/crates/lingxi-protocol/src/bin/lingxi-protocol-verify.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "d1e6258878e6d14f839c7402b9e93d34fb57a789"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.198623+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.205091+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "55a981f8d106075f1139d268517e3faa668e5f84f35978c4e5de16a6257697b4",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/rust/crates/lingxi-protocol/src/canon.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "3bda5432319f5429a4fe48bd5ed770fb2299d5a2"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.206028+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.212315+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "6726253f276829925d37deeb8fd3da3cb6bbd1f82fd4ff076bf48f52ef34066e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/rust/crates/lingxi-protocol/src/lib.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "a46d7ebed2ca3c9aa57e73525435410976c30aaa"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.220703+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.227620+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "6670f3f6b6453ad3dde6cb0c29e6930b144d02135110edc8cc5656e1b0f0b480",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/scripts/build-server-artifact.mjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "9b93965330a1c147d75d8a20f10f4fe11dd9eb61"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.230224+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.236539+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "2d7d4fb625f1ad497d3cc6a17cecdb6bac094d4d92f72cda7bb71673c7d108a1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/scripts/build-server.mjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "a490b6974c09671a3bae607de25cdf6cfd392078"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.236849+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.243121+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3948482b3bcd002623ac04d0e30cac10f87b21eb53d6b628f8c2eaf627aaad5d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/scripts/build-shell.mjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "d1790788571e4c9fc4895ae83b4b090c1bc1493a"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.244245+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.250627+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "2b1d0d6213badb32f363ab9ab9c7d9a3f31aafa94df38d29683a17e32e34a6dd",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/scripts/build-standalone-server-artifact.mjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "638533e040e95f9a1d786196348bcff2a0ec29b3"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.253112+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.259409+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "5f0604ab6aa169e6c7926763d07278c0dc59dd26caf3936fd9fec10169513466",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/scripts/compute-cli-closure.mjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "2335a4f4f4cf21d00eee42a6fa472ccba29af1c1"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.263158+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.270096+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e1fa9a79227c67713193a3040b5598cba3a7468c44021e3cd0d3ae8bd0dbc631",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/scripts/fix-modules.cjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "42af54d0cee5a5280ce0afcdbf88d3098cd4d61f"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.279368+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.285934+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "f6e5c9ebc9f1800429f5ea72575409801ada0564b840f84d8206de1c20b3900d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/scripts/notarize.cjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "1a2f190d276374a302e404f07b2ee67e79313daa"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.289588+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.296027+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e04c98e474f9c51f4e09c8497c4609ee019c29af0509414416d50dad5411953c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/scripts/resign-adhoc.cjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "eaebc0ff21fefac2ef11f9bfafdf8400074ffcbb"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.301462+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.308375+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "02c335ef85939165d203793a4de68dc82d90e2acb29cf8f6a3f1f5a626aa29c8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/scripts/rust-tauri/r01-t02-check-generated.sh"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "64c11451935e66dfbc61f933fdd7d0a992c98f2c"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.309246+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.315911+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "b6f87e978f1bc0b513c4a08c89d374694e207773af87c37f0a9a3ec217f38ac9",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/scripts/rust-tauri/r01-t02-handshake.sh"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "67b4b745970985d2129bad174a0c145babd812d6"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.316249+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.322601+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "9318feead7ee9b2f9a368b3cce7dd19be5425286ee2ba030b56d2f1c03b31438",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/scripts/rust-tauri/r01-t02-roundtrip.sh"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "c9e89d1334fb566193950327661e18ecba93c42f"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.329527+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.336230+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c4cf5d6a8331a476631b6561ebb73e75a3c0a3e640ebe469814d81d00cbac410",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/scripts/verify-standalone-server-artifact.mjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "eee44f3edbfd4c2518b82bf5b70b1d2206a28515"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.377251+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.383792+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "74bd64bbb7b38c4e3081d3543f356c74a157c530631e9d65ec16c6673835adaf",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/shared/artifact-core/activation.cjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "f07c73f76464de73749ec2246b16c36e05457401"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.385105+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.391557+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "dec4df8687d192ecb199c6c6b64f93650630144cb7d9995ec87803f06193cdf9",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/shared/artifact-core/ota-core.cjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "85f4f13e21406e1972a9ed404bda124ac5fee9ec"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.478960+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.485983+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "add4d4ba6cd9d0b9c67770a8fe0761bf4d58851d4ccd149e5c2d93bc91d68452",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/tests/artifact-boot.test.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "0777e1ba0e71eb5926240ed2531a9289a93fc07b"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.486415+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.492687+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ab2259cd3464a7e9c6f16e0459c50c0e3e6cf319b71b8e01792a9ad63e4ffdd2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/tests/artifact-core-activation.test.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "52f1d7f590e5cb40b7ffb9089658142f240d7143"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.494749+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.500644+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "da25fc27b8c7bcb1450d290891255a106183d263d80e8c9dadc2fabdfaa10ea7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/tests/artifact-ota.test.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "8c304d84c8e1e7103bcd70d37c5dd791fce53382"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.519717+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.527200+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "5563fbad1a54938d505259732ca850021162e55f25a483e131aac7066a0ec63b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/tests/build-server-artifact.test.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "579c4091b3a77d01af8d31cd7e079da83155818b"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.529588+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.536255+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "6fc49ce961ceb66b491ab97c2eca83699b3ea00df60f252c1a3c3b0e0a27213d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/tests/build-standalone-server-artifact.test.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "cce79b0347d17813d6f383ef7e41113c625b8cb5"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.549730+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.556091+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "4439546c44673b73fd1ec201c9183713bab70513e20dee3a05dd8edbf29216b7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/tests/cli-args.test.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "205387928dbeb31cff9a3dd2772bcfaed859167a"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.556922+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.563259+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e5bd9bef2a96f13b82b3e1c2cd273f3ef815de55af9f463b514100d11b08a0dd",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/tests/cli-chat.test.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "d6b1fd146694dd99fc528981a391c2cd3a732887"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.706065+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.713558+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "be8df5e1a101c0191292060802a5500bd08f387393f6f35232e54dd18238a2e0",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/tests/migration/r01-t02/canonical-json.mjs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "16864654579ed9d7c17bc6b7bb4fa14a1fc06a3c"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.771692+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.778682+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "1489e53bdd139ea0fcc1a83edb841ba248e07c5a26f10e6cbb7febbe9eba2a34",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/tests/post-verification-audit-seal.test.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "0f4a5a80948d59f488129b54e9747efdf5ad5b9a"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.804868+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.811881+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "1af66eee3ca0318e86b9471353f28eed50de55f0e12b418c0afe0dfebd36da9c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/tests/round2-delivery-evidence.test.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "ae15fc0fd6d0c212a15999c5def0bc10491219ed"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.814721+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.821166+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "5ccc692b59ac37e161c2259b21866e4ce0060058333c145b243d6662cfdc17c4",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/tests/round3-delivery-evidence.test.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "cat-file",
+        "blob",
+        "e892253231f22b19c5dcbc3d839032bda5ce328a"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.833479+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.839894+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c1981537f561eb314d083032b88c3f5d26b37ce0541734b333ea27cae9005da6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base/tests/server-startup-diagnostics-contract.test.ts"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "ls-tree",
+        "-rlz",
+        "HEAD"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.930987+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.957324+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e59238e74722cf8c15e9349a0a54bb292af9b64dd145e73db9d49608f0b1c96e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0095.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "write-tree"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.968788+00:00",
+      "finishedUtc": "2026-10-07T15:36:59.978380+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "78dd4b0712425ea6d68f95ceb17465fefe10ee54ef86ac7bc619e80cdc998bab",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0096.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "diff",
+        "--exit-code",
+        "201584f2917a7fd96d6ea603bdeddbd420082cfe",
+        "--"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:36:59.978594+00:00",
+      "finishedUtc": "2026-10-07T15:37:09.481632+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0097.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "status",
+        "--porcelain=v1",
+        "-z",
+        "--untracked-files=all"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:37:09.481986+00:00",
+      "finishedUtc": "2026-10-07T15:37:09.529017+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0098.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+      "startedUtc": "2026-10-07T15:37:09.529268+00:00",
+      "finishedUtc": "2026-10-07T15:37:09.738011+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0099.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T15:37:11.410882+00:00",
+      "finishedUtc": "2026-10-07T15:37:11.418136+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "82d8b685ab806b27b5cf0c3b770f86661adcb8958e59de111a5b9c73918573fc",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0100.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T15:37:11.418570+00:00",
+      "finishedUtc": "2026-10-07T15:37:11.424941+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization/git-0101.stdout"
+    }
+  ],
+  "platform": "darwin",
+  "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/prepare_git_copy.py",
+    "--source",
+    "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "--copy",
+    "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+    "--revision",
+    "201584f2917a7fd96d6ea603bdeddbd420082cfe",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-base-materialization"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "spaceNote": "\u5b9e\u9645\u6587\u4ef6\u7cfb\u7edf\u53ef\u7528\u7a7a\u95f4\u622a\u70b9\uff0c\u4e0d\u80fd\u89e3\u91ca\u4e3a\u6b64\u526f\u672c\u72ec\u5360\u7269\u7406\u5757",
+  "source": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "copy": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.id8Ois/repo-base",
+  "requestedRevision": "201584f2917a7fd96d6ea603bdeddbd420082cfe",
+  "sourceBefore": {
+    "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+    "headFileSha256": "a5514e446d5aa78abd1b01492bf577b9b369799dd4461fd9e7da0ae3c87814e4",
+    "indexSha256": "e65fd8f9353224483a9b94cc32bca37dde0505f363692af58539d270df9dfc9d"
+  },
+  "freeBytesBefore": 573893890048,
+  "helperSha256": "37f4246a11f54826f2a31a772c1db0b5e3422c0261ea56c9872c3a3b75c9cb24",
+  "commit": "201584f2917a7fd96d6ea603bdeddbd420082cfe",
+  "tree": "7b95fd2fce1fd57d2fc4e083c787b9e3a395dab7",
+  "objectFormat": "sha1",
+  "sourceAfter": {
+    "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+    "headFileSha256": "a5514e446d5aa78abd1b01492bf577b9b369799dd4461fd9e7da0ae3c87814e4",
+    "indexSha256": "e65fd8f9353224483a9b94cc32bca37dde0505f363692af58539d270df9dfc9d"
+  },
+  "tracked-files.json": {
+    "sha256": "8dd514cfd2b83f4abe60614151b530d7173b18969d2963e9ab3470dcde0e5c65",
+    "count": 8880
+  },
+  "source-files.json": {
+    "sha256": "8da65eeb3c98dd2c3ffcd8879a7606a3a92a409b892bf9ab28aa355347ff64d0",
+    "count": 8880
+  },
+  "trackedCount": 8880,
+  "trackedBytes": 1562337119,
+  "methods": {
+    "cow": 8795,
+    "ordinary": 0,
+    "git-blob": 85,
+    "git-link": 0
+  },
+  "copyIndexSha256": "b19cfc45c064ca49e37e0e1253cfa154b526c748573cf755e3d3dc84acd9296d",
+  "freeBytesAfter": 573870686208,
+  "finishedUtc": "2026-10-07T15:37:11.462922+00:00"
+}

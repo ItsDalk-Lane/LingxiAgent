@@ -1,0 +1,49 @@
+{
+  "cases": [
+    {
+      "actual": 1,
+      "case": "web-login-https-password-secure-14day-cookie",
+      "expect": 1,
+      "observed": {
+        "httpOnly": true,
+        "httpStatus": 200,
+        "maxAgeSeconds": 1209600,
+        "sameSiteStrict": true,
+        "secure": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "web-login-https-session-logout-revoked",
+      "expect": 1,
+      "observed": {
+        "logoutStatus": 200,
+        "sameCookieRevoked": true,
+        "sessionAuthenticated": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "web-login-foreign-origin-denied",
+      "expect": 1,
+      "observed": {
+        "corsGrant": false,
+        "httpStatus": 403
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "web-login-http-forwarded-proto-denied",
+      "expect": 1,
+      "observed": {
+        "forwardedProtoBypass": false,
+        "passwordAccepted": false
+      },
+      "ok": true
+    }
+  ],
+  "schema": "lingxi.leaf-case-results.v1"
+}

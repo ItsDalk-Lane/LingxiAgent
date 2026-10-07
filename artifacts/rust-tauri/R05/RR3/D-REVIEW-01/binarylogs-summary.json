@@ -1,0 +1,87 @@
+{
+  "utc": "2026-10-07T01:24:44.688965+00:00",
+  "requiredGate": "FAIL",
+  "environment": "BLOCKED",
+  "localizationAndPreparationReview": "PASS",
+  "R06_READY": false,
+  "candidateHead": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "inputDigest": "0f945b9884ee73957a6db3fe19c3d6b4a6b87672feef7c3fd1b46998f2f92b75",
+  "r00": {
+    "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0",
+    "resolvedPath": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0",
+    "isSymlink": false,
+    "sha256": "9f7489029c91d1c232e3c204236854bd53c69cee2fef33d6fd778a27f44696d3",
+    "stat": {
+      "inode": 276472675,
+      "size": 57416312,
+      "mtimeNS": 1791335854843565972
+    },
+    "cdhash": "d9676388f524872f1269c13f61f413458c0e9e52",
+    "signature": {
+      "argv": [
+        "/usr/bin/codesign",
+        "-d",
+        "--verbose=4",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0"
+      ],
+      "startUTC": "2026-10-07T01:18:22.526652+00:00",
+      "endUTC": "2026-10-07T01:18:25.234324+00:00",
+      "exitCode": 0,
+      "output": "Executable=/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0\nIdentifier=r00_management_leaves-294787929158efb0\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=445215 flags=0x20002(adhoc,linker-signed) hashes=13909+0 location=embedded\nVersionPlatform=1\nVersionMin=720896\nVersionSDK=1769472\nHash type=sha256 size=32\nCandidateCDHash sha256=d9676388f524872f1269c13f61f413458c0e9e52\nCandidateCDHashFull sha256=d9676388f524872f1269c13f61f413458c0e9e5246adbc3b7ccb9da04054687d\nHash choices=sha256\nCMSDigest=d9676388f524872f1269c13f61f413458c0e9e5246adbc3b7ccb9da04054687d\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=18457440\nExecutable Segment flags=0x1\nPage size=4096\nCDHash=d9676388f524872f1269c13f61f413458c0e9e52\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements=none\n"
+    },
+    "verification": {
+      "argv": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--verbose=4",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0"
+      ],
+      "startUTC": "2026-10-07T01:18:25.258771+00:00",
+      "endUTC": "2026-10-07T01:18:27.922520+00:00",
+      "exitCode": 0,
+      "output": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0: valid on disk\n/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0: satisfies its Designated Requirement\n"
+    }
+  },
+  "formalRun": {
+    "commandRef": "r00-formal-01.json",
+    "counts": [
+      {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      }
+    ],
+    "exitCode": 101,
+    "testName": "r00_management_positive_and_negative_branches_on_real_service",
+    "testSeconds": 52.75,
+    "supervisorTimedOut": false,
+    "signalsSent": [],
+    "failure": "POST /lingxi/v1/web-auth/login 192.168.3.5:60281 20s exchange timeout / 0 bytes"
+  },
+  "listenerSummary": {
+    "samples": 41,
+    "exitCodeCounts": {
+      "0": 121
+    },
+    "addresses": [
+      "*:60281",
+      "127.0.0.1:60152"
+    ],
+    "pid": 86488,
+    "parentPID": 86486,
+    "rawSha256": "a1438c1c63e83710e37da32f45393e7aded319d3733078d764f5374f8bcd9a9a"
+  },
+  "logHashes": {
+    "prebuild-r00": "36df4e05db7f195c6859fb5730403425acee732f76418d96cd2bec5e01aa925c",
+    "r00-formal-01": "e7eef5354356ded2c3c09d03602be1365caef9e48d48012aee02771ba4954dc7",
+    "compile-probe": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe-c-loopback": "e19266b64672bb012142afb97b6d0ccbca5e2eaa4a120932a33ec8f6962de8ef",
+    "probe-c-lan": "84acc61ec8e41e0e2a5fa9b7ea1d51599dc99d476dd6f88488426f3a3b148082",
+    "probe-apple-lan": "773b3e938fa81129aa4eab6cece139e54f2139a79543c66de8cd0704d53def7b",
+    "prepared-identity-check": "8d81a918646a4c14fee4f16f3578f6885ae354fe6564d1fa998921218e111690"
+  },
+  "probeBoundary": "zero-Lingxi C and Apple actual Python local endpoints; not service production entry or external phone",
+  "systemChangesExecuted": false
+}

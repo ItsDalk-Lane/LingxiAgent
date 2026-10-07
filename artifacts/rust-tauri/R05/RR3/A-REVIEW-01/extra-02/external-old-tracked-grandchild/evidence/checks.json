@@ -1,0 +1,14 @@
+{
+  "actualControls": 9,
+  "logFds": 6,
+  "sourceCopyEqual": true,
+  "mutations": [
+    "source.rs",
+    "scripts/check.sh",
+    "config.json",
+    "stage-map.json",
+    "untracked-new.rs",
+    "artifacts/rust-tauri/R05/static-old.json"
+  ],
+  "restored": true
+}

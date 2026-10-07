@@ -1,0 +1,53 @@
+{
+ "at": "2026-10-07T07:17:03.605641+00:00",
+ "kind": "reuse-input-equality",
+ "checks": {
+  "H-REVIEW-02-375": {
+   "checked": 375,
+   "equal": 375,
+   "differing": 0,
+   "differences": []
+  },
+  "I-REVIEW-01-files": {
+   "checked": 21,
+   "equal": 20,
+   "differing": 1,
+   "differences": [
+    {
+     "path": "scripts/rust-tauri/r05_t08_negative_gate.sh",
+     "reason": "sha-differs",
+     "expected": "a69110b81298705a9161652d28402a5e5a585f945fdfd214ccf071132ecb67dd",
+     "actual": "7ca614a77b2e4f0613ed82c3df171776dbb5f5866c77c54a07c10e16bcd931b6"
+    }
+   ]
+  },
+  "A-REVIEW-02-a1-17": {
+   "checked": 17,
+   "equal": 17,
+   "differing": 0,
+   "differences": []
+  },
+  "A-REVIEW-02-delivery": {
+   "checked": 19,
+   "equal": 18,
+   "differing": 1,
+   "differences": [
+    {
+     "path": "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+     "reason": "sha-differs",
+     "expected": "53ff4eddd9af1844b7722c39dd369efcb42dbb6787adc9bb70497af48c10c8df",
+     "actual": "171eaa1f7f24635d736afe1abf6f5dc8a8d563f1f21c52655fa8ddc37995cde4"
+    }
+   ]
+  },
+  "J-REVIEW-02-a1-17": {
+   "checked": 17,
+   "equal": 17,
+   "differing": 0,
+   "differences": []
+  },
+  "C-F46-REVIEW-01-inputHashes": {
+   "note": "no inputHashes; keys=utc,head,scope,beforeAfterEqual,fullBoundFileCount,digest,coreHashes,comparisonToF46RuntimeInputs,runtimeBinary,unrelatedOwnerWrites,gitStatus,after"
+  }
+ }
+}

@@ -1,0 +1,2 @@
+FAIL: Node dependency preparation: command failed (1): ['node', '-e', "const s=require('./node_modules/semver');const p=require('./package.json');if(!s.satisfies(process.version,p.engines.node)||!s.satisfies(process.argv[1],'>=11.10.0 <12'))process.exit(1)", '11.13.0']; see /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-01/selfcheck-02/actual-node-version-refused/node-preparation/command-06.stderr.log
+FAIL: isolated Node dependency preparation failed

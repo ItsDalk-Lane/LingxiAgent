@@ -1,0 +1,10 @@
+== (c-add) receipt comparison (independent sample digests vs receipt) ==
+artifacts/rust-tauri/R05/RR3/A-02/copy-delete-rename/                  pre=291f53295f8d67a4 post=291f53295f8d67a4 fresh=291f53295f8d67a4 EQUAL=True
+artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent/internal-fresh/repo/ pre=d6de2b1ecca2aeb6 post=d6de2b1ecca2aeb6 fresh=d6de2b1ecca2aeb6 EQUAL=True
+artifacts/rust-tauri/R05/RR3/J-REVIEW-01/copy/                         pre=79736540a1201ae9 post=79736540a1201ae9 fresh=fee8e52b9a496576 EQUAL=False
+ALL_SAMPLES_EQUAL=False
+== (c-add) non-empty byte read inside deep tree 40--repo ==
+file: artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/.git/hooks/pre-commit.sample
+size: 1649 first160_bytes_repr: b'#!/bin/sh\n#\n# An example hook script to verify what is about to be committed.\n# Called by "git commit" with no arguments.  The hook should\n# exit with non-zero '
+sha256_of_first160: f302157330c95443
+readable=True len=160

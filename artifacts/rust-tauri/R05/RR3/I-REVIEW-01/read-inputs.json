@@ -1,0 +1,28 @@
+{
+  "UTC": "2026-10-07T02:49:53.145838+00:00",
+  "fullReadFiles": {
+    "AGENTS.md": "3f98359bc0c6ab7038aec8326419a03cdbf0de6f3f185555d051ad3e489b531b",
+    "docs/rust-tauri/R05/repair-current/RR1_MASTER_PROMPT_2026-10-04.md": "7fc077f1b370660f582d964977685d5a619fa988befd26f8a4915f409529f2bc",
+    "docs/rust-tauri/R05/repair-current/RR2_MASTER_PROMPT_2026-10-06.md": "35802f225728954cccedd12ef0453090948afd18db9cb0f8f31cc9d896e92545",
+    "docs/rust-tauri/R05/repair-current/RR3_BRIEF.md": "31be412e410ff7be0543c2b9c5ff332ef77540de242070d6d2b1271ab0a6446c",
+    "docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md": "9395286d8272ba1c841bc7960cc0e06b93affcfbacc2037cf0a8f0df9fcb1fe8",
+    "docs/rust-tauri/R05/repair-current/RR3_I_BRIEF.md": "a209e3a2895ffbab097213a5c4bcf6aebf966cde62fe5eb7c2cb86f7f15aed26",
+    "docs/rust-tauri/R05/repair-current/RR3_I_REVIEW_BRIEF.md": "413879fa2f7d4ee10687b0a9d1b5a9124eeee3cea86e25951653e09bc65098ad",
+    "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json": "0b8ae57b94b838cbcf39ec7e73a055aea6950810b6971c5f6216e31c0a000524",
+    "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md": "2ad3bca84c3d0236c02fd417b30b98a1091193a2a92d5d829cb436b8f716deab",
+    "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md": "798ee565aee2700a32850f2a16a3b155a5a89142e171575c74c3e7f78ddeba2c",
+    "artifacts/rust-tauri/R05/RR3/I-01/REPORT.md": "8f65348bf4f0ee1a1fb1d72e4f3a8f452a00cde0e8853a6ba20996695ab83747",
+    "artifacts/rust-tauri/R05/RR3/I-01/original-negative-gate.sh": "4853e129e2d0cf7dbd6c93c8c158186fad23e6f231a03ff64f140cca61e0042f",
+    "artifacts/rust-tauri/R05/RR3/I-01/implementation.diff": "49c5a083d4e4a078d7b0e95618f8ca1d020918d7ce2c64d814c9419a35ed5a13",
+    "artifacts/rust-tauri/R05/RR3/I-01/manifest.json": "f1ba08cb9c2cc470999750b8b24f022f5de34b48af62f30a0b082853841ac640",
+    "artifacts/rust-tauri/R05/RR3/I-01/old-red-receipt.json": "1aca78e1045cf175fb3d89e2b140683ef13890cead54422fde87d617244abbd3",
+    "artifacts/rust-tauri/R05/RR3/I-01/sync-order-audit.json": "ad26659b78cd94e043b872877dac1b78b6e4e11cc69d44b1db83c3b5321a4421",
+    "artifacts/rust-tauri/R05/RR3/I-01/mutation-completeness.json": "33db384418e5508c9becf81c191b369dc9dfb169df966f62cdf51600a7cd0f69",
+    "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-failure-inventory.json": "314eac15ec3ab61ab28fc292aeac345f6ce5853453fb3d8bc72bb4f5fd5d6240",
+    "artifacts/rust-tauri/R05/RR3/I-01/source-before.json": "f1ba517d605d7b4cf46e500a4d7d5b83059928c7b9067c565d68c95047f573ca",
+    "artifacts/rust-tauri/R05/RR3/I-01/source-after.json": "6529fc4244c1c2a6299c85a8e7741fa3ded0d30ee94e49b8a602ce8d38b8edba",
+    "artifacts/rust-tauri/R05/RR3/I-01/b-production-counts.json": "b3532c9418ec2da500f0d5c3959befc32c1058e952b29fc9270a8d35da8c736e"
+  },
+  "additionalRead": "原R05任务书全文、10-02专项§6/7/9/附录C-D；主negative_gate/restore_selfcheck/mutate_pin/negative_selfcheck全文；xtask main/verify/Scope/runner_identity与B镜像相关完整函数；I历史8284摘要/652原log和命令结果；G漂移/console/default命令/N06原证与COPY脚本只读",
+  "scope": "不是全阶段验收读书或运行证明"
+}

@@ -1,0 +1,17 @@
+{
+  "case": "missing",
+  "command": [
+    "python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-new/missing/input.tsv",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-new/missing/mutation.json"
+  ],
+  "startedAt": "2026-10-07T02:30:17.804116+00:00",
+  "endedAt": "2026-10-07T02:30:17.838384+00:00",
+  "exitCode": 1,
+  "expectedExit": 1,
+  "beforeSha256": "b071c3e28870e2808e2f61f47a93c581471c00e321c6e2ee0dc7346be54a269a",
+  "afterSha256": "b071c3e28870e2808e2f61f47a93c581471c00e321c6e2ee0dc7346be54a269a",
+  "receiptPresent": false,
+  "status": "PASS"
+}

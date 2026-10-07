@@ -1,0 +1,138 @@
+{
+ "binder_observation": {
+  "classification": {
+   "regular_file": 69177
+  },
+  "enum_exit": 0,
+  "enumeration_command": "git --no-optional-locks ls-files --cached --others --exclude-standard -z",
+  "failures": {},
+  "note": "F51 relocated 56 nested-.git dirs; F52 relocated the 1 symlink entry (independent-validator-bin). Expected: 100% regular files, all six failure classes zero. Any non-zero class would fail-close cmd-06 the way FINAL-01/FINAL-02 observed.",
+  "observed_at_utc": "2026-10-07T13:26:59.835769+00:00",
+  "total_entries": 69177
+ },
+ "frozen_at_utc": "2026-10-07T13:26:59.835997+00:00",
+ "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+ "inputs": {
+  "docs/rust-tauri/R01/r01_t01_check_ownership.py": {
+   "bytes": 49866,
+   "sha256": "973e65842e6ececdebf4319a847e71cd8fecdbd97f04445fa4b0447332003412"
+  },
+  "docs/rust-tauri/R05/r05_leaf_case_map.tsv": {
+   "bytes": 8755,
+   "sha256": "a4f5866d11a833a7bbcd7224e898baaaa047a485cf4b2c66c515af25348db64f"
+  },
+  "docs/rust-tauri/R05/r05_required_cids.tsv": {
+   "bytes": 3125,
+   "sha256": "1a046aa162d62bc1fdefdd286a6211d37c15852a2683073df9c629d26190676c"
+  },
+  "docs/rust-tauri/R05/r05_stage_cids.tsv": {
+   "bytes": 37255,
+   "sha256": "ffffbe56313a1d5e50e7b216499cd851b1efc988da811a57d4fe0b07cc0be556"
+  },
+  "docs/rust-tauri/R05/r05_stage_pins.tsv": {
+   "bytes": 10498,
+   "sha256": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5"
+  },
+  "rust-toolchain.toml": {
+   "bytes": 772,
+   "sha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37"
+  },
+  "rust/Cargo.lock": {
+   "bytes": 77319,
+   "sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3"
+  },
+  "rust/Cargo.toml": {
+   "bytes": 3231,
+   "sha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096"
+  },
+  "rust/crates/lingxi-service/src/lib.rs": {
+   "bytes": 203323,
+   "sha256": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe"
+  },
+  "rust/crates/lingxi-service/src/logging.rs": {
+   "bytes": 22354,
+   "sha256": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301"
+  },
+  "rust/crates/lingxi-service/src/redaction.rs": {
+   "bytes": 41935,
+   "sha256": "5b192ab43df13d6add0705a9f1eb2ead45da1131f012c3afb61dd9f90ac10b7a"
+  },
+  "rust/crates/lingxi-service/tests/r00_management_leaves.rs": {
+   "bytes": 88806,
+   "sha256": "3e72c2a2d16287549a2727a355642ec279c09595d42d6ec42d9c5585c8d2f453"
+  },
+  "rust/crates/lingxi-service/tests/r05_t08_resources.rs": {
+   "bytes": 70474,
+   "sha256": "23b03f56bef900fc0563b3348596e61437995f7c05cc25a5173455f11a23e33f"
+  },
+  "rust/crates/xtask/src/candidate.rs": {
+   "bytes": 23258,
+   "sha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86"
+  },
+  "rust/crates/xtask/src/main.rs": {
+   "bytes": 20978,
+   "sha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1"
+  },
+  "rust/crates/xtask/src/stage_maps/R02.json": {
+   "bytes": 100387,
+   "sha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2"
+  },
+  "rust/crates/xtask/src/stage_maps/R03.json": {
+   "bytes": 96434,
+   "sha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea"
+  },
+  "rust/crates/xtask/src/stage_maps/R04.json": {
+   "bytes": 231496,
+   "sha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86"
+  },
+  "rust/crates/xtask/src/stage_maps/R05.json": {
+   "bytes": 306003,
+   "sha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798"
+  },
+  "rust/crates/xtask/src/verify.rs": {
+   "bytes": 94672,
+   "sha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e"
+  },
+  "scripts/rust-tauri/prepare_git_copy.py": {
+   "bytes": 14002,
+   "sha256": "37f4246a11f54826f2a31a772c1db0b5e3422c0261ea56c9872c3a3b75c9cb24"
+  },
+  "scripts/rust-tauri/r01-t02-check-generated.sh": {
+   "bytes": 2293,
+   "sha256": "7da60da2a23c42c83c4e2d32447cab6eec6d002a26dcf0409e9296fe442eef61"
+  },
+  "scripts/rust-tauri/r02_run_output_regression.py": {
+   "bytes": 15852,
+   "sha256": "fcee14b8c529d502d9885a4b7a31e8c5f90ade22ab92e149402d52585272fd99"
+  },
+  "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh": {
+   "bytes": 207199,
+   "sha256": "171eaa1f7f24635d736afe1abf6f5dc8a8d563f1f21c52655fa8ddc37995cde4"
+  },
+  "scripts/rust-tauri/r05_t08_mutate_pin.py": {
+   "bytes": 2526,
+   "sha256": "7785b41ebadfdc6d6415ee1d337ea48621e25d1bbb1ed1c16456004545279609"
+  },
+  "scripts/rust-tauri/r05_t08_negative_gate.sh": {
+   "bytes": 36137,
+   "sha256": "7ca614a77b2e4f0613ed82c3df171776dbb5f5866c77c54a07c10e16bcd931b6"
+  },
+  "scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py": {
+   "bytes": 5131,
+   "sha256": "f94f76721e77bf5a738b1270bd875569fd3f9ba3cc552795033ac057a8ee1867"
+  },
+  "scripts/rust-tauri/r05_t08_prepare_node.py": {
+   "bytes": 13339,
+   "sha256": "51abc64c8be5e90b1af7e35a475f3ea9e37cbb37033b9c256b5093333fd8c082"
+  },
+  "scripts/rust-tauri/r05_t08_restore_selfcheck.py": {
+   "bytes": 17026,
+   "sha256": "0cd24624bf7d6079e3cf7b4e6cf693222026db8261ffc60691bdc77fde0f57a4"
+  },
+  "scripts/rust-tauri/r05_t08_stage_suites.sh": {
+   "bytes": 19743,
+   "sha256": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e"
+  }
+ },
+ "missing": []
+}

@@ -1,0 +1,130 @@
+{
+  "schema": "lingxi.leaf-case-results.v1",
+  "leafId": "R00-T02-LA-C4E6F27D7873",
+  "cases": [
+    {
+      "actual": 1,
+      "case": "management-web-login-password-cookie-14day-desktop-scope",
+      "expect": 1,
+      "observed": {
+        "desktopWriteScope": true,
+        "expiresAtUnixMs": 1792551208763,
+        "httpOnly": true,
+        "maxAgeSeconds": 1209600,
+        "status": 200,
+        "storedWithoutPlainCookie": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-login-credential-priority-denies-invalid-token",
+      "expect": 1,
+      "observed": {
+        "sessionStoreUnchanged": true,
+        "status": 403
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-session-mobile-scope-no-write",
+      "expect": 1,
+      "observed": {
+        "connectionKind": "local",
+        "cookieSecretAbsent": true,
+        "credentialKind": "web_session",
+        "settingsWrite": false,
+        "status": 200,
+        "storeUnchanged": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-login-store-failure-no-session",
+      "expect": 1,
+      "observed": {
+        "cookieIssued": false,
+        "status": 500,
+        "storeUnchanged": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-login-token-positive-14day-mobile-scope",
+      "expect": 1,
+      "observed": {
+        "credentialTransport": "token",
+        "expiresAtUnixMs": 1792551208763,
+        "httpOnly": true,
+        "maxAgeSeconds": 1209600,
+        "mobileSettingsWrite": false,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-lan-browser-origin-login-session-logout",
+      "expect": 1,
+      "observed": {
+        "foreignStateUnchanged": true,
+        "foreignStatus": 403,
+        "loginStatus": 200,
+        "logoutStatus": 200,
+        "origin": "http://192.168.3.5:58216",
+        "preflightStatus": 204,
+        "revokedSessionAuthenticated": false,
+        "sessionAuthenticated": true,
+        "wrongSchemeStatus": 403
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "web-login-https-password-secure-14day-cookie",
+      "expect": 1,
+      "observed": {
+        "httpOnly": true,
+        "httpStatus": 200,
+        "maxAgeSeconds": 1209600,
+        "sameSiteStrict": true,
+        "secure": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "web-login-https-session-logout-revoked",
+      "expect": 1,
+      "observed": {
+        "logoutStatus": 200,
+        "sameCookieRevoked": true,
+        "sessionAuthenticated": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "web-login-foreign-origin-denied",
+      "expect": 1,
+      "observed": {
+        "corsGrant": false,
+        "httpStatus": 403
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "web-login-http-forwarded-proto-denied",
+      "expect": 1,
+      "observed": {
+        "forwardedProtoBypass": false,
+        "passwordAccepted": false
+      },
+      "ok": true
+    }
+  ]
+}

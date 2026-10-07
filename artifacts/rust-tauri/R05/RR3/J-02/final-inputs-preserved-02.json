@@ -1,0 +1,62 @@
+{
+  "scripts/rust-tauri/prepare_git_copy.py": {
+    "expected": "37f4246a11f54826f2a31a772c1db0b5e3422c0261ea56c9872c3a3b75c9cb24",
+    "main": "37f4246a11f54826f2a31a772c1db0b5e3422c0261ea56c9872c3a3b75c9cb24",
+    "copy": "37f4246a11f54826f2a31a772c1db0b5e3422c0261ea56c9872c3a3b75c9cb24",
+    "equal": true
+  },
+  "scripts/rust-tauri/prepare_git_copy_selfcheck.py": {
+    "expected": "5dc5e9486c9cf18b2c856082b611d2c64f5433cc4e0dafa5c0635e7fa527fc6f",
+    "main": "5dc5e9486c9cf18b2c856082b611d2c64f5433cc4e0dafa5c0635e7fa527fc6f",
+    "copy": "5dc5e9486c9cf18b2c856082b611d2c64f5433cc4e0dafa5c0635e7fa527fc6f",
+    "equal": true
+  },
+  "scripts/rust-tauri/r05_t08_negative_gate.sh": {
+    "expected": "7ca614a77b2e4f0613ed82c3df171776dbb5f5866c77c54a07c10e16bcd931b6",
+    "main": "7ca614a77b2e4f0613ed82c3df171776dbb5f5866c77c54a07c10e16bcd931b6",
+    "copy": "7ca614a77b2e4f0613ed82c3df171776dbb5f5866c77c54a07c10e16bcd931b6",
+    "equal": true
+  },
+  "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh": {
+    "expected": "171eaa1f7f24635d736afe1abf6f5dc8a8d563f1f21c52655fa8ddc37995cde4",
+    "main": "171eaa1f7f24635d736afe1abf6f5dc8a8d563f1f21c52655fa8ddc37995cde4",
+    "copy": "171eaa1f7f24635d736afe1abf6f5dc8a8d563f1f21c52655fa8ddc37995cde4",
+    "equal": true
+  },
+  "scripts/rust-tauri/r05_t08_prepare_node.py": {
+    "expected": "51abc64c8be5e90b1af7e35a475f3ea9e37cbb37033b9c256b5093333fd8c082",
+    "main": "51abc64c8be5e90b1af7e35a475f3ea9e37cbb37033b9c256b5093333fd8c082",
+    "copy": "51abc64c8be5e90b1af7e35a475f3ea9e37cbb37033b9c256b5093333fd8c082",
+    "equal": true
+  },
+  "scripts/rust-tauri/run_output_sinks.py": {
+    "expected": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+    "main": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+    "copy": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+    "equal": true
+  },
+  "scripts/rust-tauri/r02_run_output_regression.py": {
+    "expected": "fcee14b8c529d502d9885a4b7a31e8c5f90ade22ab92e149402d52585272fd99",
+    "main": "fcee14b8c529d502d9885a4b7a31e8c5f90ade22ab92e149402d52585272fd99",
+    "copy": "fcee14b8c529d502d9885a4b7a31e8c5f90ade22ab92e149402d52585272fd99",
+    "equal": true
+  },
+  "package.json": {
+    "expected": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+    "main": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+    "copy": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+    "equal": true
+  },
+  "package-lock.json": {
+    "expected": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+    "main": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+    "copy": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+    "equal": true
+  },
+  ".npmrc": {
+    "expected": "ce00fe5025692993005d3a5350ff13f8a568d604158041df74f1d229a2dfb607",
+    "main": "ce00fe5025692993005d3a5350ff13f8a568d604158041df74f1d229a2dfb607",
+    "copy": "ce00fe5025692993005d3a5350ff13f8a568d604158041df74f1d229a2dfb607",
+    "equal": true
+  }
+}

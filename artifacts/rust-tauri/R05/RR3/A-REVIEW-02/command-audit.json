@@ -1,0 +1,26 @@
+{
+  "actualRecordedCommands": 639,
+  "allLogHashesMatch": true,
+  "unexpectedExitCommands": [
+    {
+      "name": "independent-controls-02",
+      "exit": 1,
+      "expected": 0
+    },
+    {
+      "name": "e0s-driver",
+      "exit": 1,
+      "expected": 0
+    },
+    {
+      "name": "e0s-count-audit",
+      "exit": 1,
+      "expected": 0
+    },
+    {
+      "name": "e0s-count-audit-02",
+      "exit": 1,
+      "expected": 0
+    }
+  ]
+}

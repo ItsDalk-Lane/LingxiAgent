@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R05_HANDOFF",
+  "stage_id": "R05",
+  "generated_by": "R05-T08-执行者（RR1 WP-T08）",
+  "generated_at": "2026-10-06",
+  "baseline": {
+    "branch": "codex/rust-tauri-migration",
+    "head_sha": "d80737b6cb9186c8a18c0f35923aac00249d45c3",
+    "delivery_shape": "RR1 修复（F01–F39，含 T01–T07 各工作包与 T08 本包）全部为 HEAD 之上的未提交工作树改动；无 commit/push 授权，收口单独汇总提交状态",
+    "gate_result_ref": "RR1 候选的阶段 verify-stage R05 待跑（收口执行后回填 artifacts/rust-tauri/R05/RR1/FINAL-*/verify-R05/）；首轮 PASS（FINAL-WFR2-1）因生产源码与 gate 变化按 N16 过期，不继承",
+    "stage_status_ref": "docs/rust-tauri/R05/R05_REPORT.md §1（RR1 真值：offline_gate PENDING 最终复跑 / independent_review PENDING / live BLOCKED_NOT_AUTHORIZED）"
+  },
+  "interfaces": {
+    "model_plane": {
+      "config": "rust/crates/lingxi-service/src/config.rs 的 ServiceConfig（闭合键集 home/workspace/providers/models/workers——workers 为 RR1 F24 的单条受控 worker 声明；CLI 另有 --model-global-permits）",
+      "gateway": "lingxi-adapters models::gateway（ConfigModelGateway：pin-pair 路由、能力矩阵、reload 代次）",
+      "exchange_contract": "lingxi-kernel model_exchange（ModelTurnInput/ExchangeItem/ToolDeclarationSnapshot/RequestedToolCall：工具声明快照、宿主 ToolCallId、provider 关联、opaque 状态、截止时间）",
+      "provider": "lingxi-adapters models::provider::GatewayedProvider（bootstrap 正式接线：lib.rs wired_real_model_chain——四工具（read/write/edit/exec_command+write_stdin）+受控 worker+审批+统一网关+凭证服务；RR1 F24）"
+    },
+    "credentials": {
+      "service": "lingxi-service credentials（CredentialService：per-provider 刷新协调/撤销栅栏/持久化/代次；ProviderCredentialPort 唯一出口）",
+      "oauth": "lingxi-adapters models::oauth + oauth_flows（device/PKCE/state/轮询/刷新分类）",
+      "storage": "credentials store（原子写、版本冲突、未知字段保真；隔离于 home 的 runtime 目录）"
+    },
+    "protocol_families": [
+      "openai-completions",
+      "openai-responses",
+      "openai-codex-responses",
+      "anthropic-messages",
+      "google-generative-ai"
+    ],
+    "streaming": "lingxi-adapters models::streaming（SSE 帧解析）+ accumulators（五族流式累积）+ lingxi-service streaming_norm（规范化事件桥：MOOD/思考块、签名隔离）",
+    "network_policy": "models::network（NetworkPlane：RR1 F14 的 system/manual/direct、NO_PROXY+环回 bypass、显式 trusted CA，reload 代次发布）+ models::dispatch（分阶段超时/重试分类/429-5xx/幂等边界、错误 body 有界）+ models::egress（解析候选钉住的 URL/内网边界）+ models::compat（incumbent 兼容层）",
+    "worker_and_operations": "lingxi-service workermodel（GatewayWorkerModel：同一 QuotaManager 配额、callback trace 台账先记账后回话）+ operations.rs（operation 面：embedding/speech/transcribe/media/rerank 的统一 dispatch 与 usage sink）",
+    "usage_ledger": "lingxi-kernel usage（UsageFolder/ReportedUsage 四态）+ adapters models::usage（USAGE_MAPPINGS 公式表，RR1 F23 统一 output 口径）+ storage migration v5→v7（model_call_usage 表、parent_tool_call_id JOIN 键、transport_attempts nullable）+ runs/workermodel/operations 的记账接线（先提交后发布；取消/abandoned 臂均落行）"
+  },
+  "consumer_guidance_r06": {
+    "ready_to_consume": [
+      "R06 人格/记忆压缩所需的模型操作内核：chat/embedding/辅助槽经由 ModelGateway 与 CredentialService 的稳定入口（R05_SCOPE_MATRIX 的后续归属行）",
+      "统一规范化事件流（streaming_norm）：前端实时/历史直接消费，不需要第二套清洗",
+      "usage 台账 v5：按 owner/session/run/model_call 查询（MODEL_USAGE_SEMANTICS.md §语义）",
+      "正式 Rust 服务入口（--config 模型面）与二进制闭环证据模式（r05_t08_closed_loop 的五方一致/反作弊 nonce 模式可直接复用为 R06+ 的验收骨架）"
+    ],
+    "not_in_scope_r05": [
+      "R06 全量历史压缩/知识检索/人格编译器（R05 只交付最小会话交换层）",
+      "Tauri/React 壳替换（保持现役 Electron 入口，零改动并存）",
+      "真实数据切换与发布（NOT_IN_SCOPE）"
+    ]
+  },
+  "deferred_registrations": [
+    {
+      "id": "RR-BLK-CREDENTIALS",
+      "what": "LIVE 真实供应商验证",
+      "due": "R10（最迟）",
+      "ref": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json"
+    },
+    {
+      "id": "PLATFORM-WINDOWS-LINUX",
+      "what": "Windows 进程/沙盒实现与 Linux 真机验证（继承 R04 起）",
+      "due": "具备平台窗口时（不在 R05 清零）",
+      "ref": "docs/rust-tauri/R04/R04_PLATFORM_CAPABILITIES.json + R05_BLOCKERS.md §4"
+    }
+  ],
+  "stage_gate_registration": {
+    "map": "rust/crates/xtask/src/stage_maps/R05.json（18 场景：16 A-ID + SUP-R04REG + SUP-SCOPE；7 命令含 r04_regression_gate 前序整链；RR1 F25 后 130 叶=6 full_original_behavior+124 stage_share）",
+    "producer": "scripts/rust-tauri/r05_t08_stage_suites.sh + 三 TSV：r05_stage_pins.tsv（RR1 后 27 套件+64 lib 钉）/ r05_stage_cids.tsv（93 C-ID 逐测试唯一归属）/ r05_required_cids.tsv（RR1 F26 权威登记册 103=100+3，assembler 预跑+xtask 镜像双处精确集合校验）+ r05_leaf_case_map.tsv（137 案例行，13 条测试级）",
+    "runner_binding": "xtask main.rs STAGE_MAPS + runner_identity.rs EMBEDDED/SOURCE_INVENTORY（R05.json 双处注册）",
+    "negative_gate": "scripts/rust-tauri/r05_t08_negative_gate.sh（16 项原负测不降格）+ RR1 新增变异（F25/F26/F27：见 R05_NEGATIVE_GATE_REPORT.md RR1 节）"
+  },
+  "review_status": {
+    "independent_review": "PENDING（RR1 阶段终审未开始；T01–T07 已逐任务独立验收 PASS（含各 R2/R3 轮），T08 F24–F27 已 IMPLEMENTED 待独立验收——见 docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json）",
+    "stage_review": "待阶段门禁+独立终审后由总控收口（ORCHESTRATOR_PROGRESS 回填同时进行）"
+  },
+  "rr1_repair_round": {
+    "adversarial_audit": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04（F01–F28 问题矩阵冻结被审 HEAD d80737b6）",
+    "issue_matrix": "docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json（F01–F39 状态以矩阵为准）",
+    "evidence_root": "artifacts/rust-tauri/R05/RR1/WP-T01..T08-*（各工作包旧红/修复/审查证据）"
+  },
+  "rr2_repair_round": {
+    "recorded_by": "R05 RR2 收口（WP-F，2026-10-06/07）",
+    "candidate": {
+      "branch": "codex/rust-tauri-migration",
+      "head_sha": "ad5ec4e9853a51ed929f1e2e077b97d41c951572",
+      "delivery_shape": "RR2 修复（六工作包 A–E+G+F44+F 收口）全部为 HEAD 之上的未提交工作树改动；未 commit/push（待 FINAL-01 终审后由总控按既有有效授权统一精确暂存、提交、推送）",
+      "issue_matrix": "docs/rust-tauri/R05/repair-current/RR2_ISSUE_MATRIX.json（RR2 状态权威：10 行全部 INDEPENDENT_PASS，任务级）",
+      "progress": "docs/rust-tauri/R05/repair-current/RR2_PROGRESS.md（状态表+轮次日志）",
+      "handoff": "docs/rust-tauri/R05/repair-current/RR2_HANDOFF.md（RR2 轮交接）"
+    },
+    "stage_status": "READY_FOR_INDEPENDENT_REVIEW——六工作包+F44 独立验收通过（A-R2/REVIEW-r1.md、B-R2/R2/REVIEW-r2.md、C-R2/REVIEW-r1.md、D-R2/REVIEW-r1.md、E-R2/REVIEW-r1.md）、G-INT/G-NEG DONE（G-R2/I-MAPPING.md+NEG-GATE-RR2.md，16/16+6/6）、三追加 C 行收口；完整链 s5-full-5 exit 0、workspace 绿窗 exit 0（1476/0）。最终 accepted/R06_READY 待 FINAL-01 全新阶段审查者亲跑原总控 §5.3（cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R05/RR2/FINAL-01/verify-R05；入口目录须未存在）。终审前 R06_READY=false。",
+    "interface_and_behavior_changes_rr2": [
+      "OAuth 模型列表面（GET /lingxi/v1/models/oauth/{provider}/models）：非 OAuth/未配置 provider 由 409+oauth_only_surface 恢复为与未知 provider 完全相同的最小 404（reason=model_provider_unknown、cause=models.provider_unknown、body 除 requestId 外逐字一致，无存在性 oracle）；其余 OAuth 面（login/callback/poll/logout/add/remove model）维持 409——对齐原叶 R00-T02-LA-CFEC64F68DDE（F31，management.rs list_oauth_models 列表路由专属 match 臂）",
+      "R02 存储登记册：R02-T04_STORAGE_REGISTRY.json 补登 v6(model_call_usage_rr1_f21)/v7(model_call_usage_rr1_f38_attempts_nullable)（名称+sha256(SQL) 指纹+来源；v1–v5 逐字保留）；r02_t04_storage_tx.sh 新增 S0 等式自检（scripts/rust-tauri/r02_registry_consistency.py：MIGRATIONS==登记册 精确等式）；migrations.rs 零改动（F41）",
+      "网络面：N/A——RR2 未修改任何网络策略/egress/compat 代码（F31 为管理面状态码对齐，非网络面）",
+      "r02_t08_legacy_entry_regression.sh 运行输出归属机制重写（F42）：进程树 fd-1/2 sink 发现（fail-closed）+DIR 排除单元四重围栏（artifacts/ 内≥4 层+无 tracked+dedication，否则 FILE 最小归属降级）+TRACKED-SINK 拒+R02_A16_RUN_OUTPUT_ROOTS attestation 同围栏+双方对称排除；.gitignore 零改动；E5 分类器登记 patch-too-large 形态演化（登记红不转正式绿）",
+      "F34 永久测试腿：r05_t04_rr1_batch_terminal.rs 新增 known_stop_reason_with_unclosed_tool_block_is_loud_and_dispatches_nothing（生产代码零改动）；映射 r05_stage_pins.tsv 9→10、C11 行并入、xtask stage_map.rs 镜像同步（required_cids 103 不变）",
+      "F44：tests/post-verification-audit-seal.test.ts、tests/round2-delivery-evidence.test.ts、tests/round3-delivery-evidence.test.ts、.sync-audit/verify-post-verification-diff.mjs 共 7 处 git 子进程调用加 maxBuffer: 64MB（纯选项，断言/校验语义零改动；解除 RR1 大提交后 1MB 默认上限的 ENOBUFS 崩溃形态）",
+      "测试基建（F43）：r04_t05_process_tools.rs pid 屏障改 complete_pid_file（完整可解析 3 pid，20s 有界）；r04_t07_fixture.rs 新增 ask_model_tagged 模式（purpose=真实插槽 summarize、tag 走 argv/prompt；additive）；r05_t08_production_tools.rs 就绪屏障改『stub 记录到 summarize-model-f24 回调请求且 pgrep 见 worker』（90s 诚实上界）+SIGTERM 断言改生产真实有界契约（exit 0|6，code 6 钉 transport_drain_timed_out=true）；r00_management_leaves.rs 零改动",
+      "文档/台账（F40 收口）：RR2_ISSUE_MATRIX/RR2_PROGRESS/RR2_HANDOFF、R05_ACCEPTANCE_LEDGER.json（rr2_repair_round 节）、R05_REPORT.md §10、本文件 rr2_repair_round 段、PROGRESS_LEDGER.json（rr2_repair_round 段）、ORCHESTRATOR_PROGRESS.json（current_head+R05 段）、R05_BLOCKERS.md（RR2 环境注记）"
+    ],
+    "green_windows": {
+      "rust_test_workspace": "exit 0，115 组 ok / 1476 passed / 0 failed（D-R2 REVIEW-r1 亲跑，2026-10-06；日志 artifacts/rust-tauri/R05/RR2/D-R2/workspace-green-window-REVIEW-r1.log）",
+      "r02_t08_full_chain": "s5-full-5 exit 0 GREEN（artifacts/rust-tauri/R05/RR2/B-R2/R2/s5-full-5/run-root/stdout.log；E5 候选端登记红如实记录不转正式绿）",
+      "note": "两项为任务级独立验收窗口实测；正式 verify-stage R05（含 fmt/clippy/contracts/boundaries/R04→R03→R02/RR1 闭包整体）仍待 FINAL-01。"
+    },
+    "environment_notes": [
+      "R05-ENV-ALF-UNSIGNED-TEST-BINARY：本轮绿窗已过（r00 1/1，依赖当刻二进制实例已授予的 ALF 判定），但 ALF 按(路径,cdhash)逐实例拦截且判定不跨 relink——未来重链接的新 r00 测试二进制实例可能需用户再次 Allow（或 socketfilterfw --add/临时关防火墙/Developer ID 签名）",
+      "vitest worker 负载抖动一次的记录：B 包 r1 验收 full 轮 E5 unparseable（summary 分量和≠总数+Worker exited unexpectedly）经 REVIEW-r2 复析定性为环境型负载抖动，门禁 fail-closed 方向正确；同链 s5-full-5 求和一致 exit 0"
+    ],
+    "r06_inputs": [
+      "docs/rust-tauri/R05/R05_HANDOFF.json（本文件，含 rr2_repair_round 段）",
+      "docs/rust-tauri/R05/R05_REPORT.md（§10 RR2 增补）",
+      "docs/rust-tauri/R05/repair-current/RR2_ISSUE_MATRIX.json（RR2 状态权威）+ RR2_PROGRESS.md + RR2_HANDOFF.md",
+      "artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md（I01–I11 要求→断言→有效运行→结果映射）",
+      "rust/crates/xtask/src/stage_map.rs + stage_maps/R05.json + docs/rust-tauri/R05/{r05_stage_pins,r05_stage_cids,r05_required_cids,r05_leaf_case_map}.tsv（stage map 权威）",
+      "docs/rust-tauri/R05/CREDENTIAL_FLOW_MATRIX.json + PROTOCOL_WIRE_MATRIX.json + MODEL_USAGE_SEMANTICS.md + WORKER_MODEL_BOUNDARY.md（协议/凭证/台账语义文档）",
+      "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json（rr2_repair_round 节）+ PROGRESS_LEDGER.json + R05_BLOCKERS.md + R05_TEST_MAP.json",
+      "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json（R05 段 RR2 状态）"
+    ],
+    "next_step": "FINAL-01 阶段终审（全新审查者亲跑 §5.3 全部检查、证据根 artifacts/rust-tauri/R05/RR2/FINAL-01/verify-R05）；终审通过后再由总控按既有授权执行封印/提交/推送并写正式 accepted——本文件不预写。"
+  }
+}

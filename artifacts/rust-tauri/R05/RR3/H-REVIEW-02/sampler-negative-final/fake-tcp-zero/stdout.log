@@ -1,0 +1,17 @@
+
+running 1 test
+
+thread 'f27_sampler_controls_detect_growth_release_and_failure' (21616405) panicked at crates/lingxi-service/tests/r05_t08_resources.rs:1085:5:
+assertion `left == right` failed: 必须看见已知保留连接的两端
+  left: 0
+ right: 2
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test f27_sampler_controls_detect_growth_release_and_failure ... FAILED
+
+failures:
+
+failures:
+    f27_sampler_controls_detect_growth_release_and_failure
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1.07s
+

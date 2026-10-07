@@ -1,0 +1,12 @@
+init-internal-fresh 0
+index-internal-fresh 0
+init-internal-untracked 0
+index-internal-untracked 0
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/review_driver.py", line 130, in <module>
+    elif mode=='extra': extra()
+                        ~~~~~^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/review_driver.py", line 114, in extra
+    results.append(dict(case=case.name,startedAt=started,endedAt=utc(),exit=p.returncode,result=json.loads((ev/'results.json').read_text()) if (ev/'results.json').exists() else None)); save(base/'results.json',results); assert p.returncode==0,(case,(runroot/'child/child/stderr.log').read_text())
+                                                                                                                                                                                                                                   ^^^^^^^^^^^^^^^
+AssertionError: (PosixPath('/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-untracked'), 'Traceback (most recent call last):\n  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/review_driver.py", line 131, in <module>\n    elif mode==\'child\': child()\n                        ~~~~~^^\n  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/review_driver.py", line 93, in child\n    assert all(not x.startswith(\'DIR \') for x in (ev/\'sinks.txt\').read_text().splitlines()),\'旧孙文件时祖先DIR仍被扩大\'\n           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 旧孙文件时祖先DIR仍被扩大\n')

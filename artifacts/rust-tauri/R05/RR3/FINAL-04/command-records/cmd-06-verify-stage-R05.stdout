@@ -1,0 +1,13 @@
+xtask: verify-stage R05 [cargo test --manifest-path rust/Cargo.toml --workspace --locked] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05/rust_test_workspace
+xtask: verify-stage R05 [rust_test_workspace] FAIL
+xtask: verify-stage R05 [bash scripts/rust-tauri/r05_t08_stage_suites.sh {EVIDENCE}/R05_SUITES] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05/r05_stage_suites
+xtask: verify-stage R05 [r05_stage_suites] PASS
+xtask: verify-stage R05 [cargo fmt --manifest-path rust/Cargo.toml --all -- --check] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05/rust_fmt
+xtask: verify-stage R05 [rust_fmt] PASS
+xtask: verify-stage R05 [cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05/rust_clippy
+xtask: verify-stage R05 [rust_clippy] PASS
+xtask: verify-stage R05 [bash scripts/rust-tauri/r01-t02-check-generated.sh] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05/check_contracts
+xtask: verify-stage R05 [check_contracts] PASS
+xtask: verify-stage R05 [python3 -B docs/rust-tauri/R01/r01_t01_check_ownership.py] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05/check_boundaries
+xtask: verify-stage R05 [check_boundaries] PASS
+xtask: verify-stage R05 [cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R04 --evidence {EVIDENCE}/R04_REGRESSION] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05/r04_regression_gate

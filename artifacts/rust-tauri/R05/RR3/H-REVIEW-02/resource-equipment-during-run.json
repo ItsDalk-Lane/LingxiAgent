@@ -1,0 +1,23 @@
+{
+  "utc": "2026-10-07T03:19:31.621259+00:00",
+  "rows": [
+    {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e",
+      "fresh": true,
+      "source": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/main.rs",
+      "kind": [
+        "bin"
+      ]
+    },
+    {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r05_t08_resources-f66968a3ba499b0b",
+      "sha256": "07fa503e4fde47534ed06f6bde443a849ac8697b2091e94ccd8a67589d51d18c",
+      "fresh": false,
+      "source": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r05_t08_resources.rs",
+      "kind": [
+        "test"
+      ]
+    }
+  ]
+}

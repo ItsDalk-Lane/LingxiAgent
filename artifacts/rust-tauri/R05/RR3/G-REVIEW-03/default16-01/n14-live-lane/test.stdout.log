@@ -1,0 +1,24 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.IYrM8z/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.18s
+     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-2ada07f2097522dd)
+
+running 1 test
+test stage_map::map_tests::r05_map_declares_no_live_lane_and_only_offline_commands ... FAILED
+
+failures:
+
+---- stage_map::map_tests::r05_map_declares_no_live_lane_and_only_offline_commands stdout ----
+
+thread 'stage_map::map_tests::r05_map_declares_no_live_lane_and_only_offline_commands' (22402970) panicked at crates/xtask/src/stage_map.rs:3512:9:
+assertion `left == right` failed: the R05 map's command set drifted — new commands need explicit review against the offline-only policy
+  left: ["check_boundaries", "check_contracts", "live_probe", "r04_regression_gate", "r05_stage_suites", "rust_clippy", "rust_fmt", "rust_test_workspace"]
+ right: ["check_boundaries", "check_contracts", "r04_regression_gate", "r05_stage_suites", "rust_clippy", "rust_fmt", "rust_test_workspace"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    stage_map::map_tests::r05_map_declares_no_live_lane_and_only_offline_commands
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`

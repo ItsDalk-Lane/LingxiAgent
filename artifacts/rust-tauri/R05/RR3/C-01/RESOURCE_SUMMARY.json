@@ -1,0 +1,311 @@
+{
+  "caseId": "R05-T08-C12",
+  "load": {
+    "cancelCycles": 60,
+    "cancelDanglingActive": 60,
+    "cancelSettled": 0,
+    "errorCycles": 60,
+    "errorRuns": 60,
+    "longResponseCycles": 10,
+    "okCycles": 15,
+    "sessions": [
+      "sess_local_alpha",
+      "sess_local_beta"
+    ],
+    "workerCycles": 15
+  },
+  "binaryPhaseCounts": {
+    "baseline": 1,
+    "cancel-live": 6,
+    "cancel": 6,
+    "error": 6,
+    "ok": 3,
+    "worker-live": 15,
+    "worker-released": 15,
+    "worker-final": 1,
+    "post-restart": 1
+  },
+  "cycleResultCounts": {
+    "cancel": 60,
+    "error": 60,
+    "ok": 15,
+    "long": 10,
+    "worker": 15
+  },
+  "binarySeriesPoints": 54,
+  "binaryServiceRssKiB": [
+    27024,
+    37920
+  ],
+  "binaryTreeRssKiB": [
+    27024,
+    40496
+  ],
+  "binaryTreeFDs": [
+    15,
+    22
+  ],
+  "binaryWorkerLivePids": [
+    {
+      "38780": 37888,
+      "50679": 2576
+    },
+    {
+      "38780": 37904,
+      "51005": 2576
+    },
+    {
+      "38780": 37904,
+      "51330": 2576
+    },
+    {
+      "38780": 37904,
+      "51655": 2576
+    },
+    {
+      "38780": 37904,
+      "51980": 2576
+    },
+    {
+      "38780": 37904,
+      "52305": 2576
+    },
+    {
+      "38780": 37904,
+      "52630": 2576
+    },
+    {
+      "38780": 37904,
+      "52955": 2576
+    },
+    {
+      "38780": 37920,
+      "53292": 2560
+    },
+    {
+      "38780": 37920,
+      "53617": 2576
+    },
+    {
+      "38780": 37920,
+      "53942": 2576
+    },
+    {
+      "38780": 37920,
+      "54267": 2576
+    },
+    {
+      "38780": 37920,
+      "54592": 2576
+    },
+    {
+      "38780": 37920,
+      "54917": 2576
+    },
+    {
+      "38780": 37920,
+      "55242": 2576
+    }
+  ],
+  "liveTcp": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+  ],
+  "releasedTcp": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "ownerSeriesPoints": 61,
+  "ownerPhaseCounts": {
+    "baseline": 1,
+    "worker-and-queued-live": 15,
+    "released-steady": 45
+  },
+  "ownerPeakCounts": {
+    "activeSessionRuns": 2,
+    "backgroundIds": [],
+    "liveRunIds": [
+      "run_000001a0dcba6c00_0000a5",
+      "run_000001a0dcba6c00_0000a4"
+    ],
+    "modelPermits": 1,
+    "modelWaiters": 1,
+    "toolPermits": 1,
+    "toolWaiters": 0
+  },
+  "ownerSteadyCounts": {
+    "activeSessionRuns": 0,
+    "backgroundIds": [],
+    "liveRunIds": [],
+    "modelPermits": 0,
+    "modelWaiters": 0,
+    "toolPermits": 0,
+    "toolWaiters": 0
+  },
+  "ownerPeakCountSets": {
+    "activeSessionRuns": [
+      2
+    ],
+    "modelPermits": [
+      1
+    ],
+    "modelWaiters": [
+      1
+    ],
+    "toolPermits": [
+      1
+    ],
+    "toolWaiters": [
+      0
+    ]
+  },
+  "ownerSteadyCountSets": {
+    "activeSessionRuns": [
+      0
+    ],
+    "modelPermits": [
+      0
+    ],
+    "modelWaiters": [
+      0
+    ],
+    "toolPermits": [
+      0
+    ],
+    "toolWaiters": [
+      0
+    ]
+  },
+  "cleanup": {
+    "configRemoved": true,
+    "equipmentStubStopped": true,
+    "filesBeforeCleanup": {
+      "home": [
+        {
+          "bytes": 162,
+          "path": "data-epoch.json"
+        },
+        {
+          "bytes": 22138880,
+          "path": "lingxi-service/data/runs.db"
+        },
+        {
+          "bytes": 157,
+          "path": "lingxi-service/device-credentials.json"
+        },
+        {
+          "bytes": 113,
+          "path": "lingxi-service/devices.json"
+        },
+        {
+          "bytes": 0,
+          "path": "lingxi-service/instance.lock"
+        },
+        {
+          "bytes": 184,
+          "path": "lingxi-service/local-token.json"
+        },
+        {
+          "bytes": 65355,
+          "path": "lingxi-service/logs/service-000002.log"
+        },
+        {
+          "bytes": 65358,
+          "path": "lingxi-service/logs/service-000003.log"
+        },
+        {
+          "bytes": 33642,
+          "path": "lingxi-service/logs/service-000004.log"
+        },
+        {
+          "bytes": 0,
+          "path": "lingxi-service/logs/service-000005.log"
+        },
+        {
+          "bytes": 531,
+          "path": "lingxi-service/management.json"
+        },
+        {
+          "bytes": 0,
+          "path": "logs/security-audit.jsonl"
+        }
+      ],
+      "workspace": [
+        {
+          "bytes": 13,
+          "path": "input.txt"
+        },
+        {
+          "bytes": 11,
+          "path": "loop.txt"
+        }
+      ]
+    },
+    "homeRemoved": true,
+    "lastServiceExit": 0,
+    "lastServicePid": 55703,
+    "serviceStopped": true,
+    "workspaceRemoved": true
+  },
+  "environment": {
+    "arch": "aarch64",
+    "binary": "CARGO_BIN_EXE_lingxi-service (debug)",
+    "binaryPath": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+    "equipmentPath": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r05_t08_resources-f66968a3ba499b0b",
+    "os": "macos",
+    "stubDroppedConnections": 60,
+    "stubHits": 368,
+    "workerPath": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/r04_t07_fixture"
+  },
+  "rawSha256": "9311950697691ffee529e27654c8cd71ec249d473d31d660d3c43f0d85b078f2",
+  "filePathSets": {
+    "home": [
+      "data-epoch.json",
+      "lingxi-service/data/runs.db",
+      "lingxi-service/data/runs.db-shm",
+      "lingxi-service/data/runs.db-wal",
+      "lingxi-service/device-credentials.json",
+      "lingxi-service/devices.json",
+      "lingxi-service/instance.json",
+      "lingxi-service/instance.lock",
+      "lingxi-service/local-token.json",
+      "lingxi-service/logs/service-000001.log",
+      "lingxi-service/logs/service-000002.log",
+      "lingxi-service/logs/service-000003.log",
+      "lingxi-service/logs/service-000004.log",
+      "lingxi-service/logs/service-000005.log",
+      "lingxi-service/management.json",
+      "logs/security-audit.jsonl"
+    ],
+    "workspace": [
+      "input.txt",
+      "loop.txt"
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "command": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+    "--home",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f46-log-error-eqv57bv7",
+    "--bind",
+    "127.0.0.1:0",
+    "--log-max-files",
+    "3",
+    "--log-max-bytes",
+    "65536"
+  ],
+  "pid": 29167,
+  "startedAt": "2026-10-07T00:45:48.936364+00:00",
+  "endedAt": "2026-10-07T00:45:49.022244+00:00",
+  "serviceExitCode": 0,
+  "ready": true,
+  "explicitErrorMarker": true,
+  "binarySha256": "b180d47abeeecef4e6d677b9501fde0828cd4061f74276d8e5e2a2a9afb33d81",
+  "inventoryOnError": [
+    {
+      "name": "service-000001.log",
+      "isDirectory": true
+    },
+    {
+      "name": "service-000002.log",
+      "isDirectory": false
+    },
+    {
+      "name": "service-000003.log",
+      "isDirectory": false
+    },
+    {
+      "name": "service-000004.log",
+      "isDirectory": false
+    }
+  ],
+  "boundary": "only isolated temporary filesystem entry denies prune; error is expected and explicitly reported; no count PASS asserted for failed logging attachment",
+  "cleanup": {
+    "homeRemoved": true,
+    "serviceReaped": true
+  },
+  "status": "PASS"
+}

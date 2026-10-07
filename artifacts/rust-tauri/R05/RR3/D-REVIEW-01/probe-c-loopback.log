@@ -1,0 +1,14 @@
+pid=86498 bind=0.0.0.0:60177 connect=127.0.0.1:60177 listening=true
+phase=connect poll=1 revents=4 remaining_ms=6000
+client connected
+phase=client-write poll=1 revents=4 remaining_ms=6000
+phase=client-write transferred=4 errno=36
+phase=listener-accept poll=1 revents=1 remaining_ms=6000
+server accepted
+phase=server-recv poll=1 revents=1 remaining_ms=6000
+phase=server-recv transferred=4 errno=36
+phase=server-write poll=1 revents=4 remaining_ms=6000
+phase=server-write transferred=4 errno=36
+phase=client-recv poll=1 revents=1 remaining_ms=6000
+phase=client-recv transferred=4 errno=36
+PROBE RESULT: ok accepted=1

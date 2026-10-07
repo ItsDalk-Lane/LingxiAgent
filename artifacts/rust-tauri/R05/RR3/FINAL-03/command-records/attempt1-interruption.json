@@ -1,0 +1,18 @@
+{
+ "attempt": 1,
+ "command": "cmd-06-verify-stage-R05",
+ "argv": "/Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05",
+ "utcStart": "2026-10-07T13:41:54.152387000Z",
+ "hostKillDiscoveredAtUtc": "2026-10-07T14:28:32Z",
+ "status": "INTERRUPTED_BY_HOST_KILL",
+ "exitCodeRecorded": null,
+ "runnerShellExit": 137,
+ "killSignal": "SIGKILL(9) on the background shell hosting run-all-six.sh; cargo/xtask process tree died with it; no cargo/xtask/r00 process remained (ps verified)",
+ "lastR00MonitorSample": "2026-10-07T14:10:27Z (PID 92630, verify-stage internal nested workspace test)",
+ "partialEvidence": "177 files under verify-R05 before rename; no root verify-stage-result.json produced; gate verdict NOT PRODUCED (UNKNOWN, not FAIL)",
+ "analogy": "G-REVIEW-03 default16-01 host-killed background task; interrupted\u73b0\u573a preserved, fresh attempt in a fresh root",
+ "recordedAtUtc": "2026-10-07T14:30:11.088161+00:00",
+ "renamedTo": "artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05-ATTEMPT1-INTERRUPTED",
+ "renamedAtUtc": "2026-10-07T14:30:18.153355+00:00",
+ "renameNote": "Same-volume rename of this round's own interrupted partial output to free the mandated evidence-root path for the fresh retry; 177 file SHA256 manifest saved at attempt1-partial-manifest-sha256.txt; no bytes changed, nothing deleted."
+}

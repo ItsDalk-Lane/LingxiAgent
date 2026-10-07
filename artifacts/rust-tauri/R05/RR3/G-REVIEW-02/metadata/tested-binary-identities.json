@@ -1,0 +1,74 @@
+{
+  "at": "2026-10-07T04:35:33.510115+00:00",
+  "scope": "Observer hashes recorded after construction; timestamps and compile logs bind use. These binaries are not copied due to storage. Initial pre-existing hash is not attributed to the new control. Failed N02 may alter cache paths after control; current state is separately listed.",
+  "observed": [
+    {
+      "at": "2026-10-07T04:24:34.467295+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/lingxi-service",
+      "mtime_ns": 1791341931985372772,
+      "bytes": 62344848,
+      "sha256": "7c714bce1299c0c5237f3e72a84d4146818d16d369761606c00ad28e43443f1f"
+    },
+    {
+      "at": "2026-10-07T04:26:41.922139+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-2ada07f2097522dd",
+      "mtime_ns": 1791347200262052923,
+      "bytes": 8240584,
+      "sha256": "e8656eed0264b920bb08ed29727cfff78af0a56c5dd3a372f8474de256321b5f"
+    },
+    {
+      "at": "2026-10-07T04:27:51.527905+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/lingxi-service",
+      "mtime_ns": 1791347255631290843,
+      "bytes": 62052640,
+      "sha256": "9bd3eb746934486012af9c67b71b53d54ccbd03b3486b4f52009a067f3dfb81f"
+    },
+    {
+      "at": "2026-10-07T04:27:56.279926+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-2ada07f2097522dd",
+      "mtime_ns": 1791347262900919037,
+      "bytes": 8240584,
+      "sha256": "14e08057231be187f425cce5a02053f54d5ebc5c6f4de958028830724043a480"
+    },
+    {
+      "at": "2026-10-07T04:27:57.453436+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t01_binary_wiring-de97e3ad3e74884c",
+      "mtime_ns": 1791347255097062822,
+      "bytes": 7024552,
+      "sha256": "45a5d12964c8db4b3bc7cf7f47df27b7f10064ff9d1665097eac4a102ea41bcb"
+    },
+    {
+      "at": "2026-10-07T04:27:57.515033+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-695c8e7d3840d805",
+      "mtime_ns": 1791347255631290843,
+      "bytes": 62052640,
+      "sha256": "9bd3eb746934486012af9c67b71b53d54ccbd03b3486b4f52009a067f3dfb81f"
+    }
+  ],
+  "current": [
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-695c8e7d3840d805",
+      "exists": false,
+      "sha256": null,
+      "bytes": null
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t01_binary_wiring-de97e3ad3e74884c",
+      "exists": true,
+      "sha256": "45a5d12964c8db4b3bc7cf7f47df27b7f10064ff9d1665097eac4a102ea41bcb",
+      "bytes": 7024552
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-2ada07f2097522dd",
+      "exists": true,
+      "sha256": "14e08057231be187f425cce5a02053f54d5ebc5c6f4de958028830724043a480",
+      "bytes": 8240584
+    },
+    {
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/lingxi-service",
+      "exists": true,
+      "sha256": "9bd3eb746934486012af9c67b71b53d54ccbd03b3486b4f52009a067f3dfb81f",
+      "bytes": 62052640
+    }
+  ]
+}

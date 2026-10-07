@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running unittests src/lib.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_kernel-2c892ab3a8717e65)
+
+running 1 test
+test toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.00s
+

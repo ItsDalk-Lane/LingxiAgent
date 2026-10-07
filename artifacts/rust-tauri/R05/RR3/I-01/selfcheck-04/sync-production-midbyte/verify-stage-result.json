@@ -1,0 +1,255 @@
+{
+  "candidateSourceBinding": {
+    "after": {
+      "atUnixMs": 1791340323575,
+      "digestSha256": "91a6cffb1c4d2281d7d15347ed3b7810ba4bef17f8878a8447bf44245ee9eff7",
+      "fileCount": 298,
+      "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/sync-production-midbyte/candidate-source-after.json",
+      "manifestSha256": "ab32b8eef1fbd061f0581f5e36f3e38efd4f2c829e022c898f00ade03b3c9e45"
+    },
+    "afterError": null,
+    "before": {
+      "atUnixMs": 1791340322710,
+      "digestSha256": "fd77522e35ea019305402a15d86f40d9be6ef2bbce124f1a3dfd98830c5adeb7",
+      "fileCount": 298,
+      "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/sync-production-midbyte/candidate-source-before.json",
+      "manifestSha256": "7e854795fb5dc4dbbce51a158244db5f1c0cdc306b26054b8e0cc6ff17969d14"
+    },
+    "checkpointAfterEveryCommand": [
+      {
+        "atUnixMs": 1791340323462,
+        "changedPathBytesHex": [
+          "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+        ],
+        "commandKey": "a01_smoke",
+        "digestSha256": "91a6cffb1c4d2281d7d15347ed3b7810ba4bef17f8878a8447bf44245ee9eff7",
+        "fileCount": 298,
+        "stable": false
+      }
+    ],
+    "excluded": {
+      "evidenceOutputPathBytesHex": null,
+      "evidenceOutputRelativePath": null,
+      "policy": "This invocation's fresh --evidence subtree and exact real OS fd stdout/stderr files of this process and its ancestors are excluded. No ancestor sink directory is excluded. The set is fixed before binding; other tracked and non-ignored untracked paths stay bound.",
+      "runOutputFiles": []
+    },
+    "finalChangedPathBytesHex": [
+      "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+    ],
+    "headAtEndError": null,
+    "reason": "Candidate file bytes or HEAD changed during the registered stage checks, or a snapshot failed; stage PASS is forbidden.",
+    "schema": "lingxi-candidate-source-binding-v1",
+    "stable": false,
+    "testedShaAtEnd": "66091edaa83e6a4dc31b55bf29e28c5a7e3610bb"
+  },
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import pathlib,time,sys; p=pathlib.Path(sys.argv[1]); end=time.monotonic()+15; exec('while not p.exists() and time.monotonic()<end:\\n time.sleep(.02)'); assert p.exists(), '控制命令未释放'",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/release-command"
+      ],
+      "cleanup": null,
+      "durationMs": 638,
+      "evidencePaths": [
+        "{EVIDENCE}/a01_smoke/stdout.log"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a01_smoke",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    }
+  ],
+  "finishedAtUnixMs": 1791340323608,
+  "overall": "FAIL",
+  "platform": {
+    "arch": "aarch64",
+    "family": "unix",
+    "os": "macos"
+  },
+  "resultVersion": "lingxi.xtask.verify-stage.v1",
+  "runnerSourceBinding": {
+    "after": {
+      "compiledSourceFiles": [
+        {
+          "compiledAndDiskSha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+          "path": "scripts/rust-tauri/run_output_sinks.py"
+        },
+        {
+          "compiledAndDiskSha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+          "path": "rust/crates/xtask/src/main.rs"
+        },
+        {
+          "compiledAndDiskSha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+          "path": "rust/crates/xtask/src/verify.rs"
+        },
+        {
+          "compiledAndDiskSha256": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce",
+          "path": "rust/crates/xtask/src/stage_map.rs"
+        },
+        {
+          "compiledAndDiskSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+          "path": "rust/crates/xtask/src/candidate.rs"
+        },
+        {
+          "compiledAndDiskSha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+          "path": "rust/crates/xtask/src/runner_identity.rs"
+        },
+        {
+          "compiledAndDiskSha256": "57f7c901ce88b2f8ff4ffbc3a928b0c605f60741a75eeabfcc53d7a0c9c3a0c3",
+          "path": "rust/crates/xtask/src/stage_maps/R02.json"
+        },
+        {
+          "compiledAndDiskSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+          "path": "rust/crates/xtask/src/stage_maps/R03.json"
+        },
+        {
+          "compiledAndDiskSha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+          "path": "rust/crates/xtask/src/stage_maps/R04.json"
+        },
+        {
+          "compiledAndDiskSha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+          "path": "rust/crates/xtask/src/stage_maps/R05.json"
+        },
+        {
+          "compiledAndDiskSha256": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+          "path": "rust/crates/xtask/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+          "path": "rust/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+          "path": "rust-toolchain.toml"
+        }
+      ],
+      "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+      "schema": "lingxi-xtask-runner-source-v1",
+      "sourceInventory": [
+        "candidate.rs",
+        "candidate/tests.rs",
+        "main.rs",
+        "runner_identity.rs",
+        "stage_map.rs",
+        "stage_maps/R02.json",
+        "stage_maps/R03.json",
+        "stage_maps/R04.json",
+        "stage_maps/R05.json",
+        "verify.rs",
+        "verify/runner_tests.rs"
+      ],
+      "status": "PASS"
+    },
+    "afterError": null,
+    "before": {
+      "compiledSourceFiles": [
+        {
+          "compiledAndDiskSha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+          "path": "scripts/rust-tauri/run_output_sinks.py"
+        },
+        {
+          "compiledAndDiskSha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+          "path": "rust/crates/xtask/src/main.rs"
+        },
+        {
+          "compiledAndDiskSha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+          "path": "rust/crates/xtask/src/verify.rs"
+        },
+        {
+          "compiledAndDiskSha256": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce",
+          "path": "rust/crates/xtask/src/stage_map.rs"
+        },
+        {
+          "compiledAndDiskSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+          "path": "rust/crates/xtask/src/candidate.rs"
+        },
+        {
+          "compiledAndDiskSha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+          "path": "rust/crates/xtask/src/runner_identity.rs"
+        },
+        {
+          "compiledAndDiskSha256": "57f7c901ce88b2f8ff4ffbc3a928b0c605f60741a75eeabfcc53d7a0c9c3a0c3",
+          "path": "rust/crates/xtask/src/stage_maps/R02.json"
+        },
+        {
+          "compiledAndDiskSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+          "path": "rust/crates/xtask/src/stage_maps/R03.json"
+        },
+        {
+          "compiledAndDiskSha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+          "path": "rust/crates/xtask/src/stage_maps/R04.json"
+        },
+        {
+          "compiledAndDiskSha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+          "path": "rust/crates/xtask/src/stage_maps/R05.json"
+        },
+        {
+          "compiledAndDiskSha256": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+          "path": "rust/crates/xtask/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+          "path": "rust/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+          "path": "rust-toolchain.toml"
+        }
+      ],
+      "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+      "schema": "lingxi-xtask-runner-source-v1",
+      "sourceInventory": [
+        "candidate.rs",
+        "candidate/tests.rs",
+        "main.rs",
+        "runner_identity.rs",
+        "stage_map.rs",
+        "stage_maps/R02.json",
+        "stage_maps/R03.json",
+        "stage_maps/R04.json",
+        "stage_maps/R05.json",
+        "verify.rs",
+        "verify/runner_tests.rs"
+      ],
+      "status": "PASS"
+    },
+    "beforeError": null,
+    "status": "PASS"
+  },
+  "scenarios": [
+    {
+      "commandRefs": [
+        "a01_smoke"
+      ],
+      "id": "RX-F49-SYNC",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    }
+  ],
+  "stage": "RX",
+  "startedAtUnixMs": 1791340322597,
+  "supplementalLeafCoverage": {
+    "blocked": 0,
+    "commandsNotPassing": [],
+    "declaredInStageMap": 0,
+    "deferredLeafIds": [],
+    "deferredToLaterStage": 0,
+    "deferredToR07": 0,
+    "expectedFromR00Ledger": 0,
+    "fail": 0,
+    "note": "R13-F01/R14-F01: this stage gate CONSUMES the R00 REQUIRED_SUPPLEMENTAL leaves bound to the stage (cross-checked for set equality AND per-leaf FULL-record equality — feature, kind, task/stage responsibility, status, result/test registries, then, assertions, due — against both R00 ledgers before any command ran). R02-final group 1 stage ownership: expected == pass + deferredToR07 + fail + blocked, and overall PASS requires PASS ∪ DEFERRED_TO_R07 to cover every leaf. DEFERRED_TO_R07 is NOT a waiver: the leaf stays REQUIRED and its acceptance belongs to R07, which must consume the remainder (deferredToStage + r07Share on each entry); the deferred set is verified EQUAL to the stage map's deferred_to_r07 declarations. Early-evidence producers of pre-implemented R07 behavior stay registered and run; any failing command (commandsNotPassing) still blocks overall PASS. A BLOCKED entry is an unresolved stage-boundary conflict, a generic-authentication leaf whose cases do not prove its original behavior, or a legacy partial-kind dual-stage leaf. A FAIL entry lacks legal evidence for its R02 share or its pinned cases did not hold as recorded in the producer's structured case file.",
+    "pass": 0,
+    "r00FeatureStageAcceptancePath": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+    "r00LedgerPath": "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+    "shareSatisfiedLeafIds": []
+  },
+  "supplementalLeafScenarios": [],
+  "testedSha": "66091edaa83e6a4dc31b55bf29e28c5a7e3610bb",
+  "toolchainChannel": "1.98.1",
+  "worktreeDirty": false
+}

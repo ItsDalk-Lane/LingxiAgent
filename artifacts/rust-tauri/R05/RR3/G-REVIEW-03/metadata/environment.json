@@ -1,0 +1,14 @@
+=== G-REVIEW-03 environment baseline 2026-10-07T07:13:35.6N+0000 ===
+HOME=/Users/study_superior
+HOME resolved before check: /Users/study_superior (required /Users/study_superior; no export needed)
+R02_LEGACY_REGRESSION_MODE='<unset>'
+cargo 1.98.1 (797e8a9bc 2026-08-05)
+rustc 1.98.1 (48a229cea 2026-09-01)
+v24.16.0
+11.13.0
+/dev/disk3s5   926Gi   319Gi   583Gi    36%    4.5M  6.1G    0%   /System/Volumes/Data
+/dev/disk3s1s1   926Gi    13Gi   583Gi     3%    484k  4.3G    0%   /
+NEG_TARGET /Users/study_superior/.cache/lingxi-r05-neg-target: MISSING-cold-start
+branch: codex/rust-tauri-migration
+HEAD: b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b
+index: be43b48d2d7ddb08c31f5e48e1ec1035364d7089

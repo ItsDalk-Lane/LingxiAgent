@@ -1,0 +1,8 @@
+{
+  "utc": "2026-10-07T02:36:27.406813+00:00",
+  "scriptSha256": "a69110b81298705a9161652d28402a5e5a585f945fdfd214ccf071132ecb67dd",
+  "selfcheckSha256": "0cd24624bf7d6079e3cf7b4e6cf693222026db8261ffc60691bdc77fde0f57a4",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "status": " M scripts/rust-tauri/r05_t08_negative_gate.sh\n?? scripts/rust-tauri/r05_t08_restore_selfcheck.py\n",
+  "state": "SELF_CHECKED; production writes stopped"
+}

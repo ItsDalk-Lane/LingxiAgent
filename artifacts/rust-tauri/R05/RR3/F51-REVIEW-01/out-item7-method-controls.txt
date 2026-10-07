@@ -1,0 +1,10 @@
+== POSITIVE: digest of untouched copy (expect 291f5329...) ==
+{"du_kilobytes": 144, "file_count": 33, "max_relpath_len": 54, "nested_git_head": null, "other_count": 0, "symlink_count": 1, "total_bytes": 34456, "tree_digest": "291f53295f8d67a4005b96cb7989baf56eb7c4591bdd6e48ced40c81b8122ca4"}
+== NEGATIVE: flip ONE byte in one file -> digest MUST change ==
+flipped first byte of fixture-copy/.git/config
+{"du_kilobytes": 144, "file_count": 33, "max_relpath_len": 54, "nested_git_head": null, "other_count": 0, "symlink_count": 1, "total_bytes": 34456, "tree_digest": "a4c05501564f206594c13b5a898a909c8f1ef8bfff68b49c529871e81b091923"}
+== RESTORE byte -> digest MUST return to 291f5329 ==
+{"du_kilobytes": 144, "file_count": 33, "max_relpath_len": 54, "nested_git_head": null, "other_count": 0, "symlink_count": 1, "total_bytes": 34456, "tree_digest": "291f53295f8d67a4005b96cb7989baf56eb7c4591bdd6e48ced40c81b8122ca4"}
+== hash tool cross-check (shasum vs python hashlib) ==
+cabd6dfeb6c250aea433b1374ac61784338c5fed686cd777170724783291958b
+cabd6dfeb6c250aea433b1374ac61784338c5fed686cd777170724783291958b

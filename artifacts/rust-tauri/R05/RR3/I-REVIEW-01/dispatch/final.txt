@@ -1,0 +1,7 @@
+I/F49 独立验收 **PASS，无 mustFix**。
+
+亲跑56项回归，并独立确认旧逻辑漏恢复、新逻辑精确恢复、异常拒绝及 N03 红→绿。
+
+G首轮仍为 **FAIL：退出2、仅15行，不能算16/16**。本次仅包级通过，**R06_READY=false**。
+
+[验收报告与证据索引](/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/REVIEW.md)。已停止写入。

@@ -2205,12 +2205,17 @@ mod map_tests {
         "sup01-ask-subagent-write-refused",
     ];
 
-    /// The 124 R00 leaves bound to R04 split 55 share / 69 deferred by the
-    /// R04-T08 executor's stage-share decision (the generator script
+    /// The 124 R00 leaves bound to R04 split 46 full / 9 share / 69
+    /// deferred. R05 RR3 F54 (M-01): the 46 R04-EXCLUSIVE leaves
+    /// (r00ExecutionStageIds == ["R04"]) are full_original_behavior — a
+    /// share with no later stage would leave an unowned remainder (the
+    /// R05 RR1 F25 rule). The 9 share leaves are the DUAL-STAGE natives
+    /// (read/write/edit) + six file-family shapes whose R06 remainder has
+    /// a real later owner. The generator script
     /// `scripts/rust-tauri/r04_t08_generate_stage_map.py` holds the table;
     /// these numbers pin it — a re-classification that silently drops
-    /// share coverage turns this red until the map and the decision agree).
-    const R04_LEAF_COUNTS: (usize, usize) = (55, 69);
+    /// coverage turns this red until the map and the decision agree.
+    const R04_LEAF_COUNTS: (usize, usize, usize) = (46, 9, 69);
 
     fn parse_production_r04() -> StageMap {
         parse_stage_map(R04_PRODUCTION)
@@ -2346,6 +2351,11 @@ mod map_tests {
             124,
             "the R04 map must keep exactly the 124 R00-bound supplemental leaves"
         );
+        let full = map
+            .supplemental_leaves
+            .iter()
+            .filter(|l| l.basis_kind == BASIS_FULL_ORIGINAL_BEHAVIOR)
+            .count();
         let share = map
             .supplemental_leaves
             .iter()
@@ -2357,16 +2367,63 @@ mod map_tests {
             .filter(|l| l.basis_kind == BASIS_DEFERRED_TO_LATER_STAGE)
             .count();
         assert_eq!(
-            (share, deferred),
+            (full, share, deferred),
             R04_LEAF_COUNTS,
-            "the share/deferred split drifted from the registered decision"
+            "the full/share/deferred split drifted from the registered decision"
         );
+        // R05 RR3 F54: classification follows stage EXCLUSIVITY (the R05
+        // F25 rule mirrored onto the R04 map). An R04-EXCLUSIVE leaf must
+        // be full_original_behavior with one case group per original R00
+        // assertion; a share leaf must have a real later stage to own the
+        // remainder.
+        for leaf in &map.supplemental_leaves {
+            let exclusive =
+                leaf.r00_execution_stage_ids.len() == 1 && leaf.r00_execution_stage_ids[0] == "R04";
+            if exclusive {
+                assert_eq!(
+                    leaf.basis_kind, BASIS_FULL_ORIGINAL_BEHAVIOR,
+                    "leaf {} is EXCLUSIVE to R04 — a stage_share_satisfied classification \
+                     would leave an unowned remainder (F54)",
+                    leaf.id
+                );
+                assert_eq!(
+                    leaf.original_assertion_cases.len(),
+                    leaf.r00_assertions.len(),
+                    "leaf {} must pin at least one case per original R00 assertion",
+                    leaf.id
+                );
+                for group in &leaf.original_assertion_cases {
+                    assert!(
+                        !group.is_empty(),
+                        "leaf {} pinned an original assertion with no case",
+                        leaf.id
+                    );
+                }
+            } else if leaf.basis_kind == BASIS_STAGE_SHARE_SATISFIED {
+                assert!(
+                    leaf.r00_execution_stage_ids
+                        .iter()
+                        .any(|id| id.as_str() != "R04"),
+                    "leaf {} is classified as a share but no later stage exists to own \
+                     the remainder (F54)",
+                    leaf.id
+                );
+            }
+        }
         assert!(
             map.supplemental_leaves
                 .iter()
                 .filter(|l| l.basis_kind == BASIS_STAGE_SHARE_SATISFIED)
                 .all(|l| l.assertion_contract.is_some()),
             "every R04 share leaf must keep its assertion contract (R14-F01)"
+        );
+        assert!(
+            map.supplemental_leaves
+                .iter()
+                .filter(|l| l.basis_kind == BASIS_FULL_ORIGINAL_BEHAVIOR)
+                .all(|l| l.assertion_contract.is_some() && !l.original_assertion_cases.is_empty()),
+            "every R04 full leaf must keep its assertion contract and per-assertion \
+             case assignment (R14-F01 / F54)"
         );
         // Every share leaf pins only REAL producer cases, and every known
         // case is pinned by at least one leaf (an unpinned case is dead

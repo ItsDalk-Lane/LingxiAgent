@@ -1,0 +1,164 @@
+{
+  "generated_at_utc": "2026-10-07T23:13:46.512213+00:00",
+  "checks": [
+    {
+      "name": "json-strict:7份JSON严格解析无重复键",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "md-links:86条相对链接全部解析存在",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "cross-doc:七处rr3_current逐字节相等",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "six-tuple:rr3_current六元组=FINAL-04",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "history:E-03快照已入rr3_current_history",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "history:ORCH rr3_current_history含E-03快照",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "REPORT:RR2/FINAL层FAIL表保留",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "REPORT:旧'只剩ALF'禁语不复现（否定引用除外）",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "REPORT:FINAL-01/02/03历史FAIL保留",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "REPORT:raw npm登记红保留",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "REPORT:directed/E5许可保留",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "REPORT:LIVE延期保留",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "REPORT:平台边界保留",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "REPORT:Git未发生不预写",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "REVIEW:E-REVIEW-01历史FAIL保留",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "BLOCKERS:G02空间阻断历史保留",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NEG:G01/G02历史保留",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NEG:raw npm红保留",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "REPORT:F42-F54闭合表述",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "REPORT:r00两对象与6次LAN",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "REPORT:空间阻断时间线如实",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "consistency:与总控RR3_ISSUE_MATRIX.finalGate六元组一致",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "consistency:ORCH stages.R05状态/verdict/READY",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "consistency:HANDOFF accepted_tasks=8任务+叶表背书",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "consistency:HANDOFF rr3_repair_round存在且指向FINAL-04",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "consistency:git_delivery未预写",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "inputs:改动仅12份owned文档（实改12）",
+      "pass": true,
+      "detail": "['docs/rust-tauri/ORCHESTRATOR_PROGRESS.json', 'docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md', 'docs/rust-tauri/R05/PROGRESS_LEDGER.json', 'docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json', 'docs/rust-tauri/R05/R05_BLOCKERS.md', 'docs/rust-tauri/R05/R05_HANDOFF.json', 'docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md', 'docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json', 'docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md', 'docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json', 'docs/rust-tauri/R05/R05_REPORT.md', 'docs/rust-tauri/R05/R05_TEST_MAP.json']"
+    },
+    {
+      "name": "inputs:无删除文件",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "inputs:新增仅E-04证据根",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "inputs:FINAL-04冻结33项生产输入与当前树逐项相等",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "inputs:rust/scripts/lock/toolchain/四TSV共32项全部相等",
+      "pass": true,
+      "detail": ""
+    }
+  ],
+  "summary": {
+    "total": 31,
+    "failed": 0
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "recorded_utc": "2026-10-07T01:35:49.188231+00:00",
+  "exit_code": 1,
+  "failure": "closing packaging expected artifact_hashes count24; actual25; AssertionError",
+  "classification": "本审收尾计数错误，非产品反例",
+  "correction": "report count25; all individual hashes already validated by 05-hashes",
+  "utc_start": "未包装保存，不补造"
+}

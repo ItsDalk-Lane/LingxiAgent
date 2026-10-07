@@ -1,0 +1,3 @@
+#!/bin/sh
+printf controlled-query-failure >&2
+exit 2

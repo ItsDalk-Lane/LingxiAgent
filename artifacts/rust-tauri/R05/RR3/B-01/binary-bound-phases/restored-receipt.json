@@ -1,0 +1,35 @@
+{
+  "name": "restored",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "xtask",
+    "--bin",
+    "xtask",
+    "stage_map::map_tests::r05_stage_pin_table_matches_the_registered_suites",
+    "--",
+    "--exact"
+  ],
+  "exitCode": 0,
+  "expectedExitCode": 0,
+  "startedAt": "2026-10-07T00:19:15.368579+00:00",
+  "endedAt": "2026-10-07T00:19:15.496292+00:00",
+  "candidateHead": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "isolatedCopy": "/Users/study_superior/r05t08-work/negcopy.Gz0rkR",
+  "inputManifestDigest": "b9215837486197e6be72304fc20410d488368a9ad7429055f6557d63d67fd57f",
+  "logSha256": "2e9517ad68f096f3a2a5a9e1cefd41ac1f6c501642b201ee5d3183b6cf7ad6f5",
+  "lockSha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+  "toolchain": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "config": "N/A: xtask compile-time pin mirror, no service configuration or network",
+  "fixtureSha256": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+  "schema": "xtask stage maps and compile-time TSV inputs are in inputManifest",
+  "binaryPath": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+  "binarySha256": "52b03f6097b5ab8a4de9d8a34bb93bc0efb26a4a816e034a5930a04e873e5452",
+  "testSummary": [
+    "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 116 filtered out; finished in 0.00s"
+  ]
+}

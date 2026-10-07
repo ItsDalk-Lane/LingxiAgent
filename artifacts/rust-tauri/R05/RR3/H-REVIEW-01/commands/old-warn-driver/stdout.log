@@ -1,0 +1,2 @@
+{"label": "f47-old-warn-build", "exit": 0, "counts": [], "leafCounts": [], "inputEqual": true, "actualSourceEqual": true}
+{"label": "f47-old-warn", "exit": 1, "counts": [], "leafCounts": [{"path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-01/commands/f47-old-warn/A01/a01-leaf-cases.json", "actual": 11, "failed": 1}], "inputEqual": true, "actualSourceEqual": true}

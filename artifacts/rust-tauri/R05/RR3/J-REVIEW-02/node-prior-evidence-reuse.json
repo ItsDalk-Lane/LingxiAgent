@@ -1,0 +1,17 @@
+{
+  "dependencyManifestEqual": true,
+  "toolsEqual": true,
+  "inputsEqual": true,
+  "metadataEqual": true,
+  "manifestSha256": "a7194de703eabe3832f360f856d613e1ee1e4df7191250726c115ee6bb289408",
+  "tools": {
+    "node": {
+      "path": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+      "sha256": "1ee75375e33b94fc34b3b19aede049e11dae90efb63b374dc96d6bdace70c4b8"
+    },
+    "npm": {
+      "path": "/Users/study_superior/.nvm/versions/node/v24.16.0/lib/node_modules/npm/bin/npm-cli.js",
+      "sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7"
+    }
+  }
+}

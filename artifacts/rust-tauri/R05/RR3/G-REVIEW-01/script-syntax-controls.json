@@ -1,0 +1,29 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/r05t08-work/negcopy.hTXzzN/scripts/rust-tauri/r05_t08_negative_gate.sh"
+      ],
+      "startUTC": "2026-10-07T02:33:22.124692+00:00",
+      "endUTC": "2026-10-07T02:33:22.132485+00:00",
+      "exitCode": 0,
+      "inputSHA256": "4853e129e2d0cf7dbd6c93c8c158186fad23e6f231a03ff64f140cca61e0042f",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_negative_gate.sh"
+      ],
+      "startUTC": "2026-10-07T02:33:22.132691+00:00",
+      "endUTC": "2026-10-07T02:33:22.138775+00:00",
+      "exitCode": 0,
+      "inputSHA256": "a69110b81298705a9161652d28402a5e5a585f945fdfd214ccf071132ecb67dd",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "boundary": "两份脚本静态语法均有效；运行中的入口文件被改写后流位置出错，非目标拒绝"
+}

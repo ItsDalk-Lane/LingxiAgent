@@ -1,0 +1,33 @@
+== final git state re-check after all writes ==
+status_all_hash: c9859c9da029db0e4c0f0d3a02a5c463409dcea444e509c01cb20607c25f53f2  -
+diff_HEAD_hash:  8c23d0d944b66d76f1c65e6a8883d7782a7509d434b10bc13dda2ab5bc393361  -
+index_hash:      3016f7ae9d18d93951f05a77adb68946cab99a92d0a122294d4c5cf096407d47  -
+dir_entries:     0
+HEAD:            b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b
+branch:          codex/rust-tauri-migration
+== git log unchanged (no new commits) ==
+b3ac0e6ae docs(rust-tauri): RR2 handoff git receipt + ALF unblock path (commit e8c0672e5)
+== F51-01 inventory ==
+total 448
+drwxr-xr-x@ 22 study_superior  staff    704 Oct  7 20:03 .
+drwxr-xr-x@ 46 study_superior  staff   1472 Oct  7 19:46 ..
+-rw-r--r--@  1 study_superior  staff  57656 Oct  7 19:54 RELOCATION-RECEIPT.json
+-rw-r--r--@  1 study_superior  staff   8509 Oct  7 19:53 RELOCATION-RECEIPT.json.aborted-run2
+-rw-r--r--@  1 study_superior  staff  11087 Oct  7 20:02 REPORT.md
+-rw-r--r--@  1 study_superior  staff   1719 Oct  7 19:46 baseline-git-state.txt
+-rwxr-xr-x@  1 study_superior  staff   4630 Oct  7 19:52 digest_tree.py
+-rw-r--r--@  1 study_superior  staff    578 Oct  7 20:03 final-state-check.txt
+-rw-r--r--@  1 study_superior  staff  16954 Oct  7 19:54 relocation-checkpoint.json
+-rwxr-xr-x@  1 study_superior  staff  17305 Oct  7 19:54 run-relocation.py
+-rw-------@  1 study_superior  staff  22218 Oct  7 19:53 run1-abort-log.txt
+-rw-r--r--@  1 study_superior  staff  19496 Oct  7 19:54 selfcheck-output.txt
+-rw-r--r--@  1 study_superior  staff     67 Oct  7 19:53 selfcheck-output.txt.aborted-run2
+-rw-r--r--@  1 study_superior  staff    483 Oct  7 19:55 verify-ab.txt
+-rw-r--r--@  1 study_superior  staff   2954 Oct  7 19:57 verify-c-incident-diagnosis.txt
+-rw-r--r--@  1 study_superior  staff    833 Oct  7 19:58 verify-c-incident-diagnosis2.txt
+-rw-r--r--@  1 study_superior  staff   2489 Oct  7 19:58 verify-c-incident.json
+-rw-r--r--@  1 study_superior  staff   3063 Oct  7 19:55 verify-c.txt
+-rw-r--r--@  1 study_superior  staff    962 Oct  7 19:56 verify-c2.txt
+-rw-r--r--@  1 study_superior  staff    621 Oct  7 19:58 verify-c3-postmutation-audit.txt
+-rw-r--r--@  1 study_superior  staff   2100 Oct  7 20:01 verify-d-and-final-audit.txt
+-rw-r--r--@  1 study_superior  staff   1227 Oct  7 19:58 verify-e-xtask-candidate.txt

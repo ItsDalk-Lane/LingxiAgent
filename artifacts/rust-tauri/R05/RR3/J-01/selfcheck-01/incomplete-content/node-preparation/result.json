@@ -1,0 +1,153 @@
+{
+  "status": "FAIL",
+  "startedUtc": "2026-10-07T03:20:11.831965+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/source",
+      "startedUtc": "2026-10-07T03:20:11.832242+00:00",
+      "finishedUtc": "2026-10-07T03:20:11.839589+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "63e6a97288cd18e716de9f86f12ea844483ec71ce17c11e111bcf60fee206081",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/incomplete-content",
+      "startedUtc": "2026-10-07T03:20:11.839753+00:00",
+      "finishedUtc": "2026-10-07T03:20:11.846604+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "4f4c6cc790190d1f041fa5920d30bade90df25ad283fc63959065b03bc6dfd88",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/source",
+      "startedUtc": "2026-10-07T03:20:11.846750+00:00",
+      "finishedUtc": "2026-10-07T03:20:11.853549+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "1264cde08e9044337ee8392b1e5103616df4f3fb4dc1dbeb8be132fb83628177",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/incomplete-content",
+      "startedUtc": "2026-10-07T03:20:11.853664+00:00",
+      "finishedUtc": "2026-10-07T03:20:11.860393+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "1264cde08e9044337ee8392b1e5103616df4f3fb4dc1dbeb8be132fb83628177",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "node",
+        "--version"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/source",
+      "startedUtc": "2026-10-07T03:20:11.865402+00:00",
+      "finishedUtc": "2026-10-07T03:20:11.882599+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "a8f8f7ba69d43285857a0ea34017ef8dadd3ba012404bb7dd188fc773cf63ee2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "npm",
+        "--version"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/source",
+      "startedUtc": "2026-10-07T03:20:11.882728+00:00",
+      "finishedUtc": "2026-10-07T03:20:11.992238+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3dbc807e13de125e909bea5877613d5d67989a43fb8e982fd79ba0efa46ac952",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "node",
+        "-e",
+        "const s=require('./node_modules/semver');const p=require('./package.json');if(!s.satisfies(process.version,p.engines.node)||!s.satisfies(process.argv[1],'>=11.10.0 <12'))process.exit(1)",
+        "11.13.0"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/source",
+      "startedUtc": "2026-10-07T03:20:11.992483+00:00",
+      "finishedUtc": "2026-10-07T03:20:12.027894+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import WebSocket from 'ws';import {createRequire} from 'node:module';const r=createRequire(process.cwd()+'/package.json');console.log(JSON.stringify({ws:r.resolve('ws'),type:typeof WebSocket}));if(typeof WebSocket!=='function')process.exit(1)"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/incomplete-content",
+      "startedUtc": "2026-10-07T03:20:13.568196+00:00",
+      "finishedUtc": "2026-10-07T03:20:13.605423+00:00",
+      "exitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "765db66d089aaf6dcd0f827d7df93437b7b42dc5ffd6164853f77081eae60977"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "source": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/source",
+  "copy": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-vevjgcy2/incomplete-content",
+  "sourceHead": "23471fb8f7233ffc698da328d342f9541bfc9b37",
+  "copyHead": "23471fb8f7233ffc698da328d342f9541bfc9b37",
+  "inputs": {
+    "package.json": "4ba1a1fa16a7ccc2e80724afccd14f60ceb12478a79a5d51d8a977089ce899db",
+    "package-lock.json": "30a578a386373b098320d4e029eca8ef08b43df21cb334216c456d0634275d76",
+    ".npmrc": "f6d6be450cc3239fe9569e975697ba7c4264b62ce00f99e3dee8b0845a829d72"
+  },
+  "metadata": {
+    "installedPackages": 92,
+    "absentOptionalPackages": [],
+    "obsoleteExtraneousMetadata": [],
+    "installedLockRootVersion": "old-root-version",
+    "candidateVersion": "1.0.0"
+  },
+  "node": "v24.16.0",
+  "npm": "11.13.0",
+  "tools": {
+    "node": {
+      "path": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+      "sha256": "1ee75375e33b94fc34b3b19aede049e11dae90efb63b374dc96d6bdace70c4b8"
+    },
+    "npm": {
+      "path": "/Users/study_superior/.nvm/versions/node/v24.16.0/lib/node_modules/npm/bin/npm-cli.js",
+      "sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7"
+    }
+  },
+  "dependencyManifest": "dependency-files.json",
+  "dependencyManifestSha256": "11b3aa1e7018dc71140ced732db1a4b050e11747c99526d863bac6993b7328d2",
+  "copyMethod": {
+    "cowFiles": 2891,
+    "copiedFiles": 0,
+    "links": 10,
+    "bytes": 57905058
+  },
+  "error": "command failed (1): ['node', '--input-type=module', '-e', \"import WebSocket from 'ws';import {createRequire} from 'node:module';const r=createRequire(process.cwd()+'/package.json');console.log(JSON.stringify({ws:r.resolve('ws'),type:typeof WebSocket}));if(typeof WebSocket!=='function')process.exit(1)\"]; see /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-01/selfcheck-01/incomplete-content/node-preparation/command-07.stderr.log",
+  "finishedUtc": "2026-10-07T03:20:13.605837+00:00"
+}

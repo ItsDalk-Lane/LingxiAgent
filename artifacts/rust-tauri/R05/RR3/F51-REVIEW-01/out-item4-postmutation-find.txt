@@ -1,0 +1,15 @@
+now_utc=2026-10-07T12:17:49Z now_local=Wed Oct  7 20:17:49 CST 2026
+== all files (any type) newer than relocation end 2026-10-07 19:54:56 local ==
+./artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/.git
+./artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/.git/index
+== count ==
+       2
+== also with F51 audit boundary 19:54:45 ==
+       3
+== stat the known mutated file ==
+mtime=2026-10-07T19:55:40 size=6139139 bytes
+== semantic index (read-only) ==
+3016f7ae9d18d93951f05a77adb68946cab99a92d0a122294d4c5cf096407d47  -
+== fixture .DS_Store mtimes (pre-relocation expectation) ==
+mtime=2026-10-07T13:44:27 ./artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/.DS_Store
+mtime=2026-10-07T13:42:38 ./artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/artifacts/.DS_Store

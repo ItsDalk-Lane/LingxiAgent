@@ -1,0 +1,12 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/input_payload_fidelity.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/input_payload_fidelity-c8a25fa93c1a21a5)
+
+running 5 tests
+test c02_adversarial_combining_pair_straddling_the_historical_cut ... ok
+test c02_dedup_digest_corresponds_to_the_content_actually_executed ... ok
+test c01_foreground_boundary_lengths_deliver_the_full_input ... ok
+test c01_background_boundary_lengths_deliver_the_full_input ... ok
+test c02_unicode_payloads_byte_honest_on_both_entries ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+

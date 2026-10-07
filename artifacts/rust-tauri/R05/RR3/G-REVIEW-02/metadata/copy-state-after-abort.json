@@ -1,0 +1,90 @@
+{
+  "at": "2026-10-07T04:33:01.241485+00:00",
+  "note": "Incomplete reset after N02 ENOSPC: copy remains quarantined; no manual restoration attempted.",
+  "files": [
+    {
+      "path": "docs/rust-tauri/R05/r05_stage_pins.tsv",
+      "pristineSha": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+      "mainSha": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+      "copySha": "d4f4661ee547fcc675197c79b80a791d4adb9d7994dda5d90476147df44e39f8",
+      "copyBytes": 10502
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/credentials.rs",
+      "pristineSha": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+      "mainSha": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+      "copySha": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+      "copyBytes": 16217
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+      "pristineSha": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+      "mainSha": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+      "copySha": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+      "copyBytes": 71475
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/tool_render.rs",
+      "pristineSha": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+      "mainSha": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+      "copySha": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+      "copyBytes": 10410
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/lib.rs",
+      "pristineSha": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+      "mainSha": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+      "copySha": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+      "copyBytes": 40216
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/credentials/mod.rs",
+      "pristineSha": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+      "mainSha": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+      "copySha": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+      "copyBytes": 75040
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "pristineSha": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+      "mainSha": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+      "copySha": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+      "copyBytes": 203323
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "pristineSha": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+      "mainSha": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+      "copySha": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+      "copyBytes": 210703
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs",
+      "pristineSha": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+      "mainSha": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+      "copySha": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+      "copyBytes": 27007
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R04.json",
+      "pristineSha": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "mainSha": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "copySha": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "copyBytes": 231496
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R05.json",
+      "pristineSha": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "mainSha": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "copySha": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "copyBytes": 306003
+    },
+    {
+      "path": "scripts/rust-tauri/r05_t08_stage_suites.sh",
+      "pristineSha": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e",
+      "mainSha": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e",
+      "copySha": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e",
+      "copyBytes": 19743
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+== three hashes recheck (expect 8c23d0d9… / 3016f7ae…) ==
+8c23d0d944b66d76f1c65e6a8883d7782a7509d434b10bc13dda2ab5bc393361  -
+3016f7ae9d18d93951f05a77adb68946cab99a92d0a122294d4c5cf096407d47  -
+== HEAD still ==
+b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b
+== binder surface final assert (my classifier) ==
+{"total": 69175, "counts": {"regular_file": 69175, "final_symlink": 0, "ancestor_symlink": 0, "directory_entry": 0, "ancestor_not_dir": 0, "irregular": 0, "missing": 0}, "clean": true, "elapsed_s": 0.854}
+final classifier exit: 0
+== receipt/marker/dest files untouched by review (mtimes, expect <=21:06) ==
+21:04:13 /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/F52-01/RELOCATION-RECEIPT-F52.json
+21:02:16 /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/RELOCATED-F52.json
+== scratch cleanup ==
+SCRATCH-REMOVED
+SCRATCH-GONE

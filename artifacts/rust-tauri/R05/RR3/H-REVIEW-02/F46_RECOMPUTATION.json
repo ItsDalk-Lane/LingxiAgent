@@ -1,0 +1,36 @@
+[
+  {
+    "label": "f46-old-six",
+    "counts": [
+      1,
+      2,
+      3,
+      4,
+      4,
+      4
+    ],
+    "allReady": true,
+    "allExit0": true,
+    "allReaped": true,
+    "homeRemoved": true,
+    "binarySha256": "cb6976e73625edad015434194fcc693ef4b0890921e6756f0c0ccc5b7dc3b52d",
+    "status": "FAIL"
+  },
+  {
+    "label": "f46-restored-six",
+    "counts": [
+      1,
+      2,
+      3,
+      3,
+      3,
+      3
+    ],
+    "allReady": true,
+    "allExit0": true,
+    "allReaped": true,
+    "homeRemoved": true,
+    "binarySha256": "0afad67acdc9c36c41508ffbc5a16dc1a763fd72eec98edbc7147ee2227346e6",
+    "status": "PASS"
+  }
+]

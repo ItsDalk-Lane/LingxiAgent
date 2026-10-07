@@ -1,0 +1,33 @@
+== (d) production-reference check: scripts/, rust/, docs/ current files (tracked + untracked) vs 56 relocated paths ==
+total hits: 1
+  docs/rust-tauri/R05/repair-current/RR3_F51_BRIEF.md (untracked) -> artifacts/rust-tauri/R05/RR3/A-02/copy-delete-rename
+tracked-production-hits: 0
+== markers count and sample ==
+      41
+artifacts/rust-tauri/R05/RR3/A-02/RELOCATED-F51.json
+artifacts/rust-tauri/R05/RR3/A-02/extra/external-fresh/RELOCATED-F51.json
+artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-tracked-grandchild/RELOCATED-F51.json
+-- sample marker (A-REVIEW-02/independent-02/internal-fresh):
+{
+ "marker": "RELOCATED-F51",
+ "receipt": "artifacts/rust-tauri/R05/RR3/F51-01/RELOCATION-RECEIPT.json",
+ "relocated_children": [
+  {
+   "name": "candidate-copy/",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-02_internal-fresh_candidate-copy",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-fresh/candidate-copy/"
+  },
+  {
+   "name": "repo/",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-02_internal-fresh_repo",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-fresh/repo/"
+  }
+ ],
+ "task": "RR3 F51: nested-.git untracked fixture directories relocated out of the main tree",
+ "written_utc": "2026-10-07T11:54:56.505861Z"
+}
+== independent source-absence check (56/56) ==
+sources still present: 0 []
+receipt entries: 56 all digests_equal: True
+receipt totals: {'all_digests_equal': True, 'entries': 56, 'total_bytes': 5324827710, 'total_files': 110071, 'total_symlinks': 121}
+naming_deviations: [{"entry": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent/internal-fresh/repo", "max_relpath_len": 902, "name": "40--repo", "reason": "relocated in run 1 under slash-encoded name; deepest absolute child paths exceeded macOS PATH_MAX 1024, renamed to short form to restore reachability (bytes untouched)"}]

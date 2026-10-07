@@ -1,0 +1,16 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.HwNE95/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.88s
+     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-2ada07f2097522dd)
+
+running 8 tests
+test stage_map::map_tests::r05_stage_pin_table_matches_the_registered_suites ... ok
+test stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim ... ok
+test stage_map::map_tests::r05_production_map_registers_the_supplemental_duty_scenarios ... ok
+test stage_map::map_tests::r05_map_declares_no_live_lane_and_only_offline_commands ... ok
+test stage_map::map_tests::r05_production_map_registers_the_suite_producer_and_r04_regression_gate ... ok
+test stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once ... ok
+test stage_map::map_tests::r05_scope_matrix_covers_every_r05_bound_leaf_honestly ... ok
+test stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05 ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 113 filtered out; finished in 0.04s
+

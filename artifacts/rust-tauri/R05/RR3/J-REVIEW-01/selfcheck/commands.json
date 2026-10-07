@@ -1,0 +1,87 @@
+[
+  {
+    "name": "git-init",
+    "argv": [
+      "git",
+      "init",
+      "-q",
+      "-b",
+      "codex/rust-tauri-migration"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/tmp/r05-node-selfcheck-v0rtfuag/source",
+    "startedUtc": "2026-10-07T03:37:37.336286+00:00",
+    "finishedUtc": "2026-10-07T03:37:37.421084+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "git-add",
+    "argv": [
+      "git",
+      "add",
+      "."
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/tmp/r05-node-selfcheck-v0rtfuag/source",
+    "startedUtc": "2026-10-07T03:37:37.422646+00:00",
+    "finishedUtc": "2026-10-07T03:37:37.735212+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "git-commit",
+    "argv": [
+      "git",
+      "-c",
+      "user.email=fixture@invalid",
+      "-c",
+      "user.name=Fixture",
+      "commit",
+      "-qm",
+      "fixture"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/tmp/r05-node-selfcheck-v0rtfuag/source",
+    "startedUtc": "2026-10-07T03:37:37.735611+00:00",
+    "finishedUtc": "2026-10-07T03:37:37.779071+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "old-clone",
+    "argv": [
+      "git",
+      "clone",
+      "-q",
+      "--no-hardlinks",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/tmp/r05-node-selfcheck-v0rtfuag/source",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/tmp/r05-node-selfcheck-v0rtfuag/old-default-copy"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/tmp/r05-node-selfcheck-v0rtfuag/source",
+    "startedUtc": "2026-10-07T03:37:37.946355+00:00",
+    "finishedUtc": "2026-10-07T03:37:38.139261+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": true
+  },
+  {
+    "name": "old-real-cli-red",
+    "argv": [
+      "node",
+      "cli/entry.ts",
+      "help"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/tmp/r05-node-selfcheck-v0rtfuag/old-default-copy",
+    "startedUtc": "2026-10-07T03:37:38.139591+00:00",
+    "finishedUtc": "2026-10-07T03:37:38.229678+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "678f09b8753dc1900b1d18d6fc9bf434838e2fdf29639d170533fb47a77bf62b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ok": false
+  }
+]

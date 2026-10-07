@@ -1,0 +1,3 @@
+{"label": "control-history-normal", "exit": 0, "stdout": "{\"historicalChangedKeys\": []}\n", "stderr": ""}
+{"label": "control-history-mutated", "exit": 1, "stdout": "{\"historicalChangedKeys\": [\"acceptances\"]}\n", "stderr": ""}
+{"label": "control-history-restored", "exit": 0, "stdout": "{\"historicalChangedKeys\": []}\n", "stderr": ""}

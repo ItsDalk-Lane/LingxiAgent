@@ -1,0 +1,62 @@
+{
+  "functions": {
+    "snapshot_pristine": {
+      "sha256": "4b3a75596ab2e56901fc0bee063af93e6e3802fe63f6dc80b8bea7bfe7aafa1d",
+      "expected": "4b3a75596ab2e56901fc0bee063af93e6e3802fe63f6dc80b8bea7bfe7aafa1d",
+      "equal": true
+    },
+    "reset_copy": {
+      "sha256": "e7923be63581c42a1a79dc9b64076934343b1678f9c7c05e69981abe407d22b3",
+      "expected": "e7923be63581c42a1a79dc9b64076934343b1678f9c7c05e69981abe407d22b3",
+      "equal": true
+    },
+    "n06_start_signal": {
+      "sha256": "ed6fd2c895563f72c7db213266e54419811d9af8aaf2e67d37e30a06651df4f3",
+      "expected": "ed6fd2c895563f72c7db213266e54419811d9af8aaf2e67d37e30a06651df4f3",
+      "equal": true
+    },
+    "wait_for_n06_start": {
+      "sha256": "7de1ca0b6fbd18adc914268bf869dd03a694b08b17653944180eb6caa1eb2153",
+      "expected": "7de1ca0b6fbd18adc914268bf869dd03a694b08b17653944180eb6caa1eb2153",
+      "equal": true
+    },
+    "n06_gate_running": {
+      "sha256": "8d077620ccc04bae874e0befa24b4123671152c65cd7a749a773fc04c011e2bc",
+      "expected": "8d077620ccc04bae874e0befa24b4123671152c65cd7a749a773fc04c011e2bc",
+      "equal": true
+    },
+    "run_n03": {
+      "sha256": "8a3e8cbf06ddd92a10d33889ab0c1600e200a41a8fe3f6d927f7b4338b5b47fd",
+      "expected": "8a3e8cbf06ddd92a10d33889ab0c1600e200a41a8fe3f6d927f7b4338b5b47fd",
+      "equal": true
+    },
+    "write_results": {
+      "sha256": "56bd122712b4340f3316033ccf2548a2068060c5463878cc10e2e2adb6a12f13",
+      "expected": "56bd122712b4340f3316033ccf2548a2068060c5463878cc10e2e2adb6a12f13",
+      "equal": true
+    }
+  },
+  "caseIds": [
+    "R05-GATE-N03",
+    "R05-GATE-N01",
+    "R05-GATE-N02",
+    "R05-GATE-N04",
+    "R05-GATE-N05",
+    "R05-GATE-N06",
+    "R05-GATE-N07",
+    "R05-GATE-N08",
+    "R05-GATE-N09",
+    "R05-GATE-N10",
+    "R05-GATE-N11",
+    "R05-GATE-N12",
+    "R05-GATE-N13",
+    "R05-GATE-N14",
+    "R05-GATE-N15",
+    "R05-GATE-N16"
+  ],
+  "timing": {
+    "nodePrepare": 3219,
+    "snapshot": 4143,
+    "firstTest": 7180
+  }
+}

@@ -1,0 +1,21 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running tests/r05_t07_usage_families.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r05-t08/debug/deps/r05_t07_usage_families-5ee30e7328fbed33)
+
+running 14 tests
+test c04_anthropic_interrupted_before_output_is_partial_never_zero ... ok
+test c04_anthropic_running_total_going_backwards_is_loud ... ok
+test c04_anthropic_running_output_replaces_never_sums ... ok
+test c04_gemini_streaming_running_metadata_replaces_not_sums ... ok
+test c04_responds_families_carry_one_final_snapshot_on_the_terminal_object ... ok
+test c04_openai_final_usage_repeats_are_idempotent_and_conflicts_are_loud ... ok
+test c05_absent_usage_is_unknown_and_a_half_reported_usage_is_partial ... ok
+test c06_gemini_streaming_violating_usage_metadata_marks_the_fact_invalid ... ok
+test c06_negative_float_string_and_overflow_counts_mark_the_fact_invalid ... ok
+test c07_anthropic_cache_categories_stay_separate_from_the_input_total ... ok
+test c06_anthropic_streaming_violating_usage_fragments_mark_the_fact_invalid ... ok
+test c07_every_chat_family_declares_its_formula_and_inclusion_semantics ... ok
+test c07_gemini_thoughts_and_cache_map_inside_their_totals ... ok
+test c07_openai_families_normalize_cache_and_reasoning_without_re_adding ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

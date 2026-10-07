@@ -1,0 +1,10 @@
+D-REVIEW-01 已完成并交 root。
+
+- 定位与操作准备：**PASS**。
+- 正式套件仅跑一次，自然退出101：0通过、1失败，无跳过、无过滤、未被杀。
+- 新产物身份前、中、后一致；旧D准备已失效。
+- 必需环境仍 **BLOCKED**，R06_READY=false；未执行任何系统修改。
+
+[审查报告](artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md) · [精确操作准备](artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md) · [42份证据清单](artifacts/rust-tauri/R05/RR3/D-REVIEW-01/evidence-manifest.json)
+
+FINAL 若重新构建，必须重新核对对象身份。

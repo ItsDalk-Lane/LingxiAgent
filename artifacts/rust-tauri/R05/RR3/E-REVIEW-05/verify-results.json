@@ -1,0 +1,197 @@
+[
+ {
+  "name": "strict-json[7] HANDOFF 无重复键",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "strict-json[7] PROGRESS_LEDGER 无重复键",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "strict-json[7] ACCEPTANCE_LEDGER 无重复键",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "strict-json[7] TEST_MAP 无重复键",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "strict-json[7] PERFORMANCE_RESULTS 无重复键",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "strict-json[7] LIVE_VERIFICATION 无重复键",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "strict-json[7] ORCHESTRATOR_PROGRESS 无重复键",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "six-tuple HANDOFF 六标量=FINAL-04",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "six-tuple PROGRESS_LEDGER 六标量=FINAL-04",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "six-tuple ACCEPTANCE_LEDGER 六标量=FINAL-04",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "six-tuple TEST_MAP 六标量=FINAL-04",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "six-tuple PERFORMANCE_RESULTS 六标量=FINAL-04",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "six-tuple LIVE_VERIFICATION 六标量=FINAL-04",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "six-tuple ORCHESTRATOR_PROGRESS 六标量=FINAL-04",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "six-tuple RR3_ISSUE_MATRIX.finalGate 六字段=FINAL-04（release_state 不属该表，单列核对）",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "platform FINAL-04 结构化值=mac真实/linux继承未复验/win未验证",
+  "ok": true,
+  "detail": "macos='all commands this round real' linux='inherited registration, not reverified' windows='not verified'"
+ },
+ {
+  "name": "platform RR3_ISSUE_MATRIX.finalGate 同口径",
+  "ok": true,
+  "detail": "macOS arm64 real this round; Linux x86_64 inherited not re-verified; Windows not verified"
+ },
+ {
+  "name": "platform LIVE_VERIFICATION.rr3_platform_verification 同口径",
+  "ok": true,
+  "detail": "macos='R05 全阶段真实执行（RR3/FINAL-04 六条 §5.3 命令+三层 gate 本机亲跑全 PASS）' linux='继承原登记未复验（R09/R10 平台义务）' windows='未验证（继承）'"
+ },
+ {
+  "name": "gate R05 层 overall=PASS/stable/runner PASS/testedSha=b3ac0e6a",
+  "ok": true,
+  "detail": "overall=PASS stable=True runner=PASS"
+ },
+ {
+  "name": "gate R04 层 overall=PASS/stable/runner PASS/testedSha=b3ac0e6a",
+  "ok": true,
+  "detail": "overall=PASS stable=True runner=PASS"
+ },
+ {
+  "name": "gate R03 层 overall=PASS/stable/runner PASS/testedSha=b3ac0e6a",
+  "ok": true,
+  "detail": "overall=PASS stable=True runner=PASS"
+ },
+ {
+  "name": "R05 叶表独立计数 130/130 PASS",
+  "ok": true,
+  "detail": "len=130 status分布={'PASS': 130} coverage.pass=130 fail=0 blocked=0"
+ },
+ {
+  "name": "R05 叶表 shareSatisfied=124",
+  "ok": true,
+  "detail": "share=124 其中状态={'PASS': 124}"
+ },
+ {
+  "name": "R05 叶表 declared=expectedFromR00Ledger=130",
+  "ok": true,
+  "detail": "declared=130 expected=130"
+ },
+ {
+  "name": "R04 层 55 PASS/0 FAIL/69 deferred",
+  "ok": true,
+  "detail": "pass=55 fail=0 deferred=69"
+ },
+ {
+  "name": "R03 层 17 PASS/0 FAIL/31 deferred",
+  "ok": true,
+  "detail": "pass=17 fail=0 deferred=31"
+ },
+ {
+  "name": "HANDOFF accepted_tasks=R05-T01..T08",
+  "ok": true,
+  "detail": "['R05-T01', 'R05-T02', 'R05-T03', 'R05-T04', 'R05-T05', 'R05-T06', 'R05-T07', 'R05-T08']"
+ },
+ {
+  "name": "accepted_tasks_evidence 数值与 gate 叶表一致(124 share+6 full)",
+  "ok": true,
+  "detail": "evidence={'declared': 130, 'pass': 130, 'share_satisfied': 124, 'full_original_behavior': 6} 独立推算full=6"
+ },
+ {
+  "name": "HANDOFF rr3_repair_round.six_tuple 五标量逐字=FINAL-04 且 platform 三态同口径",
+  "ok": true,
+  "detail": " | platform原文: macOS arm64 本轮真实；Linux x86_64 继承未复验；Windows 未验证"
+ },
+ {
+  "name": "七处 rr3_current 逐字节(规范化序列化)相等",
+  "ok": true,
+  "detail": "长度: HANDOFF=30316, PROGRESS_LEDGER=30316, ACCEPTANCE_LEDGER=30316, TEST_MAP=30316, PERFORMANCE_RESULTS=30316, LIVE_VERIFICATION=30316, ORCHESTRATOR_PROGRESS=30316"
+ },
+ {
+  "name": "ORCH stages.R05 status/verdict/R06_READY 一致",
+  "ok": true,
+  "detail": "status=ACCEPTED_OFFLINE_SCOPE_WITH_REGISTERED_LIVE_DEFERRALS verdict=PASS READY=True"
+ },
+ {
+  "name": "ORCH current_head=b3ac0e6a(无 Git 写)",
+  "ok": true,
+  "detail": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b"
+ },
+ {
+  "name": "HANDOFF git_delivery 未预写(状态NOT_PERFORMED、三个回执字段全null)",
+  "ok": true,
+  "detail": "{\"status\": \"NOT_PERFORMED_AT_E04_CUTOFF\", \"committed_sha\": null, \"pushed_sha\": null, \"remote_receipt_ref\": null, \"authority\": \"FINAL-04 亲核零暂存/零提交/零推送（reflog 顶条 b3ac0e6a、index 未重写、开工==收尾两哈希相等）；本 E04 同样零 Git 写。精确 Git 动作由总控按既有授权执行并归档真实回执。\", \"receipt_contract_ref\": \"docs/rust-tauri/R05/R05_HANDOFF.json#"
+ },
+ {
+  "name": "FINAL-04 冻结 33 项生产输入当前树 SHA256 独立全等",
+  "ok": true,
+  "detail": "count=33 missing=[] mismatch=[]"
+ },
+ {
+  "name": "E-04 protected-inputs 清单与 FINAL-04 冻结清单逐项同源同值",
+  "ok": true,
+  "detail": "rows=33 frozen=33 完全一致=True"
+ },
+ {
+  "name": "E-04 后 12 份改动文档当前 SHA=MANIFEST after 值(截点后无漂移)",
+  "ok": true,
+  "detail": "[]"
+ },
+ {
+  "name": "2 份 owned 文档在 E-04 前后字节不变的声明存在",
+  "ok": true,
+  "detail": "['docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md', 'docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md']"
+ },
+ {
+  "name": "12 份改动全部属于 DOC-INPUT-BOUNDARY-01 的 14 文件所有权面",
+  "ok": true,
+  "detail": "changed=12 ⊆owned14=True"
+ },
+ {
+  "name": "Git 亲核: HEAD=b3ac0e6a 且 staged 空",
+  "ok": true,
+  "detail": "head=b3ac0e6aeae8 staged=''"
+ }
+]

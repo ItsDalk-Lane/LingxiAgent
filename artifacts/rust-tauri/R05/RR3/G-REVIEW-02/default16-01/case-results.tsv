@@ -1,0 +1,2 @@
+R05-GATE-N01	101	OK	OK	删 A16 → 镜像单测红并点名 R05-A16
+R05-GATE-N02	1	MISSING:filter matched 0 tests	BAD	零匹配筛选词 → 生产者非零并点名 running=0

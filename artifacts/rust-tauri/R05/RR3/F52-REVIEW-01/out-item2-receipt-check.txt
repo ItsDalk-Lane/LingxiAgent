@@ -1,0 +1,15 @@
+new-dir listing: ['git', 'python3']
+[pre] git sha256 EQUAL f9dc56ed2d08e1f687ed2e39c70e00f629cd485136bdea7e21b2bfaa1c0afbf8
+[pre] python3 readlink EQUAL '/Library/Frameworks/Python.framework/Versions/3.14/bin/python3'
+[pre] inode observation: git 276456367 / python3 276456368 (receipt ino: git 276456367, python3 276456368)
+[post] git sha256 EQUAL f9dc56ed2d08e1f687ed2e39c70e00f629cd485136bdea7e21b2bfaa1c0afbf8
+[post] python3 readlink EQUAL '/Library/Frameworks/Python.framework/Versions/3.14/bin/python3'
+[post] inode observation: git 276456367 / python3 276456368 (receipt ino: git 276456367, python3 276456368)
+marker OK: marker field
+marker OK: marker receipt path
+marker OK: child name
+marker OK: new abs path matches receipt
+marker OK: old rel path matches receipt
+marker OK: old rel path no longer exists
+marker OK: receipt path is the F52 receipt
+RESULT: PASS (all sha256/readlink/lstat fields equal; inode-independent)

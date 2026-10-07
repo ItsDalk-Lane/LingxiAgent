@@ -1,0 +1,78 @@
+{
+  "findingId": "F45",
+  "checks": [
+    {
+      "check": "current-count",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stderr": ""
+    },
+    {
+      "check": "different-count",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stderr": ""
+    },
+    {
+      "check": "missing-anchor",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stderr": "FAIL: N03 svc:r05_t01_model_plane: expected exactly one anchor, matched 0"
+    },
+    {
+      "check": "duplicate-anchor",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stderr": "FAIL: N03 svc:r05_t01_model_plane: expected exactly one anchor, matched 2"
+    },
+    {
+      "check": "conflicting-duplicate",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stderr": "FAIL: N03 svc:r05_t01_model_plane: expected exactly one anchor, matched 2"
+    },
+    {
+      "check": "malformed-count",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stderr": "FAIL: N03 svc:r05_t01_model_plane: malformed authoritative pin row"
+    },
+    {
+      "check": "minimum-count",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stderr": "FAIL: N03 svc:r05_t01_model_plane: cannot lower positive coverage count 1"
+    },
+    {
+      "check": "selected-one",
+      "exitCode": 0,
+      "expectedExitCode": 0
+    },
+    {
+      "check": "selected-empty",
+      "exitCode": 1,
+      "expectedExitCode": 1
+    },
+    {
+      "check": "selected-wrong-case",
+      "exitCode": 1,
+      "expectedExitCode": 1
+    },
+    {
+      "check": "selected-duplicate-case",
+      "exitCode": 1,
+      "expectedExitCode": 1
+    },
+    {
+      "check": "selected-bad-verdict",
+      "exitCode": 1,
+      "expectedExitCode": 1
+    },
+    {
+      "check": "full-missing-cases",
+      "exitCode": 1,
+      "expectedExitCode": 1
+    }
+  ],
+  "passed": 13
+}

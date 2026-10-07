@@ -1,0 +1,123 @@
+2026-10-07T11:47:31Z HEAD=b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b
+2026-10-07T11:47:32Z enumeration: 56 entries; identical to FINAL-01: True
+2026-10-07T11:47:32Z entry sanity: all 56 entries are dirs with nested .git; no nesting; no collisions
+2026-10-07T11:47:32Z destination root ready: /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures
+2026-10-07T11:47:32Z pre-digest  1/56 artifacts/rust-tauri/R05/RR3/A-02/copy-delete-rename files=33 bytes=34456 digest=291f53295f8d67a4
+2026-10-07T11:47:32Z pre-digest  2/56 artifacts/rust-tauri/R05/RR3/A-02/extra/external-fresh/repo files=33 bytes=34456 digest=0bc8742e0ef05a02
+2026-10-07T11:47:32Z pre-digest  3/56 artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-tracked-grandchild/repo files=35 bytes=34467 digest=b6a124b406c419f6
+2026-10-07T11:47:32Z pre-digest  4/56 artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-untracked-grandchild/repo files=34 bytes=34321 digest=20a2632a557d943d
+2026-10-07T11:47:32Z pre-digest  5/56 artifacts/rust-tauri/R05/RR3/A-02/extra/internal-fresh/repo files=46 bytes=50949 digest=0064cac73a3d1cec
+2026-10-07T11:47:32Z pre-digest  6/56 artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-tracked-grandchild/repo files=50 bytes=65146 digest=85cdc9cd30a3d1c4
+2026-10-07T11:47:32Z pre-digest  7/56 artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-untracked-grandchild/repo files=49 bytes=65000 digest=542a4e332e9aca88
+2026-10-07T11:47:32Z pre-digest  8/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename files=39 bytes=34354 digest=6a442564411e9335
+2026-10-07T11:47:32Z pre-digest  9/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename-02 files=33 bytes=34463 digest=aa03677c1236eaf4
+2026-10-07T11:47:32Z pre-digest 10/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-fresh/repo files=33 bytes=34466 digest=3d4ac933a4ade65b
+2026-10-07T11:47:32Z pre-digest 11/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-old-tracked-grandchild/repo files=35 bytes=34467 digest=b06bf650b28fb639
+2026-10-07T11:47:32Z pre-digest 12/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-old-untracked-grandchild/repo files=34 bytes=34321 digest=00831b492f91ceef
+2026-10-07T11:47:32Z pre-digest 13/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-fresh/repo files=46 bytes=50949 digest=b4732af99d37bbdf
+2026-10-07T11:47:32Z pre-digest 14/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-old-tracked-grandchild/repo files=50 bytes=65146 digest=9168d4712ef85c4d
+2026-10-07T11:47:32Z pre-digest 15/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-old-untracked-grandchild/repo files=49 bytes=65000 digest=3867b2fb6ae4c56a
+2026-10-07T11:47:32Z pre-digest 16/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-fresh/repo files=33 bytes=34463 digest=9824c6269a864dfc
+2026-10-07T11:47:32Z pre-digest 17/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-old-tracked-grandchild/repo files=35 bytes=34467 digest=c7a31f09d5742427
+2026-10-07T11:47:32Z pre-digest 18/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-old-untracked-grandchild/repo files=34 bytes=34321 digest=17545bad26664076
+2026-10-07T11:47:32Z pre-digest 19/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-fresh/repo files=46 bytes=50949 digest=4ef56ac24f132107
+2026-10-07T11:47:32Z pre-digest 20/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-old-tracked-grandchild/repo files=50 bytes=65146 digest=fe1e6bcc24e613d1
+2026-10-07T11:47:32Z pre-digest 21/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-old-untracked-grandchild/repo files=49 bytes=65000 digest=2c77fdddef1dd516
+2026-10-07T11:47:32Z pre-digest 22/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo files=21 bytes=26479 digest=d0b4c4645f729441
+2026-10-07T11:47:32Z pre-digest 23/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-fresh/candidate-copy files=33 bytes=34443 digest=d5602566da760017
+2026-10-07T11:47:32Z pre-digest 24/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-fresh/repo files=103 bytes=165855 digest=69f9d1a91b763289
+2026-10-07T11:47:32Z pre-digest 25/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-untracked/candidate-copy files=34 bytes=34454 digest=3a1de05c4923da71
+2026-10-07T11:47:32Z pre-digest 26/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-untracked/repo files=107 bytes=238778 digest=6a00e7e776b953f2
+2026-10-07T11:47:32Z pre-digest 27/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-fresh/candidate-copy files=33 bytes=34395 digest=cb93bce2a10624fe
+2026-10-07T11:47:32Z pre-digest 28/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-fresh/repo files=33 bytes=39323 digest=77a1557d0346cdf5
+2026-10-07T11:47:32Z pre-digest 29/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-tracked/candidate-copy files=35 bytes=34548 digest=db9a1fbd66a27b38
+2026-10-07T11:47:32Z pre-digest 30/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-tracked/repo files=35 bytes=39872 digest=51cc35f8a2e98fb2
+2026-10-07T11:47:32Z pre-digest 31/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-untracked/candidate-copy files=34 bytes=34406 digest=cdb866e544f3d853
+2026-10-07T11:47:32Z pre-digest 32/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-untracked/repo files=34 bytes=39870 digest=561a1892e429458b
+2026-10-07T11:47:32Z pre-digest 33/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-fresh/candidate-copy files=33 bytes=34459 digest=03338530578e42cd
+2026-10-07T11:47:32Z pre-digest 34/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-fresh/repo files=103 bytes=165871 digest=885ed272a2c9c682
+2026-10-07T11:47:32Z pre-digest 35/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-tracked/candidate-copy files=35 bytes=34612 digest=1ea9a7097a0572b8
+2026-10-07T11:47:32Z pre-digest 36/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-tracked/repo files=109 bytes=241320 digest=c5403a000a40c0ec
+2026-10-07T11:47:32Z pre-digest 37/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-untracked/candidate-copy files=34 bytes=34470 digest=6a350e33b0438624
+2026-10-07T11:47:32Z pre-digest 38/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-untracked/repo files=108 bytes=241318 digest=02db964dd9dcc2f1
+2026-10-07T11:47:32Z pre-digest 39/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-validator-repo files=21 bytes=27584 digest=e628034ec98b497c
+2026-10-07T11:47:32Z pre-digest 40/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent/internal-fresh/repo files=117 bytes=75371 digest=d6de2b1ecca2aeb6
+2026-10-07T11:47:32Z pre-digest 41/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-01/copy files=70 bytes=1626294 digest=be82f2f79f703e63
+2026-10-07T11:47:32Z pre-digest 42/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/copy files=70 bytes=1626293 digest=92a4896d2cc4f0a1
+2026-10-07T11:47:32Z pre-digest 43/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/runner-copy files=728 bytes=14534054 digest=ad2b075c88725d68
+2026-10-07T11:47:32Z pre-digest 44/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/copy files=70 bytes=1626295 digest=f94e4fe1092b8db2
+2026-10-07T11:47:33Z pre-digest 45/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/runner-copy files=733 bytes=23016900 digest=395d001b1de02d70
+2026-10-07T11:47:33Z pre-digest 46/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/copy files=70 bytes=1626296 digest=13c243de84e75b3e
+2026-10-07T11:47:33Z pre-digest 47/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/runner-copy files=1181 bytes=56740719 digest=1f938ad061b0a65e
+2026-10-07T11:47:33Z pre-digest 48/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/copy files=70 bytes=1626295 digest=c6148026e07e6443
+2026-10-07T11:47:33Z pre-digest 49/56 artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/runner-copy files=733 bytes=23016910 digest=ff26dfcdf220139d
+2026-10-07T11:47:33Z pre-digest 50/56 artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/copy files=70 bytes=1626294 digest=dddca0d23dff6ce7
+2026-10-07T11:47:33Z pre-digest 51/56 artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy files=1201 bytes=58288269 digest=12e22b46f021a583
+2026-10-07T11:47:33Z pre-digest 52/56 artifacts/rust-tauri/R05/RR3/J-01/i-restore-final/copy files=70 bytes=1626298 digest=153331d1c5b4d879
+2026-10-07T11:47:33Z pre-digest 53/56 artifacts/rust-tauri/R05/RR3/J-02/i-restore/copy files=70 bytes=1626294 digest=fecb5aa45f3fda68
+2026-10-07T11:47:49Z pre-digest 54/56 artifacts/rust-tauri/R05/RR3/J-REVIEW-01/copy files=102887 bytes=5130434169 digest=79736540a1201ae9
+2026-10-07T11:47:49Z pre-digest 55/56 artifacts/rust-tauri/R05/RR3/J-REVIEW-01/i-preservation/copy files=70 bytes=1626299 digest=35d002f73c95a547
+2026-10-07T11:47:49Z pre-digest 56/56 artifacts/rust-tauri/R05/RR3/J-REVIEW-02/i-restore/copy files=70 bytes=1626296 digest=947c4b3eebcf5d8b
+2026-10-07T11:47:49Z moved  1/56 artifacts/rust-tauri/R05/RR3/A-02/copy-delete-rename                   -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_copy-delete-rename  equal=True
+2026-10-07T11:47:49Z moved  2/56 artifacts/rust-tauri/R05/RR3/A-02/extra/external-fresh/repo            -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_external-fresh_repo  equal=True
+2026-10-07T11:47:49Z moved  3/56 artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-tracked-grandchild/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_external-old-tracked-grandchild_repo  equal=True
+2026-10-07T11:47:49Z moved  4/56 artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-untracked-grandchild/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_external-old-untracked-grandchild_repo  equal=True
+2026-10-07T11:47:49Z moved  5/56 artifacts/rust-tauri/R05/RR3/A-02/extra/internal-fresh/repo            -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_internal-fresh_repo  equal=True
+2026-10-07T11:47:49Z moved  6/56 artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-tracked-grandchild/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_internal-old-tracked-grandchild_repo  equal=True
+2026-10-07T11:47:49Z moved  7/56 artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-untracked-grandchild/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_internal-old-untracked-grandchild_repo  equal=True
+2026-10-07T11:47:49Z moved  8/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename            -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_copy-delete-rename  equal=True
+2026-10-07T11:47:49Z moved  9/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename-02         -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_copy-delete-rename-02  equal=True
+2026-10-07T11:47:49Z moved 10/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-fresh/repo  -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_external-fresh_repo  equal=True
+2026-10-07T11:47:49Z moved 11/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-old-tracked-grandchild/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_external-old-tracked-grandchild_repo  equal=True
+2026-10-07T11:47:49Z moved 12/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-old-untracked-grandchild/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_external-old-untracked-grandchild_repo  equal=True
+2026-10-07T11:47:49Z moved 13/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-fresh/repo  -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_internal-fresh_repo  equal=True
+2026-10-07T11:47:49Z moved 14/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-old-tracked-grandchild/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_internal-old-tracked-grandchild_repo  equal=True
+2026-10-07T11:47:49Z moved 15/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-old-untracked-grandchild/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra-02_internal-old-untracked-grandchild_repo  equal=True
+2026-10-07T11:47:49Z moved 16/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-fresh/repo     -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_external-fresh_repo  equal=True
+2026-10-07T11:47:49Z moved 17/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-old-tracked-grandchild/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_external-old-tracked-grandchild_repo  equal=True
+2026-10-07T11:47:49Z moved 18/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-old-untracked-grandchild/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_external-old-untracked-grandchild_repo  equal=True
+2026-10-07T11:47:50Z moved 19/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-fresh/repo     -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_internal-fresh_repo  equal=True
+2026-10-07T11:47:50Z moved 20/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-old-tracked-grandchild/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_internal-old-tracked-grandchild_repo  equal=True
+2026-10-07T11:47:50Z moved 21/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-old-untracked-grandchild/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_extra_internal-old-untracked-grandchild_repo  equal=True
+2026-10-07T11:47:50Z moved 22/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo          -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-01_validator-fault-repo  equal=True
+2026-10-07T11:47:50Z moved 23/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-fresh/candidate-copy -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-02_internal-fresh_candidate-copy  equal=True
+2026-10-07T11:47:50Z moved 24/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-fresh/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-02_internal-fresh_repo  equal=True
+2026-10-07T11:47:50Z moved 25/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-untracked/candidate-copy -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-02_internal-untracked_candidate-copy  equal=True
+2026-10-07T11:47:50Z moved 26/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-untracked/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-02_internal-untracked_repo  equal=True
+2026-10-07T11:47:50Z moved 27/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-fresh/candidate-copy -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-fresh_candidate-copy  equal=True
+2026-10-07T11:47:50Z moved 28/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-fresh/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-fresh_repo  equal=True
+2026-10-07T11:47:50Z moved 29/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-tracked/candidate-copy -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-tracked_candidate-copy  equal=True
+2026-10-07T11:47:50Z moved 30/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-tracked/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-tracked_repo  equal=True
+2026-10-07T11:47:50Z moved 31/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-untracked/candidate-copy -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-untracked_candidate-copy  equal=True
+2026-10-07T11:47:50Z moved 32/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-untracked/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_external-untracked_repo  equal=True
+2026-10-07T11:47:50Z moved 33/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-fresh/candidate-copy -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-fresh_candidate-copy  equal=True
+2026-10-07T11:47:50Z moved 34/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-fresh/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-fresh_repo  equal=True
+2026-10-07T11:47:50Z moved 35/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-tracked/candidate-copy -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-tracked_candidate-copy  equal=True
+2026-10-07T11:47:50Z moved 36/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-tracked/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-tracked_repo  equal=True
+2026-10-07T11:47:50Z moved 37/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-untracked/candidate-copy -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-untracked_candidate-copy  equal=True
+2026-10-07T11:47:50Z moved 38/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-untracked/repo -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-03_internal-untracked_repo  equal=True
+2026-10-07T11:47:50Z moved 39/56 artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-validator-repo    -> /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent-validator-repo  equal=True
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/F51-01/run-relocation.py", line 239, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/F51-01/run-relocation.py", line 168, in main
+    post_summary, _rows = scan_tree(dst)
+                          ~~~~~~~~~^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/F51-01/digest_tree.py", line 57, in scan_tree
+    rec("", base)
+    ~~~^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/F51-01/digest_tree.py", line 46, in rec
+    rec(rel, entry.path)
+    ~~~^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/F51-01/digest_tree.py", line 46, in rec
+    rec(rel, entry.path)
+    ~~~^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/F51-01/digest_tree.py", line 46, in rec
+    rec(rel, entry.path)
+    ~~~^^^^^^^^^^^^^^^^^
+  [Previous line repeated 94 more times]
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/F51-01/digest_tree.py", line 43, in rec
+    st = entry.stat(follow_symlinks=False)
+OSError: [Errno 63] File name too long: '/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-REVIEW-02_independent_internal-fresh_repo/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy/artifacts/rust-tauri/R05/run-review/child/child/candidate-copy'
+DRIVER_EXIT=1

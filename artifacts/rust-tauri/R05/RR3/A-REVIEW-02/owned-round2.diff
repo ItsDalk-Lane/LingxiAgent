@@ -1,0 +1,167 @@
+--- A-REVIEW-01/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh
++++ current/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh
+@@ -587,6 +587,7 @@
+   esac
+   python3 - "$repo" "$unit" <<'PYLINK' || return 1
+ import os
++import subprocess
+ import sys
+ current = sys.argv[1]
+ for component in sys.argv[2].split("/"):
+@@ -595,11 +596,16 @@
+     current = os.path.join(current, component)
+     if os.path.islink(current):
+         raise SystemExit("output root crosses a symlink: " + current)
++try:
++    query = subprocess.run(["git", "--literal-pathspecs", "-C", sys.argv[1], "ls-files", "--", sys.argv[2]], capture_output=True)
++except OSError as error:
++    raise SystemExit("git ls-files query failed: " + str(error))
++# 此查询只允许成功且没有异常提示；无法确认归属时必须拒绝排除。
++if query.returncode != 0 or query.stderr:
++    raise SystemExit(f"git ls-files query failed (exit {query.returncode}): " + query.stderr.decode("utf-8", "replace").strip())
++if query.stdout:
++    raise SystemExit("covers INDEX-TRACKED content (candidate source / committed evidence must stay bound)")
+ PYLINK
+-  if [ -n "$(git --literal-pathspecs -C "$repo" ls-files -- "$unit")" ]; then
+-    printf 'covers INDEX-TRACKED content (candidate source / committed evidence must stay bound)\n' >&2
+-    return 1
+-  fi
+   return 0
+ }
+ 
+@@ -660,6 +666,7 @@
+   [ -d "$repo/$unit" ] || { printf 'not an existing directory\n' >&2; return 1; }
+   python3 - "$repo" "$unit" <<'PYLINK' || return 1
+ import os
++import subprocess
+ import sys
+ current = sys.argv[1]
+ for component in sys.argv[2].split("/"):
+@@ -668,11 +675,16 @@
+     current = os.path.join(current, component)
+     if os.path.islink(current):
+         raise SystemExit("output root crosses a symlink: " + current)
++try:
++    query = subprocess.run(["git", "--literal-pathspecs", "-C", sys.argv[1], "ls-files", "--", sys.argv[2]], capture_output=True)
++except OSError as error:
++    raise SystemExit("git ls-files query failed: " + str(error))
++# exit 0 附带 stderr 也无法证明查询可靠，不能把它当成合法空结果。
++if query.returncode != 0 or query.stderr:
++    raise SystemExit(f"git ls-files query failed (exit {query.returncode}): " + query.stderr.decode("utf-8", "replace").strip())
++if query.stdout:
++    raise SystemExit("covers INDEX-TRACKED content (candidate source / committed evidence must stay bound)")
+ PYLINK
+-  if [ -n "$(git --literal-pathspecs -C "$repo" ls-files -- "$unit")" ]; then
+-    printf 'covers INDEX-TRACKED content (candidate source / committed evidence must stay bound)\n' >&2
+-    return 1
+-  fi
+   return 0
+ }
+ 
+@@ -2666,7 +2678,7 @@
+ } | tee -a "$EVIDENCE_DIR/e0s-self-checks.log"
+ # 真实 OS fd 反例与父子日志对照随正式入口永久执行。
+ python3 "$MAIN_REPO/scripts/rust-tauri/r02_run_output_regression.py" --evidence "$EVIDENCE_DIR/f42-real-fd"
+-note "PASS E0s-real-OS-fd-attribution (4 real fd discovery/binder cases, source-copy symmetric, 7 illegal roots rejected; raw bindings and units: f42-real-fd/)"
++note "PASS E0s-real-OS-fd-attribution (4 real fd discovery/binder cases, source-copy symmetric, 7 illegal roots rejected, 24 production validator Git-query normal/fault/restored controls; raw bindings and units: f42-real-fd/)"
+ note "PASS E0s-gate-self-checks (62 classifier fixtures incl. every REAL guard failure sentence, the zero-payload shapes, the R7 same-line/same-block mixes, the real direct-guard shape, the R8 structural-mixing negatives (compact Error:EACCES token, list/warning/matcher/wrapper tails, foreign/misplaced wrapper) and the producer-binding negatives (body lines without their lead) plus the REAL matcher-summary/diff-body positives, the R9-F01 firstDiff structure fixtures (legal bracket/comma/escape/non-ASCII paths pure, non-JSON/mixed/truncated/empty/4-element/trailing-junk payloads fail closed), the repair-group10 guard-tail-window fixtures (the two gate-r2 round2/round3 REAL 500-point windows + the derived complete-end variant classify seal+uncommitted; single-point mutations — off-by-one char, trailing junk, sentence-material fragment, wrong producer wrapper, deleted listing line — all fail closed to UNRECOGNIZED), the RR2 patch-too-large form-evolution fixtures (the two REAL s5-full-4 shapes — round2's complete 6-row RuntimeError traceback and round3's bare SystemExit line — classify seal; truncated sentence, other git error text, foreign SystemExit message, cross-producer both ways, mutated frame and node-guard producer all fail closed to UNRECOGNIZED) + no-block-rows rejection + green positive control + parseability predicate incl. exit-0 summary completeness and summary/exit consistency with the R9-F01 one-directional header-loss rule (suite-error no-arrow header and multi-error headers are PARSABLE; headers < Tests-failed is CONTRADICTORY) and the R10-F01 floors (headers < Test-Files-failed count — the zero-header suite-error summary hole — and Tests-failed>0 with Test-Files-failed==0 incoherence — both CONTRADICTORY; counts side-channel records files_failed/distinct_files/verdict) + exact-identity family membership checks + no-commit binding checks + F42 run-output-root validation (fresh artifacts/ dir accepted; tracked source dir / tracked path / repo root / absolute / parent-relative rejected), declared-root fencing (dedicated artifacts/-inside run root accepted; the whole evidence tree, a bare stage dir, rust/, outside-artifacts and non-existent rejected) and multi-unit/FILE-unit exclusion fixtures (growth under any excluded run root invisible, non-excluded and sibling changes still detected, one # header row per unit); details in e0s-self-checks.log)"
+ 
+ # ── E1: default-entry-not-switched proofs (inside the candidate copy, so
+--- A-REVIEW-01/scripts/rust-tauri/r02_run_output_regression.py
++++ current/scripts/rust-tauri/r02_run_output_regression.py
+@@ -10,6 +10,7 @@
+ import subprocess
+ import sys
+ import tempfile
++from datetime import datetime, timezone
+ 
+ REPO = Path(__file__).resolve().parents[2]
+ GATE = REPO / "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh"
+@@ -67,16 +68,78 @@
+     raise SystemExit(result.returncode)
+ 
+ 
++def validator_query_regression(evidence, scratch, discovery):
++    """真实生产校验与 Git 索引；只在隔离目录替换出错的外部查询。"""
++    case = evidence / "validator-query"
++    case.mkdir()
++    root = scratch / "validator-query-repo"
++    root.mkdir()
++    git(root, "init", "-q")
++    tracked_unit = "artifacts/rust-tauri/R05/tracked-run"
++    fresh_unit = "artifacts/rust-tauri/R05/fresh-run"
++    for unit in (tracked_unit, fresh_unit):
++        (root / unit).mkdir(parents=True)
++    (root / tracked_unit / "tracked-source.rs").write_text("tracked source")
++    git(root, "add", tracked_unit + "/tracked-source.rs")
++    lib = case / "production-functions.sh"
++    lib.write_text(functions(discovery))
++    fault_bin = scratch / "validator-query-bin"
++    fault_bin.mkdir()
++    real_git = shutil.which("git")
++    assert real_git, "真实 Git 不可用"
++    proxy = fault_bin / "git"
++    proxy.write_text("#!/usr/bin/env python3\n" + '''import os, subprocess, sys
++mode = os.environ.get("RR3_GIT_QUERY_FAULT", "normal")
++if "ls-files" in sys.argv[1:] and mode not in ("normal", "restored"):
++    if mode in ("exit2-stderr", "exit0-stderr"):
++        sys.stderr.write("controlled ls-files inspection failure\\n")
++    if mode == "exit2-stdout":
++        sys.stdout.write("misleading-result\\n")
++    sys.exit(0 if mode == "exit0-stderr" else 2)
++sys.exit(subprocess.call([os.environ["RR3_REAL_GIT"], *sys.argv[1:]]))
++''')
++    proxy.chmod(0o755)
++    records = []
++    for validator in ("validate_run_output_unit", "validate_declared_run_root"):
++        for kind, unit in (("tracked", tracked_unit), ("fresh", fresh_unit)):
++            for mode in ("normal", "exit2-stderr", "exit2-empty", "exit0-stderr", "exit2-stdout", "restored"):
++                env = dict(os.environ, RR3_REAL_GIT=real_git, RR3_GIT_QUERY_FAULT=mode)
++                # 正常和恢复对照直接调用真实 Git，故障只替换目标查询。
++                if mode not in ("normal", "restored"):
++                    env["PATH"] = str(fault_bin) + os.pathsep + env["PATH"]
++                argv = ["bash", "-c", 'source "$1"; "$2" "$3" "$4"', "bash", str(lib), validator, str(root), unit]
++                started = datetime.now(timezone.utc).isoformat()
++                result = subprocess.run(argv, env=env, capture_output=True)
++                ended = datetime.now(timezone.utc).isoformat()
++                stem = f"{validator}-{kind}-{mode}"
++                stdout_log, stderr_log = case / (stem + ".stdout.log"), case / (stem + ".stderr.log")
++                stdout_log.write_bytes(result.stdout)
++                stderr_log.write_bytes(result.stderr)
++                fault = mode not in ("normal", "restored")
++                expected = 1 if fault or kind == "tracked" else 0
++                reason_valid = (b"git ls-files query failed" in result.stderr) if fault else ((b"INDEX-TRACKED" in result.stderr) if kind == "tracked" else result.stderr == b"")
++                records.append({"validator": validator, "rootKind": kind, "mode": mode, "argv": argv, "startedAt": started, "endedAt": ended, "exitCode": result.returncode, "expectedExitCode": expected, "reasonValid": reason_valid, "passed": result.returncode == expected and reason_valid, "stdoutLog": str(stdout_log), "stderrLog": str(stderr_log), "stdoutSha256": hashlib.sha256(result.stdout).hexdigest(), "stderrSha256": hashlib.sha256(result.stderr).hexdigest()})
++    summary = {"actual": len(records), "passed": sum(row["passed"] for row in records), "ignored": 0, "filtered": 0, "realGit": real_git, "policy": "git ls-files 仅允许 exit 0 且 stderr 为空；非零、缺少诊断的非零、成功码附带错误文本均拒绝", "substituteBoundary": "临时 Git 工作区真实索引；生产函数不替换；仅故障行 PATH 代理 ls-files，其余 Git 调真实程序", "commands": records}
++    (case / "results.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n")
++    assert summary["passed"] == summary["actual"], ("生产 Git 查询异常未显式拒绝", summary["passed"], summary["actual"])
++    return {key: summary[key] for key in ("actual", "passed", "ignored", "filtered", "policy")}
++
++
+ def main():
+     parser = argparse.ArgumentParser()
+     parser.add_argument("--evidence", required=True)
+     parser.add_argument("--discovery", type=Path, default=DISCOVERY)
++    parser.add_argument("--validators-only", action="store_true")
+     args = parser.parse_args()
+     evidence = Path(args.evidence).resolve()
+     evidence.mkdir(parents=True, exist_ok=False)
+     records = []
+     scratch = Path(tempfile.mkdtemp(prefix="rr3-output-regression-")).resolve()
+     try:
++        query_regression = validator_query_regression(evidence, scratch, args.discovery.resolve())
++        if args.validators_only:
++            print(f"PASS production validators: {query_regression['passed']}/{query_regression['actual']} cases")
++            return
+         for name, old, tracked, parent in [
+             ("old-untracked-parent-child", True, False, True),
+             ("old-untracked-child-only", True, False, False),
+@@ -186,7 +249,7 @@
+             assert b"cannot query real OS output descriptors" in failure.stderr
+             os_failure = {"status": "PASS", "exit": failure.returncode, "boundary": "仅负例lsof返回错误；发现器未替换"}
+         (evidence / "root-fences.json").write_text(json.dumps({"rejections": fence_records, "legalFreshRootExit": valid.returncode}, indent=2) + "\n")
+-        (evidence / "results.json").write_text(json.dumps({"cases": records, "actual": len(records), "ignored": 0, "filtered": 0, "illegalRootsRejected": len(fence_records), "trackedSinkRejected": tracked_result.returncode == 1, "osQueryFailure": os_failure, "substituteBoundary": "仅临时Git工作区；发现器、OS fd、binder都是生产入口"}, indent=2) + "\n")
++        (evidence / "results.json").write_text(json.dumps({"cases": records, "actual": len(records), "ignored": 0, "filtered": 0, "validatorQueries": query_regression, "illegalRootsRejected": len(fence_records), "trackedSinkRejected": tracked_result.returncode == 1, "osQueryFailure": os_failure, "substituteBoundary": "仅临时Git工作区；发现器、OS fd、binder都是生产入口"}, indent=2) + "\n")
+         print(f"PASS real OS fd discovery: {len(records)}/{len(records)} cases")
+     finally:
+         # 只清理本回归自己创建的唯一临时目录。

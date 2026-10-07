@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-07T01:19:12.547237+00:00",
+  "differences": [
+    {
+      "path": "rust/crates/lingxi-service/src/logging.rs",
+      "old": "5f0aa8ccabc62295d64ff0ca6b61a5fc9a384e6a4bdd6e092d70a15ab73b6be1",
+      "current": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r05_t08_resources.rs",
+      "old": "104af86dc594f4dc990f43bfc420d194be647667a30819e5645bd3d82bd65d7d",
+      "current": "23b03f56bef900fc0563b3348596e61437995f7c05cc25a5173455f11a23e33f"
+    },
+    {
+      "path": "scripts/rust-tauri/r02_run_output_regression.py",
+      "old": "6696e8279a99a3e407d5d3c270cebd3e00c4d6031a8fbc71c4b875dfb03a5c3e",
+      "current": "fcee14b8c529d502d9885a4b7a31e8c5f90ade22ab92e149402d52585272fd99"
+    },
+    {
+      "path": "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+      "old": "3aca4ae169fa06afc29e6aa89acef79ecd1ce2a6422cf479d7913643d190bf84",
+      "current": "53ff4eddd9af1844b7722c39dd369efcb42dbb6787adc9bb70497af48c10c8df"
+    }
+  ],
+  "oldBinary": "c5975a452505bd4f90fcf87509902f812148f809b21674302e6dbd34886daa6a",
+  "currentBinary": "9f7489029c91d1c232e3c204236854bd53c69cee2fef33d6fd778a27f44696d3"
+}

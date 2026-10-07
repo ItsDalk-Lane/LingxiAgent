@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/build/lingxi-service",
+    "--bind",
+    "127.0.0.1:0",
+    "--home",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/epoch-cli-warn/selected"
+  ],
+  "env": {
+    "PATH": "/usr/bin:/bin",
+    "HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/epoch-cli-warn/fallback",
+    "TMPDIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/probe-tmp",
+    "RUST_LOG": "warn",
+    "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/epoch-cli-warn/fallback"
+  },
+  "start": "2026-10-07T02:01:07.453325+00:00",
+  "end": "2026-10-07T02:01:07.475067+00:00",
+  "binarySHA256": "7d9190d27d1b6a019abfbe97049d6855a3f225494124fee43ef8988e032ae78b"
+}

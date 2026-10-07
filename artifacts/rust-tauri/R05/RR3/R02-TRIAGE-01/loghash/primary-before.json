@@ -1,0 +1,85 @@
+{
+  "time": "2026-10-07T01:56:49.540670+00:00",
+  "records": [
+    {
+      "before": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a01_smoke/stdout.log",
+        "sha256": "7901fc7f6e27f78f435e25fbdd84c20ea807103f3a3f2c7c6fc719d186d48e4a",
+        "bytes": 1326,
+        "mtime_ns": 1791337698601909636
+      },
+      "snapshot_sha256": "7901fc7f6e27f78f435e25fbdd84c20ea807103f3a3f2c7c6fc719d186d48e4a",
+      "after": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a01_smoke/stdout.log",
+        "sha256": "7901fc7f6e27f78f435e25fbdd84c20ea807103f3a3f2c7c6fc719d186d48e4a",
+        "bytes": 1326,
+        "mtime_ns": 1791337698601909636
+      },
+      "observed_changed": false
+    },
+    {
+      "before": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a01_smoke/stderr.log",
+        "sha256": "4e7acd1cd4daef1491e661882ede84426d7eecda9e5df10b67d3b0c3a9b77692",
+        "bytes": 77,
+        "mtime_ns": 1791337698604243816
+      },
+      "snapshot_sha256": "4e7acd1cd4daef1491e661882ede84426d7eecda9e5df10b67d3b0c3a9b77692",
+      "after": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a01_smoke/stderr.log",
+        "sha256": "4e7acd1cd4daef1491e661882ede84426d7eecda9e5df10b67d3b0c3a9b77692",
+        "bytes": 77,
+        "mtime_ns": 1791337698604243816
+      },
+      "observed_changed": false
+    },
+    {
+      "before": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a13_redaction_scan/stdout.log",
+        "sha256": "a7b9ea7d91fcade65a095103d6599772cecca16fd08e53d4e61492d815fb3de5",
+        "bytes": 1892,
+        "mtime_ns": 1791338001000487883
+      },
+      "snapshot_sha256": "a7b9ea7d91fcade65a095103d6599772cecca16fd08e53d4e61492d815fb3de5",
+      "after": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a13_redaction_scan/stdout.log",
+        "sha256": "a7b9ea7d91fcade65a095103d6599772cecca16fd08e53d4e61492d815fb3de5",
+        "bytes": 1892,
+        "mtime_ns": 1791338001000487883
+      },
+      "observed_changed": false
+    },
+    {
+      "before": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a13_redaction_scan/stderr.log",
+        "sha256": "f499aa16bc713f80af19700268af2f0bfeb0476a1febf216874398c483899756",
+        "bytes": 190,
+        "mtime_ns": 1791338001025765029
+      },
+      "snapshot_sha256": "f499aa16bc713f80af19700268af2f0bfeb0476a1febf216874398c483899756",
+      "after": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a13_redaction_scan/stderr.log",
+        "sha256": "f499aa16bc713f80af19700268af2f0bfeb0476a1febf216874398c483899756",
+        "bytes": 190,
+        "mtime_ns": 1791338001025765029
+      },
+      "observed_changed": false
+    },
+    {
+      "before": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/run.log",
+        "sha256": "e2e64ba266b2c332e9af208e5fcb9ebb5fb499b042ee10b3ec3498df9bb00300",
+        "bytes": 5621,
+        "mtime_ns": 1791338175202557503
+      },
+      "snapshot_sha256": "e2e64ba266b2c332e9af208e5fcb9ebb5fb499b042ee10b3ec3498df9bb00300",
+      "after": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/run.log",
+        "sha256": "e2e64ba266b2c332e9af208e5fcb9ebb5fb499b042ee10b3ec3498df9bb00300",
+        "bytes": 5621,
+        "mtime_ns": 1791338175202557503
+      },
+      "observed_changed": false
+    }
+  ]
+}

@@ -1,0 +1,244 @@
+{
+  "status": "PASS",
+  "rows": [
+    {
+      "name": "normal",
+      "argv": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/xtask",
+        "verify-stage",
+        "R02",
+        "--evidence",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy/artifacts/f49-independent/normal"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy",
+      "startUTC": "2026-10-07T02:47:19.091951+00:00",
+      "endUTC": "2026-10-07T02:47:20.909620+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "pidAtCapture": 24661,
+      "realPS": {
+        "argv": [
+          "ps",
+          "-p",
+          "24661",
+          "-o",
+          "stat="
+        ],
+        "exitCode": 0,
+        "stdout": "S   \n",
+        "stderr": ""
+      },
+      "beforeAtUnixMs": 1791341239908,
+      "waitEndUTC": "2026-10-07T02:47:20.170103+00:00",
+      "capturedSignalUTC": "2026-10-07T02:47:20.171208+00:00",
+      "expectedSignal": "xtask: verify-stage RX [python3 -c import pathlib,time,sys; p=pathlib.Path(sys.argv[1]); end=time.monotonic()+15; exec('while not p.exists() and time.monotonic()<end:\\n time.sleep(.02)'); assert p.exists(), '控制命令未释放' /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/release-command] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy/artifacts/f49-independent/normal/a01_smoke",
+      "capturedSignal": "xtask: verify-stage RX [python3 -c import pathlib,time,sys; p=pathlib.Path(sys.argv[1]); end=time.monotonic()+15; exec('while not p.exists() and time.monotonic()<end:\\n time.sleep(.02)'); assert p.exists(), '控制命令未释放' /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/release-command] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy/artifacts/f49-independent/normal/a01_smoke",
+      "appendStartUTC": null,
+      "sourceBefore": {
+        "rust/crates/xtask/src/stage_maps/R05.json": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+        "rust/crates/xtask/src/stage_maps/R04.json": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+        "rust/crates/lingxi-service/src/lib.rs": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+        "rust/crates/lingxi-kernel/src/lib.rs": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+        "rust/crates/lingxi-adapters/src/models/tool_render.rs": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+        "rust/crates/lingxi-adapters/src/models/openai_completions.rs": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+        "rust/crates/lingxi-adapters/src/models/credentials.rs": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+        "rust/crates/lingxi-service/src/runs.rs": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+        "rust/crates/lingxi-service/src/credentials/mod.rs": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+        "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+        "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+        "scripts/rust-tauri/r05_t08_stage_suites.sh": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e"
+      },
+      "sourceAfter": {
+        "rust/crates/xtask/src/stage_maps/R05.json": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+        "rust/crates/xtask/src/stage_maps/R04.json": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+        "rust/crates/lingxi-service/src/lib.rs": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+        "rust/crates/lingxi-kernel/src/lib.rs": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+        "rust/crates/lingxi-adapters/src/models/tool_render.rs": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+        "rust/crates/lingxi-adapters/src/models/openai_completions.rs": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+        "rust/crates/lingxi-adapters/src/models/credentials.rs": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+        "rust/crates/lingxi-service/src/runs.rs": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+        "rust/crates/lingxi-service/src/credentials/mod.rs": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+        "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+        "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+        "scripts/rust-tauri/r05_t08_stage_suites.sh": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e"
+      },
+      "overall": "PASS",
+      "stable": true,
+      "commandsAllGreen": true,
+      "checkpointCount": 1,
+      "changedPaths": [],
+      "realFDExclusions": [
+        {
+          "kind": "FILE",
+          "pathBytesHex": "6172746966616374732f6634392d696e646570656e64656e742f6e6f726d616c2e6c6976652e6c6f67",
+          "relativePath": "artifacts/f49-independent/normal.live.log"
+        }
+      ],
+      "binarySha256": "47adbebcec2fdc1c05c4ca25db8fb80e5119be3541015706be646d7c5a254e05",
+      "authoritySha256": "8b68fb977c57ffa35ad32add751b6c65419bca901faa21f3c1b06adcf22cf8ef",
+      "resultSha256": "313c755288efa974f4f25c5bccf3e7eda4b9eb9fb9f3b7c78428efbff64b8a24",
+      "logSha256": "6f4522edde43102fb95d74a7f1a1fe1c053da4752c853b9d3b5c1605f287a589"
+    },
+    {
+      "name": "midbyte",
+      "argv": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/xtask",
+        "verify-stage",
+        "R02",
+        "--evidence",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy/artifacts/f49-independent/midbyte"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy",
+      "startUTC": "2026-10-07T02:47:20.987680+00:00",
+      "endUTC": "2026-10-07T02:47:23.008957+00:00",
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "pidAtCapture": 25276,
+      "realPS": {
+        "argv": [
+          "ps",
+          "-p",
+          "25276",
+          "-o",
+          "stat="
+        ],
+        "exitCode": 0,
+        "stdout": "S   \n",
+        "stderr": ""
+      },
+      "beforeAtUnixMs": 1791341241824,
+      "waitEndUTC": "2026-10-07T02:47:22.045030+00:00",
+      "capturedSignalUTC": "2026-10-07T02:47:22.045390+00:00",
+      "expectedSignal": "xtask: verify-stage RX [python3 -c import pathlib,time,sys; p=pathlib.Path(sys.argv[1]); end=time.monotonic()+15; exec('while not p.exists() and time.monotonic()<end:\\n time.sleep(.02)'); assert p.exists(), '控制命令未释放' /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/release-command] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy/artifacts/f49-independent/midbyte/a01_smoke",
+      "capturedSignal": "xtask: verify-stage RX [python3 -c import pathlib,time,sys; p=pathlib.Path(sys.argv[1]); end=time.monotonic()+15; exec('while not p.exists() and time.monotonic()<end:\\n time.sleep(.02)'); assert p.exists(), '控制命令未释放' /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/release-command] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy/artifacts/f49-independent/midbyte/a01_smoke",
+      "appendStartUTC": "2026-10-07T02:47:22.056857+00:00",
+      "sourceBefore": {
+        "rust/crates/xtask/src/stage_maps/R05.json": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+        "rust/crates/xtask/src/stage_maps/R04.json": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+        "rust/crates/lingxi-service/src/lib.rs": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+        "rust/crates/lingxi-kernel/src/lib.rs": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+        "rust/crates/lingxi-adapters/src/models/tool_render.rs": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+        "rust/crates/lingxi-adapters/src/models/openai_completions.rs": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+        "rust/crates/lingxi-adapters/src/models/credentials.rs": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+        "rust/crates/lingxi-service/src/runs.rs": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+        "rust/crates/lingxi-service/src/credentials/mod.rs": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+        "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+        "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+        "scripts/rust-tauri/r05_t08_stage_suites.sh": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e"
+      },
+      "sourceAfter": {
+        "rust/crates/xtask/src/stage_maps/R05.json": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+        "rust/crates/xtask/src/stage_maps/R04.json": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+        "rust/crates/lingxi-service/src/lib.rs": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+        "rust/crates/lingxi-kernel/src/lib.rs": "0a5f0c3aee15f437cae03cca5eb182680f6e57aa64e3dcd95fbb5561a243720f",
+        "rust/crates/lingxi-adapters/src/models/tool_render.rs": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+        "rust/crates/lingxi-adapters/src/models/openai_completions.rs": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+        "rust/crates/lingxi-adapters/src/models/credentials.rs": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+        "rust/crates/lingxi-service/src/runs.rs": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+        "rust/crates/lingxi-service/src/credentials/mod.rs": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+        "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+        "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+        "scripts/rust-tauri/r05_t08_stage_suites.sh": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e"
+      },
+      "overall": "FAIL",
+      "stable": false,
+      "commandsAllGreen": true,
+      "checkpointCount": 1,
+      "changedPaths": [
+        "rust/crates/lingxi-kernel/src/lib.rs"
+      ],
+      "realFDExclusions": [
+        {
+          "kind": "FILE",
+          "pathBytesHex": "6172746966616374732f6634392d696e646570656e64656e742f6d6964627974652e6c6976652e6c6f67",
+          "relativePath": "artifacts/f49-independent/midbyte.live.log"
+        }
+      ],
+      "binarySha256": "47adbebcec2fdc1c05c4ca25db8fb80e5119be3541015706be646d7c5a254e05",
+      "authoritySha256": "8b68fb977c57ffa35ad32add751b6c65419bca901faa21f3c1b06adcf22cf8ef",
+      "resultSha256": "cdc3105c9552efa4e9f0932a9e505a21ea275750841021aea23d86c5e435dcbc",
+      "logSha256": "7ef52e4d1dc15ec161f6bf778ceab348eab44aeb3067bcf0cb798fcb8ca012ef"
+    },
+    {
+      "name": "restored",
+      "argv": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/xtask",
+        "verify-stage",
+        "R02",
+        "--evidence",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy/artifacts/f49-independent/restored"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy",
+      "startUTC": "2026-10-07T02:47:23.089444+00:00",
+      "endUTC": "2026-10-07T02:47:25.063098+00:00",
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "pidAtCapture": 25798,
+      "realPS": {
+        "argv": [
+          "ps",
+          "-p",
+          "25798",
+          "-o",
+          "stat="
+        ],
+        "exitCode": 0,
+        "stdout": "S   \n",
+        "stderr": ""
+      },
+      "beforeAtUnixMs": 1791341243926,
+      "waitEndUTC": "2026-10-07T02:47:24.167236+00:00",
+      "capturedSignalUTC": "2026-10-07T02:47:24.168154+00:00",
+      "expectedSignal": "xtask: verify-stage RX [python3 -c import pathlib,time,sys; p=pathlib.Path(sys.argv[1]); end=time.monotonic()+15; exec('while not p.exists() and time.monotonic()<end:\\n time.sleep(.02)'); assert p.exists(), '控制命令未释放' /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/release-command] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy/artifacts/f49-independent/restored/a01_smoke",
+      "capturedSignal": "xtask: verify-stage RX [python3 -c import pathlib,time,sys; p=pathlib.Path(sys.argv[1]); end=time.monotonic()+15; exec('while not p.exists() and time.monotonic()<end:\\n time.sleep(.02)'); assert p.exists(), '控制命令未释放' /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/release-command] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy/artifacts/f49-independent/restored/a01_smoke",
+      "appendStartUTC": null,
+      "sourceBefore": {
+        "rust/crates/xtask/src/stage_maps/R05.json": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+        "rust/crates/xtask/src/stage_maps/R04.json": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+        "rust/crates/lingxi-service/src/lib.rs": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+        "rust/crates/lingxi-kernel/src/lib.rs": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+        "rust/crates/lingxi-adapters/src/models/tool_render.rs": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+        "rust/crates/lingxi-adapters/src/models/openai_completions.rs": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+        "rust/crates/lingxi-adapters/src/models/credentials.rs": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+        "rust/crates/lingxi-service/src/runs.rs": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+        "rust/crates/lingxi-service/src/credentials/mod.rs": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+        "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+        "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+        "scripts/rust-tauri/r05_t08_stage_suites.sh": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e"
+      },
+      "sourceAfter": {
+        "rust/crates/xtask/src/stage_maps/R05.json": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+        "rust/crates/xtask/src/stage_maps/R04.json": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+        "rust/crates/lingxi-service/src/lib.rs": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+        "rust/crates/lingxi-kernel/src/lib.rs": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+        "rust/crates/lingxi-adapters/src/models/tool_render.rs": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+        "rust/crates/lingxi-adapters/src/models/openai_completions.rs": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+        "rust/crates/lingxi-adapters/src/models/credentials.rs": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+        "rust/crates/lingxi-service/src/runs.rs": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+        "rust/crates/lingxi-service/src/credentials/mod.rs": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+        "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+        "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+        "scripts/rust-tauri/r05_t08_stage_suites.sh": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e"
+      },
+      "overall": "PASS",
+      "stable": true,
+      "commandsAllGreen": true,
+      "checkpointCount": 1,
+      "changedPaths": [],
+      "realFDExclusions": [
+        {
+          "kind": "FILE",
+          "pathBytesHex": "6172746966616374732f6634392d696e646570656e64656e742f726573746f7265642e6c6976652e6c6f67",
+          "relativePath": "artifacts/f49-independent/restored.live.log"
+        }
+      ],
+      "binarySha256": "47adbebcec2fdc1c05c4ca25db8fb80e5119be3541015706be646d7c5a254e05",
+      "authoritySha256": "8b68fb977c57ffa35ad32add751b6c65419bca901faa21f3c1b06adcf22cf8ef",
+      "resultSha256": "ba66556767511a26afcfeefcd9e6977634ab3e51c92efcb5fede06b46f28455f",
+      "logSha256": "15003060160a1c1a6f5945c4dc0a77cabc7e0b0ec923bafab2f6171cce23628d"
+    }
+  ],
+  "finalN16ExactRestore": true,
+  "samePristine": true,
+  "boundary": "真实生产main/verify/Scope/Git/OS fd，新独立RX控制map只证明机制，不冒充完整R02业务或16负测；未手传FILE"
+}

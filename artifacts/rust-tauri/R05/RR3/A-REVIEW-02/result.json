@@ -1,0 +1,18 @@
+{
+  "package": "A/F42",
+  "reviewer": "rr3_a_review_02",
+  "round": 2,
+  "review": "PASS",
+  "A1": "PASS_WITH_AUTHORIZED_SAME_INPUT_INDEPENDENT_EVIDENCE_REUSE",
+  "A2": "PASS_FRESH_EXECUTION",
+  "mustFix": [],
+  "stageReadiness": "NOT_ACCEPTED",
+  "R06_READY": false,
+  "fullFormalGateExecuted": false,
+  "threadId": "01a113dc-ea73-75b0-abd0-3745ae142665",
+  "entry": "Codex CLI exec --ephemeral",
+  "utc": "2026-10-07T01:08:13.258679+00:00",
+  "inputManifestSha256": "466cc6d812608af2785a28282df80dbb3eaa081554051a63f62c04943c79ddf9",
+  "reviewSha256": "cc52fe061bb557a82ba44397277f0dd719b02c8a2fd1ce02ad1b16a7e736f9e9",
+  "deliveryInputsSha256": "ac412cb5e503f57c0b02977a004adfaf86e4af5f4805c6c2a613bef6f5b2eb41"
+}

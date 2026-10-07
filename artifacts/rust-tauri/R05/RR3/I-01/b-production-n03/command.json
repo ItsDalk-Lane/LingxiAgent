@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "bash",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b-production-command.sh",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/runner-copy",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/runner-pristine",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b-production-n03",
+    "/Users/study_superior/.cargo/bin/cargo"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/runner-copy",
+  "startUTC": "2026-10-07T02:32:37.920377+00:00",
+  "endUTC": "2026-10-07T02:32:42.113872+00:00",
+  "exitCode": 0,
+  "environmentOverrides": {
+    "CARGO_TARGET_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target",
+    "CARGO_NET_OFFLINE": "true"
+  },
+  "boundary": "生产原run_n03和原汇总，原shell快照/恢复；隔离RX map不代表全R02/R05业务gate。",
+  "gateSha256": "a69110b81298705a9161652d28402a5e5a585f945fdfd214ccf071132ecb67dd",
+  "logSha256": "f543ccdc55de55789d663a601e4df2361a5c183b867d6d51f5550be2c9efa339"
+}

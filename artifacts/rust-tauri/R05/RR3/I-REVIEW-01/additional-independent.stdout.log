@@ -1,0 +1,15 @@
+old-independent-red 1
+new-independent-restore-same-pristine 0
+snapshot-mkdir-failure 1
+snapshot-mkdir-recovered 0
+process-query-exit1-nonempty 1
+process-query-exit2-with-real-log 1
+start-log-query-exit2 1
+gate-running-positive 0
+real-zombie-refused 1
+authority-empty-scenarios 1
+authority-unknown-command 1
+authority-non-string-argv 1
+authority-restored 0
+b15-independent 0
+b41-independent 0

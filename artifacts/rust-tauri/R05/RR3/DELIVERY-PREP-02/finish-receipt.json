@@ -1,0 +1,19 @@
+{
+  "startUTC": "2026-10-07T03:57:59.857303+00:00",
+  "endUTC": "2026-10-07T03:58:00.368844+00:00",
+  "argv": [
+    "python3",
+    "artifacts/rust-tauri/R05/RR3/DELIVERY-PREP-02/finish.py"
+  ],
+  "manifestPath": "MANIFEST.json",
+  "manifestSHA256": "b73fe90c599ed638d6b9956510c5a452f84a42b63f8208f86ab83b70ff4002be",
+  "verifiedFiles": 34,
+  "QA": "PASS",
+  "exitCode": 0,
+  "exitCodeMeaning": "脚本末尾即将正常返回；实际命令退出码另由工具回执确认",
+  "selfHashExcluded": true,
+  "writesAfterReceipt": "NONE_BY_THIS_AGENT",
+  "originalsChanged": false,
+  "gitWritePerformed": false,
+  "productTestsOrBuildsExecuted": false
+}

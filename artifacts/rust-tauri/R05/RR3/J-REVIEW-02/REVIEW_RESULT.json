@@ -1,0 +1,20 @@
+{
+  "reviewer": "/root/rr3_j_review_02",
+  "status": "PASS",
+  "scope": "J/F50 complete default preparation and R02 historical BASE adjacency",
+  "mustFix": [],
+  "packageEnvironmentBlocked": [],
+  "R06_READY": false,
+  "stageStatus": "NOT_ACCEPTED",
+  "defaultN01N16": "NOT_RUN",
+  "fullR02E5": "NOT_RUN",
+  "legacyDirected": "PASS E0-E4.5; E5 explicitly NOT_RUN",
+  "mainSourceFiles": 1016,
+  "trackedSourceFiles": 38066,
+  "mainGitEntries": 3217,
+  "mainInputsUnchanged": true,
+  "mainGitUnchanged": true,
+  "copyPath": "/Users/study_superior/r05t08-work/j-review02-gvphliks",
+  "completedUtc": "2026-10-07T04:21:35.139342+00:00",
+  "stopWritingAfterDelivery": true
+}

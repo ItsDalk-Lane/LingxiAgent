@@ -1,0 +1,11 @@
+2026-10-07T07:35:22.919849Z  INFO lingxi_service: data root resolved [token] source=cli ignored_sources=none
+2026-10-07T07:35:22.920126Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) [token] [token]
+2026-10-07T07:35:22.920361Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=d9331e091be9b860 pid=75973 entropy="os-random-device" lock=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-bin-hzhc8e/lingxi-service/instance.lock network_mode=loopback
+2026-10-07T07:35:22.920861Z  INFO lingxi_service: data-epoch gate passed [token] decision=ProceedSteady(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-10-07T07:35:22.933748Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-bin-hzhc8e/lingxi-service/local-token.json run_database=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-bin-hzhc8e/lingxi-service/data/runs.db
+2026-10-07T07:35:22.942900Z  INFO lingxi_service: instance record published (atomic write) record=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-bin-hzhc8e/lingxi-service/instance.json bind_addr=127.0.0.1:59563
+2026-10-07T07:35:23.032540Z  INFO lingxi_service: request handled request_id="req-a843286cca2c306f66f80f6d3bbc0874" method=GET [token] status=200
+2026-10-07T07:35:23.056090Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-10-07T07:35:23.056871Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-10-07T07:35:23.057147Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-10-07T07:35:23.057217Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

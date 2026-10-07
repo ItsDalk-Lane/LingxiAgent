@@ -1,0 +1,65 @@
+{
+  "files": [
+    {
+      "path": "I-MAPPING.md",
+      "bytes": 6734,
+      "sha256": "637820a50c043ad21b9a63d5023932ec3a7efa52e92d8317f0109486c57423fd"
+    },
+    {
+      "path": "READONLY-COMMANDS.md",
+      "bytes": 2387,
+      "sha256": "e48fce47ade4b8c6cb6efb596bf8c93e9d5901a3348a543816546f6fb35ae9d5"
+    },
+    {
+      "path": "REPORT.md",
+      "bytes": 14195,
+      "sha256": "f89f8136671d9d4c2eccf6034168b7da879637293d3079d5e85429f172f12a12"
+    },
+    {
+      "path": "audit_readonly.py",
+      "bytes": 8981,
+      "sha256": "57fce648f9a99d4e2a62a203aed0ef7ad80351982294bb885b8bfe727002758e"
+    },
+    {
+      "path": "default-index.json",
+      "bytes": 24883,
+      "sha256": "4e51cb861e7cdfa26d1d038c54bc597f27563c8b0bb243d49e3e48ca691b04e1"
+    },
+    {
+      "path": "interruption-index.json",
+      "bytes": 1920,
+      "sha256": "436ccaca93374ffa5dad2a9d79c79b7501b5124969ff99e167a12603c248ce81"
+    },
+    {
+      "path": "producer-index.json",
+      "bytes": 48485,
+      "sha256": "2ae7cf3cfcc75c100d1aff236d79f2b0e1a90ef3c618dfe7f0fdbfb8254acb00"
+    },
+    {
+      "path": "r02-and-binding-index.json",
+      "bytes": 166674,
+      "sha256": "d192282a3adf701ec7ed3cdc138c8fd520413ef3b53ec445ab190560ae9bd6be"
+    },
+    {
+      "path": "raw-reference-digests.json",
+      "bytes": 84700,
+      "sha256": "6f9936e40d087e95cf5bcd63820afddd8b2e49839ce9cacbe4fa18908bb2aede"
+    },
+    {
+      "path": "registration-readback.json",
+      "bytes": 1010,
+      "sha256": "bec5ad3f52adb4829ae0213a391c3971485a14d0f843b63701fcce080dd79d40"
+    },
+    {
+      "path": "supplement-index.json",
+      "bytes": 55586,
+      "sha256": "ed9ea508383ab61b62cb3bdac2b3e3c8a419bb5c1fbcd4fbe1e7aacb5a2d3db4"
+    },
+    {
+      "path": "verification.json",
+      "bytes": 763,
+      "sha256": "660fe91571ed6e0115336d5da99ec8fc0fd61aa9942d847cf84a5983ae4b17f4"
+    }
+  ],
+  "boundary": "只本次新归档文件；旧G没有被补造manifest或最终结论"
+}

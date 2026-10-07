@@ -1,0 +1,38 @@
+{
+  "utc": "2026-10-07T01:52:29.295376+00:00",
+  "requestRef": "artifacts/rust-tauri/R05/RR3/E-02/dispatch/request.json",
+  "requestSha256": "9ae6752989abf40504fad79114dddde74be94b2aa088ccc37a324fc3aa4d8d99",
+  "request": {
+    "argv": [
+      "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+      "exec",
+      "--ephemeral",
+      "--json",
+      "--color",
+      "never",
+      "--sandbox",
+      "danger-full-access",
+      "-c",
+      "approval_policy=\"never\"",
+      "-C",
+      "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "-o",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-02/dispatch/final.txt",
+      "-"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "createdAt": "2026-10-07T01:39:48.541788+00:00",
+    "freshHistory": true,
+    "ephemeral": true,
+    "modelOverride": null,
+    "permissionProfile": "same danger-full-access / never; no hook or rules bypass",
+    "result": "RUNNING",
+    "startedAt": "2026-10-07T01:39:48.542158+00:00"
+  },
+  "firstEvent": {
+    "type": "thread.started",
+    "thread_id": "01a11404-4cee-7b93-b851-997001c5d9e7"
+  },
+  "firstEventLineSha256": "5de88974cb5e296464a37ccec678da7ba01feffcf66d3f2f8acb5a778dd417c3",
+  "dispatchOwner": "外部总控，只读不覆盖；events可能继续追加。"
+}

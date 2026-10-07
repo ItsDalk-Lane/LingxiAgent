@@ -1,0 +1,26 @@
+2026-10-07T03:12:49.547292Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02t07-a13.RuWK4Y source=cli ignored_sources=none
+2026-10-07T03:12:49.547484Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02t07-a13.RuWK4Y runtime_dir=/private/tmp/lingxi-r02t07-a13.RuWK4Y/lingxi-service
+2026-10-07T03:12:49.547700Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=eccdc9a30cea649b pid=61046 entropy="os-random-device" lock=/private/tmp/lingxi-r02t07-a13.RuWK4Y/lingxi-service/instance.lock network_mode=loopback
+2026-10-07T03:12:49.548025Z  INFO lingxi_service: data-epoch gate passed home=/private/tmp/lingxi-r02t07-a13.RuWK4Y decision=ProceedSteady(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-10-07T03:12:49.559973Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/tmp/lingxi-r02t07-a13.RuWK4Y/lingxi-service/local-token.json run_database=/private/tmp/lingxi-r02t07-a13.RuWK4Y/lingxi-service/data/runs.db
+2026-10-07T03:12:49.569939Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r02t07-a13.RuWK4Y/lingxi-service/instance.json bind_addr=127.0.0.1:61985
+2026-10-07T03:12:49.734861Z  INFO lingxi_service::sessions: normal submission to a busy session rejected (session_busy; retryable) session_id="sess_local_beta"
+2026-10-07T03:12:49.735058Z  INFO lingxi_service: request handled request_id="req-e1e9de480a2beadb189367ba2d83423a" method=POST [token] status=409
+2026-10-07T03:12:54.954496Z  INFO lingxi_service::sessions: normal submission to a busy session rejected (session_busy; retryable) session_id="sess_local_beta"
+2026-10-07T03:12:54.954506Z  INFO lingxi_service::sessions: normal submission to a busy session rejected (session_busy; retryable) session_id="sess_local_beta"
+2026-10-07T03:12:54.954625Z  INFO lingxi_service::sessions: normal submission to a busy session rejected (session_busy; retryable) session_id="sess_local_beta"
+2026-10-07T03:12:54.954611Z  INFO lingxi_service::sessions: normal submission to a busy session rejected (session_busy; retryable) session_id="sess_local_beta"
+2026-10-07T03:12:54.954481Z  WARN lingxi_service::runs: run driver exited without a finalize; cancellation tree fired, registry entry removed, durable row left honest (R03-T07 owns recovery) run_id=run_000001a114597646_000002
+2026-10-07T03:12:54.954625Z  INFO lingxi_service::sessions: normal submission to a busy session rejected (session_busy; retryable) session_id="sess_local_beta"
+2026-10-07T03:12:54.954626Z  INFO lingxi_service::sessions: normal submission to a busy session rejected (session_busy; retryable) session_id="sess_local_beta"
+2026-10-07T03:12:54.954717Z  INFO lingxi_service: request handled request_id="req-3fd1ba106de1acb96f5c655646aa707e" method=POST [token] status=409
+2026-10-07T03:12:54.954718Z  INFO lingxi_service: request handled request_id="req-52a8a90c5818d618b4737e06d8cadcc9" method=POST [token] status=409
+2026-10-07T03:12:54.954733Z  INFO lingxi_service: request handled request_id="req-fe66e957e864c61db0967e3b0c2f10ba" method=POST [token] status=409
+2026-10-07T03:12:54.954766Z  INFO lingxi_service: request handled request_id="req-c96f3a224b42b434a24e79e8b74b608a" method=POST [token] status=409
+2026-10-07T03:12:54.954901Z  INFO lingxi_service: request handled request_id="req-dbd3b4e39d5c04b15348784d739c1f39" method=POST [token] status=409
+2026-10-07T03:12:54.954896Z  INFO lingxi_service: request handled request_id="req-47cd69f20e945709da474fb7694a8506" method=POST [token] status=503
+2026-10-07T03:12:54.954859Z  INFO lingxi_service: request handled request_id="req-9b313cc3b0f8654e8f98e66d46d7d7cd" method=POST [token] status=409
+2026-10-07T03:12:57.773963Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-10-07T03:12:57.774753Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-10-07T03:12:57.774999Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-10-07T03:12:57.775087Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

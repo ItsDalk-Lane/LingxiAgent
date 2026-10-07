@@ -1,0 +1,7 @@
+== preparing the isolated copy at /Users/study_superior/r05t08-work/negcopy.tV1ROh (local clone of HEAD b3ac0e6ae + uncommitted working-tree overlay) ==
+== copy ready (branch codex/rust-tauri-migration, HEAD b3ac0e6ae, worktree dirty=12 files) ==
+== CONTROL: xtask r05 mirror tests green in the copy ==
+PASS control: xtask r05_ tests green (exit 0)
+== N03: exactly one authoritative pin count lowered; old/new saved in mutation.json ==
+case R05-GATE-N03: exit=101 gap-named=MISSING:test stage_map::tests::r05_stage_pin_table_matches_the_registered_suites ... FAILED verdict=BAD (权威表唯一目标降钉恰一次 → 镜像单测红点名漂移)
+FAIL: N03 restored mirror was not run or not green

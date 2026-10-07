@@ -1,0 +1,406 @@
+{
+  "command": {
+    "argv": [
+      "bash",
+      "scripts/rust-tauri/r05_t08_negative_gate.sh",
+      "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T01:25:56.935082+00:00",
+    "endUTC": "2026-10-07T02:28:48.697982+00:00",
+    "exitCode": 2,
+    "log": "default-console.log",
+    "logSHA256": "23c81ff55745906608c09cca28708f6a1b0f68b6fb31dcc98b068bea9e9aa3ed"
+  },
+  "logMatches": true,
+  "rows": [
+    {
+      "id": "R05-GATE-N01",
+      "exit": 101,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "删 A16 → 镜像单测红并点名 R05-A16",
+      "files": [
+        {
+          "path": "default16-01/n01-delete-a16/exit-code.txt",
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+          "counts": [],
+          "tail": "101\n"
+        },
+        {
+          "path": "default16-01/n01-delete-a16/test.stdout.log",
+          "sha256": "abc6572f34be6ccde87447ba83f7c9d0793799f720e6bbe7efc8a6c9915c7fce",
+          "counts": [
+            "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+          ],
+          "tail": "roduction_map_keeps_the_sixteen_a_scenarios_verbatim ... FAILED\n\nfailures:\n\n---- stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim stdout ----\n\nthread 'stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim' (20485788) panicked at crates/xtask/src/stage_map.rs:2995:36:\nR05 map dropped original scenario R05-A16\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s\n\nerror: test failed, to rerun pass `-p xtask --bin xtask`\n"
+        }
+      ]
+    },
+    {
+      "id": "R05-GATE-N02",
+      "exit": 1,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "零匹配筛选词 → 生产者非零并点名 running=0",
+      "files": [
+        {
+          "path": "default16-01/n02-zero-match/exit-code.txt",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "counts": [],
+          "tail": "1\n"
+        },
+        {
+          "path": "default16-01/n02-zero-match/run.log",
+          "sha256": "9e5d7ec5a855efa1f1236109d879ec7af39b474327459367051ad704fd0d6458",
+          "counts": [],
+          "tail": "e_trace: 9/9 tests green\n== running svc:r05_t08_closed_loop (pinned 11) ==\nPASS svc:r05_t08_closed_loop: 11/11 tests green\n== running svc:r05_t08_production_tools (pinned 6) ==\nPASS svc:r05_t08_production_tools: 6/6 tests green\n== running svc:r05_t08_resources (pinned 2) ==\nPASS svc:r05_t08_resources: 2/2 tests green\nassembled 91 run records / 93 C-ID case records\ncid ownership gaps:\ncid R05-T04-C04: run 'lib-adapters/models::streaming::tests::the_buffer_bound_is_loud' is not in the pin table\nrun 'lib-adapters/models::streaming::tests::the_buffer_bound_is_loud_XYZ' pins 1 executed tests but the cid table owns 0 — every executed test must belong to exactly one C-ID\nFAIL: case assembly failed\n"
+        }
+      ]
+    },
+    {
+      "id": "R05-GATE-N03",
+      "exit": 101,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "权威表唯一目标降钉恰一次 → 镜像单测红点名漂移",
+      "files": [
+        {
+          "path": "default16-01/n03-tamper-pin-count/exit-code.txt",
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+          "counts": [],
+          "tail": "101\n"
+        },
+        {
+          "path": "default16-01/n03-tamper-pin-count/mutation-exit-code.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "counts": [],
+          "tail": "0\n"
+        },
+        {
+          "path": "default16-01/n03-tamper-pin-count/mutation.log",
+          "sha256": "ab5ed1393b1c96dc71de41bcbc2c73f4f37f815e5debad78c37fcf3160e6b41d",
+          "counts": [],
+          "tail": "{\"caseId\": \"R05-GATE-N03\", \"findingId\": \"F45\", \"target\": \"svc:r05_t01_model_plane\", \"table\": \"/Users/study_superior/r05t08-work/negcopy.hTXzzN/docs/rust-tauri/R05/r05_stage_pins.tsv\", \"line\": 76, \"matches\": 1, \"mutations\": 1, \"old\": 24, \"new\": 23, \"oldRow\": \"pin svc:r05_t01_model_plane 24 r05_t01_model_plane\", \"newRow\": \"pin svc:r05_t01_model_plane 23 r05_t01_model_plane\", \"beforeSha256\": \"fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5\", \"afterSha256\": \"42a0c4def01d824a8a9a554228e0ac6d211f032a2020b281353ae35ee6609c2b\"}\n"
+        },
+        {
+          "path": "default16-01/n03-tamper-pin-count/test.stdout.log",
+          "sha256": "8db6bfe2eca08ed92a33aa8b5df20587713429c84818952397db0782e4b1ea26",
+          "counts": [
+            "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+          ],
+          "tail": "(\"svc:r05_t05_timeouts\", 9), (\"svc:r05_t06_operations\", 7), (\"svc:r05_t06_rr1_media_resource\", 17), (\"svc:r05_t06_rr1_system_speech\", 10), (\"svc:r05_t06_worker_model\", 10), (\"svc:r05_t07_persistence\", 5), (\"svc:r05_t07_rr1_usage_ledger\", 15), (\"svc:r05_t07_usage_trace\", 9), (\"svc:r05_t08_closed_loop\", 11), (\"svc:r05_t08_production_tools\", 6), (\"svc:r05_t08_resources\", 2)]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    stage_map::map_tests::r05_stage_pin_table_matches_the_registered_suites\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s\n\nerror: test failed, to rerun pass `-p xtask --bin xtask`\n"
+        }
+      ]
+    },
+    {
+      "id": "R05-GATE-N04",
+      "exit": 1,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "吞退出码 → 计数核对仍非零并点名失败测试",
+      "files": [
+        {
+          "path": "default16-01/n04-swallowed-exit/exit-code.txt",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "counts": [],
+          "tail": "1\n"
+        },
+        {
+          "path": "default16-01/n04-swallowed-exit/run.log",
+          "sha256": "aed968942a9c8d249395ecbf5f7261b0a7ca5373f7318d128ea7664ebf5a5c7d",
+          "counts": [],
+          "tail": "c:r05_t07_usage_trace (pinned 9) ==\nPASS svc:r05_t07_usage_trace: 9/9 tests green\n== running svc:r05_t08_closed_loop (pinned 11) ==\nPASS svc:r05_t08_closed_loop: 11/11 tests green\n== running svc:r05_t08_production_tools (pinned 6) ==\nPASS svc:r05_t08_production_tools: 6/6 tests green\n== running svc:r05_t08_resources (pinned 2) ==\nPASS svc:r05_t08_resources: 2/2 tests green\nassembled 91 run records / 93 C-ID case records\ncid ownership gaps:\ncid R05-T02-C12: test 'credentials::tests::handle_refusal_texts_carry_no_material' has no `... ok` line in lib-service_credentials__tests__handle_refusal_texts_carry_no_material.log (renamed, deleted, moved module, or not green)\nFAIL: case assembly failed\n"
+        }
+      ]
+    },
+    {
+      "id": "R05-GATE-N05",
+      "exit": 1,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "旧证据目录 → 拒收并点名 not empty",
+      "files": [
+        {
+          "path": "default16-01/n05-stale-evidence/exit-code.txt",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "counts": [],
+          "tail": "1\n"
+        },
+        {
+          "path": "default16-01/n05-stale-evidence/run.log",
+          "sha256": "4fd5d98699d6dc4256a321878bbb14b9c93f257d51fae33e32b11ead21d53ab7",
+          "counts": [],
+          "tail": "   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.55s\n     Running `/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R05 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n05-stale-evidence/evidence`\nerror: evidence root /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n05-stale-evidence/evidence is not empty; preserving its prior evidence\n"
+        }
+      ]
+    },
+    {
+      "id": "R05-GATE-N06",
+      "exit": 1,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "门禁中改源码 → stable=false 整体 FAIL（R02 注册门禁演示同一机制）",
+      "files": [
+        {
+          "path": "default16-01/n06-midgate-mutation/exit-code.txt",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "counts": [],
+          "tail": "1\n"
+        },
+        {
+          "path": "default16-01/n06-midgate-mutation/named-check.txt",
+          "sha256": "4b8ff953d2144cc16dbec5210bab08e1063aea5ce0252555491ac74e0fa2c9b7",
+          "counts": [],
+          "tail": "overall=FAIL\nstable=False\nreason=Candidate file bytes or HEAD changed during the registered stage checks, or a snapshot failed; stage PASS is forbidden.\n"
+        },
+        {
+          "path": "default16-01/n06-midgate-mutation/run.log",
+          "sha256": "b127bfa174433dab04d60bd101d28a0befa68367db576ab2aaaaabdde3a43438",
+          "counts": [],
+          "tail": "erred_to_r07] DEFERRED_TO_R07\nxtask: verify-stage R02 supplemental R00-T02-LA-066B54983F6A [r02_share_satisfied] PASS\nxtask: verify-stage R02 supplemental R00-T02-LA-C4E6F27D7873 [r02_share_satisfied] PASS\nxtask: verify-stage R02 supplemental R00-T02-LA-4C1A9735CF04 [r02_share_satisfied] PASS\nxtask: verify-stage R02 supplemental R00-T02-LA-000E6E1301C0 [deferred_to_r07] DEFERRED_TO_R07\nxtask: verify-stage R02 supplemental R00-T02-LA-32FFEC05BAA7 [deferred_to_r07] DEFERRED_TO_R07\nxtask: verify-stage R02 result written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/verify-stage-result.json (overall: \"FAIL\")\n"
+        }
+      ]
+    },
+    {
+      "id": "R05-GATE-N07",
+      "exit": 2,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "删 R04 回归命令 → 场景引用即硬拒；镜像单测亦钉住该命令",
+      "files": [
+        {
+          "path": "default16-01/n07-drop-r04reg/exit-code.txt",
+          "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+          "counts": [],
+          "tail": "2\n"
+        },
+        {
+          "path": "default16-01/n07-drop-r04reg/run.log",
+          "sha256": "bb211c2b0c068610771ae8aa905300939c3822246aa8a28e2a0c41f7c7254116",
+          "counts": [],
+          "tail": "   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.10s\n     Running `/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R05 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n07-drop-r04reg/evidence`\nerror: invalid stage map for R05: stage map invalid: scenario \"R05-A16\" references unknown command \"r04_regression_gate\"\n"
+        }
+      ]
+    },
+    {
+      "id": "R05-GATE-N08",
+      "exit": 101,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "移除正常启动接线 → 二进制链红、单测仍绿",
+      "files": [
+        {
+          "path": "default16-01/n08-wiring-removed/binary.log",
+          "sha256": "8eb2ca8d1e1432de84a25bb1a133a095fb1ffb37458878cf9b9e856476755923",
+          "counts": [
+            "test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.84s"
+          ],
+          "tail": "lane_settles_unconfigured ... ok\n\nfailures:\n\n---- c02_real_binary_full_chain_through_authenticated_endpoint stdout ----\n\nthread 'c02_real_binary_full_chain_through_authenticated_endpoint' (20824836) panicked at crates/lingxi-service/tests/r05_t01_binary_wiring.rs:567:5:\nassertion `left == right` failed: exactly two provider turns hit the wire\n  left: 0\n right: 2\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    c02_real_binary_full_chain_through_authenticated_endpoint\n\ntest result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.84s\n\nerror: test failed, to rerun pass `-p lingxi-service --test r05_t01_binary_wiring`\n"
+        },
+        {
+          "path": "default16-01/n08-wiring-removed/exit-code.txt",
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+          "counts": [],
+          "tail": "101\n"
+        },
+        {
+          "path": "default16-01/n08-wiring-removed/lib-exit-code.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "counts": [],
+          "tail": "0\n"
+        },
+        {
+          "path": "default16-01/n08-wiring-removed/lib.log",
+          "sha256": "204051106f424fee7a8a17322d29141023b02f064d879bb37c0b9f7126f561bc",
+          "counts": [
+            "test result: ok. 358 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.76s"
+          ],
+          "tail": "t auth::tests::device_secret_hash_matches_node_and_accepts_earlier_rust_hashes ... ok\ntest auth::tests::revoking_device_cascades_to_its_credentials_only ... ok\ntest auth::tests::concurrent_pairing_approval_issues_once ... ok\ntest management::tests::password_scrypt_matches_node_and_upgrades_legacy_record ... ok\ntest auth::tests::authorize_order_and_denials ... ok\ntest auth::tests::pairing_and_issued_device_survive_restart ... ok\ntest auth::tests::device_credential_lifecycle_create_auth_expire_revoke ... ok\ntest auth::tests::failed_device_registry_write_keeps_live_memory_and_disk_unchanged ... ok\n\ntest result: ok. 358 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.76s\n\n"
+        }
+      ]
+    },
+    {
+      "id": "R05-GATE-N09",
+      "exit": 101,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "固定 done 替代真实回传 → 运行时 nonce 检查红",
+      "files": [
+        {
+          "path": "default16-01/n09-fixed-done/exit-code.txt",
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+          "counts": [],
+          "tail": "101\n"
+        },
+        {
+          "path": "default16-01/n09-fixed-done/test.stdout.log",
+          "sha256": "4e7530b1dcb84c2bae08c2f7e98e92ded453735a83b9251fc52de29200fac8fc",
+          "counts": [
+            "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.16s"
+          ],
+          "tail": "ides_the_next_request_and_follows_changes stdout ----\n\nthread 'c05_runtime_nonce_rides_the_next_request_and_follows_changes' (20832431) panicked at crates/lingxi-service/tests/r05_t03_protocol_adapters.rs:1064:5:\nassertion `left == right` failed: leg A: the wire carries leg A's runtime nonce\n  left: \"done\"\n right: \"NONCE-c05a-85233-1791338471527846000-0\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    c05_runtime_nonce_rides_the_next_request_and_follows_changes\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.16s\n\nerror: test failed, to rerun pass `-p lingxi-service --test r05_t03_protocol_adapters`\n"
+        }
+      ]
+    },
+    {
+      "id": "R05-GATE-N10",
+      "exit": 101,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "callId 错配 → 配对断言红（call_bin_1）",
+      "files": [
+        {
+          "path": "default16-01/n10-callid-mispair/exit-code.txt",
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+          "counts": [],
+          "tail": "101\n"
+        },
+        {
+          "path": "default16-01/n10-callid-mispair/test.stdout.log",
+          "sha256": "6b2374a0f7f7c691cb1f9d000be11b78167d624e456c01df56e9f688fc1b619d",
+          "counts": [
+            "test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.84s"
+          ],
+          "tail": "plane_settles_unconfigured ... ok\n\nfailures:\n\n---- c02_real_binary_full_chain_through_authenticated_endpoint stdout ----\n\nthread 'c02_real_binary_full_chain_through_authenticated_endpoint' (20835196) panicked at crates/lingxi-service/tests/r05_t01_binary_wiring.rs:582:5:\nassertion `left == right` failed\n  left: String(\"call-fixed-mispaired\")\n right: \"call_bin_1\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    c02_real_binary_full_chain_through_authenticated_endpoint\n\ntest result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.84s\n\nerror: test failed, to rerun pass `-p lingxi-service --test r05_t01_binary_wiring`\n"
+        }
+      ]
+    },
+    {
+      "id": "R05-GATE-N11",
+      "exit": 101,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "压平 Unknown → 状态诚实单测红",
+      "files": [
+        {
+          "path": "default16-01/n11-flatten-unknown/exit-code.txt",
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+          "counts": [],
+          "tail": "101\n"
+        },
+        {
+          "path": "default16-01/n11-flatten-unknown/test.stdout.log",
+          "sha256": "266e71c92574bd844ac69e83fbdcbbb83564ba7c5c794b0d583e490ab6c73944",
+          "counts": [
+            "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+          ],
+          "tail": "ning_and_stop_unconfirmed_statuses_are_honest ... FAILED\n\nfailures:\n\n---- models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest stdout ----\n\nthread 'models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest' (20836873) panicked at crates/lingxi-adapters/src/models/tool_render.rs:237:9:\npartial\n[process exited with code 0]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s\n\nerror: test failed, to rerun pass `-p lingxi-adapters --lib`\n"
+        }
+      ]
+    },
+    {
+      "id": "R05-GATE-N12",
+      "exit": 101,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "不释放模型 permit → 配额=1 嵌套链红",
+      "files": [
+        {
+          "path": "default16-01/n12-permit-held/exit-code.txt",
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+          "counts": [],
+          "tail": "101\n"
+        },
+        {
+          "path": "default16-01/n12-permit-held/test.stdout.log",
+          "sha256": "5f43a723516cbe9cf14b81c9a6475a1a130d9df8ca2ca5e56e40d631797119da",
+          "counts": [
+            "test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 5.28s"
+          ],
+          "tail": "main_run_worker_and_callback_complete_under_global_model_concurrency_one stdout ----\n\nthread 'c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one' (20839741) panicked at crates/lingxi-service/tests/r05_t06_worker_model.rs:958:5:\nassertion `left == right` failed: the callback reached the provider once\n  left: 0\n right: 1\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one\n\ntest result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 5.28s\n\nerror: test failed, to rerun pass `-p lingxi-service --test r05_t06_worker_model`\n"
+        }
+      ]
+    },
+    {
+      "id": "R05-GATE-N13",
+      "exit": 2,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "R04 递延叶改判/删除 → R04 门禁硬拒",
+      "files": [
+        {
+          "path": "default16-01/n13-r04-deferred-regrade/exit-code.txt",
+          "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+          "counts": [],
+          "tail": "2\n"
+        },
+        {
+          "path": "default16-01/n13-r04-deferred-regrade/run.log",
+          "sha256": "9bbf2f42e01e8267f8104e1f6a6fbf04fe22c901eaa6a70b3a4aa7d6afda9da1",
+          "counts": [],
+          "tail": "   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.90s\n     Running `/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R04 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n13-r04-deferred-regrade/evidence`\nerror: invalid stage map for R04: stage map invalid: supplemental leaf \"R00-T02-LA-00C88B996AA0\" missing basisKind\n"
+        }
+      ]
+    },
+    {
+      "id": "R05-GATE-N14",
+      "exit": 101,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "私开 LIVE lane → 离线命令集镜像红",
+      "files": [
+        {
+          "path": "default16-01/n14-live-lane/exit-code.txt",
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+          "counts": [],
+          "tail": "101\n"
+        },
+        {
+          "path": "default16-01/n14-live-lane/test.stdout.log",
+          "sha256": "e8f452471c010175e38b1461c395793bff256bb15e3a2c1bff33b6d334b03636",
+          "counts": [
+            "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+          ],
+          "tail": "fted — new commands need explicit review against the offline-only policy\n  left: [\"check_boundaries\", \"check_contracts\", \"live_probe\", \"r04_regression_gate\", \"r05_stage_suites\", \"rust_clippy\", \"rust_fmt\", \"rust_test_workspace\"]\n right: [\"check_boundaries\", \"check_contracts\", \"r04_regression_gate\", \"r05_stage_suites\", \"rust_clippy\", \"rust_fmt\", \"rust_test_workspace\"]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    stage_map::map_tests::r05_map_declares_no_live_lane_and_only_offline_commands\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s\n\nerror: test failed, to rerun pass `-p xtask --bin xtask`\n"
+        }
+      ]
+    },
+    {
+      "id": "R05-GATE-N15",
+      "exit": 101,
+      "named": "OK",
+      "verdict": "OK",
+      "note": "秘密进错误文本 → 无料单测红",
+      "files": [
+        {
+          "path": "default16-01/n15-secret-in-error/exit-code.txt",
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+          "counts": [],
+          "tail": "101\n"
+        },
+        {
+          "path": "default16-01/n15-secret-in-error/test.stdout.log",
+          "sha256": "342fb982ba9f46b85e058c022d88eb3d59f9060ccd415e2accd59ea199439f29",
+          "counts": [
+            "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+          ],
+          "tail": "ce-0532c49ca08cc763)\n\nrunning 1 test\ntest credentials::tests::handle_refusal_texts_carry_no_material ... FAILED\n\nfailures:\n\n---- credentials::tests::handle_refusal_texts_carry_no_material stdout ----\n\nthread 'credentials::tests::handle_refusal_texts_carry_no_material' (20844442) panicked at crates/lingxi-service/src/credentials/mod.rs:1618:9:\nassertion failed: !text.contains(\"sk-\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    credentials::tests::handle_refusal_texts_carry_no_material\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s\n\nerror: test failed, to rerun pass `-p lingxi-service --lib`\n"
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "name": "control-xtask",
+      "exit": 0,
+      "counts": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 113 filtered out; finished in 0.04s"
+      ]
+    },
+    {
+      "name": "control-binwiring",
+      "exit": 0,
+      "counts": [
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.81s"
+      ]
+    },
+    {
+      "name": "n03-restored",
+      "exit": 0,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+      ]
+    }
+  ]
+}

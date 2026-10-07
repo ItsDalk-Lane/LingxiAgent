@@ -1,0 +1,5 @@
+# binding-exclusion: artifacts/rust-tauri/R05/run001/child/stderr.log/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)
+# binding-exclusion: artifacts/rust-tauri/R05/run001/child/stdout.log/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)
+# binding-exclusion: artifacts/rust-tauri/R05/run001/stdout.log/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)
+8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd  A   .gitignore
+cba06b5736faf67e54b07b561eae94395e774c517a7d910a54369e1263ccfbd4  ??  artifacts/rust-tauri/R05/run001/child/old-evidence.json

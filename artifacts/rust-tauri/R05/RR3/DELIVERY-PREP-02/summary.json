@@ -1,0 +1,95 @@
+{
+  "startUTC": "2026-10-07T03:57:55.399753+00:00",
+  "endUTC": "2026-10-07T03:57:56.157670+00:00",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "branch": "codex/rust-tauri-migration",
+  "isFinalFreeze": false,
+  "scope": "只审PREP01的768项及同工作副本/票据必要补正；总表是旧快照合成，不含后来J/G/E/FINAL新增路径",
+  "reviewedPaths": 768,
+  "decisionCounts": {
+    "INCLUDE_EVIDENCE_SNAPSHOT": 257,
+    "LOCAL_ONLY": 511
+  },
+  "ruleCounts": {
+    "A02_READONLY_INPUT": 3,
+    "A_REVIEW1_WORKCOPY": 500,
+    "A_REVIEW2_WORKCOPY": 3,
+    "NEGATIVE_PRISTINE_INPUT": 44,
+    "C_FROZEN_SOURCE": 1,
+    "E_READONLY_SOURCE_EXCERPT": 24,
+    "F46_ORIGINAL_SOURCE": 1,
+    "RESTORE_PRISTINE_INPUT": 77,
+    "SNAPSHOT_CMP_RAW_INPUT": 7,
+    "RUNNER_PRISTINE_INPUT": 40,
+    "I_MKDIR_RECOVERED_INPUT": 1,
+    "I_OLD_WORKCOPY": 8,
+    "I_OLD_PRISTINE": 8,
+    "TRIAGE_CAPTURED_SOURCE": 44,
+    "TRIAGE_GIT_SOURCE": 7
+  },
+  "supplementalCorrections": 558,
+  "supplementalRuleCounts": {
+    "A_REVIEW1_WORKCOPY": 536,
+    "A_REVIEW2_WORKCOPY": 1,
+    "SYNTHETIC_RUNTIME_TICKET": 17,
+    "I_OLD_WORKCOPY": 4
+  },
+  "mergedPaths": 19734,
+  "mergedCategories": {
+    "INCLUDE_EVIDENCE": {
+      "paths": 13508,
+      "bytes": 543961821
+    },
+    "LOCAL_NESTED_REPOSITORY": {
+      "paths": 52,
+      "bytes": 15296
+    },
+    "INCLUDE_EVIDENCE_SNAPSHOT": {
+      "paths": 257,
+      "bytes": 22635897
+    },
+    "LOCAL_ONLY": {
+      "paths": 1069,
+      "bytes": 57969517
+    },
+    "LOCAL_SYMLINK": {
+      "paths": 1,
+      "bytes": 62
+    },
+    "LOCAL_BUILD_CACHE": {
+      "paths": 3442,
+      "bytes": 670398712
+    },
+    "LOCAL_BINARY": {
+      "paths": 61,
+      "bytes": 448967152
+    },
+    "LOCAL_ISOLATED_SOURCE": {
+      "paths": 1199,
+      "bytes": 40831902
+    },
+    "LOCAL_RUNTIME_STATE": {
+      "paths": 82,
+      "bytes": 7018
+    },
+    "INCLUDE_CURRENT_DOC": {
+      "paths": 42,
+      "bytes": 4820943
+    },
+    "INCLUDE_PRODUCTION": {
+      "paths": 21,
+      "bytes": 847068
+    }
+  },
+  "localOriginalIndexCount": 2036,
+  "historicalAndBaselineComparisons": 2582,
+  "mismatchCount": 0,
+  "reviewedStatChangedSincePrep01": [],
+  "inheritedLocalOriginalStatChanged": [],
+  "newContentBytesHashed": 106606428,
+  "stagedUnchanged": true,
+  "stagedBeforeCount": 0,
+  "commandsExecuted": "只读Git查询及本分类脚本；无构建、测试、证据driver执行、网络、stage/commit/push或原件删除",
+  "securityBoundary": "仅核相关driver来源与已发现临时票据，不是完整秘密安全扫描；未读取真实用户home，不公开任何令牌原文",
+  "requiredRefresh": "后续J/G/E/FINAL停止写入后必须重新实际枚举、分类、检查引用和当前输入；禁止直接套用本名单stage"
+}

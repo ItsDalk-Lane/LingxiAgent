@@ -1,0 +1,24 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.25s
+     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 1 test
+test stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once ... FAILED
+
+failures:
+
+---- stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once stdout ----
+
+thread 'stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once' (21435227) panicked at crates/xtask/src/stage_map.rs:3376:9:
+assertion `left == right` failed: the cid table must own EXACTLY the registry's cid-bound set — a fabricated, renamed, or dropped C-ID is a mismatch (fabricated/unregistered: ["R05-T99-C99"]; missing: [])
+  left: {"R05-T01-C02", "R05-T01-C03", "R05-T01-C04", "R05-T01-C05", "R05-T01-C06", "R05-T01-C07", "R05-T01-C08", "R05-T01-C09", "R05-T01-C10", "R05-T01-C11", "R05-T02-C01", "R05-T02-C02", "R05-T02-C03", "R05-T02-C04", "R05-T02-C05", "R05-T02-C06", "R05-T02-C07", "R05-T02-C08", "R05-T02-C09", "R05-T02-C10", "R05-T02-C11", "R05-T02-C12", "R05-T03-C01", "R05-T03-C02", "R05-T03-C03", "R05-T03-C04", "R05-T03-C05", "R05-T03-C06", "R05-T03-C07", "R05-T03-C08", "R05-T03-C09", "R05-T03-C10", "R05-T03-C11", "R05-T03-C12", "R05-T04-C01", "R05-T04-C02", "R05-T04-C03", "R05-T04-C04", "R05-T04-C05", "R05-T04-C06", "R05-T04-C07", "R05-T04-C08", "R05-T04-C09", "R05-T04-C10", "R05-T04-C11", "R05-T04-C12", "R05-T04-C13", "R05-T04-C14", "R05-T04-C15", "R05-T04-C16", "R05-T05-C01", "R05-T05-C02", "R05-T05-C03", "R05-T05-C05", "R05-T05-C07", "R05-T05-C08", "R05-T05-C11", "R05-T05-C11B", "R05-T05-C12", "R05-T05-C13", "R05-T06-C01", "R05-T06-C02", "R05-T06-C03", "R05-T06-C04", "R05-T06-C05", "R05-T06-C06", "R05-T06-C07", "R05-T06-C08", "R05-T06-C09", "R05-T06-C10", "R05-T06-C11", "R05-T06-C12", "R05-T07-C01", "R05-T07-C02", "R05-T07-C03", "R05-T07-C04", "R05-T07-C05", "R05-T07-C06", "R05-T07-C07", "R05-T07-C08", "R05-T07-C09", "R05-T07-C10", "R05-T08-C01", "R05-T08-C02", "R05-T08-C03", "R05-T08-C04", "R05-T08-C05", "R05-T08-C06", "R05-T08-C07", "R05-T08-C08", "R05-T08-C09", "R05-T08-C11", "R05-T08-C12", "R05-T99-C99"}
+ right: {"R05-T01-C02", "R05-T01-C03", "R05-T01-C04", "R05-T01-C05", "R05-T01-C06", "R05-T01-C07", "R05-T01-C08", "R05-T01-C09", "R05-T01-C10", "R05-T01-C11", "R05-T02-C01", "R05-T02-C02", "R05-T02-C03", "R05-T02-C04", "R05-T02-C05", "R05-T02-C06", "R05-T02-C07", "R05-T02-C08", "R05-T02-C09", "R05-T02-C10", "R05-T02-C11", "R05-T02-C12", "R05-T03-C01", "R05-T03-C02", "R05-T03-C03", "R05-T03-C04", "R05-T03-C05", "R05-T03-C06", "R05-T03-C07", "R05-T03-C08", "R05-T03-C09", "R05-T03-C10", "R05-T03-C11", "R05-T03-C12", "R05-T04-C01", "R05-T04-C02", "R05-T04-C03", "R05-T04-C04", "R05-T04-C05", "R05-T04-C06", "R05-T04-C07", "R05-T04-C08", "R05-T04-C09", "R05-T04-C10", "R05-T04-C11", "R05-T04-C12", "R05-T04-C13", "R05-T04-C14", "R05-T04-C15", "R05-T04-C16", "R05-T05-C01", "R05-T05-C02", "R05-T05-C03", "R05-T05-C05", "R05-T05-C07", "R05-T05-C08", "R05-T05-C11", "R05-T05-C11B", "R05-T05-C12", "R05-T05-C13", "R05-T06-C01", "R05-T06-C02", "R05-T06-C03", "R05-T06-C04", "R05-T06-C05", "R05-T06-C06", "R05-T06-C07", "R05-T06-C08", "R05-T06-C09", "R05-T06-C10", "R05-T06-C11", "R05-T06-C12", "R05-T07-C01", "R05-T07-C02", "R05-T07-C03", "R05-T07-C04", "R05-T07-C05", "R05-T07-C06", "R05-T07-C07", "R05-T07-C08", "R05-T07-C09", "R05-T07-C10", "R05-T08-C01", "R05-T08-C02", "R05-T08-C03", "R05-T08-C04", "R05-T08-C05", "R05-T08-C06", "R05-T08-C07", "R05-T08-C08", "R05-T08-C09", "R05-T08-C11", "R05-T08-C12"}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`

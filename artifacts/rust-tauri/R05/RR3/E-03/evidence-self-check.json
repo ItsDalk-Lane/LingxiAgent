@@ -1,0 +1,258 @@
+{
+  "at": "2026-10-07T04:55:31.275415+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "default shell raw exit is unknown",
+      "passed": true
+    },
+    {
+      "name": "recorder and observer distinct",
+      "passed": true
+    },
+    {
+      "name": "actual default scope complete intended but not completed",
+      "passed": true
+    },
+    {
+      "name": "target rows exact",
+      "passed": true
+    },
+    {
+      "name": "tsv original two rows",
+      "passed": true
+    },
+    {
+      "name": "G actual log control-xtask",
+      "passed": true
+    },
+    {
+      "name": "G actual log control-binwiring",
+      "passed": true
+    },
+    {
+      "name": "G actual log n01-delete-a16",
+      "passed": true
+    },
+    {
+      "name": "N02 real ENOSPC",
+      "passed": true
+    },
+    {
+      "name": "N02 target not reached",
+      "passed": true
+    },
+    {
+      "name": "full R02 and E5 absent",
+      "passed": true
+    },
+    {
+      "name": "G writers stopped",
+      "passed": true
+    },
+    {
+      "name": "H actual output resources-final",
+      "passed": true
+    },
+    {
+      "name": "H actual output ordinary-cancel-recovery",
+      "passed": true
+    },
+    {
+      "name": "H actual output late-result-next-run",
+      "passed": true
+    },
+    {
+      "name": "H actual output redaction-final-2",
+      "passed": true
+    },
+    {
+      "name": "H actual output logging-final",
+      "passed": true
+    },
+    {
+      "name": "dynamic manifest differences preserved",
+      "passed": true
+    },
+    {
+      "name": "authority original docs/rust-tauri/R05/repair-current/RR1_MASTER_PROMPT_2026-10-04.md",
+      "passed": true
+    },
+    {
+      "name": "authority original docs/rust-tauri/R05/repair-current/RR2_MASTER_PROMPT_2026-10-06.md",
+      "passed": true
+    },
+    {
+      "name": "authority original artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/Lingxi_R05_完整执行与验收提示词_2026-10-02.md",
+      "passed": true
+    },
+    {
+      "name": "authority original artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/01_通用执行约束.md",
+      "passed": true
+    },
+    {
+      "name": "authority original artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/02_目标架构与强制契约.md",
+      "passed": true
+    },
+    {
+      "name": "authority original artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R05_模型协议、凭证、流式处理与最小完整闭环.md",
+      "passed": true
+    },
+    {
+      "name": "authority original artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/04_阶段依赖与接口交接.md",
+      "passed": true
+    },
+    {
+      "name": "authority original artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/06_风险、技术决策与退出条件.md",
+      "passed": true
+    },
+    {
+      "name": "authority original artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R06_上下文、会话语义、记忆与知识库.md",
+      "passed": true
+    },
+    {
+      "name": "authority original artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/05_验收与性能协议.md",
+      "passed": true
+    },
+    {
+      "name": "authority original artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/03_功能与所有权矩阵.md",
+      "passed": true
+    }
+  ],
+  "raw_logs": [
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01/control-xtask/test.stdout.log",
+      "sha256": "80a7da395d4fac1650e0f33aa9a329555c2acc6198da4dff767511fb18269625",
+      "bytes": 1152,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01/control-binwiring/test.stdout.log",
+      "sha256": "76bd53863f0c488ec03db8d8e398c4cdc55e0dcd8da9f7af0600c9ba41a45fa0",
+      "bytes": 921,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01/n01-delete-a16/test.stdout.log",
+      "sha256": "17bfda8aeae49bf5e263d78bcd9435f342fafa5e491ee1aedcbabbbb79443c9e",
+      "bytes": 1038,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01/n02-zero-match/suites/build.log",
+      "sha256": "e6d74b718d18903209768d83bef371b58a3084a0a5c068349f57813dbaa443b8",
+      "bytes": 150815,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/command.json",
+      "sha256": "1bafe23e7f45ac5513177c94db797a204988b73165142c0b026ac88ede0faf52",
+      "bytes": 3258,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/stdout.log",
+      "sha256": "f3ea9615f106ce9bf00007db5ccc927021182cec870dd4b2f482eb258002e28a",
+      "bytes": 1128,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/stderr.log",
+      "sha256": "3c6ce299b9d2fd0067ae269f57889d1e9508f6432670d9293a050293653b15d7",
+      "bytes": 232,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/ordinary-cancel-recovery/command.json",
+      "sha256": "8aa0328dbf1a892460340776c63f04c057385fcfee377faa2a8432a76966fd16",
+      "bytes": 3225,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/ordinary-cancel-recovery/stdout.log",
+      "sha256": "cb7eb57e27799d0e51c2435d1dd4461965098a3a286e0f09123a51ce806e99d8",
+      "bytes": 191,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/ordinary-cancel-recovery/stderr.log",
+      "sha256": "1fb179ed5033a26ec25cbdacad94cf94b86880c7943081301c5d80b72972f35c",
+      "bytes": 284,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/late-result-next-run/command.json",
+      "sha256": "c4c61258db384a9a8a3a3c6b433a447f8a5e7dc4c0dcda949f5082598ccdf442",
+      "bytes": 3221,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/late-result-next-run/stdout.log",
+      "sha256": "cbc24d275f1eb8f77bb7415358587adcb016a95d602befa1c4e07f795af722da",
+      "bytes": 318,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/late-result-next-run/stderr.log",
+      "sha256": "6982d3469683b52c0213b62cc067f78affc64309b6813a3335d505a393393e7e",
+      "bytes": 284,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/redaction-final-2/command.json",
+      "sha256": "c898c1ffccd4b27b1964ddc38ba1f35ddd843babd3bd57978c49c5332698f760",
+      "bytes": 3137,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/redaction-final-2/stdout.log",
+      "sha256": "5a988de42bb093cb94b9c93c58c20ffe99a89088d36e58380a918250280c3af0",
+      "bytes": 2022,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/redaction-final-2/stderr.log",
+      "sha256": "fa0c252a3bd794f230e7d9c178996fead06b52288a418071c1f335929bed5e7a",
+      "bytes": 276,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/logging-final/command.json",
+      "sha256": "50a857ce30bc1cb8cd2cc15635403c705a81ed87b44be6411b5989ef95144109",
+      "bytes": 3134,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/logging-final/stdout.log",
+      "sha256": "bcf62bdbd446a605fc2b04dd12fe8245de7e38aa5d5a7bf387a3b259268eeeae",
+      "bytes": 801,
+      "mode": 420,
+      "link": null
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/logging-final/stderr.log",
+      "sha256": "79389f0175ec6e360082a991bb2963319d3c9b0552b27c7889e1e89323418252",
+      "bytes": 164,
+      "mode": 420,
+      "link": null
+    }
+  ],
+  "executed_product_tests": false
+}

@@ -1,0 +1,176 @@
+--- original-before-I
++++ current-candidate
+@@ -54,7 +54,8 @@
+ mkdir -p "$HOME/r05t08-work"
+ # 每次建立新副本，避免覆盖历史证据或另一个正在运行的注入副本。
+ COPY="$(mktemp -d "$HOME/r05t08-work/negcopy.XXXXXX")" || fail "cannot create isolated copy"
+-note "== preparing the isolated copy at $COPY (local clone of HEAD $(git -C "$ROOT" rev-parse --short HEAD) + uncommitted working-tree overlay) =="
++SOURCE_HEAD="$(git -C "$ROOT" rev-parse --short HEAD)" || fail "source HEAD query failed"
++note "== preparing the isolated copy at $COPY (local clone of HEAD $SOURCE_HEAD + uncommitted working-tree overlay) =="
+ rm -rf "$COPY"
+ if ! git -C "$ROOT" clone --no-hardlinks --quiet --branch codex/rust-tauri-migration "$ROOT" "$COPY" > "$EV/clone.log" 2>&1; then
+   cat "$EV/clone.log"; fail "local clone failed"
+@@ -69,45 +70,89 @@
+ done
+ # The copy must NOT carry main-tree artifacts (evidence trees stay behind);
+ # its candidate binding covers its own tree only.
+-note "== copy ready (branch $(git -C "$COPY" rev-parse --abbrev-ref HEAD), HEAD $(git -C "$COPY" rev-parse --short HEAD), worktree dirty=$(git -C "$COPY" status --porcelain | wc -l | tr -d ' ') files) =="
++COPY_BRANCH="$(git -C "$COPY" rev-parse --abbrev-ref HEAD)" || fail "copy branch query failed"
++COPY_HEAD="$(git -C "$COPY" rev-parse --short HEAD)" || fail "copy HEAD query failed"
++COPY_STATUS="$(git -C "$COPY" status --porcelain)" || fail "copy status query failed"
++COPY_DIRTY_COUNT="$(printf '%s\n' "$COPY_STATUS" | sed '/^$/d' | wc -l | tr -d ' ')" || fail "copy dirty count failed"
++note "== copy ready (branch $COPY_BRANCH, HEAD $COPY_HEAD, worktree dirty=$COPY_DIRTY_COUNT files) =="
+ 
+ # Pristine copies of every file this harness mutates (reset between cases).
+ PRISTINE="$EV/pristine"
+ mkdir -p "$PRISTINE"
+ snapshot_pristine() {
+-  mkdir -p "$PRISTINE/$(dirname "$1")"
+-  cp "$COPY/$1" "$PRISTINE/$1"
+-}
+-for f in \
+-  rust/crates/xtask/src/stage_maps/R05.json \
+-  rust/crates/xtask/src/stage_maps/R04.json \
+-  rust/crates/lingxi-service/src/lib.rs \
+-  rust/crates/lingxi-kernel/src/lib.rs \
+-  rust/crates/lingxi-adapters/src/models/tool_render.rs \
+-  rust/crates/lingxi-adapters/src/models/openai_completions.rs \
+-  rust/crates/lingxi-adapters/src/models/credentials.rs \
+-  rust/crates/lingxi-service/src/runs.rs \
+-  rust/crates/lingxi-service/src/credentials/mod.rs \
+-  rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs \
+-  docs/rust-tauri/R05/r05_stage_pins.tsv \
+-  scripts/rust-tauri/r05_t08_stage_suites.sh; do
++  # 快照只拍一次，不能把变异或漂移重新当作合法基线。
++  [ ! -e "$PRISTINE/$1" ] || fail "pristine snapshot already exists: $1"
++  mkdir -p "$PRISTINE/$(dirname "$1")" || fail "pristine directory failed: $1"
++  cp "$COPY/$1" "$PRISTINE/$1" || fail "pristine copy failed: $1"
++  cmp "$COPY/$1" "$PRISTINE/$1" || fail "pristine bytes differ: $1"
++}
++# 快照和恢复消费同一份清单，避免新增变异目标只登记到一侧。
++MUTATED_FILES=(
++  rust/crates/xtask/src/stage_maps/R05.json
++  rust/crates/xtask/src/stage_maps/R04.json
++  rust/crates/lingxi-service/src/lib.rs
++  rust/crates/lingxi-kernel/src/lib.rs
++  rust/crates/lingxi-adapters/src/models/tool_render.rs
++  rust/crates/lingxi-adapters/src/models/openai_completions.rs
++  rust/crates/lingxi-adapters/src/models/credentials.rs
++  rust/crates/lingxi-service/src/runs.rs
++  rust/crates/lingxi-service/src/credentials/mod.rs
++  rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs
++  docs/rust-tauri/R05/r05_stage_pins.tsv
++  scripts/rust-tauri/r05_t08_stage_suites.sh
++)
++for f in "${MUTATED_FILES[@]}"; do
+   snapshot_pristine "$f"
+ done
+ reset_copy() {
+-  for f in \
+-    rust/crates/xtask/src/stage_maps/R05.json \
+-    rust/crates/xtask/src/stage_maps/R04.json \
+-    rust/crates/lingxi-service/src/lib.rs \
+-    rust/crates/lingxi-adapters/src/models/tool_render.rs \
+-    rust/crates/lingxi-adapters/src/models/openai_completions.rs \
+-    rust/crates/lingxi-adapters/src/models/credentials.rs \
+-    rust/crates/lingxi-service/src/runs.rs \
+-    rust/crates/lingxi-service/src/credentials/mod.rs \
+-    rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs \
+-    docs/rust-tauri/R05/r05_stage_pins.tsv \
+-    scripts/rust-tauri/r05_t08_stage_suites.sh; do
+-    cp "$PRISTINE/$f" "$COPY/$f"
++  local f
++  for f in "${MUTATED_FILES[@]}"; do
++    cp "$PRISTINE/$f" "$COPY/$f" || fail "restore copy failed: $f"
++    cmp "$PRISTINE/$f" "$COPY/$f" || fail "restore bytes differ: $f"
+   done
++}
++
++n06_start_signal() {
++  # 使用现行场景首命令的权威 argv，匹配 verify.rs 已有的启动输出。
++  python3 - "$COPY/rust/crates/xtask/src/stage_maps/R02.json" "$1" <<'PY'
++import json, pathlib, sys
++stage = json.loads(pathlib.Path(sys.argv[1]).read_text())
++key = stage["scenarios"][0]["commandRefs"][0]
++argv = stage["commands"][key]["argv"]
++print(f'xtask: verify-stage {stage["stage"]} [{" ".join(argv)}] > {pathlib.Path(sys.argv[2]) / key}')
++PY
++}
++
++wait_for_n06_start() {
++  local pid="$1" log="$2" signal="$3" limit="${4:-240}" matched i
++  for ((i=0; i<limit; i++)); do
++    n06_gate_running "$pid" || return 1
++    grep -Fx -- "$signal" "$log" >/dev/null
++    matched=$?
++    if [ "$matched" -eq 0 ]; then
++      n06_gate_running "$pid" || return 1
++      return 0
++    fi
++    [ "$matched" -eq 1 ] || { echo "N06 prerequisite failed: start log query failed" >&2; return 1; }
++    sleep 1
++  done
++  echo "N06 prerequisite failed: authoritative command start not observed" >&2
++  return 1
++}
++
++n06_gate_running() {
++  # 未回收的已退出进程仍可能响应 kill -0，因此同时拒绝僵尸状态。
++  local state status
++  state="$(ps -p "$1" -o stat=)"
++  status=$?
++  if [ "$status" -gt 1 ]; then
++    echo "N06 prerequisite failed: process query failed" >&2
++    return 1
++  fi
++  case "$state" in
++    ""|*Z*) echo "N06 prerequisite failed: gate exited" >&2; return 1 ;;
++  esac
++  [ "$status" -eq 0 ] && kill -0 "$1" 2>/dev/null || { echo "N06 prerequisite failed: gate exited" >&2; return 1; }
+ }
+ 
+ record_case() { # name exit_code named verdict note
+@@ -304,21 +349,24 @@
+ N06_DIR="$EV/n06-midgate-mutation"
+ mkdir -p "$N06_DIR"
+ note "== N06: verify-stage R02 launched; a source file is edited mid-run; the result must be STALE/FAIL =="
++N06_SIGNAL="$(n06_start_signal "$N06_DIR/evidence")" || fail "N06 authority query failed"
++printf '%s\n' "$N06_SIGNAL" > "$N06_DIR/expected-start.txt" || fail "N06 signal receipt failed"
++: > "$N06_DIR/run.log" || fail "N06 log creation failed"
+ (cd "$COPY" && "$CARGO" run --manifest-path rust/Cargo.toml --locked -p xtask -- \
+    verify-stage R02 --evidence "$N06_DIR/evidence" > "$N06_DIR/run.log" 2>&1) &
+ N06_PID=$!
+-# Wait until the gate has actually STARTED (its evidence root is created
+-# right before the first command), then mutate mid-run — never before the
+-# before-snapshot, never after the gate finished.
+-N06_WAITED=0
+-for _ in $(seq 1 240); do
+-  if [ -d "$N06_DIR/evidence" ]; then N06_WAITED=1; break; fi
+-  sleep 1
+-done
+-[ "$N06_WAITED" -eq 1 ] || note "N06 WARNING: the evidence root never appeared before the mutation window"
+-sleep 3
++# 启动行在初始快照及 runner 校验之后输出；仅目录出现不能证明此前提。
++wait_for_n06_start "$N06_PID" "$N06_DIR/run.log" "$N06_SIGNAL"
++N06_SYNC_EXIT=$?
++echo "$N06_SYNC_EXIT" > "$N06_DIR/sync-exit-code.txt"
++if [ "$N06_SYNC_EXIT" -ne 0 ]; then
++  wait "$N06_PID"
++  echo "$?" > "$N06_DIR/exit-code.txt"
++  fail "N06 injection refused: initial binding and live gate not proven"
++fi
++n06_gate_running "$N06_PID" || fail "N06 injection refused: gate already exited or inaccessible"
+ printf '\n// N06 mid-gate mutation: a candidate byte change during the gate run\n' \
+-  >> "$COPY/rust/crates/lingxi-kernel/src/lib.rs"
++  >> "$COPY/rust/crates/lingxi-kernel/src/lib.rs" || fail "N06 source append failed"
+ wait $N06_PID
+ N06_EXIT=$?
+ echo "$N06_EXIT" > "$N06_DIR/exit-code.txt"
+@@ -628,5 +676,7 @@
+ if [ "$N16_REUSE_EXIT" -ne 0 ] && [ "$N16_NAMED" = "OK" ]; then N16_VERDICT=OK; fi
+ record_case "R05-GATE-N16" "$N16_REUSE_EXIT" "$N16_NAMED" "$N16_VERDICT" "验收后改码 → 绑定摘要漂移且旧证据根拒收（属性判定不依赖 R02 整体结果——其矩阵命令受已登记的间歇 LAN 停驻环境项影响，与绑定机制无关）"
+ 
++# 最后一项也必须还原，汇总不能在副本仍带变异时宣称完整恢复。
++reset_copy
+ write_results
+ note "RESULT: every R05 negative case failed closed with the gap named (16/16), controls green"

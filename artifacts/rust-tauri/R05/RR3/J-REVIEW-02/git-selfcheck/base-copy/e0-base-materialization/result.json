@@ -1,0 +1,394 @@
+{
+  "status": "PASS",
+  "startedUtc": "2026-10-07T04:14:13.325740+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+      "startedUtc": "2026-10-07T04:14:13.326132+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.332321+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "812a5354e953d6aa217bcedd16fd2e19aab59f1dda0977268661c0b637ac769d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0000.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+      "startedUtc": "2026-10-07T04:14:13.332530+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.339137+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "409ef1715c6d1707f26916000916fe7c566f0302153fd70799ede647c6dddacf",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0001.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+        "rev-parse",
+        "--verify",
+        "c3e7694aef16ec58d45af3cd8e0d44b3b54987d3^{commit}"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+      "startedUtc": "2026-10-07T04:14:13.339454+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.345905+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e0a1518466c7261e31ae05c5a1ef72bc6d7608207aea52eaf79af44ea54a1a47",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0002.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+        "rev-parse",
+        "--show-object-format"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+      "startedUtc": "2026-10-07T04:14:13.346085+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.352222+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "335277ee77cfc8d51d6602e4137232cf6041aac2bc663777e384b90d5ae74d51",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0003.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+        "ls-tree",
+        "-rlz",
+        "c3e7694aef16ec58d45af3cd8e0d44b3b54987d3"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+      "startedUtc": "2026-10-07T04:14:13.352446+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.359563+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "1e8e5baf42ae5feb51b03f908528eecb1d1111ac432e882ba962c4df3a79e556",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0004.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+        "clone",
+        "--shared",
+        "--no-checkout",
+        "--quiet",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+      "startedUtc": "2026-10-07T04:14:13.360137+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.383208+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0005.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+        "update-ref",
+        "--no-deref",
+        "HEAD",
+        "c3e7694aef16ec58d45af3cd8e0d44b3b54987d3"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+      "startedUtc": "2026-10-07T04:14:13.383371+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.390447+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0006.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+        "read-tree",
+        "c3e7694aef16ec58d45af3cd8e0d44b3b54987d3"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+      "startedUtc": "2026-10-07T04:14:13.390615+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.397942+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0007.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+      "startedUtc": "2026-10-07T04:14:13.398099+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.432362+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0008.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+      "startedUtc": "2026-10-07T04:14:13.432556+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.439380+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "bd190e9d1223f3ec77d0f3753085e67591f87eec4874a4dcaae39eddd2fd3ad2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0009.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+        "cat-file",
+        "blob",
+        "4e261541b51d9842234d2285184305448cd8b294"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+      "startedUtc": "2026-10-07T04:14:13.440343+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.446903+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ee3cab3dfc05f43d665398fea74781f16afc4adef2ea6b4dd8e151c93e2f24c4",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0010.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+        "cat-file",
+        "blob",
+        "3c8316dc5c7ace5d8b09464297605304ecb58342"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+      "startedUtc": "2026-10-07T04:14:13.447214+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.453575+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "48f2a5e52aa48adc1d96b8f578e324dc898be5a2215616775d92bdece4bf9458",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base/missing"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+        "cat-file",
+        "blob",
+        "ffea877c93f101d661df845365937e698c1e1761"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+      "startedUtc": "2026-10-07T04:14:13.454487+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.461265+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "34d6a94dacb895403529caac12a19aed745c6caca7a8d0f4ed631999044f76e8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base/plain"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+        "ls-tree",
+        "-rlz",
+        "HEAD"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+      "startedUtc": "2026-10-07T04:14:13.461916+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.468518+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "1e8e5baf42ae5feb51b03f908528eecb1d1111ac432e882ba962c4df3a79e556",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0013.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+        "write-tree"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+      "startedUtc": "2026-10-07T04:14:13.468701+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.475112+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "bd190e9d1223f3ec77d0f3753085e67591f87eec4874a4dcaae39eddd2fd3ad2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0014.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+        "diff",
+        "--exit-code",
+        "c3e7694aef16ec58d45af3cd8e0d44b3b54987d3",
+        "--"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+      "startedUtc": "2026-10-07T04:14:13.475277+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.482952+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0015.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+        "status",
+        "--porcelain=v1",
+        "-z",
+        "--untracked-files=all"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+      "startedUtc": "2026-10-07T04:14:13.483109+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.490105+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0016.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+      "startedUtc": "2026-10-07T04:14:13.490270+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.524527+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0017.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+      "startedUtc": "2026-10-07T04:14:13.525053+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.530989+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "812a5354e953d6aa217bcedd16fd2e19aab59f1dda0977268661c0b637ac769d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0018.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+      "startedUtc": "2026-10-07T04:14:13.531179+00:00",
+      "finishedUtc": "2026-10-07T04:14:13.536928+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "409ef1715c6d1707f26916000916fe7c566f0302153fd70799ede647c6dddacf",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization/git-0019.stdout"
+    }
+  ],
+  "platform": "darwin",
+  "argv": [
+    "/private/tmp/lingxi-git-copy-beb_qt6r/source/scripts/rust-tauri/prepare_git_copy.py",
+    "--source",
+    "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+    "--copy",
+    "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+    "--revision",
+    "c3e7694aef16ec58d45af3cd8e0d44b3b54987d3",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/git-selfcheck/base-copy/e0-base-materialization"
+  ],
+  "cwd": "/private/tmp/lingxi-git-copy-beb_qt6r",
+  "spaceNote": "\u5b9e\u9645\u6587\u4ef6\u7cfb\u7edf\u53ef\u7528\u7a7a\u95f4\u622a\u70b9\uff0c\u4e0d\u80fd\u89e3\u91ca\u4e3a\u6b64\u526f\u672c\u72ec\u5360\u7269\u7406\u5757",
+  "source": "/private/tmp/lingxi-git-copy-beb_qt6r/source",
+  "copy": "/private/tmp/lingxi-git-copy-beb_qt6r/base-work/repo-base",
+  "requestedRevision": "c3e7694aef16ec58d45af3cd8e0d44b3b54987d3",
+  "sourceBefore": {
+    "head": "41d362e5be41a0ac534b37a9783b3b5c6d764dca",
+    "headFileSha256": "a5514e446d5aa78abd1b01492bf577b9b369799dd4461fd9e7da0ae3c87814e4",
+    "indexSha256": "775b2e740a0522d84b322eac70dbe2e98ae743e44910e3300b39a0fc56c4e175"
+  },
+  "freeBytesBefore": 1519333376,
+  "helperSha256": "37f4246a11f54826f2a31a772c1db0b5e3422c0261ea56c9872c3a3b75c9cb24",
+  "commit": "c3e7694aef16ec58d45af3cd8e0d44b3b54987d3",
+  "tree": "3d0f1fa384d56ff1f7b673e7c8fbc0a97bc68fe6",
+  "objectFormat": "sha1",
+  "sourceAfter": {
+    "head": "41d362e5be41a0ac534b37a9783b3b5c6d764dca",
+    "headFileSha256": "a5514e446d5aa78abd1b01492bf577b9b369799dd4461fd9e7da0ae3c87814e4",
+    "indexSha256": "775b2e740a0522d84b322eac70dbe2e98ae743e44910e3300b39a0fc56c4e175"
+  },
+  "tracked-files.json": {
+    "sha256": "d3efe6d7c67a6668f5dfabd9747820ee63a93c75a56191b09eb1d392ae8f7b05",
+    "count": 8
+  },
+  "source-files.json": {
+    "sha256": "a8994390c15d45fe73f993cef5eaee5de7d7612bc9add3ecf7040188a859b2b9",
+    "count": 8
+  },
+  "trackedCount": 8,
+  "trackedBytes": 14098,
+  "methods": {
+    "cow": 5,
+    "ordinary": 0,
+    "git-blob": 2,
+    "git-link": 1
+  },
+  "copyIndexSha256": "ab7e1d1f359c2d114d7271e80be2eefbca5a457b1ab4b277cc015ff36eb4d3f5",
+  "freeBytesAfter": 1519128576,
+  "finishedUtc": "2026-10-07T04:14:13.537547+00:00"
+}

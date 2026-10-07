@@ -1,0 +1,759 @@
+[
+  {
+    "label": "a01-final-both-levels",
+    "classification": "EXECUTED",
+    "record": "commands/a01-final-both-levels/command.json",
+    "recordSha256": "d0fbb9f97b0e594d3408e6ca838f1546a49a43e111db145530732cb384a48a42",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a01-final-both-levels/levels/warn/a01-leaf-cases.json",
+        "actual": 17,
+        "failed": 0
+      },
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a01-final-both-levels/levels/info/a01-leaf-cases.json",
+        "actual": 17,
+        "failed": 0
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "a13-final",
+    "classification": "EXECUTED",
+    "record": "commands/a13-final/command.json",
+    "recordSha256": "80002171766c7de3378af8308383fdd8932f4b4fcb52c72bf768a43ae6d28053",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "acceptance-independent-analysis",
+    "classification": "INVALID_CACHE_PREPARATION_RETAINED",
+    "record": "commands/acceptance-independent-analysis/command.json",
+    "recordSha256": "d0309d51609e6d19259fe95b1ba93e92058f6e1bfad988feb68885abdd39d889",
+    "exit": 1,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "acceptance-independent-analysis-2",
+    "classification": "EXECUTED",
+    "record": "commands/acceptance-independent-analysis-2/command.json",
+    "recordSha256": "dbf2e9f2dc639d66912274cdffc7229818afa327b11eb37bc7e767a3063c01a1",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "baseline-identity",
+    "classification": "EXECUTED",
+    "record": "commands/baseline-identity/command.json",
+    "recordSha256": "2f6b44edecfd0ea8879474edc9210fc93cdba2c5ada65436090848c0055bc8dd",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "ad4aa037205eafb92430c92b766f3e41c33747c550fcc3487ce523a19ade2e71"
+    }
+  },
+  {
+    "label": "f46-explicit-error",
+    "classification": "EXECUTED",
+    "record": "commands/f46-explicit-error/command.json",
+    "recordSha256": "8e5c905fc719b10988715558e96c86a6c7760756a912bf46577bc44075a7ab08",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "f46-final-six-command",
+    "classification": "EXECUTED",
+    "record": "commands/f46-final-six-command/command.json",
+    "recordSha256": "7a2acea3bf92f3f1b68dc3ffba0a7bd983bb666b8bb39c4e66b3021f2e2c5038",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "f46-old-prune-red",
+    "classification": "EXECUTED",
+    "record": "commands/f46-old-prune-red/command.json",
+    "recordSha256": "5591dfc4a23633888829ece7f68916807b146aac711cc624ba41c4a136602f36",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "cb6976e73625edad015434194fcc693ef4b0890921e6756f0c0ccc5b7dc3b52d"
+    }
+  },
+  {
+    "label": "f46-old-prune-red-build",
+    "classification": "EXECUTED",
+    "record": "commands/f46-old-prune-red-build/command.json",
+    "recordSha256": "bd442a7cc27a6221f50635001188c0640c7823b5a6e0bcf21a5e36934dd5f525",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "cb6976e73625edad015434194fcc693ef4b0890921e6756f0c0ccc5b7dc3b52d"
+    }
+  },
+  {
+    "label": "f46-old-prune-red-driver",
+    "classification": "EXECUTED",
+    "record": "commands/f46-old-prune-red-driver/command.json",
+    "recordSha256": "c090434077c82cdd8fa30ead4367ad814c14bfe9fc2f10a4f0bd81b58f51ad90",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "cb6976e73625edad015434194fcc693ef4b0890921e6756f0c0ccc5b7dc3b52d"
+    }
+  },
+  {
+    "label": "f46-old-six-command",
+    "classification": "TARGET_RED",
+    "record": "commands/f46-old-six-command/command.json",
+    "recordSha256": "3432507023921278b79784282241a1808d82e235247c1ac6307e7e2103e803f9",
+    "exit": 1,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "cb6976e73625edad015434194fcc693ef4b0890921e6756f0c0ccc5b7dc3b52d"
+    }
+  },
+  {
+    "label": "f46-restored-green",
+    "classification": "EXECUTED",
+    "record": "commands/f46-restored-green/command.json",
+    "recordSha256": "799e1a90e844c47224710b3f2f687d0828608da185ce2a9b988c9694f5c563d7",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "0afad67acdc9c36c41508ffbc5a16dc1a763fd72eec98edbc7147ee2227346e6"
+    }
+  },
+  {
+    "label": "f46-restored-green-build",
+    "classification": "EXECUTED",
+    "record": "commands/f46-restored-green-build/command.json",
+    "recordSha256": "8c94b8f67f5425f62efceed7d327f13296c7f358454dfca3ff737272b6ec3f44",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "0afad67acdc9c36c41508ffbc5a16dc1a763fd72eec98edbc7147ee2227346e6"
+    }
+  },
+  {
+    "label": "f46-restored-green-driver",
+    "classification": "EXECUTED",
+    "record": "commands/f46-restored-green-driver/command.json",
+    "recordSha256": "517392fd25a2ded7bb0b585eca81a7f32dc878ea8d64871c77df7dd7795f2ca7",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "0afad67acdc9c36c41508ffbc5a16dc1a763fd72eec98edbc7147ee2227346e6"
+    }
+  },
+  {
+    "label": "f46-restored-six-command",
+    "classification": "EXECUTED",
+    "record": "commands/f46-restored-six-command/command.json",
+    "recordSha256": "527aec88481ff0f87792baa6b155d804f5200f22c6878337386666de9e08f41e",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "0afad67acdc9c36c41508ffbc5a16dc1a763fd72eec98edbc7147ee2227346e6"
+    }
+  },
+  {
+    "label": "f47-guard-red",
+    "classification": "TARGET_RED",
+    "record": "commands/f47-guard-red/command.json",
+    "recordSha256": "50bcaa529adc56d3ccae8ca616ce82584fd9c1e6a1ebbd9167d94ca71bb2b79a",
+    "exit": 1,
+    "counts": [],
+    "leafCounts": [
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f47-guard-red/A01/a01-leaf-cases.json",
+        "actual": 11,
+        "failed": 1
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "fe8deb7b72e8f7ba3d3fc5d9d4a28b18ad9aebf1c62f6619c0e1aec827bc77bd"
+    }
+  },
+  {
+    "label": "f47-guard-red-build",
+    "classification": "EXECUTED",
+    "record": "commands/f47-guard-red-build/command.json",
+    "recordSha256": "2ffc21f9af4df25fa9765060f5deda9e50cdb8cc29b6ca52208bdee54d36aba9",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "fe8deb7b72e8f7ba3d3fc5d9d4a28b18ad9aebf1c62f6619c0e1aec827bc77bd"
+    }
+  },
+  {
+    "label": "f47-guard-red-driver",
+    "classification": "TARGET_RED",
+    "record": "commands/f47-guard-red-driver/command.json",
+    "recordSha256": "c11e520ee89439d2497c12838f3f7e924216f4564b210839b250311cd69beece",
+    "exit": 1,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "fe8deb7b72e8f7ba3d3fc5d9d4a28b18ad9aebf1c62f6619c0e1aec827bc77bd"
+    }
+  },
+  {
+    "label": "f47-old-warn",
+    "classification": "TARGET_RED",
+    "record": "commands/f47-old-warn/command.json",
+    "recordSha256": "8b36fd519175bcd5097992700173aa1c82cec75bc61e2baeac993aa65e63d609",
+    "exit": 1,
+    "counts": [],
+    "leafCounts": [
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f47-old-warn/A01/a01-leaf-cases.json",
+        "actual": 11,
+        "failed": 1
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "926499974b2631fed4debfb90dae9820b21b741b87a42f816ef657d66109d8ee"
+    }
+  },
+  {
+    "label": "f47-old-warn-build",
+    "classification": "EXECUTED",
+    "record": "commands/f47-old-warn-build/command.json",
+    "recordSha256": "11cc097690b85f118981d642fa6ba994af1e4149cda1cbbb6c65434dced9ca5c",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "926499974b2631fed4debfb90dae9820b21b741b87a42f816ef657d66109d8ee"
+    }
+  },
+  {
+    "label": "f47-restored-green",
+    "classification": "EXECUTED",
+    "record": "commands/f47-restored-green/command.json",
+    "recordSha256": "deb93690b0ef77b9a44c0c12f8db3e8d871a309015d48360cdcb13b2ed192a73",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f47-restored-green/A01/a01-leaf-cases.json",
+        "actual": 17,
+        "failed": 0
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "926499974b2631fed4debfb90dae9820b21b741b87a42f816ef657d66109d8ee"
+    }
+  },
+  {
+    "label": "f47-restored-green-2",
+    "classification": "EXECUTED",
+    "record": "commands/f47-restored-green-2/command.json",
+    "recordSha256": "c80900d65948c8037d774ee7212841090c8fa4a9b564e736452f94ae4be1c391",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f47-restored-green-2/A01/a01-leaf-cases.json",
+        "actual": 17,
+        "failed": 0
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "c59fc012a29bbbf97f2dc2459e2e29fea467556048ea254848d752bc6fd2f006"
+    }
+  },
+  {
+    "label": "f47-restored-green-2-build",
+    "classification": "EXECUTED",
+    "record": "commands/f47-restored-green-2-build/command.json",
+    "recordSha256": "8fbbb07fe31237535d2accc8027e8bd4b986ea027c3732addebef9e9221a75cd",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "c59fc012a29bbbf97f2dc2459e2e29fea467556048ea254848d752bc6fd2f006"
+    }
+  },
+  {
+    "label": "f47-restored-green-2-driver",
+    "classification": "EXECUTED",
+    "record": "commands/f47-restored-green-2-driver/command.json",
+    "recordSha256": "6b83829ce68b392e61221711d6596238941402e7dd6c2eeb3a031fcb830bdebd",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "c59fc012a29bbbf97f2dc2459e2e29fea467556048ea254848d752bc6fd2f006"
+    }
+  },
+  {
+    "label": "f47-restored-green-build",
+    "classification": "EXECUTED",
+    "record": "commands/f47-restored-green-build/command.json",
+    "recordSha256": "5f5c8ebf3dcd3d23f1dd9574d28fe647750177529441d5ac632df403c94baca5",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "926499974b2631fed4debfb90dae9820b21b741b87a42f816ef657d66109d8ee"
+    }
+  },
+  {
+    "label": "f47-restored-green-driver",
+    "classification": "EXECUTED",
+    "record": "commands/f47-restored-green-driver/command.json",
+    "recordSha256": "4b09351940a2967978fad47192f6a5931c3bbe7405a5a6d7afaf62119745a6b4",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "926499974b2631fed4debfb90dae9820b21b741b87a42f816ef657d66109d8ee"
+    }
+  },
+  {
+    "label": "f47-root-red",
+    "classification": "TARGET_RED",
+    "record": "commands/f47-root-red/command.json",
+    "recordSha256": "641f559c0a9b456d72ee72c4da865754aca3599b7536fcfebfd850712ae5c97c",
+    "exit": 1,
+    "counts": [],
+    "leafCounts": [
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f47-root-red/A01/a01-leaf-cases.json",
+        "actual": 9,
+        "failed": 1
+      }
+    ],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "1af150c69e7293c533b3df2ecb54c61a4bbe2f2e673a4d8bf98546f5bca952a3"
+    }
+  },
+  {
+    "label": "f47-root-red-build",
+    "classification": "EXECUTED",
+    "record": "commands/f47-root-red-build/command.json",
+    "recordSha256": "630b55bfbc3b9d9d7e56946a661533e0d72e125d8bf93da3a8f4d703e56d361a",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "1af150c69e7293c533b3df2ecb54c61a4bbe2f2e673a4d8bf98546f5bca952a3"
+    }
+  },
+  {
+    "label": "f47-root-red-driver",
+    "classification": "TARGET_RED",
+    "record": "commands/f47-root-red-driver/command.json",
+    "recordSha256": "f01a483a181e05f2ba224fd15ed8282b4c7e4c91a956fa60e337844abee2a6fa",
+    "exit": 1,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "1af150c69e7293c533b3df2ecb54c61a4bbe2f2e673a4d8bf98546f5bca952a3"
+    }
+  },
+  {
+    "label": "f48-boundary-red",
+    "classification": "TARGET_RED",
+    "record": "commands/f48-boundary-red/command.json",
+    "recordSha256": "c21b2e5d921537dd536df71203c0385957a2124cdbfa60b541f73d8085cc52b9",
+    "exit": 1,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "ea64674ecda3d0b449d0e5ab294cc4bb6d9d08d31e3f694217bb84e2b363c4a9"
+    }
+  },
+  {
+    "label": "f48-boundary-red-build",
+    "classification": "EXECUTED",
+    "record": "commands/f48-boundary-red-build/command.json",
+    "recordSha256": "7b703709f5cb33c795d852d8a4ae1054e6ab538615865e43d9bc09f208a9cd1e",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "ea64674ecda3d0b449d0e5ab294cc4bb6d9d08d31e3f694217bb84e2b363c4a9"
+    }
+  },
+  {
+    "label": "f48-boundary-red-driver",
+    "classification": "TARGET_RED",
+    "record": "commands/f48-boundary-red-driver/command.json",
+    "recordSha256": "a2dbaf4c07c7c3743604493f612afda9cc6c9b4f07dc75895d1eb27c9da08083",
+    "exit": 1,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "ea64674ecda3d0b449d0e5ab294cc4bb6d9d08d31e3f694217bb84e2b363c4a9"
+    }
+  },
+  {
+    "label": "f48-boundary-unit-red",
+    "classification": "TARGET_RED",
+    "record": "commands/f48-boundary-unit-red/command.json",
+    "recordSha256": "b1c70b02b169ff023b7212dcc3faa75ba5ec8c6df80f2fca445b56a6d9576ca0",
+    "exit": 101,
+    "counts": [
+      "test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 358 filtered out; finished in 0.00s"
+    ],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "ea64674ecda3d0b449d0e5ab294cc4bb6d9d08d31e3f694217bb84e2b363c4a9"
+    }
+  },
+  {
+    "label": "f48-restored-green",
+    "classification": "EXECUTED",
+    "record": "commands/f48-restored-green/command.json",
+    "recordSha256": "e5d5a5647731206cd39e082456408bce9d424a1d542e4efd196ba3b55ee451bc",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "63e70031d291fc56ade28c3571d3fb5d1e40c080f0e07377fbd574122b2914aa"
+    }
+  },
+  {
+    "label": "f48-restored-green-2",
+    "classification": "EXECUTED",
+    "record": "commands/f48-restored-green-2/command.json",
+    "recordSha256": "5e6840d30e66969227000681de849efb775ae7b712fdd91cf0ab2ce858fb0c89",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "b7665bf31fba1c90de91dcbb98af2722e216a9b48e78f6c3161cd8d472818c0b"
+    }
+  },
+  {
+    "label": "f48-restored-green-2-build",
+    "classification": "EXECUTED",
+    "record": "commands/f48-restored-green-2-build/command.json",
+    "recordSha256": "2f2ed6bcfff3c432d11d41879d0c1e0cc5749896af6d3d1dcffdc47a41f5cd7e",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "b7665bf31fba1c90de91dcbb98af2722e216a9b48e78f6c3161cd8d472818c0b"
+    }
+  },
+  {
+    "label": "f48-restored-green-2-driver",
+    "classification": "EXECUTED",
+    "record": "commands/f48-restored-green-2-driver/command.json",
+    "recordSha256": "c4e8f9b4b2e8aa151a97ad8ac30c29bee5f877189c2371c64c7fd3df08263306",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "b7665bf31fba1c90de91dcbb98af2722e216a9b48e78f6c3161cd8d472818c0b"
+    }
+  },
+  {
+    "label": "f48-restored-green-build",
+    "classification": "EXECUTED",
+    "record": "commands/f48-restored-green-build/command.json",
+    "recordSha256": "977c894625619b4b1322db4fb0bc05b8acedda2a5c3f57e709f93affe412954f",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "63e70031d291fc56ade28c3571d3fb5d1e40c080f0e07377fbd574122b2914aa"
+    }
+  },
+  {
+    "label": "f48-restored-green-driver",
+    "classification": "EXECUTED",
+    "record": "commands/f48-restored-green-driver/command.json",
+    "recordSha256": "654d09646e3e5512f5e6e9e5ce8f9d70c6fe337fde6c5998a8d26363cfc08c14",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "63e70031d291fc56ade28c3571d3fb5d1e40c080f0e07377fbd574122b2914aa"
+    }
+  },
+  {
+    "label": "invalidate-own-fingerprints",
+    "classification": "EXECUTED",
+    "record": "commands/invalidate-own-fingerprints/command.json",
+    "recordSha256": "7943206a787733ff2839edcda3d50da13c67888bc75603931703ed1d3671e461",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "0afad67acdc9c36c41508ffbc5a16dc1a763fd72eec98edbc7147ee2227346e6"
+    }
+  },
+  {
+    "label": "late-result-next-run",
+    "classification": "EXECUTED",
+    "record": "commands/late-result-next-run/command.json",
+    "recordSha256": "c4c61258db384a9a8a3a3c6b433a447f8a5e7dc4c0dcda949f5082598ccdf442",
+    "exit": 0,
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.08s"
+    ],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "live-correlation-final",
+    "classification": "EXECUTED",
+    "record": "commands/live-correlation-final/command.json",
+    "recordSha256": "76330f49d36e3a9dfae02e7aad5db14f02ee93235ee60e4a9d3ad3b68b93be7f",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "logging-final",
+    "classification": "EXECUTED",
+    "record": "commands/logging-final/command.json",
+    "recordSha256": "50a857ce30bc1cb8cd2cc15635403c705a81ed87b44be6411b5989ef95144109",
+    "exit": 0,
+    "counts": [
+      "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 352 filtered out; finished in 0.11s"
+    ],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "ordinary-cancel-recovery",
+    "classification": "EXECUTED",
+    "record": "commands/ordinary-cancel-recovery/command.json",
+    "recordSha256": "8aa0328dbf1a892460340776c63f04c057385fcfee377faa2a8432a76966fd16",
+    "exit": 0,
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.12s"
+    ],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "prepare-isolated",
+    "classification": "EXECUTED",
+    "record": "commands/prepare-isolated/command.json",
+    "recordSha256": "296a27b9efa2ad6c6795a72a7a22f2bfd96d8007a89619a1610abb922de0d51b",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "ad4aa037205eafb92430c92b766f3e41c33747c550fcc3487ce523a19ade2e71"
+    }
+  },
+  {
+    "label": "primary-default-build",
+    "classification": "INVALID_CACHE_PREPARATION_RETAINED",
+    "record": "commands/primary-default-build/command.json",
+    "recordSha256": "2c69c79c5bb137f6e060f702b716804260cd11085215c1f1c9e0fcfdf84393d3",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "0afad67acdc9c36c41508ffbc5a16dc1a763fd72eec98edbc7147ee2227346e6"
+    }
+  },
+  {
+    "label": "primary-default-build-2",
+    "classification": "EXECUTED",
+    "record": "commands/primary-default-build-2/command.json",
+    "recordSha256": "746f65443e9057baab30a64f06aab507b8cbd9a14407a07fb871af557a3ce3cc",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "primary-force-recompile",
+    "classification": "EXECUTED",
+    "record": "commands/primary-force-recompile/command.json",
+    "recordSha256": "e6bf0e18c117dacf18edbdb3ad1c79e9db92283f8530c5f1bccbfada29477a60",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "0afad67acdc9c36c41508ffbc5a16dc1a763fd72eec98edbc7147ee2227346e6"
+    }
+  },
+  {
+    "label": "redaction-final",
+    "classification": "INVALID_CACHE_PREPARATION_RETAINED",
+    "record": "commands/redaction-final/command.json",
+    "recordSha256": "5867214778a9fdb527480ffcba7516a615c0e9309ac9ef7ce2cc56d6b17f25ef",
+    "exit": 101,
+    "counts": [
+      "test result: FAILED. 22 passed; 3 failed; 0 ignored; 0 measured; 336 filtered out; finished in 0.00s"
+    ],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "0afad67acdc9c36c41508ffbc5a16dc1a763fd72eec98edbc7147ee2227346e6"
+    }
+  },
+  {
+    "label": "redaction-final-2",
+    "classification": "EXECUTED",
+    "record": "commands/redaction-final-2/command.json",
+    "recordSha256": "c898c1ffccd4b27b1964ddc38ba1f35ddd843babd3bd57978c49c5332698f760",
+    "exit": 0,
+    "counts": [
+      "test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 336 filtered out; finished in 0.00s"
+    ],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "resources-equipment-build",
+    "classification": "EXECUTED",
+    "record": "commands/resources-equipment-build/command.json",
+    "recordSha256": "e18716243297553331ed53b3f3bec2c5d04b00312b87af707315c00c0570728d",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "resources-final",
+    "classification": "EXECUTED",
+    "record": "commands/resources-final/command.json",
+    "recordSha256": "1bafe23e7f45ac5513177c94db797a204988b73165142c0b026ac88ede0faf52",
+    "exit": 0,
+    "counts": [
+      "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 336.02s"
+    ],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "resources-independent-analysis",
+    "classification": "EXECUTED",
+    "record": "commands/resources-independent-analysis/command.json",
+    "recordSha256": "58e02a0536a84865e0d3db975bb2faefcd8c2d04da6e3a52a4b4f220e9caf2e9",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  },
+  {
+    "label": "sampler-negatives",
+    "classification": "EXECUTED",
+    "record": "commands/sampler-negatives/command.json",
+    "recordSha256": "fc6c80b0e9a1f8fa830b8c5ce160b9f43af049a1a1d259612f28dc38065e14db",
+    "exit": 0,
+    "counts": [],
+    "leafCounts": [],
+    "binary": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+      "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+    }
+  }
+]

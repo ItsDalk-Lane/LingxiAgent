@@ -1,0 +1,3 @@
+.gitignore:113:!artifacts/rust-tauri/**/*.log	artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a13-final/stdout.log
+.gitignore:154:/artifacts/rust-tauri/R05/**/target/	artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/target/probe
+.gitignore:66:node_modules	artifacts/rust-tauri/R05/RR3/J-01/node_modules/probe

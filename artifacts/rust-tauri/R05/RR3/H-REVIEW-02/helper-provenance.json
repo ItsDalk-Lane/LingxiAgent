@@ -1,0 +1,50 @@
+[
+  {
+    "source": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-01/capture.py",
+    "sourceSha256": "88338089b87a8a60f7c72e7db333b7213a46c6928a30eb6e29e10218f3784dd4",
+    "reviewed": true,
+    "adaptation": "\u4ec5\u65b0\u8bc1\u636e\u76ee\u5f55H-REVIEW-02"
+  },
+  {
+    "source": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-01/prepare_isolated.py",
+    "sourceSha256": "3cae533a78aac4d142f904c369751d407e0c4bd4524dad21f4aaca003d8d282b",
+    "reviewed": true,
+    "adaptation": "\u4ec5\u65b0\u8bc1\u636e\u76ee\u5f55H-REVIEW-02"
+  },
+  {
+    "source": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-01/isolation_cases.py",
+    "sourceSha256": "3d699f9e2348c96fd974630433562f8701f618b6b9a25b15efe44cb5a0228265",
+    "reviewed": true,
+    "adaptation": "\u4ec5\u65b0\u8bc1\u636e\u76ee\u5f55H-REVIEW-02"
+  },
+  {
+    "source": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-01/binary_probe.py",
+    "sourceSha256": "cda456ce1c3c636de0bcb650768c77d0b5976584e6981897f4d6adcce8ec7c75",
+    "reviewed": true,
+    "adaptation": "\u4ec5\u65b0\u8bc1\u636e\u76ee\u5f55H-REVIEW-02"
+  },
+  {
+    "source": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-01/correlation_probe.py",
+    "sourceSha256": "0bc25f85efad7537f04b066b984d7bbec70d5dd33bd4f4fdfcd712f967309583",
+    "reviewed": true,
+    "adaptation": "\u4ec5\u65b0\u8bc1\u636e\u76ee\u5f55H-REVIEW-02"
+  },
+  {
+    "source": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-01/sampler_negative_probe.py",
+    "sourceSha256": "eda007122aca86744ac50311631750eb0fbcb5cf57579982e7cb9f68c68d3325",
+    "reviewed": true,
+    "adaptation": "\u4ec5\u65b0\u8bc1\u636e\u76ee\u5f55H-REVIEW-02"
+  },
+  {
+    "source": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-01/analyze_resources.py",
+    "sourceSha256": "633faed739f29a321fb7c8d495313029dd325bc844d864f0a3688ce3459c5853",
+    "reviewed": true,
+    "adaptation": "\u4ec5\u65b0\u8bc1\u636e\u76ee\u5f55H-REVIEW-02"
+  },
+  {
+    "source": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-01/runtime_snapshot.py",
+    "sourceSha256": "3dcd4077ded474d6f47f2434ee1ec25822934d836ee7b56ea4df59e6fe24c0aa",
+    "reviewed": true,
+    "adaptation": "\u4ec5\u65b0\u8bc1\u636e\u76ee\u5f55H-REVIEW-02"
+  }
+]

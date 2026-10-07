@@ -1,0 +1,129 @@
+{
+  "utc": "2026-10-07T02:00:22.553544+00:00",
+  "reference": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/a1-reuse-input-equality.json",
+  "referenceSHA256": "90a514aa5efb2eb494e1bf4d1018d2c2c91d629cebe6c9bee89ba1859ed24052",
+  "count": 17,
+  "files": [
+    {
+      "path": ".gitignore",
+      "prior": "8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd",
+      "newAReview": "8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd",
+      "current": "8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd",
+      "allEqual": true
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "prior": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "newAReview": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "current": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "allEqual": true
+    },
+    {
+      "path": "rust/Cargo.toml",
+      "prior": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+      "newAReview": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+      "current": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+      "allEqual": true
+    },
+    {
+      "path": "rust/Cargo.lock",
+      "prior": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "newAReview": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "current": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "allEqual": true
+    },
+    {
+      "path": "scripts/rust-tauri/run_output_sinks.py",
+      "prior": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+      "newAReview": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+      "current": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+      "allEqual": true
+    },
+    {
+      "path": "rust/crates/xtask/Cargo.toml",
+      "prior": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+      "newAReview": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+      "current": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+      "allEqual": true
+    },
+    {
+      "path": "rust/crates/xtask/src/runner_identity.rs",
+      "prior": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+      "newAReview": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+      "current": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+      "allEqual": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_map.rs",
+      "prior": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce",
+      "newAReview": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce",
+      "current": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce",
+      "allEqual": true
+    },
+    {
+      "path": "rust/crates/xtask/src/verify.rs",
+      "prior": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+      "newAReview": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+      "current": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+      "allEqual": true
+    },
+    {
+      "path": "rust/crates/xtask/src/candidate.rs",
+      "prior": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+      "newAReview": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+      "current": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+      "allEqual": true
+    },
+    {
+      "path": "rust/crates/xtask/src/main.rs",
+      "prior": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+      "newAReview": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+      "current": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+      "allEqual": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R04.json",
+      "prior": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "newAReview": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "current": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "allEqual": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R05.json",
+      "prior": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "newAReview": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "current": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "allEqual": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R02.json",
+      "prior": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+      "newAReview": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+      "current": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+      "allEqual": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R03.json",
+      "prior": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+      "newAReview": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+      "current": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+      "allEqual": true
+    },
+    {
+      "path": "rust/crates/xtask/src/candidate/tests.rs",
+      "prior": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+      "newAReview": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+      "current": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+      "allEqual": true
+    },
+    {
+      "path": "rust/crates/xtask/src/verify/runner_tests.rs",
+      "prior": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69",
+      "newAReview": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69",
+      "current": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69",
+      "allEqual": true
+    }
+  ],
+  "allEqual": true,
+  "boundary": "仅A1有效17输入；两个已修脚本不在复用范围，本轮A2独立新审覆盖"
+}

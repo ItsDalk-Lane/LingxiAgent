@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "startedUtc": "2026-10-07T03:20:08.798827+00:00",
+  "commands": [],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "receipt": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-01/selfcheck-01/prepared/node-preparation/result.json",
+  "receiptSha256": "b1de3cc5d3940e73234abf3422d0e1ee5b53958cd11526f5e8eefd79f3782d3e",
+  "checkedFiles": 2902,
+  "finishedUtc": "2026-10-07T03:20:09.253539+00:00"
+}

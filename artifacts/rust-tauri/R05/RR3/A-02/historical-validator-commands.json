@@ -1,0 +1,156 @@
+[
+  {
+    "caseId": "validator-normal-reject-validate_run_output_unit",
+    "F-ID": "F42",
+    "argv": [
+      "bash",
+      "-c",
+      "source \"$1\"; validate_run_output_unit \"$2\" \"$3\"",
+      "bash",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-green/fence-functions.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo",
+      "artifacts/rust-tauri/R05/declared-run"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:43:15.727230+00:00",
+    "finishedAt": "2026-10-07T00:43:15.757341+00:00",
+    "durationSeconds": 0.029949125018902123,
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "logSha256": "9a0e0cbedc478e8b16b4d0b46093d8436152e73647e02b4f0ddf5e01c83dccd0",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "executedProductionFunctionCalls": 1,
+    "expectedMatched": true
+  },
+  {
+    "caseId": "validator-git-error-validate_run_output_unit",
+    "F-ID": "F42",
+    "argv": [
+      "bash",
+      "-c",
+      "source \"$1\"; validate_run_output_unit \"$2\" \"$3\"",
+      "bash",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-green/fence-functions.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo",
+      "artifacts/rust-tauri/R05/declared-run"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {
+      "PATH": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.codex/tmp/arg0/codex-arg0uQYuTZ:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/study_superior/.lmstudio/bin"
+    },
+    "startedAt": "2026-10-07T00:43:15.757998+00:00",
+    "finishedAt": "2026-10-07T00:43:16.020790+00:00",
+    "durationSeconds": 0.26281537499744445,
+    "exitCode": 0,
+    "expectedExitCode": 1,
+    "logSha256": "65c118d2333f75ccf2a93fab022ac990d61e635f6954d4e336c346a4a916a8b5",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "executedProductionFunctionCalls": 1,
+    "expectedMatched": false
+  },
+  {
+    "caseId": "validator-query-restored-validate_run_output_unit",
+    "F-ID": "F42",
+    "argv": [
+      "bash",
+      "-c",
+      "source \"$1\"; validate_run_output_unit \"$2\" \"$3\"",
+      "bash",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-green/fence-functions.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo",
+      "artifacts/rust-tauri/R05/declared-run"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:43:16.021344+00:00",
+    "finishedAt": "2026-10-07T00:43:16.049845+00:00",
+    "durationSeconds": 0.028517749975435436,
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "logSha256": "9a0e0cbedc478e8b16b4d0b46093d8436152e73647e02b4f0ddf5e01c83dccd0",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "executedProductionFunctionCalls": 1,
+    "expectedMatched": true
+  },
+  {
+    "caseId": "validator-normal-reject-validate_declared_run_root",
+    "F-ID": "F42",
+    "argv": [
+      "bash",
+      "-c",
+      "source \"$1\"; validate_declared_run_root \"$2\" \"$3\"",
+      "bash",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-green/fence-functions.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo",
+      "artifacts/rust-tauri/R05/declared-run"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:43:16.050359+00:00",
+    "finishedAt": "2026-10-07T00:43:16.078657+00:00",
+    "durationSeconds": 0.02832791698165238,
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "logSha256": "9a0e0cbedc478e8b16b4d0b46093d8436152e73647e02b4f0ddf5e01c83dccd0",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "executedProductionFunctionCalls": 1,
+    "expectedMatched": true
+  },
+  {
+    "caseId": "validator-git-error-validate_declared_run_root",
+    "F-ID": "F42",
+    "argv": [
+      "bash",
+      "-c",
+      "source \"$1\"; validate_declared_run_root \"$2\" \"$3\"",
+      "bash",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-green/fence-functions.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo",
+      "artifacts/rust-tauri/R05/declared-run"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {
+      "PATH": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.codex/tmp/arg0/codex-arg0uQYuTZ:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/study_superior/.lmstudio/bin"
+    },
+    "startedAt": "2026-10-07T00:43:16.079265+00:00",
+    "finishedAt": "2026-10-07T00:43:16.106659+00:00",
+    "durationSeconds": 0.02742291591130197,
+    "exitCode": 0,
+    "expectedExitCode": 1,
+    "logSha256": "65c118d2333f75ccf2a93fab022ac990d61e635f6954d4e336c346a4a916a8b5",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "executedProductionFunctionCalls": 1,
+    "expectedMatched": false
+  },
+  {
+    "caseId": "validator-query-restored-validate_declared_run_root",
+    "F-ID": "F42",
+    "argv": [
+      "bash",
+      "-c",
+      "source \"$1\"; validate_declared_run_root \"$2\" \"$3\"",
+      "bash",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/discovery-green/fence-functions.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo",
+      "artifacts/rust-tauri/R05/declared-run"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+    "envOverrides": {},
+    "startedAt": "2026-10-07T00:43:16.107303+00:00",
+    "finishedAt": "2026-10-07T00:43:16.135956+00:00",
+    "durationSeconds": 0.028677667025476694,
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "logSha256": "9a0e0cbedc478e8b16b4d0b46093d8436152e73647e02b4f0ddf5e01c83dccd0",
+    "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+    "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+    "executedProductionFunctionCalls": 1,
+    "expectedMatched": true
+  }
+]

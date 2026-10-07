@@ -1,0 +1,136 @@
+{
+  "status": "FAIL",
+  "startedUtc": "2026-10-07T03:38:51.906406+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "startedUtc": "2026-10-07T03:38:51.906723+00:00",
+      "finishedUtc": "2026-10-07T03:38:51.914683+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "a0067d02359c46ac965a8166d6a5ce8e948682ce7d5561119fb84bd6f2781e4b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/actual-node-version-refused",
+      "startedUtc": "2026-10-07T03:38:51.914937+00:00",
+      "finishedUtc": "2026-10-07T03:38:51.922525+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "cfddc6e28e942269fbf5c9cd58d233a83375e842dd216e27cdf587176b869472",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "startedUtc": "2026-10-07T03:38:51.922703+00:00",
+      "finishedUtc": "2026-10-07T03:38:51.929853+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "9c1156879a415e9d193e98144bcbbc8fcf5a667b4ab5d9936aa5f28c9e7c9944",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/actual-node-version-refused",
+      "startedUtc": "2026-10-07T03:38:51.929975+00:00",
+      "finishedUtc": "2026-10-07T03:38:51.936770+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "9c1156879a415e9d193e98144bcbbc8fcf5a667b4ab5d9936aa5f28c9e7c9944",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/actual-node-version-refused",
+      "startedUtc": "2026-10-07T03:38:51.936890+00:00",
+      "finishedUtc": "2026-10-07T03:38:51.980443+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "node",
+        "--version"
+      ],
+      "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "startedUtc": "2026-10-07T03:38:51.985479+00:00",
+      "finishedUtc": "2026-10-07T03:38:52.001241+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "a8f8f7ba69d43285857a0ea34017ef8dadd3ba012404bb7dd188fc773cf63ee2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "npm",
+        "--version"
+      ],
+      "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "startedUtc": "2026-10-07T03:38:52.001512+00:00",
+      "finishedUtc": "2026-10-07T03:38:52.069817+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3dbc807e13de125e909bea5877613d5d67989a43fb8e982fd79ba0efa46ac952",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "node",
+        "-e",
+        "const s=require('./node_modules/semver');const p=require('./package.json');if(!s.satisfies(process.version,p.engines.node)||!s.satisfies(process.argv[1],'>=11.10.0'))process.exit(1)",
+        "11.13.0"
+      ],
+      "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "startedUtc": "2026-10-07T03:38:52.070094+00:00",
+      "finishedUtc": "2026-10-07T03:38:52.104639+00:00",
+      "exitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "source": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+  "copy": "/private/tmp/r05-node-selfcheck-bz5g0665/actual-node-version-refused",
+  "sourceHead": "3e082ada3f2c392c4f865bc93fd8b799cbe10959",
+  "copyHead": "3e082ada3f2c392c4f865bc93fd8b799cbe10959",
+  "inputs": {
+    "package.json": "bdd8676740837e552913e374020ecc5857b6b8475843fdb128528caceb8e43cf",
+    "package-lock.json": "b9ab1298ec5a86381b6948fd6dd90896cb1788e7bf78fff22387a6d1d37b2a4e",
+    ".npmrc": "f6d6be450cc3239fe9569e975697ba7c4264b62ce00f99e3dee8b0845a829d72"
+  },
+  "metadata": {
+    "installedLockEntries": 92,
+    "installedPackages": 92,
+    "absentOptionalPackages": [],
+    "obsoleteExtraneousMetadata": [],
+    "installedLockRootVersion": "old-root-version",
+    "candidateVersion": "1.0.0"
+  },
+  "node": "v24.16.0",
+  "npm": "11.13.0",
+  "error": "command failed (1): ['node', '-e', \"const s=require('./node_modules/semver');const p=require('./package.json');if(!s.satisfies(process.version,p.engines.node)||!s.satisfies(process.argv[1],'>=11.10.0'))process.exit(1)\", '11.13.0']; see /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/actual-node-version-refused/node-preparation/command-07.stderr.log",
+  "finishedUtc": "2026-10-07T03:38:52.104835+00:00"
+}

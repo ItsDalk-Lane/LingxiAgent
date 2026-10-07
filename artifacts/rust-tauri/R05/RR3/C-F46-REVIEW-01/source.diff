@@ -1,0 +1,827 @@
+diff --git a/rust/crates/lingxi-service/src/logging.rs b/rust/crates/lingxi-service/src/logging.rs
+index 73b094362..be2bd9e32 100644
+--- a/rust/crates/lingxi-service/src/logging.rs
++++ b/rust/crates/lingxi-service/src/logging.rs
+@@ -99,8 +99,8 @@ pub struct RotatingLogFile {
+ }
+ 
+ impl RotatingLogFile {
+-    /// Opens the log directory (0700, created if missing), prunes older
+-    /// files beyond `max_files` and opens the next sequence.
++    /// 打开日志目录（缺失时创建为 0700），创建下一份日志后，
++    /// 将包含当前文件的完整集合裁剪到 `max_files`。
+     pub fn open(dir: PathBuf, config: &LogRotationConfig) -> io::Result<Self> {
+         config
+             .validate()
+@@ -116,8 +116,8 @@ impl RotatingLogFile {
+             written: 0,
+         };
+         log.seq = log.next_seq()?;
+-        log.prune()?;
+         log.open_current()?;
++        log.prune()?;
+         Ok(log)
+     }
+ 
+@@ -478,6 +478,85 @@ mod tests {
+         let _ = fs::remove_dir_all(&dir);
+     }
+ 
++    #[test]
++    fn opening_at_the_file_limit_prunes_the_oldest_and_preserves_newer_contents() {
++        let dir = temp_dir("open-at-limit");
++        fs::create_dir_all(&dir).expect("准备旧日志目录");
++        for seq in 1..=3 {
++            fs::write(
++                dir.join(format!("service-{seq:06}.log")),
++                format!("existing {seq}\n"),
++            )
++            .expect("准备旧日志");
++        }
++        let config = LogRotationConfig {
++            max_bytes: 128,
++            max_files: 3,
++        };
++        let mut log = RotatingLogFile::open(dir.clone(), &config).expect("打开已有满额日志");
++        assert_eq!(
++            all_log_files(&dir).len(),
++            3,
++            "打开后即满足包含当前文件的上限"
++        );
++        assert!(!dir.join("service-000001.log").exists());
++        for seq in 2..=3 {
++            assert_eq!(
++                fs::read_to_string(dir.join(format!("service-{seq:06}.log"))).unwrap(),
++                format!("existing {seq}\n"),
++                "保留日志内容不能被截断"
++            );
++        }
++        log.write_line("newest run").expect("新日志仍可正常写入");
++        assert_eq!(lines_of(&dir.join("service-000004.log")), ["newest run"]);
++        drop(log);
++        fs::remove_dir_all(&dir).expect("清理日志目录");
++    }
++
++    #[test]
++    fn repeated_open_without_writes_is_bounded_from_the_new_directory() {
++        let dir = temp_dir("open-without-writes");
++        let config = LogRotationConfig {
++            max_bytes: 128,
++            max_files: 3,
++        };
++        for restart in 1..=6 {
++            let log = RotatingLogFile::open(dir.clone(), &config).expect("连续打开");
++            let files = all_log_files(&dir);
++            assert_eq!(files.len(), restart.min(3), "没有写入也必须保持数量上限");
++            assert_eq!(log.seq, restart as u64, "重启不能复用旧序号");
++            assert!(files.iter().all(|p| fs::metadata(p).unwrap().len() == 0));
++            drop(log);
++        }
++        fs::remove_dir_all(&dir).expect("清理日志目录");
++    }
++
++    #[test]
++    fn startup_prune_and_rotation_open_failures_are_returned() {
++        let dir = temp_dir("open-prune-error");
++        fs::create_dir_all(dir.join("service-000001.log")).expect("准备不可删除为文件的旧条目");
++        for seq in 2..=3 {
++            fs::write(dir.join(format!("service-{seq:06}.log")), "older\n").unwrap();
++        }
++        let config = LogRotationConfig {
++            max_bytes: 64,
++            max_files: 3,
++        };
++        assert!(
++            RotatingLogFile::open(dir.clone(), &config).is_err(),
++            "启动裁剪失败不能报告成功"
++        );
++        fs::remove_dir_all(&dir).expect("清理错误夹具");
++
++        let mut log = RotatingLogFile::open(dir.clone(), &config).expect("正常打开");
++        log.write_line("first line").expect("正常写入");
++        fs::remove_dir_all(&dir).expect("使下一份日志无法创建");
++        assert!(
++            log.write_line(&"x".repeat(64)).is_err(),
++            "轮转创建失败必须显式返回"
++        );
++    }
++
+     #[cfg(unix)]
+     #[test]
+     fn log_files_are_owner_only() {
+diff --git a/rust/crates/lingxi-service/tests/r05_t08_resources.rs b/rust/crates/lingxi-service/tests/r05_t08_resources.rs
+index e88ab64da..aecb9273f 100644
+--- a/rust/crates/lingxi-service/tests/r05_t08_resources.rs
++++ b/rust/crates/lingxi-service/tests/r05_t08_resources.rs
+@@ -30,6 +30,9 @@ use std::time::{Duration, Instant};
+ 
+ use tokio::io::{AsyncBufReadExt as _, AsyncReadExt as _, AsyncWriteExt as _, BufReader};
+ 
++#[path = "support/r05_resource_sampler.rs"]
++mod resource_sampler;
++
+ // ── the validated resource sampler ──────────────────────────────────────────
+ 
+ /// Why a sample could not be taken (an honest UNKNOWN, never a fake 0).
+@@ -119,7 +122,10 @@ fn fds_of(pid: i32) -> Result<usize, SampleError> {
+                 });
+             }
+             saw_pid_record = true;
+-        } else if line.starts_with('f') && line[1..].chars().all(|c| c.is_ascii_digit()) {
++        } else if line.starts_with('f')
++            && line.len() > 1
++            && line[1..].chars().all(|c| c.is_ascii_digit())
++        {
+             fds += 1;
+         }
+     }
+@@ -129,6 +135,12 @@ fn fds_of(pid: i32) -> Result<usize, SampleError> {
+             detail: format!("lsof output carried no p<{}> identity record", pid_text),
+         });
+     }
++    if fds < 3 {
++        return Err(SampleError {
++            what: "fds: invalid live-process sample",
++            detail: format!("pid {pid} has {fds} numeric descriptors; expected at least stdio"),
++        });
++    }
+     Ok(fds)
+ }
+ 
+@@ -140,6 +152,8 @@ struct RecordedRequest {
+ 
+ enum Step {
+     Sse(String),
++    // 仅阻塞供应商替身响应；宿主和 worker 仍走完整生产链。
++    GatedSse(String, Arc<tokio::sync::Notify>, Arc<AtomicUsize>),
+     /// Hold the connection open forever (the cancel-load parked stream).
+     Park,
+     Error(u16, String),
+@@ -187,6 +201,19 @@ impl StubServer {
+                 };
+                 let step = router(&recorded);
+                 match step {
++                    Step::GatedSse(body, release, arrived) => {
++                        arrived.fetch_add(1, Ordering::SeqCst);
++                        release.notified().await;
++                        let response = format!(
++                            "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
++                            body.len()
++                        );
++                        socket
++                            .write_all(response.as_bytes())
++                            .await
++                            .expect("gated stub response");
++                        socket.shutdown().await.expect("gated stub shutdown");
++                    }
+                     Step::Sse(body) => {
+                         let response = format!(
+                             "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\n\
+@@ -674,6 +701,298 @@ fn fixture_exe() -> &'static str {
+     env!("CARGO_BIN_EXE_r04_t07_fixture")
+ }
+ 
++// 进程树按真实 PPID 发现，采样失败必须保留为 UNKNOWN，不能少算进程。
++fn tree_sample(pid: i32) -> serde_json::Value {
++    let ids = resource_sampler::process_ids(pid).expect("UNKNOWN: 进程树采样失败");
++    let mut processes = Vec::new();
++    let mut rss = 0;
++    let mut fds = 0;
++    let mut connections = 0;
++    for id in ids {
++        let process_rss = rss_of(id).expect("UNKNOWN: 树 RSS 采样失败");
++        let process_fds = fds_of(id).expect("UNKNOWN: 树 FD 采样失败");
++        let tcp = resource_sampler::tcp_of(id).expect("UNKNOWN: 树 TCP 采样失败");
++        assert!(process_rss > 0 && process_fds >= 3, "活进程假零采样 {id}");
++        rss += process_rss;
++        fds += process_fds;
++        connections += tcp.len();
++        processes.push(serde_json::json!({"pid": id, "rssKiB": process_rss, "fds": process_fds, "establishedTcp": tcp}));
++    }
++    serde_json::json!({"rootPid": pid, "rssKiB": rss, "fds": fds, "establishedTcpCount": connections, "processes": processes})
++}
++
++fn file_sample(home: &Path, workspace: &Path) -> serde_json::Value {
++    serde_json::json!({
++        "home": resource_sampler::files(home).expect("UNKNOWN: home 文件采样失败"),
++        "workspace": resource_sampler::files(workspace).expect("UNKNOWN: workspace 文件采样失败"),
++    })
++}
++
++fn assert_log_file_bound(files: &serde_json::Value, phase: &str) {
++    let logs: Vec<&serde_json::Value> = files["home"]
++        .as_array()
++        .expect("完整 home 清单")
++        .iter()
++        .filter(|entry| {
++            let path = entry["path"].as_str().expect("文件路径");
++            path.starts_with("lingxi-service/logs/service-") && path.ends_with(".log")
++        })
++        .collect();
++    assert!(
++        logs.len() <= 3,
++        "F46: {phase}: 重启/稳态日志数量 {} 超过事前上限3: {logs:?}",
++        logs.len()
++    );
++}
++
++fn owner_principal() -> lingxi_service::Principal {
++    lingxi_service::Principal {
++        schema_version: 1,
++        principal_id: "principal_local".into(),
++        kind: lingxi_service::PrincipalKind::LocalUser,
++        user_id: Some(lingxi_service::LOCAL_OWNER_USER_ID.into()),
++        studio_id: None,
++        server_node_id: None,
++        device_id: None,
++        credential_id: None,
++        web_session_id: None,
++        connection_kind: lingxi_service::auth::ConnectionKindSerde::Local,
++        credential_kind: lingxi_service::CredentialKind::LoopbackToken,
++        trust_state: lingxi_service::TrustState::Local,
++        scopes: vec!["chat".into()],
++    }
++}
++
++fn owner_sample(state: &lingxi_service::ServiceState) -> serde_json::Value {
++    use lingxi_service::quotas::QuotaResource;
++    let quotas = state.runs().quotas();
++    serde_json::json!({
++        "activeSessionRuns": state.sessions().session_supervisor().active_run_count(),
++        "liveRunIds": state.runs().cancel_registry().live_run_ids(),
++        "modelPermits": quotas.in_use(QuotaResource::Model),
++        "modelWaiters": quotas.waiting(QuotaResource::Model),
++        "toolPermits": quotas.in_use(QuotaResource::Tool),
++        "toolWaiters": quotas.waiting(QuotaResource::Tool),
++        "backgroundIds": state.background().live_ids(),
++    })
++}
++
++// 此补证是进程内生产组合根，保留它与正式二进制资源序列的边界。
++// 不注入 provider/supervisor/存储，配置、凭证、工具、worker、HTTP 都走原实现。
++async fn owner_resource_series(
++    home: &Path,
++    workspace: &Path,
++    config_path: &Path,
++    arrived: &AtomicUsize,
++    release: &tokio::sync::Notify,
++) -> Vec<serde_json::Value> {
++    use lingxi_service::quotas::{LayeredQuotaLimits, QuotaLimits};
++    use lingxi_service::{
++        prepare_layout, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
++    };
++    let layout = prepare_layout(home).expect("owner layout");
++    let file = lingxi_service::config::read_service_config(config_path).expect("owner config");
++    let (source, plane) =
++        lingxi_service::config::resolve_model_plane(Some(config_path), &layout.runtime_dir)
++            .expect("owner plane")
++            .expect("owner plane present");
++    let credentials = Arc::new(
++        lingxi_service::credentials::CredentialService::bootstrap(
++            &plane,
++            &layout.runtime_dir,
++            Arc::new(lingxi_service::inject::SystemClock),
++        )
++        .expect("owner credentials"),
++    );
++    let state = ServiceState::bootstrap_with_deps(
++        ServiceConfig {
++            bind_addr: "127.0.0.1:0".parse().expect("owner bind"),
++            data_home: home.to_path_buf(),
++            home_source: HomeSource::Cli,
++            network_mode: NetworkMode::Loopback,
++            shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
++        },
++        &layout,
++        ServiceDeps {
++            model_gateway: Some(Arc::new(
++                lingxi_adapters::models::gateway::ConfigModelGateway::from_validated(plane),
++            )),
++            model_plane_source: Some(source),
++            credential_service: Some(credentials),
++            workspace_root: file.workspace,
++            worker_tool_registration: file.workers,
++            quota_limits: QuotaLimits {
++                model: LayeredQuotaLimits {
++                    global: 1,
++                    per_agent: 1,
++                    per_session: 1,
++                },
++                ..QuotaLimits::default()
++            },
++            ..ServiceDeps::default()
++        },
++    )
++    .await
++    .expect("owner production bootstrap");
++    let started = Instant::now();
++    let mut points = Vec::new();
++    let sample = |phase: &str, cycle: usize| {
++        serde_json::json!({
++            "phase": phase, "cycle": cycle, "tMs": started.elapsed().as_millis(),
++            "owners": owner_sample(&state), "processTree": tree_sample(std::process::id() as i32),
++            "files": file_sample(home, workspace),
++        })
++    };
++    points.push(sample("baseline", 0));
++    assert_eq!(points[0]["owners"]["activeSessionRuns"], 0);
++    for cycle in 0..WORKER_CYCLES {
++        let before = arrived.load(Ordering::SeqCst);
++        let drive_state = state.clone();
++        let worker = tokio::spawn(async move {
++            drive_state
++                .sessions()
++                .execute_for(
++                    drive_state.storage().as_ref(),
++                    drive_state.events(),
++                    drive_state.runs(),
++                    &owner_principal(),
++                    "sess_local_alpha",
++                    &format!("w: owner {cycle}"),
++                    1_790_409_600_000,
++                )
++                .await
++                .expect("owner worker accepted")
++        });
++        let deadline = Instant::now() + Duration::from_secs(30);
++        while arrived.load(Ordering::SeqCst) == before {
++            assert!(
++                Instant::now() < deadline,
++                "owner worker 未到达真实 HTTP 屏障"
++            );
++            tokio::time::sleep(Duration::from_millis(10)).await;
++        }
++        let queued_state = state.clone();
++        let queued = tokio::spawn(async move {
++            queued_state
++                .sessions()
++                .execute_for(
++                    queued_state.storage().as_ref(),
++                    queued_state.events(),
++                    queued_state.runs(),
++                    &owner_principal(),
++                    "sess_local_beta",
++                    "owner queued",
++                    1_790_409_600_000,
++                )
++                .await
++                .expect("owner queued accepted")
++        });
++        let deadline = Instant::now() + Duration::from_secs(5);
++        while state
++            .runs()
++            .quotas()
++            .waiting(lingxi_service::quotas::QuotaResource::Model)
++            != 1
++        {
++            assert!(
++                Instant::now() < deadline,
++                "真实第二任务未进入 permit 等待队列"
++            );
++            tokio::time::sleep(Duration::from_millis(10)).await;
++        }
++        let peak = sample("worker-and-queued-live", cycle);
++        assert_eq!(peak["owners"]["activeSessionRuns"], 2);
++        assert_eq!(
++            peak["owners"]["liveRunIds"]
++                .as_array()
++                .expect("live ids")
++                .len(),
++            2
++        );
++        assert_eq!(peak["owners"]["modelPermits"], 1);
++        assert_eq!(peak["owners"]["modelWaiters"], 1);
++        assert_eq!(peak["owners"]["toolPermits"], 1);
++        assert_eq!(
++            peak["processTree"]["processes"]
++                .as_array()
++                .expect("live tree")
++                .len(),
++            2
++        );
++        points.push(peak);
++        let id = latest_run_id(home, "sess_local_beta")
++            .await
++            .expect("queued id");
++        state
++            .sessions()
++            .cancel_run_for(
++                state.storage().as_ref(),
++                state.runs(),
++                &owner_principal(),
++                &id,
++            )
++            .await
++            .expect("queued cancel accepted");
++        queued.await.expect("queued task joined");
++        assert_eq!(
++            state
++                .runs()
++                .quotas()
++                .waiting(lingxi_service::quotas::QuotaResource::Model),
++            0
++        );
++        release.notify_one();
++        let result = worker.await.expect("worker task joined");
++        let terminal = wait_run_status(
++            home,
++            &result.run_id,
++            |status| status != "running",
++            "owner completed",
++        )
++        .await;
++        assert_eq!(terminal, "completed");
++        // 三个连续清理后窗口；保留计数，避免单个终点冒充稳态。
++        for window in 0..3 {
++            let point = sample("released-steady", cycle);
++            let owners = &point["owners"];
++            assert_log_file_bound(&point["files"], "owner released-steady");
++            for field in [
++                "activeSessionRuns",
++                "modelPermits",
++                "modelWaiters",
++                "toolPermits",
++                "toolWaiters",
++            ] {
++                assert_eq!(
++                    owners[field], 0,
++                    "资源未释放: {field}, cycle={cycle}, window={window}"
++                );
++            }
++            assert!(owners["liveRunIds"]
++                .as_array()
++                .expect("live ids")
++                .is_empty());
++            assert!(owners["backgroundIds"]
++                .as_array()
++                .expect("background ids")
++                .is_empty());
++            assert_eq!(
++                point["processTree"]["processes"]
++                    .as_array()
++                    .expect("released tree")
++                    .len(),
++                1
++            );
++            assert_eq!(point["processTree"]["establishedTcpCount"], 0);
++            points.push(point);
++            tokio::time::sleep(Duration::from_millis(100)).await;
++        }
++    }
++    state.storage().close().await.expect("owner storage close");
++    drop(state);
++    points
++}
++
+ // ── leg 1: the sampler's positive/negative controls ─────────────────────────
+ 
+ /// Spawns `sleep <secs>` with `extra_fds` ADDITIONAL descriptors held open
+@@ -743,6 +1062,77 @@ async fn f27_sampler_controls_detect_growth_release_and_failure() {
+     let bogus = fds_of(2_000_000);
+     assert!(bogus.is_err(), "an unknown pid must not sample");
+ 
++    // TCP 正反控制：指定端口的两端连接都必须可见，释放后都必须消失。
++    let self_pid = std::process::id() as i32;
++    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
++        .await
++        .expect("control bind");
++    let addr = listener.local_addr().expect("control addr");
++    let marker = format!(":{}", addr.port());
++    let count = || {
++        resource_sampler::tcp_of(self_pid)
++            .expect("UNKNOWN: TCP 控制采样")
++            .iter()
++            .filter(|name| name.contains(&marker))
++            .count()
++    };
++    assert_eq!(count(), 0);
++    let client = tokio::net::TcpStream::connect(addr)
++        .await
++        .expect("control connect");
++    let (peer, _) = listener.accept().await.expect("control accept");
++    let retained = count();
++    assert_eq!(retained, 2, "必须看见已知保留连接的两端");
++    drop(client);
++    drop(peer);
++    assert_eq!(count(), 0, "释放后不再有 ESTABLISHED 连接");
++    assert!(resource_sampler::tcp_of(2_000_000).is_err());
++    assert!(resource_sampler::parse_tcp("", self_pid).is_err());
++    assert!(
++        resource_sampler::parse_tcp("p1\nf4\nPTCP\nTST=ESTABLISHED\nnlocalhost", self_pid).is_err()
++    );
++
++    // 文件清单正反控制：不是只删除目录后猜测临时文件已消失。
++    let root = unique_dir("sampler-file-control");
++    assert!(resource_sampler::files(&root)
++        .expect("empty inventory")
++        .is_empty());
++    for i in 0..3 {
++        std::fs::write(root.join(format!("held-{i}.tmp")), [7; 17]).expect("held file");
++    }
++    let held_files = resource_sampler::files(&root).expect("held inventory");
++    assert_eq!(held_files.len(), 3);
++    for i in 0..3 {
++        std::fs::remove_file(root.join(format!("held-{i}.tmp"))).expect("release file");
++    }
++    assert!(resource_sampler::files(&root)
++        .expect("released inventory")
++        .is_empty());
++    std::fs::remove_dir(&root).expect("remove control directory");
++    assert!(
++        resource_sampler::files(&root).is_err(),
++        "不存在目录不能充当空清单"
++    );
++    let held_tree = tree_sample(plain);
++    assert_eq!(
++        held_tree["processes"]
++            .as_array()
++            .expect("process list")
++            .len(),
++        1
++    );
++    assert!(resource_sampler::process_ids(loaded).is_err());
++
++    println!(
++        "F27 sampler controls: {}",
++        serde_json::json!({
++            "fdBaseline": base, "fdRetained": grown, "fdReleased": "UNKNOWN (dead/reaped PID)",
++            "tcpRetained": retained, "tcpReleased": 0, "filesRetained": held_files,
++            "filesReleased": [], "liveProcessTree": held_tree,
++            "deadProcessTree": "UNKNOWN", "emptyAndWrongIdentity": "UNKNOWN",
++        })
++    );
++
+     kill_and_reap(&mut plain_child);
+ }
+ 
+@@ -770,6 +1160,10 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+     // The mode the router keys on; flipped between load phases.
+     let mode = Arc::new(Mutex::new("ok".to_string()));
+     let mode_for_stub = Arc::clone(&mode);
++    let worker_release = Arc::new(tokio::sync::Notify::new());
++    let worker_arrived = Arc::new(AtomicUsize::new(0));
++    let stub_release = Arc::clone(&worker_release);
++    let stub_arrived = Arc::clone(&worker_arrived);
+     let read_args = serde_json::json!({"path": "loop.txt"}).to_string();
+     let worker_args = serde_json::json!({"input": "input.txt"}).to_string();
+     let long_body = "L".repeat(512 * 1024);
+@@ -790,7 +1184,11 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+             }
+             _ => match request.body["model"].as_str() {
+                 // The worker callback leg rides the aux-slot route.
+-                Some("summarize-model-f27") => Step::Sse(sse_final("callback ok")),
++                Some("summarize-model-f27") => Step::GatedSse(
++                    sse_final("callback ok"),
++                    Arc::clone(&stub_release),
++                    Arc::clone(&stub_arrived),
++                ),
+                 _ => {
+                     if text.starts_with("w:") && last_tool_result(&request.body).is_none() {
+                         Step::Sse(tool_call_turn("call_f27_w", "probe", &worker_args))
+@@ -891,11 +1289,15 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+     );
+ 
+     let started = Instant::now();
++    let evidence_dir = unique_dir("f27-series");
++    let series_path = evidence_dir.join("f27-resource-series.json");
++    println!("F27 raw resource series: {}", series_path.display());
+     // Sampling happens SYNCHRONOUSLY at each phase marker (a ~100 ms
+     // instrumented pause every 10 cycles — the sample must read the LIVE
+     // process of THAT phase's instance, and a deferred handle could
+     // outlive the instance between restarts).
+     let mut series: Vec<serde_json::Value> = Vec::new();
++    let mut cycle_results = Vec::new();
+     let sample = |series: &mut Vec<serde_json::Value>, sample_pid: i32, phase: &str| {
+         let rss = rss_of(sample_pid).expect("an rss sample failed — UNKNOWN is loud");
+         let fds = fds_of(sample_pid).expect("an fds sample failed — UNKNOWN is loud");
+@@ -904,7 +1306,14 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+             "phase": phase,
+             "rssKiB": rss,
+             "fds": fds,
++            "serviceTree": tree_sample(sample_pid),
++            "equipmentProcess": {"pid": std::process::id(), "rssKiB": rss_of(std::process::id() as i32).expect("UNKNOWN: test process RSS"), "fds": fds_of(std::process::id() as i32).expect("UNKNOWN: test process FD")},
++            "files": file_sample(&home, &workspace),
+         }));
++        // 中断或断言失败仍留下已取得的原始数据，不把部分运行记 PASS。
++        std::fs::write(&series_path, serde_json::to_vec_pretty(&serde_json::json!({
++            "schema": "lingxi.r05-f27-resource-series.v1", "status": "PARTIAL_RUNNING_OR_FAILED", "series": series
++        })).expect("partial json")).expect("write partial raw series");
+     };
+ 
+     // Warmup: two clean cycles, then the baseline sample.
+@@ -930,6 +1339,7 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+         } else {
+             "sess_local_beta"
+         };
++        let hits_before = stub.hits();
+         let owned = submit_owned(
+             addr,
+             token.clone(),
+@@ -943,7 +1353,7 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+             if let Some(id) = latest_run_id(&home, session).await {
+                 let db = open_runs_db(&home);
+                 let status = query_one(&db, "SELECT status FROM runs WHERE run_id = ?1", &[&id]);
+-                if status.as_deref() == Some("running") {
++                if status.as_deref() == Some("running") && stub.hits() > hits_before {
+                     break id;
+                 }
+             }
+@@ -953,6 +1363,15 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+             );
+             tokio::time::sleep(Duration::from_millis(10)).await;
+         };
++        if cycle % 10 == 0 {
++            sample(&mut series, pid, "cancel-live");
++            assert!(
++                series.last().expect("cancel peak")["serviceTree"]["establishedTcpCount"]
++                    .as_u64()
++                    .expect("tcp")
++                    >= 2
++            );
++        }
+         // HOLD the socket open through the budget window: the production
+         // request-budget watchdog itself cancels the parked submission
+         // (408 back, the handler future dropped, the parked provider
+@@ -1007,6 +1426,7 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+                 }
+                 Some("running") => {
+                     cancel_dangling += 1;
++                    cycle_results.push(serde_json::json!({"phase":"cancel", "cycle":cycle, "runId":run_id, "status":"running", "providerConnectionReclaimed":true, "httpStatus":408}));
+                     break;
+                 }
+                 Some(other) => {
+@@ -1015,6 +1435,7 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+                         "cancel cycle {cycle}: unexpected terminal {other}"
+                     );
+                     cancel_settled += 1;
++                    cycle_results.push(serde_json::json!({"phase":"cancel", "cycle":cycle, "runId":run_id, "status":other, "providerConnectionReclaimed":true, "httpStatus":408}));
+                     break;
+                 }
+                 None => panic!("cancel cycle {cycle}: run row vanished"),
+@@ -1097,6 +1518,8 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+         let st = wait_run_status(&home, &run_id, |st| st != "running", "settled").await;
+         assert_eq!(st, "failed", "error cycle {cycle} settled honestly: {st}");
+         error_runs += 1;
++        cycle_results
++            .push(serde_json::json!({"phase":"error", "cycle":cycle, "runId":run_id, "status":st}));
+         if cycle % 10 == 9 {
+             sample(&mut series, child2.pid(), "error");
+         }
+@@ -1111,6 +1534,8 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+         let run_id = a["runId"].as_str().expect("runId").to_string();
+         let st = wait_run_status(&home, &run_id, |st| st != "running", "settled").await;
+         assert_eq!(st, "completed");
++        cycle_results
++            .push(serde_json::json!({"phase":"ok", "cycle":cycle, "runId":run_id, "status":st}));
+         if cycle % 5 == 4 {
+             sample(&mut series, child2.pid(), "ok");
+         }
+@@ -1122,14 +1547,58 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+         let run_id = a["runId"].as_str().expect("runId").to_string();
+         let st = wait_run_status(&home, &run_id, |st| st != "running", "settled").await;
+         assert_eq!(st, "completed", "the 512 KiB final settles: {st}");
++        cycle_results
++            .push(serde_json::json!({"phase":"long", "cycle":cycle, "runId":run_id, "status":st}));
+     }
+     *mode.lock().expect("mode") = "ok".to_string();
+     for cycle in 0..WORKER_CYCLES {
+-        let (s, a) = submit(addr, &token, "sess_local_alpha", &format!("w: {cycle}")).await;
++        let before = worker_arrived.load(Ordering::SeqCst);
++        let drive_token = token.clone();
++        let drive = tokio::spawn(async move {
++            submit(
++                addr,
++                &drive_token,
++                "sess_local_alpha",
++                &format!("w: {cycle}"),
++            )
++            .await
++        });
++        let deadline = Instant::now() + Duration::from_secs(30);
++        while worker_arrived.load(Ordering::SeqCst) == before {
++            assert!(
++                Instant::now() < deadline,
++                "worker 未抵达真实 callback HTTP 屏障"
++            );
++            tokio::time::sleep(Duration::from_millis(10)).await;
++        }
++        sample(&mut series, child2.pid(), "worker-live");
++        let tree = &series.last().expect("live point")["serviceTree"];
++        assert_eq!(
++            tree["processes"].as_array().expect("processes").len(),
++            2,
++            "service + 一个存活 worker"
++        );
++        assert!(
++            tree["establishedTcpCount"].as_u64().expect("tcp") >= 2,
++            "提交连接及 worker callback 连接存活"
++        );
++        worker_release.notify_one();
++        let (s, a) = drive.await.expect("worker drive joined");
+         assert_eq!(s, 200, "{a}");
+         let run_id = a["runId"].as_str().expect("runId").to_string();
+         let st = wait_run_status(&home, &run_id, |st| st != "running", "settled").await;
+         assert_eq!(st, "completed", "worker cycle {cycle}: {st}");
++        cycle_results.push(
++            serde_json::json!({"phase":"worker", "cycle":cycle, "runId":run_id, "status":st}),
++        );
++        sample(&mut series, child2.pid(), "worker-released");
++        let tree = &series.last().expect("released point")["serviceTree"];
++        assert_eq!(
++            tree["processes"].as_array().expect("processes").len(),
++            1,
++            "worker 回收完成"
++        );
++        assert_eq!(tree["establishedTcpCount"], 0, "worker 完成后连接释放");
+     }
+     sample(&mut series, child2.pid(), "worker-final");
+ 
+@@ -1145,6 +1614,8 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+             RSS_BOUND_KIB,
+             point["phase"]
+         );
++        assert!(point["serviceTree"]["rssKiB"].as_u64().expect("tree rss") < RSS_BOUND_KIB);
++        assert!(point["serviceTree"]["fds"].as_u64().expect("tree fds") < FD_BOUND as u64);
+         assert!(
+             fds < FD_BOUND as u64,
+             "open FDs {fds} exceed the pre-registered bound (phase {})",
+@@ -1216,7 +1687,32 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+         "phase": "post-restart",
+         "rssKiB": post_rss,
+         "fds": post_fds,
++        "serviceTree": tree_sample(child3.pid()),
++        "files": file_sample(&home, &workspace),
+     }));
++    assert_log_file_bound(&series.last().expect("重启采样")["files"], "post-restart");
++
++    // 清理记录只能在退出、回收及删除已经被核对后写入。
++    let final_service_pid = child3.pid();
++    let exit = child3.stop().await;
++    assert!(exit.success(), "最后实例未正常退出: {exit}");
++    assert!(resource_sampler::process_ids(final_service_pid).is_err());
++    let owners = owner_resource_series(
++        &home,
++        &workspace,
++        &config_path,
++        &worker_arrived,
++        &worker_release,
++    )
++    .await;
++    let files_before_cleanup = file_sample(&home, &workspace);
++    let stub_dropped = stub.dropped();
++    let stub_hits = stub.hits();
++    stub.stop().await;
++    std::fs::remove_dir_all(&home).expect("删除隔离 home");
++    std::fs::remove_dir_all(&workspace).expect("删除隔离 workspace");
++    std::fs::remove_dir_all(&config_root).expect("删除隔离 config");
++    assert!(!home.exists() && !workspace.exists() && !config_root.exists());
+ 
+     // ── the RAW time series is preserved (the evidence the frozen
+     // candidate never kept). The series lands in the test's OWN freshly
+@@ -1224,8 +1720,6 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+     // the gate producer captures, and the stage-suite script copies the
+     // printed file into the run's evidence directory (the Rust side never
+     // writes outside its own temp root).
+-    let evidence_dir = unique_dir("f27-series");
+-    let series_path = evidence_dir.join("f27-resource-series.json");
+     let doc = serde_json::json!({
+         "schema": "lingxi.r05-f27-resource-series.v1",
+         "caseId": "R05-T08-C12",
+@@ -1257,12 +1751,24 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+             "os": std::env::consts::OS,
+             "arch": std::env::consts::ARCH,
+             "binary": "CARGO_BIN_EXE_lingxi-service (debug)",
+-            "stubDroppedConnections": stub.dropped(),
+-            "stubHits": stub.hits(),
++            "binaryPath": env!("CARGO_BIN_EXE_lingxi-service"),
++            "workerPath": fixture_exe(),
++            "equipmentPath": std::env::current_exe().expect("test exe path"),
++            "stubDroppedConnections": stub_dropped,
++            "stubHits": stub_hits,
+         },
+         "series": series,
++        "cycleResults": cycle_results,
++        "ownerResourceSeries": owners,
+         "cleanup": {
+             "serviceStopped": true,
++            "lastServicePid": final_service_pid,
++            "lastServiceExit": exit.code(),
++            "filesBeforeCleanup": files_before_cleanup,
++            "homeRemoved": !home.exists(),
++            "workspaceRemoved": !workspace.exists(),
++            "configRemoved": !config_root.exists(),
++            "equipmentStubStopped": true,
+         },
+     });
+     std::fs::write(
+@@ -1272,10 +1778,5 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
+     .expect("write the raw series");
+     println!("F27 raw resource series: {}", series_path.display());
+ 
+-    child3.stop().await;
+-    stub.stop().await;
+-    let _ = std::fs::remove_dir_all(&home);
+-    let _ = std::fs::remove_dir_all(&workspace);
+-    let _ = std::fs::remove_dir_all(&config_root);
+     // The series directory SURVIVES the cleanup — it is the evidence.
+ }

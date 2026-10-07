@@ -1,0 +1,99 @@
+[
+  {
+    "name": "service RSS",
+    "pass": true,
+    "detail": [
+      27328,
+      36656
+    ]
+  },
+  {
+    "name": "service FD",
+    "pass": true,
+    "detail": [
+      15,
+      19
+    ]
+  },
+  {
+    "name": "tree_rss_kib",
+    "pass": true,
+    "detail": [
+      27328,
+      39232
+    ]
+  },
+  {
+    "name": "tree_fds",
+    "pass": true,
+    "detail": [
+      15,
+      22
+    ]
+  },
+  {
+    "name": "所有series进程数值实际求和",
+    "pass": true,
+    "detail": null
+  },
+  {
+    "name": "所有series日志原上限",
+    "pass": true,
+    "detail": null
+  },
+  {
+    "name": "所有ownerResourceSeries进程数值实际求和",
+    "pass": true,
+    "detail": null
+  },
+  {
+    "name": "所有ownerResourceSeries日志原上限",
+    "pass": true,
+    "detail": null
+  },
+  {
+    "name": "45点owner全部回零",
+    "pass": true,
+    "detail": null
+  },
+  {
+    "name": "15存活worker峰值",
+    "pass": true,
+    "detail": null
+  },
+  {
+    "name": "15worker释放",
+    "pass": true,
+    "detail": null
+  },
+  {
+    "name": "原始npm失败统计",
+    "pass": true,
+    "detail": "fails=6\ndistinct_files=3\nfiles_failed=3\ntests_failed=6\ntf_lines=1\nt_lines=1\nverdict=PARSABLE\n"
+  },
+  {
+    "name": "base原始统计",
+    "pass": true,
+    "detail": "fails=0\ndistinct_files=0\nfiles_failed=0\ntests_failed=0\ntf_lines=1\nt_lines=1\nverdict=GREEN\n"
+  },
+  {
+    "name": "raw candidate1 base0明确红",
+    "pass": true,
+    "detail": "== R02-A16 legacy-entry regression: GREEN — default entry NOT switched vs 201584f2917a7fd96d6ea603bdeddbd420082cfe (Node/Electron incumbent default: E1c entry chain + E1d runtime-default / no-injection / branch-guard / bootstrap-load / cli-default / no-double-write assertions all hold; authorized wiring range archived in e1-surface-diff-files.txt); no new regressions vs baseline (candidate reds ⊆ baseline-replay reds ∪ registered pre-existing families, currently the seal trio); base replay ran on a pristine historical checkout; all reds classified from actual diagnostics with file-level coverage pinned to the summary at both ends (R10-F01: distinct FAIL-header files >= summary files_failed, parser-drift assert) (candidate raw exit 1, base raw exit 0 — registered, not formal green) =="
+  },
+  {
+    "name": "directed真实E5 scope skip",
+    "pass": true,
+    "detail": null
+  },
+  {
+    "name": "普通取消统计核subagent_closeout::parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap",
+    "pass": true,
+    "detail": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.10s"
+  },
+  {
+    "name": "普通取消统计核late_result_fence::r03_a07_late_result_after_cancel_and_next_run_pollutes_nothing",
+    "pass": true,
+    "detail": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.06s"
+  }
+]

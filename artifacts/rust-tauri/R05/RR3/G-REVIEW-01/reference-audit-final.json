@@ -1,0 +1,640 @@
+{
+  "utc": "2026-10-07T02:40:02.477399+00:00",
+  "inputs": [
+    {
+      "label": "A19",
+      "count": 19,
+      "changes": [],
+      "equal": true
+    },
+    {
+      "label": "C/F46 actual321",
+      "count": 321,
+      "changes": [
+        {
+          "path": "rust/crates/lingxi-service/src/lib.rs",
+          "expected": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756",
+          "actual": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/redaction.rs",
+          "expected": "9d749fc88d7c653399db7908b4fddd1bcca3264362c9da3a6a7ba49318c6a1ed",
+          "actual": "5b192ab43df13d6add0705a9f1eb2ead45da1131f012c3afb61dd9f90ac10b7a"
+        }
+      ],
+      "equal": false
+    },
+    {
+      "label": "B4",
+      "count": 4,
+      "changes": [
+        {
+          "path": "scripts/rust-tauri/r05_t08_negative_gate.sh",
+          "expected": "4853e129e2d0cf7dbd6c93c8c158186fad23e6f231a03ff64f140cca61e0042f",
+          "actual": "a69110b81298705a9161652d28402a5e5a585f945fdfd214ccf071132ecb67dd"
+        }
+      ],
+      "equal": false
+    }
+  ],
+  "manifests": [
+    {
+      "manifest": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/manifest.json",
+      "sha256": "c4287707afc562c3e76fd726b11c518248da11701e282bdc490322276313f87a",
+      "fileCount": 2475,
+      "mismatches": []
+    },
+    {
+      "manifest": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/evidence-sha256.json",
+      "sha256": "99350ed06c68c0798ffc5946a06c503624eab0d63163f471d140d4df23049c67",
+      "fileCount": 641,
+      "mismatches": []
+    },
+    {
+      "manifest": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/MANIFEST.json",
+      "sha256": "c5bf68a63f5d26151b1e97ba5ed4ef19328ae7377ab86459f8e414336462338c",
+      "fileCount": 533,
+      "mismatches": []
+    }
+  ],
+  "historicalLayers": [
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+      "sha256": "0f5911462089380b8eb94d137b98f8d2382d062564c43d54cd84338b0852191e",
+      "stage": "R05",
+      "overall": "FAIL",
+      "commands": [
+        {
+          "key": "rust_test_workspace",
+          "status": "FAIL",
+          "exitCode": 101
+        },
+        {
+          "key": "r05_stage_suites",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "rust_fmt",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "rust_clippy",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "check_contracts",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "check_boundaries",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "r04_regression_gate",
+          "status": "FAIL",
+          "exitCode": 1
+        }
+      ],
+      "stable": true,
+      "checkpoints": [
+        {
+          "atUnixMs": 1791309524587,
+          "changedPathBytesHex": [],
+          "commandKey": "rust_test_workspace",
+          "digestSha256": "f5fed9c3b970e97fe4618c0ce77b1ee6447f2c3eb5be28800dc09eaa49b2abe0",
+          "fileCount": 37557,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791309922350,
+          "changedPathBytesHex": [],
+          "commandKey": "r05_stage_suites",
+          "digestSha256": "f5fed9c3b970e97fe4618c0ce77b1ee6447f2c3eb5be28800dc09eaa49b2abe0",
+          "fileCount": 37557,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791309942292,
+          "changedPathBytesHex": [],
+          "commandKey": "rust_fmt",
+          "digestSha256": "f5fed9c3b970e97fe4618c0ce77b1ee6447f2c3eb5be28800dc09eaa49b2abe0",
+          "fileCount": 37557,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791310613165,
+          "changedPathBytesHex": [],
+          "commandKey": "rust_clippy",
+          "digestSha256": "f5fed9c3b970e97fe4618c0ce77b1ee6447f2c3eb5be28800dc09eaa49b2abe0",
+          "fileCount": 37557,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791310632763,
+          "changedPathBytesHex": [],
+          "commandKey": "check_contracts",
+          "digestSha256": "f5fed9c3b970e97fe4618c0ce77b1ee6447f2c3eb5be28800dc09eaa49b2abe0",
+          "fileCount": 37557,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791310652408,
+          "changedPathBytesHex": [],
+          "commandKey": "check_boundaries",
+          "digestSha256": "f5fed9c3b970e97fe4618c0ce77b1ee6447f2c3eb5be28800dc09eaa49b2abe0",
+          "fileCount": 37557,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791312510385,
+          "changedPathBytesHex": [],
+          "commandKey": "r04_regression_gate",
+          "digestSha256": "f5fed9c3b970e97fe4618c0ce77b1ee6447f2c3eb5be28800dc09eaa49b2abe0",
+          "fileCount": 37557,
+          "stable": true
+        }
+      ],
+      "runnerSourceBinding": "PASS"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/verify-stage-result.json",
+      "sha256": "b9c115415225b03d19929708095bc3cd3cfae6c8677804a541a6a909ff732d40",
+      "stage": "R04",
+      "overall": "FAIL",
+      "commands": [
+        {
+          "key": "rust_test_workspace",
+          "status": "FAIL",
+          "exitCode": 101
+        },
+        {
+          "key": "r04_tool_matrix",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "rust_fmt",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "rust_clippy",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "check_contracts",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "check_boundaries",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "r03_regression_gate",
+          "status": "FAIL",
+          "exitCode": 1
+        },
+        {
+          "key": "r04_rr1_repair_suites",
+          "status": "PASS",
+          "exitCode": 0
+        }
+      ],
+      "stable": false,
+      "checkpoints": [
+        {
+          "atUnixMs": 1791310830796,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f7230345f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "rust_test_workspace",
+          "digestSha256": "165260cf11ef890c75e5e9ce696ed45dbb2567cb579e6be387184f758a246adb",
+          "fileCount": 37672,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311157337,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f7230345f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "r04_tool_matrix",
+          "digestSha256": "b093b5f56f5d38552b6a919c19302a16a6cfa2f0ed0433af1daec7aecaf9edf4",
+          "fileCount": 37672,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311177284,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f7230345f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "rust_fmt",
+          "digestSha256": "e6b129ed97bafcc6925d3606ce46a8d20a1224c19d8dcacdb88b2e43c38398ff",
+          "fileCount": 37672,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311196602,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f7230345f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "rust_clippy",
+          "digestSha256": "74301847d6d167adf59b44377b475debd66f6da2c404729159371b6afba031a9",
+          "fileCount": 37672,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311216236,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f7230345f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "check_contracts",
+          "digestSha256": "46a9c05c50fd4a6f10afbbaec114b69d3b69963f968f56333d230c6663b2f218",
+          "fileCount": 37672,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311235544,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f7230345f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "check_boundaries",
+          "digestSha256": "575edb2542b9ad49cb00a39a929bfc78216441cdddc35110edbb1e7b107c661a",
+          "fileCount": 37672,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791312412286,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f7230345f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "r03_regression_gate",
+          "digestSha256": "0264762f4d20dd08936d7c8d3b9c956155286ad12455c66bffd4181843b96429",
+          "fileCount": 37672,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791312470787,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f7230345f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "r04_rr1_repair_suites",
+          "digestSha256": "afbfe40a17e1d83456ee4abb2bfeab031f61d81e771ea1ab946605869fce7fd4",
+          "fileCount": 37672,
+          "stable": false
+        }
+      ],
+      "runnerSourceBinding": "PASS"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+      "sha256": "157d8cd5e1f03d19f57f5d35ce0041904503c5809964ae1b2900abcd292d6803",
+      "stage": "R03",
+      "overall": "FAIL",
+      "commands": [
+        {
+          "key": "rust_test_workspace",
+          "status": "FAIL",
+          "exitCode": 101
+        },
+        {
+          "key": "a15_combo_and_leaves",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "r02_storage_tx",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "r02_full_chain",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "r02_backup_restore",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "r02_recovery_drill",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "rust_fmt",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "rust_clippy",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "check_contracts",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "check_boundaries",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "r02_auth_matrix",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "r02_legacy_regression",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "a16_seed_mechanism",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "repair_suites",
+          "status": "PASS",
+          "exitCode": 0
+        },
+        {
+          "key": "r02_events_matrix",
+          "status": "PASS",
+          "exitCode": 0
+        }
+      ],
+      "stable": false,
+      "checkpoints": [
+        {
+          "atUnixMs": 1791311353818,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "rust_test_workspace",
+          "digestSha256": "fa12758e1e29ee8d24b6df2087580aaf6b3df16b456d1c6693c39d676e40dc69",
+          "fileCount": 37747,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311381283,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "a15_combo_and_leaves",
+          "digestSha256": "45d3ad4c06a9899fca8522a2f8de2a06cbf9618abf8ded89e5c206c29318a471",
+          "fileCount": 37747,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311403094,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "r02_storage_tx",
+          "digestSha256": "376ecb9775b141a749b7df09e4477b949d4a2947a549ed2fe504288512fb8439",
+          "fileCount": 37747,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311429427,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "r02_full_chain",
+          "digestSha256": "d3f9fb78b699361d13ca3936ba5562eb33fa8f9c33b8de6d296c71c2893b66ee",
+          "fileCount": 37747,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311457474,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "r02_backup_restore",
+          "digestSha256": "cb3da8f1182f16f69bc83d7064bb4e8d6223b43dbbdbdc276d8cc0b33cd693c5",
+          "fileCount": 37747,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311479286,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "r02_recovery_drill",
+          "digestSha256": "d57f913a3eef2376c10ded368972fc57ddb8f69d5b180145c247ee84fd443887",
+          "fileCount": 37747,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311499300,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "rust_fmt",
+          "digestSha256": "0d70ad26028083f601953a55322d1b3a466ca6d34672fabe59eef73df169673a",
+          "fileCount": 37747,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311518653,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "rust_clippy",
+          "digestSha256": "49612cd43e74828a9b8e39577db193ac2acd46b0c7a877fc8e1bdd5ae46f8367",
+          "fileCount": 37747,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311538333,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "check_contracts",
+          "digestSha256": "27d0e1d9d75866a2d07337683f1df01e53785b38f9b04013b7017f7c212b6346",
+          "fileCount": 37747,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311557670,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "check_boundaries",
+          "digestSha256": "ddbf46397833f8aa01138489dc5495a54dfaf4693017c675c03c0796856232ce",
+          "fileCount": 37747,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791311649440,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "r02_auth_matrix",
+          "digestSha256": "7fced080de71cb51004d12727d0b758a1827d56d0d7832b9a946c6ac8c796b8d",
+          "fileCount": 37747,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791312263688,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "r02_legacy_regression",
+          "digestSha256": "5855574d797f0fb21f276046e1b1dcb32f29a7cef3a64ef1c9fa9572cada5eb2",
+          "fileCount": 37747,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791312288772,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "a16_seed_mechanism",
+          "digestSha256": "2fd61a7b7f8d44c6887f841a80d71d0ec878c0bb65d71502aa249e4e55711679",
+          "fileCount": 37747,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791312330465,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "repair_suites",
+          "digestSha256": "5c4d242b3847b98fdbcffd5761fae989b3b8b1cfb5f4405fb8ecff2003ee620e",
+          "fileCount": 37747,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791312372248,
+          "changedPathBytesHex": [
+            "6172746966616374732f727573742d74617572692f5230352f5252322f46494e414c2d30312f7665726966792d7230352d322f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67"
+          ],
+          "commandKey": "r02_events_matrix",
+          "digestSha256": "62626fe889040b4bf9d90bc084cb8a50d9b68c3da7105ed2a36599ec6d46d5d7",
+          "fileCount": 37747,
+          "stable": false
+        }
+      ],
+      "runnerSourceBinding": "PASS"
+    }
+  ],
+  "newCResourceRaw": {
+    "sha256": "e6c7c080cb25e5bf14edaf2dd6e0eada76d1b07d971804fde84a115bb0ef066d",
+    "load": {
+      "cancelCycles": 60,
+      "cancelDanglingActive": 60,
+      "cancelSettled": 0,
+      "errorCycles": 60,
+      "errorRuns": 60,
+      "longResponseCycles": 10,
+      "okCycles": 15,
+      "sessions": [
+        "sess_local_alpha",
+        "sess_local_beta"
+      ],
+      "workerCycles": 15
+    },
+    "counts": {
+      "series": 54,
+      "cycles": 160,
+      "owners": 61
+    },
+    "binaryPhases": {
+      "baseline": 1,
+      "cancel-live": 6,
+      "cancel": 6,
+      "error": 6,
+      "ok": 3,
+      "worker-live": 15,
+      "worker-released": 15,
+      "worker-final": 1,
+      "post-restart": 1
+    },
+    "ownerPhases": {
+      "baseline": 1,
+      "worker-and-queued-live": 15,
+      "released-steady": 45
+    },
+    "cleanup": {
+      "configRemoved": true,
+      "equipmentStubStopped": true,
+      "filesBeforeCleanup": {
+        "home": [
+          {
+            "bytes": 162,
+            "path": "data-epoch.json"
+          },
+          {
+            "bytes": 22138880,
+            "path": "lingxi-service/data/runs.db"
+          },
+          {
+            "bytes": 157,
+            "path": "lingxi-service/device-credentials.json"
+          },
+          {
+            "bytes": 113,
+            "path": "lingxi-service/devices.json"
+          },
+          {
+            "bytes": 0,
+            "path": "lingxi-service/instance.lock"
+          },
+          {
+            "bytes": 184,
+            "path": "lingxi-service/local-token.json"
+          },
+          {
+            "bytes": 65290,
+            "path": "lingxi-service/logs/service-000004.log"
+          },
+          {
+            "bytes": 31986,
+            "path": "lingxi-service/logs/service-000005.log"
+          },
+          {
+            "bytes": 1980,
+            "path": "lingxi-service/logs/service-000006.log"
+          },
+          {
+            "bytes": 531,
+            "path": "lingxi-service/management.json"
+          },
+          {
+            "bytes": 0,
+            "path": "logs/security-audit.jsonl"
+          }
+        ],
+        "workspace": [
+          {
+            "bytes": 13,
+            "path": "input.txt"
+          },
+          {
+            "bytes": 11,
+            "path": "loop.txt"
+          }
+        ]
+      },
+      "homeRemoved": true,
+      "lastServiceExit": 0,
+      "lastServicePid": 57305,
+      "serviceStopped": true,
+      "workspaceRemoved": true
+    }
+  },
+  "boundary": "input subset equality and evidence hash audit; no current whole-tree freeze or new business-gate PASS implied"
+}

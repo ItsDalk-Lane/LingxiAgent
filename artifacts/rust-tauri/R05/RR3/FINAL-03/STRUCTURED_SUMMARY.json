@@ -1,0 +1,91 @@
+{
+  "review": "RR3 FINAL-03 fresh independent final stage review",
+  "reviewerIdentity": "fresh empty-history stage reviewer; no participation in any RR3 implementation/repair/package review/FINAL-01/FINAL-02; no subagents",
+  "brief": "docs/rust-tauri/R05/repair-current/RR3_FINAL_BRIEF.md (incl. FINAL-03 dispatch addendum)",
+  "openingReceipt": {
+    "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+    "branch": "codex/rust-tauri-migration",
+    "dfDataAvailableGi": 557,
+    "home": "/Users/study_superior",
+    "evidenceRootPreexisting": false
+  },
+  "candidate": {
+    "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+    "gitDiffHeadSha256": "8c23d0d944b66d76f1c65e6a8883d7782a7509d434b10bc13dda2ab5bc393361",
+    "gitLsFilesSha256": "3016f7ae9d18d93951f05a77adb68946cab99a92d0a122294d4c5cf096407d47",
+    "trackedTreeChangedSinceFinal01": false,
+    "frozenInputs": {"count": 30, "changedAfterRun": 0, "missing": 0},
+    "cargoLockSha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08999a4b9e3fca618eff3",
+    "binderSurfaceAtOpen": {
+      "totalEntries": 69177,
+      "regularFile": 69177,
+      "directoryEntries": 0,
+      "symlinkFinal": 0,
+      "symlinkAncestor": 0,
+      "irregular": 0,
+      "missing": 0,
+      "note": "F51/F52 relocations held; cmd-06 passed candidate binding for the first time"
+    },
+    "gitWrites": "none (reflog top = b3ac0e6a commit; index size/mtime unchanged; zero staged)"
+  },
+  "section53Commands": [
+    {"n": 1, "cmd": "cargo fmt --manifest-path rust/Cargo.toml --all -- --check", "utcStart": "2026-10-07T13:28:17Z", "utcEnd": "2026-10-07T13:28:18Z", "exit": 0, "note": "stdout/stderr 0 bytes"},
+    {"n": 2, "cmd": "cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings", "utcEnd": "2026-10-07T13:28:19Z", "exit": 0, "note": "0 warnings 0 errors; warm cache ~1s recorded honestly"},
+    {"n": 3, "cmd": "cargo test --manifest-path rust/Cargo.toml --workspace --locked", "utcStart": "2026-10-07T13:28:19Z", "utcEnd": "2026-10-07T13:41:52Z", "exit": 0, "suites": 115, "passed": 1486, "failed": 0, "ignored": 0, "filtered": 0, "note": "incl. r00 LAN pass, resources ~332s, closed_loop ~300s"},
+    {"n": 4, "cmd": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-contracts", "utcEnd": "2026-10-07T13:41:53Z", "exit": 0, "note": "56 generated files drift-free; API_COMPAT_MATRIX 626 entries"},
+    {"n": 5, "cmd": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-boundaries", "utcEnd": "2026-10-07T13:41:54Z", "exit": 0, "note": "RESULT: OK"},
+    {"n": 6, "cmd": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05", "attempts": [
+      {"attempt": 1, "utcStart": "2026-10-07T13:41:54Z", "outcome": "INTERRUPTED_BY_HOST_KILL", "runnerShellExit": 137, "gateVerdict": "UNKNOWN (no verify-stage-result.json produced)", "partialEvidence": "177 files preserved verbatim at FINAL-03/verify-R05-ATTEMPT1-INTERRUPTED/ (same-volume rename, sha manifest archived)", "analogy": "G-REVIEW-03 default16-01 host-killed background task"},
+      {"attempt": 2, "utcStart": "2026-10-07T14:30:51Z", "utcEnd": "2026-10-07T15:47:35Z", "durationS": 4601, "exit": 1, "verdict": "gate FAIL, full chain executed, this round's signed result", "launchMode": "python start_new_session fully detached (immune to host task kill)"}]}
+  ],
+  "supplementaryEvidenceCommands": [
+    {"label": "supp-01-terminal-family-exact", "cmd": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r04_t08_tool_matrix terminal_family_share_cases -- --exact", "exit": 0, "result": "1 passed / 0 failed / 9 filtered, 0.21s — flake NOT reproduced in isolation"},
+    {"label": "supp-02-workspace-nofailfast", "cmd": "cargo test --manifest-path rust/Cargo.toml --workspace --locked --no-fail-fast", "utcEnd": "2026-10-07T16:08:29Z", "exit": 0, "result": "115 suites, 1486 passed / 0 failed / 0 ignored — completes the 46 binaries left unexecuted by the nested R03 fail-fast stop; no additional failures"}
+  ],
+  "verifyStageLayers": [
+    {"layer": "R05", "path": "verify-stage-result.json", "overall": "FAIL", "testedSha": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b", "stable": true, "checkpoints": "7/7 stable", "runner": "PASS", "commands": "6/7 PASS; r04_regression_gate exit=1 FAIL (3105s)", "scenarios": "16 PASS; R05-A16 + R05-SUP-R04REG FAIL (both reference r04_regression_gate)", "leaves": {"declared": 130, "pass": 130, "fail": 0, "blocked": 0}},
+    {"layer": "R04", "path": "R04_REGRESSION/verify-stage-result.json", "overall": "FAIL", "testedSha": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b", "stable": true, "checkpoints": "8/8 stable", "runner": "PASS", "commands": "7/8 PASS; r03_regression_gate exit=1 FAIL (1585s)", "scenarios": "R04-SUP05 FAIL only", "leaves": {"declared": 124, "pass": 9, "fail": 46, "deferred": 69, "failReason": "EXCLUSIVE to R04 classified stage_share_satisfied with deferredToStages=[] (identical to RR2/FINAL-01 R04 layer — standing deterministic blocker)"}},
+    {"layer": "R03", "path": "R04_REGRESSION/R03_REGRESSION/verify-stage-result.json", "overall": "FAIL", "testedSha": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b", "stable": true, "checkpoints": "15/15 stable", "runner": "PASS", "commands": "14/15 PASS; rust_test_workspace exit=101 FAIL (439s, fail-fast stopped after 69/115 binaries)", "scenarios": "17/17 FAIL (fail-closed aggregation on workspace command)", "leaves": {"declared": 48, "pass": 17, "fail": 0, "deferred": 31},
+     "r02Chain": "all r02_* commands PASS; r02_legacy_regression = directed mode E0-E4.5 ALL GREEN (271s), E5 skipped by scope (full E5 belongs to N16, covered by G-REVIEW-03 isolated run, historical); raw npm registered reds remain registered-not-formal-green"}
+  ],
+  "completeFailureList": [
+    {"id": "F-1", "where": "R03 layer / rust_test_workspace", "test": "terminal_family_share_cases", "assertion": "case terminal-snapshot-current-transcript: pinned expectation 1 did not hold (observed 0)", "location": "rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs:103", "attribution": "timing-sensitive PTY snapshot assertion under sustained load; same candidate 5 green / 1 red this round (cmd-3, attempt1-R05, attempt1-R04, attempt2-R05, supp-01, supp-02 green; attempt2-R03 red); flake, not deterministic product defect, not environment blocker; counts as gate FAIL per release formula"},
+    {"id": "F-2", "where": "R04 layer leaves", "count": 46, "reason": "R04-exclusive leaves classified stage_share_satisfied with deferredToStages=[] (unowned remainder)", "attribution": "standing deterministic R04 stage-map/ledger classification gap, byte-identical distribution+reason to RR2/FINAL-01 R04 layer; blocks the chain independently of F-1"},
+    {"id": "F-3", "where": "R03 scenarios", "count": 17, "attribution": "derived fail-closed from F-1"},
+    {"id": "F-4", "where": "R04 r03_regression_gate exit=1 / R04-SUP05", "attribution": "derived from R03 overall FAIL"},
+    {"id": "F-5", "where": "R05 r04_regression_gate exit=1 / R05-A16 + R05-SUP-R04REG", "attribution": "derived from R04 overall FAIL"}
+  ],
+  "r00": {
+    "binary": "rust/target/debug/deps/r00_management_leaves-590de196dceb15ce",
+    "sha256": "43d959700c53bfd91228f2b3720752aab05a8a05e4c2f495991142802f02b54f",
+    "cdhash": "4ab00dfeb4a4ae93531c857bfef40b879ac82201",
+    "birthUtc": "2026-10-07T11:15:42Z",
+    "relabeled": false,
+    "lanThisRound": "PASS x6 (cmd-3, attempt1 R05/R04 layers, attempt2 R05/R04/R03 layers; loopback then wildcard listen per instance, monitor jsonl)",
+    "consecutivePassesAcrossFinals": "FINAL-01 + FINAL-02 + FINAL-03 (this object)",
+    "conclusion": "not a blocker this round; no user firewall action evidenced; R05-ENV-R00 instance-flakiness observation retained; zero system modifications"
+  },
+  "sixTuple": {
+    "offline_gate": "FAIL",
+    "independent_review": "FAIL",
+    "live_verification": "BLOCKED_NOT_AUTHORIZED",
+    "platform_verification": {"macos_arm64": "all commands this round real", "linux_x86_64": "inherited registration, not reverified", "windows": "not verified"},
+    "stage_readiness": "NOT_ACCEPTED",
+    "R06_READY": false,
+    "release_state": "NOT_IN_SCOPE"
+  },
+  "section61Check": "items 1/3/4 hold on current evidence; item 2 partially (R05 leaves 130/130 but 2 scenarios fail via R04 chain); items 5/6 fail (cmd-6 exit=1); item 7 held by E-REVIEW-04 (post-FINAL backfill pending with coordinator); item 8 fails (two required blockers remain)",
+  "remainingBlockers": [
+    "terminal_family_share_cases PTY snapshot flake under load (needs new implementer round for timing determinism + new independent review)",
+    "R04 layer 46 exclusive-leaf stage_share_satisfied/deferredToStages=[] classification gap (deterministic, standing since RR2; needs R04 map/ledger fix + new independent review)"
+  ],
+  "nextCommand": "/Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05 (after both blockers closed; NEW reviewer; long commands should run fully detached from host session)",
+  "artifacts": {
+    "stageReview": "artifacts/rust-tauri/R05/RR3/FINAL-03/STAGE_REVIEW.md",
+    "structuredSummary": "artifacts/rust-tauri/R05/RR3/FINAL-03/STRUCTURED_SUMMARY.json",
+    "commandRecords": "artifacts/rust-tauri/R05/RR3/FINAL-03/command-records/ (61 files, external->archive SHA256 equal, MANIFEST-sha256.txt)",
+    "interruptedAttemptPreserved": "artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05-ATTEMPT1-INTERRUPTED/ (177 files, byte-preserved)",
+    "evidenceRoot": "artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/ (created by cmd-6 attempt 2)"
+  },
+  "boundary": "wrote only FINAL-03/ subtree and /private/tmp/rr3-final03-dir; main tree otherwise read-only; no git writes; no system changes; no subagents; production entries untouched; no empty filters/ignores/swallowed exits"
+}

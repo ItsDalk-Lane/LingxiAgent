@@ -1,0 +1,9 @@
+F47/F48 已实施并自检通过，状态为 **SELF_CHECKED**。
+
+- warn/info 启动检查各17项通过。
+- 脱敏25项、日志9项及完整160轮资源检查通过。
+- 隔离反例均检出失败，还原后通过；历史失败保留。
+
+[实施报告](/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-01/REPORT.md)
+
+已停止写入。全新H独立验收和最终门禁仍待总控安排，未自签独立通过。

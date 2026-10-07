@@ -1,0 +1,3251 @@
+{
+  "time": "2026-10-07T02:15:19.564256+00:00",
+  "scope": "this triage directory only; self-excluded manifest/files.json; pre-existing dispatch preserved",
+  "files": [
+    {
+      "path": "REPORT.md",
+      "bytes": 21455,
+      "sha256": "6f4dfa16accf7d0d59f729da122d79e99e6f861675053cd041705cb8228684d0"
+    },
+    {
+      "path": "commands/caller-env-sysctl.json",
+      "bytes": 260,
+      "sha256": "8fcdfbce66dd44f2f7a34e47747b4fb532ee1d19edf7b362241a294a38e25b44"
+    },
+    {
+      "path": "commands/caller-env-sysctl.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/caller-env-sysctl.stdout.log",
+      "bytes": 563,
+      "sha256": "4960b9db26b7dac63c112f9522ee33af410558816f8c99604a58b56f5d4e051a"
+    },
+    {
+      "path": "commands/caller-env.json",
+      "bytes": 189,
+      "sha256": "e23576dd44230842d975f3bb8818d93b3864d804d01a4d34ad36df63436805c2"
+    },
+    {
+      "path": "commands/candidate-branch.json",
+      "bytes": 216,
+      "sha256": "ca259e69dde42c9ac3bada44cbe19b1d388938d198da31ea122e6d5cd0489e06"
+    },
+    {
+      "path": "commands/candidate-branch.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/candidate-branch.stdout.log",
+      "bytes": 27,
+      "sha256": "2ad51d278d71d6840dbe83cfd1e80739413fdca39a745d2742603709273fe1fa"
+    },
+    {
+      "path": "commands/candidate-head.json",
+      "bytes": 209,
+      "sha256": "d0cca46f50fc11170186952b17a4b6ee3a729a6ee68b05ffd03085b63d743619"
+    },
+    {
+      "path": "commands/candidate-head.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/candidate-head.stdout.log",
+      "bytes": 41,
+      "sha256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552"
+    },
+    {
+      "path": "commands/cargo-version.json",
+      "bytes": 232,
+      "sha256": "080fdcb12630f1504c6994eb2b53a9c5dc87b61024a977a7f8564277bd3a1c3e"
+    },
+    {
+      "path": "commands/cargo-version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/cargo-version.stdout.log",
+      "bytes": 36,
+      "sha256": "9950bbb2d5c3417b1a068f0e81f6d3cac991a363193bdf2a22d447f5acf8b503"
+    },
+    {
+      "path": "commands/cdd213078-inject.json",
+      "bytes": 99,
+      "sha256": "593df2f96177ddf777a70a3d14b27ccaa06b3b954111de7268e4c3b8004b2dff"
+    },
+    {
+      "path": "commands/cdd213078-redaction.json",
+      "bytes": 102,
+      "sha256": "b737dd1440f5784f2d7e3722c7c8006b9f8617ab46ca0d5bf9049ca43ff6cec9"
+    },
+    {
+      "path": "commands/d80737b6c-inject.json",
+      "bytes": 99,
+      "sha256": "87a966e75247889e26a574efee652ee3e4f193863cb7defdcb11674e8dd4a876"
+    },
+    {
+      "path": "commands/d80737b6c-redaction.json",
+      "bytes": 102,
+      "sha256": "43c9db1cebdeb041b64ce9ce7af6811e847808ea01c1f09c1e6d1703a3de4943"
+    },
+    {
+      "path": "commands/epoch-cli-info.json",
+      "bytes": 967,
+      "sha256": "b7ca454a59ae952510898fb6bdf9f774496637d01dcaebf317680ec2129ef1a1"
+    },
+    {
+      "path": "commands/epoch-cli-info.stderr.log",
+      "bytes": 1627,
+      "sha256": "92f084b56983e1f9efe9f402289b55ecd0b636cb897ce19c927c2b6719f6319e"
+    },
+    {
+      "path": "commands/epoch-cli-info.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/epoch-cli-unset.json",
+      "bytes": 946,
+      "sha256": "24725e55cc19e1952950593cef625921ff02ff0bd0fea399e488fea3e0db7298"
+    },
+    {
+      "path": "commands/epoch-cli-unset.stderr.log",
+      "bytes": 1628,
+      "sha256": "4d17d8c6d55a4674c68bf5cd1ca1e767bea4464df71f9ea61856bcce8bef4bb5"
+    },
+    {
+      "path": "commands/epoch-cli-unset.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/epoch-cli-warn.json",
+      "bytes": 967,
+      "sha256": "5e76e20509c039f7da7c3bb14f50b4d75378a7237ee7e39fe44815dbd254b87a"
+    },
+    {
+      "path": "commands/epoch-cli-warn.stderr.log",
+      "bytes": 936,
+      "sha256": "4c6be9436d079439434c9858f066abb8312b659f4d6592813b03e5746610fe04"
+    },
+    {
+      "path": "commands/epoch-cli-warn.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/epoch-config-file-info.json",
+      "bytes": 846,
+      "sha256": "0805f0c013da6d0b8713ad49023b2a78c83218979dd5311d7811417901cfbb8d"
+    },
+    {
+      "path": "commands/epoch-config-file-info.stderr.log",
+      "bytes": 1610,
+      "sha256": "41c393fd2194e1ca8120cdee142252b487f1156ed31c8887abdc88ececb8fa4a"
+    },
+    {
+      "path": "commands/epoch-config-file-info.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/epoch-env-info.json",
+      "bytes": 826,
+      "sha256": "9472c6a6fb3530e75c03854ad72b73cfc17611605e5969266853691116fd283d"
+    },
+    {
+      "path": "commands/epoch-env-info.stderr.log",
+      "bytes": 1594,
+      "sha256": "5fa9ddfb337bf85d317e7e3d3c52de7fb9b9aa20d0fb5ebb90d3a495d3184292"
+    },
+    {
+      "path": "commands/epoch-env-info.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/head-inject.json",
+      "bytes": 74,
+      "sha256": "4bdcf8cd317c0a359933d5c3efc01391f71567e11f179da97d904b715aa01e72"
+    },
+    {
+      "path": "commands/head-logging.json",
+      "bytes": 75,
+      "sha256": "eecced9e955f9628d6117fb0f61f48ceefd79bfef5bc700d9b120ff996f31a89"
+    },
+    {
+      "path": "commands/head-logging.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/head-logging.stdout.log",
+      "bytes": 19186,
+      "sha256": "5f0aa8ccabc62295d64ff0ca6b61a5fc9a384e6a4bdd6e092d70a15ab73b6be1"
+    },
+    {
+      "path": "commands/head-r02_t01_service_smoke.json",
+      "bytes": 77,
+      "sha256": "8a83253c5fee7f254e30797c2472535c097976d25d4e6b0608504280814da60b"
+    },
+    {
+      "path": "commands/head-r02_t07_redaction_scan.json",
+      "bytes": 78,
+      "sha256": "322e65a2a19a2a0d758e2594298eb77cadaa1deb034995d4e199130ed16a58cc"
+    },
+    {
+      "path": "commands/head-redaction.json",
+      "bytes": 77,
+      "sha256": "bd07f9f839cb3f853a71c61c5a91e344467c8f15c9dd179ff4d6e63bbf2d3bb5"
+    },
+    {
+      "path": "commands/minimal-probes.json",
+      "bytes": 250,
+      "sha256": "ff070dd2b78378fd9c689878d099676dc3f10aba6eded9ae26ca5015e9bc622f"
+    },
+    {
+      "path": "commands/minimal-probes.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/minimal-probes.stdout.log",
+      "bytes": 985,
+      "sha256": "627805a3cc58efe96931a1fa1d002fe66788ac9a24368306b60948e6325068da"
+    },
+    {
+      "path": "commands/node-version.json",
+      "bytes": 198,
+      "sha256": "4c1f321716447d419c4d55269080b940b9049c2915fb055edf0dd83b5a5b81a3"
+    },
+    {
+      "path": "commands/node-version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/node-version.stdout.log",
+      "bytes": 9,
+      "sha256": "a8f8f7ba69d43285857a0ea34017ef8dadd3ba012404bb7dd188fc773cf63ee2"
+    },
+    {
+      "path": "commands/npm-version.json",
+      "bytes": 197,
+      "sha256": "978e16f2acf451ab5c6322028139cea09b1d65f7df944c2eb310c236f4cb2932"
+    },
+    {
+      "path": "commands/npm-version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/npm-version.stdout.log",
+      "bytes": 8,
+      "sha256": "3dbc807e13de125e909bea5877613d5d67989a43fb8e982fd79ba0efa46ac952"
+    },
+    {
+      "path": "commands/platform.json",
+      "bytes": 193,
+      "sha256": "9be8fb0391fd80fa5a70d495564c54f7c5c3d6e8eda32a7ad7f0f59b680a9ac2"
+    },
+    {
+      "path": "commands/platform.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/platform.stdout.log",
+      "bytes": 13,
+      "sha256": "16b8cd028eb757aab907ab404e1656e01783846457156eec99372a91fc1b104d"
+    },
+    {
+      "path": "commands/primary-read.json",
+      "bytes": 646,
+      "sha256": "4bbe01f0332d314795d59b95fc4e2ed95134b102c043a81694521e7b26dc358f"
+    },
+    {
+      "path": "commands/primary-read.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/primary-read.stdout.log",
+      "bytes": 3485,
+      "sha256": "b5b94a15c2d70e6bd9db7f99ae3031e6d54b6e408c54794fb717ff6d511f29e4"
+    },
+    {
+      "path": "commands/raw-a01-read.json",
+      "bytes": 519,
+      "sha256": "a892585f3a8a8e40fa56377ed0c6cd607c58440d0535d68e7386d1a6042f532a"
+    },
+    {
+      "path": "commands/raw-a01-read.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/raw-a01-read.stdout.log",
+      "bytes": 2042,
+      "sha256": "dfd8411cc30b41cd99d490371e03403b0ebc470462be8fd27bfe49d23b6107ec"
+    },
+    {
+      "path": "commands/raw-a13-read.json",
+      "bytes": 679,
+      "sha256": "c617a77f6cd1c2e436fe6b8b28c69e6861ea876dbe51c854afc51571c343d65e"
+    },
+    {
+      "path": "commands/raw-a13-read.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/raw-a13-read.stdout.log",
+      "bytes": 18387,
+      "sha256": "1b1b893937e962fb81fe356c7173c364b4f9e99a91601ebcd03d6b41ab6a3a41"
+    },
+    {
+      "path": "commands/raw-recompute.json",
+      "bytes": 252,
+      "sha256": "5f544737c8ea29a3490cdea105f3f11afc9f737cb0584c7b0f936a45862e6819"
+    },
+    {
+      "path": "commands/raw-recompute.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/raw-recompute.stdout.log",
+      "bytes": 336,
+      "sha256": "f5983cd9e8368853e9c434d72ca8e59b2dbb01626dfc067fe882507b13946a58"
+    },
+    {
+      "path": "commands/redactor-history.json",
+      "bytes": 282,
+      "sha256": "9ee6aec037c332639d7798d2ad67126027c17605b365b5f8605d9a99af31e04e"
+    },
+    {
+      "path": "commands/redactor-history.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/redactor-history.stdout.log",
+      "bytes": 11046,
+      "sha256": "b4d01fc2a6ba42860e25318ef0d84c55fd16c44ed88be4a24b6e7aa21ef14428"
+    },
+    {
+      "path": "commands/request-correlation.json",
+      "bytes": 843,
+      "sha256": "dcf03be86fe68e0cb3ceeb32c9ebe62eebccc955b8ba904e2cc0d4f4a6d9aa40"
+    },
+    {
+      "path": "commands/request-correlation.stderr.log",
+      "bytes": 2245,
+      "sha256": "f95e18286bdd5acbabe415e8cc61cb457d98a4dba86869afe86fc76c12390289"
+    },
+    {
+      "path": "commands/request-correlation.stdout.log",
+      "bytes": 179,
+      "sha256": "8a9c6610bd27bd20a049b7aa8f4770cceb4d332b8655b0bb6116638f72267687"
+    },
+    {
+      "path": "commands/rustc-version.json",
+      "bytes": 232,
+      "sha256": "a30065b55d0661741ae969cbbbc610572ed6b8912d511ab145e86edc036136db"
+    },
+    {
+      "path": "commands/rustc-version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/rustc-version.stdout.log",
+      "bytes": 36,
+      "sha256": "2073de5abf149185c2f4d7473dc833bc921b99135560d24ae7b2293f33a9c376"
+    },
+    {
+      "path": "commands/worktree-current.json",
+      "bytes": 209,
+      "sha256": "fb3e14ef2756fd606afddb4256f770bf098dde8ae62a536e4b6950d6b4c040ce"
+    },
+    {
+      "path": "commands/worktree-current.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "commands/worktree-current.stdout.log",
+      "bytes": 2134,
+      "sha256": "db05dc7a25a6431c83faadb52b4721ad73b9415cc14aab65c292a5948177484f"
+    },
+    {
+      "path": "dispatch/events.jsonl",
+      "bytes": 1031911,
+      "sha256": "0909dd45b749b77e7330bb395c6d4f5c870eb2d5c952d6afb42778cd2ebfb9a4"
+    },
+    {
+      "path": "dispatch/prompt.txt",
+      "bytes": 2533,
+      "sha256": "2da7ed2e71c731afd696aa60e799337366ce6e01730cd2c40f6bb03689477aa1"
+    },
+    {
+      "path": "dispatch/request.json",
+      "bytes": 810,
+      "sha256": "3eb1df338e02da329ff94f4e1527d2d4381f7a94aa74692d510cf2caa47b8cd1"
+    },
+    {
+      "path": "dispatch/stderr.log",
+      "bytes": 1279,
+      "sha256": "eddcaa784c95bb16564523e744db98bf1fde3bbdd8ea73e349ac1d51ceb3efd2"
+    },
+    {
+      "path": "exit/caller-env-sysctl.json",
+      "bytes": 55,
+      "sha256": "53d39a155454535df74b35f6dc4833f7b154803f7c1abf226d919caf8a281d73"
+    },
+    {
+      "path": "exit/caller-env.json",
+      "bytes": 45,
+      "sha256": "0f316afff231f51044e82a316196367ba00ce3d38a96436e2af34f97dd0a6cdf"
+    },
+    {
+      "path": "exit/candidate-branch.json",
+      "bytes": 55,
+      "sha256": "fb522588ebe3c76acf1af62392044977cb9b3482e8d2a062779bbd5e2a396813"
+    },
+    {
+      "path": "exit/candidate-head.json",
+      "bytes": 55,
+      "sha256": "8b8b452c167b80071b006ed35d32f6a519e74397e3fa8f0841391b285ecb4ea0"
+    },
+    {
+      "path": "exit/cargo-version.json",
+      "bytes": 55,
+      "sha256": "dce10c6f033aca709f71cd06db85713f032704242cfb26c738c017ebd5d65e9f"
+    },
+    {
+      "path": "exit/cdd213078-inject.json",
+      "bytes": 15,
+      "sha256": "769eeee53ad97740736371b400ef1ad1b664fdb4385e9c1ed5f9cbd49b203457"
+    },
+    {
+      "path": "exit/cdd213078-redaction.json",
+      "bytes": 15,
+      "sha256": "769eeee53ad97740736371b400ef1ad1b664fdb4385e9c1ed5f9cbd49b203457"
+    },
+    {
+      "path": "exit/d80737b6c-inject.json",
+      "bytes": 15,
+      "sha256": "769eeee53ad97740736371b400ef1ad1b664fdb4385e9c1ed5f9cbd49b203457"
+    },
+    {
+      "path": "exit/d80737b6c-redaction.json",
+      "bytes": 15,
+      "sha256": "769eeee53ad97740736371b400ef1ad1b664fdb4385e9c1ed5f9cbd49b203457"
+    },
+    {
+      "path": "exit/epoch-cli-info.json",
+      "bytes": 15,
+      "sha256": "3ef7bdf7b9bd7f67ca605d71093c854bed94afb440545aa4f84fe37ea5f91cba"
+    },
+    {
+      "path": "exit/epoch-cli-unset.json",
+      "bytes": 15,
+      "sha256": "3ef7bdf7b9bd7f67ca605d71093c854bed94afb440545aa4f84fe37ea5f91cba"
+    },
+    {
+      "path": "exit/epoch-cli-warn.json",
+      "bytes": 15,
+      "sha256": "3ef7bdf7b9bd7f67ca605d71093c854bed94afb440545aa4f84fe37ea5f91cba"
+    },
+    {
+      "path": "exit/epoch-config-file-info.json",
+      "bytes": 15,
+      "sha256": "3ef7bdf7b9bd7f67ca605d71093c854bed94afb440545aa4f84fe37ea5f91cba"
+    },
+    {
+      "path": "exit/epoch-env-info.json",
+      "bytes": 15,
+      "sha256": "3ef7bdf7b9bd7f67ca605d71093c854bed94afb440545aa4f84fe37ea5f91cba"
+    },
+    {
+      "path": "exit/head-inject.json",
+      "bytes": 11,
+      "sha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+    },
+    {
+      "path": "exit/head-logging.json",
+      "bytes": 11,
+      "sha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+    },
+    {
+      "path": "exit/head-r02_t01_service_smoke.json",
+      "bytes": 11,
+      "sha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+    },
+    {
+      "path": "exit/head-r02_t07_redaction_scan.json",
+      "bytes": 11,
+      "sha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+    },
+    {
+      "path": "exit/head-redaction.json",
+      "bytes": 11,
+      "sha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+    },
+    {
+      "path": "exit/minimal-probes.json",
+      "bytes": 55,
+      "sha256": "42e4158e7ee819a65c3e86d537185a1ca28db0601919184663dc820efc01573f"
+    },
+    {
+      "path": "exit/node-version.json",
+      "bytes": 55,
+      "sha256": "d0f86ff4dc94e3be76009b92c613afbdfd34be99041159a0ede60b74f80b793d"
+    },
+    {
+      "path": "exit/npm-version.json",
+      "bytes": 55,
+      "sha256": "68f941d3062c54d4da9834129d0b5b2a3235b3c0ec55eddb07b98b888142aed1"
+    },
+    {
+      "path": "exit/platform.json",
+      "bytes": 55,
+      "sha256": "f3659abfc37f61b7fb05f09a6d35f7d16850d3b2b08e628cf5baf55e18ea4543"
+    },
+    {
+      "path": "exit/primary-read.json",
+      "bytes": 55,
+      "sha256": "8f43280491da0375bb8b5e176e0d41d063a78c5a2dd61ebbe672187ef53f289e"
+    },
+    {
+      "path": "exit/raw-a01-read.json",
+      "bytes": 55,
+      "sha256": "1517fca543c8a1f7270fc81c4e43b8962d91ede7797a3fa5feaad1e3102258aa"
+    },
+    {
+      "path": "exit/raw-a13-read.json",
+      "bytes": 55,
+      "sha256": "84e9c06828d9e85f4ade1eef05e787e76780db09effda8b78e9836dd72868a44"
+    },
+    {
+      "path": "exit/raw-recompute.json",
+      "bytes": 55,
+      "sha256": "4b356cf939e772296d6f3022fed54104be9715c24fcd30f74c0f9114bf5a3b8b"
+    },
+    {
+      "path": "exit/redactor-history.json",
+      "bytes": 55,
+      "sha256": "5a498e74c0d77cebba40e2b746a17d9b75f96a3a82e7e93c23657fc64d5f9c53"
+    },
+    {
+      "path": "exit/request-correlation.json",
+      "bytes": 33,
+      "sha256": "2868c984e18bf38769c26295ffc2af38718521b195ab0f9a2a352fde7e430349"
+    },
+    {
+      "path": "exit/rustc-version.json",
+      "bytes": 55,
+      "sha256": "4e17d733d4f62f1f9f7ca0e886dc2958dadc781721daeded3da66b766cd5d8d0"
+    },
+    {
+      "path": "exit/worktree-current.json",
+      "bytes": 55,
+      "sha256": "ce0704b88406a7ecb8fb89fc7e6ec9552eebe8ead1c205dd2d275699f1b5ea48"
+    },
+    {
+      "path": "input/a01-recomputed.json",
+      "bytes": 1790,
+      "sha256": "5903ae6e42cf49bd4343613a715203eb4836b7178f2e8bf13b9c2c0ccf843840"
+    },
+    {
+      "path": "input/a13-recomputed.json",
+      "bytes": 4723,
+      "sha256": "dc82555cf07589dd105611d8101cb3bb75c1d5eec3676682f757b2be1c91c270"
+    },
+    {
+      "path": "input/caller-env-raw-search.json",
+      "bytes": 514,
+      "sha256": "8046e918d363416dc3f1b2ebad4af2cc87697a0bfabe2c4cfbd3dff33d0f82e1"
+    },
+    {
+      "path": "input/caller-env-sysctl.json",
+      "bytes": 562,
+      "sha256": "6491f1f6cca5fd7e8c4b6bacd7f78f4bbc04787a79bb5e49b8a1f18e03579220"
+    },
+    {
+      "path": "input/caller-logging-environment.json",
+      "bytes": 638,
+      "sha256": "9ccf01c3f8cbcd3e2d3de65509ed18b08afda696ac4d4bd9e75c910b747e4a8f"
+    },
+    {
+      "path": "input/epoch-cli-info/selected/app-data/existing.bin",
+      "bytes": 23,
+      "sha256": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586"
+    },
+    {
+      "path": "input/epoch-cli-info/selected/data-epoch.json",
+      "bytes": 161,
+      "sha256": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8"
+    },
+    {
+      "path": "input/epoch-cli-info/selected/lingxi-service/instance.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/epoch-cli-info/selected/lingxi-service/logs/service-000001.log",
+      "bytes": 157,
+      "sha256": "fdb7f7d5d34eb1a28b678d1ce59d45f28ed428705eb1466a09417c40d3958a28"
+    },
+    {
+      "path": "input/epoch-cli-unset/selected/app-data/existing.bin",
+      "bytes": 23,
+      "sha256": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586"
+    },
+    {
+      "path": "input/epoch-cli-unset/selected/data-epoch.json",
+      "bytes": 161,
+      "sha256": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8"
+    },
+    {
+      "path": "input/epoch-cli-unset/selected/lingxi-service/instance.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/epoch-cli-unset/selected/lingxi-service/logs/service-000001.log",
+      "bytes": 157,
+      "sha256": "ebcea065ab1f6d196aea39b7f8e4b2370d68aefea54554c428904902d1644286"
+    },
+    {
+      "path": "input/epoch-cli-warn/selected/app-data/existing.bin",
+      "bytes": 23,
+      "sha256": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586"
+    },
+    {
+      "path": "input/epoch-cli-warn/selected/data-epoch.json",
+      "bytes": 161,
+      "sha256": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8"
+    },
+    {
+      "path": "input/epoch-cli-warn/selected/lingxi-service/instance.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/epoch-cli-warn/selected/lingxi-service/logs/service-000001.log",
+      "bytes": 157,
+      "sha256": "79d66cf6bf545821cbcc728583edcd7e56e748f100ecc4dbf8f4daa99f677e76"
+    },
+    {
+      "path": "input/epoch-config-file-info/config.json",
+      "bytes": 143,
+      "sha256": "a0ab5993540ba298114bd2cd305debb72b8ce64d9c400b8be021d97d5244a0a7"
+    },
+    {
+      "path": "input/epoch-config-file-info/selected/app-data/existing.bin",
+      "bytes": 23,
+      "sha256": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586"
+    },
+    {
+      "path": "input/epoch-config-file-info/selected/data-epoch.json",
+      "bytes": 161,
+      "sha256": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8"
+    },
+    {
+      "path": "input/epoch-config-file-info/selected/lingxi-service/instance.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/epoch-config-file-info/selected/lingxi-service/logs/service-000001.log",
+      "bytes": 157,
+      "sha256": "c37ecc53f3f3f10c03fe21c6e6180776fa8bd0d8e8080fa4b2a9b247add4e04c"
+    },
+    {
+      "path": "input/epoch-env-info/selected/app-data/existing.bin",
+      "bytes": 23,
+      "sha256": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586"
+    },
+    {
+      "path": "input/epoch-env-info/selected/data-epoch.json",
+      "bytes": 161,
+      "sha256": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8"
+    },
+    {
+      "path": "input/epoch-env-info/selected/lingxi-service/instance.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/epoch-env-info/selected/lingxi-service/logs/service-000001.log",
+      "bytes": 157,
+      "sha256": "ffb997e81aa73f61b20a915a3769b49c5f621ca79b354e08749a4acb1687a570"
+    },
+    {
+      "path": "input/epoch-probe-results.json",
+      "bytes": 5278,
+      "sha256": "28d94ebbf253a4d7b75691dc0b3d2d11b0c20d46c2b329d5f9b632b8fa4c8d12"
+    },
+    {
+      "path": "input/historical-contract-controls.json",
+      "bytes": 2609,
+      "sha256": "680bff4513d13e4fc527c1890f169014351e315efe2637f2e9bd3e1454ca76d4"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-build.log",
+      "bytes": 286,
+      "sha256": "19bcb842436c1adf8a0da6477c8637c3edf2ea42c39287abae0727bb7fb639fd"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-cargo-metadata.err",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-child-snapshot.tsv",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-deptree-evidence.log",
+      "bytes": 289,
+      "sha256": "589b7d1ecfce24e61c9754a2e1d22565c2b907dbc904038c4333ddba76c753b7"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-health-body.json",
+      "bytes": 123,
+      "sha256": "f7fcacea611f836fcfee896f96b921cb6f11f87ef330adf7f40d820cb361ac1c"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-health-check.log",
+      "bytes": 225,
+      "sha256": "ce8e91e2bb58529946f22fe61ea1f93511ca96850d113ffadcd9a8a9aa3b9082"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-invalid-bind-homes-after.txt",
+      "bytes": 227,
+      "sha256": "1f53980455b3deca38448da5218f26351cd8bf60a088accdb9c20430391d0659"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-invalid-bind-homes-before.txt",
+      "bytes": 227,
+      "sha256": "1f53980455b3deca38448da5218f26351cd8bf60a088accdb9c20430391d0659"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-invalid-bind.stderr.log",
+      "bytes": 70,
+      "sha256": "bd84f8ddedc8d4a798d42ce9bc1673e9e1c662167f3082562e8a40472b95ab7d"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-invalid-bind.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-leaf-cases.json",
+      "bytes": 1771,
+      "sha256": "6c88f1bf243b09c3f5c0207654b095224ce3608f74e78b992b2a648ff6ad119b"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-config-data-fallback-after.txt",
+      "bytes": 105,
+      "sha256": "27b76f0492ed99fc1d658c111d4e0542890e2e17e1aff90104a059f1f12c2243"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-config-data-fallback-before.txt",
+      "bytes": 105,
+      "sha256": "27b76f0492ed99fc1d658c111d4e0542890e2e17e1aff90104a059f1f12c2243"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-config-data-homes-after.txt",
+      "bytes": 684,
+      "sha256": "194e970aa155586b53ad007841dc01ea2c122e46e6e91fd370e0c314f9cae405"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-config-data-homes-before.txt",
+      "bytes": 410,
+      "sha256": "9e39a679f564be4dc7602307dce5b3601035174f563a4bf0ab17c2449c6b1359"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-config-data-original-after.sha256",
+      "bytes": 390,
+      "sha256": "b45d40695144c779fcfd178243b14b21121201eb7af8f946ecadb1e3ac9da355"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-config-data-original-before.sha256",
+      "bytes": 390,
+      "sha256": "b45d40695144c779fcfd178243b14b21121201eb7af8f946ecadb1e3ac9da355"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-config-data.stderr.log",
+      "bytes": 1971,
+      "sha256": "72896ea783668e73528df569693defe92333067a1fc4d5130071051c88db4432"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-config-data.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-data-fallback-after.txt",
+      "bytes": 105,
+      "sha256": "27b76f0492ed99fc1d658c111d4e0542890e2e17e1aff90104a059f1f12c2243"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-data-fallback-before.txt",
+      "bytes": 105,
+      "sha256": "27b76f0492ed99fc1d658c111d4e0542890e2e17e1aff90104a059f1f12c2243"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-data-homes-after.txt",
+      "bytes": 677,
+      "sha256": "2890bf8587313356aab23777cf01e743cce72f0febf5503c8f691d8f398663cf"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-data-homes-before.txt",
+      "bytes": 403,
+      "sha256": "a931e37e2f1b4b657427bbc40c9c44aba0273992a30807c8c7f324d4776ce140"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-data-original-after.sha256",
+      "bytes": 376,
+      "sha256": "51953f8425e5c592dc2954eef85cf4d920463825e1ba97fd413be3eea8c85c79"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-data-original-before.sha256",
+      "bytes": 376,
+      "sha256": "51953f8425e5c592dc2954eef85cf4d920463825e1ba97fd413be3eea8c85c79"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-data.stderr.log",
+      "bytes": 2041,
+      "sha256": "186006050e025aa18defea67e0df75c3cb911038ab57d43b49d8be0f6ed0d0a1"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-data.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-env-data-fallback-after.txt",
+      "bytes": 105,
+      "sha256": "27b76f0492ed99fc1d658c111d4e0542890e2e17e1aff90104a059f1f12c2243"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-env-data-fallback-before.txt",
+      "bytes": 105,
+      "sha256": "27b76f0492ed99fc1d658c111d4e0542890e2e17e1aff90104a059f1f12c2243"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-env-data-homes-after.txt",
+      "bytes": 681,
+      "sha256": "f5d097053fa9637c73f3bac043bcdd88b59be56ccad82ac063d4148f3a38d9d1"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-env-data-homes-before.txt",
+      "bytes": 407,
+      "sha256": "610d809d5b6b63be4f5a471f61d4c24822612ec1e46f43b4e472e58a9acffda3"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-env-data-original-after.sha256",
+      "bytes": 384,
+      "sha256": "504217f1a825daeabccdc2044bf5c1408fd61db6575e3ca543aaf1f143ac1ad5"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-env-data-original-before.sha256",
+      "bytes": 384,
+      "sha256": "504217f1a825daeabccdc2044bf5c1408fd61db6575e3ca543aaf1f143ac1ad5"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-env-data.stderr.log",
+      "bytes": 1948,
+      "sha256": "c5be2f3164091cb49cc1209334d91b3062149519cdf1af8773798137af75c5a3"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-newer-env-data.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-service-stderr.log",
+      "bytes": 2509,
+      "sha256": "300e76dc0c0c7bb37f9a68ef9a15be7d5fba98a6ca67ed3a246ea1746fcd5d95"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-service-stdout.log",
+      "bytes": 148,
+      "sha256": "51d6f61f812e4d622ba294fbf4c3b1c1705e31b1c276be78f89b43be87c51616"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/a01-shutdown.log",
+      "bytes": 139,
+      "sha256": "2407ddc61f54fa51f4038797f90bacc86b5fbaf21870d2bf603a22d363880c4a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A01/leaf-cases.ndjson",
+      "bytes": 1389,
+      "sha256": "3ce1005240a8ebfb25acd73c8ec01b4df742a35b81e2a622a6c65bf368865033"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/build.log",
+      "bytes": 72,
+      "sha256": "a5f4c585ee974ca44916ac30a98bbc189e067a7e0a6bc6d2e8d6bc525be724af"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-execute-ok.body",
+      "bytes": 52,
+      "sha256": "22537ba8c923456f72f478b786fee6a73f3f9709ee606a1b0eaba220a8f95fb2"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-execute-ok.headers",
+      "bytes": 108,
+      "sha256": "3dd07524369391d40b33b559dfc449fada5bc404374f409f9e604d463345bfec"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-execute-request.json",
+      "bytes": 227,
+      "sha256": "4e38ffcd373cb9faac3bd1881d675776a089520fc94d443b306bced20e040e27"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-issue-credential.body",
+      "bytes": 214,
+      "sha256": "5e651527f0f9b497ba9ede818b036627341b4dd3f74158d818df6abd164a3d7c"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-issue-credential.headers",
+      "bytes": 114,
+      "sha256": "420124c35057d7108e1304a321af31ff5d5b386bb0352b6ae9f90b21c5264c63"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-issue-request.json",
+      "bytes": 44,
+      "sha256": "e4f7d15ff214194f7c5c24e9a2d1c020776147eba88dd3ecea2e456a7c234da3"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-me-ok.body",
+      "bytes": 1412,
+      "sha256": "c0101f944a240591f6d7ba3f61a73abeb5b2ceb638a396f799d7baaf12738377"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-me-ok.headers",
+      "bytes": 110,
+      "sha256": "f49d28448fc91592b88501c00616edb96c6c5535654106582fad2ffb7741d9dc"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-ticket-request.json",
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-ticket.body",
+      "bytes": 96,
+      "sha256": "8d95c94c739ad0f99b33cfea5e72c90b33ef5440032aa9c72780d06f44a03a20"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-ticket.headers",
+      "bytes": 108,
+      "sha256": "5a28dc7ffa2204cffe6374627219b94574ce56250dcf25304a67c1e9b65b360c"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-bad-bearer.body",
+      "bytes": 206,
+      "sha256": "d236c4ecde96b84eb5ebd0199e5048f6f235f1d317586a4f54c08544b90a524e"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-bad-bearer.headers",
+      "bytes": 119,
+      "sha256": "a75ae72128866bbe02fd11a3ed9e85e2da7a4d5941ae773dba9251b1673e8b24"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-no-auth.body",
+      "bytes": 206,
+      "sha256": "d3c34766ac8a3767919ff9acdb92b52521ebf7be1dbec9fa881cc4ce4f172d8b"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-no-auth.headers",
+      "bytes": 119,
+      "sha256": "a75ae72128866bbe02fd11a3ed9e85e2da7a4d5941ae773dba9251b1673e8b24"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-cross.body",
+      "bytes": 219,
+      "sha256": "756b8c2c9a49636103925880427a6e1b38b94ddcc3f2880d0a788a61fbfcf4d0"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-cross.headers",
+      "bytes": 116,
+      "sha256": "8f801ae9716666620d4a4c59950a1b718a40bb69cde49957c110a69b1e856447"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-missing.body",
+      "bytes": 163,
+      "sha256": "eecc0e88181bdddb3e347ec74ee37e68a3d2cf7b27b6433940cbde9f9295d4b5"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-missing.headers",
+      "bytes": 116,
+      "sha256": "4c64279b08ca8beb50fad3033d0a85d91fc2741a4f661e691381048593414ae4"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-ws-bad-query.body",
+      "bytes": 206,
+      "sha256": "1253852e9ec590179af804319d4c728b424a636d2a93fa26af695a876a9da2fb"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-ws-bad-query.headers",
+      "bytes": 119,
+      "sha256": "a75ae72128866bbe02fd11a3ed9e85e2da7a4d5941ae773dba9251b1673e8b24"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-ws-transcript.txt",
+      "bytes": 331,
+      "sha256": "bc5c798c8846facd87a34da03c3888687355cd3b64ccd008907c9fea00a535ae"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-1.body",
+      "bytes": 262,
+      "sha256": "1d087ea708541d70fd08b157ab37b1c10b732b7d15cd0ade1768b5ea5988e746"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-2.body",
+      "bytes": 202,
+      "sha256": "85f81e3ac320b895648081441d6fb4783f0844c1bd5d015bba07329162c9bcf1"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-3.body",
+      "bytes": 202,
+      "sha256": "c828341f0e55d067a6920611f974e7205cb3453ab92707fd75f3bc7537103406"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-4.body",
+      "bytes": 202,
+      "sha256": "b6cb9d18241bf041ca37d7eb34840def88e13d4aee2f40b3602deead05853c39"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-5.body",
+      "bytes": 202,
+      "sha256": "e4ed88a141f0f1b4d0835c8ec6db503fb69858e16a538b96ae08821d3d0c221c"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-6.body",
+      "bytes": 202,
+      "sha256": "93761cc5e8b37f6a3d5538f6dd6fd730ce973b31930f4e9e263cfd3495665eb2"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-7.body",
+      "bytes": 202,
+      "sha256": "09e8aeb8a3407458a54eef29b714438c4342bdf49278334763eeec453c2830e1"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-8.body",
+      "bytes": 202,
+      "sha256": "f801c5d716262fbae975c71801d264fd980c0afe92ae1ef1dd7b3f988a6a6f1f"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p3-execute-request.json",
+      "bytes": 55,
+      "sha256": "e89d50f95150fa2e9458cb0c5d045ab66124116f16d839c55b21a703190fe91d"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p3-lock.log",
+      "bytes": 10,
+      "sha256": "907723b5d86c72777fe8dfd76bfc1580c43b34885f954e13efd5ac9d21596ec1"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p3-status-codes.txt",
+      "bytes": 32,
+      "sha256": "4e3b1621aa6dbfd48c6e905e261dc448f05a8e1ee2a90b5c9bf934ad0bc42ea4"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/service-logs/retention-manifest.txt",
+      "bytes": 464,
+      "sha256": "8c9a82e78c623dae3130c868acd6249ab2b685170ca769f5bc2ccae4f2b8518a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/service-logs/service-000001.log",
+      "bytes": 3150,
+      "sha256": "5fe95a0ca1544ef0749b59ab40b3f6ed18157274a1b0871c528491a8d97e56a3"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/service-logs/service-000002.log",
+      "bytes": 3575,
+      "sha256": "284b381555726d02f9a87482eb6a2851e24929a2447ffc90413f953877c88f60"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/service-logs/service-000003.log",
+      "bytes": 201,
+      "sha256": "1dd8bbd94b81d9d041190364fd69df116b13b34f8ce861de3127673441036528"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/service-p1.addr",
+      "bytes": 16,
+      "sha256": "1f416da8ffa6c5257dbf960182e9a36b5bfb6950411ead6f37c6a73fee789a4a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/service-p1.err",
+      "bytes": 4450,
+      "sha256": "64a4ed3329af775d5b95e088cf0645b8fe321db227befe7782462095205e02c6"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/service-p1.out",
+      "bytes": 140,
+      "sha256": "b8c684f2b93928691ca8b393d7211eebcb8a7ee12668ebcf02ab1992850a9765"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/service-p3.addr",
+      "bytes": 16,
+      "sha256": "eeb6963ee56fbf8ac8527a7ff9cf5b67322ffeb7fa527b106be8075b197ca795"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/service-p3.err",
+      "bytes": 4373,
+      "sha256": "7b39cd7a98b5c3963df3732f907dc9e62f912e906296d9a80d8ffb3f0401b1fd"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/service-p3.out",
+      "bytes": 140,
+      "sha256": "b18ad0a3c138707e080b120603bfcf39bd75df159c4277569d9520bfd1993cc0"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/service-p4.err",
+      "bytes": 1688,
+      "sha256": "3e69eba3b9e4ce5abfbe6a45d30e1baafd6811e83ab39ecf645420659b17bbfb"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/service-p4.out",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/summary.txt",
+      "bytes": 1558,
+      "sha256": "afca01c4d66e998420690e16f3c905a516958c1f9717dedfdf549ec59d56e017"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/a01_smoke/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/a01_smoke/stdout.log",
+      "bytes": 1423,
+      "sha256": "52c03621106244a22df13298b95eedf48fc39562551b8d1f7c0546c289198dae"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/a13_redaction_scan/stderr.log",
+      "bytes": 190,
+      "sha256": "619117ef31142206e9d9b812b9177d72be01c1d314408dcd767d0dad6183fb6f"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/a13_redaction_scan/stdout.log",
+      "bytes": 1892,
+      "sha256": "fd55a8dc466f1aed3be779b8c5457d2641fde792cc7cdf4e3f82964187d57af5"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/verify-stage-result.json",
+      "bytes": 175491,
+      "sha256": "09eff53e678b273ecde847540d57367056b99f2b751200c1f8e18cda7ad1ee35"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-build.log",
+      "bytes": 286,
+      "sha256": "32c4c717e867467e52f3203b23384e9e93417f3422fb39e5b839136bd9c14275"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-cargo-metadata.err",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-child-snapshot.tsv",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-deptree-evidence.log",
+      "bytes": 289,
+      "sha256": "589b7d1ecfce24e61c9754a2e1d22565c2b907dbc904038c4333ddba76c753b7"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-health-body.json",
+      "bytes": 123,
+      "sha256": "f7fcacea611f836fcfee896f96b921cb6f11f87ef330adf7f40d820cb361ac1c"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-health-check.log",
+      "bytes": 225,
+      "sha256": "ce8e91e2bb58529946f22fe61ea1f93511ca96850d113ffadcd9a8a9aa3b9082"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-invalid-bind-homes-after.txt",
+      "bytes": 227,
+      "sha256": "3776f2b0f0742e074b9f4f1c37ae65014181ec45c6bbc96c7cf47e4015d523dc"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-invalid-bind-homes-before.txt",
+      "bytes": 227,
+      "sha256": "3776f2b0f0742e074b9f4f1c37ae65014181ec45c6bbc96c7cf47e4015d523dc"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-invalid-bind.stderr.log",
+      "bytes": 70,
+      "sha256": "bd84f8ddedc8d4a798d42ce9bc1673e9e1c662167f3082562e8a40472b95ab7d"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-invalid-bind.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-leaf-cases.json",
+      "bytes": 1771,
+      "sha256": "6c88f1bf243b09c3f5c0207654b095224ce3608f74e78b992b2a648ff6ad119b"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-config-data-fallback-after.txt",
+      "bytes": 105,
+      "sha256": "27017ba3e14b3d7ae20c1d1d47cf97d63aec24b2df0ac63a75898e9483640998"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-config-data-fallback-before.txt",
+      "bytes": 105,
+      "sha256": "27017ba3e14b3d7ae20c1d1d47cf97d63aec24b2df0ac63a75898e9483640998"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-config-data-homes-after.txt",
+      "bytes": 684,
+      "sha256": "92af65de07043ed6b8c3603cfe83ec636e8b31790d2c1b433ed3cb4459751e5b"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-config-data-homes-before.txt",
+      "bytes": 410,
+      "sha256": "b8bb0e0fff4b721085c327fc1f81d5ede3756df3f42ce2c0112a062ab8bb43ba"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-config-data-original-after.sha256",
+      "bytes": 390,
+      "sha256": "dc9b16f94f7de92c6b9c888e0bc4beee37cc9d91d534e6f128329e29b935c7c6"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-config-data-original-before.sha256",
+      "bytes": 390,
+      "sha256": "dc9b16f94f7de92c6b9c888e0bc4beee37cc9d91d534e6f128329e29b935c7c6"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-config-data.stderr.log",
+      "bytes": 1971,
+      "sha256": "bdf84850b10a5b0c91c86cf50a0500dbc9e0cef6f198892c6f32514fd2d68c12"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-config-data.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-data-fallback-after.txt",
+      "bytes": 105,
+      "sha256": "27017ba3e14b3d7ae20c1d1d47cf97d63aec24b2df0ac63a75898e9483640998"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-data-fallback-before.txt",
+      "bytes": 105,
+      "sha256": "27017ba3e14b3d7ae20c1d1d47cf97d63aec24b2df0ac63a75898e9483640998"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-data-homes-after.txt",
+      "bytes": 677,
+      "sha256": "b3dcb8297b76bf27cb356ab53e379b84b211d04766ca2f4350eee9a59056966c"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-data-homes-before.txt",
+      "bytes": 403,
+      "sha256": "93caff759087d62def1589fa73218ad5fe5d7092ff5a3d786b922d3b436245c0"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-data-original-after.sha256",
+      "bytes": 376,
+      "sha256": "765e721e6a26c173fc822f825940c290af22b7532c542fc814057cb00fc7f82f"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-data-original-before.sha256",
+      "bytes": 376,
+      "sha256": "765e721e6a26c173fc822f825940c290af22b7532c542fc814057cb00fc7f82f"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-data.stderr.log",
+      "bytes": 2041,
+      "sha256": "ee2d552231f590bebddb717036d6454b0975765f3ee896a89ff1b86a5c297ee6"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-data.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-env-data-fallback-after.txt",
+      "bytes": 105,
+      "sha256": "27017ba3e14b3d7ae20c1d1d47cf97d63aec24b2df0ac63a75898e9483640998"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-env-data-fallback-before.txt",
+      "bytes": 105,
+      "sha256": "27017ba3e14b3d7ae20c1d1d47cf97d63aec24b2df0ac63a75898e9483640998"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-env-data-homes-after.txt",
+      "bytes": 681,
+      "sha256": "c13b2a22ace692a6c3323052d65c235527861168b02fdb79b7312dc19a3bc3e4"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-env-data-homes-before.txt",
+      "bytes": 407,
+      "sha256": "470ad244466261153bc87b8cdc3eb50d4124b39c852b690af10107305dcbd4b0"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-env-data-original-after.sha256",
+      "bytes": 384,
+      "sha256": "4376fc74bccac45449ee40c1dfe72f909dd9def5f9f2f43b068e447ed9f3d362"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-env-data-original-before.sha256",
+      "bytes": 384,
+      "sha256": "4376fc74bccac45449ee40c1dfe72f909dd9def5f9f2f43b068e447ed9f3d362"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-env-data.stderr.log",
+      "bytes": 1948,
+      "sha256": "71c0bfa00bec29041116fa30634c7227ae7873241ef54b60a076123cef6cf433"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-newer-env-data.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-service-stderr.log",
+      "bytes": 2509,
+      "sha256": "14b12aa0051a7bbf4d5547731a25b17d531753bb235c315a7b894b0685e3b765"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-service-stdout.log",
+      "bytes": 148,
+      "sha256": "87afc94107175b3225f34ead55bdee43235c61c38139ebb86da15ac97033b718"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/a01-shutdown.log",
+      "bytes": 139,
+      "sha256": "2407ddc61f54fa51f4038797f90bacc86b5fbaf21870d2bf603a22d363880c4a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A01/leaf-cases.ndjson",
+      "bytes": 1389,
+      "sha256": "3ce1005240a8ebfb25acd73c8ec01b4df742a35b81e2a622a6c65bf368865033"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/build.log",
+      "bytes": 72,
+      "sha256": "a5f4c585ee974ca44916ac30a98bbc189e067a7e0a6bc6d2e8d6bc525be724af"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-execute-ok.body",
+      "bytes": 52,
+      "sha256": "5515a0ac35355139ef2dffbc5ad3f2c0a6a8bb41ab1f6d917f5594fc076591d9"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-execute-ok.headers",
+      "bytes": 108,
+      "sha256": "34c15cc0e33d093118f12c837540cd0a9c8e31139e17783f8e0f8f10db603810"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-execute-request.json",
+      "bytes": 227,
+      "sha256": "4e38ffcd373cb9faac3bd1881d675776a089520fc94d443b306bced20e040e27"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-issue-credential.body",
+      "bytes": 214,
+      "sha256": "37d96fb6e074580746b4592230e1476c24fd9df0b37a131c6a2bbe867634d805"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-issue-credential.headers",
+      "bytes": 114,
+      "sha256": "3473361937e80b7ec375273d2aa5e3c6f2aa5ba080e701cd66cb105ade2a49d7"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-issue-request.json",
+      "bytes": 44,
+      "sha256": "e4f7d15ff214194f7c5c24e9a2d1c020776147eba88dd3ecea2e456a7c234da3"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-me-ok.body",
+      "bytes": 1412,
+      "sha256": "5d1d1dacc9770788aadecf79849ef2d123cef8ebb2ac54590892cacaf06aa4a6"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-me-ok.headers",
+      "bytes": 110,
+      "sha256": "344879fa059dc01cfcd96a3a7561bdd5cba61482af482c61213fc9d6714ada73"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-ticket-request.json",
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-ticket.body",
+      "bytes": 96,
+      "sha256": "1597f002749db75b0c988fd0abf440d6054873dc59d17c44fdee316e1e5af7b8"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-ticket.headers",
+      "bytes": 108,
+      "sha256": "8c8a8010239a553591d2abba911259a108fa9f00635042ace73a6ae79cafdcb3"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-me-bad-bearer.body",
+      "bytes": 206,
+      "sha256": "f47dcc4d885039b7a424eaf71cf0c9b484201cfc1c43d767ea63be51777e8ff8"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-me-bad-bearer.headers",
+      "bytes": 119,
+      "sha256": "75002eaa93282f1bceaaa9523098c97152fdee842bcbb318187d3ad8c6724566"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-me-no-auth.body",
+      "bytes": 206,
+      "sha256": "e148c62a057f5f8b6bd1cb2622840e5dcdb7f5121f83967ce8ef69f5d7f6020e"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-me-no-auth.headers",
+      "bytes": 119,
+      "sha256": "75002eaa93282f1bceaaa9523098c97152fdee842bcbb318187d3ad8c6724566"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-session-cross.body",
+      "bytes": 219,
+      "sha256": "7d687f57b019dbbe5d0549a3582cfbadc1945ac64bc814244c363e805c8653e1"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-session-cross.headers",
+      "bytes": 116,
+      "sha256": "473cf9f78be535992c1ed70082c7e927472889d07b5b83e00907504d9566a84f"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-session-missing.body",
+      "bytes": 163,
+      "sha256": "4550368211d47c5df165f7589bce8a7b7972ec8e7c4fc4e14577d407ef6afba9"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-session-missing.headers",
+      "bytes": 116,
+      "sha256": "726323afd424dd076a9cff9f15a95cb49dd14c1a86501c4f22b996ba336727b2"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-ws-bad-query.body",
+      "bytes": 206,
+      "sha256": "b565c3a0b165cc7b8f08332306cff039b8886639072d16f02ce2cce05f29d37a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-ws-bad-query.headers",
+      "bytes": 119,
+      "sha256": "75002eaa93282f1bceaaa9523098c97152fdee842bcbb318187d3ad8c6724566"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-ws-transcript.txt",
+      "bytes": 331,
+      "sha256": "bc5c798c8846facd87a34da03c3888687355cd3b64ccd008907c9fea00a535ae"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p3-burst-1.body",
+      "bytes": 262,
+      "sha256": "ddf7e009a9e744b6b674d6c1bc4e9a48305e09c19ab2e448e05cf324793915ed"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p3-burst-2.body",
+      "bytes": 202,
+      "sha256": "c589545b0e2a43442b59ba0218aee59aec307b13645422ba3a85a016d359b318"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p3-burst-3.body",
+      "bytes": 202,
+      "sha256": "d96df521a86c50510a4afa19ca55030238bc627bcbcf3c83d87f6a1de948cfaf"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p3-burst-4.body",
+      "bytes": 202,
+      "sha256": "a07389e735103d5d6d6591b43aaafef61ac49c293d4d05199a28e81193d477df"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p3-burst-5.body",
+      "bytes": 202,
+      "sha256": "c06e3258a91536981310790121c1e18c80e71f71918a87eb8acf963613b537f1"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p3-burst-6.body",
+      "bytes": 202,
+      "sha256": "4e942b20c57fdf58b0d8817804d82914a63b600483717ba2507437a383e04384"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p3-burst-7.body",
+      "bytes": 202,
+      "sha256": "5c951e15199627be356ebfd6c84f869c8d7c66959eaee2eb74bfb43b82208d78"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p3-burst-8.body",
+      "bytes": 52,
+      "sha256": "0b9c1deaaef104f917e5ddf5d85b61119a61ccc554a1430f64a0668cfa3a7b89"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p3-execute-request.json",
+      "bytes": 55,
+      "sha256": "e89d50f95150fa2e9458cb0c5d045ab66124116f16d839c55b21a703190fe91d"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p3-lock.log",
+      "bytes": 10,
+      "sha256": "907723b5d86c72777fe8dfd76bfc1580c43b34885f954e13efd5ac9d21596ec1"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p3-status-codes.txt",
+      "bytes": 32,
+      "sha256": "d7d831c0ad2ea223b495877825eddda09bcc0341f522eef54274c30c5d4ba995"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/service-logs/retention-manifest.txt",
+      "bytes": 464,
+      "sha256": "c33b88c9663d7dd3d2ae051c29b74729d8979422155e3417728c15f2349fe0cc"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/service-logs/service-000001.log",
+      "bytes": 3150,
+      "sha256": "066034b66f33260150a4cfa1efc43ebec49c1a5fc22f535fa45089e22db3663d"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/service-logs/service-000002.log",
+      "bytes": 3664,
+      "sha256": "b5feab5561b22a7481c4b690f490fce6bef46d9b1971e36edf1403d5106c2381"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/service-logs/service-000003.log",
+      "bytes": 201,
+      "sha256": "2d376896cf62286a95d6cc331a04831014ec7a6e603efaf4b6aaac945ddbc36c"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/service-p1.addr",
+      "bytes": 16,
+      "sha256": "0104240d7ca6f9922d2c515d2377484ae261abfdc6cfb01648469113442d4962"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/service-p1.err",
+      "bytes": 4450,
+      "sha256": "676725ba7f76de4d20a07c7831bb26f492ea34ca1efe1dd9fbaac8868cd213be"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/service-p1.out",
+      "bytes": 140,
+      "sha256": "c62d6d6a3a510de4e8d22d5c79c8e0b5291ea5606db9a8ca9230ff8429079ea8"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/service-p3.addr",
+      "bytes": 16,
+      "sha256": "7a481e1c4e076182ce1dde03cc205daa17ee57497519210a0565315cc4f329f5"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/service-p3.err",
+      "bytes": 4462,
+      "sha256": "a0e9586e635cb9abb76e67771fec4a13b059ba58bd8467497d92fbb11944d68a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/service-p3.out",
+      "bytes": 140,
+      "sha256": "4de01ac070bed75ff7657c445783abfa08269bc46e9ada993ddabb726117ccff"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/service-p4.err",
+      "bytes": 1688,
+      "sha256": "65ef1586d3333444a3670035e1d2861d5aeea36870776fcc74fb7878fdf20b46"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/service-p4.out",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/summary.txt",
+      "bytes": 1558,
+      "sha256": "af7e1f02c80911561c4a987a7759f653aaea2cb8ebc37f68083debaeaec778ed"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/a01_smoke/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/a01_smoke/stdout.log",
+      "bytes": 1423,
+      "sha256": "e264d272ac68826e570bbe509d75c6d912fb108441b2fe5345af126b0d8b5ecc"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/a13_redaction_scan/stderr.log",
+      "bytes": 190,
+      "sha256": "95fb71b2557b7a584eb709a781a7bde2b4f237fc2f005229c5be44c60f9744a7"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/a13_redaction_scan/stdout.log",
+      "bytes": 1892,
+      "sha256": "0fd94b9adf71b0d6c98f3a4ac315eeba369e710738446bbe9d401180f746ee23"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/verify-stage-result.json",
+      "bytes": 173355,
+      "sha256": "f7b3f8eaa26f270b2593494060a27d0e6cdf4899cab027214be3beee09dcbb36"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-build.log",
+      "bytes": 390,
+      "sha256": "c1976751856c174814c998b239f8e12695ee8059ced59f7ee2d96a58833e0f4d"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-cargo-metadata.err",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-child-snapshot.tsv",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-deptree-evidence.log",
+      "bytes": 289,
+      "sha256": "589b7d1ecfce24e61c9754a2e1d22565c2b907dbc904038c4333ddba76c753b7"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-health-body.json",
+      "bytes": 123,
+      "sha256": "f7fcacea611f836fcfee896f96b921cb6f11f87ef330adf7f40d820cb361ac1c"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-health-check.log",
+      "bytes": 225,
+      "sha256": "ce8e91e2bb58529946f22fe61ea1f93511ca96850d113ffadcd9a8a9aa3b9082"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-invalid-bind-homes-after.txt",
+      "bytes": 227,
+      "sha256": "3ef6578329bb525e73dd979a9f2896f447ffcd57805850f790b61b20f141140d"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-invalid-bind-homes-before.txt",
+      "bytes": 227,
+      "sha256": "3ef6578329bb525e73dd979a9f2896f447ffcd57805850f790b61b20f141140d"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-invalid-bind.stderr.log",
+      "bytes": 70,
+      "sha256": "bd84f8ddedc8d4a798d42ce9bc1673e9e1c662167f3082562e8a40472b95ab7d"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-invalid-bind.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-leaf-cases.json",
+      "bytes": 1771,
+      "sha256": "6c88f1bf243b09c3f5c0207654b095224ce3608f74e78b992b2a648ff6ad119b"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-config-data-fallback-after.txt",
+      "bytes": 105,
+      "sha256": "82a2796faa8737647ba5c90f5a289a51a16c96ced5eea5d6a600f4dce73980dc"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-config-data-fallback-before.txt",
+      "bytes": 105,
+      "sha256": "82a2796faa8737647ba5c90f5a289a51a16c96ced5eea5d6a600f4dce73980dc"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-config-data-homes-after.txt",
+      "bytes": 684,
+      "sha256": "e29408789d1c5e23952f99933dc53a4382c99f6041f7f9aa48c2e6ad5d284ecd"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-config-data-homes-before.txt",
+      "bytes": 410,
+      "sha256": "5fbe1baaead2263cb61775f93ec2e9a3b8eddefe2c262b0ba49c04beb6903e05"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-config-data-original-after.sha256",
+      "bytes": 390,
+      "sha256": "b93405258ea28d3dc0b170046eb8058cdccc8c1cee973adf95a067eca733d599"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-config-data-original-before.sha256",
+      "bytes": 390,
+      "sha256": "b93405258ea28d3dc0b170046eb8058cdccc8c1cee973adf95a067eca733d599"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-config-data.stderr.log",
+      "bytes": 1971,
+      "sha256": "e8a62dc4b385479643dd8c0bd360eddeedabcfd8f320c5b60842d6df03199f00"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-config-data.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-data-fallback-after.txt",
+      "bytes": 105,
+      "sha256": "82a2796faa8737647ba5c90f5a289a51a16c96ced5eea5d6a600f4dce73980dc"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-data-fallback-before.txt",
+      "bytes": 105,
+      "sha256": "82a2796faa8737647ba5c90f5a289a51a16c96ced5eea5d6a600f4dce73980dc"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-data-homes-after.txt",
+      "bytes": 677,
+      "sha256": "0a96a916b36d1dba574a9315640649d2cd2eabca9782df3084890d910463825b"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-data-homes-before.txt",
+      "bytes": 403,
+      "sha256": "b3e6a532f4d33be283bf227e3d1d39a67990879f5815b9e9d9f04e7987b1c76d"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-data-original-after.sha256",
+      "bytes": 376,
+      "sha256": "feb703bf1329951b0e3a64b14c79f29d66176298ded32cc810823bbcfdcd5f56"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-data-original-before.sha256",
+      "bytes": 376,
+      "sha256": "feb703bf1329951b0e3a64b14c79f29d66176298ded32cc810823bbcfdcd5f56"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-data.stderr.log",
+      "bytes": 2041,
+      "sha256": "d5765cacb81637bd0a940486051e06bef8662925a1991d6bd4acd74c24cb0aaa"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-data.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-env-data-fallback-after.txt",
+      "bytes": 105,
+      "sha256": "82a2796faa8737647ba5c90f5a289a51a16c96ced5eea5d6a600f4dce73980dc"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-env-data-fallback-before.txt",
+      "bytes": 105,
+      "sha256": "82a2796faa8737647ba5c90f5a289a51a16c96ced5eea5d6a600f4dce73980dc"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-env-data-homes-after.txt",
+      "bytes": 681,
+      "sha256": "a846272d49eb6a07afb44915ab144429543278acc0ea9a53a6afbd1d22ac36da"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-env-data-homes-before.txt",
+      "bytes": 407,
+      "sha256": "b34569180aaf0678a24a368d7f557089cfc8e7367cab480b728bd775ee64b7b0"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-env-data-original-after.sha256",
+      "bytes": 384,
+      "sha256": "0c4e7682fa78cdb9e71a6a61a0354a0b3381860d16e5faab3ef5411a8bf7ccfa"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-env-data-original-before.sha256",
+      "bytes": 384,
+      "sha256": "0c4e7682fa78cdb9e71a6a61a0354a0b3381860d16e5faab3ef5411a8bf7ccfa"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-env-data.stderr.log",
+      "bytes": 1948,
+      "sha256": "4b2f7eb3184014f9b2cfc30756684fe8bd7366873cbd969ba54ac5877c25a71f"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-newer-env-data.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-service-stderr.log",
+      "bytes": 2509,
+      "sha256": "0b51ac01cccc3bf67d76a5168791169d9ffe180a2f1d5f0b3976f70f9368b948"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-service-stdout.log",
+      "bytes": 148,
+      "sha256": "f2012c90f3279513d34f66c0797f742501c9ec8b989bf59478f85190956d31ee"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/a01-shutdown.log",
+      "bytes": 139,
+      "sha256": "2407ddc61f54fa51f4038797f90bacc86b5fbaf21870d2bf603a22d363880c4a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A01/leaf-cases.ndjson",
+      "bytes": 1389,
+      "sha256": "3ce1005240a8ebfb25acd73c8ec01b4df742a35b81e2a622a6c65bf368865033"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/build.log",
+      "bytes": 72,
+      "sha256": "a5f4c585ee974ca44916ac30a98bbc189e067a7e0a6bc6d2e8d6bc525be724af"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-execute-ok.body",
+      "bytes": 52,
+      "sha256": "1e2f8e8a7211ac1e11fde89ca37a0b84a65ddaf2399fc096f6ac9997e74ca25a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-execute-ok.headers",
+      "bytes": 108,
+      "sha256": "aa6d2f8a1ead852633d664714822d424245de9250d17aabc27c9aff1c9f9ef23"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-execute-request.json",
+      "bytes": 227,
+      "sha256": "4e38ffcd373cb9faac3bd1881d675776a089520fc94d443b306bced20e040e27"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-issue-credential.body",
+      "bytes": 214,
+      "sha256": "7e6e844bdc5a5916669115e3ef8cd3a912c09b7f6a265127d1f74033b9815798"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-issue-credential.headers",
+      "bytes": 114,
+      "sha256": "fc85eea044f58bbcc61e7ecf4813a2bc660ba5e93ba03fd1afea017efd697843"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-issue-request.json",
+      "bytes": 44,
+      "sha256": "e4f7d15ff214194f7c5c24e9a2d1c020776147eba88dd3ecea2e456a7c234da3"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-me-ok.body",
+      "bytes": 1412,
+      "sha256": "975173fd509246bcf686f5a50c42fd9c68f8aaea6e63a740a6815dd77b03d01f"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-me-ok.headers",
+      "bytes": 110,
+      "sha256": "e857a284810462ffa13bca6444bab564f0ca935b86e9c065cdd0645da19afc15"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-ticket-request.json",
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-ticket.body",
+      "bytes": 96,
+      "sha256": "594301319946983d336f00017715a0cf2f63a5eea538ea5f5f2a37f3ec219933"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-ticket.headers",
+      "bytes": 108,
+      "sha256": "a99ec6c01d3b7f3315b43c2c7786577f4bf44a3dbc335aac788e222f2ed20a30"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-me-bad-bearer.body",
+      "bytes": 206,
+      "sha256": "9572cf4a550e3b5591d5e9ab7caca1dd769ac9953c3a8a5f27eaad7ac4ee4c83"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-me-bad-bearer.headers",
+      "bytes": 119,
+      "sha256": "7e7565fb6bbf569f13135286a0ddb957cf602d7ca4945f6c030c54909749769a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-me-no-auth.body",
+      "bytes": 206,
+      "sha256": "6b8d67d6556bddbd3af005078befdb9268e977994a555eb1edfaaeb4f1827262"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-me-no-auth.headers",
+      "bytes": 119,
+      "sha256": "7e7565fb6bbf569f13135286a0ddb957cf602d7ca4945f6c030c54909749769a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-session-cross.body",
+      "bytes": 219,
+      "sha256": "9688aad8c608c38fa0e032ada8cb5bc3b465825ef049598a7fb10e246db69f6e"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-session-cross.headers",
+      "bytes": 116,
+      "sha256": "9ede310c7541be0fa56a954764d18f32907857d99147db9ef0b1153be56348ac"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-session-missing.body",
+      "bytes": 163,
+      "sha256": "9aec81c4d5e9e65a5c873e2e76eab166a374461aa3184ba8cb638643296abef0"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-session-missing.headers",
+      "bytes": 116,
+      "sha256": "53b20a99ab0fd47d317a65d43453fc56cc83e6e27b9ef424d1e6b39c2592aaa4"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-ws-bad-query.body",
+      "bytes": 206,
+      "sha256": "6fde98814aea09478d6efd13ab59577710472dfd4d9f65c0609f367fed520452"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-ws-bad-query.headers",
+      "bytes": 119,
+      "sha256": "7e7565fb6bbf569f13135286a0ddb957cf602d7ca4945f6c030c54909749769a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-ws-transcript.txt",
+      "bytes": 331,
+      "sha256": "bc5c798c8846facd87a34da03c3888687355cd3b64ccd008907c9fea00a535ae"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p3-burst-1.body",
+      "bytes": 262,
+      "sha256": "a42a68c1a35a09bbc619cf3e6a7518db5e6713e6edab45955d3f74f711f827bb"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p3-burst-2.body",
+      "bytes": 202,
+      "sha256": "5f5acf37a00013edc8bb9a773c4951fae62e0828b7f80cf37fa40014cfecea1d"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p3-burst-3.body",
+      "bytes": 202,
+      "sha256": "0b0a9985cc44c5ef6cd36bc1d7844255bac005c1e25dbb8f1f2fed8181ff2dbe"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p3-burst-4.body",
+      "bytes": 202,
+      "sha256": "3dc40feb81f36b271be087a11d053982169ee70fd9feb3fbfff420da28ceaacc"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p3-burst-5.body",
+      "bytes": 202,
+      "sha256": "58833bfa7a006d5ac12f521588fbf55d2b8ae62b57dc66e1de600d3ee9187268"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p3-burst-6.body",
+      "bytes": 202,
+      "sha256": "f083fa5c13b92e5dac4654c6d22154230a3907393708bd8361667e899b6cc6a6"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p3-burst-7.body",
+      "bytes": 202,
+      "sha256": "6fe80bf7e535198897ea7ffa4f3605413a90c8d7188788e945b7d55d30f60561"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p3-burst-8.body",
+      "bytes": 202,
+      "sha256": "c5bbe25795940d2aa458c17dd8e4e24ae1264d8f7c82d4faa4ef556fb5edfc10"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p3-execute-request.json",
+      "bytes": 55,
+      "sha256": "e89d50f95150fa2e9458cb0c5d045ab66124116f16d839c55b21a703190fe91d"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p3-lock.log",
+      "bytes": 10,
+      "sha256": "907723b5d86c72777fe8dfd76bfc1580c43b34885f954e13efd5ac9d21596ec1"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p3-status-codes.txt",
+      "bytes": 32,
+      "sha256": "6704a28e71d35c81f734e5a252cb4b0b9d6a8ee45a85979e9daa3e1066dee4f8"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/service-logs/retention-manifest.txt",
+      "bytes": 463,
+      "sha256": "d9df5a1125f153037d8b7ee07c42b1747e35478bf5550f20fe626326b296bb0d"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/service-logs/service-000001.log",
+      "bytes": 3150,
+      "sha256": "5ab642ea8ed01063c4f6909b55cc8e6a9c5644ed234719990e323148880b9b17"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/service-logs/service-000002.log",
+      "bytes": 3575,
+      "sha256": "c98291e7b5b97fcd140856e928625f3a209611080a5e0b451548b0bbd9d91807"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/service-logs/service-000003.log",
+      "bytes": 201,
+      "sha256": "8fdec90e4e2e2885bfc368256ad817351167ef5845189157b278d68f90947ca6"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/service-p1.addr",
+      "bytes": 16,
+      "sha256": "7836bf37ecf762fa0ffd815c04c6c2411c5abda67049d94d559177a1a15e2367"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/service-p1.err",
+      "bytes": 4449,
+      "sha256": "251f0013174c33188f3d6d7c283c18a45f3738bdb4d975cb24849655dfd61987"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/service-p1.out",
+      "bytes": 140,
+      "sha256": "9b54282a51a22f0c5c38b115275fed071413d7de0648016b23bb803a72ff2c20"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/service-p3.addr",
+      "bytes": 16,
+      "sha256": "a7d5034899f93efd6716ec29d4053f9835c73c60b018dcebd1310d9e644d3974"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/service-p3.err",
+      "bytes": 4372,
+      "sha256": "16b24cd6781d6ba9f0244e737199dcfdddadf9342a7f4deab3598b6e3ca4bc50"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/service-p3.out",
+      "bytes": 140,
+      "sha256": "aeacbd9cc1084129610bd2edc275ede3a0422d70e2b0c587f6110fff7d304a8a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/service-p4.err",
+      "bytes": 1687,
+      "sha256": "354c27cc0e241507485502e6ecb6514c98b77907dbf281943e3dd2a5e62be883"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/service-p4.out",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/summary.txt",
+      "bytes": 1557,
+      "sha256": "686f961704ec2a471ebc5d1deeef5d0445062a2f8346172d719041ff77ce115a"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/a01_smoke/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/a01_smoke/stdout.log",
+      "bytes": 1423,
+      "sha256": "7f0ca902eff33977cdea8d72d61bf43e6208525d67499021a99d99909d334b84"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/a13_redaction_scan/stderr.log",
+      "bytes": 190,
+      "sha256": "0ca12d6753791cc70d2d80b286f937dd4871f7f6c5ccf2468727d0a5c3029bd7"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/a13_redaction_scan/stdout.log",
+      "bytes": 1891,
+      "sha256": "3e151ddec14cfaf8bbb2092d513e2c668de1326ae4fac48f2e2d4ac2f538f7dd"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/verify-stage-result.json",
+      "bytes": 173355,
+      "sha256": "9bc3c9cb41a5e26fff565e36628b390df816fd6cd71289b0053a64f9da7cdb7c"
+    },
+    {
+      "path": "input/history-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/run-default.py",
+      "bytes": 2519,
+      "sha256": "aa0ad757f914ac051a19ccf553fa192cbe0b1ad600231e7e62dfbb7cd20519e3"
+    },
+    {
+      "path": "input/history-before/docs/rust-tauri/R05/repair-current/RR2_BRIEF.md",
+      "bytes": 5166,
+      "sha256": "1ee083e21a23a69109cb96810377dba2a9615f7df00a89232dc276631808ff98"
+    },
+    {
+      "path": "input/history-before/docs/rust-tauri/R05/repair-current/RR2_HANDOFF.md",
+      "bytes": 7454,
+      "sha256": "3560187fb5b114c90a958ef844c204619c5292099d2647fab83e43eca559b044"
+    },
+    {
+      "path": "input/history-before/docs/rust-tauri/R05/repair-current/RR2_ISSUE_MATRIX.json",
+      "bytes": 37720,
+      "sha256": "c2f0475ebf998ae225ac300393e58a3365419fb07347861ff78f3a5f0d0c8dbd"
+    },
+    {
+      "path": "input/history-before/docs/rust-tauri/R05/repair-current/RR2_MASTER_PROMPT_2026-10-06.md",
+      "bytes": 8316,
+      "sha256": "35802f225728954cccedd12ef0453090948afd18db9cb0f8f31cc9d896e92545"
+    },
+    {
+      "path": "input/history-before/docs/rust-tauri/R05/repair-current/RR2_PROGRESS.md",
+      "bytes": 30484,
+      "sha256": "90f1bb1b1cbf0b0cf42114e83e768a4f943723155a7144e061d330a43b649e1e"
+    },
+    {
+      "path": "input/history-before/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+      "bytes": 207621,
+      "sha256": "53ff4eddd9af1844b7722c39dd369efcb42dbb6787adc9bb70497af48c10c8df"
+    },
+    {
+      "path": "input/history-before/scripts/rust-tauri/r03_t08_generate_stage_map.py",
+      "bytes": 26365,
+      "sha256": "bbeba7fd39609f6dcc82f6c5d5fe827c2af00b50f2bf7401419b737b498b6937"
+    },
+    {
+      "path": "input/history-before/scripts/rust-tauri/r04_rr1_g05_repair_suites.sh",
+      "bytes": 23249,
+      "sha256": "264b19b6dd1582affa06407855c73e939e9fab378982e56a10cdd1b04aa8bc6f"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/build.log",
+      "bytes": 3435,
+      "sha256": "a595e4abbde4cfd7bce822c30aa8dccee1e96490ee28a55d65881050dd7fe8a5"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/inventory.txt",
+      "bytes": 4768,
+      "sha256": "ae9cdd957353fd7a5a1a26d0b54377c4d16d502b0b1473672e05a66870d1cd8f"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p2-me-bad-bearer.body",
+      "bytes": 206,
+      "sha256": "4a563fb5afb25b506e641b3ea566b0559ac2da8598c0764e448ef3fb460d78da"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/retention-manifest.txt",
+      "bytes": 464,
+      "sha256": "82cbba6e9687250aec1aa20e7596ffd69043dfbe39b64a603a1cf0585d9634d8"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000001.log",
+      "bytes": 3651,
+      "sha256": "d96d2a17d21da3472297b8e3e7f05c1416bc236a88346f6cf891d0cf06c57eb6"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000002.log",
+      "bytes": 4410,
+      "sha256": "2fea1d2428d154253a187049b8a305b97abbb73da4db4b26234d128ab4b092a1"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000003.log",
+      "bytes": 201,
+      "sha256": "fe2ce7dd6a102803297b998d7044725cde97d4d1180bd4235170cbfb1be6ebcb"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-p1.err",
+      "bytes": 5148,
+      "sha256": "863ba6803a55b0961ecd4318051990382ff2dff1fbcb4fa4bf94f25b2c756bc5"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/summary.txt",
+      "bytes": 1694,
+      "sha256": "1a092b19a32a137042931d0c6158f6b69bfc4532fe5a080626590da95373eea8"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A07_A08/s4-migrations-round1.json",
+      "bytes": 2986,
+      "sha256": "fc75ba8d86322698e73a9edd50e2d0b7e9e00e622d907ecebc457e257dee72cd"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+      "bytes": 162120,
+      "sha256": "157d8cd5e1f03d19f57f5d35ce0041904503c5809964ae1b2900abcd292d6803"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/verify-stage-result.json",
+      "bytes": 366788,
+      "sha256": "b9c115415225b03d19929708095bc3cd3cfae6c8677804a541a6a909ff732d40"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R05_SUITES/f27-resource-series.json",
+      "bytes": 2864,
+      "sha256": "f3d2f23cf5061e557f129a65a8abd843951b80973c0161d171937aa438aa579b"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+      "bytes": 438586,
+      "sha256": "0f5911462089380b8eb94d137b98f8d2382d062564c43d54cd84338b0852191e"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default-console.log",
+      "bytes": 3926,
+      "sha256": "a969474f2af39a19a093b73054275d6ecb0288509a9388041ef8d35a22127c49"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/case-results.tsv",
+      "bytes": 1176,
+      "sha256": "82ded6e0fb8b85c7effe376fa920f13dd1229656f7b91e51aea35a5dafcd6368"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s1-counts-after-stop.json",
+      "bytes": 136,
+      "sha256": "d713b4d2f2123afe9c6c7fc9f2e89746849192a9276c9c9383b94d4ab7fd0c66"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s2-counts-after-crash.json",
+      "bytes": 136,
+      "sha256": "347987f9452c382b32e905cd01a47510e5b5052b9177d6711a0828ded331f07a"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s4-migrations-round1.json",
+      "bytes": 2986,
+      "sha256": "dd51ba6d008c91db937a4588138a90bb0a14b7d2eb519b02c2945bc10b20765d"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s4-migrations-round2.json",
+      "bytes": 2986,
+      "sha256": "dd51ba6d008c91db937a4588138a90bb0a14b7d2eb519b02c2945bc10b20765d"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s4-migrations-round3.json",
+      "bytes": 2986,
+      "sha256": "dd51ba6d008c91db937a4588138a90bb0a14b7d2eb519b02c2945bc10b20765d"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A11/backup-restore/s1-backup-outcome.json",
+      "bytes": 245,
+      "sha256": "6435f5426aa3b752fe13f750eed488f53c8d65dfcdd9f15cebe36c34a5af1084"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A11/backup-restore/s1-restore-outcome.json",
+      "bytes": 263,
+      "sha256": "0eb22c772198f3b93ce25de4a50cac99257bfadfae7ba53dfd22bfbb01b60245"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A11/backup-restore/s3-backup-out.json",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A11/backup-restore/s4-ws-probe.json",
+      "bytes": 30,
+      "sha256": "9b33c4d50a9f7a0434980244454a85ce4288c7323241cf9ff22c50e6b8f8dd85"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/cli-rust-cases.json",
+      "bytes": 28972,
+      "sha256": "b099353d2ed5bc8d7d7d1617aae3ea3fd7cd90a254e0c7f0053ebec82e767e86"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/verify-stage-result.json",
+      "bytes": 176126,
+      "sha256": "b35306cc22a5edf077606aa714ae97aab8315770bb8ca1dcae405b257961a2a7"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/exit-code.txt",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/named-check.txt",
+      "bytes": 153,
+      "sha256": "4b8ff953d2144cc16dbec5210bab08e1063aea5ce0252555491ac74e0fa2c9b7"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/summary.txt",
+      "bytes": 3899,
+      "sha256": "2f2423396c950712f70bc9dcaa267b0160121920aeeaa2b68fd95b8d6cd0e66e"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/mutation-state-008.json",
+      "bytes": 1840,
+      "sha256": "6c72f7a6bfebe0efc4bc1e7c2c140cfd3444329ede969204450b70482c74220d"
+    },
+    {
+      "path": "input/late-raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/source-midrun-observation.json",
+      "bytes": 4577,
+      "sha256": "f03de2761fba9b8c70dfccc58ae07aa0bc1e5eb54e26b9998558546a12d6505c"
+    },
+    {
+      "path": "input/live-binary-selected.json",
+      "bytes": 3858,
+      "sha256": "c92d1cebc1e21203cd140dda42c5722e184395e5b4f87a2503f701a8d1924c69"
+    },
+    {
+      "path": "input/migration-consistency.json",
+      "bytes": 1051,
+      "sha256": "89034112fbf22a601e7200bb2b29098896d2f6ebf5330c5b304db8d2d0832ea1"
+    },
+    {
+      "path": "input/n06-observed-binding.json",
+      "bytes": 14980,
+      "sha256": "57d4bc69417737315b4b8d2f45ed26a24709d69f0563f9f1d9bf7f41277938c8"
+    },
+    {
+      "path": "input/old-a13-contract-control.json",
+      "bytes": 459,
+      "sha256": "73fe2175bee9a504e340c50e04211c2cf44aecb209eae21cea1deca0e2935293"
+    },
+    {
+      "path": "input/original-requirements.json",
+      "bytes": 2743,
+      "sha256": "91ec1a0c780eb22734dad9eece9c808dcab77f6425e47e90beeedfaee9d39bf3"
+    },
+    {
+      "path": "input/primary-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a01_smoke/stderr.log",
+      "bytes": 77,
+      "sha256": "4e7acd1cd4daef1491e661882ede84426d7eecda9e5df10b67d3b0c3a9b77692"
+    },
+    {
+      "path": "input/primary-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a01_smoke/stdout.log",
+      "bytes": 1326,
+      "sha256": "7901fc7f6e27f78f435e25fbdd84c20ea807103f3a3f2c7c6fc719d186d48e4a"
+    },
+    {
+      "path": "input/primary-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a13_redaction_scan/stderr.log",
+      "bytes": 190,
+      "sha256": "f499aa16bc713f80af19700268af2f0bfeb0476a1febf216874398c483899756"
+    },
+    {
+      "path": "input/primary-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a13_redaction_scan/stdout.log",
+      "bytes": 1892,
+      "sha256": "a7b9ea7d91fcade65a095103d6599772cecca16fd08e53d4e61492d815fb3de5"
+    },
+    {
+      "path": "input/primary-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/run.log",
+      "bytes": 5621,
+      "sha256": "e2e64ba266b2c332e9af208e5fcb9ebb5fb499b042ee10b3ec3498df9bb00300"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-build.log",
+      "bytes": 300,
+      "sha256": "93bb3659e679a3cbaa0ddc7787acf9a6cffb93088b0faf2d44dc553e999301b7"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-cargo-metadata.err",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-cargo-metadata.json",
+      "bytes": 1587087,
+      "sha256": "4198745825bf534a564568426d500d38ea56a74caf9edf1a4d2ce0616ec835a8"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-child-snapshot.tsv",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-deptree-evidence.log",
+      "bytes": 289,
+      "sha256": "589b7d1ecfce24e61c9754a2e1d22565c2b907dbc904038c4333ddba76c753b7"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-health-body.json",
+      "bytes": 123,
+      "sha256": "f7fcacea611f836fcfee896f96b921cb6f11f87ef330adf7f40d820cb361ac1c"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-health-check.log",
+      "bytes": 225,
+      "sha256": "ce8e91e2bb58529946f22fe61ea1f93511ca96850d113ffadcd9a8a9aa3b9082"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-invalid-bind-homes-after.txt",
+      "bytes": 227,
+      "sha256": "ef07135e137ddd0547718393431bb1d0c38d7c6164259c9e82ffcb494ed42f17"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-invalid-bind-homes-before.txt",
+      "bytes": 227,
+      "sha256": "ef07135e137ddd0547718393431bb1d0c38d7c6164259c9e82ffcb494ed42f17"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-invalid-bind.stderr.log",
+      "bytes": 70,
+      "sha256": "bd84f8ddedc8d4a798d42ce9bc1673e9e1c662167f3082562e8a40472b95ab7d"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-invalid-bind.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-leaf-cases.json",
+      "bytes": 1123,
+      "sha256": "14c18c47fe4ae28d17c23e3b509b440b1aa615e0bc6dfe09046801852c34aa24"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-newer-data-fallback-after.txt",
+      "bytes": 105,
+      "sha256": "553ae98ff6649a17b79a0dfb8a3526059008206376697f561cfbc10ab98dfa31"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-newer-data-fallback-before.txt",
+      "bytes": 105,
+      "sha256": "553ae98ff6649a17b79a0dfb8a3526059008206376697f561cfbc10ab98dfa31"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-newer-data-homes-after.txt",
+      "bytes": 677,
+      "sha256": "a55208b9936b60159b451013fbcbb9f79bd52adb413f6ae9d664c26586318fd0"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-newer-data-homes-before.txt",
+      "bytes": 403,
+      "sha256": "dcac6b8699beb58f859ee47fd6de3d2cae26f7c74182c0accb00ea37bebddda9"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-newer-data-original-after.sha256",
+      "bytes": 376,
+      "sha256": "fdcb5a2a0039329feaa8da67372e26a10eb08845c500b7efdba1370222d42afe"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-newer-data-original-before.sha256",
+      "bytes": 376,
+      "sha256": "fdcb5a2a0039329feaa8da67372e26a10eb08845c500b7efdba1370222d42afe"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-newer-data.stderr.log",
+      "bytes": 1018,
+      "sha256": "390241f2112633e7d4afab079048b6cf8c847850a65a6f73cc63616ad0c3337b"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-newer-data.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-service-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-service-stdout.log",
+      "bytes": 148,
+      "sha256": "472ee35c401ac21e3298d4653344fa48a5042230cb5e320fc7887039858ec2f5"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-shutdown.log",
+      "bytes": 139,
+      "sha256": "2407ddc61f54fa51f4038797f90bacc86b5fbaf21870d2bf603a22d363880c4a"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/leaf-cases.ndjson",
+      "bytes": 855,
+      "sha256": "d46d9049101e366dd3786fb919768428a2eef99a46ccbe0cd94b697c7b14fdb4"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/build.log",
+      "bytes": 72,
+      "sha256": "c92508a29848820f033cd2ea015c85dde0953c88b07cc967ce34b7c08f610549"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-execute-ok.body",
+      "bytes": 52,
+      "sha256": "24895dd12f7b894ac84e5b9b503483b909534c5de5151d7a9c71333b18ac9018"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-execute-ok.headers",
+      "bytes": 108,
+      "sha256": "e70e2fe9cfa7eb069d763f97f13f31e49c89ed48961f50f8d5a0883f0490e2bb"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-execute-request.json",
+      "bytes": 227,
+      "sha256": "4e38ffcd373cb9faac3bd1881d675776a089520fc94d443b306bced20e040e27"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-issue-credential.body",
+      "bytes": 214,
+      "sha256": "89f3900e58f9c316bc62e09829aeac90c08792eb1adb818d175df7b91118ae20"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-issue-credential.headers",
+      "bytes": 114,
+      "sha256": "aeeb960e221c7622dbee7965ce3af065087b53a982516b2884ac70f8710f2214"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-issue-request.json",
+      "bytes": 44,
+      "sha256": "e4f7d15ff214194f7c5c24e9a2d1c020776147eba88dd3ecea2e456a7c234da3"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-me-ok.body",
+      "bytes": 1412,
+      "sha256": "a7f7c908a7e1c1440d25c790c7056b82fb5ebadbdc3598223fe8b7863bfb1380"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-me-ok.headers",
+      "bytes": 110,
+      "sha256": "3268207dd5b91fe4e3d348adc0625848a6e7f45aa5e4cb03551bcd0cca82a1b4"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-ticket-request.json",
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-ticket.body",
+      "bytes": 96,
+      "sha256": "4038d58c83ecd434a498ec5871035a9783a2f70185a1ffe9d4797d825310f1fb"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-ticket.headers",
+      "bytes": 108,
+      "sha256": "e25eb76e0046d952595414a0367b4b008636eaa8cb85e0594d8d74b272a8691b"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-bad-bearer.body",
+      "bytes": 206,
+      "sha256": "08161c1f8b43ef2c3c2a5f6fd20ea5d5416afc02f324157577548bf38f3912e2"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-bad-bearer.headers",
+      "bytes": 119,
+      "sha256": "4b08ea9a186b6416aa800e1da57d7ddf40ac446ff2900432dc1d33e073548384"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-no-auth.body",
+      "bytes": 206,
+      "sha256": "4cb79cacfb68003766fda24fbe42fe4c9a511aa319bf037bfa49d2bbebd74b0f"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-no-auth.headers",
+      "bytes": 119,
+      "sha256": "4b08ea9a186b6416aa800e1da57d7ddf40ac446ff2900432dc1d33e073548384"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-cross.body",
+      "bytes": 219,
+      "sha256": "402e95d4b63b26e8d55346d650f69d688403c7b2669e9a9254a21a2f051d4b55"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-cross.headers",
+      "bytes": 116,
+      "sha256": "560b290519300a305211ca05be239d96cb4aebe73741d74a473487fe8203ee1d"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-missing.body",
+      "bytes": 163,
+      "sha256": "b7c788fe2c0ac924a377ebc4a2e5611d9d4d6eb38e450fc20681134e1051dc3d"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-missing.headers",
+      "bytes": 116,
+      "sha256": "41d3b113f45a18ca22a03b72028f59430619b5f0404531ec497ae995a27fdee0"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-ws-bad-query.body",
+      "bytes": 206,
+      "sha256": "ff5ba5bf2675b5b1d583a0cd10bdb18dca36570a163e296a1eb93a3e7cec72af"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-ws-bad-query.headers",
+      "bytes": 119,
+      "sha256": "4b08ea9a186b6416aa800e1da57d7ddf40ac446ff2900432dc1d33e073548384"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-ws-transcript.txt",
+      "bytes": 331,
+      "sha256": "bc5c798c8846facd87a34da03c3888687355cd3b64ccd008907c9fea00a535ae"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-1.body",
+      "bytes": 262,
+      "sha256": "2eb93f1c43f2ece4ead0e2bd3235fb17a6536cf273c9962f53befee59af46b6c"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-2.body",
+      "bytes": 202,
+      "sha256": "d9cacfc18aa909252d368f504fc3c86591ec2f5e4fc2f34509e70d7358fc0950"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-3.body",
+      "bytes": 202,
+      "sha256": "887e1562183cdc81d7c4b45e7b538e5f0116075df40401b46936ed27096dfb8d"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-4.body",
+      "bytes": 202,
+      "sha256": "eeedc127d3f6750c20d4d032503241b71b5c233296396634e22c507a9f130999"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-5.body",
+      "bytes": 202,
+      "sha256": "4af4e378df554fba3398a667b036060ba85d617deb383b50d44d1d7c483efad1"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-6.body",
+      "bytes": 202,
+      "sha256": "1742c7fd50b5c1b41238a7c45a618b83039f3789aa4300c6fef7a4666e7da8f2"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-7.body",
+      "bytes": 202,
+      "sha256": "d521bf894f2ab14250d8b5915d7dbe833b7287610d889d7b8bfa5cda9c33e988"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p3-burst-8.body",
+      "bytes": 202,
+      "sha256": "fda6dcac38b8719dfb357ca875392efb4e6198b69bce3c6f30ce13f486e49a7a"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p3-execute-request.json",
+      "bytes": 55,
+      "sha256": "e89d50f95150fa2e9458cb0c5d045ab66124116f16d839c55b21a703190fe91d"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p3-lock.log",
+      "bytes": 10,
+      "sha256": "907723b5d86c72777fe8dfd76bfc1580c43b34885f954e13efd5ac9d21596ec1"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p3-status-codes.txt",
+      "bytes": 32,
+      "sha256": "4e3b1621aa6dbfd48c6e905e261dc448f05a8e1ee2a90b5c9bf934ad0bc42ea4"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/service-logs/retention-manifest.txt",
+      "bytes": 464,
+      "sha256": "049ddc995e3ba268a6acb5c79bed0257ce8346f0775f180abaf928720d6f6acd"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/service-logs/service-000001.log",
+      "bytes": 3150,
+      "sha256": "81e78a797c147c6a6e64417d28f7013d72383c756c47cdd1f1d297897cc2522d"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/service-logs/service-000002.log",
+      "bytes": 3575,
+      "sha256": "95955f5ad044360f086f1cb605c51014e6b6a71156a7302aabaedcf7bf86941f"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/service-logs/service-000003.log",
+      "bytes": 201,
+      "sha256": "5f99d96f071321ff98ac0c165f045ae7a61cde1bf5138d79083b2609649a39a1"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/service-p1.addr",
+      "bytes": 16,
+      "sha256": "7c178b0b0bf3bcecd60e114479ae6b5c7d1143aab9cf50bc889fac9144b7cee2"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/service-p1.err",
+      "bytes": 4450,
+      "sha256": "e847d2e10327bfcb2049643b76a55a54d6f5c92f4cb2b013bd96a1bbf0fc767b"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/service-p1.out",
+      "bytes": 140,
+      "sha256": "7199739d00e9f2e8fb8578641a15afcb60801761b59fe416148c6581e5d00b2e"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/service-p3.addr",
+      "bytes": 16,
+      "sha256": "978e4925cd92314b82ff7f5c17bf5ee4eba575ddd933bfdb8d442a113ee1ed96"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/service-p3.err",
+      "bytes": 4373,
+      "sha256": "3847e21450b2d7d441b7c779309532b2789b7ed13b7045d1eb52ee6179ac3b69"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/service-p3.out",
+      "bytes": 140,
+      "sha256": "691678e8512f416a24b51de2b92edd3ac575bf0e1452fa527a33a06a0151c37a"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/service-p4.err",
+      "bytes": 1688,
+      "sha256": "da27d65e3469565b830a07e048e8dfd97d81471a54210d4caee6fff70b253e4f"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/service-p4.out",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/summary.txt",
+      "bytes": 1558,
+      "sha256": "7fe0dfd3a8b367b9fd3577c8f5c1bdd54c1b780029b3907da6992548be2a3fc5"
+    },
+    {
+      "path": "input/raw-before/docs/rust-tauri/R05/repair-current/RR1_MASTER_PROMPT_2026-10-04.md",
+      "bytes": 70892,
+      "sha256": "7fc077f1b370660f582d964977685d5a619fa988befd26f8a4915f409529f2bc"
+    },
+    {
+      "path": "input/raw-before/docs/rust-tauri/R05/repair-current/RR2_MASTER_PROMPT_2026-10-06.md",
+      "bytes": 8316,
+      "sha256": "35802f225728954cccedd12ef0453090948afd18db9cb0f8f31cc9d896e92545"
+    },
+    {
+      "path": "input/raw-before/docs/rust-tauri/R05/repair-current/RR3_BRIEF.md",
+      "bytes": 7538,
+      "sha256": "31be412e410ff7be0543c2b9c5ff332ef77540de242070d6d2b1271ab0a6446c"
+    },
+    {
+      "path": "input/raw-before/docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md",
+      "bytes": 2610,
+      "sha256": "0119a821a8ece1516a7fd807b55f8df9c08f8f2e356126db7d467097e303ee54"
+    },
+    {
+      "path": "input/raw-before/docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+      "bytes": 3424,
+      "sha256": "3d9d389e6cef875a781b1312e22f5856f14b2ad49866a8d670d9a8def834e80b"
+    },
+    {
+      "path": "input/raw-before/docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+      "bytes": 7652,
+      "sha256": "635ad078c6b9acb850092626ea8ab1f6e883181f3eed0f7049be019020bbcac0"
+    },
+    {
+      "path": "input/raw-before/docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+      "bytes": 10775,
+      "sha256": "8ef151f0d64a29441da28d55195a62748b29ffa4b9c02ca6e80d944a497fcae1"
+    },
+    {
+      "path": "input/raw-before/docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md",
+      "bytes": 3911,
+      "sha256": "9395286d8272ba1c841bc7960cc0e06b93affcfbacc2037cf0a8f0df9fcb1fe8"
+    },
+    {
+      "path": "input/registry-consistency.json",
+      "bytes": 1386,
+      "sha256": "5e4efa12847dcad02b485080f2e3c3bb833c19dc02467b9acda510805aacb7a7"
+    },
+    {
+      "path": "input/request-correlation/home/data-epoch.json",
+      "bytes": 162,
+      "sha256": "373e6ca06eefbdb140526c223c80ddaf833bac317a8c9477d2e3d867fb68e3f0"
+    },
+    {
+      "path": "input/request-correlation/home/lingxi-service/data/runs.db",
+      "bytes": 167936,
+      "sha256": "e82e6998f031fc084bc16c950dd3c861e74ef849a1e42f0c7d8695f746acb92a"
+    },
+    {
+      "path": "input/request-correlation/home/lingxi-service/device-credentials.json",
+      "bytes": 157,
+      "sha256": "69bc7fb9e49b4919f7d810d851fb6308a5f53a799c0eed88479317150052b296"
+    },
+    {
+      "path": "input/request-correlation/home/lingxi-service/devices.json",
+      "bytes": 113,
+      "sha256": "8498c58e5741c9f0fffdcb4fd8fa20791e54feb6fc4d0d1035980f3d46d937e9"
+    },
+    {
+      "path": "input/request-correlation/home/lingxi-service/instance.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/request-correlation/home/lingxi-service/local-token.json",
+      "bytes": 184,
+      "sha256": "155ce286ec6b216c17f5001fe0cd07521e34a4ba419e6c830299e8f9b511979b"
+    },
+    {
+      "path": "input/request-correlation/home/lingxi-service/logs/service-000001.log",
+      "bytes": 1549,
+      "sha256": "ce2a6dc9c3a700aa2d3af7f91870e1dc37c9873f910a7c5796fe4747632c2a00"
+    },
+    {
+      "path": "input/request-correlation/home/lingxi-service/management.json",
+      "bytes": 531,
+      "sha256": "2e3db4062c1a776a8ba3425f4de4c4ef95a8c7e0fb7813af158606b47d3b378f"
+    },
+    {
+      "path": "input/request-correlation/home/logs/security-audit.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "input/request-correlation/request.json",
+      "bytes": 159,
+      "sha256": "4bd4047c60bfc06b41be22ed5ede8bb153d7554d674a1fc3df1d1a878d0cd536"
+    },
+    {
+      "path": "input/request-correlation/response.body",
+      "bytes": 206,
+      "sha256": "1a4450c1a6719fe1f1969a061ff7be8a15e2edf961ca6fb73f7ace5e10409239"
+    },
+    {
+      "path": "input/request-correlation/result.json",
+      "bytes": 489,
+      "sha256": "5cce6add72b0ddd7faefc91de263cc98495f8e8fab2beb4379ef1cb021648865"
+    },
+    {
+      "path": "input/requirements-before/artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/Lingxi_R05_完整执行与验收提示词_2026-10-02.md",
+      "bytes": 76252,
+      "sha256": "371fffc32310ff7fdd6f8b383d437d327b6ab3b8848f78154011cad3719bdfdb"
+    },
+    {
+      "path": "input/requirements-before/artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/01_通用执行约束.md",
+      "bytes": 8145,
+      "sha256": "d4f07185735acda91b73a2aa97a42ca7ce5795babf1104968c83671131cf871c"
+    },
+    {
+      "path": "input/requirements-before/artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/02_目标架构与强制契约.md",
+      "bytes": 11718,
+      "sha256": "53dbf699675d9981b60ea5c982c4d0507afffd5184e6bebac875aae40d173c4d"
+    },
+    {
+      "path": "input/requirements-before/artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/03_功能与所有权矩阵.md",
+      "bytes": 5882,
+      "sha256": "6e84fc77a9f3124d51fe4d088fda6c8dcb96989e43d280634b94b7fc1d778560"
+    },
+    {
+      "path": "input/requirements-before/artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/04_阶段依赖与接口交接.md",
+      "bytes": 4233,
+      "sha256": "940c896508e929ec5f25c2b9020c06c2035c3f9800f43b78b1fd5e303e92bde3"
+    },
+    {
+      "path": "input/requirements-before/artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/05_验收与性能协议.md",
+      "bytes": 10299,
+      "sha256": "d86c51f4b8571f94f0e9b457e74e79d9281d5c846e7a37d1f39edfdf47324b61"
+    },
+    {
+      "path": "input/requirements-before/artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/06_风险、技术决策与退出条件.md",
+      "bytes": 4454,
+      "sha256": "6c92962e5bcb739509630eb8c9cf8b96fabf67c0d51315717ae048d9b87786f0"
+    },
+    {
+      "path": "input/requirements-before/artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R05_模型协议、凭证、流式处理与最小完整闭环.md",
+      "bytes": 17336,
+      "sha256": "a10490c115d00f1f0c5bbcf1a5e2f6b8740397103d8b8ad5cc029a3427f1a3e0"
+    },
+    {
+      "path": "input/requirements-before/artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R06_上下文、会话语义、记忆与知识库.md",
+      "bytes": 17423,
+      "sha256": "d54e7fcc638b62fc4303ce4af8f01ba8c358fd1a90d0f85a491bfd4a439bbd2e"
+    },
+    {
+      "path": "input/requirements-before/docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+      "bytes": 1651955,
+      "sha256": "96f70219d1df88249e8df073f4dfe211f8562cef20f7e45b1c03064feb5362be"
+    },
+    {
+      "path": "input/requirements-before/docs/rust-tauri/R02/R02-T07_REPORT.md",
+      "bytes": 30601,
+      "sha256": "7443607c838fb38c58fdad3a6fe133c663b3d8f7c0c7e06caec585a8b65f7919"
+    },
+    {
+      "path": "input/requirements-before/rust/crates/xtask/src/main.rs",
+      "bytes": 20978,
+      "sha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1"
+    },
+    {
+      "path": "input/source-before/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/rust/crates/lingxi-service/src/logging.rs",
+      "bytes": 22354,
+      "sha256": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301"
+    },
+    {
+      "path": "input/source-before/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated-normal-build/command.json",
+      "bytes": 50869,
+      "sha256": "a3b4b91a8361156da697abde559d0c74f68c6f208b89beced62f2ca82f832fd0"
+    },
+    {
+      "path": "input/source-before/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated-old-build/command.json",
+      "bytes": 50869,
+      "sha256": "5786077e7c2dd899dd6893c2d3e4d5c1e56b15ffe05a6eb40c02817a3eead714"
+    },
+    {
+      "path": "input/source-before/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated-source-manifest.json",
+      "bytes": 41100,
+      "sha256": "9371397f135761e3c230313a4052ff9016a341a6873b67c8b7c5b95f088598bc"
+    },
+    {
+      "path": "input/source-before/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json",
+      "bytes": 6595,
+      "sha256": "9785871fb67a4d5fdc0b469911dabecd4c7c0fb7dfab1ffae957ee9dee72ce2e"
+    },
+    {
+      "path": "input/source-before/docs/rust-tauri/R02/R02-T07_REVIEW_R1.md",
+      "bytes": 22235,
+      "sha256": "69d94455449c1d589fd8bd7f83c0da2d16750c4449311d176e93cec69091af09"
+    },
+    {
+      "path": "input/source-before/docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md",
+      "bytes": 2610,
+      "sha256": "0119a821a8ece1516a7fd807b55f8df9c08f8f2e356126db7d467097e303ee54"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json",
+      "bytes": 6595,
+      "sha256": "9785871fb67a4d5fdc0b469911dabecd4c7c0fb7dfab1ffae957ee9dee72ce2e"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/docs/rust-tauri/R02/R02-T07_REVIEW_R1.md",
+      "bytes": 22235,
+      "sha256": "69d94455449c1d589fd8bd7f83c0da2d16750c4449311d176e93cec69091af09"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md",
+      "bytes": 2610,
+      "sha256": "0119a821a8ece1516a7fd807b55f8df9c08f8f2e356126db7d467097e303ee54"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/Cargo.lock",
+      "bytes": 77319,
+      "sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-adapters/src/storage/migrations.rs",
+      "bytes": 38639,
+      "sha256": "df9519611c4020c5eed3acccedc92287feeb9f6b0af477ee69e1317ef089859d"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-protocol/src/lib.rs",
+      "bytes": 18350,
+      "sha256": "7dc6fe93e4c9aa29da6ca4690e039f647c23938599557c374d185f047c62fce2"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service/src/config.rs",
+      "bytes": 94038,
+      "sha256": "960365bee86e48825681bf6962730ac0f67f48dab870656cde174ff44981cd8d"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service/src/epoch.rs",
+      "bytes": 58094,
+      "sha256": "9c29d9ee8924d7b514a9bc4b7f8d374d420287f25b1b36f5295619c0f882b855"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service/src/inject.rs",
+      "bytes": 5726,
+      "sha256": "c440a0c38f5710500b3aa3c557ca33d9503db485d13fc1555416a7efb4c560e4"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service/src/lib.rs",
+      "bytes": 203023,
+      "sha256": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service/src/logging.rs",
+      "bytes": 22354,
+      "sha256": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service/src/main.rs",
+      "bytes": 45662,
+      "sha256": "9ea695ee5b2eef4163db16df4b584b363df6a375ca334f02c9160886ed1b5f5b"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service/src/redaction.rs",
+      "bytes": 38972,
+      "sha256": "9d749fc88d7c653399db7908b4fddd1bcca3264362c9da3a6a7ba49318c6a1ed"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask/src/stage_maps/R02.json",
+      "bytes": 100387,
+      "sha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask/src/stage_maps/R03.json",
+      "bytes": 96434,
+      "sha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask/src/stage_maps/R04.json",
+      "bytes": 231496,
+      "sha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask/src/stage_maps/R05.json",
+      "bytes": 306003,
+      "sha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask/src/verify.rs",
+      "bytes": 94672,
+      "sha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust-toolchain.toml",
+      "bytes": 772,
+      "sha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/scripts/rust-tauri/r02_t01_service_smoke.sh",
+      "bytes": 21818,
+      "sha256": "14516af32a59d2f590018be232c601817dfeadb3e4355fa860fd90b1cc34bd79"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/scripts/rust-tauri/r02_t07_redaction_scan.sh",
+      "bytes": 35836,
+      "sha256": "59876a68d3b3c1a68a889bb4e4739e2710918f23861b822f5bad3eb34d9fb792"
+    },
+    {
+      "path": "input/source-before/external/Users/study_superior/r05t08-work/negcopy.hTXzzN/scripts/rust-tauri/r05_t08_negative_gate.sh",
+      "bytes": 33126,
+      "sha256": "4853e129e2d0cf7dbd6c93c8c158186fad23e6f231a03ff64f140cca61e0042f"
+    },
+    {
+      "path": "input/source-before/rust/Cargo.lock",
+      "bytes": 77319,
+      "sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3"
+    },
+    {
+      "path": "input/source-before/rust/crates/lingxi-adapters/src/storage/migrations.rs",
+      "bytes": 38639,
+      "sha256": "df9519611c4020c5eed3acccedc92287feeb9f6b0af477ee69e1317ef089859d"
+    },
+    {
+      "path": "input/source-before/rust/crates/lingxi-protocol/src/lib.rs",
+      "bytes": 18350,
+      "sha256": "7dc6fe93e4c9aa29da6ca4690e039f647c23938599557c374d185f047c62fce2"
+    },
+    {
+      "path": "input/source-before/rust/crates/lingxi-service/src/config.rs",
+      "bytes": 94038,
+      "sha256": "960365bee86e48825681bf6962730ac0f67f48dab870656cde174ff44981cd8d"
+    },
+    {
+      "path": "input/source-before/rust/crates/lingxi-service/src/epoch.rs",
+      "bytes": 58094,
+      "sha256": "9c29d9ee8924d7b514a9bc4b7f8d374d420287f25b1b36f5295619c0f882b855"
+    },
+    {
+      "path": "input/source-before/rust/crates/lingxi-service/src/inject.rs",
+      "bytes": 5726,
+      "sha256": "c440a0c38f5710500b3aa3c557ca33d9503db485d13fc1555416a7efb4c560e4"
+    },
+    {
+      "path": "input/source-before/rust/crates/lingxi-service/src/lib.rs",
+      "bytes": 203023,
+      "sha256": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756"
+    },
+    {
+      "path": "input/source-before/rust/crates/lingxi-service/src/logging.rs",
+      "bytes": 22354,
+      "sha256": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301"
+    },
+    {
+      "path": "input/source-before/rust/crates/lingxi-service/src/main.rs",
+      "bytes": 45662,
+      "sha256": "9ea695ee5b2eef4163db16df4b584b363df6a375ca334f02c9160886ed1b5f5b"
+    },
+    {
+      "path": "input/source-before/rust/crates/lingxi-service/src/redaction.rs",
+      "bytes": 38972,
+      "sha256": "9d749fc88d7c653399db7908b4fddd1bcca3264362c9da3a6a7ba49318c6a1ed"
+    },
+    {
+      "path": "input/source-before/rust/crates/xtask/src/stage_maps/R02.json",
+      "bytes": 100387,
+      "sha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2"
+    },
+    {
+      "path": "input/source-before/rust/crates/xtask/src/stage_maps/R03.json",
+      "bytes": 96434,
+      "sha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea"
+    },
+    {
+      "path": "input/source-before/rust/crates/xtask/src/stage_maps/R04.json",
+      "bytes": 231496,
+      "sha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86"
+    },
+    {
+      "path": "input/source-before/rust/crates/xtask/src/stage_maps/R05.json",
+      "bytes": 306003,
+      "sha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798"
+    },
+    {
+      "path": "input/source-before/rust/crates/xtask/src/verify.rs",
+      "bytes": 94672,
+      "sha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e"
+    },
+    {
+      "path": "input/source-before/rust-toolchain.toml",
+      "bytes": 772,
+      "sha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37"
+    },
+    {
+      "path": "input/source-before/scripts/rust-tauri/r02_t01_service_smoke.sh",
+      "bytes": 21818,
+      "sha256": "14516af32a59d2f590018be232c601817dfeadb3e4355fa860fd90b1cc34bd79"
+    },
+    {
+      "path": "input/source-before/scripts/rust-tauri/r02_t07_redaction_scan.sh",
+      "bytes": 35836,
+      "sha256": "59876a68d3b3c1a68a889bb4e4739e2710918f23861b822f5bad3eb34d9fb792"
+    },
+    {
+      "path": "input/source-before/scripts/rust-tauri/r05_t08_negative_gate.sh",
+      "bytes": 33126,
+      "sha256": "4853e129e2d0cf7dbd6c93c8c158186fad23e6f231a03ff64f140cca61e0042f"
+    },
+    {
+      "path": "input/versions-recomputed.json",
+      "bytes": 14291,
+      "sha256": "26c7318b21c7fdccdb97dc4bd3662c919ba1145fac79db4b413c1f09b1125274"
+    },
+    {
+      "path": "loghash/history-after.json",
+      "bytes": 217649,
+      "sha256": "4b367bbcce20f43841b8a4e09fabb598b8538b9ac65d61c409c65856b3d1d781"
+    },
+    {
+      "path": "loghash/history-before.json",
+      "bytes": 234851,
+      "sha256": "01f1e031b0d97d20166d91077c8d4647e6910cdc6a3b06bb3c5347250fc346ac"
+    },
+    {
+      "path": "loghash/late-raw-after.json",
+      "bytes": 24013,
+      "sha256": "3e84849f811302deffec097b1ea8c7e3c196d5702636d4383152b558d317e767"
+    },
+    {
+      "path": "loghash/late-raw-before.json",
+      "bytes": 25965,
+      "sha256": "965c63cb2d170be2423d7f8a750d208a239b70e81d4ab59c374bcd0b2f21aa1f"
+    },
+    {
+      "path": "loghash/observed-changes.json",
+      "bytes": 6287,
+      "sha256": "eb071e0624d274f1bad7c9707856f1e9f9c21943c09ea75bd9d286d716f7c0d5"
+    },
+    {
+      "path": "loghash/primary-after.json",
+      "bytes": 3901,
+      "sha256": "ad600e3c37fa371a606b6874fd073c057eeda52cca35e1f2f7c3a598b95b4205"
+    },
+    {
+      "path": "loghash/primary-before.json",
+      "bytes": 4208,
+      "sha256": "8ae3dbff60453d7686f32dbe5184611199b3b6480cce28d5b5243ec2838d9405"
+    },
+    {
+      "path": "loghash/raw-after.json",
+      "bytes": 62087,
+      "sha256": "ae980a7c2f7002de8473e2d6c4788a23df0b191b3cdae6c4c261c8807221ee38"
+    },
+    {
+      "path": "loghash/raw-before.json",
+      "bytes": 66912,
+      "sha256": "80dcc80b523068c2a8c8c4143a05f7bd58ecdf2b005a1c7eb5d1d7aeefab7e96"
+    },
+    {
+      "path": "loghash/requirements-after.json",
+      "bytes": 9379,
+      "sha256": "4135c6a3d8344910d84a9415f0e3a14fee6ab4d91db9361eaa2d716e9cfd1736"
+    },
+    {
+      "path": "loghash/requirements-before.json",
+      "bytes": 10111,
+      "sha256": "0b96f40b02f4a50d98b556d13dd1545dade6bc8d03089b22b63c39c89c406ed7"
+    },
+    {
+      "path": "loghash/source-after.json",
+      "bytes": 31339,
+      "sha256": "812bd8bdfca93214d54df071fb412a1a403ec740a46e8a891f843c598c34ef54"
+    },
+    {
+      "path": "loghash/source-before.json",
+      "bytes": 34271,
+      "sha256": "3a3699d85c957550a5e7cb0d0c939bfc1ad03c6a5bfb1c41bff98132c36c240b"
+    },
+    {
+      "path": "manifest/probe-binary-after.json",
+      "bytes": 288,
+      "sha256": "19d64b7c70f649d617e3aa7d5a9116152e5844e32e485786fc926622262af7ee"
+    },
+    {
+      "path": "manifest/probe-binary-before.json",
+      "bytes": 1132,
+      "sha256": "195ac99050ab72c53836ec01f9b619379f9b0cea50728cf5db1981b85fd368ce"
+    },
+    {
+      "path": "manifest/registration-proposal.json",
+      "bytes": 1935,
+      "sha256": "13b95190d92f8a7c9a2cb28cd750efcf64eb3ad70789e882da9efe17d7a6b2d9"
+    },
+    {
+      "path": "manifest/verification.json",
+      "bytes": 597,
+      "sha256": "57d8b32d86f8f0e1c4bb30daf8509dc8624c3ef2ddc89d453682c1c183c7b990"
+    },
+    {
+      "path": "source/HEAD-inject.rs",
+      "bytes": 5726,
+      "sha256": "c440a0c38f5710500b3aa3c557ca33d9503db485d13fc1555416a7efb4c560e4"
+    },
+    {
+      "path": "source/HEAD-logging.rs",
+      "bytes": 19186,
+      "sha256": "5f0aa8ccabc62295d64ff0ca6b61a5fc9a384e6a4bdd6e092d70a15ab73b6be1"
+    },
+    {
+      "path": "source/HEAD-r02_t01_service_smoke.sh",
+      "bytes": 21818,
+      "sha256": "14516af32a59d2f590018be232c601817dfeadb3e4355fa860fd90b1cc34bd79"
+    },
+    {
+      "path": "source/HEAD-r02_t07_redaction_scan.sh",
+      "bytes": 35836,
+      "sha256": "59876a68d3b3c1a68a889bb4e4739e2710918f23861b822f5bad3eb34d9fb792"
+    },
+    {
+      "path": "source/HEAD-redaction.rs",
+      "bytes": 38972,
+      "sha256": "9d749fc88d7c653399db7908b4fddd1bcca3264362c9da3a6a7ba49318c6a1ed"
+    },
+    {
+      "path": "source/__pycache__/collect.cpython-314.pyc",
+      "bytes": 5181,
+      "sha256": "8dc0e695ad5da12618ec95060c2679af7152c5711aa240a9cd1eccd03e51c85b"
+    },
+    {
+      "path": "source/analyze.py",
+      "bytes": 8312,
+      "sha256": "0869663d562188179c36cc70e44bab2643fdc9287dedca0112517bccd957fb6e"
+    },
+    {
+      "path": "source/cdd213078-inject.rs",
+      "bytes": 5726,
+      "sha256": "c440a0c38f5710500b3aa3c557ca33d9503db485d13fc1555416a7efb4c560e4"
+    },
+    {
+      "path": "source/cdd213078-redaction.rs",
+      "bytes": 34008,
+      "sha256": "70b5b73b218fc43e5d81db6acd2961570b8da4fa0eccf8c9e15c8e172ea36351"
+    },
+    {
+      "path": "source/collect.py",
+      "bytes": 1855,
+      "sha256": "40bf5d245b245d8be7d31f81a41d311e8b353cec71c07bbf214b2b183976e4f9"
+    },
+    {
+      "path": "source/d80737b6c-inject.rs",
+      "bytes": 5726,
+      "sha256": "c440a0c38f5710500b3aa3c557ca33d9503db485d13fc1555416a7efb4c560e4"
+    },
+    {
+      "path": "source/d80737b6c-redaction.rs",
+      "bytes": 38972,
+      "sha256": "9d749fc88d7c653399db7908b4fddd1bcca3264362c9da3a6a7ba49318c6a1ed"
+    },
+    {
+      "path": "source/final-observation.json",
+      "bytes": 2302,
+      "sha256": "984d8a796b25a79a4586212f8fb36331ac0109e6408c245e8e7e5d60403b9781"
+    },
+    {
+      "path": "source/head-working-copy-comparison.json",
+      "bytes": 3144,
+      "sha256": "7ff3b1dd7cbc0dbddafcc22d79927e9d0f7774e92e90f7d08bea84ba6e340eaa"
+    },
+    {
+      "path": "source/probe.py",
+      "bytes": 6205,
+      "sha256": "fe29cdd57ed5590fb660fbf2cafe39f2a85487ecee38e126651cc6c7a9645966"
+    },
+    {
+      "path": "source/read_caller_env.py",
+      "bytes": 1500,
+      "sha256": "12e63f96773d63dafda65ef362f902bd516faeefbcc967b44881f3d7431cbd94"
+    }
+  ]
+}

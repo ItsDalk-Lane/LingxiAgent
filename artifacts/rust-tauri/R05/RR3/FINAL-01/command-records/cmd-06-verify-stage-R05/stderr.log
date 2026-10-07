@@ -1,0 +1,3 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running `rust/target/debug/xtask verify-stage R05 --evidence artifacts/rust-tauri/R05/RR3/FINAL-01/verify-R05`
+error: cannot snapshot candidate before stage gate: candidate file /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-02/copy-delete-rename was replaced by a non-file

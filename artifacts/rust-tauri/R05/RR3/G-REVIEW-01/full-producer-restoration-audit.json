@@ -1,0 +1,838 @@
+{
+  "utc": "2026-10-07T02:45:23.718119+00:00",
+  "commandExit": 0,
+  "runs": 91,
+  "passed": 427,
+  "failed": 0,
+  "ignored": 0,
+  "counts": [
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__config__tests__credential_is_explicit_and_never_defaulted.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "a75e73d11371e544b9e52706c0f6fb92169dd161060d3d7d58e2a795a513acfa"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t07_rr1_usage_ledger.log",
+      "passed": 15,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "52e56c11c470318858fdf9f6e52dde6e6f9ce93d47e9523776690bc106905c8a"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_credentials__store__tests__a_failed_write_keeps_the_previous_state_and_reports.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "98c8bfe268ce19693e1518f6ee65cce28048925e9b9f141cc11ff9e58723294a"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__compat__tests__anthropic_max_effort_raises_the_implicit_one_third_cap.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "495086fc75ad48164a7d63be7fefc38dcb6fb50137bb3299ad70c0f446eaae79"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/adp_r05_t04_streaming.log",
+      "passed": 18,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "ce1e6b0c4bd791efb8e9cb4dbb49460c24170eb797a3be5efd44245ea533f273"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__egress__tests__scheme_userinfo_and_host_shapes_refuse.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "60fe1269f04f26afa0ba11a24c9a390ffc3eaafb9da97764b569c140d25f202c"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t05_network.log",
+      "passed": 21,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "0345730d1c715de378176f2ed5193f36c14df8413ba36d903b0bc1bc0271f9e2"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__anthropic_messages__tests__cross_family_opaque_state_is_never_echoed.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "307283b82a2ba0bc493f64a4703f303665d3c618a067191bd054e12ec13b68cd"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t06_worker_model.log",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "7c193cd3fc704947864b3a4dd5cb0292493a5c3ac6c8c7adba33d705fc6b5060"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-kernel_model_exchange__tests__snapshot_declares_only_callable_resident_targets_at_the_pinned_generation.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 86,
+      "sha256": "cbb90a7211edd6e4513032a7141283f65c32316359781407d04e0144107ace51"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__egress__tests__the_endpoint_origin_exception_lets_the_loopback_stub_through.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "6ef0566dc6ac44804febf5b291a7cb397a4bbeda4dae44b060f2b74be6f95405"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/adp_r05_t03_goldens.log",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "cf6f9fbd9f6d9882032b8a1b458fa4e7cad0234fbf8ebc239beb4705611222ee"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/adp_r05_t05_timeouts.log",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "c3d52f2235e10ca0138caae8262dd298fceddfe3249f41ccb2291f4c07723dd5"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t08_production_tools.log",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "030404f84cf443152b26a301e234d1c92f06b6c7bc68c51cbdffc214bba3ada6"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__gateway__tests__chat_and_auxiliary_routes_resolve_independently.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "5d4fd1be6e01e43e143092ad6e70c9c21543e2a8f52498db06ffe67825a2afaa"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-kernel_toolcatalog__tests__same_name_two_sources_never_overwrites_and_name_only_is_ambiguous.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 86,
+      "sha256": "c745a8bb5acfd2cf439e20989a2a73da7d20edd96f31403d8ce1e1534e4231bb"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__openai_completions__tests__unknown_wire_names_are_protocol_violations_never_guesses.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "8d6dcc9c022f103e196601c4e2c0266a21f208525ae43b162d5a7bc41063e724"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t06_rr1_system_speech.log",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "ca326ece976a82c46773204a2a25dd03b267d56ecb6722049e47bb3d12779857"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__compat__tests__volcengine_disable_guard_passes_through_without_controls.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "4bcb5fe4fa64eb589285ecd5dd050fb5d040e17d31a25c30c908245b3c1d5f66"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t01_model_plane.log",
+      "passed": 24,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "b652b762732c0c2e547e89e018bde5b6048401feed324ba4e85fd0aac79cbbc2"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__compat__tests__codex_strips_budget_and_temperature_fields.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "56194ec5f782a05c18904941ac54b85faaa1fdbb1337d6160d4fed7075870b6e"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/adp_r05_t07_usage_families.log",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "4dc74ce45d3913b8a7afe5ba8e17492b3c5c9914ceead417c407b6f1bea8800f"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_credentials__tests__resolve_refreshes_at_most_once_when_every_mint_is_already_expired.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "4ae5e8d66e6379b7d17493cd807d3b8a86f441ec8ed3a069254ebab16600c575"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/adp_r05_t05_compat.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "18c0e6c75f848b27c0292e7ba2479db43a1ad282092e4ffd7aed434efe1f88ec"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__dispatch__tests__error_status_classification_matches_the_incumbent.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "03fc31d55f9b906eda0177a1103962b868a49c3a15db65c3dfeb4c93ced6bb50"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_redaction__tests__r05_secret_key_words_match_case_insensitively.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "15665c00b42b78ad8dd552833144075c80d641288cf4984ee26252c553379d41"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/adp_r05_t06_operations.log",
+      "passed": 27,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "cfe348965b79079a85812e9de2d8ae1e60aa9796691045f6da51bb90e33ecab3"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-kernel_toolcatalog__tests__stale_catalog_generation_refuses_and_requires_refresh.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 86,
+      "sha256": "b81b8ebe7f133bcb3b79f58e5bf9811bf189d764a6d0cc802bd634d58619aea6"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_credentials__tests__a_cancelled_waiter_does_not_disturb_the_flight.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "6185dad343d5602ee7a7d443d04265ab090f7168416981e41d3c6971f6b73963"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/adp_r05_t07_rr1_usage_strict.log",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "3748fc21826fe9a3234e0df7900ae4432c0ceda7afb42291220cdb07f82f6119"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__tool_render__tests__the_four_base_states_keep_the_t01_vocabulary.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "b83b4db5a6b2813ba8f195974b79f5064285df19ef474682e147e622129f3157"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__streaming__tests__a_leading_bom_is_stripped_once.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "fbbbf2bf3637503fa0b472d16c5d55fffa2e1353714c14dfe7a279b42fa1a400"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__tool_render__tests__success_renders_resources_status_and_truncation_last.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "d1408891cb74850a2ef8632338d9b8f2bcdfad542a8681944b2685e3daa97c8a"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t06_operations.log",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "4f7eb756b653a8d3ed0c94cea48eead85872bb3d61247b53abd10f856b2f792b"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t03_protocol_adapters.log",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "f2a1107a1688d6c5701f36d88691c3c56f9afb266e161cf4ae69cf0ac876140a"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_redaction__tests__r05_provider_api_key_shapes_are_redacted.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "6bd5eac7140840b4927fa62dfc2289eab0c37ba54619b0c6c45a314f75b85262"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__openai_responses__tests__reasoning_items_roundtrip_verbatim_with_summary_as_reasoning.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "3e3be27fd6729147f5913ac8370124d31bff01f59d9b99660acb7076c61953a3"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__egress__tests__guarded_ipv4_literals_refuse_outside_the_endpoint_exception.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "bdf73c8b9f1e135191f226439d4bb506d3183e58cd2c69beafe9263f5067018f"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_credentials__tests__handle_refusal_texts_carry_no_material.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "bb5457e3e71e17c4a90369c3f819a8c9525267be335728f2c9033550c9aef248"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/adp_r05_t04_rr1_batch_terminal.log",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "c837abf72ce1525ce9a923201086ee2a1ef00b2ffced24ec6733c3795bb433e9"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_credentials__tests__an_expired_handle_is_refused.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "12126e0a22862c1b6e6fde75b8b9d9fa618834f00db460ab5ddb48a768ebdbe3"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__gateway__tests__the_pin_pair_rule_never_guesses_a_provider_from_a_model.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "5290f0c1ec014722c54c0d0230ba2b6e9990de25a622daea6fe952cbc5c0ea8c"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__openai_codex_responses__tests__codex_body_pins_store_stream_and_instructions.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "1675d757b22c851827a6affca3814380c0a7a23d2c8a05f4a1ea9e859b00e13f"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t04_streaming.log",
+      "passed": 18,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "30d0c6ad0faef09757bfd73a9ff36e26eace6188ccca6af12b9da44fcd3f7125"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__openai_responses__tests__request_shape_instructions_tools_and_no_server_state.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "6fa4bd845bb619abdab62116bcca9c37dadeb1d57f256602f3c12be94f0fb36f"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t01_binary_wiring.log",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "c7293210bc64c9a1126edcafec4af638d7e8febed807bad7c21f6257e937f436"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-kernel_model_exchange__tests__wire_name_sanitization_fits_the_strictest_protocol_face.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 86,
+      "sha256": "069c726e50909916cc07b14b1ecbb855b693d9a0e0a5077f6bf24f7f299c083d"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__streaming__tests__the_per_frame_bound_is_loud_across_lines_and_chunks.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "2ba9d85e1b0bfbb9883af99cfd865c464cc16959059598e38ba4e8442b8f657b"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t02_credentials.log",
+      "passed": 38,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "f4c082835a4f070593f6377e569f78e75a5127a2e675aa433720723b01114f42"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__compat__tests__dispatch_is_first_match_in_incumbent_order.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "e98038147ad008c7affd1d26177581df9dcfcfca36d6b54a72b5450afba02389"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_credentials__tests__resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "2709e127b88d2423b8d6432defd7a738f67bc9ec937cc81fa42fdc36a52d2057"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t07_persistence.log",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "f23567b7f95df0c561614cad1a0ee8b2bc542102855119a6b3990b840e9e7eb6"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__compat__tests__ollama_bridges_response_format_and_num_ctx.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "e06df4e226a9e136c88a1d4f17262c4ec914a1199bd79e940e02ee8fa9a45b64"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_redaction__tests__r05_t02_base64_tokens_with_slash_and_padding_are_redacted.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "f0960995055939c838976162da68d1d5b1e4eca492eda420b7f6bbf2ecf9db19"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__anthropic_messages__tests__thinking_and_signature_roundtrip_as_state_never_text.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "054d35f1392fe2b5c7dbf4af462a36f333460a148e4df45ab1ab20c8e326be89"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__compat__tests__anthropic_marks_system_and_two_recent_user_messages.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "60d8ca758beb7ad57942e76aeb21f629a012e58b6e529d96bee7a4c321909cd7"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__google_generative_ai__tests__thoughts_signatures_and_function_calls_parse_in_order.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "2c405fbc735f8384ba4da31e68872db9692c1dd2fa9118d4474c118394eb2f54"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__streaming__tests__comments_and_id_and_retry_fields_are_ignored.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "b8cae5d0635ef60e910051609a05a74fa44b03d475c9117ace0666c385146827"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__streaming__tests__simple_frames_dispatch_on_blank_lines.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "016fc524588f70dd7fbd0bd35782ac5788d4870f1168cc3baa97687b989db750"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_credentials__store__tests__a_version_conflict_is_loud.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "703da88ebcd4cce675f72a5942e4aaef1519d5fb17304d498d39bacf5b68441b"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__egress__tests__ipv4_parsing_is_strict_and_default_ports_elide.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "c4d1568348f83e167a36ee7d8183378d7cb375bd7d612b2c4c7d9939df5e4770"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_credentials__tests__forged_handles_and_provider_references_are_refused.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "2f2562f81700433b2abda64ad86511d2695ae1f58de045259967518d7b4c6707"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_credentials__store__tests__missing_file_loads_empty_and_round_trips.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "9fdfec654c87f2349fd78b15720d1497e27199124a22453cb9c4433a1630ade4"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_credentials__store__tests__unknown_fields_survive_a_write.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "950686879365204a014dc504fb0911ffd88a837b4d597d2c586b58dd8272f01a"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t05_timeouts.log",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "b5aa944793c2502c11ceaf3fe1320ea99d31aca9730c9dcf9cb658dc3a57e671"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/adp_r05_t03_rr1_replay.log",
+      "passed": 33,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "04d11ee92a90e3a2e8fafefd5e3d03e0e12a18da1475862863c652a042482fcc"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__streaming__tests__multi_line_data_joins_and_chunks_may_split_anywhere.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "a0ebc1c5a6b418ea17d39c0e88f0f575452d10b341f6435f807f49e88e36def6"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-kernel_toolcatalog__tests__update_cannot_change_the_target_identity.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 86,
+      "sha256": "680a03c4fd9df0fad2221928642e6ab1f5e7659b00f66ed2742790eb26b99814"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t06_rr1_media_resource.log",
+      "passed": 17,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "5c1d01d1207554b9bb106050dc40248cd20ef66dd04143c91b253a159c2e4100"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__tool_render__tests__running_and_stop_unconfirmed_statuses_are_honest.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "76abff1fe2cd7bbded5f83582f09d14849b562115abb488b737491b486b8ebba"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t08_closed_loop.log",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "5fa64bad322d44e69422bac790bd2e998edd6064d1749b2d4780c4e4a114a8f5"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t08_resources.log",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "3e0f4ea68024a668fd7de1c1fa4c0c32d36f44c09b49e3073076dbdeb6b5952e"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/svc_r05_t07_usage_trace.log",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "22e17f55099133dbbb1cf0dd305803724df5ae0ac779d50f3c8fd2ac5e4674c1"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__gateway__tests__reload_swaps_atomically_and_bumps_the_generation.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "43bc9a9522adbb176a351761fa33b32e8a529de8bd325a4db859870ba2a87bc6"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-kernel_toolcatalog__tests__aliases_resolve_to_the_authoritative_identity_and_share_permissions.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 86,
+      "sha256": "4a49c22a25268227acca7b23e691b45a6e5f22c0290fd519180a740b14b5a308"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__streaming__tests__the_buffer_bound_is_loud.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "94a63e7a1af97dcdc5b2df88f3cf4723ec5b4adb9b011850a3665684f83c095d"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_credentials__tests__a_reload_replacing_the_cell_discards_the_late_writeback.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "4d24f9e31d7e0dcae85e26508498d2657ac9a40ca233e4700ec235e039bfc5c9"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_credentials__tests__revoke_fences_a_late_writeback.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "b048ad5788e9d388c7fdd4236b0ab1c726b43a88ee9f29993251ebb6fa3bcc4b"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__egress__tests__https_public_passes_and_plain_http_is_same_origin_only.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "e81a099e3ed46acfddb31eaefdf4c3b0b6dfd4447c58291713c8696690a94f40"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__compat__tests__openrouter_adaptive_disable_is_a_loud_refusal.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "408c413935714628e643314edcf6cf0d45eebc245d95bd75d1d3b9cb02799934"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_credentials__tests__a_rotated_credential_is_reused_without_a_second_refresh.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "43098b5a939dd12bffe14018f22b712dcd7cc5fd122278d837a80c8af347fb55"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-service_credentials__tests__concurrent_401s_merge_into_one_refresh.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 357,
+      "sha256": "ca082815a96d179851bc0d480f1bbe9a6d7a5d7eb3351d1e060d2121c7af4a69"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-kernel_model_exchange__tests__empty_snapshot_is_generation_zero.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 86,
+      "sha256": "efedfcad9aeaa6c3a26616b97b21ddd6ee1c29b01ec06f6893645608918736c8"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__openai_completions__tests__final_answer_identity_comes_from_the_driver_not_the_response.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "44524117f63dfc46f4b6da8034723f8260a82e67f858f337910409fb5a221513"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__gateway__tests__unconfigured_operations_are_loud_route_gaps.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "407dfc3bc6169bb6ae8fe158bfe9f7bff837f3d6ac46625f43dd4bacbbe8985c"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-kernel_toolcatalog__tests__disable_and_uninstall_change_callability_and_generation.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 86,
+      "sha256": "8ee362e37235c4b0d6f48725a0a865cd6c17122d63fe8aed2411546459842ae2"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__gateway__tests__a_family_outside_the_operations_matrix_is_loud.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "fe17b0aae628551978e81c5ead552d19504e3c911fdaaaaff3a263d84f030a52"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__openai_completions__tests__parses_tool_calls_with_usage_and_identity_from_the_driver.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "ec07efea1e46b0c6793d7b20f655544736847de69591e35cd3a6bb94970858ea"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-adapters_models__openai_completions__tests__a_history_target_missing_from_the_snapshot_fails_loudly.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 118,
+      "sha256": "a4a934ff23b0860ebbd04fdbacc21f66cb5acdb9a9691d32971677f926820a5c"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/adp_r05_t02_oauth_flows.log",
+      "passed": 21,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "sha256": "da42acdf39a6eaad41511e270d6653876de9831a77d3ddeb9cf5f65aece90185"
+    },
+    {
+      "log": "supplements/producer-restored-full/suites/lib-kernel_model_exchange__tests__wire_name_collisions_resolve_deterministically_or_fail_loudly.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 86,
+      "sha256": "abc979405e743b3aebddf07db193ca0002a2d7814d06b83197d9fd8047726b42"
+    }
+  ],
+  "resource": {
+    "load": {
+      "cancelCycles": 60,
+      "cancelDanglingActive": 60,
+      "cancelSettled": 0,
+      "errorCycles": 60,
+      "errorRuns": 60,
+      "longResponseCycles": 10,
+      "okCycles": 15,
+      "sessions": [
+        "sess_local_alpha",
+        "sess_local_beta"
+      ],
+      "workerCycles": 15
+    },
+    "series": 54,
+    "cycles": 160,
+    "owners": 61,
+    "sha256": "7363dac1b2ea4d39adc3c078646a22aee0e63e61129a7e925c0bb73ea11431ca",
+    "phases": {
+      "baseline": 1,
+      "cancel-live": 6,
+      "cancel": 6,
+      "error": 6,
+      "ok": 3,
+      "worker-live": 15,
+      "worker-released": 15,
+      "worker-final": 1,
+      "post-restart": 1
+    },
+    "cleanup": {
+      "configRemoved": true,
+      "equipmentStubStopped": true,
+      "filesBeforeCleanup": {
+        "home": [
+          {
+            "bytes": 162,
+            "path": "data-epoch.json"
+          },
+          {
+            "bytes": 22138880,
+            "path": "lingxi-service/data/runs.db"
+          },
+          {
+            "bytes": 157,
+            "path": "lingxi-service/device-credentials.json"
+          },
+          {
+            "bytes": 113,
+            "path": "lingxi-service/devices.json"
+          },
+          {
+            "bytes": 0,
+            "path": "lingxi-service/instance.lock"
+          },
+          {
+            "bytes": 184,
+            "path": "lingxi-service/local-token.json"
+          },
+          {
+            "bytes": 65358,
+            "path": "lingxi-service/logs/service-000003.log"
+          },
+          {
+            "bytes": 33642,
+            "path": "lingxi-service/logs/service-000004.log"
+          },
+          {
+            "bytes": 0,
+            "path": "lingxi-service/logs/service-000005.log"
+          },
+          {
+            "bytes": 531,
+            "path": "lingxi-service/management.json"
+          },
+          {
+            "bytes": 0,
+            "path": "logs/security-audit.jsonl"
+          }
+        ],
+        "workspace": [
+          {
+            "bytes": 13,
+            "path": "input.txt"
+          },
+          {
+            "bytes": 11,
+            "path": "loop.txt"
+          }
+        ]
+      },
+      "homeRemoved": true,
+      "lastServiceExit": 0,
+      "lastServicePid": 11525,
+      "serviceStopped": true,
+      "workspaceRemoved": true
+    }
+  },
+  "inputBeforeAfterEqual": true,
+  "boundary": "旧冻结隔离输入完全恢复的当前亲跑；不是新H/I current main或正式R05整阶段通过"
+}

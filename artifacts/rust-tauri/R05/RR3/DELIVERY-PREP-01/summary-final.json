@@ -1,0 +1,75 @@
+{
+  "startUTC": "2026-10-07T03:33:26.855243+00:00",
+  "endUTC": "2026-10-07T03:33:34.544888+00:00",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "branch": "codex/rust-tauri-migration",
+  "isFinalFreeze": false,
+  "totalPaths": 19734,
+  "totalBytes": 1790455388,
+  "categories": {
+    "INCLUDE_CURRENT_DOC": {
+      "paths": 42,
+      "bytes": 4820943
+    },
+    "INCLUDE_EVIDENCE": {
+      "paths": 14066,
+      "bytes": 551912268
+    },
+    "INCLUDE_PRODUCTION": {
+      "paths": 21,
+      "bytes": 847068
+    },
+    "LOCAL_BINARY": {
+      "paths": 61,
+      "bytes": 448967152
+    },
+    "LOCAL_BUILD_CACHE": {
+      "paths": 3442,
+      "bytes": 670398712
+    },
+    "LOCAL_ISOLATED_SOURCE": {
+      "paths": 1199,
+      "bytes": 40831902
+    },
+    "LOCAL_NESTED_REPOSITORY": {
+      "paths": 52,
+      "bytes": 15296
+    },
+    "LOCAL_RUNTIME_STATE": {
+      "paths": 82,
+      "bytes": 7018
+    },
+    "LOCAL_SYMLINK": {
+      "paths": 1,
+      "bytes": 62
+    },
+    "REVIEW_SOURCE_SNAPSHOT": {
+      "paths": 768,
+      "bytes": 72654967
+    }
+  },
+  "metadataReadCount": 897,
+  "referenceCount": 31282,
+  "referenceStatusCounts": {
+    "PRESENT_LOCAL": 29011,
+    "PRESENT_DIRECTORY": 242,
+    "EXTERNAL_NOT_ACCESSED": 49,
+    "UNRESOLVED_REFERENCE_NOT_PROVEN_MISSING": 109,
+    "HISTORICAL_DELETED_CLONE_OBJECT_RECEIPT": 1871
+  },
+  "existingExplicitLocalOnlyFields": 0,
+  "stagedCount": 0,
+  "ignoredDirectoryOrFileCount": 633,
+  "requiredFinalRefresh": "J及后续G/E/FINAL完成停写后，以相同规则刷新；当前清单不能用于宣称最终冻结或远端原件可达",
+  "resolvedReferenceStatusCounts": {
+    "PRESENT_LOCAL": 29059,
+    "PRESENT_DIRECTORY": 242,
+    "EXTERNAL_NOT_ACCESSED": 49,
+    "HISTORICAL_DELETED_CLONE_OBJECT_RECEIPT": 1932
+  },
+  "unresolvedReferenceCount": 0,
+  "localOriginalClaimComparisons": 1253,
+  "historicalClaimMismatchCount": 0,
+  "incomparableLinkClaims": 2,
+  "finishUTC": "2026-10-07T03:36:18.298495+00:00"
+}

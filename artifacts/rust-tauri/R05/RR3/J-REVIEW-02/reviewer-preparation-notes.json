@@ -1,0 +1,19 @@
+{
+  "failures": [
+    {
+      "script": "audit_inputs.initial.py",
+      "exitCode": 1,
+      "reason": "审查记录器bytes.index误传str，未生成保持性结论；只修本目录记录器后直接比较前后字节成功。",
+      "error": "TypeError: argument should be integer or bytes-like object, not str",
+      "originalPreserved": true
+    }
+  ],
+  "correctedObservations": [
+    {
+      "file": "negative-identities.initial.json",
+      "reason": "审查正则漏掉双引号而统计0；按真实record_case行修正，16个原ID各一次。",
+      "initialPreserved": true
+    }
+  ],
+  "productFailures": []
+}

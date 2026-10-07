@@ -1,0 +1,22 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r05_t07_rr1_usage_ledger.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t07_rr1_usage_ledger-ae0c6bcaf2c77893)
+
+running 15 tests
+test rr1_f21_operation_context_carries_session_run_and_cause ... ok
+test rr1_f21_empty_answer_failure_keeps_the_reported_usage ... ok
+test rr1_f21_partial_usage_survives_a_failed_aux_settlement ... ok
+test rr1_f21_unexpected_tool_response_failure_keeps_the_reported_usage ... ok
+test rr1_f21_usage_query_filters_by_date_purpose_and_model ... ok
+test rr1_f21_worker_failed_physical_request_must_leave_unknown_usage_row ... ok
+test rr1_f21_operation_queue_timeout_never_invents_an_http_attempt ... ok
+test rr1_f21_worker_pre_send_refusal_records_zero_attempts ... ok
+test rr1_f22_operation_invalid_usage_must_not_persist_secret_payload ... ok
+test rr1_f21_worker_parent_join_through_the_real_subprocess_chain ... ok
+test rr1_f38_driver_cancel_of_in_flight_stream_leads_a_cancelled_row_across_restart ... ok
+test rr1_f38_run_cancel_drop_of_in_flight_callback_leads_a_cancelled_row ... ok
+test rr1_f39_fence_cancelled_before_write_keeps_the_turns_real_usage_row ... ok
+test rr1_f39_fence_mismatch_cancelled_during_audit_keeps_the_turns_real_usage_row ... ok
+test rr1_f38_worker_deadline_expiry_of_in_flight_callback_leads_a_cancelled_row ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.24s
+

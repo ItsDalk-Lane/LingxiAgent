@@ -1,0 +1,12 @@
+label: cmd-03-workspace-test
+argv: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --workspace --locked
+cwd: /Users/study_superior/Desktop/Code/LingxiAgent
+HOME: /Users/study_superior
+user: study_superior
+utcStart: 2026-10-07T12:28:35.058828000Z
+dfBefore: /dev/disk3s5       926  344       556    39% 5090527 5839252840    0%   /System/Volumes/Data
+utcEnd: 2026-10-07T12:42:08.118447000Z
+exit: 0
+stdoutBytes: 123070
+stderrBytes: 11870
+dfAfter: /dev/disk3s5       926  344       556    39% 5094123 5840057840    0%   /System/Volumes/Data

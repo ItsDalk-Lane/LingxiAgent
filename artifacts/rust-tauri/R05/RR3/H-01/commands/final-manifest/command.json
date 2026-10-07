@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-01/finish_manifest.py"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "UTC_start": "2026-10-07T02:53:10.251665+00:00",
+  "UTC_end": "2026-10-07T02:53:10.349203+00:00",
+  "exit": 0,
+  "counts": [],
+  "leafCounts": [],
+  "inputEqual": true,
+  "inputBeforeDigest": "d44d6f5509b454afc2e8e1d46632efd6855ed781a74b15eae2447f0d8717e296",
+  "inputAfterDigest": "d44d6f5509b454afc2e8e1d46632efd6855ed781a74b15eae2447f0d8717e296",
+  "boundary": "只校验并归档H证据，不是独立验收或全阶段封印",
+  "environment": {
+    "RUST_LOG": "warn"
+  },
+  "binary": "3c2c30954478adc179b6b1073d70405a9025722463a132be6ee36c8727ea4865",
+  "stdoutSHA256": "8db792579ea8b580949d9f0dcbdf3adaf0c484d0e154190f0e794f3fcfe24a43",
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

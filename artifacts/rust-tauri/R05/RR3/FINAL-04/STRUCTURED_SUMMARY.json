@@ -1,0 +1,79 @@
+{
+  "review": "RR3 FINAL-04 fresh independent final stage review",
+  "reviewerIdentity": "fresh empty-history stage reviewer; no participation in any RR3 implementation/repair/package review/FINAL-01/02/03; no subagents",
+  "brief": "docs/rust-tauri/R05/repair-current/RR3_FINAL_BRIEF.md (incl. FINAL-04 dispatch addendum)",
+  "openingReceipt": {
+    "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+    "branch": "codex/rust-tauri-migration",
+    "remoteSameSha": true,
+    "dfDataAvailableGi": 513,
+    "home": "/Users/study_superior",
+    "evidenceRootPreexisting": false
+  },
+  "candidate": {
+    "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+    "gitDiffHeadSha256": "7041cafb7c92b26de560a58e9577a34f69f8821510cd9274c09edb8e2617087e",
+    "gitLsFilesSha256": "3016f7ae9d18d93951f05a77adb68946cab99a92d0a0a122294d4c5cf096407d47",
+    "trackedModifiedOpenAndClose": 29,
+    "trackedSetUnchangedSinceFinal01": true,
+    "diffDeltaVsFinal03": "4 files added by L/F53 + M/F54 (r04_t08_tool_matrix.rs, stage_map.rs, stage_maps/R04.json, r04_t08_generate_stage_map.py) — all within L-REVIEW-01/M-REVIEW-01 independently PASSed scopes",
+    "frozenInputs": {"count": 33, "postcheckChangedVsFinal03Baseline": ["rust/crates/xtask/src/stage_maps/R04.json (M/F54 rebuild, expected)"], "missing": 0, "openSnapshotOverwrittenNote": "open-run freeze snapshot was overwritten by postcheck rerun (honest process slip); equivalence established by (a) open==close git hash pair equal, (b) cross-check vs FINAL-03 frozen baseline, (c) gate 3-layer binding before==after"},
+    "cargoLockSha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08999a4b9e3fca618eff3",
+    "binderSurfaceAtOpen": {"totalEntries": 72097, "regularFile": 72097, "directoryEntries": 0, "symlinkFinal": 0, "symlinkAncestor": 0, "irregular": 0, "missing": 0, "note": "F51/F52 relocations held"},
+    "gitWrites": "none (reflog top = b3ac0e6a commit; index size/mtime unchanged; zero staged; open==close hash pair equal)"
+  },
+  "section53Commands": [
+    {"n": 1, "cmd": "cargo fmt --manifest-path rust/Cargo.toml --all -- --check", "utcStart": "2026-10-07T19:56:20Z", "utcEnd": "2026-10-07T19:56:21Z", "exit": 0, "note": "stdout/stderr 0 bytes"},
+    {"n": 2, "cmd": "cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings", "utcEnd": "2026-10-07T19:57:17Z", "exit": 0, "note": "0 warnings 0 errors; real partial recheck 53.06s (ring/rcgen/lingxi-service recompiled due to L test-file change)"},
+    {"n": 3, "cmd": "cargo test --manifest-path rust/Cargo.toml --workspace --locked", "utcStart": "2026-10-07T19:57:27Z", "utcEnd": "2026-10-07T20:12:19Z", "exit": 0, "suites": 115, "passed": 1486, "failed": 0, "ignored": 0, "measured": 0, "filtered": 0, "note": "incl. r00 LAN pass (object cf9bce2f...)"},
+    {"n": 4, "cmd": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-contracts", "utcEnd": "2026-10-07T20:12:37Z", "exit": 0, "note": "56 generated files drift-free; API_COMPAT_MATRIX 626 entries"},
+    {"n": 5, "cmd": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-boundaries", "utcEnd": "2026-10-07T20:12:40Z", "exit": 0, "note": "RESULT: OK"},
+    {"n": 6, "cmd": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05", "attempts": [
+      {"attempt": 1, "utcStart": "2026-10-07T20:13:41Z", "killedUtcApprox": "2026-10-07T21:23:31Z", "launchMode": "python subprocess start_new_session=True", "outcome": "INTERRUPTED_BY_HOST_KILL — host cleanup killed even the detached session-leader xtask (descendant-tree walk; one level deeper than FINAL-03 attempt-1)", "gateVerdict": "UNKNOWN (no verify-stage-result.json produced)", "gateProgressAtKill": "R05 layer complete; R04 complete except nested R03; R03 nested workspace ~85/115 suites", "partialEvidence": "192 files preserved verbatim at FINAL-04/verify-R05-ATTEMPT1-INTERRUPTED/ (sha manifest archived)"},
+      {"attempt": 2, "utcStart": "2026-10-07T21:24:41Z", "utcEnd": "2026-10-07T22:46:35Z", "gateDurationS": 4912.7, "exit": 0, "verdict": "gate PASS, all layers PASS, this round's signed result", "launchMode": "double-fork daemonize (fork->setsid->fork->exec; launchd-adopted orphan with no host ancestry link; exit code recorded via wrapper shell to external file)"}]}
+  ],
+  "verifyStageLayers": [
+    {"layer": "R05", "path": "verify-stage-result.json", "overall": "PASS", "testedSha": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b", "worktreeDirty": true, "stable": true, "checkpoints": "7/7 stable, all changedPathBytesHex empty, finalChanged=[]", "bindingDigestBeforeEqualsAfter": true, "bindingFileCount": 72289, "runner": "PASS", "commands": "7/7 exit0 PASS: rust_test_workspace 844.8s, r05_stage_suites 441.3s, fmt 39.3s, clippy 38.7s, check_contracts 39.0s, check_boundaries 38.7s, r04_regression_gate 3390.9s", "scenarios": "18/18 PASS (R05-A01..A16 + R05-SUP-R04REG + R05-SUP-SCOPE)", "leaves": {"declared": 130, "expected": 130, "pass": 130, "fail": 0, "blocked": 0, "deferred": 0, "shareSatisfiedLeafIds": 124}},
+    {"layer": "R04", "path": "R04_REGRESSION/verify-stage-result.json", "overall": "PASS", "testedSha": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b", "worktreeDirty": true, "stable": true, "checkpoints": "8/8 stable, changed=0, finalChanged=[]", "bindingDigestBeforeEqualsAfter": true, "bindingFileCount": 72402, "runner": "PASS", "commands": "8/8 exit0: rust_test_workspace 845.4s, r04_tool_matrix 339.5s, fmt/clippy/contracts/boundaries, r03_regression_gate 1862.0s, r04_rr1_repair_suites 68.3s", "scenarios": "24/24 PASS", "leaves": {"declared": 124, "expected": 124, "pass": 55, "fail": 0, "deferredToLaterStage": 69, "blocked": 0, "commandsNotPassing": [], "note": "F54 fix verified in the formal main-tree chain: the FINAL-03 46-FAIL classification surface is cleared; 55 = 46 full_original_behavior + 9 stage_share_satisfied; 69 deferred legal remainders to R06/R07 with laterShare"}},
+    {"layer": "R03", "path": "R04_REGRESSION/R03_REGRESSION/verify-stage-result.json", "overall": "PASS", "testedSha": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b", "worktreeDirty": true, "stable": true, "checkpoints": "15/15 stable, changed=0, finalChanged=[]", "bindingDigestBeforeEqualsAfter": true, "bindingFileCount": 72475, "runner": "PASS", "commands": "15/15 exit0: rust_test_workspace 844.9s, a15, r02_storage_tx, r02_full_chain, r02_backup_restore, r02_recovery_drill, fmt/clippy/contracts/boundaries, r02_auth_matrix 105.0s, r02_legacy_regression 284.6s, a16_seed_mechanism, repair_suites, r02_events_matrix", "scenarios": "17/17 PASS (F53 flake not reproduced; FINAL-03 17-FAIL surface gone)", "leaves": {"declared": 48, "expected": 48, "pass": 17, "fail": 0, "deferredToLaterStage": 31, "blocked": 0},
+     "r02Chain": "all r02_* commands PASS; r02_legacy_regression = DIRECTED (E0-E4.5) ALL GREEN, E5 BY SCOPE SKIP (full E5 belongs to N16, independently proven by G-REVIEW-03 isolated run 20/20 overall=PASS + seal-family GREEN, historical); raw npm registered reds (seal trio) remain registered-not-formal-green, not re-signed this round; RR1 repair_suites + r04_rr1_repair_suites PASS"}
+  ],
+  "completeFailureList": [],
+  "processEventsNonGateHonestLog": [
+    "cmd-06 attempt-1 host kill (UNKNOWN preserved, 192 files renamed verbatim)",
+    "first r00-monitor comm-matching defect (ps comm is absolute path) fixed mid-round; listener detail capture ultimately failed (jsonl only stop-line) — LAN pass concluded from 6 in-test stdout assertions",
+    "open-run frozen-inputs.json overwritten by postcheck rerun; equivalence re-established 3 ways (git hash pair, FINAL-03 baseline cross-check, gate binding before==after)",
+    "zsh glob no-match aborted one cp; one cwd drift placed MANIFEST-sha256.txt at repo root — moved into command-records immediately, root re-verified clean",
+    "leftover FINAL-03 external read-only r00 monitor process (pid 22794, writes only /private/tmp/rr3-final03-dir) observed, not a repo writer, left as-is",
+    "one zsh `echo ===` syntax error (exit 1 on the wrapper echo only, not the tested command); one `cat` of wrong stderr filename (cmd-02 vs cmd-02-clippy label)"
+  ],
+  "r00": {
+    "expectedObjectReuse": "43d95970... (per addendum) — NOT held, relinked twice this round, recorded honestly",
+    "objectAtOpen": {"sha256": "cf9bce2fcb58f9d152a941d08a728024fb9366128ae082ee978e4c5d62d18852", "mtimeUtc": "2026-10-07T17:04:35Z", "attribution": "relinked during M-01 standalone window; used by cmd-03 (1 LAN pass)"},
+    "objectDuringGate": {"path": "rust/target/debug/deps/r00_management_leaves-590de196dceb15ce", "sha256": "d57ea731b6f2561e2bd84cf119049b3bed57278b49fe48ee8332c6514314f67e", "cdhash": "364514be2a80192205220ddee1f4e4c4b41a756f", "birthUtc": "2026-10-07T20:14:37Z", "usedBy": "attempt-1 R05/R04 workspaces + attempt-2 R05/R04/R03 workspaces (5 LAN passes)"},
+    "lanThisRound": "PASS x6 (cmd-3, attempt1 R05/R04 layers, attempt2 R05/R04/R03 layers; in-test LAN Origin/login/session/logout exchange asserted ok each time)",
+    "listenerCapture": "failed this round (monitor limitation, honest); FINAL-03 historical capture was loopback->wildcard",
+    "conclusion": "both new objects permitted by ALF this round; not a blocker; no user firewall action evidenced; R05-ENV-R00 instance-flakiness observation retained; zero system modifications"
+  },
+  "sixTuple": {
+    "offline_gate": "PASS",
+    "independent_review": "PASS",
+    "live_verification": "BLOCKED_NOT_AUTHORIZED",
+    "platform_verification": {"macos_arm64": "all commands this round real", "linux_x86_64": "inherited registration, not reverified", "windows": "not verified"},
+    "stage_readiness": "ACCEPTED_OFFLINE_SCOPE_WITH_REGISTERED_LIVE_DEFERRALS",
+    "R06_READY": true,
+    "release_state": "NOT_IN_SCOPE"
+  },
+  "section61Check": "1 F-ID closure holds (F01-F28 + preserved F31/F34/F41/F43/F44 + RR3 F42-F54 all CLOSED, unrefuted); 2 16A/100+3C/130 leaves: 18/18 scenarios, 130/130 R05 leaves, R04 55/0/69; 3 closed loop/restart/perm/cancel/usage via workspace 1486 green; 4 offline duties via G-REVIEW-03 16/16 + full R02/E5 + C/F46 resources (input-equality reuse, historical, unrefuted); 5 full R05 gate + R04/R03/R02/RR1 closure PASSES this round (cmd-6 exit=0); 6 fresh independent reviewer personally ran all PASS; 7 docs consistency held by E-REVIEW-04 with E04 backfill delegated to coordinator per addendum (non-blocking); 8 remaining items are only originally-permitted LIVE deferral (RR-BLK-CREDENTIALS, due R10) and legally inherited platform obligations (Linux/Windows, R09/R10) — no new waivers",
+  "remainingBlockers": [],
+  "nextCommand": "coordinator: E04 doc backfill consuming this tuple flip -> E-REVIEW-05 -> DELIVERY-FINAL-02/DELIVERY-REVIEW-01 -> precise git commit/push per existing authorization; R06 may start (read R05_HANDOFF + R06 taskbook)",
+  "artifacts": {
+    "stageReview": "artifacts/rust-tauri/R05/RR3/FINAL-04/STAGE_REVIEW.md",
+    "structuredSummary": "artifacts/rust-tauri/R05/RR3/FINAL-04/STRUCTURED_SUMMARY.json",
+    "commandRecords": "artifacts/rust-tauri/R05/RR3/FINAL-04/command-records/ (36 files; external->archive 35 files SHA256 equal + MANIFEST-sha256.txt)",
+    "evidenceRoot": "artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05/ (created by cmd-06 attempt 2; 750 files, 3 layer result JSONs)",
+    "interruptedAttemptPreserved": "artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05-ATTEMPT1-INTERRUPTED/ (192 files, byte-preserved)",
+    "externalProcessDir": "/private/tmp/rr3-final04-dir/ (kept as-is)"
+  },
+  "boundary": "wrote only FINAL-04/ subtree and /private/tmp/rr3-final04-dir; main tree otherwise read-only; no git writes; no system changes; no subagents; production entries untouched; no empty filters/ignores/swallowed exits"
+}

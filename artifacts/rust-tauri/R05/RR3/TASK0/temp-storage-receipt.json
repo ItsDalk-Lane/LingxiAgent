@@ -1,0 +1,78 @@
+{
+  "scope": "only redundant object storage in three exact this-round completed temporary copies; source, refs, index, all evidence and primary objects preserved",
+  "startedAt": "2026-10-07T01:12:06.480498+00:00",
+  "primaryObjectStore": "/Users/study_superior/Desktop/Code/LingxiAgent/.git/objects",
+  "rows": [
+    {
+      "copy": "/Users/study_superior/r05t08-work/negcopy.tV1ROh",
+      "ownershipEvidence": "artifacts/rust-tauri/R05/RR3/B-01/n03-rerun/summary.txt",
+      "copyBirthUtc": "2026-10-07T00:16:40.377235+00:00",
+      "before": {
+        "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+        "headTree": "be43b48d2d7ddb08c31f5e48e1ec1035364d7089",
+        "statusSha256": "fb10cad334c69862a5c736cf7340cb0cd5b323d3eacca63973e4334f746f0707",
+        "indexSha256": "eb042d894065fe0ae62c0b885e10d9438823753541fa7b2f2b7f927559025eb2"
+      },
+      "operation": "replace duplicated object files with read-only Git alternate to immutable primary object store",
+      "after": {
+        "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+        "headTree": "be43b48d2d7ddb08c31f5e48e1ec1035364d7089",
+        "statusSha256": "fb10cad334c69862a5c736cf7340cb0cd5b323d3eacca63973e4334f746f0707",
+        "indexSha256": "eb042d894065fe0ae62c0b885e10d9438823753541fa7b2f2b7f927559025eb2"
+      },
+      "identityEqual": true,
+      "redundantStorageRemoved": true,
+      "diskFreeAfter": 5695713280
+    },
+    {
+      "copy": "/Users/study_superior/r05t08-work/negcopy.Gz0rkR",
+      "ownershipEvidence": "artifacts/rust-tauri/R05/RR3/B-01/n03-rerun-2/summary.txt",
+      "copyBirthUtc": "2026-10-07T00:17:28.117432+00:00",
+      "before": {
+        "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+        "headTree": "be43b48d2d7ddb08c31f5e48e1ec1035364d7089",
+        "statusSha256": "cd7b0b386004cb368c6ddf81a0a4a6872dbbd6e2a5382778ed36411872c45fe6",
+        "indexSha256": "5ba80d2426ef98de3fbcbde679935b82d362bfd9aa0f9327832e60aa4669bff5"
+      },
+      "operation": "replace duplicated object files with read-only Git alternate to immutable primary object store",
+      "after": {
+        "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+        "headTree": "be43b48d2d7ddb08c31f5e48e1ec1035364d7089",
+        "statusSha256": "cd7b0b386004cb368c6ddf81a0a4a6872dbbd6e2a5382778ed36411872c45fe6",
+        "indexSha256": "5ba80d2426ef98de3fbcbde679935b82d362bfd9aa0f9327832e60aa4669bff5"
+      },
+      "identityEqual": true,
+      "redundantStorageRemoved": true,
+      "diskFreeAfter": 9431953408
+    },
+    {
+      "copy": "/Users/study_superior/r05t08-work/negcopy.qcldNA",
+      "ownershipEvidence": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/n03/summary.txt",
+      "copyBirthUtc": "2026-10-07T00:22:54.240436+00:00",
+      "before": {
+        "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+        "headTree": "be43b48d2d7ddb08c31f5e48e1ec1035364d7089",
+        "statusSha256": "3ae4ad652f3d8780fc2568da46cc168692e3810f4d956c30fa63c4d392363b8f",
+        "indexSha256": "b4e7d07a1a1a20126bc5b5e454461fd1a5833ee2b54ada34906f815a7c17d173"
+      },
+      "operation": "replace duplicated object files with read-only Git alternate to immutable primary object store",
+      "after": {
+        "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+        "headTree": "be43b48d2d7ddb08c31f5e48e1ec1035364d7089",
+        "statusSha256": "3ae4ad652f3d8780fc2568da46cc168692e3810f4d956c30fa63c4d392363b8f",
+        "indexSha256": "b4e7d07a1a1a20126bc5b5e454461fd1a5833ee2b54ada34906f815a7c17d173"
+      },
+      "identityEqual": true,
+      "redundantStorageRemoved": true,
+      "diskFreeAfter": 13173075968
+    }
+  ],
+  "primaryHeadBefore": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "primaryIndexBefore": "e65fd8f9353224483a9b94cc32bca37dde0505f363692af58539d270df9dfc9d",
+  "diskFreeBefore": 1959120896,
+  "primaryHeadAfter": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "primaryIndexAfter": "e65fd8f9353224483a9b94cc32bca37dde0505f363692af58539d270df9dfc9d",
+  "diskFreeAfter": 13173067776,
+  "endedAt": "2026-10-07T01:12:12.086647+00:00",
+  "exitCode": 0
+}

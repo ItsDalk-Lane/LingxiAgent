@@ -1,0 +1,18 @@
+{
+  "name": "probe-c-loopback",
+  "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe",
+    "127.0.0.1"
+  ],
+  "timeout": 15,
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "start": "2026-10-07T08:29:07.015245+08:00",
+  "end": "2026-10-07T08:29:07.431924+08:00",
+  "elapsedSeconds": 0.417,
+  "pid": 70055,
+  "actualExitCode": 0,
+  "supervisorTimedOut": false,
+  "supervisorExitCode": 0,
+  "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-c-loopback.log",
+  "logSha256": "98e974f6df695899c8588d773f8cee4d5fe3dd36a6b902f4856f0b88bb4fd36f"
+}

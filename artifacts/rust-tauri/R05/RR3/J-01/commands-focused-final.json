@@ -1,0 +1,61 @@
+[
+  {
+    "name": "final-shared-clone",
+    "argv": [
+      "git",
+      "-C",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/source",
+      "clone",
+      "--shared",
+      "--quiet",
+      "--branch",
+      "codex/rust-tauri-migration",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/source",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/final-dirty-npmrc-copy"
+    ],
+    "cwd": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/source",
+    "startedUtc": "2026-10-07T03:27:03.270017+00:00",
+    "finishedUtc": "2026-10-07T03:27:03.342095+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "final-dirty-npmrc-prepare",
+    "argv": [
+      "python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_prepare_node.py",
+      "--source",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/source",
+      "--copy",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/final-dirty-npmrc-copy",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-01/final-dirty-npmrc-prepare"
+    ],
+    "cwd": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/source",
+    "startedUtc": "2026-10-07T03:27:03.342749+00:00",
+    "finishedUtc": "2026-10-07T03:27:05.459733+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "final-dirty-npmrc-verify",
+    "argv": [
+      "python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_prepare_node.py",
+      "--verify",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-01/final-dirty-npmrc-prepare/result.json",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-01/final-dirty-npmrc-verify"
+    ],
+    "cwd": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-up4w908s/source",
+    "startedUtc": "2026-10-07T03:27:05.459990+00:00",
+    "finishedUtc": "2026-10-07T03:27:05.898172+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

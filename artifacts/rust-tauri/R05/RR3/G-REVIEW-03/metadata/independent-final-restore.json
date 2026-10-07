@@ -1,0 +1,89 @@
+{
+ "at": "2026-10-07T11:05:32.286561+00:00",
+ "kind": "independent-final-restore-verification",
+ "allTwelveMutatedFilesRestoredToPristine": true,
+ "files": [
+  {
+   "file": "rust/crates/xtask/src/stage_maps/R05.json",
+   "copySha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+   "pristineSha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+   "equal": true
+  },
+  {
+   "file": "rust/crates/xtask/src/stage_maps/R04.json",
+   "copySha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+   "pristineSha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+   "equal": true
+  },
+  {
+   "file": "rust/crates/lingxi-service/src/lib.rs",
+   "copySha256": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+   "pristineSha256": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+   "equal": true
+  },
+  {
+   "file": "rust/crates/lingxi-kernel/src/lib.rs",
+   "copySha256": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+   "pristineSha256": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+   "equal": true
+  },
+  {
+   "file": "rust/crates/lingxi-adapters/src/models/tool_render.rs",
+   "copySha256": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+   "pristineSha256": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+   "equal": true
+  },
+  {
+   "file": "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+   "copySha256": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+   "pristineSha256": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+   "equal": true
+  },
+  {
+   "file": "rust/crates/lingxi-adapters/src/models/credentials.rs",
+   "copySha256": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+   "pristineSha256": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+   "equal": true
+  },
+  {
+   "file": "rust/crates/lingxi-service/src/runs.rs",
+   "copySha256": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+   "pristineSha256": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+   "equal": true
+  },
+  {
+   "file": "rust/crates/lingxi-service/src/credentials/mod.rs",
+   "copySha256": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+   "pristineSha256": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+   "equal": true
+  },
+  {
+   "file": "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs",
+   "copySha256": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+   "pristineSha256": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+   "equal": true
+  },
+  {
+   "file": "docs/rust-tauri/R05/r05_stage_pins.tsv",
+   "copySha256": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+   "pristineSha256": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+   "equal": true
+  },
+  {
+   "file": "scripts/rust-tauri/r05_t08_stage_suites.sh",
+   "copySha256": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e",
+   "pristineSha256": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e",
+   "equal": true
+  }
+ ],
+ "copyDirtyCount": 72,
+ "copyDirtySample": [
+  " M docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+  " M docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+  " M docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+  " M docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+  " M docs/rust-tauri/R05/R05_BLOCKERS.md",
+  " M docs/rust-tauri/R05/R05_HANDOFF.json"
+ ],
+ "note": "copy is the overlay candidate (dirty vs HEAD is the legal uncommitted RR3 candidate), mutated files must equal the pristine snapshot taken before any injection"
+}

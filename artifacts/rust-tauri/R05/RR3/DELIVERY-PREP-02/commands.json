@@ -1,0 +1,66 @@
+[
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T03:57:55.399883+00:00",
+    "endUTC": "2026-10-07T03:57:55.407472+00:00",
+    "exitCode": 0,
+    "stdout": "head.stdout",
+    "stdoutSHA256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552",
+    "stderr": "head.stderr",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T03:57:55.407516+00:00",
+    "endUTC": "2026-10-07T03:57:55.414237+00:00",
+    "exitCode": 0,
+    "stdout": "branch.stdout",
+    "stdoutSHA256": "2ad51d278d71d6840dbe83cfd1e80739413fdca39a745d2742603709273fe1fa",
+    "stderr": "branch.stderr",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--cached",
+      "--name-only",
+      "-z"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T03:57:55.414264+00:00",
+    "endUTC": "2026-10-07T03:57:55.424144+00:00",
+    "exitCode": 0,
+    "stdout": "staged-before.stdout",
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr": "staged-before.stderr",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--cached",
+      "--name-only",
+      "-z"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T03:57:56.146678+00:00",
+    "endUTC": "2026-10-07T03:57:56.157630+00:00",
+    "exitCode": 0,
+    "stdout": "staged-after.stdout",
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr": "staged-after.stderr",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

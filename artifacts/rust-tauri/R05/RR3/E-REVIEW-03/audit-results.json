@@ -1,0 +1,1257 @@
+{
+  "at": "2026-10-07T05:03:02.203986+00:00",
+  "checks": [
+    {
+      "name": "same current docs/rust-tauri/R05/R05_HANDOFF.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "same current docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "same current docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "same current docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "same current docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "same current docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "same current docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "current matches independent facts",
+      "pass_": true,
+      "detail": []
+    },
+    {
+      "name": "E03 delivered document docs/rust-tauri/R05/R05_REPORT.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "E03 delivered document docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "E03 delivered document docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "E03 delivered document docs/rust-tauri/R05/R05_HANDOFF.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "E03 delivered document docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "E03 delivered document docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "E03 delivered document docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "E03 delivered document docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "E03 delivered document docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "E03 delivered document docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "E03 delivered document docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "E03 delivered document docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "E03 delivered document docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "E03 delivered document docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest REPORT.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest SELF_CHECK-first.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest SELF_CHECK.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest STOPPED.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest audit.py",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest authority-reading.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest before-documents.json.gz",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest changed-files.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest check-v1.py",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest check.py",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-01.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-01.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-02.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-02.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-03.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-03.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-04.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-04.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-05.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-05.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-06.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-06.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-07.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-07.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-08.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-08.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-09.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-09.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-10.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-10.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-11.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-11.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-12.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-12.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-13.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-13.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-14.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-14.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-15.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-15.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-16.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-16.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-17.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-17.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-18.stderr",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest cmd-18.stdout",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest commands.jsonl",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest current-documents.diff",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest current-state.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest documents-after.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest documents-before.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest evidence-self-check.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest evidence_audit.py",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest g02-current-after-comparison.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest g02-current-before-comparison.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest h02-current-after-comparison.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest h02-current-before-comparison.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest historical-dispatch-differences.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest read-inputs.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest refine.py",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest seal.py",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest semantic-inputs-after.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest semantic-inputs-before-initial-scope.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest semantic-inputs-before.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest update-receipt.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "author manifest update.py",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/schemaVersion",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/artifactKind",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/stage_id",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/baseline",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/interfaces",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/consumer_guidance_r06",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/deferred_registrations",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/stage_gate_registration",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/rr1_repair_round",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/rr2_repair_round",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/source_sha",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/protocol_version",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/data_epoch",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/storage_schema_version",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/dependency_locks",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/accepted_tasks",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/accepted_tasks_semantics",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_HANDOFF.json/historical_generated_metadata",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "previous current retained docs/rust-tauri/R05/R05_HANDOFF.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/PROGRESS_LEDGER.json/schemaVersion",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/PROGRESS_LEDGER.json/artifactKind",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/PROGRESS_LEDGER.json/stage_id",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/PROGRESS_LEDGER.json/baseline",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/PROGRESS_LEDGER.json/tasks",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/PROGRESS_LEDGER.json/gates_terminal_state",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/PROGRESS_LEDGER.json/environment_items",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/PROGRESS_LEDGER.json/followup_obligations_for_t03_plus",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/PROGRESS_LEDGER.json/rr1_repair_round",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/PROGRESS_LEDGER.json/rr2_repair_round",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "previous current retained docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json/schemaVersion",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json/artifactKind",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json/stage_id",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json/baseline",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json/note",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json/acceptances",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json/rr2_repair_round",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "previous current retained docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_TEST_MAP.json/schemaVersion",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_TEST_MAP.json/artifactKind",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_TEST_MAP.json/stage_id",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_TEST_MAP.json/structure",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_TEST_MAP.json/aIndex",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_TEST_MAP.json/entries",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_TEST_MAP.json/oldProductUntouchedDiff",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_TEST_MAP.json/ledgerNameCorrections",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_TEST_MAP.json/aIndexNote",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_TEST_MAP.json/registryNote",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "previous current retained docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/schemaVersion",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/artifactKind",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/stage_id",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/honestyRule",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/preregisteredThresholds",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/measured",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/notClaimed",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/rr3_resource_selfcheck",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "previous current retained docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/schemaVersion",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/artifactKind",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/stage_id",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/policy",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/status",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/statusVocabulary",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/whatIsBlocked",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/whatIsNotBlocked",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/deferredObligation",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "historical top field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/platformVerification",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "previous current retained docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH non R05 stages unchanged",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH tasks unchanged",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "large historical field PROGRESS_LEDGER.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "large historical field R05_ACCEPTANCE_LEDGER.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "large historical field R05_TEST_MAP.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged interface WORKER_MODEL_BOUNDARY.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged interface R05_INTERFACE_EVOLUTION.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "lock rust/Cargo.lock",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "lock rust-toolchain.toml",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "lock package-lock.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR2/FINAL-01/STAGE_REVIEW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/A-02/REPORT.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/C-01/REPORT.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/F46-01/resources-01/f27-resource-series.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/F46-01/resources-01/runtime-binding.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/result.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/D-01/REPORT.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/D-01/PREPARED-ALLOW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-binding-exclusions.txt",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-run-output-sinks.txt",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/A-REVIEW-02/manifest.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/MANIFEST.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/RESULT.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/command.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/f27-resource-series.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/RESOURCE_ANALYSIS.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/runtime-binding.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/result.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-subagent/command.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-late/command.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/D-REVIEW-01/evidence-manifest.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/D-REVIEW-01/prepared-object.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/D-REVIEW-01/r00-formal-01.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/E-REVIEW-01/REVIEW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/E-REVIEW-01/manifest.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/E-02/manifest-consumption.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/E-02/REPORT.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/E-02/raw-audit.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/E-02/source-audit.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/E-02/g-observation-final.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/E-02/d-object-readback.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/E-02/E01-manifest-consumption.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/I-REVIEW-01/REVIEW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/ordinary-cancel-recovery/command.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/G-REVIEW-02/STOPPED.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/H-REVIEW-02/FINAL_SOURCE_BINDING.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/DELIVERY-PREP-02/REFRESH_RULES.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/command.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/DOC-INPUT-BOUNDARY-01/REPORT.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/H-REVIEW-02/sampler-negative-final/result.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/STORAGE-03/REPORT.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/J-REVIEW-02/REVIEW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/late-result-next-run/command.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/G-REVIEW-02/REVIEW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/E-REVIEW-02/REVIEW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/f27-resource-series.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/DELIVERY-PREP-02/REPORT.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/H-REVIEW-02/REVIEW.md",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/STORAGE-03/execution-receipt.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/H-REVIEW-02/RESOURCE_ANALYSIS-resources-final.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "handoff evidence artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/runtime-binding.json",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "markdown references docs/rust-tauri/R05/R05_REPORT.md",
+      "pass_": true,
+      "detail": []
+    },
+    {
+      "name": "markdown references docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "pass_": true,
+      "detail": []
+    },
+    {
+      "name": "markdown references docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "pass_": true,
+      "detail": []
+    },
+    {
+      "name": "markdown references docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "pass_": true,
+      "detail": []
+    },
+    {
+      "name": "markdown references docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+      "pass_": true,
+      "detail": []
+    },
+    {
+      "name": "markdown references docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "pass_": true,
+      "detail": []
+    },
+    {
+      "name": "markdown references docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+      "pass_": true,
+      "detail": []
+    },
+    {
+      "name": "author semantic before after equal",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "independent enumeration equal author",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "semantic digest",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "all H375 source equal",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "G preserved changes explicit",
+      "pass_": true,
+      "detail": null
+    }
+  ],
+  "failures": [],
+  "assertions": 250
+}

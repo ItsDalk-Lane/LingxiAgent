@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running unittests src/main.rs (rust/target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 1 test
+test verify::runner_tests::rr3_real_fd_standard_nested_layout_has_stable_checkpoints_at_every_layer ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 8.02s
+

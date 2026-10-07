@@ -1,0 +1,330 @@
+{
+  "mode": "current",
+  "checks": [
+    {
+      "name": "docs/rust-tauri/R05/R05_HANDOFF.json 阶段未放行",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_HANDOFF.json current A",
+      "pass": false,
+      "detail": {
+        "actual": {
+          "status": "SELF_CHECKED",
+          "independent_review": "PENDING",
+          "note": "A-02仅补shell Git查询异常拒绝；24/24自检绿。A-REVIEW-01 FAIL永久保留；新A复验未签收。",
+          "evidence_ref": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md"
+        },
+        "expected": {
+          "status": "CLOSED",
+          "review": "rr3_a_review_02 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md；首轮review01 FAIL永久保留"
+        }
+      }
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_HANDOFF.json current C_F46",
+      "pass": false,
+      "detail": {
+        "actual": {
+          "status": "SELF_CHECKED",
+          "independent_review": "PENDING",
+          "review_execution": "RUNNING（新CLI联合独立验收已启动，尚无本轮可签收结论）",
+          "note": "F46完整160负载2/2自检绿；C旧measurement-01的2/2因最终4日志超3不证明全部资源PASS。",
+          "evidence_ref": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md"
+        },
+        "expected": {
+          "status": "CLOSED",
+          "review": "rr3_cf46_review_01 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md"
+        }
+      }
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_HANDOFF.json FINAL未编造",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "docs/rust-tauri/R05/PROGRESS_LEDGER.json 阶段未放行",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "docs/rust-tauri/R05/PROGRESS_LEDGER.json current A",
+      "pass": false,
+      "detail": {
+        "actual": {
+          "status": "SELF_CHECKED",
+          "independent_review": "PENDING",
+          "note": "A-02仅补shell Git查询异常拒绝；24/24自检绿。A-REVIEW-01 FAIL永久保留；新A复验未签收。",
+          "evidence_ref": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md"
+        },
+        "expected": {
+          "status": "CLOSED",
+          "review": "rr3_a_review_02 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md；首轮review01 FAIL永久保留"
+        }
+      }
+    },
+    {
+      "name": "docs/rust-tauri/R05/PROGRESS_LEDGER.json current C_F46",
+      "pass": false,
+      "detail": {
+        "actual": {
+          "status": "SELF_CHECKED",
+          "independent_review": "PENDING",
+          "review_execution": "RUNNING（新CLI联合独立验收已启动，尚无本轮可签收结论）",
+          "note": "F46完整160负载2/2自检绿；C旧measurement-01的2/2因最终4日志超3不证明全部资源PASS。",
+          "evidence_ref": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md"
+        },
+        "expected": {
+          "status": "CLOSED",
+          "review": "rr3_cf46_review_01 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md"
+        }
+      }
+    },
+    {
+      "name": "docs/rust-tauri/R05/PROGRESS_LEDGER.json FINAL未编造",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json 阶段未放行",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json current A",
+      "pass": false,
+      "detail": {
+        "actual": {
+          "status": "SELF_CHECKED",
+          "independent_review": "PENDING",
+          "note": "A-02仅补shell Git查询异常拒绝；24/24自检绿。A-REVIEW-01 FAIL永久保留；新A复验未签收。",
+          "evidence_ref": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md"
+        },
+        "expected": {
+          "status": "CLOSED",
+          "review": "rr3_a_review_02 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md；首轮review01 FAIL永久保留"
+        }
+      }
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json current C_F46",
+      "pass": false,
+      "detail": {
+        "actual": {
+          "status": "SELF_CHECKED",
+          "independent_review": "PENDING",
+          "review_execution": "RUNNING（新CLI联合独立验收已启动，尚无本轮可签收结论）",
+          "note": "F46完整160负载2/2自检绿；C旧measurement-01的2/2因最终4日志超3不证明全部资源PASS。",
+          "evidence_ref": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md"
+        },
+        "expected": {
+          "status": "CLOSED",
+          "review": "rr3_cf46_review_01 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md"
+        }
+      }
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json FINAL未编造",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_TEST_MAP.json 阶段未放行",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_TEST_MAP.json current A",
+      "pass": false,
+      "detail": {
+        "actual": {
+          "status": "SELF_CHECKED",
+          "independent_review": "PENDING",
+          "note": "A-02仅补shell Git查询异常拒绝；24/24自检绿。A-REVIEW-01 FAIL永久保留；新A复验未签收。",
+          "evidence_ref": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md"
+        },
+        "expected": {
+          "status": "CLOSED",
+          "review": "rr3_a_review_02 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md；首轮review01 FAIL永久保留"
+        }
+      }
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_TEST_MAP.json current C_F46",
+      "pass": false,
+      "detail": {
+        "actual": {
+          "status": "SELF_CHECKED",
+          "independent_review": "PENDING",
+          "review_execution": "RUNNING（新CLI联合独立验收已启动，尚无本轮可签收结论）",
+          "note": "F46完整160负载2/2自检绿；C旧measurement-01的2/2因最终4日志超3不证明全部资源PASS。",
+          "evidence_ref": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md"
+        },
+        "expected": {
+          "status": "CLOSED",
+          "review": "rr3_cf46_review_01 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md"
+        }
+      }
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_TEST_MAP.json FINAL未编造",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json 阶段未放行",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json current A",
+      "pass": false,
+      "detail": {
+        "actual": {
+          "status": "SELF_CHECKED",
+          "independent_review": "PENDING",
+          "note": "A-02仅补shell Git查询异常拒绝；24/24自检绿。A-REVIEW-01 FAIL永久保留；新A复验未签收。",
+          "evidence_ref": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md"
+        },
+        "expected": {
+          "status": "CLOSED",
+          "review": "rr3_a_review_02 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md；首轮review01 FAIL永久保留"
+        }
+      }
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json current C_F46",
+      "pass": false,
+      "detail": {
+        "actual": {
+          "status": "SELF_CHECKED",
+          "independent_review": "PENDING",
+          "review_execution": "RUNNING（新CLI联合独立验收已启动，尚无本轮可签收结论）",
+          "note": "F46完整160负载2/2自检绿；C旧measurement-01的2/2因最终4日志超3不证明全部资源PASS。",
+          "evidence_ref": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md"
+        },
+        "expected": {
+          "status": "CLOSED",
+          "review": "rr3_cf46_review_01 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md"
+        }
+      }
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json FINAL未编造",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json 阶段未放行",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json current A",
+      "pass": false,
+      "detail": {
+        "actual": {
+          "status": "SELF_CHECKED",
+          "independent_review": "PENDING",
+          "note": "A-02仅补shell Git查询异常拒绝；24/24自检绿。A-REVIEW-01 FAIL永久保留；新A复验未签收。",
+          "evidence_ref": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md"
+        },
+        "expected": {
+          "status": "CLOSED",
+          "review": "rr3_a_review_02 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md；首轮review01 FAIL永久保留"
+        }
+      }
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json current C_F46",
+      "pass": false,
+      "detail": {
+        "actual": {
+          "status": "SELF_CHECKED",
+          "independent_review": "PENDING",
+          "review_execution": "RUNNING（新CLI联合独立验收已启动，尚无本轮可签收结论）",
+          "note": "F46完整160负载2/2自检绿；C旧measurement-01的2/2因最终4日志超3不证明全部资源PASS。",
+          "evidence_ref": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md"
+        },
+        "expected": {
+          "status": "CLOSED",
+          "review": "rr3_cf46_review_01 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md"
+        }
+      }
+    },
+    {
+      "name": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json FINAL未编造",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json/stages/R05 阶段未放行",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json/stages/R05 current A",
+      "pass": false,
+      "detail": {
+        "actual": {
+          "status": "SELF_CHECKED",
+          "independent_review": "PENDING",
+          "note": "A-02仅补shell Git查询异常拒绝；24/24自检绿。A-REVIEW-01 FAIL永久保留；新A复验未签收。",
+          "evidence_ref": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md"
+        },
+        "expected": {
+          "status": "CLOSED",
+          "review": "rr3_a_review_02 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md；首轮review01 FAIL永久保留"
+        }
+      }
+    },
+    {
+      "name": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json/stages/R05 current C_F46",
+      "pass": false,
+      "detail": {
+        "actual": {
+          "status": "SELF_CHECKED",
+          "independent_review": "PENDING",
+          "review_execution": "RUNNING（新CLI联合独立验收已启动，尚无本轮可签收结论）",
+          "note": "F46完整160负载2/2自检绿；C旧measurement-01的2/2因最终4日志超3不证明全部资源PASS。",
+          "evidence_ref": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md"
+        },
+        "expected": {
+          "status": "CLOSED",
+          "review": "rr3_cf46_review_01 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md"
+        }
+      }
+    },
+    {
+      "name": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json/stages/R05 FINAL未编造",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "HANDOFF当前unresolved不虚列已关闭A/C",
+      "pass": false,
+      "detail": [
+        "A",
+        "C_F46",
+        "D",
+        "E",
+        "G",
+        "FINAL"
+      ]
+    },
+    {
+      "name": "真实独立报告 A-REVIEW-02",
+      "pass": true,
+      "detail": "cc52fe061bb557a82ba44397277f0dd719b02c8a2fd1ce02ad1b16a7e736f9e9"
+    },
+    {
+      "name": "真实独立报告 C-F46-REVIEW-01",
+      "pass": true,
+      "detail": "c59ac409a316f5a1affbd29afbb68784c9a1ad48a80bce12a9608a600866de1e"
+    }
+  ],
+  "passed": 16,
+  "failed": 15
+}

@@ -1,0 +1,4 @@
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_run_output_regression.py", line 23
+    validation = source[source.index("validate_run_output_unit() {"):source.index("
+                                                                                  ^
+SyntaxError: unterminated string literal (detected at line 23)

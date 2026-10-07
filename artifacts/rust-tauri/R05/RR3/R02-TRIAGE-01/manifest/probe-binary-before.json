@@ -1,0 +1,19 @@
+{
+  "observedUTC": "2026-10-07T02:00:32.727233+00:00",
+  "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/build/lingxi-service",
+  "bytes": 59478432,
+  "sha256": "7d9190d27d1b6a019abfbe97049d6855a3f225494124fee43ef8988e032ae78b",
+  "buildRecord": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated-normal-build/command.json",
+  "buildRecordSHA256": "a3b4b91a8361156da697abde559d0c74f68c6f208b89beced62f2ca82f832fd0",
+  "recordedBinarySHA256": "7d9190d27d1b6a019abfbe97049d6855a3f225494124fee43ef8988e032ae78b",
+  "buildExits": [
+    0,
+    0
+  ],
+  "method": "strict copied complete service lib + main; rustc 1.98.1, exact existing --locked Cargo dependency artifacts reused by fingerprint identity; no target tree copied; output only review evidence",
+  "loggingSourceMatch": true,
+  "lockSHA256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+  "recordedLockSHA256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+  "inheritedRUST_LOG": "warn",
+  "binaryBuildMatch": true
+}

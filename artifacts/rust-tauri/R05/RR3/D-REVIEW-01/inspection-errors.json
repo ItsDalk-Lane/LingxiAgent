@@ -1,0 +1,33 @@
+{
+  "utc": "2026-10-07T01:24:44.686259+00:00",
+  "errors": [
+    {
+      "command": "sed r00 source; cat dispatch/request.txt",
+      "exitCode": 1,
+      "diagnostic": "dispatch/request.txt: No such file or directory",
+      "resolution": "actual dispatch/request.json and prompt.txt read successfully"
+    },
+    {
+      "command": "rg env in verify.rs/runner_identity.rs/R05.json; cat rust/.cargo/config.toml",
+      "exitCode": 1,
+      "diagnostic": "rust/.cargo/config.toml: No such file or directory",
+      "resolution": "config absent; build-environment records actual searched locations"
+    },
+    {
+      "command": "rg and sed verify/runner.rs",
+      "exitCode": 1,
+      "diagnostic": "rust/crates/xtask/src/verify/runner.rs: No such file or directory",
+      "resolution": "actual implementation verify.rs:1094-1184 read successfully"
+    },
+    {
+      "command": "python stdin final aggregation first attempt",
+      "exitCode": 1,
+      "diagnostic": "SyntaxError: Non-UTF-8 code starting with byte e5 on line 11, no encoding declared",
+      "resolution": "added explicit UTF-8 declaration; no test repeated"
+    }
+  ],
+  "warnings": [
+    "Initial broad file search and several large read outputs truncated; authorities subsequently split, D raw read completely and hashed.",
+    "Original-spec wc directory emitted read:Is a directory; combined command actual exit0."
+  ]
+}

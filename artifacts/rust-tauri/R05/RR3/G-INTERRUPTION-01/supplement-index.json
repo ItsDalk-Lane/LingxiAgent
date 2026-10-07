@@ -1,0 +1,1014 @@
+[
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--",
+      "verify-stage",
+      "R02",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-normal/evidence"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:28:49.003876+00:00",
+    "endUTC": "2026-10-07T02:29:55.498892+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {
+      "LINGXI_G_MUTATE": "0"
+    },
+    "logSHA256": "23c2cb0e12c85a7c5963bf6f8d7e1ad3e583e19a6c2d5e24b54a1a327b65f3c5",
+    "counts": [],
+    "cargoRunningBinaries": [],
+    "name": "stable-normal",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [],
+    "tail": "   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.20s\n     Running `/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R02 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-normal/evidence`\nxtask: verify-stage RX [python3 -c import os,pathlib; p=pathlib.Path('rust/crates/lingxi-kernel/src/lib.rs'); p.write_bytes(p.read_bytes()+b'\\n// G controlled mid-command byte change\\n') if os.environ.get('LINGXI_G_MUTATE')=='1' else None; print('controlled command exit zero')] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-normal/evidence/binding-control\nxtask: verify-stage RX [binding-control] PASS\nxtask: verify-stage R02 result written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-normal/evidence/verify-stage-result.json (overall: \"PASS\")\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--",
+      "verify-stage",
+      "R02",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-midbyte-red/evidence"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:29:55.610260+00:00",
+    "endUTC": "2026-10-07T02:31:03.038319+00:00",
+    "exitCode": 1,
+    "environmentOverrides": {
+      "LINGXI_G_MUTATE": "1"
+    },
+    "logSHA256": "e2a22e1b9fff3ba0638ec9cb054feb08b4427b4f88bf5309c9408e76bd145b3f",
+    "counts": [],
+    "cargoRunningBinaries": [],
+    "name": "stable-midbyte-red",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": false,
+    "countsRecomputed": [],
+    "tail": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s\n     Running `/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R02 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-midbyte-red/evidence`\nxtask: verify-stage RX [python3 -c import os,pathlib; p=pathlib.Path('rust/crates/lingxi-kernel/src/lib.rs'); p.write_bytes(p.read_bytes()+b'\\n// G controlled mid-command byte change\\n') if os.environ.get('LINGXI_G_MUTATE')=='1' else None; print('controlled command exit zero')] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-midbyte-red/evidence/binding-control\nxtask: verify-stage RX [binding-control] PASS\nxtask: verify-stage R02 result written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-midbyte-red/evidence/verify-stage-result.json (overall: \"FAIL\")\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--",
+      "verify-stage",
+      "R02",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-restored/evidence"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:31:03.216453+00:00",
+    "endUTC": "2026-10-07T02:32:11.146120+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {
+      "LINGXI_G_MUTATE": "0"
+    },
+    "logSHA256": "8fde904b200d92f484f1709eb27ad189e0f05c8b9abbbace6add85d3ce1c0dbc",
+    "counts": [],
+    "cargoRunningBinaries": [],
+    "name": "stable-restored",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [],
+    "tail": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s\n     Running `/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R02 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-restored/evidence`\nxtask: verify-stage RX [python3 -c import os,pathlib; p=pathlib.Path('rust/crates/lingxi-kernel/src/lib.rs'); p.write_bytes(p.read_bytes()+b'\\n// G controlled mid-command byte change\\n') if os.environ.get('LINGXI_G_MUTATE')=='1' else None; print('controlled command exit zero')] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-restored/evidence/binding-control\nxtask: verify-stage RX [binding-control] PASS\nxtask: verify-stage R02 result written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-restored/evidence/verify-stage-result.json (overall: \"PASS\")\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "build",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:32:11.305852+00:00",
+    "endUTC": "2026-10-07T02:32:12.427284+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "9e3eb19a516b51530be0da379a9577e59e171543a8a050f2e64a42d71731df26",
+    "counts": [],
+    "cargoRunningBinaries": [],
+    "name": "rebuild-original-runner",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [],
+    "tail": "   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.09s\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:32:12.541479+00:00",
+    "endUTC": "2026-10-07T02:32:27.247734+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "5d1293e6d9a4956d47a316008de8bc11d012716ee3956853c892206fa46cb9e9",
+    "counts": [
+      "test result: ok. 121 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.11s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "e64aaf6af9d2f275b4e03f2fea8a4ea4cd45e5a0325b1a36c016c6fb3bc870f3",
+        "bytes": 9370504
+      }
+    ],
+    "name": "xtask-restored-all",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: ok. 121 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.11s"
+    ],
+    "tail": "est candidate::tests::symlink_is_refused_and_non_utf8_path_identity_is_byte_exact ... ok\ntest candidate::tests::evidence_outside_repository_does_not_exclude_candidate_paths ... ok\ntest candidate::tests::a_changed_checkpoint_cannot_be_erased_by_restoring_final_bytes ... ok\ntest candidate::tests::tracked_file_parent_symlink_cannot_escape_repository ... ok\ntest candidate::tests::binds_tracked_and_nonignored_untracked_bytes_without_own_evidence ... ok\ntest candidate::tests::real_os_fd_parent_and_child_logs_keep_all_checkpoints_stable ... ok\ntest verify::runner_tests::timeout_cleanup_kills_the_whole_process_tree ... ok\ntest verify::runner_tests::timeout_kills_the_command_and_fails ... ok\nkill: 58715: No such process\nkill: 58715: No such process\nkill: 58715: No such process\ntest verify::runner_tests::timeout_cleanup_reports_a_group_leaver_without_signalling_it ... ok\nkill: 58701: No such process\ntest verify::runner_tests::timeout_cleanup_tracks_reparented_descendants_truthfully ... ok\ntest verify::runner_tests::rr3_real_fd_standard_nested_layout_has_stable_checkpoints_at_every_layer ... ok\n\ntest result: ok. 121 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.11s\n\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r05_t01_binary_wiring"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:32:27.360778+00:00",
+    "endUTC": "2026-10-07T02:32:39.854674+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "21bf6c9eea310de1dbc692db23dbaff3c85954329e2539220190966dff44cbb4",
+    "counts": [
+      "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.88s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t01_binary_wiring-accb1ca8bb78e736",
+        "sha256": "b29ee6cb47e1a0fb59e61b5c75447435a441281347622d1ac5c3f919c41a09d0",
+        "bytes": 7107400
+      }
+    ],
+    "name": "restore-N08-N10",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.88s"
+    ],
+    "tail": "   Compiling ring v0.17.14\n   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-kernel)\n   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-adapters)\n   Compiling rcgen v0.14.10\n   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.01s\n     Running tests/r05_t01_binary_wiring.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t01_binary_wiring-accb1ca8bb78e736)\n\nrunning 2 tests\ntest c03_real_binary_without_plane_settles_unconfigured ... ok\ntest c02_real_binary_full_chain_through_authenticated_endpoint ... ok\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.88s\n\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r05_t03_protocol_adapters",
+      "c05_runtime_nonce"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:32:40.041340+00:00",
+    "endUTC": "2026-10-07T02:32:48.322180+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "3a079ebb3b4af4399f6390e54a62fb0693f61055c4a78aab00664f1c2c716872",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.16s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t03_protocol_adapters-2b7d5000bc3dad67",
+        "sha256": "c46275fc1bda85d442eee542dff1758c4429e180056b2eeef36bdf709eed193d",
+        "bytes": 46040424
+      }
+    ],
+    "name": "restore-N09",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.16s"
+    ],
+    "tail": "   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.04s\n     Running tests/r05_t03_protocol_adapters.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t03_protocol_adapters-2b7d5000bc3dad67)\n\nrunning 1 test\ntest c05_runtime_nonce_rides_the_next_request_and_follows_changes ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.16s\n\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-adapters",
+      "--lib",
+      "models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest",
+      "--",
+      "--exact"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:32:48.439461+00:00",
+    "endUTC": "2026-10-07T02:32:56.419341+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "0a7abc9a3bbcb71f96daa433b68706a91a94e070f0945d0931056a7ed18e54fa",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_adapters-25f1ae8b0ef7c0f1",
+        "sha256": "7a9d87206f08925c8b6a41a3244afe9c25688f4cba48726657310ba36e3d0ffe",
+        "bytes": 23017104
+      }
+    ],
+    "name": "restore-N11",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+    ],
+    "tail": "   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-kernel)\n   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-adapters)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.57s\n     Running unittests src/lib.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_adapters-25f1ae8b0ef7c0f1)\n\nrunning 1 test\ntest models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s\n\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r05_t06_worker_model",
+      "c06_"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:32:56.537717+00:00",
+    "endUTC": "2026-10-07T02:33:03.465786+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "a1c90ef38bd0c9aa2101c4dd44b0c527cf303530e293deb187c9fb7eee06b800",
+    "counts": [
+      "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.73s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t06_worker_model-209d0a13dc6d2262",
+        "sha256": "55a2f022ee8ad1294ae770695d199bf035a56ca774abf57f9139c59ee7f8cd7a",
+        "bytes": 45673560
+      }
+    ],
+    "name": "restore-N12",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.73s"
+    ],
+    "tail": "   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.04s\n     Running tests/r05_t06_worker_model.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t06_worker_model-209d0a13dc6d2262)\n\nrunning 2 tests\ntest c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one ... ok\ntest c06_a_held_global_model_permit_makes_the_callback_refuse_bounded_not_deadlock ... ok\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.73s\n\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::handle_refusal_texts_carry_no_material",
+      "--",
+      "--exact"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:33:03.587521+00:00",
+    "endUTC": "2026-10-07T02:33:12.700108+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "5b81d6f82b86ba1beeec79c2e14d32b1ae48aa8a2339c8c31e47d4bfcb9665cd",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-0532c49ca08cc763",
+        "sha256": "dc61fe658474314d78629ceecdf2a4d5d9a3015c210d6b6f2b4e734c05dbf8a1",
+        "bytes": 55056928
+      }
+    ],
+    "name": "restore-N04-N15",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+    ],
+    "tail": "   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.68s\n     Running unittests src/lib.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-0532c49ca08cc763)\n\nrunning 1 test\ntest credentials::tests::handle_refusal_texts_carry_no_material ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s\n\n"
+  },
+  {
+    "argv": [
+      "bash",
+      "scripts/rust-tauri/r05_t08_stage_suites.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/producer-restored-full/suites"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:33:12.824363+00:00",
+    "endUTC": "2026-10-07T02:43:22.097562+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "3fb79f59ee2487849aca6b6e19e7fb81eb236fcd6440fb1f25f95f26ce9d9ebe",
+    "counts": [],
+    "cargoRunningBinaries": [],
+    "name": "producer-restored-full",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [],
+    "tail": "svc:r05_t06_worker_model (pinned 10) ==\nPASS svc:r05_t06_worker_model: 10/10 tests green\n== running svc:r05_t07_persistence (pinned 5) ==\nPASS svc:r05_t07_persistence: 5/5 tests green\n== running svc:r05_t07_rr1_usage_ledger (pinned 15) ==\nPASS svc:r05_t07_rr1_usage_ledger: 15/15 tests green\n== running svc:r05_t07_usage_trace (pinned 9) ==\nPASS svc:r05_t07_usage_trace: 9/9 tests green\n== running svc:r05_t08_closed_loop (pinned 11) ==\nPASS svc:r05_t08_closed_loop: 11/11 tests green\n== running svc:r05_t08_production_tools (pinned 6) ==\nPASS svc:r05_t08_production_tools: 6/6 tests green\n== running svc:r05_t08_resources (pinned 2) ==\nPASS svc:r05_t08_resources: 2/2 tests green\nassembled 91 run records / 93 C-ID case records\nPASS case files assembled (r05-cases.json + leaf-cases.json; every executed test owned by exactly one C-ID)\nRESULT: all R05 stage runs green with exact pinned counts (27 suites + 64 lib pins; 93 cid-owned + 10 command-bound = 103 required C-IDs; 130 leaves / 137 leaf cases)\nPASS F27 raw resource series preserved (/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/producer-restored-full/suites/f27-resource-series.json)\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--",
+      "verify-stage",
+      "R02",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:43:22.211453+00:00",
+    "endUTC": "2026-10-07T02:56:16.383362+00:00",
+    "exitCode": 1,
+    "environmentOverrides": {},
+    "logSHA256": "881f2792f88201f4700e37ee97546cdae335fea8c89c00d2ff6f4d6c4b5cb683",
+    "counts": [],
+    "cargoRunningBinaries": [],
+    "name": "binding-restored-real-R02",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [],
+    "tail": "-LA-8BC1A036AFAA [deferred_to_r07] DEFERRED_TO_R07\nxtask: verify-stage R02 supplemental R00-T02-LA-3291CFD5F7E2 [deferred_to_r07] DEFERRED_TO_R07\nxtask: verify-stage R02 supplemental R00-T02-LA-2A1C298F62FC [deferred_to_r07] DEFERRED_TO_R07\nxtask: verify-stage R02 supplemental R00-T02-LA-8ED658F9DB9E [deferred_to_r07] DEFERRED_TO_R07\nxtask: verify-stage R02 supplemental R00-T02-LA-F8935B6B0221 [deferred_to_r07] DEFERRED_TO_R07\nxtask: verify-stage R02 supplemental R00-T02-LA-39AD35E1FD71 [deferred_to_r07] DEFERRED_TO_R07\nxtask: verify-stage R02 supplemental R00-T02-LA-066B54983F6A [r02_share_satisfied] PASS\nxtask: verify-stage R02 supplemental R00-T02-LA-C4E6F27D7873 [r02_share_satisfied] PASS\nxtask: verify-stage R02 supplemental R00-T02-LA-4C1A9735CF04 [r02_share_satisfied] PASS\nxtask: verify-stage R02 supplemental R00-T02-LA-000E6E1301C0 [deferred_to_r07] DEFERRED_TO_R07\nxtask: verify-stage R02 supplemental R00-T02-LA-32FFEC05BAA7 [deferred_to_r07] DEFERRED_TO_R07\nxtask: verify-stage R02 result written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/verify-stage-result.json (overall: \"FAIL\")\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--",
+      "verify-stage",
+      "R02",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:16.203127+00:00",
+    "endUTC": "2026-10-07T02:57:16.917359+00:00",
+    "exitCode": 1,
+    "environmentOverrides": {},
+    "logSHA256": "6126d69ca10a7b081d54740d95d05a55138ef8366c026371d87f49c5cdaef1a4",
+    "counts": [],
+    "cargoRunningBinaries": [],
+    "name": "N16-used-root-refusal-supplement",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [],
+    "tail": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s\n     Running `/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R02 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a`\nerror: evidence root /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a is not empty; preserving its prior evidence\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_stage_cid_table_owns"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:17.025102+00:00",
+    "endUTC": "2026-10-07T02:57:20.561791+00:00",
+    "exitCode": 101,
+    "environmentOverrides": {},
+    "logSHA256": "55d04db9004a3519896f0b45b7d83cc9aba1f30c5d6d9910e524b13413214c30",
+    "counts": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "aac06e942377ef8f8eda78dc13996952dd2368f2d31377407c71b56ecb4eba7d",
+        "bytes": 9370504
+      }
+    ],
+    "name": "F26-cid-rename",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+    ],
+    "tail": "05-T04-C02\", \"R05-T04-C03\", \"R05-T04-C04\", \"R05-T04-C05\", \"R05-T04-C06\", \"R05-T04-C07\", \"R05-T04-C08\", \"R05-T04-C09\", \"R05-T04-C10\", \"R05-T04-C11\", \"R05-T04-C12\", \"R05-T04-C13\", \"R05-T04-C14\", \"R05-T04-C15\", \"R05-T04-C16\", \"R05-T05-C01\", \"R05-T05-C02\", \"R05-T05-C03\", \"R05-T05-C05\", \"R05-T05-C07\", \"R05-T05-C08\", \"R05-T05-C11\", \"R05-T05-C11B\", \"R05-T05-C12\", \"R05-T05-C13\", \"R05-T06-C01\", \"R05-T06-C02\", \"R05-T06-C03\", \"R05-T06-C04\", \"R05-T06-C05\", \"R05-T06-C06\", \"R05-T06-C07\", \"R05-T06-C08\", \"R05-T06-C09\", \"R05-T06-C10\", \"R05-T06-C11\", \"R05-T06-C12\", \"R05-T07-C01\", \"R05-T07-C02\", \"R05-T07-C03\", \"R05-T07-C04\", \"R05-T07-C05\", \"R05-T07-C06\", \"R05-T07-C07\", \"R05-T07-C08\", \"R05-T07-C09\", \"R05-T07-C10\", \"R05-T08-C01\", \"R05-T08-C02\", \"R05-T08-C03\", \"R05-T08-C04\", \"R05-T08-C05\", \"R05-T08-C06\", \"R05-T08-C07\", \"R05-T08-C08\", \"R05-T08-C09\", \"R05-T08-C11\", \"R05-T08-C12\"}\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s\n\nerror: test failed, to rerun pass `-p xtask --bin xtask`\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_stage_cid_table_owns"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:20.682400+00:00",
+    "endUTC": "2026-10-07T02:57:26.585486+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "21199fbf30304b03e4039e132e285b3270236e8f65a0353fc4cf8c04cf0c2ede",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "3bd3ef1da40d3d1355059dd69ea71415b932ca7d4decd2239457d4fbeeb7e424",
+        "bytes": 9370504
+      }
+    ],
+    "name": "F26-cid-rename-restored",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+    ],
+    "tail": "   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.86s\n     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)\n\nrunning 1 test\ntest stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s\n\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_stage_cid_table_owns"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:26.706555+00:00",
+    "endUTC": "2026-10-07T02:57:32.842740+00:00",
+    "exitCode": 101,
+    "environmentOverrides": {},
+    "logSHA256": "fac5fdd44f49fda17c5733c140e67651ba0842f8c0ceb24e8fe2c8fcdb8647d2",
+    "counts": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "4f516ff981f395aa46d4fa261e3b52f969bb084220a72780259d19c7749f1a3f",
+        "bytes": 9370504
+      }
+    ],
+    "name": "F26-registry-missing",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+    ],
+    "tail": "   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.96s\n     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)\n\nrunning 1 test\ntest stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once ... FAILED\n\nfailures:\n\n---- stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once stdout ----\n\nthread 'stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once' (21436960) panicked at crates/xtask/src/stage_map.rs:3352:9:\nassertion `left == right` failed: the authoritative registry must carry the 103 required C-IDs\n  left: 102\n right: 103\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s\n\nerror: test failed, to rerun pass `-p xtask --bin xtask`\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_stage_cid_table_owns"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:32.959144+00:00",
+    "endUTC": "2026-10-07T02:57:39.394763+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "7b2f40c2edd9bb4202e1f73a5e05844d421066e4f585ce8c0d3b834d4cf1f37e",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "cc12c95acafc2dd2c099a2659e1a51f664493023d3d8c970ebd20efb970835e8",
+        "bytes": 9370504
+      }
+    ],
+    "name": "F26-registry-missing-restored",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+    ],
+    "tail": "   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.92s\n     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)\n\nrunning 1 test\ntest stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s\n\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_stage_cid_table_owns"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:39.521932+00:00",
+    "endUTC": "2026-10-07T02:57:45.496967+00:00",
+    "exitCode": 101,
+    "environmentOverrides": {},
+    "logSHA256": "a3337a9316a3d1745a93fc500550c049b90bdd06e55e88d3f1c5d8375631310f",
+    "counts": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "6688a75be203e7fbd615c1e0bd13395ca9200da0a6c16be35e1d463cd0d682cc",
+        "bytes": 9370504
+      }
+    ],
+    "name": "F26-bogus-command",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+    ],
+    "tail": "   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.80s\n     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)\n\nrunning 1 test\ntest stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once ... FAILED\n\nfailures:\n\n---- stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once stdout ----\n\nthread 'stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once' (21438823) panicked at crates/xtask/src/stage_map.rs:3392:17:\nregistry entry R05-T08-C13 binds to command \"bogus_gate\" which the R05 map does not register\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s\n\nerror: test failed, to rerun pass `-p xtask --bin xtask`\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_stage_cid_table_owns"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:45.619678+00:00",
+    "endUTC": "2026-10-07T02:57:52.143275+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "5ebfabde4ee68ab510740a1c4362a4826a47e731a5ba4f379ecf5ecffc4c7126",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "7bf0d657e6a278aef257e7f5c57e4d0e0c796ef2bc62e32d1104ef9e6851d46d",
+        "bytes": 9370504
+      }
+    ],
+    "name": "F26-bogus-command-restored",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+    ],
+    "tail": "   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.03s\n     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)\n\nrunning 1 test\ntest stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s\n\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_production_map_mirrors"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:52.262649+00:00",
+    "endUTC": "2026-10-07T02:58:00.549786+00:00",
+    "exitCode": 101,
+    "environmentOverrides": {},
+    "logSHA256": "31ce6ae549208de7ea6e53b47b9655eb53824ca0ca25d84368650fb1a434e436",
+    "counts": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "dd92a1eef8bd618e32363d17359b8f3acb03531e2c1280a5540352ac105aa032",
+        "bytes": 9370504
+      }
+    ],
+    "name": "F25-exclusive-share",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+    ],
+    "tail": "ing xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.99s\n     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)\n\nrunning 1 test\ntest stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05 ... FAILED\n\nfailures:\n\n---- stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05 stdout ----\n\nthread 'stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05' (21441073) panicked at crates/xtask/src/stage_map.rs:2885:14:\nthe registered R05 stage map must parse with this runner: \"stage map invalid: supplemental leaf \\\"R00-T02-LA-16CEB6D12A6A\\\" stageShare must be a non-empty string, got \\\"\\\"\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s\n\nerror: test failed, to rerun pass `-p xtask --bin xtask`\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_production_map_mirrors"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:00.673960+00:00",
+    "endUTC": "2026-10-07T02:58:06.338370+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "e7fc427cea0a8ce00777f5caf8bc28dc541ff659b5ce3647e4290fb351df075a",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.04s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "e00923870c176f8e5db4acdbefacfe6a3250a8941eb696ef63d3284c0a7a34cf",
+        "bytes": 9370504
+      }
+    ],
+    "name": "F25-exclusive-share-restored",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.04s"
+    ],
+    "tail": "   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.74s\n     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)\n\nrunning 1 test\ntest stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05 ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.04s\n\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_production_map_mirrors"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:06.459760+00:00",
+    "endUTC": "2026-10-07T02:58:13.849582+00:00",
+    "exitCode": 101,
+    "environmentOverrides": {},
+    "logSHA256": "bd26717b1d52b384e0b70854985d85459aed8b92c47fb608685a3821fbe73201",
+    "counts": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.03s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "bc469687eab17dbb21ee8d1599cfe1379d8483527b405036e2b16493f92060cb",
+        "bytes": 9370504
+      }
+    ],
+    "name": "F25-leafcase-missing",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.03s"
+    ],
+    "tail": "   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.56s\n     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)\n\nrunning 1 test\ntest stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05 ... FAILED\n\nfailures:\n\n---- stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05 stdout ----\n\nthread 'stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05' (21442960) panicked at crates/xtask/src/stage_map.rs:3223:9:\nassertion `left == right` failed: the leaf-case map drifted from 137\n  left: 136\n right: 137\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.03s\n\nerror: test failed, to rerun pass `-p xtask --bin xtask`\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_production_map_mirrors"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:13.971025+00:00",
+    "endUTC": "2026-10-07T02:58:20.354177+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "a9d251040f2d138e300c6e35efa28422c98225d3f78a0bfc1d290c76c4748fdf",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.03s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "b462cc6e9ebef4e7e34a6188d2b1d7509af1d87d19b342029a41010ecc7d4f96",
+        "bytes": 9370504
+      }
+    ],
+    "name": "F25-leafcase-missing-restored",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.03s"
+    ],
+    "tail": "   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.30s\n     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)\n\nrunning 1 test\ntest stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05 ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.03s\n\n"
+  },
+  {
+    "argv": [
+      "bash",
+      "scripts/rust-tauri/r05_t08_stage_suites.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-producer-preflight/suites"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:20.473587+00:00",
+    "endUTC": "2026-10-07T02:58:20.522826+00:00",
+    "exitCode": 1,
+    "environmentOverrides": {},
+    "logSHA256": "032ce8a2cdb12ccda6c0a565959f534b1ac6d517411a8d9561c5320b9bb73b11",
+    "counts": [],
+    "cargoRunningBinaries": [],
+    "name": "F26-producer-preflight",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [],
+    "tail": "the cid table does not match the authoritative registry — fabricated/unregistered: []; missing: ['R05-T04-C07']\nFAIL: required-C-ID identity check failed\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:20.638018+00:00",
+    "endUTC": "2026-10-07T02:58:25.347147+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "c865ffb7f5572c306d1e05eda20beccb304b1b1056298cd0032c9ebfb7b6fd30",
+    "counts": [
+      "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 113 filtered out; finished in 0.04s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "f03e1cec32bfbbed868bc67130e9d9f1b9cd127b187ee01bcf2a21b7a4d76ef7",
+        "bytes": 9370504
+      }
+    ],
+    "name": "extra-registry-restored-all",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 113 filtered out; finished in 0.04s"
+    ],
+    "tail": "   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.42s\n     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)\n\nrunning 8 tests\ntest stage_map::map_tests::r05_stage_pin_table_matches_the_registered_suites ... ok\ntest stage_map::map_tests::r05_map_declares_no_live_lane_and_only_offline_commands ... ok\ntest stage_map::map_tests::r05_production_map_registers_the_supplemental_duty_scenarios ... ok\ntest stage_map::map_tests::r05_production_map_registers_the_suite_producer_and_r04_regression_gate ... ok\ntest stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim ... ok\ntest stage_map::map_tests::r05_scope_matrix_covers_every_r05_bound_leaf_honestly ... ok\ntest stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once ... ok\ntest stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05 ... ok\n\ntest result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 113 filtered out; finished in 0.04s\n\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::handle_refusal_texts_carry_no_material",
+      "--",
+      "--exact"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:25.484330+00:00",
+    "endUTC": "2026-10-07T02:58:37.866135+00:00",
+    "exitCode": 101,
+    "environmentOverrides": {},
+    "logSHA256": "dee7bee3324bfc9e9723909b3f8dfe06706df04a4174a99798483c37ca8a8d0e",
+    "counts": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-0532c49ca08cc763",
+        "sha256": "b7256246310997c3fd0d4c71cdf3c469ee1bb1fc8dcb7ab3cc476367f020de09",
+        "bytes": 55056928
+      }
+    ],
+    "name": "N04-direct-target-red",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+    ],
+    "tail": "   Compiling ring v0.17.14\n   Compiling rcgen v0.14.10\n   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.46s\n     Running unittests src/lib.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-0532c49ca08cc763)\n\nrunning 1 test\ntest credentials::tests::handle_refusal_texts_carry_no_material ... FAILED\n\nfailures:\n\n---- credentials::tests::handle_refusal_texts_carry_no_material stdout ----\n\nthread 'credentials::tests::handle_refusal_texts_carry_no_material' (21446973) panicked at crates/lingxi-service/src/credentials/mod.rs:1617:9:\nN04 injected failure\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    credentials::tests::handle_refusal_texts_carry_no_material\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s\n\nerror: test failed, to rerun pass `-p lingxi-service --lib`\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::handle_refusal_texts_carry_no_material",
+      "--",
+      "--exact"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:37.990930+00:00",
+    "endUTC": "2026-10-07T02:58:45.936191+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "8466b3c15de0543263a6796ba398d3660bebc42ebab38826ebabfc6db3fc81ec",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-0532c49ca08cc763",
+        "sha256": "ce00852591b84ced93685cb9c5db00a6d825f6119128332187694f5c0c030589",
+        "bytes": 55056928
+      }
+    ],
+    "name": "N04-direct-target-restored",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+    ],
+    "tail": "   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.53s\n     Running unittests src/lib.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-0532c49ca08cc763)\n\nrunning 1 test\ntest credentials::tests::handle_refusal_texts_carry_no_material ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s\n\n"
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r04_t03_approval_service"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:46.063803+00:00",
+    "endUTC": "2026-10-07T02:59:04.341910+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "7b6c1be0ad67c1e76080e183544a4e57ea2cb4ec21373269b0a740c7d2550bcf",
+    "counts": [
+      "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.51s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r04_t03_approval_service-a3cd2bd00f3a49b5",
+        "sha256": "e6eb51b9915cf26bd56ab29177dcfc83fae71973343988d7ac15293ab1f5e441",
+        "bytes": 44488120
+      }
+    ],
+    "name": "I06-existing-approval",
+    "logMatches": true,
+    "inputCountBefore": 913,
+    "inputCountAfter": 913,
+    "inputBeforeAfterEqual": true,
+    "countsRecomputed": [
+      "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.51s"
+    ],
+    "tail": "   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.96s\n     Running tests/r04_t03_approval_service.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r04_t03_approval_service-a3cd2bd00f3a49b5)\n\nrunning 11 tests\ntest alias_cannot_reuse_a_single_use_grant ... ok\ntest restart_invalidates_old_approvals_and_grants ... ok\ntest approval_timeout_is_a_definite_rejection_and_late_approval_is_refused ... ok\ntest one_approval_cannot_be_spent_by_two_concurrent_requests ... ok\ntest cancel_during_wait_then_late_approval_never_resurrects ... ok\ntest o05_policy_allowed_never_re_prompts_the_wired_gate ... ok\ntest r04_a06_wait_disabled_then_approved_still_refuses ... ok\ntest user_session_mode_matrix_on_the_real_chain ... ok\ntest r04_a05_approved_digest_a_cannot_execute_payload_b ... ok\ntest sup01_ask_tier_subagent_matrix_on_the_real_chain ... ok\ntest concurrent_spends_of_one_grant_produce_exactly_one_winner ... ok\n\ntest result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.51s\n\n"
+  }
+]

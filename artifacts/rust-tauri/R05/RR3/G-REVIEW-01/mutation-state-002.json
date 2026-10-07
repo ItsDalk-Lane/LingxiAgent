@@ -1,0 +1,22 @@
+{
+  "utc": "2026-10-07T01:27:15.464202+00:00",
+  "consoleLastLines": [
+    "== CONTROL: the binary-wiring suite is green in the copy (for N08/N10) ==",
+    "PASS control: r05_t01_binary_wiring green (exit 0)",
+    "== N01: deleted the R05-A16 scenario from the copy's map; xtask map-pinning tests: =="
+  ],
+  "hashes": {
+    "scripts/rust-tauri/r05_t08_stage_suites.sh": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e",
+    "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+    "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+    "rust/crates/lingxi-service/src/lib.rs": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756",
+    "rust/crates/lingxi-service/src/runs.rs": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+    "rust/crates/lingxi-service/src/credentials/mod.rs": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+    "rust/crates/xtask/src/stage_maps/R04.json": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+    "rust/crates/xtask/src/stage_maps/R05.json": "08c501909f73499e6a16890fccaa7ad09afc2c4033267e6140306d4c2a958663",
+    "rust/crates/lingxi-kernel/src/lib.rs": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+    "rust/crates/lingxi-adapters/src/models/openai_completions.rs": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+    "rust/crates/lingxi-adapters/src/models/credentials.rs": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+    "rust/crates/lingxi-adapters/src/models/tool_render.rs": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0"
+  }
+}

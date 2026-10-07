@@ -1,0 +1,53 @@
+== toolchain: rustup run 1.98.1 (rustc 1.98.1 (48a229cea 2026-09-01))
+== [1/5] build the service binary (locked, offline, isolated target dir)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.97s
+== [2/5] dependency-tree desktop proof (cargo metadata resolve graph)
+workspace members (7): ['lingxi-adapters', 'lingxi-browser-spike', 'lingxi-kernel', 'lingxi-protocol', 'lingxi-service', 'lingxi-spike', 'xtask']
+resolve-graph packages: 315
+desktop dependency scan: 0 hits for patterns ['tauri', 'electron', 'tao', 'wry', 'webkit2gtk', 'winit', 'webview']
+== [3/5] start real service process (synthetic /tmp home, loopback, ephemeral port)
+service ready: pid=50757 addr=127.0.0.1:50708 home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02-t01-smoke-home.Veuhyp
+== [4/5] health check
+health validation: OK (minimal surface, protocol-sourced versions)
+== [5/5] clean shutdown (SIGTERM, exit 0, port freed, no children)
+service exit code after SIGTERM: 0
+no leftover child processes (pre-TERM snapshot, birth-time verified): OK
+port closed after shutdown: OK
+== [6/6] startup refusal and newer data version: explicit error, no fallback root ==
+a01-leaf-cases.json: 11 cases, 1 failing
+ERROR: a01-newer-data newer data version refusal or root preservation failed
+== R02-T07 / R02-A13 redaction scan (toolchain 1.98.1, target /Users/study_superior/.cache/lingxi-r05-neg-target) ==
+== building lingxi-service (--locked, offline) ==
+PASS build
+== P1/P2: normal + error traffic ==
+PASS P1 GET /me -> 200
+PASS P1 execute -> 200 (runId minted; input carried preset secret material)
+PASS P1 issue credential -> 201 (201 issuance body = sanctioned surface, scan-excluded)
+PASS P1 ws-ticket minted -> 200
+PASS P2 401 bad bearer
+PASS P2 401 missing credential
+PASS P2 401 bad query token
+PASS P2 403 cross-principal
+PASS P2 404 unknown session
+PASS P2 WS rejections (bad bearer upgrade 401; malformed frame -> invalid_message + close)
+== P3: storage error via externally-held WAL write lock (busy timeout) ==
+P3 burst results: 200x0, 503x1
+PASS P3 storage error: 1 explicit 503 db_busy (retryable) responses; no fake success
+== P4: epoch gate refusal diagnostics ==
+PASS P4 epoch refusal exit 2 with marker
+== RETAIN: copy the run's REAL rotating logs into the evidence set ==
+retained 3 real rotating log file(s) under service-logs/ — fresh-root, source-bound to THIS round (UTC 2026-10-07T01:53:20Z, pid 59268), set-equal and per-file sha256-identical (retention-manifest.txt); in the scan below; sha256 in inventory.txt
+== SCAN: preset sensitive values across REAL logs + stderr/stdout + error bodies ==
+SCAN api_key: clean (0 files)
+SCAN device_secret: clean (0 files)
+SCAN oauth_bearer: clean (0 files)
+SCAN query_token: clean (0 files)
+SCAN local_token: clean (0 files)
+SCAN ws_ticket: clean (0 files)
+SCAN RESULT: PASS (0 occurrences of 6 preset/minted secrets across 246/41 read evidence files incl. the retained real rotating logs)
+PASS SCAN: preset + minted sensitive values absent from the REAL rotating logs, stderr/stdout captures, error bodies and WS transcripts (every target read; unreadable would have failed)
+== CORRELATION: 关联 ID 保留 ==
+Traceback (most recent call last):
+  File "<stdin>", line 15, in <module>
+AssertionError: requestId req-2385be7efcccbb90c96ac40b6432d50b from the error body not found in an auth marker line

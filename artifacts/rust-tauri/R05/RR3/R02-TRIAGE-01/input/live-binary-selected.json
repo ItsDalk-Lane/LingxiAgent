@@ -1,0 +1,68 @@
+{
+  "before": {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/live-binary-observations.json",
+    "sha256": "c937cfb3b1ba14e672744f4455188bac52e7047e827114c4e1664d4a6fef2b4a",
+    "bytes": 9743401,
+    "mtime_ns": 1791338721855670073
+  },
+  "after": {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/live-binary-observations.json",
+    "sha256": "c937cfb3b1ba14e672744f4455188bac52e7047e827114c4e1664d4a6fef2b4a",
+    "bytes": 9743401,
+    "mtime_ns": 1791338721855670073
+  },
+  "observed_changed": false,
+  "rows": [
+    {
+      "utc": "2026-10-07T01:47:49.964867+00:00",
+      "pid": "50450",
+      "ppid": "50448",
+      "observedCommand": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R02 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence",
+      "executable": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask",
+      "bytes": 4940152,
+      "sha256": "eed3684fe22b627e5f374e39f2b96b87f6db060480c1f3fb92ef1dafe85b9fcc",
+      "phase": "== N06: verify-stage R02 launched; a source file is edited mid-run; the result must be STALE/FAIL =="
+    },
+    {
+      "utc": "2026-10-07T01:48:17.188412+00:00",
+      "pid": "50757",
+      "ppid": "50669",
+      "observedCommand": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02-t01-smoke-home.Veuhyp",
+      "executable": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/lingxi-service",
+      "bytes": 62344112,
+      "sha256": "90daa4e828f4f5103e9502928e93984ce087f16c431033e6d3eb0cc892a69a2b",
+      "phase": "== N06: verify-stage R02 launched; a source file is edited mid-run; the result must be STALE/FAIL =="
+    },
+    {
+      "utc": "2026-10-07T01:53:09.406350+00:00",
+      "pid": "59285",
+      "ppid": "59268",
+      "observedCommand": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t07-a13.sZeZXa --bind 127.0.0.1:0",
+      "executable": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/lingxi-service",
+      "bytes": 62344848,
+      "sha256": "d005248caa067367176b6212745ff5a17cb0442b72e301d81c0b0e648cf95e4d",
+      "phase": "== N06: verify-stage R02 launched; a source file is edited mid-run; the result must be STALE/FAIL =="
+    },
+    {
+      "utc": "2026-10-07T01:53:12.707642+00:00",
+      "pid": "59393",
+      "ppid": "59268",
+      "observedCommand": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t07-a13.sZeZXa --bind 127.0.0.1:0",
+      "executable": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/lingxi-service",
+      "bytes": 62344848,
+      "sha256": "d005248caa067367176b6212745ff5a17cb0442b72e301d81c0b0e648cf95e4d",
+      "phase": "== N06: verify-stage R02 launched; a source file is edited mid-run; the result must be STALE/FAIL =="
+    },
+    {
+      "utc": "2026-10-07T02:02:13.809268+00:00",
+      "pid": "87199",
+      "ppid": "87198",
+      "observedCommand": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R02 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a",
+      "executable": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask",
+      "bytes": 4940152,
+      "sha256": "eb9bdf761cbfeea7fa2b1d1e3a7db2e4e8e1a996d36300b824cdb764ec425a63",
+      "phase": "== N16: two verify-stage R02 runs bracket a source edit; the candidate digests must differ, and the used evidence root must be refused =="
+    }
+  ],
+  "note": "只有读取时观察，不据当前target绑定历史程序"
+}

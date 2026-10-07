@@ -1,0 +1,170 @@
+{
+  "at": "2026-10-07T04:38:40.464339+00:00",
+  "filesScanned": 40745,
+  "physicalInputBytes": 3266652761,
+  "scope": [
+    "docs/rust-tauri",
+    "artifacts/rust-tauri",
+    "/private/tmp/rr3-g-review-02-20261007"
+  ],
+  "prunedDirectoryKinds": [
+    "candidate",
+    "candidate-copy",
+    "copy",
+    "copy-delete-rename",
+    "copy-delete-rename-02",
+    "current",
+    "debug",
+    "independent-validator-repo",
+    "negcopy.hTXzzN",
+    "repo",
+    "runner-copy",
+    "target",
+    "validator-fault-repo",
+    "workspace"
+  ],
+  "patternsSha256": "70bd3139175037a20dbfd222433cd56fd9545ab756258678f4b6b88f30aecf8a",
+  "matchFiles": [
+    {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-02/metadata/owned-cache-boundary.json",
+      "sha256": "25dd2c48430e85d063037c33e11191bdd6f19450798d53168143a0ff0923febd",
+      "hits": [
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.00.rcgu.o",
+          "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-02/metadata/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        },
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.01.rcgu.o",
+          "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-02/metadata/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        },
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.05.rcgu.o",
+          "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-02/metadata/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        },
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.06.rcgu.o",
+          "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-02/metadata/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        },
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.09.rcgu.o",
+          "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-02/metadata/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        },
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.11.rcgu.o",
+          "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-02/metadata/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        },
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.12.rcgu.o",
+          "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-02/metadata/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        },
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.15.rcgu.o",
+          "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-02/metadata/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        }
+      ]
+    },
+    {
+      "path": "/private/tmp/rr3-g-review-02-20261007/owned-cache-boundary.json",
+      "sha256": "25dd2c48430e85d063037c33e11191bdd6f19450798d53168143a0ff0923febd",
+      "hits": [
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.00.rcgu.o",
+          "path": "/private/tmp/rr3-g-review-02-20261007/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        },
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.01.rcgu.o",
+          "path": "/private/tmp/rr3-g-review-02-20261007/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        },
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.05.rcgu.o",
+          "path": "/private/tmp/rr3-g-review-02-20261007/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        },
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.06.rcgu.o",
+          "path": "/private/tmp/rr3-g-review-02-20261007/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        },
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.09.rcgu.o",
+          "path": "/private/tmp/rr3-g-review-02-20261007/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        },
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.11.rcgu.o",
+          "path": "/private/tmp/rr3-g-review-02-20261007/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        },
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.12.rcgu.o",
+          "path": "/private/tmp/rr3-g-review-02-20261007/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        },
+        {
+          "object": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.15.rcgu.o",
+          "path": "/private/tmp/rr3-g-review-02-20261007/owned-cache-boundary.json",
+          "reason": [
+            "exact_filename"
+          ],
+          "classification": "FORMAL_OR_UNCLASSIFIED_HOLD"
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

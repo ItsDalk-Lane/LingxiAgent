@@ -1,0 +1,27 @@
+{
+  "beforeAt": "2026-10-07T04:32:35.699884+00:00",
+  "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.13.rcgu.o",
+  "sha256": "56c7cde2dbc6053d84f7e7b8196eb8e3051cee7e59a499b2a2a56bee4815c130",
+  "bytes": 19546160,
+  "mode": "0o100644",
+  "birthUtc": "2026-10-07T04:28:25.283037+00:00",
+  "mtimeUtc": "2026-10-07T04:28:26.027036+00:00",
+  "lsof": {
+    "argv": [
+      "/usr/sbin/lsof",
+      "-F",
+      "pftn",
+      "--",
+      "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.13.rcgu.o"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  "authorization": "RR3_G_R2_BRIEF permits owned reconstructable cache cleanup; root explicitly authorized exactly this path on 2026-10-07.",
+  "reason": "Failed current N02 service lib test --test -C extra-filename=-db0defd20b34f871. Non-executable compiler intermediate; no valid runtime consumes this standalone object. Its exact command is preserved in default16-01/n02-zero-match/suites/build.log. No other cache deleted.",
+  "freeBefore": 121122816,
+  "afterAt": "2026-10-07T04:32:35.717025+00:00",
+  "existsAfter": false,
+  "freeAfter": 140869632
+}

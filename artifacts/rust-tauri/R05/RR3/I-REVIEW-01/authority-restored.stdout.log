@@ -1,0 +1,1 @@
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t01_service_smoke.sh {EVIDENCE}/A01] > /unused/a01_smoke

@@ -1,0 +1,18 @@
+{
+  "recorded_at_utc": "2026-10-07T23:13:45Z",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "branch": "codex/rust-tauri-migration",
+  "origin_same": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "staged_empty": true,
+  "note": "E-04 零 Git 写操作（无 add/commit/push/重置）；FINAL-04 已亲核零暂存/零提交/零推送；真实提交/推送回执由总控按既有授权执行后另行归档，本 E04 不预写。",
+  "git_status_porcelain_head": [
+    "M docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+    " M docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+    " M docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+    " M docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+    " M docs/rust-tauri/R05/R05_BLOCKERS.md",
+    " M docs/rust-tauri/R05/R05_HANDOFF.json",
+    " M docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+    " M docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json"
+  ]
+}

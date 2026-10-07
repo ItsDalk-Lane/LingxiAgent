@@ -1,0 +1,179 @@
+{
+  "utc": "2026-10-07T02:06:21.225470+00:00",
+  "GReportExists": false,
+  "GLog": "== preparing the isolated copy at /Users/study_superior/r05t08-work/negcopy.hTXzzN (local clone of HEAD b3ac0e6ae + uncommitted working-tree overlay) ==\n== copy ready (branch codex/rust-tauri-migration, HEAD b3ac0e6ae, worktree dirty=39 files) ==\n== CONTROL: xtask r05 mirror tests green in the copy ==\nPASS control: xtask r05_ tests green (exit 0)\n== CONTROL: the binary-wiring suite is green in the copy (for N08/N10) ==\nPASS control: r05_t01_binary_wiring green (exit 0)\n== N01: deleted the R05-A16 scenario from the copy's map; xtask map-pinning tests: ==\ncase R05-GATE-N01: exit=101 gap-named=OK verdict=OK (删 A16 → 镜像单测红并点名 R05-A16)\n== N02: pin path mutated to match zero tests; the producer must fail naming the 0-match run (full producer run) ==\ncase R05-GATE-N02: exit=1 gap-named=OK verdict=OK (零匹配筛选词 → 生产者非零并点名 running=0)\n== N03: exactly one authoritative pin count lowered; old/new saved in mutation.json ==\ncase R05-GATE-N03: exit=101 gap-named=OK verdict=OK (权威表唯一目标降钉恰一次 → 镜像单测红点名漂移)\nPASS N03 restore: authoritative table byte-equal, exact mirror 1/1 green\n== N04: one lib test fails AND the producer's exit capture is neutralized; the producer must still fail via the parsed-count check ==\ncase R05-GATE-N04: exit=1 gap-named=OK verdict=OK (吞退出码 → 计数核对仍非零并点名失败测试)\n== N05: pre-populated evidence root; verify-stage R05 must refuse ==\ncase R05-GATE-N05: exit=1 gap-named=OK verdict=OK (旧证据目录 → 拒收并点名 not empty)\n== N06: verify-stage R02 launched; a source file is edited mid-run; the result must be STALE/FAIL ==\ncase R05-GATE-N06: exit=1 gap-named=OK verdict=OK (门禁中改源码 → stable=false 整体 FAIL（R02 注册门禁演示同一机制）)\n== N07: r04_regression_gate command deleted while SUP-R04REG still references it; verify-stage R05 must refuse fast ==\ncase R05-GATE-N07: exit=2 gap-named=OK verdict=OK (删 R04 回归命令 → 场景引用即硬拒；镜像单测亦钉住该命令)\n== N08: the real-chain wiring condition inverted (never wires without an injected provider); the BINARY suite must go red while units stay green ==\ncase R05-GATE-N08: exit=101 gap-named=OK verdict=OK (移除正常启动接线 → 二进制链红、单测仍绿)\n== N09: Success rendered as the fixed string 'done'; the runtime-nonce checks must go red ==\ncase R05-GATE-N09: exit=101 gap-named=OK verdict=OK (固定 done 替代真实回传 → 运行时 nonce 检查红)\n== N10: tool results paired to a constant id; the pairing assertions must go red ==\ncase R05-GATE-N10: exit=101 gap-named=OK verdict=OK (callId 错配 → 配对断言红（call_bin_1）)\n== N11: Unknown flattened to an exit-0 success claim; the honesty unit pin must go red ==\ncase R05-GATE-N11: exit=101 gap-named=OK verdict=OK (压平 Unknown → 状态诚实单测红)\n== N12: model permit held across tool execution; the concurrency=1 nested worker chain must go red ==\ncase R05-GATE-N12: exit=101 gap-named=OK verdict=OK (不释放模型 permit → 配额=1 嵌套链红)\nmutated deferred leaves: 1\n== N13: an R04 deferred leaf's kind field removed (re-grade shape); verify-stage R04 must refuse at the map/coverage check ==\ncase R05-GATE-N13: exit=2 gap-named=OK verdict=OK (R04 递延叶改判/删除 → R04 门禁硬拒)\n== N14: a LIVE lane command (env-key pickup) sneaked into the map; the offline-only mirror must go red ==\ncase R05-GATE-N14: exit=101 gap-named=OK verdict=OK (私开 LIVE lane → 离线命令集镜像红)\n== N15: the credential refusal Display leaks a synthetic secret (sk-N15-…); the no-material pin must go red ==\ncase R05-GATE-N15: exit=101 gap-named=OK verdict=OK (秘密进错误文本 → 无料单测红)\n== N16: two verify-stage R02 runs bracket a source edit; the candidate digests must differ, and the used evidence root must be refused ==\n",
+  "coordination": {
+    "round": "RR3",
+    "baselineHead": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+    "stageStatus": "NOT_ACCEPTED",
+    "R06_READY": false,
+    "issues": [
+      {
+        "id": "F42",
+        "workPackage": "A",
+        "title": "跨层输入/输出误报与漏报",
+        "status": "CLOSED",
+        "owner": "rr3_a_impl_02",
+        "round": 2,
+        "scope": "xtask绑定及R02真实OS发现器",
+        "evidenceDir": "artifacts/rust-tauri/R05/RR3/A-02/",
+        "independentReview": "rr3_a_review_02 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md；首轮review01 FAIL永久保留",
+        "nextCommand": "E/G各自独立收口后冻结，新FINAL亲跑全链",
+        "selfChecks": "A-02仅两授权文件；旧两校验8/24目标红exit1→修后24/24；真实fd4/非法7、6组52变异/sourcecopy、E0s62+4+24新跑绿；A1 17输入同字节复用新review01的121及100checkpoint。",
+        "mustFixHistory": [
+          {
+            "round": 1,
+            "review": "A-REVIEW-01/REVIEW.md",
+            "issue": "生产shell validate_run_output_unit及validate_declared_run_root把git ls-files查询exit2/stderr当空集合，含tracked根被接受；需异常显式拒绝",
+            "status": "CLOSED by A-REVIEW-02 PASS"
+          }
+        ],
+        "remaining": "无包级mustFix；正式全链stable/全部checkpoint仍待新FINAL"
+      },
+      {
+        "id": "F45",
+        "workPackage": "B",
+        "title": "N03过期锚点无实际变异",
+        "status": "CLOSED",
+        "owner": "rr3_b_impl_01",
+        "round": 1,
+        "scope": "负测脚本唯一权威目标解析与计数变异",
+        "evidenceDir": "artifacts/rust-tauri/R05/RR3/B-01/",
+        "independentReview": "rr3_b_review_01 / PASS / artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+        "nextCommand": "集成冻结后默认N01–N16",
+        "selfChecks": "N03真实8/8绿→动态24/23目标1/1红exit101并点名→字节还原精确1/1绿；15辅助自检通过。首轮测试定位错误记录保留不算有效注入。",
+        "remaining": "无包级mustFix；集成G-NEG-RR3仍待冻结后全16新复验"
+      },
+      {
+        "id": "F27-RR3",
+        "workPackage": "C",
+        "title": "全部实际进程和资源稳态证据缺口",
+        "status": "CLOSED",
+        "owner": "rr3_c_impl_01",
+        "round": 1,
+        "scope": "限定补证及I10正确引用",
+        "evidenceDir": "artifacts/rust-tauri/R05/RR3/C-01/",
+        "independentReview": "rr3_cf46_review_01 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+        "nextCommand": "消费新独立资源证据进入G/最终正式链",
+        "selfChecks": "新独立2/2 exit0、337.41s；160/54binary/61owner/15存活worker/60重启消解，普通取消及媒体/恢复具名新复验；FD/TCP假零红恢复绿；全部原阈值不变。E性能汇总1变动真实记录，321执行输入相等。",
+        "remaining": "无包级mustFix；完整正式阶段需FINAL"
+      },
+      {
+        "id": "R05-ENV-R00",
+        "workPackage": "D",
+        "title": "确切二进制非回环入站超时",
+        "status": "BLOCKED",
+        "owner": "rr3_d_impl_01",
+        "round": 1,
+        "scope": "本轮身份/过滤/监听及最小差分探针",
+        "evidenceDir": "artifacts/rust-tauri/R05/RR3/D-01/",
+        "independentReview": "rr3_d_review_01 CLI fresh ephemeral / 定位准备PASS、required gate FAIL/BLOCKED / artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+        "nextCommand": "其他全验/FINAL后校准该正式运行的实际binary身份，再用户应用级允许操作+新编号真实复验；不全局关闭/不跳LAN",
+        "selfChecks": "F46后新Cargo JSON fresh=false r00同路径新SHA9f7489029c91d1c232e3c204236854bd53c69cee2fef33d6fd778a27f44696d3、CDHashd9676388f524872f1269c13f61f413458c0e9e52；355输入前中后相等。正式单套件一次101、0/1/0/0，PID86488 0.0.0.0:60281→192.168.3.5 20s0字节。C同对象loop绿LAN红/Apple实际Python绿，ALFpermitted不能代真绿。只精准准备未改系统，FINAL对象不同须新核。"
+      },
+      {
+        "id": "F28-RR3",
+        "workPackage": "E",
+        "title": "阶段结论和交接纠错收口",
+        "status": "SELF_CHECKED",
+        "owner": "rr3_e_impl_02 CLI fresh ephemeral",
+        "round": 2,
+        "scope": "报告矩阵交接和进度一致",
+        "evidenceDir": "artifacts/rust-tauri/R05/RR3/E-02/",
+        "independentReview": "E-REVIEW-01 FAIL历史保留；新rr3_e_review_02 CLI fresh ephemeral RUNNING",
+        "nextCommand": "RR3_E_R2_REVIEW_BRIEF全新独立验收→G完整结论→冻结正式FINAL",
+        "selfChecks": "E-02两mustFix精准修好，13docs；423生产输入相同，current/wire两类0→1→0，亲读A2475/C533/D42/E150条manifest摘要，原历史/raw npm/LIVE平台保持。",
+        "mustFixHistory": [
+          {
+            "round": 1,
+            "review": "E-REVIEW-01/REVIEW.md",
+            "issues": [
+              "MF-E01",
+              "MF-E02"
+            ],
+            "status": "OPEN"
+          }
+        ]
+      },
+      {
+        "id": "F46",
+        "workPackage": "C-adjacent",
+        "title": "重启后日志数超过原3文件阈值且旧断言漏检",
+        "status": "CLOSED",
+        "owner": "rr3_f46_impl_01",
+        "round": 1,
+        "scope": "rust/crates/lingxi-service/src/logging.rs启动清理及必要内联回归；C测试交接后必要邻接须登记",
+        "authorization": "本轮新增必需缺口修好；保持日志数3原契约，不新造资源系统",
+        "evidenceDir": "artifacts/rust-tauri/R05/RR3/F46-01/",
+        "independentReview": "rr3_cf46_review_01 CLI fresh ephemeral / PASS / artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+        "nextCommand": "消费新独立资源证据进入G/最终正式链",
+        "historicalRed": "C-01/f46-directed-command-01 exit1；真实4次启动日志数[1,2,3,4]超3；C-01/measurement-01虽旧cargo2/2但完整原始清单不满足门槛",
+        "brief": "docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md",
+        "selfChecks": "本人旧binary6轮[1,2,3,4,4,4]exit1；新6轮[1,2,3,3,3,3]绿。完整新C2/2 exit0、335.40s、160轮/54binary点/61owner点全部原阈值绿，最终重启3/owner45稳态≤3；normal→假FD/TCP零各101→恢复0；logging9/9、权威镜像2/2，无pins变更。",
+        "remaining": "无mustFix；新独立真实旧6轮超3红→字节还原重build6轮≤3绿，正式原C全量通过"
+      }
+    ],
+    "preservedRepairs": [
+      "F31",
+      "F34",
+      "F41",
+      "F43-test-readiness",
+      "F44"
+    ],
+    "historicalGate": {
+      "round": "RR2/FINAL-01",
+      "commandsPassed": 5,
+      "commandsTotal": 7,
+      "overall": "FAIL",
+      "note": "另有candidateSourceBinding不稳定，不能写只剩ALF",
+      "layerAudit": "artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+      "bindingFailures": [
+        "R04全部8 checkpoint不稳：外层stdout变化",
+        "R03全部15 checkpoint不稳：父层stdout变化"
+      ]
+    },
+    "toolchain": {
+      "rustc": "1.98.1",
+      "cargo": "1.98.1",
+      "pin": "rust-toolchain.toml",
+      "cargoPath": "/Users/study_superior/.cargo/bin/cargo",
+      "node": "v24.16.0",
+      "npm": "11.13.0",
+      "platform": "Darwin arm64"
+    },
+    "integrationGates": [
+      {
+        "id": "G-NEG-RR3",
+        "status": "RUNNING",
+        "owner": "rr3_g_review_01 CLI fresh ephemeral",
+        "scope": "集成冻结后默认N01–N16及受影响F25/F26/F27/A新反例；受影响来源绑定负测不只继承历史16/16",
+        "evidenceDir": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/",
+        "nextCommand": "亲跑default16-01完整生产默认16及恢复controls，独立I01-I11映射；G通过不代FINAL"
+      }
+    ],
+    "observedFailuresPendingClassification": [
+      {
+        "id": "RR3-R02-OBS-A01",
+        "owner": "rr3_r02_triage_01 CLI fresh ephemeral",
+        "evidence": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a01_smoke/",
+        "observed": "newer data version refusal or root preservation failed",
+        "status": "TRIAGE_RUNNING",
+        "note": "真实FAIL；尚不把观察等同产品缺陷或ALF"
+      },
+      {
+        "id": "RR3-R02-OBS-A13",
+        "owner": "rr3_r02_triage_01 CLI fresh ephemeral",
+        "evidence": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a13_redaction_scan/",
+        "observed": "真实秘密扫描PASS，错误requestId在auth marker中缺失，correlation失败",
+        "status": "TRIAGE_RUNNING"
+      },
+      {
+        "id": "RR3-R02-OBS-CLI",
+        "owner": "rr3_g_review_01 CLI fresh ephemeral",
+        "evidence": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/",
+        "observed": "supplemental_cli_rust_matrix与supplemental_cli_sessions_matrix实际FAIL，待全部原结果归因",
+        "status": "REVIEW_RUNNING"
+      }
+    ]
+  }
+}

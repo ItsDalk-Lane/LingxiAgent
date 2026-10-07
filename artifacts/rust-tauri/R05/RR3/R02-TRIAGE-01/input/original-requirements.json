@@ -1,0 +1,83 @@
+{
+  "source": "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+  "sourceSHA256": "96f70219d1df88249e8df073f4dfe211f8562cef20f7e45b1c03064feb5362be",
+  "records": {
+    "R02-A01": {
+      "kind": "base",
+      "stage_id": "R02",
+      "task_ids": [
+        "R02-T01"
+      ],
+      "requirement": "REQUIRED",
+      "spec": {
+        "name": "无桌面启动",
+        "given": "没有 Tauri/Electron 的运行环境",
+        "when": "启动服务并执行健康检查",
+        "then": "服务可用且依赖树无桌面包",
+        "evidence": "构建/启动日志",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "requirement": "REQUIRED",
+        "activation_condition": "本阶段范围内必须验证；环境不足为BLOCKED，不改写为通过。",
+        "spec_status": "NOT_STARTED",
+        "task_id": "R02-T01",
+        "stage_id": "R02"
+      },
+      "ledger_status": "NOT_STARTED",
+      "result_ids": [],
+      "feature_ids": [],
+      "test_ids": []
+    },
+    "R02-A13": {
+      "kind": "base",
+      "stage_id": "R02",
+      "task_ids": [
+        "R02-T07"
+      ],
+      "requirement": "REQUIRED",
+      "spec": {
+        "name": "敏感值不出现在日志",
+        "given": "样本带 API key、OAuth token、敏感头",
+        "when": "触发正常与错误请求并导出日志",
+        "then": "预设敏感值全无，关联 ID 保留",
+        "evidence": "脱敏扫描报告",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "requirement": "REQUIRED",
+        "activation_condition": "本阶段范围内必须验证；环境不足为BLOCKED，不改写为通过。",
+        "spec_status": "NOT_STARTED",
+        "task_id": "R02-T07",
+        "stage_id": "R02"
+      },
+      "ledger_status": "NOT_STARTED",
+      "result_ids": [],
+      "feature_ids": [],
+      "test_ids": []
+    },
+    "R00-T02-LA-1B09760C2B1C": {
+      "kind": "supplemental",
+      "stage_id": "R00",
+      "execution_stage_ids": [
+        "R02",
+        "R07"
+      ],
+      "task_ids": [
+        "R02-T03",
+        "R07-T09"
+      ],
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "feature_id": "F-D20-CLI-CLI-SERVE-1B0976",
+      "then": "以前台服务进程运行，保留指定 channel 与数据降级约束",
+      "formalization_task_id": "R00-T07",
+      "ledger_status": "SPECIFIED_NOT_EXECUTED",
+      "result_ids": [],
+      "feature_ids": [
+        "F-D20-CLI-CLI-SERVE-1B0976"
+      ],
+      "test_ids": []
+    }
+  },
+  "digests": {
+    "R02-A01": "b07e176f9ba65b7379982e70a8ad7e652469a5696aa9b51c9714554182528336",
+    "R02-A13": "361a3698a2efd3d8da264df1b21db40d3c07462be1e07e8f831c865c7a0050b1",
+    "R00-T02-LA-1B09760C2B1C": null
+  }
+}

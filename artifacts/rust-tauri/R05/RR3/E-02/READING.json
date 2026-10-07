@@ -1,0 +1,226 @@
+{
+  "utc": "2026-10-07T01:44:01.591984+00:00",
+  "scope": "完整材料字节读取索引；源码与接口另存source-audit；不冒称重新执行原始测试。",
+  "files": {
+    "docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md": {
+      "sha256": "9395286d8272ba1c841bc7960cc0e06b93affcfbacc2037cf0a8f0df9fcb1fe8",
+      "bytes": 3911
+    },
+    "docs/rust-tauri/R05/repair-current/RR1_FINAL_REPORT.md": {
+      "sha256": "6bcdff2135a8a93bd3a7e44c98ae663c971fc0e93f5b083495d190621d5c2706",
+      "bytes": 14827
+    },
+    "docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json": {
+      "sha256": "6196fdd0c6ebe5d3250ab6e3c39931fe734dbefcb260f4c51f9d192b5ac9887b",
+      "bytes": 279575
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_FINAL_BRIEF.md": {
+      "sha256": "27339ef4f9f171d6fd10a674af43daa3b9849165cf06bd0fe86af7bbe737d1a8",
+      "bytes": 5166
+    },
+    "docs/rust-tauri/R05/repair-current/RR2_HANDOFF.md": {
+      "sha256": "3560187fb5b114c90a958ef844c204619c5292099d2647fab83e43eca559b044",
+      "bytes": 7454
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_A_R2_BRIEF.md": {
+      "sha256": "2223620df3a6652e546eb2b183329f29c8ddef3f926e8588d7d0cb6198d5f75d",
+      "bytes": 2414
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json": {
+      "sha256": "007c70f352f12f7194dc3f89ee0fda9ce01973d024766991bfa9423111a189ff",
+      "bytes": 7744
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_G_BRIEF.md": {
+      "sha256": "8f05e0ee2e9ebe2506d247fd7904d5cb48134ce6697a5d0a3a130b7e4bb148a3",
+      "bytes": 3115
+    },
+    "docs/rust-tauri/R05/repair-current/RR1_BRIEF.md": {
+      "sha256": "89c312ff936cc582b944c97d6166e7c6ffc6a57f8481aee0653d1bc9815b05fb",
+      "bytes": 19955
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md": {
+      "sha256": "ca4de02ad2ff68656967d90bd60cd77061b15ca19b0ee82279bc98c4d5503c38",
+      "bytes": 10505
+    },
+    "docs/rust-tauri/R05/repair-current/RR2_ISSUE_MATRIX.json": {
+      "sha256": "c2f0475ebf998ae225ac300393e58a3365419fb07347861ff78f3a5f0d0c8dbd",
+      "bytes": 37720
+    },
+    "docs/rust-tauri/R05/repair-current/RR1_LEAF_DEVIATIONS.md": {
+      "sha256": "3e95ce7cdc958023ceffea7ba0bfbb6742c2dafd7e40e42fd89227b6546b8f05",
+      "bytes": 5202
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_E_R2_REVIEW_BRIEF.md": {
+      "sha256": "f1b12543094179fdb079e8dc39e5a305380f27069cfb7545a71bd37f8531efc4",
+      "bytes": 2483
+    },
+    "docs/rust-tauri/R05/repair-current/RR1_MASTER_PROMPT_2026-10-04.md": {
+      "sha256": "7fc077f1b370660f582d964977685d5a619fa988befd26f8a4915f409529f2bc",
+      "bytes": 70892
+    },
+    "docs/rust-tauri/R05/repair-current/RR1_PROGRESS.md": {
+      "sha256": "cc51a8db03f30c9aec46201cbffe5c8cab3fbe6ae256485a5a1d9426b9d9111d",
+      "bytes": 27309
+    },
+    "docs/rust-tauri/R05/repair-current/RR2_MASTER_PROMPT_2026-10-06.md": {
+      "sha256": "35802f225728954cccedd12ef0453090948afd18db9cb0f8f31cc9d896e92545",
+      "bytes": 8316
+    },
+    "docs/rust-tauri/R05/repair-current/RR2_PROGRESS.md": {
+      "sha256": "90f1bb1b1cbf0b0cf42114e83e768a4f943723155a7144e061d330a43b649e1e",
+      "bytes": 30484
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_E_R2_BRIEF.md": {
+      "sha256": "28fc2df66c6db57e49391df8855b2ada0e9b6f5a01b32a6deae4e992743a7276",
+      "bytes": 2502
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md": {
+      "sha256": "0119a821a8ece1516a7fd807b55f8df9c08f8f2e356126db7d467097e303ee54",
+      "bytes": 2610
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_E_BRIEF.md": {
+      "sha256": "83db95a21fe67ecaca2fa289aa3577623c8d93f616fadd8ea95616cb56448d9c",
+      "bytes": 4037
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_BRIEF.md": {
+      "sha256": "31be412e410ff7be0543c2b9c5ff332ef77540de242070d6d2b1271ab0a6446c",
+      "bytes": 7538
+    },
+    "docs/rust-tauri/R05/repair-current/RR2_BRIEF.md": {
+      "sha256": "1ee083e21a23a69109cb96810377dba2a9615f7df00a89232dc276631808ff98",
+      "bytes": 5166
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md": {
+      "sha256": "f9eb4898057fd6530a1fcec040dab54a2e4d6690425a707d8c48b6579f47b4e8",
+      "bytes": 3114
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_CF46_REVIEW_BRIEF.md": {
+      "sha256": "e6562f92b20c6858765b6b5e6067db098f3ba7ceb55f6dd24a5aa6b92d0cd57d",
+      "bytes": 3093
+    },
+    "docs/rust-tauri/R05/repair-current/RR3_D_REVIEW_BRIEF.md": {
+      "sha256": "490ecacee26c01ebc90be7b4dfd1f2d709bbac2e27e08a11c72ece9ae1cba2f7",
+      "bytes": 3185
+    },
+    "docs/rust-tauri/R05/R05_SCOPE_MATRIX.json": {
+      "sha256": "222e8e7e54030578c0ce4697d33a98b59ec3ca5cc210642bdc83bdb3b7a72110",
+      "bytes": 117184
+    },
+    "docs/rust-tauri/R05/r05_stage_pins.tsv": {
+      "sha256": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+      "bytes": 10498
+    },
+    "docs/rust-tauri/R05/r05_stage_cids.tsv": {
+      "sha256": "ffffbe56313a1d5e50e7b216499cd851b1efc988da811a57d4fe0b07cc0be556",
+      "bytes": 37255
+    },
+    "docs/rust-tauri/R05/r05_required_cids.tsv": {
+      "sha256": "1a046aa162d62bc1fdefdd286a6211d37c15852a2683073df9c629d26190676c",
+      "bytes": 3125
+    },
+    "docs/rust-tauri/R05/r05_leaf_case_map.tsv": {
+      "sha256": "a4f5866d11a833a7bbcd7224e898baaaa047a485cf4b2c66c515af25348db64f",
+      "bytes": 8755
+    },
+    "artifacts/rust-tauri/R05/RR3/E-01/REPORT.md": {
+      "sha256": "751bf15832843109d7670469514d9a0a32b159d4f90334870d210964ad02baae",
+      "bytes": 9560
+    },
+    "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/REVIEW.md": {
+      "sha256": "57023419618ec8bd7f925dd3ef48eb0549f948cdf6af7227a6a37d5abd114fda",
+      "bytes": 15943
+    },
+    "docs/rust-tauri/R05/R05_REPORT.md": {
+      "sha256": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+      "bytes": 22823
+    },
+    "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md": {
+      "sha256": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+      "bytes": 23793
+    },
+    "docs/rust-tauri/R05/R05_BLOCKERS.md": {
+      "sha256": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+      "bytes": 11714
+    },
+    "docs/rust-tauri/R05/R05_HANDOFF.json": {
+      "sha256": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+      "bytes": 40047
+    },
+    "docs/rust-tauri/R05/PROGRESS_LEDGER.json": {
+      "sha256": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+      "bytes": 52626
+    },
+    "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": {
+      "sha256": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+      "bytes": 4039326
+    },
+    "docs/rust-tauri/R05/R05_TEST_MAP.json": {
+      "sha256": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+      "bytes": 76657
+    },
+    "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md": {
+      "sha256": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+      "bytes": 11015
+    },
+    "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": {
+      "sha256": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+      "bytes": 18728
+    },
+    "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": {
+      "sha256": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+      "bytes": 12609
+    },
+    "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md": {
+      "sha256": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+      "bytes": 5656
+    },
+    "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md": {
+      "sha256": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+      "bytes": 20415
+    },
+    "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md": {
+      "sha256": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+      "bytes": 67889
+    },
+    "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json": {
+      "sha256": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+      "bytes": 236829
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/Lingxi_R05_完整执行与验收提示词_2026-10-02.md": {
+      "sha256": "371fffc32310ff7fdd6f8b383d437d327b6ab3b8848f78154011cad3719bdfdb",
+      "bytes": 76252
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/01_通用执行约束.md": {
+      "sha256": "d4f07185735acda91b73a2aa97a42ca7ce5795babf1104968c83671131cf871c",
+      "bytes": 8145
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/02_目标架构与强制契约.md": {
+      "sha256": "53dbf699675d9981b60ea5c982c4d0507afffd5184e6bebac875aae40d173c4d",
+      "bytes": 11718
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R05_模型协议、凭证、流式处理与最小完整闭环.md": {
+      "sha256": "a10490c115d00f1f0c5bbcf1a5e2f6b8740397103d8b8ad5cc029a3427f1a3e0",
+      "bytes": 17336
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/04_阶段依赖与接口交接.md": {
+      "sha256": "940c896508e929ec5f25c2b9020c06c2035c3f9800f43b78b1fd5e303e92bde3",
+      "bytes": 4233
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/06_风险、技术决策与退出条件.md": {
+      "sha256": "6c92962e5bcb739509630eb8c9cf8b96fabf67c0d51315717ae048d9b87786f0",
+      "bytes": 4454
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R06_上下文、会话语义、记忆与知识库.md": {
+      "sha256": "d54e7fcc638b62fc4303ce4af8f01ba8c358fd1a90d0f85a491bfd4a439bbd2e",
+      "bytes": 17423
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/05_验收与性能协议.md": {
+      "sha256": "d86c51f4b8571f94f0e9b457e74e79d9281d5c846e7a37d1f39edfdf47324b61",
+      "bytes": 10299
+    },
+    "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/03_功能与所有权矩阵.md": {
+      "sha256": "6e84fc77a9f3124d51fe4d088fda6c8dcb96989e43d280634b94b7fc1d778560",
+      "bytes": 5882
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "round": "RR3/E-04",
+  "generated_at_utc": "2026-10-07T23:14:05Z",
+  "recorded_by": "rr3_e_impl_04（全新空历史文档实施者；无子代理）",
+  "files": [
+    {
+      "path": "REPORT.md",
+      "sha256": "df441e55817ec8acd5a1a920163367e28909222ca54aefd8233e3862b9acc480",
+      "bytes": 12015
+    },
+    {
+      "path": "changed-files.json",
+      "sha256": "d9b4adcf8fdbdf8481de1bf373ed142e8d8f64da3ef4b34afbe1d7e159d9b6a7",
+      "bytes": 4749
+    },
+    {
+      "path": "check-results.json",
+      "sha256": "928363577bbcba52156a6f3477ab6445ce27db8a2ae5d521b179d2754608db14",
+      "bytes": 4056
+    },
+    {
+      "path": "check.py",
+      "sha256": "7bef0455ecfc67bff356a8aa01d2f8713293d1c9dc829c4adae0292c214ee0b8",
+      "bytes": 10995
+    },
+    {
+      "path": "controls/control-results.json",
+      "sha256": "db43263062b22544d441efdf4c4f43a7e00e0b1acb3b1f9385e12b06bf8acb28",
+      "bytes": 1019
+    },
+    {
+      "path": "controls.py",
+      "sha256": "f852dcac6563d35fd920d9ba8903408a048132719c005ed92c833d9a4c9153a4",
+      "bytes": 4996
+    },
+    {
+      "path": "finalize.py",
+      "sha256": "29801e698147112ff56b59bfa0a4e535d44d816b48df773abfbccdfb73e34764",
+      "bytes": 6328
+    },
+    {
+      "path": "git-state.json",
+      "sha256": "9ccf388f8996cb26407694e0f2852f2d8a2d57f6a4a17cae8a1603a848621dff",
+      "bytes": 901
+    },
+    {
+      "path": "protected-inputs-equality.json",
+      "sha256": "a668a498dcaa546a16435fe591285261d684a49f6b8110018fe404832ee5c3be",
+      "bytes": 11733
+    },
+    {
+      "path": "snapshot_tree.py",
+      "sha256": "20c37c0f74b54cbe122f6a7b842a4aeba91d76de4a6ad0fb76d1b62b7163db11",
+      "bytes": 2486
+    },
+    {
+      "path": "update_docs.py",
+      "sha256": "c8e2086451b40df12709a00021706fb41e34e904fb05defbf69cb4f638c3c92a",
+      "bytes": 40321
+    },
+    {
+      "path": "update_markdown.py",
+      "sha256": "56e20bb1c023683cf9add9295760c5462b7ad445f07ed7029b89ad7d1b578b84",
+      "bytes": 21479
+    },
+    {
+      "path": "write_manifest.py",
+      "sha256": "f43e72e454552eafeb07ef9255170f979be20ecf707420975886c003189a132d",
+      "bytes": 2143
+    }
+  ],
+  "notes": [
+    "MANIFEST.json 自排除；tree-snapshot-before/after.json（各约 73,078 文件枚举）过大不计入，由 protected-inputs-equality.json 引用，可用 snapshot_tree.py 复算核验。",
+    "本目录全部脚本仅在本轮文档回填/自检中运行；未运行任何 Cargo/产品测试。"
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "rows": [
+    {
+      "path": "rust/crates/lingxi-service/src/main.rs",
+      "current": "9ea695ee5b2eef4163db16df4b584b363df6a375ca334f02c9160886ed1b5f5b",
+      "oldIsolated": "9ea695ee5b2eef4163db16df4b584b363df6a375ca334f02c9160886ed1b5f5b",
+      "same": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "current": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+      "oldIsolated": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+      "same": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/redaction.rs",
+      "current": "5b192ab43df13d6add0705a9f1eb2ead45da1131f012c3afb61dd9f90ac10b7a",
+      "oldIsolated": "5b192ab43df13d6add0705a9f1eb2ead45da1131f012c3afb61dd9f90ac10b7a",
+      "same": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/logging.rs",
+      "current": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+      "oldIsolated": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+      "same": true
+    },
+    {
+      "path": "scripts/rust-tauri/r02_t01_service_smoke.sh",
+      "current": "76f3e9fd143842b4f9ef7577bf3c857ddaee29e02ec849b9b93d2cc14afede1c",
+      "oldIsolated": "14516af32a59d2f590018be232c601817dfeadb3e4355fa860fd90b1cc34bd79",
+      "same": false
+    }
+  ],
+  "priorCommands": [
+    {
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "argv": [
+        "python3",
+        "artifacts/rust-tauri/R05/RR3/H-REVIEW-01/prepare_isolated.py"
+      ],
+      "exit": 0,
+      "binary": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "sha256": "3c2c30954478adc179b6b1073d70405a9025722463a132be6ee36c8727ea4865"
+      }
+    },
+    {
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-01/isolated",
+      "argv": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-01/isolated/scripts/rust-tauri/r02_t01_service_smoke.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-01/commands/f47-old-warn/A01"
+      ],
+      "exit": 1,
+      "binary": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "sha256": "ad4aa037205eafb92430c92b766f3e41c33747c550fcc3487ce523a19ade2e71"
+      }
+    },
+    {
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "argv": [
+        "python3",
+        "artifacts/rust-tauri/R05/RR3/H-REVIEW-01/isolation_cases.py",
+        "f47-old-warn"
+      ],
+      "exit": 1,
+      "binary": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "sha256": "ad4aa037205eafb92430c92b766f3e41c33747c550fcc3487ce523a19ade2e71"
+      }
+    },
+    {
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-01/isolated",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "lingxi-service",
+        "--message-format=json"
+      ],
+      "exit": 0,
+      "binary": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "sha256": "ad4aa037205eafb92430c92b766f3e41c33747c550fcc3487ce523a19ade2e71"
+      }
+    },
+    {
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "argv": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "exit": 0,
+      "binary": {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+        "sha256": "3c2c30954478adc179b6b1073d70405a9025722463a132be6ee36c8727ea4865"
+      }
+    }
+  ],
+  "conclusion": "旧H01隔离Rust四文件等当前，只有旧warn脚本不同；主缓存仍为旧隔离编译对象，不能贴当前源结论；旧中断无最终review"
+}

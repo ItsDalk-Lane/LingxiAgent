@@ -1,0 +1,4 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.10s
+     Running `/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R05 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n07-drop-r04reg/evidence`
+error: invalid stage map for R05: stage map invalid: scenario "R05-A16" references unknown command "r04_regression_gate"

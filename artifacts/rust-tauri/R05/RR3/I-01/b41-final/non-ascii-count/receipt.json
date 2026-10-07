@@ -1,0 +1,17 @@
+{
+  "case": "non-ascii-count",
+  "command": [
+    "python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/non-ascii-count/input.tsv",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-final/non-ascii-count/mutation.json"
+  ],
+  "startedAt": "2026-10-07T02:33:05.183553+00:00",
+  "endedAt": "2026-10-07T02:33:05.213116+00:00",
+  "exitCode": 1,
+  "expectedExit": 1,
+  "beforeSha256": "5fd2e69fca7da7987808173f8d2141b0379fc472026ec85aee350cc282a7ba74",
+  "afterSha256": "5fd2e69fca7da7987808173f8d2141b0379fc472026ec85aee350cc282a7ba74",
+  "receiptPresent": false,
+  "status": "PASS"
+}

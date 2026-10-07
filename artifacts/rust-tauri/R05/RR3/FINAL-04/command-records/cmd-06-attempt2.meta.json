@@ -1,0 +1,24 @@
+{
+ "argv": [
+  "/Users/study_superior/.cargo/bin/cargo",
+  "run",
+  "--manifest-path",
+  "rust/Cargo.toml",
+  "--locked",
+  "-p",
+  "xtask",
+  "--",
+  "verify-stage",
+  "R05",
+  "--evidence",
+  "artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05"
+ ],
+ "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+ "df_before": "/dev/disk3s5   926Gi   389Gi   512Gi    44%    5.5M  5.4G    0%   /System/Volumes/Data",
+ "exit_code_file": "cmd-06-attempt2.exit",
+ "label": "cmd-06-verify-stage-R05-attempt2",
+ "launch_mode": "double-fork daemonize (launchd-adopted orphan runs /bin/sh -c cargo...; exit code -> cmd-06-attempt2.exit)",
+ "stderr_file": "cmd-06-attempt2.stderr",
+ "stdout_file": "cmd-06-attempt2.stdout",
+ "utc_start": "2026-10-07T21:24:41.511454+00:00"
+}

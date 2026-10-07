@@ -1,0 +1,14 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.47s
+     Running tests/r05_t08_resources.rs (rust/target/debug/deps/r05_t08_resources-f66968a3ba499b0b)
+
+running 2 tests
+test f27_sampler_controls_detect_growth_release_and_failure ... F27 sampler controls: {"deadProcessTree":"UNKNOWN","emptyAndWrongIdentity":"UNKNOWN","fdBaseline":3,"fdReleased":"UNKNOWN (dead/reaped PID)","fdRetained":6,"filesReleased":[],"filesRetained":[{"bytes":17,"path":"held-0.tmp"},{"bytes":17,"path":"held-1.tmp"},{"bytes":17,"path":"held-2.tmp"}],"liveProcessTree":{"establishedTcpCount":0,"fds":3,"processes":[{"establishedTcp":[],"fds":3,"pid":81594,"rssKiB":1472}],"rootPid":81594,"rssKiB":1472},"tcpReleased":0,"tcpRetained":2}
+ok
+test f27_sustained_cancel_error_worker_load_stays_bounded ... F27 raw resource series: /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-series-81588-1791333559031421000/f27-resource-series.json
+F27 cancel phase: hits=62 dropped=60 settled=0 dangling=60
+F27 raw resource series: /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-series-81588-1791333559031421000/f27-resource-series.json
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 335.40s
+

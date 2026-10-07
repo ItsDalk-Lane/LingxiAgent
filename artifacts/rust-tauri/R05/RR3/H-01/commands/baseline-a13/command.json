@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "bash",
+    "scripts/rust-tauri/r02_t07_redaction_scan.sh",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/baseline-a13/A13"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "UTC_start": "2026-10-07T02:21:49.677157+00:00",
+  "UTC_end": "2026-10-07T02:22:01.950598+00:00",
+  "exit": 1,
+  "counts": [],
+  "leafCounts": [],
+  "inputEqual": true,
+  "inputBeforeDigest": "fdc79a74392f624b0869ac9fdcf5397172b2739173a25a8d02a29589a0ef65a8",
+  "inputAfterDigest": "fdc79a74392f624b0869ac9fdcf5397172b2739173a25a8d02a29589a0ef65a8",
+  "environment": {
+    "PATH": "/Users/study_superior/.cargo/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.codex/tmp/arg0/codex-arg09KvvCE:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.codex/tmp/arg0/codex-arg0uQYuTZ:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/study_superior/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/study_superior/.lmstudio/bin",
+    "CARGO_TARGET_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target",
+    "CARGO_NET_OFFLINE": "true",
+    "TMPDIR": "/tmp",
+    "RUST_LOG": "warn"
+  },
+  "stdoutSHA256": "f2c575eb39842fd2051e3dd4bd0785287326b7384592c957f937434adc4cb14c",
+  "stderrSHA256": "fe6030d428e6f5184f21d05f14bedf180468551153544c1394de703cd33ff5d6",
+  "binary": {
+    "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+    "sha256": "b180d47abeeecef4e6d677b9501fde0828cd4061f74276d8e5e2a2a9afb33d81"
+  },
+  "boundary": "正式Cargo和真实服务入口；仅本包隔离变异明确单列；无供应商外发",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b"
+}

@@ -1,0 +1,58 @@
+{
+  "utc": "2026-10-07T01:37:27.304292+00:00",
+  "dispatchObserved": [
+    {
+      "path": "dispatch/request.json",
+      "sha256": "dc7dca85fc655ef5efd1c5ae4ceb88c0beabc3b5cfdee743012ec05c9e0ce4ea",
+      "bytes": 808
+    },
+    {
+      "path": "dispatch/stderr.log",
+      "sha256": "1ba154c8580471fe250de14aa8991d53558674e608ab7fc82b21a883be9b135d",
+      "bytes": 966
+    },
+    {
+      "path": "dispatch/prompt.txt",
+      "sha256": "bb0de60f9d3ea941b3fe9fa601c80bda1e0e43571f749c40dce7f560467889b5",
+      "bytes": 2388
+    },
+    {
+      "path": "dispatch/events.jsonl",
+      "sha256": "d28040fd48c44e067449458a6d634f47677f2d38344d6783cdb95e034cd19216",
+      "bytes": 1453061
+    }
+  ],
+  "identity": "rr3_g_review_01",
+  "threadEventFirst": {
+    "type": "thread.started",
+    "thread_id": "01a113f6-7e90-7051-b75f-8f28fd53ee99"
+  },
+  "request": {
+    "argv": [
+      "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+      "exec",
+      "--ephemeral",
+      "--json",
+      "--color",
+      "never",
+      "--sandbox",
+      "danger-full-access",
+      "-c",
+      "approval_policy=\"never\"",
+      "-C",
+      "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "-o",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/dispatch/final.txt",
+      "-"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "createdAt": "2026-10-07T01:24:42.479400+00:00",
+    "freshHistory": true,
+    "ephemeral": true,
+    "modelOverride": null,
+    "permissionProfile": "same danger-full-access / never; no hook or rules bypass",
+    "result": "RUNNING",
+    "startedAt": "2026-10-07T01:24:43.740743+00:00"
+  },
+  "boundary": "dispatch由派发者写，审查者只读；不推断不可观察的后端模型版本，不调用其他agent"
+}

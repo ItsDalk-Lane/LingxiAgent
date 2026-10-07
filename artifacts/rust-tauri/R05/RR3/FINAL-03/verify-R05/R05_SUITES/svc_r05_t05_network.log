@@ -1,0 +1,28 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r05_t05_network.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r05-t08/debug/deps/r05_t05_network-9506e532c45dbc39)
+
+running 21 tests
+test rr1_f14::direct_policy_dials_the_source_itself ... ok
+test rr1_f14::forced_loopback_bypass_keeps_local_endpoints_direct ... ok
+test rr1_f14::network_policy_section_parses_and_validates ... ok
+test rr1_f14::manual_proxy_routes_a_real_chat_turn_through_the_proxy ... ok
+test rr1_f14::oauth_operation_and_download_share_the_proxy_policy ... ok
+test rr1_f14::publishing_a_policy_generation_reroutes_the_next_request ... ok
+test rr1_f14::private_ca_authorizes_chat_and_default_verification_refuses_it ... ok
+test rr1_f14::wrong_hostname_expired_and_wrong_chain_are_refused ... ok
+test rr1_f14::system_mode_routes_through_the_snapshotted_environment ... ok
+test rr1_f15::a_proxied_download_routes_through_the_proxy_and_still_refuses_guarded_names ... ok
+test rr1_f15::localhost_download_makes_zero_connections ... ok
+test rr1_f15::private_resolved_candidate_refuses_with_zero_connections ... ok
+test rr1_f15::mixed_candidates_refuse_and_public_candidates_pass_judgment ... ok
+test rr1_f15::the_same_origin_exception_downloads_real_bytes ... ok
+test rr1_f16::a_parked_refresh_wait_obeys_the_call_deadline ... ok
+test rr1_f15::the_pinned_dial_never_re_resolves ... ok
+test rr1_f16::error_body_must_obey_total_deadline ... ok
+test rr1_f16::error_body_read_failure_is_preserved_not_swallowed ... ok
+test rr1_f16::chat_queue::the_run_drivers_queue_wait_obeys_the_call_budget ... ok
+test rr1_f16::oversized_error_body_is_capped_with_the_fact_preserved ... ok
+test rr1_f16::operations_queue_wait_obeys_the_call_budget ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.39s
+

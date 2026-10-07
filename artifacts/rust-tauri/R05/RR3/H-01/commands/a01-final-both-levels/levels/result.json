@@ -1,0 +1,22 @@
+[
+  {
+    "outerRUST_LOG": "warn",
+    "actual": 17,
+    "failed": 0,
+    "sources": [
+      "cli",
+      "env",
+      "config-file"
+    ]
+  },
+  {
+    "outerRUST_LOG": "info",
+    "actual": 17,
+    "failed": 0,
+    "sources": [
+      "cli",
+      "env",
+      "config-file"
+    ]
+  }
+]

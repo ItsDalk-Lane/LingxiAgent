@@ -1,0 +1,9 @@
+== all files written AFTER relocation (local > 19:54:56 = UTC 11:54:56) ==
+/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/.git/index
+== .DS_Store mtimes distribution (top-level few) ==
+2026-10-07T13:44:27  /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/.DS_Store
+2026-10-07T13:42:38  /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/artifacts/.DS_Store
+== stability: full digest twice, 20s apart ==
+scan1 digest=fee8e52b9a4965766eb4b3b3fd376f3da761e05d47db1d7eabd966815ea39e9b files=102887 bytes=5130434169
+scan2 digest=fee8e52b9a4965766eb4b3b3fd376f3da761e05d47db1d7eabd966815ea39e9b files=102887 bytes=5130434169
+stable= True

@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "caseCount": 10,
+  "source": "AUTH/sessions-list-matrix.json",
+  "expectedCases": [
+    "a05-cli-sessions-foreign-empty",
+    "a05-cli-sessions-limit-20",
+    "a05-cli-sessions-owner-list",
+    "a05-cli-sessions-unauthorized-error",
+    "a05-sessions-list-empty-shape",
+    "a05-sessions-list-foreign-excludes-owner-sessions",
+    "a05-sessions-list-foreign-principal",
+    "a05-sessions-list-no-credential",
+    "a05-sessions-list-owner",
+    "a05-sessions-list-owner-contains-own-session"
+  ],
+  "sourceSha256": "6094edcf1597b62c14e727ade9b3d3db25182db7add3ca3e38c2f45b9aff0057",
+  "boundary": "same actual auth business result rechecked against unchanged producer exact identities; no full producer/build claimed"
+}

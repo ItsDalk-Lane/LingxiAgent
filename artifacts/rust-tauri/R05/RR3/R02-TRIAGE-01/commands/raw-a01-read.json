@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "sh",
+    "-c",
+    "cat artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/*newer*.txt artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/*newer*.sha256; cat artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A01/a01-service-stderr.log"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "start": "2026-10-07T01:57:48.063135+00:00",
+  "end": "2026-10-07T01:57:48.073787+00:00"
+}

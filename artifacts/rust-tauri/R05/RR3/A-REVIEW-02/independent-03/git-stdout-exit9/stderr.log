@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/snapshot/scripts/rust-tauri/run_output_sinks.py", line 76, in tracked
+    out = subprocess.run(
+          ~~~~~~~~~~~~~~^
+        ["git", "--literal-pathspecs", "-C", repo, "ls-files", "--", path],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        check=True, capture_output=True, text=True,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).stdout
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['git', '--literal-pathspecs', '-C', '/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-fresh/repo', 'ls-files', '--', 'artifacts/rust-tauri/R05/run-review/stdout.log']' returned non-zero exit status 9.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/snapshot/scripts/rust-tauri/run_output_sinks.py", line 107, in <module>
+    if tracked(rel):
+       ~~~~~~~^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/snapshot/scripts/rust-tauri/run_output_sinks.py", line 81, in tracked
+    raise RuntimeError("cannot inspect tracked sink ownership") from exc
+RuntimeError: cannot inspect tracked sink ownership

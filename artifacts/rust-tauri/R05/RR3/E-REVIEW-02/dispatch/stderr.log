@@ -1,0 +1,10 @@
+2026-10-07T01:56:50.108063Z  WARN codex_skills::interface: ignoring interface.icon_small: icon path with '..' must resolve under plugin assets/
+2026-10-07T01:56:50.108123Z  WARN codex_skills::interface: ignoring interface.icon_large: icon path with '..' must resolve under plugin assets/
+2026-10-07T01:56:50.118386Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
+2026-10-07T01:56:50.347485Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: HTTP error: 426 Upgrade Required, url: ws://127.0.0.1:15721/v1/responses
+2026-10-07T01:56:50.347574Z  WARN codex_core::client: falling back to HTTP
+2026-10-07T01:56:51.637674Z  WARN codex_skills::interface: ignoring interface.icon_small: icon path with '..' must resolve under plugin assets/
+2026-10-07T01:56:51.637727Z  WARN codex_skills::interface: ignoring interface.icon_large: icon path with '..' must resolve under plugin assets/
+2026-10-07T02:03:05.074421Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (1/5 in 207ms)... turn_id=01a11413-e389-76b3-b632-a4af271bb5c0 retries=1 max_retries=5 sampling_error=stream disconnected before completion: Transport error: network error: error decoding response body
+2026-10-07T02:04:47.610862Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (2/5 in 373ms)... turn_id=01a11413-e389-76b3-b632-a4af271bb5c0 retries=2 max_retries=5 sampling_error=stream disconnected before completion: Transport error: network error: error decoding response body
+2026-10-07T02:08:35.105085Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (1/5 in 212ms)... turn_id=01a11413-e389-76b3-b632-a4af271bb5c0 retries=1 max_retries=5 sampling_error=stream disconnected before completion: Transport error: network error: error decoding response body

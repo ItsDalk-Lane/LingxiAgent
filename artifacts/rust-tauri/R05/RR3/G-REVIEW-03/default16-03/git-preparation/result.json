@@ -1,0 +1,3388 @@
+{
+  "status": "PASS",
+  "startedUtc": "2026-10-07T09:43:34.990997+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T09:43:34.991353+00:00",
+      "finishedUtc": "2026-10-07T09:43:34.997880+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "82d8b685ab806b27b5cf0c3b770f86661adcb8958e59de111a5b9c73918573fc",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0000.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T09:43:34.998074+00:00",
+      "finishedUtc": "2026-10-07T09:43:35.004278+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0001.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "rev-parse",
+        "--verify",
+        "HEAD^{commit}"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T09:43:35.006908+00:00",
+      "finishedUtc": "2026-10-07T09:43:35.013496+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0002.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "rev-parse",
+        "--show-object-format"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T09:43:35.013654+00:00",
+      "finishedUtc": "2026-10-07T09:43:35.019728+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "335277ee77cfc8d51d6602e4137232cf6041aac2bc663777e384b90d5ae74d51",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0003.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "ls-tree",
+        "-rlz",
+        "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T09:43:35.019908+00:00",
+      "finishedUtc": "2026-10-07T09:43:35.213510+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "2f7b3b48996371691ab6e6f2049bbe0ab6d9b2df5cbf4e564e200c7b3cac003d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0004.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "clone",
+        "--shared",
+        "--no-checkout",
+        "--quiet",
+        "--branch",
+        "codex/rust-tauri-migration",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T09:43:42.279742+00:00",
+      "finishedUtc": "2026-10-07T09:43:42.310548+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0005.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:42.310766+00:00",
+      "finishedUtc": "2026-10-07T09:43:42.317040+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0006.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "read-tree",
+        "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:42.317204+00:00",
+      "finishedUtc": "2026-10-07T09:43:42.379109+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0007.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:42.379306+00:00",
+      "finishedUtc": "2026-10-07T09:43:42.613437+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0008.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:42.613621+00:00",
+      "finishedUtc": "2026-10-07T09:43:42.620162+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "579682b8b266d9d1e1e41204efb66e1c88458f79a7595f2dd21fdf2da8121022",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0009.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "4f086b4df3e6617c986986e9c34153ae85f21216"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.767226+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.774980+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "fccabf1fc5553a3c71906d6d9a7ee9f43e970870ac870c1b404a31cee7e80a2c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T07/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "788b63b8117cb9cd461db577e53eebddd92c698b"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.776148+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.782899+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "95328747a002cc5f55b28369e4f5018b1b2be934c008b6d4fbc64d6fcebc46c7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T07/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "3deaa556ef76af288c732864c81b26c649f3bfa7"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.783806+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.790117+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "1eb782316b94db215e18ee48c45c901f1a5dd2db9a67ed7915500ec1c1ccdb5e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T07/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "50ba087e9b730a87e351719215ee4a1af9f5b839"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.791022+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.797688+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3938a66f852da63fc4e7e1b276f3aebfd6cf336c8c88cced0e3d9e7293e8be8c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T07/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "82fc27b0795a316027be3bdc29393b3f01d4c152"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.798351+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.805188+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "fd245a529c69f38efd2657719debb648db6403002236f1b390f56beefa42a39d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T07/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "82fc27b0795a316027be3bdc29393b3f01d4c152"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.805980+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.812632+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "fd245a529c69f38efd2657719debb648db6403002236f1b390f56beefa42a39d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T07/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "437f7cd40dc09aaeac7d4e116c361c8b3879990f"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.813309+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.820037+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ef20dc6471c3c10f37786bed92651dd37321b68639fef67ba4e906c084934109",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T07/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "e2e5460fae5211d86b06f52543b86e13b81fbb02"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.820833+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.826943+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3bfc2d7ca0a51683f6a1022941dda02029844062e24475de0f9f8e48d84e86d3",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T07/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "82fc27b0795a316027be3bdc29393b3f01d4c152"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.827704+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.833766+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "fd245a529c69f38efd2657719debb648db6403002236f1b390f56beefa42a39d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T07/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "fcb2e842f9ed9302672cf09d0bddb636bd76ed12"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.929774+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.936125+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "2c5745d4933ff257ef6570306b62fe22dd6afc649e7627e24c7d83eff4314f8b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T08/verify-stage/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "10409a6c93756a83f86dda512ae0bf8c57e79c9a"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.937287+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.943798+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c4b5ea4779be836b81e20ae599fea5cae776084bb4cd068c0eabbd5c4c19fba9",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T08/verify-stage/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "2015e11a10576a0d54f74888aa81fcf1177a1f24"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.944833+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.950775+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "14f28cf1d0d0726218ac0c6eef32870df9836cdc38306e873306a5a8707e8e00",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T08/verify-stage/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "ce2fbac659963666f7669c180664e026369535e8"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.952072+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.958793+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ae0e1200ec3aa7c64873e16f6bcb83cda5f80025120a5a97b64aee32156d86a6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T08/verify-stage/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "adb0f464f5ec1b9ffd1058f788ddc78573b76729"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.959569+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.965642+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "5ace8dc9fcf2b3d4e93f260ae28aeaae7a0857ba4eb2093a487257b0872665c6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T08/verify-stage/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "adb0f464f5ec1b9ffd1058f788ddc78573b76729"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.966439+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.973322+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "5ace8dc9fcf2b3d4e93f260ae28aeaae7a0857ba4eb2093a487257b0872665c6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T08/verify-stage/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "9733bdece777d9f96b6973609088e9261d69e726"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.974376+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.980919+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "60c7def71e4c6126c84a3592a468676af68b5bd12a1bf95b275a4d735447ccb3",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T08/verify-stage/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "8a13f59361585175e5f9cc64c31519304a36957a"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.981720+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.987780+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e46e90045fbe3b1b83acb2bd2462f7759f32d4d1c060e4fe23330ebf1db55a6b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T08/verify-stage/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "adb0f464f5ec1b9ffd1058f788ddc78573b76729"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:46.988462+00:00",
+      "finishedUtc": "2026-10-07T09:43:46.994345+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "5ace8dc9fcf2b3d4e93f260ae28aeaae7a0857ba4eb2093a487257b0872665c6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/T08/verify-stage/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "68d5dd54b2c7280701963932ec2d5964ed8e5818"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.412712+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.420332+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e4bcd29cbd9b77e966a927a8c3721ae16f400be49576534f6498d4263cdec421",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "db974a8d7bfe64b6cb9d116e29312300c585fd51"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.421288+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.427947+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "07c3e3cb2f003eea2b7bfa79eac906dc9c151fdad4efa2d95ed9b9e90d5f56bc",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "73431ce0af97b177e43dccca5fc1fb0199116d18"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.428888+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.435615+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "b69d71b53eac1938644c3a239f2f33c7104fe89966c320f6202f45671defbc2c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "9c7c4d0bed36cee048f09a39b2facbad8abb4e2b"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.436552+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.443285+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "bff1f89d2347f05540fc01033d38d47da830815dbb9123f9905a78f8a824f766",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "14e79e95779bc22f262f4cbded8a8179bb679e0d"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.443955+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.450079+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c1d335267aa3a4d55ece56354dd4c478ffcd565f6afcc0704b3a03e18c61bb4f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "14e79e95779bc22f262f4cbded8a8179bb679e0d"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.450738+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.456985+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c1d335267aa3a4d55ece56354dd4c478ffcd565f6afcc0704b3a03e18c61bb4f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "26fd08f907d0e9e5326c8f08521498885834900b"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.457673+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.464491+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ddb61388e7aec14e7b5b459667cd4fe44e6b78bfbb992e9cea0d93c631d93ab0",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "32af8f17eff3505fd46afd2c032b62cbc342d1e3"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.465194+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.471657+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "be775aa5aa398f066bec1f0f8cf9629b593c2c0277b65c15c2fd7bebd9b62bf6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "14e79e95779bc22f262f4cbded8a8179bb679e0d"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.472355+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.479082+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c1d335267aa3a4d55ece56354dd4c478ffcd565f6afcc0704b3a03e18c61bb4f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "ca5cce57c7b24c3c8e5f0a6a837a1870a285716d"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.643027+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.650459+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e4e3c9e058ffcd2b1ecb1df9255ac52c89934b19a7521944852013d551bb3179",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a29e5adbb404ad70/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "977c0d3f39bc34cbc961f82eb7c2b4d7286d0318"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.651520+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.657979+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3b4bf8c8f405804010e63182c997ee9af8dd85cb487c0876bf0cc57b848e64c4",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a29e5adbb404ad70/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "d8b1cc1774b970383033839ed67f3731a102edc6"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.659491+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.666150+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "d578d3f3bfa8477c28c1d68ae6b26e2885b1e13e06a0d07f2d08b7b03ad4a244",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a29e5adbb404ad70/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "9dae5586a3c21f0ecdf3af1e74111a053dbb60da"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.667067+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.673643+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "30b10f18b8dabfd13e46b5c5341a791f9fe9d874af128dc434e904a17896ad48",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a29e5adbb404ad70/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "431ee8b56cabf9743845164b57458fe63184f2b6"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.674293+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.680948+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "0d83e4c5ff82a931c0925aac2a2dd96e004e5f1a7268aea52e3c9d5775083009",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a29e5adbb404ad70/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "431ee8b56cabf9743845164b57458fe63184f2b6"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.681634+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.688358+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "0d83e4c5ff82a931c0925aac2a2dd96e004e5f1a7268aea52e3c9d5775083009",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a29e5adbb404ad70/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "a86d95675b8ee1730e68edfcbd2f56e9ff5b3baa"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.689210+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.695748+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c9e3186b87b77bc7ecfcb50f9a6f65ab7590267ff0c5a9cbd0e33ec86c1ab397",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a29e5adbb404ad70/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "0813ec2202a669d5ddb4270ec35635324c3a79d6"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.696551+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.703036+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "cafe561f44a6f77fb0489bc41520b65574c3a5169680f9e65ed09d9bdebc580f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a29e5adbb404ad70/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "431ee8b56cabf9743845164b57458fe63184f2b6"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.703758+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.710556+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "0d83e4c5ff82a931c0925aac2a2dd96e004e5f1a7268aea52e3c9d5775083009",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-a29e5adbb404ad70/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "e347ea77c9d30dbc7813e067cc1c863554e71ad6"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.880113+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.887331+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "48ed521097d97cbdebd94e2c459dd3fdfad846357c37ff4a7fddfbdc594a3918",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "51f8ee492ee496bd43ad4ef3d290df2edd5c8dd5"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.888396+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.894798+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "b3a08a1082cbfaad9231eadb3a66dc46c9e9129a8ae3fede00299b2cba011a11",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "2e8367053f6012a1d061a10ea62e58807da3041d"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.895817+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.902033+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "a06f83537237f2feba71d0abda49a1b0f36cdeb999e0b10e80ca20fdfe8bafa9",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "1e792dc443eab8252520532465082d1678a8ecb8"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.902998+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.909648+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c1bbdb568467439dcb3e178820919f03f13fd4358ece47d9d377b414cbc25b26",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "b61171e2f135e1e3c03002c9879749cc173caf20"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.910393+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.917598+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "d181f98dbeeb377f9001eafc2c3954c0ccd957d8313c1496ffd9cd0600db2c78",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "b61171e2f135e1e3c03002c9879749cc173caf20"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.918515+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.925020+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "d181f98dbeeb377f9001eafc2c3954c0ccd957d8313c1496ffd9cd0600db2c78",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "445e337a3c789dabee0c8c0826c175262ab6882f"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.925864+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.932113+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "6254f2a75276918603ed5adb801cd53070d0637452832e677ba33dff03a5c906",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "a1d30b8629565964af1f0eda77c201be478d550c"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.932904+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.939792+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c68c27f8356856c75844cae6ca7b6e57fec949563ede0fdfef2505d4a2762ff3",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "b61171e2f135e1e3c03002c9879749cc173caf20"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:47.940498+00:00",
+      "finishedUtc": "2026-10-07T09:43:47.946715+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "d181f98dbeeb377f9001eafc2c3954c0ccd957d8313c1496ffd9cd0600db2c78",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "753af392c6a676439f181a38da90d1c2e59c3c9f"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.142804+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.151305+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "5bdd9fab30248129cc534d78847daa4155c57888fee8be72abbb3d9e15294c66",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-fc9971898df7a9e8/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "d7f208b4170ac59e273b7731b27460b92d9dbfea"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.152384+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.158742+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c0ade58240fc8ff1311ae9e9ec725cd2e053b73a76a66aa609121462be57281e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-fc9971898df7a9e8/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "2acc5ac747cfc3a8d914554fa1c4934a7e2fe57b"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.159776+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.167168+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "23c3a07b05c57e6edf05511248605336885992a0b35af3a4be5bc4ce8420ee57",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-fc9971898df7a9e8/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "7034f537c4bcf912df861e18fe1e492b578ff946"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.168582+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.175908+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "7666faa01a65bad0dab54a247dd7c02820064f6d37e34699f16dd690237c88ae",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-fc9971898df7a9e8/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "d45ffcdfb373f4a087f6046d531abc5bfd9a1113"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.176695+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.183344+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "657c213cf74bd6d99cd0cf6e7c1650a2a9cc7d4e3d8337777b83f01c677dbcfe",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-fc9971898df7a9e8/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "d45ffcdfb373f4a087f6046d531abc5bfd9a1113"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.184093+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.190470+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "657c213cf74bd6d99cd0cf6e7c1650a2a9cc7d4e3d8337777b83f01c677dbcfe",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-fc9971898df7a9e8/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "007b91d635dd2fc66b6d7e5e3fdc55317b6d081a"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.191296+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.198405+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "01239c07d7e77e6c6953f4dcf3a3dfa4a841ea3b8bec383354ced707ed0f4f7c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-fc9971898df7a9e8/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "a03cdb154e40c241d73e0c1765d83c8f67d4bc2b"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.199130+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.206555+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "86d8d3444617091fd1d5a0e717c075a1165f2484a7a6973a41a8fd4465fd0d51",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-fc9971898df7a9e8/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "d45ffcdfb373f4a087f6046d531abc5bfd9a1113"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.207342+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.214109+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "657c213cf74bd6d99cd0cf6e7c1650a2a9cc7d4e3d8337777b83f01c677dbcfe",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R02/final-candidate-fc9971898df7a9e8/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "f29d7f36a528b68335dd8e1731fa96390d60e479"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.678645+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.686451+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c5b12a414b3886eecc741d375129a1ab761076edf90b6b84826fe4adef243d4e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F01/verify-stage-r02/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "354f05c40d54e3d2ae1c26fb741dfb1338fdaf5c"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.687523+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.694369+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "23f0f7386af03abd925ea77e4375999048c9cbe435530dfef602817496c4a17b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F01/verify-stage-r02/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "49219f81661974d3ec655e98836e905ec439a3be"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.695473+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.702272+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "de7c42563c29b014aca92faba5e30b26d79d486d4708200ee2ed1276e8b6459a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F01/verify-stage-r02/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "feab1185d045489af8cf78d2233fcfa36de4a473"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.703326+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.709294+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "52140487cbbe304fd176c9a33729a98c1030e6b770756b32cf7d196805d5295c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F01/verify-stage-r02/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "3300c2f2fcdab8db47897f7eef4fda194cc6aa9e"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.710077+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.717050+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "55bf994d0ebbece490cd0299e96e70b9460214a0fdb1d48cd0c4650a0fb83495",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F01/verify-stage-r02/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "3300c2f2fcdab8db47897f7eef4fda194cc6aa9e"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.717945+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.723965+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "55bf994d0ebbece490cd0299e96e70b9460214a0fdb1d48cd0c4650a0fb83495",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F01/verify-stage-r02/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "589369d588221160a276503ff45bc5b1144d9be7"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.724791+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.731482+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "61e9259260fba2b2760f0175fbb29a230a990355e2303b8207d74f91bdfbbdb0",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F01/verify-stage-r02/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "77e94063a9484f006981c9de197c797c4c63db51"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.732183+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.738162+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "2829d6c9f737fbcef039da7c22c12e9e1c81cd3ea9e435c1f86dbbd0e8f01c98",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F01/verify-stage-r02/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "3300c2f2fcdab8db47897f7eef4fda194cc6aa9e"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.738877+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.745788+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "55bf994d0ebbece490cd0299e96e70b9460214a0fdb1d48cd0c4650a0fb83495",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F01/verify-stage-r02/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "300ef65769b0ae1b6f028327f19ba68d29b69f2f"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.863443+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.870580+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "23731f696c122eb0de09aec69aa4c039395f2c35265145680d2e7275865f9062",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F02/verify-stage-r02/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "da6b313c5c1c6da2a623a7da6e6665aaf7e231a4"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.871594+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.878300+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "5776b72da707a4f7da7eccf1ad7c15763f4fff56ffab0cb0d3adee87bea0065a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F02/verify-stage-r02/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "b522214d830373a7f7bdb875babd9de81a8c0cbc"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.879246+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.885416+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "8ca538ae041a413dcac4163b7aa08125e24cd295b185839be4232bd0bd03269a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F02/verify-stage-r02/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "6fd4d55246fb5274c5955fd1540240bad165a712"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.886408+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.892522+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "2845b39e012a17bfbf2509c93b9dc596d23648f4f79d1d0b18e02b0a50f78e86",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F02/verify-stage-r02/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "3adb4089fa37e75e63f4f3b7990fb30c63a13d25"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.893217+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.899404+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "261a1d6a6e914362fef4830554c0f94a5a6e17deba3cccedfba3d145c0a2c733",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F02/verify-stage-r02/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "3adb4089fa37e75e63f4f3b7990fb30c63a13d25"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.900100+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.906614+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "261a1d6a6e914362fef4830554c0f94a5a6e17deba3cccedfba3d145c0a2c733",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F02/verify-stage-r02/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "6130379198d3610313803f275b27903364a53431"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.907303+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.913410+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3857382564e496a62e940db37604e0b513084e72e6ff3a91e3465785ec7e9d5a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F02/verify-stage-r02/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "7d15133e1a8492182bc30bed3d0bcffee3d4c2b8"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.914113+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.920828+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c2646fbe68ef6fac0c5afffacfbdeb94de814c4e5a4dab723488a1d6da6b3e2f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F02/verify-stage-r02/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "3adb4089fa37e75e63f4f3b7990fb30c63a13d25"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:48.921556+00:00",
+      "finishedUtc": "2026-10-07T09:43:48.928445+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "261a1d6a6e914362fef4830554c0f94a5a6e17deba3cccedfba3d145c0a2c733",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F02/verify-stage-r02/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "df0bee70336fb3e64888c7e006e2de7338fed13f"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.066179+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.072863+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "6436acd1587a05ed4544fe9ee2d80949b0b293f6e685dd9dfe7c256a773615f5",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F03/verify-stage-r02/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "73e10c48f09d03904a2f2c8af946fedde92e1e70"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.074274+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.080243+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "5210d236403daa2c21785887440b8a5ad417955dc6a407656fd4b05a8dc569a3",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F03/verify-stage-r02/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "c8787547346dc22f436ae285441f00e8c59b7609"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.081264+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.087953+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "b7ce5768f01a41c0777dcab2182bfd14202230d59a67a2968304666e75a7b63a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F03/verify-stage-r02/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "17b72aac9699e318259988ae707f877eca436595"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.088882+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.094881+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "a3c5f7a6b29b8dd394fed2178db15fd3f59ea0c3e57f20e4abc000c8c9570b7a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F03/verify-stage-r02/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "17cdc5c80d3c970cf8501a098fcb53be52dea274"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.095562+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.101545+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e9981ff32819af76b374c4faa35985410183bfae16f81445c0d9ca22e08cf5ed",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F03/verify-stage-r02/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "17cdc5c80d3c970cf8501a098fcb53be52dea274"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.102219+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.108212+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e9981ff32819af76b374c4faa35985410183bfae16f81445c0d9ca22e08cf5ed",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F03/verify-stage-r02/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "46df32ec6a66c48f00d285b2767c860d3413233d"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.108904+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.115007+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "0675b04be779478baef42c423fa8cde2accf9ec55399d971fb0b1ac3c00fd386",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F03/verify-stage-r02/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "5517c7f67010b5d81e1aaafe07ec089c3dcf6eb8"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.115692+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.122289+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "84c29dd880db643297b20eb2ab178c03311c3266e023597ce5c8f7973967fc51",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F03/verify-stage-r02/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "17cdc5c80d3c970cf8501a098fcb53be52dea274"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.122992+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.130007+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e9981ff32819af76b374c4faa35985410183bfae16f81445c0d9ca22e08cf5ed",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F03/verify-stage-r02/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "d82b47c691ce08599c9b508666a66847b06719d1"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.659842+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.667786+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3a7026954f0ccf5b77604fb165129b083902bdb9ce44e184d3669e3fb4533f52",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/T08-E01/verify-stage-r02-regression/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "b0dfecb12766adc190c6939df5b0b237979b9941"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.668749+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.675750+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "f55855a4851a86d4a1167620b0b1bc089c4c7febc214188e1797010579d9ec9e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/T08-E01/verify-stage-r02-regression/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "69f48dc9bb51ddc85f247b4d011c46fe91b993ec"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.676846+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.683454+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "b32eec38a7fc44df5ed7b8121d989628dd1d897bdf777b793884fea9c75f29b9",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/T08-E01/verify-stage-r02-regression/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "6e52ba989af8d12726c1858200c4791b65763cb9"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.684413+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.690455+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "7bdfba256ee3187375aa5082c41de319dbea3900be1d94eae312f79190962997",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/T08-E01/verify-stage-r02-regression/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "c2bb13b302b7bdaa1580b116911aabbc864c5082"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.691166+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.697783+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "756e94b06d442ad542610a0cec39f11453608f58b1a6f01b8fd9629df4da6c98",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/T08-E01/verify-stage-r02-regression/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "c2bb13b302b7bdaa1580b116911aabbc864c5082"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.698499+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.704459+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "756e94b06d442ad542610a0cec39f11453608f58b1a6f01b8fd9629df4da6c98",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/T08-E01/verify-stage-r02-regression/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "7792abde6907bdbd12854d3cbcafc48c852119f9"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.705148+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.711099+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "df988872b4dbd20d2feaddfd95cecc3cf9e75163bc2d40b2ddf613b2e9e40aa8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/T08-E01/verify-stage-r02-regression/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "e9f28fd816956f6869b5fe0b25cb756f4fab3a78"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.711816+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.717833+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "94cb0a3ec5442bcebc5301b9c193a6b4a3b971f249adc64946f47d3af22b7438",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/T08-E01/verify-stage-r02-regression/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "c2bb13b302b7bdaa1580b116911aabbc864c5082"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:49.718543+00:00",
+      "finishedUtc": "2026-10-07T09:43:49.725540+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "756e94b06d442ad542610a0cec39f11453608f58b1a6f01b8fd9629df4da6c98",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/T08-E01/verify-stage-r02-regression/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "aab5b5de217934fa23e9e654538507d89f93808f"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:50.695690+00:00",
+      "finishedUtc": "2026-10-07T09:43:50.703897+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "82106816e364782b34957428b0db1ccafe9d16a4c5b569b89a57f938db12789c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r02-regression/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "3716bd141a8e3ce09cb8549dca1c7f7efec1a5ea"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:50.705105+00:00",
+      "finishedUtc": "2026-10-07T09:43:50.712220+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "7072d1ae8fb9a238421b13855934767f69ab97c6b22f34711cb1de222f6a1b63",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r02-regression/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "4f036fcdcc4be7312303d7130b49d0ad531ab9de"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:50.713295+00:00",
+      "finishedUtc": "2026-10-07T09:43:50.720148+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "26e7e5df63b6701b5c9bd23278529c6257d4e7c2105c27132fbe6f9c8860437d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r02-regression/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "ff1d1a889deaad925f800d61136ff0e7a858288f"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:50.721143+00:00",
+      "finishedUtc": "2026-10-07T09:43:50.728207+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "b0e21f1eb48b330b4f43d80ad999d6d1c86269d57257a62b3e492c77873f1a6f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r02-regression/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "14c7252669882110ef1c0e2cab0b0f290d2ef655"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:50.728974+00:00",
+      "finishedUtc": "2026-10-07T09:43:50.735272+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "b12a8eee99500324ae66fe4164409783b5aecd106f6b1972b2b66e814a8efbd2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r02-regression/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "e85c6f507e2881c61e3dfa4d792e61136245e0ef"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:50.736198+00:00",
+      "finishedUtc": "2026-10-07T09:43:50.742855+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "2c1e583e02fe2ee0950245fa148d5071f7f26c8cee204f4754c3a8aafb6462d4",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r02-regression/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "8a958f8f4d89232aa6b5c6410c4ff96d7bbb42a6"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:50.743575+00:00",
+      "finishedUtc": "2026-10-07T09:43:50.750135+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ba8d41d52c9d73d21717dc8c61a270965a1befabc69b39db62797d47a1616127",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r02-regression/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "556502d966fc809a1ecd08d5f69bb3d0ca762bfe"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:50.750855+00:00",
+      "finishedUtc": "2026-10-07T09:43:50.756887+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "266ef50847945a9fbee39c8b7744896f2f509edecc00acedab7702dc5ad218d4",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r02-regression/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "e85c6f507e2881c61e3dfa4d792e61136245e0ef"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:50.757630+00:00",
+      "finishedUtc": "2026-10-07T09:43:50.763654+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "2c1e583e02fe2ee0950245fa148d5071f7f26c8cee204f4754c3a8aafb6462d4",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r02-regression/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "7733d0108fa768a7bbf1769ad1f031e1fd33ac70"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:57.331663+00:00",
+      "finishedUtc": "2026-10-07T09:43:57.339598+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "b9462c5fe44cd8e1bd66a3914bf52177c852de0802dd287ddebdcbf40707b173",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR1/WP-T02-E01/old-red-frozen-head-d80737b6.log"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "388f61f73b5772e9c039a07d7844c61c7408d2bb"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.353793+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.362041+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ee51211b08e5c620e29d82f5254eb8925c030202322097ed3f33cfe145248c94",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "281124a8f8aadb4a4fe3ed5bb84bd9b0515ce341"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.363103+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.370147+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "9fac9904e6651951f6b639cac6cacdf91e7e0831ec0ade44d3f6c6c7ac7738a6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "c6b23d66b0372c661c9015ebdf5cc5f9b7f7fe1b"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.371255+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.377683+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "777bcd2f2f1cdb62c8e15599ca781cb031dec4a259221e221a143d18354717d8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "94473f87ce51095a39497d040928f97b81d44c08"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.378826+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.386097+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "7d7b30803ffcf1676ecc097eaa48d394c4831ad7a5e7fecf9542718e93d95c57",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "1e22ba165adfbf8685b98be286ecedcfff5afea1"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.386982+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.393982+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ac923742dc6405acb37be10546cff008ddd8e218b10d2a8a5ef6ae142a95b0fe",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "1e22ba165adfbf8685b98be286ecedcfff5afea1"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.394731+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.401373+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ac923742dc6405acb37be10546cff008ddd8e218b10d2a8a5ef6ae142a95b0fe",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "8fe51423d0bcab7ea8a48d05d1bda840426da323"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.402105+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.408899+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "21e7205c626b75d8a078c3f605c409ef53c3d19934516264d8b89c65fe859969",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "47411c77d953a4187e2032339f6c6cc5981b449a"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.409691+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.416356+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "aa8065c4b5925fba147d2d18926e16b04f4e3c305c8e3e0b146289da6b5e48d6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "1e22ba165adfbf8685b98be286ecedcfff5afea1"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.417114+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.423886+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ac923742dc6405acb37be10546cff008ddd8e218b10d2a8a5ef6ae142a95b0fe",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "24175d7c63972179efa4fe69ce686ce014748536"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.614495+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.622241+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "f9a02933316c9ea6cb2e5b6201dea844310ffd35097751ca33a88c7d6343ff62",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "0949d3dd39e02f8ea89aeaf2d65ad9e1cb670a2f"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.623377+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.630591+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "8f0f67822d41185c247f0ebc9cbc2dd172c797496279d3cc71d29e66fd7033ba",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "57d4ea3e174b13aa8b0be9b72ed586214bf3761a"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.631721+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.638134+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "72f4de36c0244d1d3f3f065bec636dc2be86f6f6442aecdc9d98eda04ef87a4f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "2e3698098f884552c47f6efb451963e1834c6884"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.639244+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.645947+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "baa9a5df820e98e7c3c14e3fe0e2d8a7e056835e4797291c2df52c75a745550e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "c8e99b406376dbe20c3a7d69057c88f14a4e727d"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.646701+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.653451+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "993581debc08fab6d00f8d2032325229061bdd29d2b642b73d642906ab878a41",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "c8e99b406376dbe20c3a7d69057c88f14a4e727d"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.654431+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.661117+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "993581debc08fab6d00f8d2032325229061bdd29d2b642b73d642906ab878a41",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "32268b6dc16770c482d0f4db3d06a65155e542ba"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.661853+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.668604+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e80119623f9783eff6c353ca51edba31ca356aa0581ad5402a7d9fbba56ee661",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "bf59baa2ad403082a1cba54bfa7211d8c5250bc9"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.669402+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.676245+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "b6a0b795e6ab9150dc1237716e8bc8f85a59f5c97a55351e8de30b3be8e43e9d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "c8e99b406376dbe20c3a7d69057c88f14a4e727d"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.677003+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.683378+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "993581debc08fab6d00f8d2032325229061bdd29d2b642b73d642906ab878a41",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "4004f5672272ed09d7ae3ead6f7c99167c9be500"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.890635+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.898701+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "8b0f0c308737730988dbacc47b6e88a3eae7878f8baef89c8be2a85114c8d9db",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "0cc98c2d7920e2ea441a38951a6a0241800b521c"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.899807+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.906993+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "5db6434b07f8e62b69b50e08a594f9757bad61b1f24bb5525cca6569b74c7fdf",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "6e5d5dfa2e276b2c3e99b2a1035c3f1aee509e00"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.908097+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.921099+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "fcfe03a38c0a3f7eb165cd95c1715e1d36f683ee6b285d00babf15ecf177ccad",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "5c83b8b8d2bf14256a4c16c3cc0d838a62a58bd5"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.922261+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.930286+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "0d3d2789dccf4d50d1fe67a7a8276ab64253c2c2681e0f17977c3abea5a74417",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "e51255a3f6ec76dfad53250e1f78965bf52dc8b3"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.931108+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.937878+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c5220eecf48ab5c79b594fd4231d2f45aedd7cfc58834181265685e831c18485",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "e51255a3f6ec76dfad53250e1f78965bf52dc8b3"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.938771+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.945710+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c5220eecf48ab5c79b594fd4231d2f45aedd7cfc58834181265685e831c18485",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "ed2e31f5933ebbae425d837c1d64febcd269a182"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.946616+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.953929+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3c48d42ac8367cbd43ddac9f99feb75d51f7beba992aeef5499ed37b140cff5d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "8652ab25aba8855234955419b19fa134b12d6405"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.954885+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.962025+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3bffb7e13dc423f6be533456a77081ee2062de73b6f72b0f79912f0399f2e7d3",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "e51255a3f6ec76dfad53250e1f78965bf52dc8b3"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:58.962868+00:00",
+      "finishedUtc": "2026-10-07T09:43:58.969557+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c5220eecf48ab5c79b594fd4231d2f45aedd7cfc58834181265685e831c18485",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "c93c88a73156df6e092d852dd8fca79e849bbad2"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.700029+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.707932+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ec3ec9a1102b96da5497be99433e43096753d816b3ac24dd7190c83ad3f338dd",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n06-midgate-mutation/evidence/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "0149e4a946c0c7e2622ea8534fe0bff7aa657d41"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.708978+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.716289+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c81fa410291659b67b547e85fc735119bcc595d2cb03e3269e3765903e6c3e8c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n06-midgate-mutation/evidence/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "d8dc5771426491598260d3cf93d48057aeca71bd"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.717386+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.725185+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "32dbfd826f92ef4bd452b33b8c970a06f9100b831306871228ff04ad154f7b79",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n06-midgate-mutation/evidence/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "3f255e887012b05451a5bcff69c2a72903e4437b"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.726339+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.734160+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "2d37c37531d497f145d065e524a94bf5580f138321eb94e172e45a54ca57b176",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n06-midgate-mutation/evidence/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "e27ddad1f3af5c35ff7487b5a8bb380d1dc2d753"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.735053+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.742471+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e011ee1fd2482a633d98c892e666ef0979b508207c644ef5abdb14fa41a9131b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "e27ddad1f3af5c35ff7487b5a8bb380d1dc2d753"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.743288+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.750225+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e011ee1fd2482a633d98c892e666ef0979b508207c644ef5abdb14fa41a9131b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "f75f481dd71a86aee276c0e9d194eb9b3c166696"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.750979+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.758024+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "9a261be7159789c1b4a70d84b781688f95e792d7d230bfbc150d53ea7354d8b0",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "cabc7db7903d52764d463daebf215b903bac04a0"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.758748+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.765732+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "f6840aadfc68d740d4b290b10ab22bc96e55861aa67ef3eb5b28ab04234a8dcb",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "e27ddad1f3af5c35ff7487b5a8bb380d1dc2d753"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.766532+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.773312+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e011ee1fd2482a633d98c892e666ef0979b508207c644ef5abdb14fa41a9131b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n06-midgate-mutation/evidence/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "b70325ea545fa1e865641c372bbdd62008e925b9"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.950535+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.958545+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "8bdae60eacdef982560daaa6035071616156ba6dd6f927006b0366eab00af969",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-a/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "68874a2554023952002ed69bedd4d3e5004dd28e"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.959518+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.966558+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "6e11fe2ce7d0f9039f7e2654502fc99b2c3b9d0ea3e044687c59963aca5dd8b7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-a/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "b12f3628167d3f412f80ea878d6d933aa9447922"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.967538+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.974377+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "4f3c8022c8d30fcbde0c654e2446364be4d11cb881e8831800ca645d92098b83",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-a/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "3c125fa4ceb90e0e466759783e2a63c252c487b0"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.975383+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.982296+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "4b31953e785927bee0c2094848de64453964848a26ce44873667834646677974",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-a/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "1d5973d8528869fe3d682913aac2e5ac670f24b5"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.983022+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.990317+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "d2117068972a01e9cbbd43e088bb2c81fbb44c0f2e58abc696363abe9fe9e558",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-a/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "1d5973d8528869fe3d682913aac2e5ac670f24b5"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.991028+00:00",
+      "finishedUtc": "2026-10-07T09:43:59.998151+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "d2117068972a01e9cbbd43e088bb2c81fbb44c0f2e58abc696363abe9fe9e558",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-a/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "3b46265cb5c6963ba53e7ad20e7d5e4f69bf90dd"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:43:59.998894+00:00",
+      "finishedUtc": "2026-10-07T09:44:00.005648+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "a0ddfc3f27133e127666092206db5b028cdd5fbfb7133bd7c9312b860f5af99c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-a/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "3e812756f34e10839a16d8de1363a3434f0e7608"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:00.006392+00:00",
+      "finishedUtc": "2026-10-07T09:44:00.013239+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ee9a25661e3b4e77ad397f354df6e6579c7356a7befe3988097a3058d18e1db1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-a/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "1d5973d8528869fe3d682913aac2e5ac670f24b5"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:00.013980+00:00",
+      "finishedUtc": "2026-10-07T09:44:00.021025+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "d2117068972a01e9cbbd43e088bb2c81fbb44c0f2e58abc696363abe9fe9e558",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-a/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "e70df61543084a13f4ae8a2c0418e361d109055c"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:00.208595+00:00",
+      "finishedUtc": "2026-10-07T09:44:00.216409+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "9865c05db24ca534aed74cf4cda169235d89f6e3dd93141dfc352ee3854f63fd",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/A13/redaction-scan/p1-execute-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "3a4c1c11f1f868f39c7aadc173c55872b9ab81a4"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:00.217459+00:00",
+      "finishedUtc": "2026-10-07T09:44:00.224991+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ff6a820340eeaf1b0e4fff6063b20f25964b0ab30091827c81fe17e824ff3ae6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/A13/redaction-scan/p1-issue-credential.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "28ce11b0d89f3b92220bc12f2c52074539034341"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:00.226032+00:00",
+      "finishedUtc": "2026-10-07T09:44:00.232924+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "fb67f3180d197fa834d17098ab7340ca79a3954110cdcadcdf323c48e0483d91",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/A13/redaction-scan/p1-me-ok.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "8bc97d900a6f322f969b21dcc6ba2433c9b1188c"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:00.233958+00:00",
+      "finishedUtc": "2026-10-07T09:44:00.240398+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "08647d122e3826443cd6723ce235a3103b8966345433914bd6ab8d1b1f0d04df",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/A13/redaction-scan/p1-ticket.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "55bcfbbb2e9505a25b2e12f31016e940f99e4ff2"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:00.241291+00:00",
+      "finishedUtc": "2026-10-07T09:44:00.247875+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "bc8da7586bc67dcb8f26bc072a7e7ba2dee1d3054ad4bbd5104fe82e9201cd0f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/A13/redaction-scan/p2-me-bad-bearer.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "55bcfbbb2e9505a25b2e12f31016e940f99e4ff2"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:00.248668+00:00",
+      "finishedUtc": "2026-10-07T09:44:00.255881+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "bc8da7586bc67dcb8f26bc072a7e7ba2dee1d3054ad4bbd5104fe82e9201cd0f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/A13/redaction-scan/p2-me-no-auth.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "cb6cdc4cf7eed57d4abf1f5c0ff19fe1c9571e2c"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:00.256682+00:00",
+      "finishedUtc": "2026-10-07T09:44:00.263868+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "d4396f05835279f920e72f063b3caae79f95b2bbd20399b7a2b9b76b0eebe634",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/A13/redaction-scan/p2-session-cross.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "175daf2e6ccb076547bb6a61c4fdf6c4ecc73e86"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:00.264633+00:00",
+      "finishedUtc": "2026-10-07T09:44:00.271645+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "365e8a4dbb272ed9ab101338203193aedabd4394facffe8511a0343df7d6afc3",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/A13/redaction-scan/p2-session-missing.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "55bcfbbb2e9505a25b2e12f31016e940f99e4ff2"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:00.272406+00:00",
+      "finishedUtc": "2026-10-07T09:44:00.279192+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "bc8da7586bc67dcb8f26bc072a7e7ba2dee1d3054ad4bbd5104fe82e9201cd0f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/A13/redaction-scan/p2-ws-bad-query.headers"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "121e9a9092726f0a37eed12d70ac2eb936ac53a2"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:01.958618+00:00",
+      "finishedUtc": "2026-10-07T09:44:01.968393+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "43419656975bc810639fbe5e4b4870c3a460fdc6d9a65fabe14a45dbb75b8429",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/docs/rust-tauri/ORCHESTRATOR_PROGRESS.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "d4d3f41e5279e354e8ee00fe5e47e2df68dec2b5"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.176861+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.185357+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c219180aab39823c647f8758028fe91150bd2e5e76d735b3dd9000ab99ec7b37",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "46ef99e9cfb8afe2c9cc1859f9a6b562b33ce1c1"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.185853+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.194602+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "2c431b2bf9fa6ad83ca010f4392cc262844eca2e2366a6e6aa204e14b280f108",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/docs/rust-tauri/R05/PROGRESS_LEDGER.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "6406699f778564f37556c355b09fcdffc116227a"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.199365+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.213908+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "6fc4c7096145a3bfa3d6f318b32721ad520f064162d34f007080a41a524c73d1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "35c7fd6f94b3ee4f5806a2377246de49ddeed1f2"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.219231+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.227364+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "de950b466ac930d201f61bbb464a66a49a7b69afd79295931a7d753a637ae563",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/docs/rust-tauri/R05/R05_BLOCKERS.md"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "4662754dc9a166712c3614e0d245606e1131e4d1"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.227821+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.235377+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "41eb3ad1a91a577511402736b80b38cc5529b937ca6574bbc074acc7d01376b1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/docs/rust-tauri/R05/R05_HANDOFF.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "3b7d9c25199a2c6482453e63cb0f3a2e04c91acf"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.235773+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.243241+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "edaefa5b5a1d0f5afaa3c75760c264269fecadaa54acb2915793052e99557d2c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "4df0279ffa610b02ecfb54102819d163b06bd8cd"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.244397+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.252051+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "11afe718db1c1c251fe915f77b378fe54450ed76a01966939b8df83b2bc5102b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "7fdd074607dac2157dec93178a61ff3b009ddc1e"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.252434+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.260107+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "0cfd02db2ab41fd1b876b694d705410dd90564265d56917413e98d28508a61f2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "17ed3e8b9174027a386b9cb4803e3574ed54edf6"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.260571+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.267458+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c1fd4b03b677d033ddc6a19df1cae2e41be7ea46d3dfd3f4424b7bb2aea0801a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "d53244199819a0671a620093b0dd6f096ecffa0a"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.267882+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.275052+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "a13ca7342991da5725a721e93fa8dade0437b600a06e64814206254872a23907",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/docs/rust-tauri/R05/R05_REPORT.md"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "b8da9e269628c88746a19c5fa8d303a8277fe9d5"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.276293+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.283681+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "c6b5da4a74938e66b6962b733a46a1d9ef8401cab36dc816ccbdb2de553bec99",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/docs/rust-tauri/R05/R05_TEST_MAP.json"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "d3d2642196aa9e8b046f6bffce82e22301bda295"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.284153+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.291076+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "027afa74e452e5839885ccd6d1412301b7ffcc19812fffaaea9ffd9bdd3f35c4",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "48ecc0711697fe20d4463cf1b87e6983be32db83"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.578109+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.586718+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/rust/crates/lingxi-service/src/lib.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "73b094362a6154837f51b19fbb3a786e8b188d9f"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.587815+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.595164+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "5f0aa8ccabc62295d64ff0ca6b61a5fc9a384e6a4bdd6e092d70a15ab73b6be1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/rust/crates/lingxi-service/src/logging.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "d51d45c81194bb32aa8ea5c7388d05e892a566a8"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.599813+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.607491+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "9d749fc88d7c653399db7908b4fddd1bcca3264362c9da3a6a7ba49318c6a1ed",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/rust/crates/lingxi-service/src/redaction.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "e88ab64dab85399642c6b0d8dab930f61fc22180"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.642685+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.650358+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "b3acabda89bb933614c84e4de1a5ffc2c8c01172534e3d69821b829a7abfdb2a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/rust/crates/lingxi-service/tests/r05_t08_resources.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "97411c536a60597e91eb10d1506ac5eb00338de5"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.661920+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.669380+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "fb90af8ed20c651bc90e63226e975d8c1f2e95e3dbc0cdd881c25533988daf05",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/rust/crates/xtask/src/candidate.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "9d99ee008c249e2d4c81dbf2680e3e41945992de"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.669852+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.677114+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "5a81ff0fba2dc6d6e1f742fd413ab7a8b5358248ecd3942d04a4090f1270e505",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/rust/crates/xtask/src/candidate/tests.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "cf0da424422ae4b472ed80b60caadc1a53d1b058"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.677536+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.685110+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "30bd54247412030bb750b3bcf86b3a185672507eafb2cafc001256a230e78c28",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/rust/crates/xtask/src/main.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "a02e3160a26e1530eaf7df9a0d8cdccad0f06130"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.685617+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.692657+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "8cf07fecee891e9ced4353b5e6e12cc65f9f56518c1022ff9527fd5777587639",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/rust/crates/xtask/src/runner_identity.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "d557678da3c55bc38e21782d3c7eb75aac3e09fd"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.697684+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.704972+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "92137c6fe700e52c75e044a0a6e544ed1e653f3bafdd628354c59aadf8036e6a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/rust/crates/xtask/src/verify/runner_tests.rs"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "4ffd8cf741d23feaff2df2da4a0576c9fd382cb9"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.743267+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.750640+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "14516af32a59d2f590018be232c601817dfeadb3e4355fa860fd90b1cc34bd79",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/scripts/rust-tauri/r02_t01_service_smoke.sh"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "61d83d1fd8fa7414f4347708a0bd54dc55dbd2ee"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.756861+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.765058+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "454897045afaebe8be5b698e079461d40aaf9cb8fa567913355bb7e209417236",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "cat-file",
+        "blob",
+        "5941852e612baa33394849aa99d774e9a9952e32"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:02.769800+00:00",
+      "finishedUtc": "2026-10-07T09:44:02.776433+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "30b2907a9a9eb285304154ebe0f91294152d730d5cdd8c3d929770cf90fbf28e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/r05t08-work/negcopy.f8U5qz/scripts/rust-tauri/r05_t08_negative_gate.sh"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "ls-tree",
+        "-rlz",
+        "HEAD"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:03.303900+00:00",
+      "finishedUtc": "2026-10-07T09:44:03.437993+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "2f7b3b48996371691ab6e6f2049bbe0ab6d9b2df5cbf4e564e200c7b3cac003d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0189.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "write-tree"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:03.510517+00:00",
+      "finishedUtc": "2026-10-07T09:44:03.533446+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "579682b8b266d9d1e1e41204efb66e1c88458f79a7595f2dd21fdf2da8121022",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0190.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "diff",
+        "--exit-code",
+        "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+        "--"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:03.533701+00:00",
+      "finishedUtc": "2026-10-07T09:44:25.683153+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0191.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "status",
+        "--porcelain=v1",
+        "-z",
+        "--untracked-files=all"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:25.683475+00:00",
+      "finishedUtc": "2026-10-07T09:44:25.938311+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0192.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+      "startedUtc": "2026-10-07T09:44:25.938610+00:00",
+      "finishedUtc": "2026-10-07T09:44:26.175485+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0193.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T09:44:32.214334+00:00",
+      "finishedUtc": "2026-10-07T09:44:32.222192+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "82d8b685ab806b27b5cf0c3b770f86661adcb8958e59de111a5b9c73918573fc",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0194.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T09:44:32.222625+00:00",
+      "finishedUtc": "2026-10-07T09:44:32.228646+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation/git-0195.stdout"
+    }
+  ],
+  "platform": "darwin",
+  "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/prepare_git_copy.py",
+    "--source",
+    "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "--copy",
+    "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+    "--revision",
+    "HEAD",
+    "--branch",
+    "codex/rust-tauri-migration",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/git-preparation"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "spaceNote": "\u5b9e\u9645\u6587\u4ef6\u7cfb\u7edf\u53ef\u7528\u7a7a\u95f4\u622a\u70b9\uff0c\u4e0d\u80fd\u89e3\u91ca\u4e3a\u6b64\u526f\u672c\u72ec\u5360\u7269\u7406\u5757",
+  "source": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "copy": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+  "requestedRevision": "HEAD",
+  "sourceBefore": {
+    "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+    "headFileSha256": "a5514e446d5aa78abd1b01492bf577b9b369799dd4461fd9e7da0ae3c87814e4",
+    "indexSha256": "e65fd8f9353224483a9b94cc32bca37dde0505f363692af58539d270df9dfc9d"
+  },
+  "freeBytesBefore": 619780268032,
+  "helperSha256": "37f4246a11f54826f2a31a772c1db0b5e3422c0261ea56c9872c3a3b75c9cb24",
+  "commit": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "tree": "be43b48d2d7ddb08c31f5e48e1ec1035364d7089",
+  "objectFormat": "sha1",
+  "sourceAfter": {
+    "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+    "headFileSha256": "a5514e446d5aa78abd1b01492bf577b9b369799dd4461fd9e7da0ae3c87814e4",
+    "indexSha256": "e65fd8f9353224483a9b94cc32bca37dde0505f363692af58539d270df9dfc9d"
+  },
+  "tracked-files.json": {
+    "sha256": "bb6647c2b166b2835df84410c8c447e17ef14533ea15b9a5237d786397991edc",
+    "count": 38066
+  },
+  "source-files.json": {
+    "sha256": "cee260ff5d907f0815233945ffd220a49830938d8f0b1a6b6b8907057f0aef0a",
+    "count": 38066
+  },
+  "trackedCount": 38066,
+  "trackedBytes": 3741290865,
+  "methods": {
+    "cow": 37887,
+    "ordinary": 0,
+    "git-blob": 179,
+    "git-link": 0
+  },
+  "copyIndexSha256": "d07da361a0375c8effc8b073aaf0cf6e517853c0932c8130e1660402362e9564",
+  "freeBytesAfter": 619689611264,
+  "finishedUtc": "2026-10-07T09:44:32.374772+00:00"
+}

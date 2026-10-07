@@ -1,0 +1,8 @@
+pid=70055 bind=0.0.0.0:50239 connect=127.0.0.1:50239
+client connected
+server poll=1 revents=1
+client send=4
+server accepted
+server recv=4
+client recv=4 errno=0 (Undefined error: 0)
+PROBE RESULT: ok accepted=1

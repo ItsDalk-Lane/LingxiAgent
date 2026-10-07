@@ -1,0 +1,21 @@
+{
+  "classifierEqualBytes": true,
+  "classifierSha256": "85809bb89d9b903f552607c4730077c9ff479f180f04ffc6e737b10110dbec94",
+  "binderEqualBytes": true,
+  "binderSha256": "6bcbe0e8b148d5794e061ccef82a1c3f09bab9dfbc26cafe66e67a213388c63c",
+  "cmpLinesEqual": true,
+  "cmpLines": [
+    "cmp -s \"$EVIDENCE_DIR/e0-candidate-binding.tsv\" \"$WORK/candidate-copy-binding.tsv\" \\",
+    "cmp -s \"$SELFCHECK/bind-a.tsv\" \"$SELFCHECK/bind-a2.tsv\" \\",
+    "cmp -s \"$SELFCHECK/bind-a.tsv\" \"$SELFCHECK/bind-b.tsv\" \\",
+    "cmp -s \"$SELFCHECK/bind-b.tsv\" \"$SELFCHECK/bind-c.tsv\" \\",
+    "cmp -s \"$SELFCHECK/bind-ev1.tsv\" \"$SELFCHECK/bind-ev2.tsv\" \\",
+    "cmp -s \"$SELFCHECK/bind-ev2.tsv\" \"$SELFCHECK/bind-ev3.tsv\" \\",
+    "cmp -s \"$SELFCHECK/bind-mu1.tsv\" \"$SELFCHECK/bind-mu2.tsv\" \\",
+    "cmp -s \"$SELFCHECK/bind-mu2.tsv\" \"$SELFCHECK/bind-mu3.tsv\" \\",
+    "cmp -s \"$SELFCHECK/bind-fu1.tsv\" \"$SELFCHECK/bind-fu2.tsv\" \\",
+    "cmp -s \"$SELFCHECK/bind-fu2.tsv\" \"$SELFCHECK/bind-fu3.tsv\" \\"
+  ],
+  "extractedFullBodySha256": "da3149fcf0de53e417fd824be7445edf61cf006b87ead29c93b3d4b45fd7ec40",
+  "wrapperBoundary": "原生产四函数、完整classifier及E0s；只补路径/note/fail/临时目录，不是E1-E5/npm完整门禁"
+}

@@ -1,0 +1,158 @@
+{
+ "schema": "lingxi.r05-negative-gate.v1",
+ "isolatedCopy": "local git clone (read-only on the source) + uncommitted working-tree overlay under $HOME; the main working tree carries ZERO injections (reset_copy restores every mutated file from the pristine snapshot)",
+ "scope": "ALL",
+ "isolatedCopyPath": "/Users/study_superior/r05t08-work/negcopy.f8U5qz",
+ "expectedCases": [
+  "R05-GATE-N01",
+  "R05-GATE-N02",
+  "R05-GATE-N03",
+  "R05-GATE-N04",
+  "R05-GATE-N05",
+  "R05-GATE-N06",
+  "R05-GATE-N07",
+  "R05-GATE-N08",
+  "R05-GATE-N09",
+  "R05-GATE-N10",
+  "R05-GATE-N11",
+  "R05-GATE-N12",
+  "R05-GATE-N13",
+  "R05-GATE-N14",
+  "R05-GATE-N15",
+  "R05-GATE-N16"
+ ],
+ "unexecutedCases": [],
+ "controls": [
+  {
+   "name": "xtask-r05-mirror",
+   "exitCode": 0,
+   "expected": 0
+  },
+  {
+   "name": "n03-restored-mirror",
+   "exitCode": 0,
+   "expected": 0
+  },
+  {
+   "name": "binary-wiring-suite",
+   "exitCode": 0,
+   "expected": 0
+  }
+ ],
+ "cases": [
+  {
+   "case": "R05-GATE-N01",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "删 A16 → 镜像单测红并点名 R05-A16"
+  },
+  {
+   "case": "R05-GATE-N02",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "零匹配筛选词 → 生产者非零并点名 running=0"
+  },
+  {
+   "case": "R05-GATE-N03",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "权威表唯一目标降钉恰一次 → 镜像单测红点名漂移"
+  },
+  {
+   "case": "R05-GATE-N04",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "吞退出码 → 计数核对仍非零并点名失败测试"
+  },
+  {
+   "case": "R05-GATE-N05",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "旧证据目录 → 拒收并点名 not empty"
+  },
+  {
+   "case": "R05-GATE-N06",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "门禁中改源码 → stable=false 整体 FAIL（R02 注册门禁演示同一机制）"
+  },
+  {
+   "case": "R05-GATE-N07",
+   "exitCode": 2,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "删 R04 回归命令 → 场景引用即硬拒；镜像单测亦钉住该命令"
+  },
+  {
+   "case": "R05-GATE-N08",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "移除正常启动接线 → 二进制链红、单测仍绿"
+  },
+  {
+   "case": "R05-GATE-N09",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "固定 done 替代真实回传 → 运行时 nonce 检查红"
+  },
+  {
+   "case": "R05-GATE-N10",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "callId 错配 → 配对断言红（call_bin_1）"
+  },
+  {
+   "case": "R05-GATE-N11",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "压平 Unknown → 状态诚实单测红"
+  },
+  {
+   "case": "R05-GATE-N12",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "不释放模型 permit → 配额=1 嵌套链红"
+  },
+  {
+   "case": "R05-GATE-N13",
+   "exitCode": 2,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "R04 递延叶改判/删除 → R04 门禁硬拒"
+  },
+  {
+   "case": "R05-GATE-N14",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "私开 LIVE lane → 离线命令集镜像红"
+  },
+  {
+   "case": "R05-GATE-N15",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "秘密进错误文本 → 无料单测红"
+  },
+  {
+   "case": "R05-GATE-N16",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "验收后改码 → 绑定摘要漂移且旧证据根拒收（属性判定不依赖 R02 整体结果——其矩阵命令受已登记的间歇 LAN 停驻环境项影响，与绑定机制无关）"
+  }
+ ],
+ "allRefused": true,
+ "controlsGreen": true
+}

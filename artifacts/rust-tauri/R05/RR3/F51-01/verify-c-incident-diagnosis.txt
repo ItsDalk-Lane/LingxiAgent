@@ -1,0 +1,25 @@
+== mtime of .git/index vs neighbors ==
+2026-10-07T19:55:40  /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/.git/index
+2026-10-07T11:35:25  /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/.git/HEAD
+2026-10-07T11:35:25  /Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/.git/config
+== files in fixture with mtime after 11:55:00 today (relocation finished 11:54:56Z; local UTC-7 → 04:54:56 local... check both) ==
+now_utc=2026-10-07T11:57:06Z
+now_local=2026-10-07T19:57:06+0800
+/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/.DS_Store
+/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/artifacts/.DS_Store
+/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/node_modules/.DS_Store
+/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/.git/index
+/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/artifacts/rust-tauri/.DS_Store
+/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/node_modules/es-toolkit/.DS_Store
+/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/node_modules/@earendil-works/.DS_Store
+/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/artifacts/rust-tauri/R05/.DS_Store
+/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/artifacts/rust-tauri/R04/.DS_Store
+/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/artifacts/rust-tauri/R03/.DS_Store
+/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/node_modules/@earendil-works/pi-coding-agent/.DS_Store
+/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/artifacts/rust-tauri/R03/repair-current/.DS_Store
+/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy/node_modules/@earendil-works/pi-coding-agent/node_modules/.DS_Store
+(if empty, try local-time boundary: relocation at 11:54:56Z = 04:54:56 local)
+== semantic index check (read-only, --no-optional-locks) ==
+b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b
+3016f7ae9d18d93951f05a77adb68946cab99a92d0a122294d4c5cf096407d47  -
+diff-index-exit=0 (1=worktree diffs vs HEAD exist, expected for overlay)

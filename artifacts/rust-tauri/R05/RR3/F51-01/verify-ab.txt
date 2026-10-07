@@ -1,0 +1,12 @@
+== (a) dir-entry enumeration after relocation ==
+       0
+grep_exit_expected_1:
+grep_exit=1
+== (b1) tracked modification set vs baseline ==
+TRACKED-SET-IDENTICAL
+== (b2) hashes vs baseline ==
+status_all: c9859c9da029db0e4c0f0d3a02a5c463409dcea444e509c01cb20607c25f53f2  -
+diff_HEAD:  8c23d0d944b66d76f1c65e6a8883d7782a7509d434b10bc13dda2ab5bc393361  -
+index_ls:   3016f7ae9d18d93951f05a77adb68946cab99a92d0a122294d4c5cf096407d47  -
+== (b3) untracked delta ==
+UNTRACKED-SET-IDENTICAL

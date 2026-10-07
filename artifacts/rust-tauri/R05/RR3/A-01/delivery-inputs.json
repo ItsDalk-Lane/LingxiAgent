@@ -1,0 +1,98 @@
+{
+  "at": "2026-10-07T00:34:22.584957+00:00",
+  "inputConsistency": [
+    {
+      "path": "rust-toolchain.toml",
+      "sha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "rust/Cargo.lock",
+      "sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "rust/crates/xtask/src/main.rs",
+      "sha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "rust/crates/xtask/src/candidate.rs",
+      "sha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "rust/crates/xtask/src/candidate/tests.rs",
+      "sha256": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "rust/crates/xtask/src/runner_identity.rs",
+      "sha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "rust/crates/xtask/src/verify.rs",
+      "sha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "rust/crates/xtask/src/verify/runner_tests.rs",
+      "sha256": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "scripts/rust-tauri/run_output_sinks.py",
+      "sha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "scripts/rust-tauri/r02_run_output_regression.py",
+      "sha256": "6696e8279a99a3e407d5d3c270cebd3e00c4d6031a8fbc71c4b875dfb03a5c3e",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+      "sha256": "3aca4ae169fa06afc29e6aa89acef79ecd1ce2a6422cf479d7913643d190bf84",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "rust/target/debug/xtask",
+      "sha256": "8766f2f1e83894d3be29add3e0d733ef63e02cfb167f6cd5281a38bbde60a34d",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R02.json",
+      "sha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R03.json",
+      "sha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R04.json",
+      "sha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "matchesFinalCapture": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R05.json",
+      "sha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "matchesFinalCapture": true
+    }
+  ],
+  "allInputsEqual": true,
+  "testBinary": {
+    "path": "rust/target/debug/deps/xtask-ad766de8ea03e62c",
+    "sha256": "8d50011105e9aa6d0dfce6506dd2242d172da1044721334527f930fc269944c2"
+  },
+  "npm": "11.13.0",
+  "workingTreeStatus": " M rust/crates/lingxi-service/tests/r05_t08_resources.rs\n M rust/crates/xtask/src/candidate.rs\n M rust/crates/xtask/src/candidate/tests.rs\n M rust/crates/xtask/src/main.rs\n M rust/crates/xtask/src/runner_identity.rs\n M rust/crates/xtask/src/verify/runner_tests.rs\n M scripts/rust-tauri/r02_t08_legacy_entry_regression.sh\n M scripts/rust-tauri/r05_t08_negative_gate.sh\n?? artifacts/rust-tauri/R05/RR3/\n?? docs/rust-tauri/R05/repair-current/RR3_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_E_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md\n?? docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json\n?? docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md\n?? docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md\n?? rust/crates/lingxi-service/tests/support/\n?? scripts/rust-tauri/r02_run_output_regression.py\n?? scripts/rust-tauri/r05_t08_mutate_pin.py\n?? scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py\n?? scripts/rust-tauri/run_output_sinks.py\n",
+  "boundary": "非冻结工作树；仅A输入与最后完整自检一致。status保留并行B/C/总控修改。"
+}

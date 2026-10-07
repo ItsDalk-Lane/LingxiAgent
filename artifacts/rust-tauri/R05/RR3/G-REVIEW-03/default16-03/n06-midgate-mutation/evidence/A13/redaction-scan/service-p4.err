@@ -1,0 +1,9 @@
+2026-10-07T10:07:17.021398Z  INFO lingxi_service: data root resolved effective_home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t07-a13.XVl9QQ source=cli ignored_sources=none
+2026-10-07T10:07:17.021599Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t07-a13.XVl9QQ runtime_dir=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t07-a13.XVl9QQ/lingxi-service
+2026-10-07T10:07:17.021774Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=f5c30c2066d1754b pid=70007 entropy="os-random-device" lock=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t07-a13.XVl9QQ/lingxi-service/instance.lock network_mode=loopback
+LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE reason=corrupt-stamp
+[data-epoch] The data safety gate refused startup (corrupt-stamp): the epoch stamp is unreadable (key must be a string at line 1 column 2) and no transition journal is present; the data version cannot be established, so startup is refused instead of guessing
+[data-epoch] 数据安全闸拒绝启动（corrupt-stamp）：the epoch stamp is unreadable (key must be a string at line 1 column 2) and no transition journal is present; the data version cannot be established, so startup is refused instead of guessing
+[data-epoch] 请保留现场文件，使用维护/恢复流程处理；不要删除未知状态后强行启动。
+
+2026-10-07T10:07:17.022104Z ERROR lingxi_service: data-epoch gate refused startup (exit 2) reason="corrupt-stamp" home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t07-a13.XVl9QQ

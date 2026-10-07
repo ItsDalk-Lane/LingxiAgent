@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "python3",
+    "-c",
+    "import pathlib,subprocess,json; p=pathlib.Path(\"artifacts/rust-tauri/R05/RR3/G-REVIEW-01\"); print(json.dumps({\"completed_report_exists\":(p/\"REVIEW.md\").exists(),\"result_exists\":(p/\"RESULT.json\").exists(),\"console\":(p/\"default-console.log\").read_text(),\"processes\":[x for x in subprocess.run([\"ps\",\"-axo\",\"pid,ppid,command\"],capture_output=True,text=True).stdout.splitlines() if (\"run-default.py\" in x or \"r05_t08_negative_gate.sh\" in x) and \"python3 -c\" not in x]},ensure_ascii=False))"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startUTC": "2026-10-07T02:07:28.251907+00:00",
+  "endUTC": "2026-10-07T02:07:28.314307+00:00",
+  "exitCode": 0,
+  "logs": {
+    "stdout": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/16-g-observe-stdout.log",
+      "sha256": "b9c4b49106a7cec821a0d0444c8e7c55aa171ad360a3b553e6d4ef7992c60afe",
+      "bytes": 4455
+    },
+    "stderr": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/16-g-observe-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

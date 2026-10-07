@@ -1,0 +1,30 @@
+{
+  "UTC": "2026-10-07T02:49:53.082072+00:00",
+  "files": {
+    "scripts/rust-tauri/r05_t08_negative_gate.sh": "a69110b81298705a9161652d28402a5e5a585f945fdfd214ccf071132ecb67dd",
+    "scripts/rust-tauri/r05_t08_restore_selfcheck.py": "0cd24624bf7d6079e3cf7b4e6cf693222026db8261ffc60691bdc77fde0f57a4",
+    "scripts/rust-tauri/r05_t08_mutate_pin.py": "7785b41ebadfdc6d6415ee1d337ea48621e25d1bbb1ed1c16456004545279609",
+    "scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py": "f94f76721e77bf5a738b1270bd875569fd3f9ba3cc552795033ac057a8ee1867",
+    "scripts/rust-tauri/run_output_sinks.py": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+    "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+    "rust/Cargo.lock": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+    "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+    ".git/HEAD": "a5514e446d5aa78abd1b01492bf577b9b369799dd4461fd9e7da0ae3c87814e4",
+    ".git/index": "e65fd8f9353224483a9b94cc32bca37dde0505f363692af58539d270df9dfc9d",
+    "rust/crates/xtask/src/runner_identity.rs": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+    "rust/crates/xtask/src/stage_map.rs": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce",
+    "rust/crates/xtask/src/verify.rs": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+    "rust/crates/xtask/src/candidate.rs": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+    "rust/crates/xtask/src/main.rs": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+    "rust/crates/xtask/src/stage_maps/R04.json": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+    "rust/crates/xtask/src/stage_maps/R05.json": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+    "rust/crates/xtask/src/stage_maps/R02.json": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+    "rust/crates/xtask/src/stage_maps/R03.json": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+    "rust/crates/xtask/src/candidate/tests.rs": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+    "rust/crates/xtask/src/verify/runner_tests.rs": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69"
+  },
+  "changes": [],
+  "localScopeOnly": true,
+  "mainHEADIndexBytesEqual": true,
+  "boundary": "只证明这些实际输入不变，不宣称H或主工作树完整冻结"
+}

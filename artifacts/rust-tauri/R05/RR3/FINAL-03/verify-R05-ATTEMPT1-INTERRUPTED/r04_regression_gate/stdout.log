@@ -1,0 +1,3 @@
+xtask: verify-stage R04 [cargo test --manifest-path rust/Cargo.toml --workspace --locked] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/rust_test_workspace
+xtask: verify-stage R04 [rust_test_workspace] PASS
+xtask: verify-stage R04 [bash scripts/rust-tauri/r04_t08_matrix.sh {EVIDENCE}/R04_MATRIX] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-03/verify-R05/R04_REGRESSION/r04_tool_matrix

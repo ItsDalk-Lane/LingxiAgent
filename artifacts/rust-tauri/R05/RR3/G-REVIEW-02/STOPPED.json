@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-07T04:40:52.446473+00:00",
+  "scope": "Only G02 default runner, compile/test descendants, recorder, observer and supplemental audit writers. Storage03 is a separately owned later cleanup, not a G02 test execution.",
+  "defaultPid": 11341,
+  "recorderPid": 11328,
+  "observerPid": 11853,
+  "knownProcessesPresent": [],
+  "activeCargoRustcOrG02": [],
+  "psExit": 0,
+  "defaultRawExit": "UNKNOWN",
+  "recorderToolExit": 1,
+  "observerToolExit": 143,
+  "finalizerPid": 13798,
+  "finalizer": "This process only seals G02 evidence and will exit after manifest write; successful tool exit is the final stop acknowledgement.",
+  "noMoreBuilds": true,
+  "noSourceOrDocsWrites": true,
+  "freeBytes": 127238144
+}

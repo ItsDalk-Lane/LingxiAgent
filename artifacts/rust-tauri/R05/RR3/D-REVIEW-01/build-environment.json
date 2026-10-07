@@ -1,0 +1,181 @@
+{
+  "utc": "2026-10-07T01:15:49.093257+00:00",
+  "buildEnvironment": {
+    "RUSTFLAGS": "<unset>",
+    "CARGO_ENCODED_RUSTFLAGS": "<unset>",
+    "CARGO_TARGET_DIR": "<unset>",
+    "RUSTUP_TOOLCHAIN": "<unset>",
+    "RUSTC": "<unset>",
+    "RUSTC_WRAPPER": "<unset>",
+    "RUSTC_WORKSPACE_WRAPPER": "<unset>",
+    "CARGO_BUILD_TARGET": "<unset>",
+    "CARGO_BUILD_RUSTFLAGS": "<unset>",
+    "CARGO_INCREMENTAL": "<unset>",
+    "CARGO_PROFILE_TEST_OPT_LEVEL": "<unset>",
+    "CARGO_PROFILE_TEST_DEBUG": "<unset>",
+    "CARGO_PROFILE_DEV_DEBUG": "<unset>",
+    "PATH": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.codex/tmp/arg0/codex-arg09xS3Yb:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.codex/tmp/arg0/codex-arg0uQYuTZ:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/study_superior/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/study_superior/.lmstudio/bin",
+    "SDKROOT": "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+    "MACOSX_DEPLOYMENT_TARGET": "<unset>",
+    "CARGO_HOME": "<unset>",
+    "RUSTUP_HOME": "<unset>",
+    "CC": "<unset>",
+    "CXX": "<unset>",
+    "AR": "<unset>",
+    "CARGO_BUILD_JOBS": "<unset>",
+    "CARGO_NET_OFFLINE": "<unset>",
+    "CARGO_PROFILE_TEST_CODEGEN_UNITS": "<unset>",
+    "CARGO_PROFILE_TEST_INCREMENTAL": "<unset>",
+    "RUST_BACKTRACE": "<unset>"
+  },
+  "commands": [
+    {
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "+1.98.1",
+        "--version"
+      ],
+      "startUTC": "2026-10-07T01:15:49.093285+00:00",
+      "endUTC": "2026-10-07T01:15:49.109729+00:00",
+      "exitCode": 0,
+      "output": "cargo 1.98.1 (797e8a9bc 2026-08-05)\n"
+    },
+    {
+      "argv": [
+        "/Users/study_superior/.cargo/bin/rustc",
+        "+1.98.1",
+        "-vV"
+      ],
+      "startUTC": "2026-10-07T01:15:49.109759+00:00",
+      "endUTC": "2026-10-07T01:15:49.143727+00:00",
+      "exitCode": 0,
+      "output": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: aarch64-apple-darwin\nrelease: 1.98.1\nLLVM version: 22.1.8\n"
+    },
+    {
+      "argv": [
+        "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+        "--version"
+      ],
+      "startUTC": "2026-10-07T01:15:49.143746+00:00",
+      "endUTC": "2026-10-07T01:15:49.157711+00:00",
+      "exitCode": 0,
+      "output": "v24.16.0\n"
+    },
+    {
+      "argv": [
+        "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/npm",
+        "--version"
+      ],
+      "startUTC": "2026-10-07T01:15:49.157727+00:00",
+      "endUTC": "2026-10-07T01:15:49.217651+00:00",
+      "exitCode": 0,
+      "output": "11.13.0\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/sw_vers"
+      ],
+      "startUTC": "2026-10-07T01:15:49.217674+00:00",
+      "endUTC": "2026-10-07T01:15:49.227244+00:00",
+      "exitCode": 0,
+      "output": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/uname",
+        "-m"
+      ],
+      "startUTC": "2026-10-07T01:15:49.227263+00:00",
+      "endUTC": "2026-10-07T01:15:49.229722+00:00",
+      "exitCode": 0,
+      "output": "arm64\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/xcrun",
+        "--find",
+        "python3"
+      ],
+      "startUTC": "2026-10-07T01:15:49.229734+00:00",
+      "endUTC": "2026-10-07T01:15:49.235241+00:00",
+      "exitCode": 0,
+      "output": "/Library/Developer/CommandLineTools/usr/bin/python3\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "-c",
+        "import sys; print(sys.executable)"
+      ],
+      "startUTC": "2026-10-07T01:15:49.235259+00:00",
+      "endUTC": "2026-10-07T01:15:49.251760+00:00",
+      "exitCode": 0,
+      "output": "/Library/Developer/CommandLineTools/usr/bin/python3\n"
+    },
+    {
+      "argv": [
+        "/usr/libexec/ApplicationFirewall/socketfilterfw",
+        "--help"
+      ],
+      "startUTC": "2026-10-07T01:15:49.251777+00:00",
+      "endUTC": "2026-10-07T01:15:49.257835+00:00",
+      "exitCode": 255,
+      "output": "usage: /usr/libexec/ApplicationFirewall/socketfilterfw [-h] [--getglobalstate] [--setglobalstate on | off] [--getblockall] [--setblockall on | off] [--listapps] [--getappblocked <path>] [--blockapp <path>] [--unblockapp <path>] [--add <path>] [--remove <path>] [--getallowsigned] [--setallowsigned on | off] [--setallowsignedapp on | off] [--getstealthmode] [--setstealthmode on | off]\n"
+    }
+  ],
+  "cargoProxy": {
+    "path": "/Users/study_superior/.cargo/bin/cargo",
+    "isSymlink": true,
+    "resolved": "/Users/study_superior/.cargo/bin/rustup"
+  },
+  "configFiles": {
+    "/Users/study_superior/Desktop/Code/LingxiAgent/.cargo/config": {
+      "exists": false,
+      "sha256": null
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/.cargo/config.toml": {
+      "exists": false,
+      "sha256": null
+    },
+    "/Users/study_superior/Desktop/Code/.cargo/config": {
+      "exists": false,
+      "sha256": null
+    },
+    "/Users/study_superior/Desktop/Code/.cargo/config.toml": {
+      "exists": false,
+      "sha256": null
+    },
+    "/Users/study_superior/Desktop/.cargo/config": {
+      "exists": false,
+      "sha256": null
+    },
+    "/Users/study_superior/Desktop/.cargo/config.toml": {
+      "exists": false,
+      "sha256": null
+    },
+    "/Users/study_superior/.cargo/config": {
+      "exists": false,
+      "sha256": null
+    },
+    "/Users/study_superior/.cargo/config.toml": {
+      "exists": false,
+      "sha256": null
+    },
+    "/Users/.cargo/config": {
+      "exists": false,
+      "sha256": null
+    },
+    "/Users/.cargo/config.toml": {
+      "exists": false,
+      "sha256": null
+    },
+    "/.cargo/config": {
+      "exists": false,
+      "sha256": null
+    },
+    "/.cargo/config.toml": {
+      "exists": false,
+      "sha256": null
+    }
+  }
+}

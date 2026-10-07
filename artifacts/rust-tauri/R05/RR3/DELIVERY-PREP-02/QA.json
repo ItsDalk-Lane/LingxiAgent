@@ -1,0 +1,99 @@
+{
+  "startUTC": "2026-10-07T03:57:59.857303+00:00",
+  "endUTC": "2026-10-07T03:58:00.327094+00:00",
+  "scope": "仅交付资料的JSON/集合/引用/自身身份一致性，不是产品测试或最终交付验收",
+  "checks": [
+    {
+      "check": "768条唯一且完全覆盖旧待定",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "逐项明确决定且没有UNKNOWN",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "计数等于报告",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "规则映射及基线比较成立",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "旧全集不增漏且唯一",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "精确列表互斥且覆盖",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "列表计数",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "总字节与初步清点相等",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "报告字节和清单相等",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "新排除原件身份与索引相同",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "合成清单不纳三种工作副本或临时票据",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "已有报告原日志测量未被误作补正对象",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "本轮每条来源和历史引用实物存在",
+      "ok": true,
+      "detail": 12003
+    },
+    {
+      "check": "分类后到封口原件stat未变",
+      "ok": true,
+      "detail": 1326
+    },
+    {
+      "check": "JSON可解析且无重复键",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "本目录Markdown链接有效",
+      "ok": true,
+      "detail": 31
+    },
+    {
+      "check": "未更改Git暂存清单",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "清楚声明非最终冻结",
+      "ok": true,
+      "detail": null
+    }
+  ],
+  "failed": 0,
+  "status": "PASS"
+}

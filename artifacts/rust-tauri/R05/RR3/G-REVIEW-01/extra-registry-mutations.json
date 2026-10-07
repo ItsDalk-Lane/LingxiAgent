@@ -1,0 +1,65 @@
+{
+  "cases": [
+    {
+      "case": "F26-cid-rename",
+      "exitCode": 101,
+      "mutations": [
+        {
+          "path": "docs/rust-tauri/R05/r05_stage_cids.tsv",
+          "beforeSHA256": "ffffbe56313a1d5e50e7b216499cd851b1efc988da811a57d4fe0b07cc0be556",
+          "afterSHA256": "9aa15842e8ba5df71f6188fd29f7172b829975ce7c8e63328e6aded29d36100b"
+        }
+      ]
+    },
+    {
+      "case": "F26-registry-missing",
+      "exitCode": 101,
+      "mutations": [
+        {
+          "path": "docs/rust-tauri/R05/r05_required_cids.tsv",
+          "beforeSHA256": "1a046aa162d62bc1fdefdd286a6211d37c15852a2683073df9c629d26190676c",
+          "afterSHA256": "5e23e94c75a376ccaae3c8dbf4fd3bd13d6d7f780dfd697891c34aad5faa7f6a"
+        }
+      ]
+    },
+    {
+      "case": "F26-bogus-command",
+      "exitCode": 101,
+      "mutations": [
+        {
+          "path": "docs/rust-tauri/R05/r05_required_cids.tsv",
+          "beforeSHA256": "1a046aa162d62bc1fdefdd286a6211d37c15852a2683073df9c629d26190676c",
+          "afterSHA256": "649389b173dbff73177fa70a3c8a03e91045eb063b80ae984e2e2bfcbdb227f6"
+        }
+      ]
+    },
+    {
+      "case": "F25-exclusive-share",
+      "exitCode": 101,
+      "mutations": [
+        {
+          "path": "rust/crates/xtask/src/stage_maps/R05.json",
+          "beforeSHA256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+          "afterSHA256": "64f37176f464a9d535c7f9484b4f4be7fc3d21f511cb5886443cd9f5bcd10f02"
+        }
+      ]
+    },
+    {
+      "case": "F25-leafcase-missing",
+      "exitCode": 101,
+      "mutations": [
+        {
+          "path": "docs/rust-tauri/R05/r05_leaf_case_map.tsv",
+          "beforeSHA256": "a4f5866d11a833a7bbcd7224e898baaaa047a485cf4b2c66c515af25348db64f",
+          "afterSHA256": "06a015a37228584983389699c252a5697d82fccf0b0462bc5e50f6a9a915b9d1"
+        }
+      ]
+    },
+    {
+      "case": "F26-producer-preflight",
+      "exitCode": 1
+    }
+  ],
+  "allRestored": true,
+  "boundary": "真实当前生产镜像和生产者预检，不改主树或生产需求；完整producer正常控与当前目标恢复测试共同提供恢复绿"
+}

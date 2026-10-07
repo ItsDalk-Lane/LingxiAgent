@@ -1,0 +1,51 @@
+
+running 1 test
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/bounded-control-0
+本层真实 stdout 在 checkpoint 前增长：2/bounded-control-0
+xtask: verify-stage RX [bounded-control-0] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/bounded-control-1
+本层真实 stdout 在 checkpoint 前增长：2/bounded-control-1
+xtask: verify-stage RX [bounded-control-1] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/bounded-control-2
+本层真实 stdout 在 checkpoint 前增长：2/bounded-control-2
+xtask: verify-stage RX [bounded-control-2] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/bounded-control-3
+本层真实 stdout 在 checkpoint 前增长：2/bounded-control-3
+xtask: verify-stage RX [bounded-control-3] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/bounded-control-4
+本层真实 stdout 在 checkpoint 前增长：2/bounded-control-4
+xtask: verify-stage RX [bounded-control-4] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/bounded-control-5
+本层真实 stdout 在 checkpoint 前增长：2/bounded-control-5
+xtask: verify-stage RX [bounded-control-5] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/bounded-control-6
+本层真实 stdout 在 checkpoint 前增长：2/bounded-control-6
+xtask: verify-stage RX [bounded-control-6] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/bounded-control-7
+本层真实 stdout 在 checkpoint 前增长：2/bounded-control-7
+xtask: verify-stage RX [bounded-control-7] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/bounded-control-8
+本层真实 stdout 在 checkpoint 前增长：2/bounded-control-8
+xtask: verify-stage RX [bounded-control-8] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/bounded-control-9
+本层真实 stdout 在 checkpoint 前增长：2/bounded-control-9
+xtask: verify-stage RX [bounded-control-9] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/bounded-control-10
+本层真实 stdout 在 checkpoint 前增长：2/bounded-control-10
+xtask: verify-stage RX [bounded-control-10] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/bounded-control-11
+本层真实 stdout 在 checkpoint 前增长：2/bounded-control-11
+xtask: verify-stage RX [bounded-control-11] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/bounded-control-12
+本层真实 stdout 在 checkpoint 前增长：2/bounded-control-12
+xtask: verify-stage RX [bounded-control-12] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/bounded-control-13
+本层真实 stdout 在 checkpoint 前增长：2/bounded-control-13
+xtask: verify-stage RX [bounded-control-13] PASS
+xtask: verify-stage RX [env LINGXI_NESTED_LEVEL=3 LINGXI_NESTED_EVIDENCE=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/xtask-ad766de8ea03e62c --exact verify::runner_tests::rr3_nested_process_probe --nocapture] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-external-34860-1791332591412620000/run001/verify-R05/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression
+本层真实 stdout 在 checkpoint 前增长：2/r02_legacy_regression
+xtask: verify-stage RX [r02_legacy_regression] PASS
+test verify::runner_tests::rr3_nested_process_probe ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 5.23s
+

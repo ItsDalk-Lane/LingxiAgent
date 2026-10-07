@@ -1,0 +1,9 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.48s
+     Running tests/r05_t05_compat.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t05_compat-ddf368131df0ea32)
+
+running 1 test
+test every_golden_aligns_with_the_incumbent_ts_run ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

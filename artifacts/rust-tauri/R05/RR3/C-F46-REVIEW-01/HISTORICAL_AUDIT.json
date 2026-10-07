@@ -1,0 +1,1620 @@
+{
+  "utc": "2026-10-07T01:05:15.411496+00:00",
+  "records": [
+    {
+      "package": "C-01",
+      "fileCount": 53,
+      "manifestChecks": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/CONTENT_CHECKS.json",
+          "expectedSha256": "53bb2f0597f687aa8ed1c341b60a84c44415ffb81d27f597f6de6e3e1ef9e2ed",
+          "actualSha256": "53bb2f0597f687aa8ed1c341b60a84c44415ffb81d27f597f6de6e3e1ef9e2ed",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/DELIVERY_CHECKS.json",
+          "expectedSha256": "28b584a76b5746eaf1fed9ef9d5f0d39d47e7ef2e571132ac49ef6599194af62",
+          "actualSha256": "28b584a76b5746eaf1fed9ef9d5f0d39d47e7ef2e571132ac49ef6599194af62",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/FINAL_SOURCE_BINDING.json",
+          "expectedSha256": "760f0a2f246791e4b4d95110847745b3459a42bd9973dafa10a6952a94957ffb",
+          "actualSha256": "760f0a2f246791e4b4d95110847745b3459a42bd9973dafa10a6952a94957ffb",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+          "expectedSha256": "c67fb4795cd3934283ec8ce319e428127c95557584d487f9dae405c3dd31787d",
+          "actualSha256": "c67fb4795cd3934283ec8ce319e428127c95557584d487f9dae405c3dd31787d",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/REPORT.md",
+          "expectedSha256": "07e42bdaa5d332edeb9028a399c227f01f97f9cc11d996f8f26d4f6623d6192e",
+          "actualSha256": "07e42bdaa5d332edeb9028a399c227f01f97f9cc11d996f8f26d4f6623d6192e",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/RESOURCE_SUMMARY.json",
+          "expectedSha256": "83585953bf44cede720a3b46482b3f652736e4677ac85f2b67ba563cede89f8a",
+          "actualSha256": "83585953bf44cede720a3b46482b3f652736e4677ac85f2b67ba563cede89f8a",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/build-01-compiler-error.json",
+          "expectedSha256": "aefb68a58da4dc41a76103279f8e6458e6824013c1fa94d537c4cad9252fc36a",
+          "actualSha256": "aefb68a58da4dc41a76103279f8e6458e6824013c1fa94d537c4cad9252fc36a",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/build-02/command.json",
+          "expectedSha256": "13785875db0143fa72c231a9e4a45a5bf74b3efe9722ebf1adfd639a2123d740",
+          "actualSha256": "13785875db0143fa72c231a9e4a45a5bf74b3efe9722ebf1adfd639a2123d740",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/build-02/stdout.log",
+          "expectedSha256": "735fcb88df22bef4e609840a1efb3cc91cc127ba190c5da46fc32082a5649753",
+          "actualSha256": "735fcb88df22bef4e609840a1efb3cc91cc127ba190c5da46fc32082a5649753",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/clippy-01/command.json",
+          "expectedSha256": "afdb1ed02147de4394d02a9f856dd057941c4681ce879d93c8d20b4a4e9644ef",
+          "actualSha256": "afdb1ed02147de4394d02a9f856dd057941c4681ce879d93c8d20b4a4e9644ef",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/clippy-01/stdout.log",
+          "expectedSha256": "eab52c226c4503a9b93cd8c70ae6c1fe752da3cfa223168ece0a9ad038b8d6bc",
+          "actualSha256": "eab52c226c4503a9b93cd8c70ae6c1fe752da3cfa223168ece0a9ad038b8d6bc",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/clippy-final-01/command.json",
+          "expectedSha256": "a57d5edde8bf2ef90f066310b99a6d2400bf577ff5928ea0440c00b9c354036a",
+          "actualSha256": "a57d5edde8bf2ef90f066310b99a6d2400bf577ff5928ea0440c00b9c354036a",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/clippy-final-01/stdout.log",
+          "expectedSha256": "49e374901af342d44377ed633b417bc4aeb15c96231ef5f95856467f9bdc060a",
+          "actualSha256": "49e374901af342d44377ed633b417bc4aeb15c96231ef5f95856467f9bdc060a",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/environment.json",
+          "expectedSha256": "5fad22baba110dc61df9839ff86a9aca0d8429382fe018c732c60e83426b853a",
+          "actualSha256": "5fad22baba110dc61df9839ff86a9aca0d8429382fe018c732c60e83426b853a",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/f46-directed-command-01/command.json",
+          "expectedSha256": "2d1285de91b109e05873065d8173c6dedcb939a28638cfbe8b442be38226f9d2",
+          "actualSha256": "2d1285de91b109e05873065d8173c6dedcb939a28638cfbe8b442be38226f9d2",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/f46-directed-command-01/stdout.log",
+          "expectedSha256": "5ac03295992809c5fc46972801680b6b2c97cbd67310e5e1914084ad66f77e50",
+          "actualSha256": "5ac03295992809c5fc46972801680b6b2c97cbd67310e5e1914084ad66f77e50",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/f46-directed-red-01/result.json",
+          "expectedSha256": "41c66e92b0574112722c4751b6a10e78f0da454ad57dddedc26f4ab48ab27fee",
+          "actualSha256": "41c66e92b0574112722c4751b6a10e78f0da454ad57dddedc26f4ab48ab27fee",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/f46-directed-red-01/service-0-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/f46-directed-red-01/service-0-stdout.log",
+          "expectedSha256": "58910242b84efd33bd21c342c4d58b82fab0ceba0ee7b059e580cd0e13c1166e",
+          "actualSha256": "58910242b84efd33bd21c342c4d58b82fab0ceba0ee7b059e580cd0e13c1166e",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/f46-directed-red-01/service-1-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/f46-directed-red-01/service-1-stdout.log",
+          "expectedSha256": "abf3b7ad68ff0ef1a371e5b35864313b89552f8d2368cb3e8eb781b2951374fc",
+          "actualSha256": "abf3b7ad68ff0ef1a371e5b35864313b89552f8d2368cb3e8eb781b2951374fc",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/f46-directed-red-01/service-2-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/f46-directed-red-01/service-2-stdout.log",
+          "expectedSha256": "21c2540cd24fb5317c4719a72df56bbdb0566b65a252a844f58f8471f24a0dd8",
+          "actualSha256": "21c2540cd24fb5317c4719a72df56bbdb0566b65a252a844f58f8471f24a0dd8",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/f46-directed-red-01/service-3-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/f46-directed-red-01/service-3-stdout.log",
+          "expectedSha256": "c8ce8f8171082e166e78beeca66f26e741425c249a2f0e72a7a5bcddadb678fd",
+          "actualSha256": "c8ce8f8171082e166e78beeca66f26e741425c249a2f0e72a7a5bcddadb678fd",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/f46_reopen_probe.py",
+          "expectedSha256": "7adadc5e94bfe2eba70ec57074e61d2512482a289c9bf54ec67c42977c797fdb",
+          "actualSha256": "7adadc5e94bfe2eba70ec57074e61d2512482a289c9bf54ec67c42977c797fdb",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/fmt-01/command.json",
+          "expectedSha256": "18d9d1c99a0c1ace711a9d89eaeedfdc75c6db46a35178167d8891ee918c3478",
+          "actualSha256": "18d9d1c99a0c1ace711a9d89eaeedfdc75c6db46a35178167d8891ee918c3478",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/fmt-01/stdout.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/fmt-final-01/command.json",
+          "expectedSha256": "fc0ee238f2a80c5a579b1024ff271fdc960ff3d8fabf15b26246ad2fe949afc7",
+          "actualSha256": "fc0ee238f2a80c5a579b1024ff271fdc960ff3d8fabf15b26246ad2fe949afc7",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/fmt-final-01/stdout.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/measurement-01/command.json",
+          "expectedSha256": "100f38ae0926f37c8f4bb41866168d073c087ac8f1a71cecf489748af0eb84a5",
+          "actualSha256": "100f38ae0926f37c8f4bb41866168d073c087ac8f1a71cecf489748af0eb84a5",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/measurement-01/f27-resource-series.json",
+          "expectedSha256": "9311950697691ffee529e27654c8cd71ec249d473d31d660d3c43f0d85b078f2",
+          "actualSha256": "9311950697691ffee529e27654c8cd71ec249d473d31d660d3c43f0d85b078f2",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/measurement-01/runtime-binding.json",
+          "expectedSha256": "1b703f04f2e15d2fce7adbb3aac0e0b5e2ce586a4fd8eb02db8ff4002dd37386",
+          "actualSha256": "1b703f04f2e15d2fce7adbb3aac0e0b5e2ce586a4fd8eb02db8ff4002dd37386",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/measurement-01/stdout.log",
+          "expectedSha256": "c81e5cd15135c62e9612e43edb1aaa2336b46f00db9a70ee2b0a20b5e91c7725",
+          "actualSha256": "c81e5cd15135c62e9612e43edb1aaa2336b46f00db9a70ee2b0a20b5e91c7725",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/negative-fd-zero/bin/lsof",
+          "expectedSha256": "14994bd1c631c98371a2ba0d2e76223125e64bea706ad8e46a94a499b1849be6",
+          "actualSha256": "14994bd1c631c98371a2ba0d2e76223125e64bea706ad8e46a94a499b1849be6",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/negative-fd-zero/calls.jsonl",
+          "expectedSha256": "478c5261afdb28c6131053d05ff06683ec48d1ba0626031290d1ec6a1813f75b",
+          "actualSha256": "478c5261afdb28c6131053d05ff06683ec48d1ba0626031290d1ec6a1813f75b",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/negative-fd-zero/cleanup.json",
+          "expectedSha256": "3607e0be8299e71042e6f1d966b14fd183ec7cfaa7a37d1d56f4912ad14cc478",
+          "actualSha256": "3607e0be8299e71042e6f1d966b14fd183ec7cfaa7a37d1d56f4912ad14cc478",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/negative-fd-zero-run/command.json",
+          "expectedSha256": "ee7e8b7e150c0ae7cdfcc62cef9a7b6db70bb961322bc29e63ae901bbd48d225",
+          "actualSha256": "ee7e8b7e150c0ae7cdfcc62cef9a7b6db70bb961322bc29e63ae901bbd48d225",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/negative-fd-zero-run/stdout.log",
+          "expectedSha256": "5bb42a56758a17a4921e4a53dfcf0093bb8ac37a371cd5922fd4aa9dd48859b5",
+          "actualSha256": "5bb42a56758a17a4921e4a53dfcf0093bb8ac37a371cd5922fd4aa9dd48859b5",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/negative-tcp-zero/bin/lsof",
+          "expectedSha256": "2d3ad893d055f73650543ce3f1588c789343e2549dc326367ea0411ec56dcbbe",
+          "actualSha256": "2d3ad893d055f73650543ce3f1588c789343e2549dc326367ea0411ec56dcbbe",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/negative-tcp-zero/calls.jsonl",
+          "expectedSha256": "afbe648393b8b15cdda10d2fa9d2536ecb9361cbfac1076c982763d6c4cb3014",
+          "actualSha256": "afbe648393b8b15cdda10d2fa9d2536ecb9361cbfac1076c982763d6c4cb3014",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/negative-tcp-zero/cleanup.json",
+          "expectedSha256": "8fd792c7104ec5ef8b64b4f4cd8b1f09742e4bce659ad89bd01d3189712a9431",
+          "actualSha256": "8fd792c7104ec5ef8b64b4f4cd8b1f09742e4bce659ad89bd01d3189712a9431",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/negative-tcp-zero-run/command.json",
+          "expectedSha256": "939ca0b4ab4aa3b9a1a68879abe7a4fedd5c23f94beaf2b18adfadddbd28e8bb",
+          "actualSha256": "939ca0b4ab4aa3b9a1a68879abe7a4fedd5c23f94beaf2b18adfadddbd28e8bb",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/negative-tcp-zero-run/stdout.log",
+          "expectedSha256": "9e6c203525d91fa6080fc76d5f51292fa7f222bee82d7c584c3d302f600fb67f",
+          "actualSha256": "9e6c203525d91fa6080fc76d5f51292fa7f222bee82d7c584c3d302f600fb67f",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json",
+          "expectedSha256": "7740090dcefd823fea5126cc8bfcab1a7d23e9cf2b9779db97a4e2db1be86656",
+          "actualSha256": "7740090dcefd823fea5126cc8bfcab1a7d23e9cf2b9779db97a4e2db1be86656",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/stdout.log",
+          "expectedSha256": "83373bfb09d4ddc7a2f18e8c9abef4b8569649ff319f71ee549692fc3a1f2990",
+          "actualSha256": "83373bfb09d4ddc7a2f18e8c9abef4b8569649ff319f71ee549692fc3a1f2990",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json",
+          "expectedSha256": "7394927e21e332f9a151d999a9e740bbcb6c466758c7378125a5387ac806931b",
+          "actualSha256": "7394927e21e332f9a151d999a9e740bbcb6c466758c7378125a5387ac806931b",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/stdout.log",
+          "expectedSha256": "d6e56903a9dbb0ac5a9751f0ecaba3679ecf57c0c4df3afdb1c5c5fa29b80f48",
+          "actualSha256": "d6e56903a9dbb0ac5a9751f0ecaba3679ecf57c0c4df3afdb1c5c5fa29b80f48",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/preregistered.json",
+          "expectedSha256": "aaa54f9ebc8620ffb46bbe7475160a51d6304df133df08ce105c024ac2b42d9b",
+          "actualSha256": "aaa54f9ebc8620ffb46bbe7475160a51d6304df133df08ce105c024ac2b42d9b",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/restored-controls-01/command.json",
+          "expectedSha256": "9e39de2bc35eab6dc9219f9293b5a9c3c2801a1349db53ad4a0ed7cb461aea7c",
+          "actualSha256": "9e39de2bc35eab6dc9219f9293b5a9c3c2801a1349db53ad4a0ed7cb461aea7c",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/restored-controls-01/stdout.log",
+          "expectedSha256": "e6baba44ef12f13179215c65139e5bcb8c6627574d13a99c995795c0e3e66729",
+          "actualSha256": "e6baba44ef12f13179215c65139e5bcb8c6627574d13a99c995795c0e3e66729",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/run_command.py",
+          "expectedSha256": "6a0faa57fb31da051488ed6c9c91e68812989c3a32aac570f6aa5981b30a5031",
+          "actualSha256": "6a0faa57fb31da051488ed6c9c91e68812989c3a32aac570f6aa5981b30a5031",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/source.diff",
+          "expectedSha256": "e4db969ad38c2d22a92d8f40abc93dc2955a159d23d6b7d158e990a8e1858928",
+          "actualSha256": "e4db969ad38c2d22a92d8f40abc93dc2955a159d23d6b7d158e990a8e1858928",
+          "equal": true
+        }
+      ],
+      "allManifestEqual": true,
+      "commands": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/build-02/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--test",
+            "r05_t08_resources",
+            "--no-run"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:20:20.794039+00:00",
+          "endedAt": "2026-10-07T00:20:26.197084+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/clippy-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "clippy",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--test",
+            "r05_t08_resources",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:23:24.225133+00:00",
+          "endedAt": "2026-10-07T00:25:19.978536+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/clippy-final-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "clippy",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--test",
+            "r05_t08_resources",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:32:55.619297+00:00",
+          "endedAt": "2026-10-07T00:32:57.892768+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/f46-directed-command-01/command.json",
+          "command": [
+            "python3",
+            "artifacts/rust-tauri/R05/RR3/C-01/f46_reopen_probe.py"
+          ],
+          "exitCode": 1,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:32:44.207070+00:00",
+          "endedAt": "2026-10-07T00:32:45.454326+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/fmt-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "fmt",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:23:08.577199+00:00",
+          "endedAt": "2026-10-07T00:23:09.683523+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/fmt-final-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "fmt",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:32:54.588546+00:00",
+          "endedAt": "2026-10-07T00:32:55.564953+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/measurement-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--test",
+            "r05_t08_resources",
+            "--",
+            "--nocapture",
+            "--test-threads=1"
+          ],
+          "exitCode": 0,
+          "summaries": [
+            "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 336.81s"
+          ],
+          "startedAt": "2026-10-07T00:21:05.622143+00:00",
+          "endedAt": "2026-10-07T00:27:23.651377+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/negative-fd-zero-run/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--test",
+            "r05_t08_resources",
+            "f27_sampler_controls_detect_growth_release_and_failure",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exitCode": 101,
+          "summaries": [
+            "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.49s"
+          ],
+          "startedAt": "2026-10-07T00:23:52.725889+00:00",
+          "endedAt": "2026-10-07T00:25:20.562018+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/negative-tcp-zero-run/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--test",
+            "r05_t08_resources",
+            "f27_sampler_controls_detect_growth_release_and_failure",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exitCode": 101,
+          "summaries": [
+            "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1.16s"
+          ],
+          "startedAt": "2026-10-07T00:25:40.479981+00:00",
+          "endedAt": "2026-10-07T00:25:41.788764+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--test",
+            "late_result_fence",
+            "r03_a07_late_result_after_cancel_and_next_run_pollutes_nothing",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "summaries": [
+            "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.06s"
+          ],
+          "startedAt": "2026-10-07T00:28:22.947480+00:00",
+          "endedAt": "2026-10-07T00:28:41.905944+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--test",
+            "subagent_closeout",
+            "parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "summaries": [
+            "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.10s"
+          ],
+          "startedAt": "2026-10-07T00:27:38.259646+00:00",
+          "endedAt": "2026-10-07T00:27:53.326679+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/C-01/restored-controls-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--test",
+            "r05_t08_resources",
+            "f27_sampler_controls_detect_growth_release_and_failure",
+            "--",
+            "--exact",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "summaries": [
+            "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1.00s"
+          ],
+          "startedAt": "2026-10-07T00:26:07.485898+00:00",
+          "endedAt": "2026-10-07T00:26:08.647945+00:00"
+        }
+      ],
+      "raw": {
+        "sha256": "9311950697691ffee529e27654c8cd71ec249d473d31d660d3c43f0d85b078f2",
+        "cycleCounts": {
+          "cancel": 60,
+          "error": 60,
+          "ok": 15,
+          "long": 10,
+          "worker": 15
+        },
+        "binaryPoints": 54,
+        "ownerPoints": 61,
+        "postRestartLogCount": 4,
+        "steadyLogCounts": [
+          4
+        ]
+      },
+      "claimBoundary": "C old cargo 2/2 is full resource FAIL if raw exceeds3; implementation data does not replace independent executions"
+    },
+    {
+      "package": "F46-01",
+      "fileCount": 106,
+      "manifestChecks": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/CONTENT_CHECKS.json",
+          "expectedSha256": "aeacd1e42369ab44b23eb06148ebda156b050dcc725f4af48b65dea2cc732534",
+          "actualSha256": "aeacd1e42369ab44b23eb06148ebda156b050dcc725f4af48b65dea2cc732534",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/FINAL_SOURCE_BINDING.json",
+          "expectedSha256": "b43db632b1b98d925bcefa437be5eabd4c1bd04492eb741e04e4a698aa9491da",
+          "actualSha256": "b43db632b1b98d925bcefa437be5eabd4c1bd04492eb741e04e4a698aa9491da",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md",
+          "expectedSha256": "75fe8d084c6524c2a2390f6f6eb48db1510eddb082bb1e1c4fc111e16c78e91b",
+          "actualSha256": "75fe8d084c6524c2a2390f6f6eb48db1510eddb082bb1e1c4fc111e16c78e91b",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/RESOURCE_SUMMARY.json",
+          "expectedSha256": "53b729384713f514c9b78474f95c023631be5b642a7ba4ecc781879f225fa87c",
+          "actualSha256": "53b729384713f514c9b78474f95c023631be5b642a7ba4ecc781879f225fa87c",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/RUNTIME_INPUTS_AFTER.json",
+          "expectedSha256": "d903ca0e29408604b8bfebe9a3390fa36a18e09a1d952aa0e3d400fe9d3da01e",
+          "actualSha256": "d903ca0e29408604b8bfebe9a3390fa36a18e09a1d952aa0e3d400fe9d3da01e",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/RUNTIME_INPUTS_DURING.json",
+          "expectedSha256": "3bd6c3b773086c3bb95e3b8b77ba6eed3fcf51b7d34b5f48fc887a411b625992",
+          "actualSha256": "3bd6c3b773086c3bb95e3b8b77ba6eed3fcf51b7d34b5f48fc887a411b625992",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/build-after/command.json",
+          "expectedSha256": "b5a9e23927508769680fae28396aed5085ccca65331cbd33654b893f4f05eed4",
+          "actualSha256": "b5a9e23927508769680fae28396aed5085ccca65331cbd33654b893f4f05eed4",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/build-after/stdout.log",
+          "expectedSha256": "55c0e1c3d85e622a0f3fc7a76184e9fa4324dfc05397d399a166f5369e5a1b15",
+          "actualSha256": "55c0e1c3d85e622a0f3fc7a76184e9fa4324dfc05397d399a166f5369e5a1b15",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/build-before/command.json",
+          "expectedSha256": "3777eb9e3739f4428beb02f95df0684c0b04a9237d0133c2a746fe37a8ede7c3",
+          "actualSha256": "3777eb9e3739f4428beb02f95df0684c0b04a9237d0133c2a746fe37a8ede7c3",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/build-before/stdout.log",
+          "expectedSha256": "2b34696728dc82b03cbf6311d7e3a6a41658bbde097834c3010a78bc82842c1a",
+          "actualSha256": "2b34696728dc82b03cbf6311d7e3a6a41658bbde097834c3010a78bc82842c1a",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/clippy-01/command.json",
+          "expectedSha256": "21f0b97e2f38d68a7c8da7378fbcf3daf1b6656431f42d65b0886d6fcfdce672",
+          "actualSha256": "21f0b97e2f38d68a7c8da7378fbcf3daf1b6656431f42d65b0886d6fcfdce672",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/clippy-01/stdout.log",
+          "expectedSha256": "61dffc608ab6c667d9237509f3dc1944d58bbc1b8243d592e78fc89a1eac3c5d",
+          "actualSha256": "61dffc608ab6c667d9237509f3dc1944d58bbc1b8243d592e78fc89a1eac3c5d",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/error-explicit-binary/result.json",
+          "expectedSha256": "7abe47257bb52cc1efecd2de9299e674f281e0ad52c8508c43350076fb7be492",
+          "actualSha256": "7abe47257bb52cc1efecd2de9299e674f281e0ad52c8508c43350076fb7be492",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/error-explicit-binary/stderr.log",
+          "expectedSha256": "4fe587e365956df763ecc95263f4d5c8473e37b16b23c80f7285aecaa63b137a",
+          "actualSha256": "4fe587e365956df763ecc95263f4d5c8473e37b16b23c80f7285aecaa63b137a",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/error-explicit-binary/stdout.log",
+          "expectedSha256": "013619133f729b4163312b5b7ccbdade70826db565bf62486426311388712343",
+          "actualSha256": "013619133f729b4163312b5b7ccbdade70826db565bf62486426311388712343",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/error-explicit-command-01/command.json",
+          "expectedSha256": "f7058dc8b88d2e91809d87ca39dae9de2fd9be61a68249966a9ed7f04ac474a2",
+          "actualSha256": "f7058dc8b88d2e91809d87ca39dae9de2fd9be61a68249966a9ed7f04ac474a2",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/error-explicit-command-01/stdout.log",
+          "expectedSha256": "2c591b60e0dd42209a74091a007b2b135c7f87d492529fda5f5efa9e01fb877c",
+          "actualSha256": "2c591b60e0dd42209a74091a007b2b135c7f87d492529fda5f5efa9e01fb877c",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/error_probe.py",
+          "expectedSha256": "d2fb1b24fefc903ae59f5f49625139440b597a770e0a964f3812ace218f46b0e",
+          "actualSha256": "d2fb1b24fefc903ae59f5f49625139440b597a770e0a964f3812ace218f46b0e",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/formatting-01/command.json",
+          "expectedSha256": "d328d93b3a5c5d23d058efbcfdbb6defb65ddc4ebb168e1a1e44551d7c98c0ad",
+          "actualSha256": "d328d93b3a5c5d23d058efbcfdbb6defb65ddc4ebb168e1a1e44551d7c98c0ad",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/formatting-01/stdout.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/logging-before.rs",
+          "expectedSha256": "5f0aa8ccabc62295d64ff0ca6b61a5fc9a384e6a4bdd6e092d70a15ab73b6be1",
+          "actualSha256": "5f0aa8ccabc62295d64ff0ca6b61a5fc9a384e6a4bdd6e092d70a15ab73b6be1",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/logging-tests-01/command.json",
+          "expectedSha256": "b469a5cb0a49db462b859a88aad14e33181a91ba89b13650071836e203175f59",
+          "actualSha256": "b469a5cb0a49db462b859a88aad14e33181a91ba89b13650071836e203175f59",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/logging-tests-01/stdout.log",
+          "expectedSha256": "4434df5935f6dcc0e0aab30454894c7aa1f9254554f924fd982bc15eb0152824",
+          "actualSha256": "4434df5935f6dcc0e0aab30454894c7aa1f9254554f924fd982bc15eb0152824",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/logging-tests-final/command.json",
+          "expectedSha256": "fb9d860f173b94526f56be644ce6b885007e2b7e10a79cf2ebec4cc78f693f32",
+          "actualSha256": "fb9d860f173b94526f56be644ce6b885007e2b7e10a79cf2ebec4cc78f693f32",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/logging-tests-final/stdout.log",
+          "expectedSha256": "58e010495c45704f44083aae47bc22f7add1de67e8483a4ae79566158082ed07",
+          "actualSha256": "58e010495c45704f44083aae47bc22f7add1de67e8483a4ae79566158082ed07",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after/result.json",
+          "expectedSha256": "584de16e8fdf7a8ed0288ce9ff439f955e97ed0e4f7e07f6e8ca4a5e9ea249c0",
+          "actualSha256": "584de16e8fdf7a8ed0288ce9ff439f955e97ed0e4f7e07f6e8ca4a5e9ea249c0",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after/service-0-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after/service-0-stdout.log",
+          "expectedSha256": "2158e2d45511d1aa02bcad8b42d0b1883f34080161bfc9e8783a260c93b5e47e",
+          "actualSha256": "2158e2d45511d1aa02bcad8b42d0b1883f34080161bfc9e8783a260c93b5e47e",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after/service-1-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after/service-1-stdout.log",
+          "expectedSha256": "30089c42d034289cc27a0bebed86f85ec250d5d26dfc9fb15a820275a692d948",
+          "actualSha256": "30089c42d034289cc27a0bebed86f85ec250d5d26dfc9fb15a820275a692d948",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after/service-2-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after/service-2-stdout.log",
+          "expectedSha256": "1732f12ed90f442ac9667b86210d334ec833b51f8b70f60e91332c8186ad97b7",
+          "actualSha256": "1732f12ed90f442ac9667b86210d334ec833b51f8b70f60e91332c8186ad97b7",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after/service-3-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after/service-3-stdout.log",
+          "expectedSha256": "ec4b8f3eea81346ed6e36d3b57ed6a67ef6b10c04da664b89cfecf3cd389f5c7",
+          "actualSha256": "ec4b8f3eea81346ed6e36d3b57ed6a67ef6b10c04da664b89cfecf3cd389f5c7",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after/service-4-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after/service-4-stdout.log",
+          "expectedSha256": "c35dbd8104f24bd6a3b0b5789f05b3b886354ed403fd345ae2f1506a0a31910d",
+          "actualSha256": "c35dbd8104f24bd6a3b0b5789f05b3b886354ed403fd345ae2f1506a0a31910d",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after/service-5-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after/service-5-stdout.log",
+          "expectedSha256": "4009ed530743ccdd50005ed05634a291dec53ad2cc2978ff3b207c85160f4ee0",
+          "actualSha256": "4009ed530743ccdd50005ed05634a291dec53ad2cc2978ff3b207c85160f4ee0",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after-command/command.json",
+          "expectedSha256": "89e600c7decb50a519beb208ad71db15e0626b9e23826586a69fd7a88281c9f1",
+          "actualSha256": "89e600c7decb50a519beb208ad71db15e0626b9e23826586a69fd7a88281c9f1",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after-command/stdout.log",
+          "expectedSha256": "e3495657bfbb37deb8bc4b5b0a6bbceb192982f70170b719d79e21cf45f5dcc9",
+          "actualSha256": "e3495657bfbb37deb8bc4b5b0a6bbceb192982f70170b719d79e21cf45f5dcc9",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before/result.json",
+          "expectedSha256": "d359c67e15c72a411f2a232214ea3fff5dd70138609ac4369f370a91b1907c62",
+          "actualSha256": "d359c67e15c72a411f2a232214ea3fff5dd70138609ac4369f370a91b1907c62",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before/service-0-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before/service-0-stdout.log",
+          "expectedSha256": "aa01ab7c4eca1395f0e82fcfc6c16c1e096b68c7700ecba27667f085a25bf2ce",
+          "actualSha256": "aa01ab7c4eca1395f0e82fcfc6c16c1e096b68c7700ecba27667f085a25bf2ce",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before/service-1-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before/service-1-stdout.log",
+          "expectedSha256": "9b118212e3c719ceb2974ff217ca07148c021b01f9d328a58b8c668b088d44cc",
+          "actualSha256": "9b118212e3c719ceb2974ff217ca07148c021b01f9d328a58b8c668b088d44cc",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before/service-2-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before/service-2-stdout.log",
+          "expectedSha256": "da724804f4640cd918c86266f74e92970579fe9b3bd39430bcee0174df3f63ec",
+          "actualSha256": "da724804f4640cd918c86266f74e92970579fe9b3bd39430bcee0174df3f63ec",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before/service-3-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before/service-3-stdout.log",
+          "expectedSha256": "8423d803e8fc563f478f3e20aeec50fec950431db986e723f6890af59f7d0822",
+          "actualSha256": "8423d803e8fc563f478f3e20aeec50fec950431db986e723f6890af59f7d0822",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before/service-4-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before/service-4-stdout.log",
+          "expectedSha256": "ccfccf322da352869bafb26bf3d3ba514dcf7dad343bdd0385df22e111ad1448",
+          "actualSha256": "ccfccf322da352869bafb26bf3d3ba514dcf7dad343bdd0385df22e111ad1448",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before/service-5-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before/service-5-stdout.log",
+          "expectedSha256": "4f56a2ce7b3f6eb83ecd847770653915a710326e86974b0eb468d7e610b5074a",
+          "actualSha256": "4f56a2ce7b3f6eb83ecd847770653915a710326e86974b0eb468d7e610b5074a",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before-command/command.json",
+          "expectedSha256": "799f648020ad032129ec168b513c3da8e3e7ece39b48fa722f5fb27dd44173e7",
+          "actualSha256": "799f648020ad032129ec168b513c3da8e3e7ece39b48fa722f5fb27dd44173e7",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before-command/stdout.log",
+          "expectedSha256": "28d2c3266c9a02ca91e5f8e86c0316488ea2a2d8dd2199beba5a209f044705b3",
+          "actualSha256": "28d2c3266c9a02ca91e5f8e86c0316488ea2a2d8dd2199beba5a209f044705b3",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before-command-02/command.json",
+          "expectedSha256": "25e20a799d67994d2e919e39e3ecce587955a2d2b836e9e37a5b00c57480da0a",
+          "actualSha256": "25e20a799d67994d2e919e39e3ecce587955a2d2b836e9e37a5b00c57480da0a",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before-command-02/stdout.log",
+          "expectedSha256": "e50eb386be0a6ef42f91cc1d38212ad45c7f9f50ccfc1813a5b68ae6060faca8",
+          "actualSha256": "e50eb386be0a6ef42f91cc1d38212ad45c7f9f50ccfc1813a5b68ae6060faca8",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final/result.json",
+          "expectedSha256": "112d09a63b52e2735a85aa495f828b85ab3e9a535133e267d5bbb9c447162dae",
+          "actualSha256": "112d09a63b52e2735a85aa495f828b85ab3e9a535133e267d5bbb9c447162dae",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final/service-0-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final/service-0-stdout.log",
+          "expectedSha256": "06f399df13a66e926eff4553039eb087451f83f2848dd174390dab1fb5566073",
+          "actualSha256": "06f399df13a66e926eff4553039eb087451f83f2848dd174390dab1fb5566073",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final/service-1-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final/service-1-stdout.log",
+          "expectedSha256": "7a9122f911320b2c76e103b2e44eb5c7206da2bcbc48944edc0ab577a17fb800",
+          "actualSha256": "7a9122f911320b2c76e103b2e44eb5c7206da2bcbc48944edc0ab577a17fb800",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final/service-2-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final/service-2-stdout.log",
+          "expectedSha256": "110a742547762d27b8acdf990fb5751c4ac781e63191b4083ba2531137ef01e4",
+          "actualSha256": "110a742547762d27b8acdf990fb5751c4ac781e63191b4083ba2531137ef01e4",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final/service-3-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final/service-3-stdout.log",
+          "expectedSha256": "3f93e5e0afeae787a41c4a1c5dc94f654d1f810a0a3ad42e8960847b17902335",
+          "actualSha256": "3f93e5e0afeae787a41c4a1c5dc94f654d1f810a0a3ad42e8960847b17902335",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final/service-4-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final/service-4-stdout.log",
+          "expectedSha256": "1c82142336c0404abc863604713185a54a9d32ccd906a5d6f30a222c89ee3725",
+          "actualSha256": "1c82142336c0404abc863604713185a54a9d32ccd906a5d6f30a222c89ee3725",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final/service-5-stderr.log",
+          "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final/service-5-stdout.log",
+          "expectedSha256": "2f6d12c3cab3014f569fb59d3ff8f7a0316dda2fb37d30c4a8cb2a824deadd05",
+          "actualSha256": "2f6d12c3cab3014f569fb59d3ff8f7a0316dda2fb37d30c4a8cb2a824deadd05",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final-command/command.json",
+          "expectedSha256": "96855a842c9801f9ba1c1c84b3985b5617ef920368975c76a238602b372b4e4d",
+          "actualSha256": "96855a842c9801f9ba1c1c84b3985b5617ef920368975c76a238602b372b4e4d",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final-command/stdout.log",
+          "expectedSha256": "e3495657bfbb37deb8bc4b5b0a6bbceb192982f70170b719d79e21cf45f5dcc9",
+          "actualSha256": "e3495657bfbb37deb8bc4b5b0a6bbceb192982f70170b719d79e21cf45f5dcc9",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen_probe.py",
+          "expectedSha256": "8281bbccbd9d4cecc053d45ac5f3d1e4440a3985cd4976efbd93623184cced3b",
+          "actualSha256": "8281bbccbd9d4cecc053d45ac5f3d1e4440a3985cd4976efbd93623184cced3b",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json",
+          "expectedSha256": "0f2d2aab36ba252c429ac8bebfa042a69215c552b7e8036f32d1cb1817780af3",
+          "actualSha256": "0f2d2aab36ba252c429ac8bebfa042a69215c552b7e8036f32d1cb1817780af3",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/f27-resource-series.json",
+          "expectedSha256": "bcc0620794f4384196d74b7844098c063a96947147be48897a1076b9d6a50b7b",
+          "actualSha256": "bcc0620794f4384196d74b7844098c063a96947147be48897a1076b9d6a50b7b",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/runtime-binding.json",
+          "expectedSha256": "7be7185c83ee92a6834da5e73f5503767a4b99a9692ec938d6f303b25463bbd3",
+          "actualSha256": "7be7185c83ee92a6834da5e73f5503767a4b99a9692ec938d6f303b25463bbd3",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/stdout.log",
+          "expectedSha256": "db35fcfc5b67880e1afa8474f97119ebcf6762b131b3ccd565f8a2b9c9e27b9a",
+          "actualSha256": "db35fcfc5b67880e1afa8474f97119ebcf6762b131b3ccd565f8a2b9c9e27b9a",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/resources-list-01/command.json",
+          "expectedSha256": "00c213584efa8c706674426d40ee4667fd4e22c9df1205a985785ad7306afa89",
+          "actualSha256": "00c213584efa8c706674426d40ee4667fd4e22c9df1205a985785ad7306afa89",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/resources-list-01/stdout.log",
+          "expectedSha256": "a7399485e9c08ee536e9cbf80b0920ca364e1dab6f4efc7cd01509d21e08ff90",
+          "actualSha256": "a7399485e9c08ee536e9cbf80b0920ca364e1dab6f4efc7cd01509d21e08ff90",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/run_command.py",
+          "expectedSha256": "7d16de0862e5b6f6076907a9e845a1a56d37f161e5fa7a24a650e0dcff50b917",
+          "actualSha256": "7d16de0862e5b6f6076907a9e845a1a56d37f161e5fa7a24a650e0dcff50b917",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-command-01/command.json",
+          "expectedSha256": "f7a40ed80271524856ab7e25b9665a3e4152e7e0b2ab3aabbd5b1b13fcb89a99",
+          "actualSha256": "f7a40ed80271524856ab7e25b9665a3e4152e7e0b2ab3aabbd5b1b13fcb89a99",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-command-01/stdout.log",
+          "expectedSha256": "4b0de6d3def9e3189a5c19fd94f6b08a4f3e71c5ab2edb8f948d9453005762d7",
+          "actualSha256": "4b0de6d3def9e3189a5c19fd94f6b08a4f3e71c5ab2edb8f948d9453005762d7",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/fake-fd-zero/bin/lsof",
+          "expectedSha256": "aba014adc5414b8875a18d52987897e2d7de038124a32a42ff5fc8e0d4799cc3",
+          "actualSha256": "aba014adc5414b8875a18d52987897e2d7de038124a32a42ff5fc8e0d4799cc3",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/fake-fd-zero/calls.jsonl",
+          "expectedSha256": "e553d729c5e181fe350dd414a62b8fb6f41b57fefcfeb44e03af48e23e874962",
+          "actualSha256": "e553d729c5e181fe350dd414a62b8fb6f41b57fefcfeb44e03af48e23e874962",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/fake-fd-zero/command.json",
+          "expectedSha256": "379e077d3fad562d93da57d8923fffeb7e91e5ed6729a93c2c5b33c6dd72b2fc",
+          "actualSha256": "379e077d3fad562d93da57d8923fffeb7e91e5ed6729a93c2c5b33c6dd72b2fc",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/fake-fd-zero/stdout.log",
+          "expectedSha256": "11cca3a3b537cd4f9475865de447bcf8b124090aba498f9f020b9c8a73daff3e",
+          "actualSha256": "11cca3a3b537cd4f9475865de447bcf8b124090aba498f9f020b9c8a73daff3e",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/fake-tcp-zero/bin/lsof",
+          "expectedSha256": "49548c48b5e3d3a468b1cf3621325ea1fb7ad25b625233283b636423167768c9",
+          "actualSha256": "49548c48b5e3d3a468b1cf3621325ea1fb7ad25b625233283b636423167768c9",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/fake-tcp-zero/calls.jsonl",
+          "expectedSha256": "52e9e60da8f9f7969086a73b0b3da53e4367ec0effe485354c99df1d61230b8c",
+          "actualSha256": "52e9e60da8f9f7969086a73b0b3da53e4367ec0effe485354c99df1d61230b8c",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/fake-tcp-zero/command.json",
+          "expectedSha256": "c3f00bdbc657905b88d4f82189d72164ae8e4355dddda732a1c31528e4b02d70",
+          "actualSha256": "c3f00bdbc657905b88d4f82189d72164ae8e4355dddda732a1c31528e4b02d70",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/fake-tcp-zero/stdout.log",
+          "expectedSha256": "62ce325b74ee45700593dc69ed3c0ac4cfe14b017b39636ed442bf3a1439f4a7",
+          "actualSha256": "62ce325b74ee45700593dc69ed3c0ac4cfe14b017b39636ed442bf3a1439f4a7",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/normal/command.json",
+          "expectedSha256": "a78b1ee66b2d30aba0bccb2d051d14e353cb4321c1c09dd2596eae29b211f482",
+          "actualSha256": "a78b1ee66b2d30aba0bccb2d051d14e353cb4321c1c09dd2596eae29b211f482",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/normal/stdout.log",
+          "expectedSha256": "12b68e5e9f4e5bfddb8ab43467b42524849e165794e8be2531033174de375e56",
+          "actualSha256": "12b68e5e9f4e5bfddb8ab43467b42524849e165794e8be2531033174de375e56",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/r05_t08_resources",
+          "expectedSha256": "323456600dc961ee6e4d20b60cf7cf9964526bfcd4153090c7b4e89c0bf2e3a1",
+          "actualSha256": "323456600dc961ee6e4d20b60cf7cf9964526bfcd4153090c7b4e89c0bf2e3a1",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/restored/command.json",
+          "expectedSha256": "2e0f1109a92ea8b52d8c9117de08ad347c3f65a98ac5050e0873cbed50fa4532",
+          "actualSha256": "2e0f1109a92ea8b52d8c9117de08ad347c3f65a98ac5050e0873cbed50fa4532",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/restored/stdout.log",
+          "expectedSha256": "e939931db3c725747f535775938ce3fe70068deed029484d1725a6046d98df33",
+          "actualSha256": "e939931db3c725747f535775938ce3fe70068deed029484d1725a6046d98df33",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/result.json",
+          "expectedSha256": "6bd69752fb4e9aabc8cbbc17cc0df0d65185b53bd731c255fe65cc674a480a87",
+          "actualSha256": "6bd69752fb4e9aabc8cbbc17cc0df0d65185b53bd731c255fe65cc674a480a87",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler_negative_probe.py",
+          "expectedSha256": "ce664bfd3bff7d4069a2b1dfa33dcd4fb0af35ee9f7cf087ba76b952fbdc6cac",
+          "actualSha256": "ce664bfd3bff7d4069a2b1dfa33dcd4fb0af35ee9f7cf087ba76b952fbdc6cac",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/service-lib-list-01/command.json",
+          "expectedSha256": "1d7db42d64fae2da724ef0f004c874dfe105b8bcaef7ae80992d3a5488dba79e",
+          "actualSha256": "1d7db42d64fae2da724ef0f004c874dfe105b8bcaef7ae80992d3a5488dba79e",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/service-lib-list-01/stdout.log",
+          "expectedSha256": "19026de15484eba3a622686df5bb4ad63e3fcc38d8b87321fd21e3941cbfcf7d",
+          "actualSha256": "19026de15484eba3a622686df5bb4ad63e3fcc38d8b87321fd21e3941cbfcf7d",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/source.diff",
+          "expectedSha256": "856cf23d3a6302c59bf8e65220d0ccd0fae7a8a2b28aa8c754a48885e2918bc9",
+          "actualSha256": "856cf23d3a6302c59bf8e65220d0ccd0fae7a8a2b28aa8c754a48885e2918bc9",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/stage-pin-check-01/command.json",
+          "expectedSha256": "e5cd029eb54cf06d3720ba17d87f2e5845b70a05b925b51056bd58786e209e6f",
+          "actualSha256": "e5cd029eb54cf06d3720ba17d87f2e5845b70a05b925b51056bd58786e209e6f",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/stage-pin-check-01/stdout.log",
+          "expectedSha256": "6522f09b8980178c008fe36959d15fe07f226211642a2842764474fbe601f737",
+          "actualSha256": "6522f09b8980178c008fe36959d15fe07f226211642a2842764474fbe601f737",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/stage-pin-check-02/command.json",
+          "expectedSha256": "0bc1fe964b9e3e3b8a4b66e2cd114d0cd7cc70394287190610ac352ea6c302f9",
+          "actualSha256": "0bc1fe964b9e3e3b8a4b66e2cd114d0cd7cc70394287190610ac352ea6c302f9",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/stage-pin-check-02/stdout.log",
+          "expectedSha256": "49325bb4203cf56770e040e3cc8f4ce2f288597431e175d895c046439c9d0687",
+          "actualSha256": "49325bb4203cf56770e040e3cc8f4ce2f288597431e175d895c046439c9d0687",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/stage-pin-list-01/command.json",
+          "expectedSha256": "7925782bb456eed13ce7d73315c50f801cf4770489cbb3c0fa92684b067c9073",
+          "actualSha256": "7925782bb456eed13ce7d73315c50f801cf4770489cbb3c0fa92684b067c9073",
+          "equal": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/stage-pin-list-01/stdout.log",
+          "expectedSha256": "94e189715a94d166e63c7006cffe9266d62e5e7ceece1d18dcc6f985d616c834",
+          "actualSha256": "94e189715a94d166e63c7006cffe9266d62e5e7ceece1d18dcc6f985d616c834",
+          "equal": true
+        }
+      ],
+      "allManifestEqual": true,
+      "commands": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/build-after/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "build",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--bin",
+            "lingxi-service"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:38:24.696996+00:00",
+          "endedAt": "2026-10-07T00:38:38.479168+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/build-before/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "build",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--bin",
+            "lingxi-service"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:37:06.302183+00:00",
+          "endedAt": "2026-10-07T00:37:06.492656+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/clippy-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "clippy",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--lib",
+            "--test",
+            "r05_t08_resources",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:43:26.429893+00:00",
+          "endedAt": "2026-10-07T00:43:38.876870+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/error-explicit-command-01/command.json",
+          "command": [
+            "python3",
+            "artifacts/rust-tauri/R05/RR3/F46-01/error_probe.py"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:45:48.902674+00:00",
+          "endedAt": "2026-10-07T00:45:49.055016+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/formatting-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "fmt",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:40:14.732612+00:00",
+          "endedAt": "2026-10-07T00:40:15.884303+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/logging-tests-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--lib",
+            "logging::tests",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "summaries": [
+            "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 349 filtered out; finished in 0.13s"
+          ],
+          "startedAt": "2026-10-07T00:38:07.156701+00:00",
+          "endedAt": "2026-10-07T00:38:18.932802+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/logging-tests-final/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--lib",
+            "logging::tests",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "summaries": [
+            "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 349 filtered out; finished in 0.11s"
+          ],
+          "startedAt": "2026-10-07T00:44:02.692179+00:00",
+          "endedAt": "2026-10-07T00:44:02.948612+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-after-command/command.json",
+          "command": [
+            "python3",
+            "artifacts/rust-tauri/R05/RR3/F46-01/reopen_probe.py",
+            "reopen-after"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:38:58.982826+00:00",
+          "endedAt": "2026-10-07T00:39:00.027568+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before-command/command.json",
+          "command": [
+            "python3",
+            "artifacts/rust-tauri/R05/RR3/F46-01/reopen_probe.py",
+            "reopen-before"
+          ],
+          "exitCode": 1,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:37:10.413655+00:00",
+          "endedAt": "2026-10-07T00:37:10.457483+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-before-command-02/command.json",
+          "command": [
+            "python3",
+            "artifacts/rust-tauri/R05/RR3/F46-01/reopen_probe.py",
+            "reopen-before"
+          ],
+          "exitCode": 1,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:37:26.311901+00:00",
+          "endedAt": "2026-10-07T00:37:27.170199+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/reopen-final-command/command.json",
+          "command": [
+            "python3",
+            "artifacts/rust-tauri/R05/RR3/F46-01/reopen_probe.py",
+            "reopen-final"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:44:03.024781+00:00",
+          "endedAt": "2026-10-07T00:44:04.005541+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--test",
+            "r05_t08_resources",
+            "--",
+            "--nocapture",
+            "--test-threads=1"
+          ],
+          "exitCode": 0,
+          "summaries": [
+            "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 335.40s"
+          ],
+          "startedAt": "2026-10-07T00:39:00.092394+00:00",
+          "endedAt": "2026-10-07T00:44:52.354726+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/resources-list-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--test",
+            "r05_t08_resources",
+            "--",
+            "--list"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:43:35.004369+00:00",
+          "endedAt": "2026-10-07T00:43:38.971280+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-command-01/command.json",
+          "command": [
+            "python3",
+            "artifacts/rust-tauri/R05/RR3/F46-01/sampler_negative_probe.py"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:42:28.765183+00:00",
+          "endedAt": "2026-10-07T00:42:33.260195+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/fake-fd-zero/command.json",
+          "command": [
+            "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/r05_t08_resources",
+            "f27_sampler_controls_detect_growth_release_and_failure",
+            "--exact",
+            "--nocapture"
+          ],
+          "exitCode": 101,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:42:30.358115+00:00",
+          "endedAt": "2026-10-07T00:42:30.873946+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/fake-tcp-zero/command.json",
+          "command": [
+            "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/r05_t08_resources",
+            "f27_sampler_controls_detect_growth_release_and_failure",
+            "--exact",
+            "--nocapture"
+          ],
+          "exitCode": 101,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:42:30.917429+00:00",
+          "endedAt": "2026-10-07T00:42:32.066445+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/normal/command.json",
+          "command": [
+            "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/r05_t08_resources",
+            "f27_sampler_controls_detect_growth_release_and_failure",
+            "--exact",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:42:28.850108+00:00",
+          "endedAt": "2026-10-07T00:42:30.313165+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/restored/command.json",
+          "command": [
+            "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/r05_t08_resources",
+            "f27_sampler_controls_detect_growth_release_and_failure",
+            "--exact",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:42:32.112963+00:00",
+          "endedAt": "2026-10-07T00:42:33.210511+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/service-lib-list-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "lingxi-service",
+            "--lib",
+            "--",
+            "--list"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:41:39.791037+00:00",
+          "endedAt": "2026-10-07T00:43:34.928014+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/stage-pin-check-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "xtask",
+            "stage_map::tests::r05_stage_",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "summaries": [
+            "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 121 filtered out; finished in 0.00s"
+          ],
+          "startedAt": "2026-10-07T00:40:09.973723+00:00",
+          "endedAt": "2026-10-07T00:40:14.664752+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/stage-pin-check-02/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "xtask",
+            "stage_map::map_tests::r05_stage_",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "summaries": [
+            "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 119 filtered out; finished in 0.02s"
+          ],
+          "startedAt": "2026-10-07T00:41:51.890233+00:00",
+          "endedAt": "2026-10-07T00:43:26.350974+00:00"
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/F46-01/stage-pin-list-01/command.json",
+          "command": [
+            "/Users/study_superior/.cargo/bin/cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "--list"
+          ],
+          "exitCode": 0,
+          "summaries": [],
+          "startedAt": "2026-10-07T00:41:39.659069+00:00",
+          "endedAt": "2026-10-07T00:41:39.728248+00:00"
+        }
+      ],
+      "raw": {
+        "sha256": "bcc0620794f4384196d74b7844098c063a96947147be48897a1076b9d6a50b7b",
+        "cycleCounts": {
+          "cancel": 60,
+          "error": 60,
+          "ok": 15,
+          "long": 10,
+          "worker": 15
+        },
+        "binaryPoints": 54,
+        "ownerPoints": 61,
+        "postRestartLogCount": 3,
+        "steadyLogCounts": [
+          3
+        ]
+      },
+      "claimBoundary": "C old cargo 2/2 is full resource FAIL if raw exceeds3; implementation data does not replace independent executions"
+    }
+  ]
+}

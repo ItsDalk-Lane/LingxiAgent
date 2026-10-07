@@ -1,0 +1,52 @@
+{
+  "utc": "2026-10-07T01:20:52.343156+00:00",
+  "status": "MATCH",
+  "expected": {
+    "utc": "2026-10-07T01:20:45.019297+00:00",
+    "absolutePath": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0",
+    "sha256": "9f7489029c91d1c232e3c204236854bd53c69cee2fef33d6fd778a27f44696d3",
+    "cdhash": "d9676388f524872f1269c13f61f413458c0e9e52",
+    "sourceInputDigest": "0f945b9884ee73957a6db3fe19c3d6b4a6b87672feef7c3fd1b46998f2f92b75",
+    "candidateHead": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+    "scope": "只针对本轮CargoJSON r00；最终FINAL重链接或环境不同必须重新核对象，不沿用同名。",
+    "systemChangesExecuted": false
+  },
+  "actualIdentity": {
+    "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0",
+    "resolvedPath": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0",
+    "isSymlink": false,
+    "sha256": "9f7489029c91d1c232e3c204236854bd53c69cee2fef33d6fd778a27f44696d3",
+    "stat": {
+      "inode": 276472675,
+      "size": 57416312,
+      "mtimeNS": 1791335854843565972
+    },
+    "cdhash": "d9676388f524872f1269c13f61f413458c0e9e52",
+    "signature": {
+      "argv": [
+        "/usr/bin/codesign",
+        "-d",
+        "--verbose=4",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0"
+      ],
+      "startUTC": "2026-10-07T01:20:45.075224+00:00",
+      "endUTC": "2026-10-07T01:20:49.338825+00:00",
+      "exitCode": 0,
+      "output": "Executable=/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0\nIdentifier=r00_management_leaves-294787929158efb0\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=445215 flags=0x20002(adhoc,linker-signed) hashes=13909+0 location=embedded\nVersionPlatform=1\nVersionMin=720896\nVersionSDK=1769472\nHash type=sha256 size=32\nCandidateCDHash sha256=d9676388f524872f1269c13f61f413458c0e9e52\nCandidateCDHashFull sha256=d9676388f524872f1269c13f61f413458c0e9e5246adbc3b7ccb9da04054687d\nHash choices=sha256\nCMSDigest=d9676388f524872f1269c13f61f413458c0e9e5246adbc3b7ccb9da04054687d\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=18457440\nExecutable Segment flags=0x1\nPage size=4096\nCDHash=d9676388f524872f1269c13f61f413458c0e9e52\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements=none\n"
+    },
+    "verification": {
+      "argv": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--verbose=4",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0"
+      ],
+      "startUTC": "2026-10-07T01:20:49.365661+00:00",
+      "endUTC": "2026-10-07T01:20:52.306213+00:00",
+      "exitCode": 0,
+      "output": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0: valid on disk\n/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0: satisfies its Designated Requirement\n"
+    }
+  },
+  "currentInputDigest": "0f945b9884ee73957a6db3fe19c3d6b4a6b87672feef7c3fd1b46998f2f92b75",
+  "systemChangesExecuted": false
+}

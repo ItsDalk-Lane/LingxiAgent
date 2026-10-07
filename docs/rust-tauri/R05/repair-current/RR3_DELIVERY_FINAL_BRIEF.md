@@ -1,0 +1,11 @@
+# RR3 最终精确交付清点（仅总控明确派发）
+你为全新空历史只读交付准备者。全文读RR1/RR2 MASTER、RR3_BRIEF、最新RR3交接/矩阵、DELIVERY-PREP-01/REPORT、DELIVERY-PREP-02/REPORT与REFRESH_RULES和分类数据、最新G/E/FINAL报告以及DOC-INPUT-BOUNDARY-01。当前所有生产/文档/测试作者已停；root授权的commit/push由root执行，你不写Git/主源码/currentdocs/系统，不删除任何原件，不运行产品测试/构建或历史driver，不派代理。唯一新输出DELIVERY-FINAL-01。
+按真实git ls-files --others --exclude-standard -z、git diff --name-only -z、git diff --cached --name-only -z重新枚举。本轮只RR3及白名单内授权生产/currentdocs，HEAD应与最新交接一致。PRECISION：旧PREP02的19734集合和13828拟include不是最终清单，必须实际处理新J/G/E/FINAL/本轮准备材料与变动，旧已判类别仅在身份仍成立且使用角色不变时继承；不盲gitadd目录，不导入target/缓存/嵌套仓库/可运行故障副本/用户文件。
+保留真报告、历史FAIL、全部命令退出和原日志、原始测量序列、独立driver和故障变异/恢复说明；独立pristine/源码摘存按实际创建与消费路径判角色而非后缀。故障工作copy即使恢复仍localOnly；运行时真实临时票据/token/home/数据库仅本地，合成测试常量不简单按secret词删；混敏感值日志保留原件并单列必要无值摘要，不改旧日志。只读取任务材料，不搜索真实用户home/钥匙，不外发、不添LFS/release。
+对每个排除且被正式证据引用的原件登记实际或明确继承的SHA/bytes/driver/source、localOnly=true、remoteOriginalAvailable=false；原manifest不删改。有限历史已删本轮clone对象按原cleanup回执标historically_removed不能当缺失复写。大于GitHub普通单文件限制的134MB rlib等仍localOnly，不声称重新生成能取到同字节旧binary。识别用户要求的交付义务有无真实未满足，不把每个可重建缓存都设产品阻断。
+输出全路径唯一分类（include/local/unknown互斥覆盖）、精确NUL列表可供root后续逐文件暂存（另人类可读txt）、每文件SHA/size/mode及类别依据、当前引用边界索引、正常与不明条目分别记录。JSON严格无重复键/来源摘要/引用/集合计数核对；最终新材料自身也纳入可递增精确清单，避免循环自hash。真实仓内source/files前后稳定核验，记录UTC/命令exit/真实HEAD/index/staged列表但不写Git。若最终还有UNKNOWN逐条说明不要机械放行。报告完成停写，交root精确stage、核Git对象与有效候选语义输入相等、commit/push和remote读回；你不能预写这些动作成功。
+
+本轮事实补充：G02独立BLOCKED_BY_STORAGE，完整G/FINAL未完成，RR3 FINAL目录不应伪造或要求其报告已存在；E03将保存该事实。此清点不把不可执行门禁变成PASS。磁盘仅约265MB，控制输出规模，用单一必要路径清单/摘要和增量原证核验，避免重复几十MB引用全展开副本。请在精确include清单齐后只读估计Git写入所需空间：逐个按Git blob头+内容zlib压缩长度、文件系统块/新增对象去重、index临时及push pack必要余量作保守估计，不写对象、不stage，不伪保证实际峰值。若不能安全执行Git交付，给具体容量证据，源码/证据全部本地保留，不盲填满磁盘。
+
+本轮并行安排：E03作者已SELF_CHECKED停写，E-REVIEW-03全新审查者只读同一现行文档/生产，唯一另写新E-REVIEW-03证据。你可先处理已冻结范围和全部旧、新材料；不得在E审查者停写前封最终清单。总控会送达其最终状态，之后最后枚举包含其新证据并完成分类，若E要求修复则暂停最终封口等新修后事实。你与E审查只在不同证据目录写，无产品/现行文档变更。总控在此窗口也不写其他仓内文件。
+新增必读DELIVERY-SPACE-01/REPORT.md及normalization-boundary.json。旧13784可测路径缺4207 blob，4KiB估算83.14MB、含index/tree等预算125–155MB；当前约237MB余量，新增479MB逻辑材料未分类，不能认为足够。最终请直接估算真实纳入原字节blob，不以filter后的内容替代原始证据。163旧CRLF项已证普通Git转换改变SHA；不改attrs/原件，精确标记未来需要--no-filters写入+update-index保留原始blob的路径和raw/filtered对照，最终Git方式还须新独立交付审查。控制输出规模，不能把完整库存重复N份；无论容量结果如何都先交可审阅精确分类与必需限制，不操作Git。

@@ -1,0 +1,31 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r05_t01_model_plane.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t01_model_plane-ed68cffcc7f180ed)
+
+running 24 tests
+test c03_no_model_plane_is_the_explicit_unconfigured_outcome ... ok
+test c02_full_chain_real_wiring_real_tool_real_result ... ok
+test c04_same_model_id_different_providers_never_cross_wire ... ok
+test c05_in_flight_call_keeps_its_snapshot_and_cancel_is_unaffected ... ok
+test c05_reload_through_management_surface_swaps_atomically ... ok
+test c05_reload_without_a_configured_plane_is_a_loud_404 ... ok
+test rr1_f01_f02::f01_control_no_capability_needs_still_dispatches ... ok
+test rr1_f01_f02::f01_declared_image_capability_sends_the_image_payload ... ok
+test rr1_f01_f02::f01_declared_tools_capability_sends_the_tools_payload ... ok
+test rr1_f01_f02::f01_explicitly_unsupported_tools_capability_makes_zero_requests ... ok
+test rr1_f01_f02::f01_keyless_local_model_with_declared_tools_works ... ok
+test rr1_f01_f02::f01_reload_removing_the_declaration_or_binding_refuses_new_calls ... ok
+test rr1_f01_f02::f01_same_model_id_across_providers_and_auxiliary_slot_follow_the_route ... ok
+test rr1_f01_f02::f01_undeclared_image_capability_makes_zero_requests ... ok
+test rr1_f01_f02::f01_undeclared_tools_capability_makes_zero_requests ... ok
+test rr1_f01_f02::f02_kept_seed_serves_both_generations ... ok
+test c06_unsupported_family_makes_zero_requests ... ok
+test rr1_f01_f02::f02_old_route_never_resolves_new_generation_material ... ok
+test rr1_f01_f02::f02_key_only_rotation_safe_failure_then_new_call_uses_new_key ... ok
+test rr1_f01_f02::f02_removed_provider_old_route_is_not_configured ... ok
+test rr1_f01_f02::f02_resolve_dispatch_freezes_compat_and_capabilities_with_the_route ... ok
+test rr1_f01_f02::f02_unrelated_provider_reload_is_isolated_per_provider ... ok
+test rr1_f01_f02::f02_reload_during_401_never_sends_new_key_to_old_endpoint ... ok
+test rr1_f29::f29_management_reload_during_inflight_401_never_leaks_the_new_key ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.57s
+

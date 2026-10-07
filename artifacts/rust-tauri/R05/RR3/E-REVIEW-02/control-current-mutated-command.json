@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/independent-audit.py",
+    "current",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/isolated-current.json"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startUTC": "2026-10-07T02:06:21.057288+00:00",
+  "endUTC": "2026-10-07T02:06:21.126511+00:00",
+  "exitCode": 1,
+  "logs": {
+    "stdout": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-current-mutated-stdout.log",
+      "sha256": "9552405c297b92e2f8a01321c9d7bf5ff3743f60560642594f59e06361c28301",
+      "bytes": 799
+    },
+    "stderr": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-REVIEW-02/control-current-mutated-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

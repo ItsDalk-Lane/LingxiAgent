@@ -1,0 +1,43 @@
+{
+  "argv": [
+    "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+    "exec",
+    "--ephemeral",
+    "--json",
+    "--color",
+    "never",
+    "--sandbox",
+    "danger-full-access",
+    "-c",
+    "approval_policy=\"never\"",
+    "-C",
+    "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "-o",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/dispatch/final.txt",
+    "-"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "createdAt": "2026-10-07T01:56:02.122962+00:00",
+  "freshHistory": true,
+  "ephemeral": true,
+  "modelOverride": null,
+  "permissionProfile": "same danger-full-access / never; no hook or rules bypass",
+  "result": "COMPLETED",
+  "startedAt": "2026-10-07T01:56:02.123112+00:00",
+  "exitCode": 0,
+  "endedAt": "2026-10-07T02:15:38.754262+00:00",
+  "logs": {
+    "prompt.txt": {
+      "sha256": "2da7ed2e71c731afd696aa60e799337366ce6e01730cd2c40f6bb03689477aa1",
+      "bytes": 2533
+    },
+    "events.jsonl": {
+      "sha256": "94b85b1ebcb3f6e4ecb818cfeb8fde04c0b0cb758d882e5c9b0ad363cbd8a10c",
+      "bytes": 1035335
+    },
+    "stderr.log": {
+      "sha256": "8b8983f6d5b0bf94dfad1c744a0e9487399a9748b840d08fd77c604a601cef71",
+      "bytes": 1570
+    }
+  }
+}

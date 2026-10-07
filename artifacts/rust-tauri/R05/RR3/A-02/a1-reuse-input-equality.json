@@ -1,0 +1,129 @@
+{
+  "review": "RR3/A-REVIEW-01/REVIEW.md",
+  "purpose": "A1无行为输入变更，复用新独立121测试和内外50checkpoint；A2发现器/校验/E0s受影响已亲跑",
+  "inputFilesEqual": 17,
+  "files": [
+    {
+      "path": ".gitignore",
+      "sha256": "8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd",
+      "bytes": 5130,
+      "currentSha256": "8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd",
+      "equal": true
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "sha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "bytes": 772,
+      "currentSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "equal": true
+    },
+    {
+      "path": "rust/Cargo.toml",
+      "sha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+      "bytes": 3231,
+      "currentSha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+      "equal": true
+    },
+    {
+      "path": "rust/Cargo.lock",
+      "sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "bytes": 77319,
+      "currentSha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "equal": true
+    },
+    {
+      "path": "scripts/rust-tauri/run_output_sinks.py",
+      "sha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+      "bytes": 5875,
+      "currentSha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/Cargo.toml",
+      "sha256": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+      "bytes": 1096,
+      "currentSha256": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/runner_identity.rs",
+      "sha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+      "bytes": 6854,
+      "currentSha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_map.rs",
+      "sha256": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce",
+      "bytes": 158313,
+      "currentSha256": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/verify.rs",
+      "sha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+      "bytes": 94672,
+      "currentSha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/candidate.rs",
+      "sha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+      "bytes": 23258,
+      "currentSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/main.rs",
+      "sha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+      "bytes": 20978,
+      "currentSha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R04.json",
+      "sha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "bytes": 231496,
+      "currentSha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R05.json",
+      "sha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "bytes": 306003,
+      "currentSha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R02.json",
+      "sha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+      "bytes": 100387,
+      "currentSha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R03.json",
+      "sha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+      "bytes": 96434,
+      "currentSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/candidate/tests.rs",
+      "sha256": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+      "bytes": 12443,
+      "currentSha256": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/verify/runner_tests.rs",
+      "sha256": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69",
+      "bytes": 96139,
+      "currentSha256": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69",
+      "equal": true
+    }
+  ],
+  "checkpointIndexSha256": "d73bb0c7a33a3df3de21fa9c3522be863ce0d9b183f62b458fd2e8faadc7b6e4",
+  "testsLogSha256": "b0774cd35e192b48ee95f70a1a928734b5d9cb66775b863e9bbb93bc9fc73c11",
+  "shellAndRegressionReused": false
+}

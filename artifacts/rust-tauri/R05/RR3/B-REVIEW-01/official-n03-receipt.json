@@ -1,0 +1,14 @@
+{
+  "command": [
+    "bash",
+    "scripts/rust-tauri/r05_t08_negative_gate.sh",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/n03",
+    "--case",
+    "N03"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedAt": "2026-10-07T00:22:54.201717+00:00",
+  "endedAt": "2026-10-07T00:23:34.637124+00:00",
+  "exitCode": 0,
+  "logSha256": "aaf4624d0ae42fffff3022a677da319fad7def94ca757ab4788e6789429dca43"
+}

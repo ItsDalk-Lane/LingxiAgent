@@ -1,0 +1,79 @@
+{
+  "cases": [
+    {
+      "case": "auth-bad",
+      "method": "GET",
+      "path": "/lingxi/v1/me",
+      "status": 401,
+      "expected": 401,
+      "requestId": "req-84a6226e22778796e97ccd9939baff7b",
+      "assignmentBytes": 47,
+      "marker": "LINGXI_AUTH_REJECTED",
+      "UTC_start": "2026-10-07T02:26:42.109218+00:00",
+      "UTC_end": "2026-10-07T02:26:42.112711+00:00",
+      "realMarkerMatch": true,
+      "realHandledMatch": true
+    },
+    {
+      "case": "auth-missing",
+      "method": "GET",
+      "path": "/lingxi/v1/me",
+      "status": 401,
+      "expected": 401,
+      "requestId": "req-4c810a6229d4a0723aa4015b61229d4d",
+      "assignmentBytes": 47,
+      "marker": "LINGXI_AUTH_REJECTED",
+      "UTC_start": "2026-10-07T02:26:42.112789+00:00",
+      "UTC_end": "2026-10-07T02:26:42.113538+00:00",
+      "realMarkerMatch": true,
+      "realHandledMatch": true
+    },
+    {
+      "case": "ws-auth",
+      "method": "GET",
+      "path": "/lingxi/v1/ws",
+      "status": 401,
+      "expected": 401,
+      "requestId": "req-5bf4f5b3f09f4aaf53ec633194e3a2a5",
+      "assignmentBytes": 47,
+      "marker": "LINGXI_AUTH_REJECTED",
+      "UTC_start": "2026-10-07T02:26:42.113561+00:00",
+      "UTC_end": "2026-10-07T02:26:42.114214+00:00",
+      "realMarkerMatch": true,
+      "realHandledMatch": true
+    },
+    {
+      "case": "ws-transport",
+      "method": "GET",
+      "path": "/lingxi/v1/ws",
+      "status": 400,
+      "expected": 400,
+      "requestId": "req-6a3b418a3307b41ae891881dac85b6dd",
+      "assignmentBytes": 47,
+      "marker": "LINGXI_TRANSPORT_REJECTED",
+      "UTC_start": "2026-10-07T02:26:42.114229+00:00",
+      "UTC_end": "2026-10-07T02:26:42.115290+00:00",
+      "realMarkerMatch": true,
+      "realHandledMatch": true
+    },
+    {
+      "case": "origin-transport",
+      "method": "GET",
+      "path": "/lingxi/v1/me",
+      "status": 403,
+      "expected": 403,
+      "requestId": "req-a4432daa86217ad48ac77016fe6bcd36",
+      "assignmentBytes": 47,
+      "marker": "LINGXI_TRANSPORT_REJECTED",
+      "UTC_start": "2026-10-07T02:26:42.115309+00:00",
+      "UTC_end": "2026-10-07T02:26:42.116119+00:00",
+      "realMarkerMatch": true,
+      "realHandledMatch": true
+    }
+  ],
+  "actual": 5,
+  "failed": 0,
+  "cleanupExit": 0,
+  "homeRemoved": true,
+  "boundary": "正式Cargo生成的main；真实回环HTTP、AUTH/TRANSPORT/WS与轮转日志；无模型或外部调用"
+}

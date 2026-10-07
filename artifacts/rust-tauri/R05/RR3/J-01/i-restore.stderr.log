@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_restore_selfcheck.py", line 252, in <module>
+    main()
+    ~~~~^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_restore_selfcheck.py", line 60, in main
+    assert 'reset_copy\nwrite_results\nnote "RESULT: every' in source
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

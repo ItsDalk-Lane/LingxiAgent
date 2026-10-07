@@ -1,0 +1,10 @@
+{
+  "actualClassifierFixtures": 62,
+  "expectedActualFixtureRows": 61,
+  "missingBlockRowsNegative": 1,
+  "greenPositiveControl": 1,
+  "passed": 62,
+  "ignored": 0,
+  "filtered": 0,
+  "explanation": "独立逐行统计：61条expected/actual判定+1缺块拒绝=原62；另1合法全绿对照"
+}

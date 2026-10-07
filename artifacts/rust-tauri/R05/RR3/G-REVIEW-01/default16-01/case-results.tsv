@@ -1,0 +1,15 @@
+R05-GATE-N01	101	OK	OK	删 A16 → 镜像单测红并点名 R05-A16
+R05-GATE-N02	1	OK	OK	零匹配筛选词 → 生产者非零并点名 running=0
+R05-GATE-N03	101	OK	OK	权威表唯一目标降钉恰一次 → 镜像单测红点名漂移
+R05-GATE-N04	1	OK	OK	吞退出码 → 计数核对仍非零并点名失败测试
+R05-GATE-N05	1	OK	OK	旧证据目录 → 拒收并点名 not empty
+R05-GATE-N06	1	OK	OK	门禁中改源码 → stable=false 整体 FAIL（R02 注册门禁演示同一机制）
+R05-GATE-N07	2	OK	OK	删 R04 回归命令 → 场景引用即硬拒；镜像单测亦钉住该命令
+R05-GATE-N08	101	OK	OK	移除正常启动接线 → 二进制链红、单测仍绿
+R05-GATE-N09	101	OK	OK	固定 done 替代真实回传 → 运行时 nonce 检查红
+R05-GATE-N10	101	OK	OK	callId 错配 → 配对断言红（call_bin_1）
+R05-GATE-N11	101	OK	OK	压平 Unknown → 状态诚实单测红
+R05-GATE-N12	101	OK	OK	不释放模型 permit → 配额=1 嵌套链红
+R05-GATE-N13	2	OK	OK	R04 递延叶改判/删除 → R04 门禁硬拒
+R05-GATE-N14	101	OK	OK	私开 LIVE lane → 离线命令集镜像红
+R05-GATE-N15	101	OK	OK	秘密进错误文本 → 无料单测红

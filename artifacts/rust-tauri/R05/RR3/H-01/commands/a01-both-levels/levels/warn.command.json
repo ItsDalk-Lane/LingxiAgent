@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "bash",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t01_service_smoke.sh",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-01/commands/a01-both-levels/levels/warn"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "UTC_start": "2026-10-07T02:25:51.478320+00:00",
+  "UTC_end": "2026-10-07T02:26:14.010578+00:00",
+  "exit": 0,
+  "outerRUST_LOG": "warn",
+  "scriptBefore": "76f3e9fd143842b4f9ef7577bf3c857ddaee29e02ec849b9b93d2cc14afede1c",
+  "scriptAfter": "76f3e9fd143842b4f9ef7577bf3c857ddaee29e02ec849b9b93d2cc14afede1c"
+}

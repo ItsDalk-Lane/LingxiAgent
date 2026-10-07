@@ -1,0 +1,10 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.27s
+     Running tests/late_result_fence.rs (rust/target/debug/deps/late_result_fence-974c58de69b9c62f)
+
+running 1 test
+R03_A07_TRACE run_terminal: cancelled=run_000001a0dcba6c00_000001 next=run_000001a0dcba6c00_000002 audit=run_terminal cross_leak=0
+test r03_a07_late_result_after_cancel_and_next_run_pollutes_nothing ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.09s
+

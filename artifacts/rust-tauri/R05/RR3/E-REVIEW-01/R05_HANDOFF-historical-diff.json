@@ -1,0 +1,42 @@
+[
+  [
+    "/generated_by",
+    "R05-T08-执行者（RR1 WP-T08）",
+    "rr3_e_impl_01（RR3 E文档实施，不作独立签收）"
+  ],
+  [
+    "/generated_at",
+    "2026-10-06",
+    "2026-10-07T01:11:01.507159+00:00"
+  ],
+  [
+    "/consumer_guidance_r06/ready_to_consume",
+    [
+      "R06 人格/记忆压缩所需的模型操作内核：chat/embedding/辅助槽经由 ModelGateway 与 CredentialService 的稳定入口（R05_SCOPE_MATRIX 的后续归属行）",
+      "统一规范化事件流（streaming_norm）：前端实时/历史直接消费，不需要第二套清洗",
+      "usage 台账 v5：按 owner/session/run/model_call 查询（MODEL_USAGE_SEMANTICS.md §语义）",
+      "正式 Rust 服务入口（--config 模型面）与二进制闭环证据模式（r05_t08_closed_loop 的五方一致/反作弊 nonce 模式可直接复用为 R06+ 的验收骨架）"
+    ],
+    [
+      "R06 人格/记忆压缩所需的模型操作内核：chat/embedding/辅助槽经由 ModelGateway 与 CredentialService 的稳定入口（R05_SCOPE_MATRIX 的后续归属行）",
+      "统一规范化事件流（streaming_norm）：前端实时/历史直接消费，不需要第二套清洗",
+      "usage 台账 v7：按 owner/session/run/model_call 查询（MODEL_USAGE_SEMANTICS.md §语义）",
+      "正式 Rust 服务入口（--config 模型面）与二进制闭环证据模式（r05_t08_closed_loop 的五方一致/反作弊 nonce 模式可直接复用为 R06+ 的验收骨架）"
+    ]
+  ],
+  [
+    "/stage_gate_registration/map",
+    "rust/crates/xtask/src/stage_maps/R05.json（18 场景：16 A-ID + SUP-R04REG + SUP-SCOPE；7 命令含 r04_regression_gate 前序整链；RR1 F25 后 130 叶=6 full_original_behavior+124 stage_share）",
+    "rust/crates/xtask/src/stage_maps/R05.json：16A+2SUP，7命令；130适用叶=119shared+6full+5deferred，124dualStage包含5deferred（非124shared）。"
+  ],
+  [
+    "/review_status/independent_review",
+    "PENDING（RR1 阶段终审未开始；T01–T07 已逐任务独立验收 PASS（含各 R2/R3 轮），T08 F24–F27 已 IMPLEMENTED 待独立验收——见 docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json）",
+    "FAIL（最新完成正式RR2/FINAL-01）"
+  ],
+  [
+    "/review_status/stage_review",
+    "待阶段门禁+独立终审后由总控收口（ORCHESTRATOR_PROGRESS 回填同时进行）",
+    "NOT_ACCEPTED；RR3 FINAL NOT RUN；R06_READY=false"
+  ]
+]

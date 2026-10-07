@@ -1,0 +1,60 @@
+--- before-J02/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh
++++ after-J02/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh
+@@ -214,11 +214,9 @@
+ #       NO throwaway-copy exception, and the R4 construction used exactly
+ #       those inside the copy. The baseline is now BUILT FRESH from exact
+ #       git content instead of inherit-then-clean: the copy gets its own
+-#       CoW-cloned .git store with the stale index re-initialized (the one
+-#       file removed is the copy's own stale metadata, never a worktree
+-#       path), a NON-forced `checkout --detach BASE_SHA` over an EMPTY
+-#       worktree (nothing to overwrite, nothing to delete — the copy never
+-#       contains the candidate files at all), and an isolated CoW copy of
++#       独立 HEAD/index、共享只读 Git 对象，并完整物化准确 BASE_SHA：
++#       逐字节等于历史对象的普通文件才借用 CoW，差异必须读取历史对象。
++#       新目录不含候选脏文件，无须覆盖或清理，再添加独立 CoW copy of
+ #       node_modules (ignored deps reused, never written back to the
+ #       invoking repo). Before anything runs, the baseline must prove it
+ #       is a pristine checkout: HEAD == BASE_SHA, index clean,
+@@ -791,32 +789,22 @@
+ cmp -s "$EVIDENCE_DIR/e0-candidate-binding.tsv" "$WORK/candidate-copy-binding.tsv" \
+   || fail "candidate copy does not mirror the invoking worktree (tracked+untracked content binding differs)"
+ 
+-# Baseline copy: exact historical git content of BASE_SHA and NOTHING else,
+-# constructed without ever inheriting the candidate files:
+-#   1. own .git object store (CoW clone of the invoking repo's store — new
+-#      directory entries in this copy; object blobs are immutable and are
+-#      never written back);
+-#   2. the copy's stale index file is re-initialized (the ONE file removed
+-#      here is the copy's own metadata copied in step 1 — no worktree path,
+-#      no candidate file, nothing the invoking repo owns);
+-#   3. `checkout --detach BASE_SHA` (NOT -f) over the still-EMPTY worktree:
+-#      git populates exactly the tracked files of BASE_SHA. There is
+-#      nothing to overwrite and nothing to delete — no `clean -fd` exists
+-#      in this gate because nothing untracked ever enters the copy;
+-#   4. dependencies: an isolated CoW copy of node_modules (ignored path,
+-#      reused as-is, never written back to the invoking repo).
+-mkdir -p "$BASE_COPY"
+-cp -Rc "$MAIN_REPO/.git" "$BASE_COPY/.git"
+-rm -f "$BASE_COPY/.git/index"
+-git -C "$BASE_COPY" checkout --detach "$BASE_SHA" > "$EVIDENCE_DIR/e0-base-checkout.log" 2>&1 \
+-  || { cat "$EVIDENCE_DIR/e0-base-checkout.log" >&2; fail "cannot check out base $BASE_SHA in the isolated copy"; }
++# 历史基线完整物化：指定提交的全部对象/模式/链接保留；只有确证相同的
++# 普通文件借用独立 CoW，脏文件或缺文件由准确 Git 对象恢复。来源只读，
++# 新副本拥有独立 HEAD/index，明确拒绝共享对象失效、复制失败和来源漂移。
++# 系统 TMPDIR 可能使用 /var 别名；只解析本次已创建的父目录，助手仍拒绝链接路径。
++BASE_COPY="$(cd "$WORK" && pwd -P)/repo-base" || fail "cannot resolve fresh baseline parent"
++python3 "$MAIN_REPO/scripts/rust-tauri/prepare_git_copy.py" \
++  --source "$MAIN_REPO" --copy "$BASE_COPY" --revision "$BASE_SHA" \
++  --evidence "$EVIDENCE_DIR/e0-base-materialization" > "$EVIDENCE_DIR/e0-base-checkout.log" 2>&1 \
++  || { cat "$EVIDENCE_DIR/e0-base-checkout.log" >&2; fail "cannot materialize complete base $BASE_SHA in the isolated copy"; }
+ cp -Rc "$MAIN_REPO/node_modules" "$BASE_COPY/node_modules"
+ {
+   echo "HEAD=$(git -C "$BASE_COPY" rev-parse HEAD)"
+   echo "diff-vs-base: $(git -C "$BASE_COPY" diff --quiet "$BASE_SHA" -- && echo empty || echo NONEMPTY)"
+   echo "index: $(git -C "$BASE_COPY" diff --cached --quiet && echo clean || echo DIRTY)"
+   echo "status-all: $(git -C "$BASE_COPY" status --porcelain --untracked-files=all | wc -l | tr -d ' ') entries"
+-  echo "construction: fresh .git CoW store + index re-init + non-forced detach checkout + isolated node_modules (no checkout -f, no clean -fd, no commit)"
++  echo "construction: shared immutable Git objects + independent HEAD/index + complete verified BASE materialization (CoW only for identical blobs) + isolated node_modules (no checkout -f, no clean -fd, no commit)"
+ } > "$EVIDENCE_DIR/e0-base-purity.txt"
+ [ "$(git -C "$BASE_COPY" rev-parse HEAD)" = "$BASE_SHA" ] || fail "base copy HEAD mismatch"
+ git -C "$BASE_COPY" diff --quiet "$BASE_SHA" -- \

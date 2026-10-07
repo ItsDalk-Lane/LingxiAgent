@@ -1,0 +1,828 @@
+[
+  {
+    "case": "internal-fresh",
+    "startedAt": "2026-10-07T01:01:10.082857+00:00",
+    "endedAt": "2026-10-07T01:01:13.828691+00:00",
+    "exit": 0,
+    "result": {
+      "fdCount": 6,
+      "stableDuringGrowth": true,
+      "transformations": [
+        {
+          "path": "source.rs",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        }
+      ],
+      "units": [
+        "artifacts/rust-tauri/R05/run-review/child/child/own-evidence",
+        "artifacts/rust-tauri/R05/run-review/child/child",
+        "artifacts/rust-tauri/R05/run-review/child",
+        "artifacts/rust-tauri/R05/run-review",
+        "artifacts/rust-tauri/R05/run-review/child/child/own-evidence"
+      ],
+      "actual": 16
+    }
+  },
+  {
+    "case": "internal-untracked",
+    "startedAt": "2026-10-07T01:01:13.857929+00:00",
+    "endedAt": "2026-10-07T01:01:17.854857+00:00",
+    "exit": 0,
+    "result": {
+      "fdCount": 6,
+      "stableDuringGrowth": true,
+      "transformations": [
+        {
+          "path": "source.rs",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/run-review/child/child/old-evidence.json",
+          "action": "old-content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        }
+      ],
+      "units": [
+        "artifacts/rust-tauri/R05/run-review/child/child/own-evidence",
+        "artifacts/rust-tauri/R05/run-review/child/child/stderr.log",
+        "artifacts/rust-tauri/R05/run-review/child/child/stdout.log",
+        "artifacts/rust-tauri/R05/run-review/child/stderr.log",
+        "artifacts/rust-tauri/R05/run-review/child/stdout.log",
+        "artifacts/rust-tauri/R05/run-review/stderr.log",
+        "artifacts/rust-tauri/R05/run-review/stdout.log",
+        "artifacts/rust-tauri/R05/run-review/child/child/own-evidence"
+      ],
+      "actual": 17
+    }
+  },
+  {
+    "case": "internal-tracked",
+    "startedAt": "2026-10-07T01:01:17.931022+00:00",
+    "endedAt": "2026-10-07T01:01:22.219429+00:00",
+    "exit": 0,
+    "result": {
+      "fdCount": 6,
+      "stableDuringGrowth": true,
+      "transformations": [
+        {
+          "path": "source.rs",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/run-review/child/child/old-evidence.json",
+          "action": "old-content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        }
+      ],
+      "units": [
+        "artifacts/rust-tauri/R05/run-review/child/child/own-evidence",
+        "artifacts/rust-tauri/R05/run-review/child/child/stderr.log",
+        "artifacts/rust-tauri/R05/run-review/child/child/stdout.log",
+        "artifacts/rust-tauri/R05/run-review/child/stderr.log",
+        "artifacts/rust-tauri/R05/run-review/child/stdout.log",
+        "artifacts/rust-tauri/R05/run-review/stderr.log",
+        "artifacts/rust-tauri/R05/run-review/stdout.log",
+        "artifacts/rust-tauri/R05/run-review/child/child/own-evidence"
+      ],
+      "actual": 17
+    }
+  },
+  {
+    "case": "external-fresh",
+    "startedAt": "2026-10-07T01:01:22.251146+00:00",
+    "endedAt": "2026-10-07T01:01:26.366831+00:00",
+    "exit": 0,
+    "result": {
+      "fdCount": 6,
+      "stableDuringGrowth": true,
+      "transformations": [
+        {
+          "path": "source.rs",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        }
+      ],
+      "units": [
+        "artifacts/rust-tauri/R05/run-review/child/child",
+        "artifacts/rust-tauri/R05/run-review/child",
+        "artifacts/rust-tauri/R05/run-review"
+      ],
+      "actual": 16
+    }
+  },
+  {
+    "case": "external-untracked",
+    "startedAt": "2026-10-07T01:01:26.428267+00:00",
+    "endedAt": "2026-10-07T01:01:30.830813+00:00",
+    "exit": 0,
+    "result": {
+      "fdCount": 6,
+      "stableDuringGrowth": true,
+      "transformations": [
+        {
+          "path": "source.rs",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/run-review/child/child/old-evidence.json",
+          "action": "old-content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        }
+      ],
+      "units": [
+        "artifacts/rust-tauri/R05/run-review/child/child/stderr.log",
+        "artifacts/rust-tauri/R05/run-review/child/child/stdout.log",
+        "artifacts/rust-tauri/R05/run-review/child/stderr.log",
+        "artifacts/rust-tauri/R05/run-review/child/stdout.log",
+        "artifacts/rust-tauri/R05/run-review/stderr.log",
+        "artifacts/rust-tauri/R05/run-review/stdout.log"
+      ],
+      "actual": 17
+    }
+  },
+  {
+    "case": "external-tracked",
+    "startedAt": "2026-10-07T01:01:30.898628+00:00",
+    "endedAt": "2026-10-07T01:01:35.232609+00:00",
+    "exit": 0,
+    "result": {
+      "fdCount": 6,
+      "stableDuringGrowth": true,
+      "transformations": [
+        {
+          "path": "source.rs",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "source.rs",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "scripts/run.sh",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "config.json",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "add",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "delete",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "stage-map.json",
+          "action": "rename",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        },
+        {
+          "path": "artifacts/rust-tauri/R05/run-review/child/child/old-evidence.json",
+          "action": "old-content",
+          "detected": true,
+          "sourceCopyEqual": true,
+          "restored": true
+        }
+      ],
+      "units": [
+        "artifacts/rust-tauri/R05/run-review/child/child/stderr.log",
+        "artifacts/rust-tauri/R05/run-review/child/child/stdout.log",
+        "artifacts/rust-tauri/R05/run-review/child/stderr.log",
+        "artifacts/rust-tauri/R05/run-review/child/stdout.log",
+        "artifacts/rust-tauri/R05/run-review/stderr.log",
+        "artifacts/rust-tauri/R05/run-review/stdout.log"
+      ],
+      "actual": 17
+    }
+  }
+]

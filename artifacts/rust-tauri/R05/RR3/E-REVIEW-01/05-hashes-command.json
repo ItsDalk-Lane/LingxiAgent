@@ -1,0 +1,16 @@
+{
+  "reviewer": "rr3_e_review_01",
+  "argv": [
+    "python3",
+    "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/independent-checks.py",
+    "hashes"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "utc_start": "2026-10-07T01:27:25.003053+00:00",
+  "utc_end": "2026-10-07T01:27:25.114811+00:00",
+  "exit_code": 0,
+  "stdout": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/05-hashes-stdout.log",
+  "stderr": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/05-hashes-stderr.log",
+  "stdout_sha256": "8d30db86fb37b996c2f28a0696de5c256828f1d6a6bc83e056adb2444837c78c",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

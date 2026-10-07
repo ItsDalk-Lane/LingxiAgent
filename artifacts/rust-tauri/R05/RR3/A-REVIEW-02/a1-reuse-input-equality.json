@@ -1,0 +1,309 @@
+{
+  "actual": 17,
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 5130,
+      "sha256": "8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd",
+      "equalBytes": true,
+      "priorManifestSha256": "8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd"
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "bytes": 772,
+      "sha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "equalBytes": true,
+      "priorManifestSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37"
+    },
+    {
+      "path": "rust/Cargo.toml",
+      "bytes": 3231,
+      "sha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+      "equalBytes": true,
+      "priorManifestSha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096"
+    },
+    {
+      "path": "rust/Cargo.lock",
+      "bytes": 77319,
+      "sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "equalBytes": true,
+      "priorManifestSha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3"
+    },
+    {
+      "path": "scripts/rust-tauri/run_output_sinks.py",
+      "bytes": 5875,
+      "sha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+      "equalBytes": true,
+      "priorManifestSha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061"
+    },
+    {
+      "path": "rust/crates/xtask/Cargo.toml",
+      "bytes": 1096,
+      "sha256": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+      "equalBytes": true,
+      "priorManifestSha256": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776"
+    },
+    {
+      "path": "rust/crates/xtask/src/runner_identity.rs",
+      "bytes": 6854,
+      "sha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+      "equalBytes": true,
+      "priorManifestSha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7"
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_map.rs",
+      "bytes": 158313,
+      "sha256": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce",
+      "equalBytes": true,
+      "priorManifestSha256": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce"
+    },
+    {
+      "path": "rust/crates/xtask/src/verify.rs",
+      "bytes": 94672,
+      "sha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+      "equalBytes": true,
+      "priorManifestSha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e"
+    },
+    {
+      "path": "rust/crates/xtask/src/candidate.rs",
+      "bytes": 23258,
+      "sha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+      "equalBytes": true,
+      "priorManifestSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86"
+    },
+    {
+      "path": "rust/crates/xtask/src/main.rs",
+      "bytes": 20978,
+      "sha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+      "equalBytes": true,
+      "priorManifestSha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1"
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R04.json",
+      "bytes": 231496,
+      "sha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "equalBytes": true,
+      "priorManifestSha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86"
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R05.json",
+      "bytes": 306003,
+      "sha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "equalBytes": true,
+      "priorManifestSha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798"
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R02.json",
+      "bytes": 100387,
+      "sha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+      "equalBytes": true,
+      "priorManifestSha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2"
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R03.json",
+      "bytes": 96434,
+      "sha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+      "equalBytes": true,
+      "priorManifestSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea"
+    },
+    {
+      "path": "rust/crates/xtask/src/candidate/tests.rs",
+      "bytes": 12443,
+      "sha256": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+      "equalBytes": true,
+      "priorManifestSha256": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233"
+    },
+    {
+      "path": "rust/crates/xtask/src/verify/runner_tests.rs",
+      "bytes": 96139,
+      "sha256": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69",
+      "equalBytes": true,
+      "priorManifestSha256": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69"
+    }
+  ],
+  "priorManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+  "testLogSha256": "b0774cd35e192b48ee95f70a1a928734b5d9cb66775b863e9bbb93bc9fc73c11",
+  "selectedCommands": [
+    {
+      "caseId": "xtask-all",
+      "F-ID": "F42",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+      "envOverrides": {
+        "CARGO_TARGET_DIR": "/tmp/lingxi-rr3-a-review-01-target",
+        "LINGXI_NESTED_ARCHIVE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/nested-internal"
+      },
+      "startedAt": "2026-10-07T00:40:32.682351+00:00",
+      "finishedAt": "2026-10-07T00:40:47.664575+00:00",
+      "durationSeconds": 14.982168416958302,
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "logSha256": "b0774cd35e192b48ee95f70a1a928734b5d9cb66775b863e9bbb93bc9fc73c11",
+      "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+      "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+      "testCount": {
+        "passed": 121,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "expectedMatched": true
+    },
+    {
+      "caseId": "nested-external",
+      "F-ID": "F42",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "rr3_real_fd_standard_nested_layout",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+      "envOverrides": {
+        "CARGO_TARGET_DIR": "/tmp/lingxi-rr3-a-review-01-target",
+        "LINGXI_NESTED_EXTERNAL": "1",
+        "LINGXI_NESTED_ARCHIVE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/nested-external"
+      },
+      "startedAt": "2026-10-07T00:40:47.665065+00:00",
+      "finishedAt": "2026-10-07T00:40:55.415633+00:00",
+      "durationSeconds": 7.750558041036129,
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "logSha256": "b97ea090f3a17c02012bdae783984768248e0977a5d0567dd2590418366b448e",
+      "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+      "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+      "testCount": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 120
+      },
+      "expectedMatched": true
+    },
+    {
+      "caseId": "helper-baseline-02",
+      "F-ID": "F42",
+      "argv": [
+        "/tmp/lingxi-rr3-a-review-01-target/debug/deps/xtask-ad766de8ea03e62c",
+        "--exact",
+        "verify::runner_tests::rr3_nested_process_probe",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+      "envOverrides": {},
+      "startedAt": "2026-10-07T00:42:50.222960+00:00",
+      "finishedAt": "2026-10-07T00:42:50.232825+00:00",
+      "durationSeconds": 0.009714208077639341,
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "logSha256": "21617496e6a0b1026e7461538b95579b172a0a0cab774439b2bebfab7601f983",
+      "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+      "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+      "testCount": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 120
+      },
+      "binaryReceipt": "binary-manifest-before.json",
+      "sourceMutationReceipt": null,
+      "expectedMatched": true
+    },
+    {
+      "caseId": "helper-mismatch-red",
+      "F-ID": "F42",
+      "argv": [
+        "/tmp/lingxi-rr3-a-review-01-target/debug/deps/xtask-ad766de8ea03e62c",
+        "--exact",
+        "verify::runner_tests::rr3_nested_process_probe",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+      "envOverrides": {},
+      "startedAt": "2026-10-07T00:42:50.237678+00:00",
+      "finishedAt": "2026-10-07T00:42:50.241897+00:00",
+      "durationSeconds": 0.004235917003825307,
+      "exitCode": 101,
+      "expectedExitCode": 101,
+      "logSha256": "835fb4eb3b609ed8a4cbd7380e69536d96e89c1df192f2d3075ba124965e0043",
+      "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+      "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+      "testCount": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 120
+      },
+      "binaryReceipt": "binary-manifest-before.json",
+      "sourceMutationReceipt": "helper-mutation.json",
+      "expectedMatched": true
+    },
+    {
+      "caseId": "helper-restored-green",
+      "F-ID": "F42",
+      "argv": [
+        "/tmp/lingxi-rr3-a-review-01-target/debug/deps/xtask-ad766de8ea03e62c",
+        "--exact",
+        "verify::runner_tests::rr3_nested_process_probe",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot",
+      "envOverrides": {},
+      "startedAt": "2026-10-07T00:42:50.242313+00:00",
+      "finishedAt": "2026-10-07T00:42:50.251549+00:00",
+      "durationSeconds": 0.009255166980437934,
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "logSha256": "21617496e6a0b1026e7461538b95579b172a0a0cab774439b2bebfab7601f983",
+      "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+      "inputBoundary": "隔离生产快照；F46主树并行无总体冻结",
+      "testCount": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 120
+      },
+      "binaryReceipt": "binary-manifest-before.json",
+      "sourceMutationReceipt": null,
+      "expectedMatched": true
+    }
+  ],
+  "helperLogs": [
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/helper-baseline-02.log",
+      "sha256": "21617496e6a0b1026e7461538b95579b172a0a0cab774439b2bebfab7601f983",
+      "expectedExit": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/helper-mismatch-red.log",
+      "sha256": "835fb4eb3b609ed8a4cbd7380e69536d96e89c1df192f2d3075ba124965e0043",
+      "expectedExit": 101
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/helper-restored-green.log",
+      "sha256": "21617496e6a0b1026e7461538b95579b172a0a0cab774439b2bebfab7601f983",
+      "expectedExit": 0
+    }
+  ],
+  "stableFailFragment": "if !stable {\n        // 原有命令或场景失败必须保留；身份漂移只会增加失败原因。\n        report[\"overall\"] = serde_json::Value::String(\"FAIL\".into());\n        report[\"candidateSourceBinding\"][\"reason\"] = serde_json::Value::String(\n            \"Candidate file bytes or HEAD changed during the registered stage checks, or a snapshot failed; stage PASS is forbidden.\".into()\n        );\n    }\n    report[\"finishedAtUnixMs\"] = serde_json::json!(now_ms());\n\n    let overall_pass = report[\"overall\"] == \"PASS\";\n    let result_path = evidence_root.join(\"verify-stage-result.json\");\n    let mut result_bytes = serde_json::to_vec_pretty(&report).expect(\"result JSON serializes\");\n    resul",
+  "shellAndPermanentRegressionReused": false
+}

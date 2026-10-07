@@ -1,0 +1,89 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "/usr/libexec/ApplicationFirewall/socketfilterfw",
+        "--help"
+      ],
+      "exitCode": 255,
+      "output": "usage: /usr/libexec/ApplicationFirewall/socketfilterfw [-h] [--getglobalstate] [--setglobalstate on | off] [--getblockall] [--setblockall on | off] [--listapps] [--getappblocked <path>] [--blockapp <path>] [--unblockapp <path>] [--add <path>] [--remove <path>] [--getallowsigned] [--setallowsigned on | off] [--setallowsignedapp on | off] [--getstealthmode] [--setstealthmode on | off]\n"
+    },
+    {
+      "argv": [
+        "/usr/libexec/ApplicationFirewall/socketfilterfw",
+        "--getappblocked",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe"
+      ],
+      "exitCode": 0,
+      "output": "Incoming connection to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe is permitted.\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/codesign",
+        "-dvvv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe"
+      ],
+      "exitCode": 0,
+      "output": "Executable=/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe\nIdentifier=lan_probe\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=386 flags=0x20002(adhoc,linker-signed) hashes=9+0 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=d1c56ad1389b71f46a7b0f75f2cfa9be66fdb8f5\nCandidateCDHashFull sha256=d1c56ad1389b71f46a7b0f75f2cfa9be66fdb8f5861ac572ea4aec1677323f5d\nHash choices=sha256\nCMSDigest=d1c56ad1389b71f46a7b0f75f2cfa9be66fdb8f5861ac572ea4aec1677323f5d\nCMSDigestType=2\nCDHash=d1c56ad1389b71f46a7b0f75f2cfa9be66fdb8f5\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements=none\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--verbose=4",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe"
+      ],
+      "exitCode": 0,
+      "output": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe: valid on disk\n/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe: satisfies its Designated Requirement\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/codesign",
+        "-dvvv",
+        "/usr/bin/python3"
+      ],
+      "exitCode": 0,
+      "output": "Executable=/usr/bin/python3\nIdentifier=com.apple.dt.xcode_select.tool-shim-public\nFormat=Mach-O universal (x86_64 arm64e arm64e.x1)\nCodeDirectory v=20400 size=323 flags=0x0(none) hashes=4+2 location=embedded\nPlatform identifier=26\nHash type=sha256 size=32\nCandidateCDHash sha256=0b5ceae04228eecab447d34d153562e1f64c1756\nCandidateCDHashFull sha256=0b5ceae04228eecab447d34d153562e1f64c175687c47eddee3a5f2547375a94\nHash choices=sha256\nCMSDigest=0b5ceae04228eecab447d34d153562e1f64c175687c47eddee3a5f2547375a94\nCMSDigestType=2\nCDHash=0b5ceae04228eecab447d34d153562e1f64c1756\nSignature size=4202\nAuthority=macOS Software Signing\nAuthority=Apple Code Signing Certification Authority\nAuthority=Apple Root CA\nSigned Time=Aug 9, 2026 at 08:36:33\nInfo.plist entries=17\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=1 size=92\nTotal signatures=1\nChosen signature=1\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--verbose=4",
+        "/usr/bin/python3"
+      ],
+      "exitCode": 0,
+      "output": "/usr/bin/python3: valid on disk\n/usr/bin/python3: satisfies its Designated Requirement\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/xcrun",
+        "clang",
+        "--version"
+      ],
+      "exitCode": 0,
+      "output": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin\n"
+    },
+    {
+      "argv": [
+        "/bin/ps",
+        "-axo",
+        "pid,ppid,comm"
+      ],
+      "exitCode": 0,
+      "output": ""
+    }
+  ],
+  "files": {
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe": "86d4f4f5fec48a66dfd38278331578e6764bf9edc2592e4315334294ab7b6b65",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe.c": "9d6b3b25bc0d7a363e8c9efceb23cb17da022fd8fd72f2e801135a7d5bc96959",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe.py": "9bac28fb72f376a6846c460289226e1cf62259713bfe9158103edf683f74f906",
+    "/usr/bin/python3": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2"
+  },
+  "r00Source": {
+    "path": "rust/crates/lingxi-service/tests/r00_management_leaves.rs",
+    "headSha256": "3e72c2a2d16287549a2727a355642ec279c09595d42d6ec42d9c5585c8d2f453",
+    "currentSha256": "3e72c2a2d16287549a2727a355642ec279c09595d42d6ec42d9c5585c8d2f453",
+    "matchesHead": true
+  }
+}

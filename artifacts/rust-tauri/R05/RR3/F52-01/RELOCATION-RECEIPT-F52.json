@@ -1,0 +1,163 @@
+{
+ "aborted": false,
+ "binder_surface": {
+  "final_assert_runB2": "see binder-surface-post-relocation.json (run after this receipt was written; --assert-clean)",
+  "post_relocation_runB1": {
+   "clean": true,
+   "counts": {
+    "ancestor_not_dir": 0,
+    "ancestor_symlink": 0,
+    "directory_entry": 0,
+    "final_symlink": 0,
+    "irregular": 0,
+    "missing": 0,
+    "regular_file": 69126
+   },
+   "total": 69126
+  },
+  "pre_relocation_runA": {
+   "counts": {
+    "ancestor_not_dir": 0,
+    "ancestor_symlink": 0,
+    "directory_entry": 0,
+    "final_symlink": 1,
+    "irregular": 0,
+    "missing": 0,
+    "regular_file": 69122
+   },
+   "sole_non_regular": [
+    {
+     "class": "final_symlink",
+     "detail": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-validator-bin/python3",
+     "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-validator-bin/python3"
+    }
+   ],
+   "total": 69123
+  },
+  "semantics": "candidate.rs:326-369 component-wise lstat walk over git ls-files --cached --others --exclude-standard -z"
+ },
+ "branch": "codex/rust-tauri-migration",
+ "destination_root": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures",
+ "driver": "manual shell mv + python3 digest helpers (all argv/exit recorded in REPORT.md)",
+ "entries": [
+  {
+   "digests_equal": {
+    "git_sha256_equal": true,
+    "inodes_preserved": {
+     "git": 276456367,
+     "python3": 276456368
+    },
+    "lstat_fields_equal_all": true,
+    "python3_readlink_target_equal": true
+   },
+   "entry_count": 2,
+   "moved_utc": "2026-10-07T13:01:41Z (mv exit 0; exact wall time bounded by 13:01:30.80Z pre-digest and 13:02:05.57Z post-digest)",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust_tauri_R05_RR3_A-REVIEW-02_independent-validator-bin",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-validator-bin/",
+   "post": {
+    "git": {
+     "lstat": {
+      "dev": 16777231,
+      "gid": 20,
+      "ino": 276456367,
+      "mode": "0o100755",
+      "mtime_ns": 1791334791598252451,
+      "size": 255,
+      "uid": 501
+     },
+     "sha256": "f9dc56ed2d08e1f687ed2e39c70e00f629cd485136bdea7e21b2bfaa1c0afbf8",
+     "type": "regular_file"
+    },
+    "python3": {
+     "lstat": {
+      "dev": 16777231,
+      "gid": 20,
+      "ino": 276456368,
+      "mode": "0o120755",
+      "mtime_ns": 1791334791598365243,
+      "size": 62,
+      "uid": 501
+     },
+     "readlink_target": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+     "type": "symlink"
+    }
+   },
+   "pre": {
+    "git": {
+     "lstat": {
+      "dev": 16777231,
+      "gid": 20,
+      "ino": 276456367,
+      "mode": "0o100755",
+      "mtime_ns": 1791334791598252451,
+      "size": 255,
+      "uid": 501
+     },
+     "sha256": "f9dc56ed2d08e1f687ed2e39c70e00f629cd485136bdea7e21b2bfaa1c0afbf8",
+     "type": "regular_file"
+    },
+    "python3": {
+     "lstat": {
+      "dev": 16777231,
+      "gid": 20,
+      "ino": 276456368,
+      "mode": "0o120755",
+      "mtime_ns": 1791334791598365243,
+      "size": 62,
+      "uid": 501
+     },
+     "readlink_target": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+     "type": "symlink"
+    }
+   }
+  }
+ ],
+ "gates": {
+  "cargo_xtask_candidate": {
+   "exit": 0,
+   "failed": 0,
+   "filtered_out": 112,
+   "ignored": 0,
+   "log": "artifacts/rust-tauri/R05/RR3/F52-01/cargo-xtask-candidate.log",
+   "measured": 0,
+   "passed": 9
+  },
+  "destination_equality": "both entries fully (not sampled) verified equal: git sha256 + python3 readlink target + all lstat fields + inodes",
+  "tracked_tree_zero_change": {
+   "git_diff_head_sha256_after": "8c23d0d944b66d76f1c65e6a8883d7782a7509d434b10bc13dda2ab5bc393361",
+   "git_diff_head_sha256_before": "8c23d0d944b66d76f1c65e6a8883d7782a7509d434b10bc13dda2ab5bc393361",
+   "git_ls_files_s_sha256_after": "3016f7ae9d18d93951f05a77adb68946cab99a92d0a122294d4c5cf096407d47",
+   "git_ls_files_s_sha256_before": "3016f7ae9d18d93951f05a77adb68946cab99a92d0a122294d4c5cf096407d47",
+   "porcelain_tracked_lines_identical": true,
+   "porcelain_untracked_note": "artifacts/rust-tauri/R05/RR3/ appears as a single directory-level ?? entry both before and after (internal changes invisible at porcelain granularity)"
+  }
+ },
+ "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+ "marker": {
+  "format": "RELOCATED-F51.json marker format (marker/receipt/relocated_children/task/written_utc)",
+  "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/RELOCATED-F52.json",
+  "written_utc": "2026-10-07T13:02:16.662240+00:00"
+ },
+ "notes": [
+  "HOME=/Users/study_superior already correct; no export needed",
+  "destination root already contained 56 F51 entries; untouched; only the new artifacts_rust_tauri_R05_RR3_A-REVIEW-02_independent-validator-bin entry was added",
+  "no git write operations; all git reads used --no-optional-locks",
+  "no files deleted; relocation only"
+ ],
+ "receipt_written_utc": "2026-10-07T13:04:13.603663+00:00",
+ "repo": "/Users/study_superior/Desktop/Code/LingxiAgent",
+ "same_filesystem_rename": {
+  "destination_root_st_dev": 16777231,
+  "note": "mv on same APFS volume == rename(2); inodes preserved proves bytes untouched",
+  "repo_st_dev": 16777231
+ },
+ "started_utc": "2026-10-07T13:00:36.501683+00:00",
+ "task": "F52 relocation of the sole symlink-bearing binder-surface fixture directory out of the main tree",
+ "totals": {
+  "bytes_deleted": 0,
+  "entries_relocated": 1,
+  "files": 1,
+  "symlinks": 1,
+  "total_bytes_files": 255
+ }
+}

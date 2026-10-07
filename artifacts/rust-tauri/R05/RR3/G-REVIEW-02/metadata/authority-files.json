@@ -1,0 +1,107 @@
+{
+  "at": "2026-10-07T04:37:11.599033+00:00",
+  "files": [
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_MASTER_PROMPT_2026-10-04.md",
+      "bytes": 70892,
+      "sha256": "7fc077f1b370660f582d964977685d5a619fa988befd26f8a4915f409529f2bc",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_MASTER_PROMPT_2026-10-06.md",
+      "bytes": 8316,
+      "sha256": "35802f225728954cccedd12ef0453090948afd18db9cb0f8f31cc9d896e92545",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_BRIEF.md",
+      "bytes": 7538,
+      "sha256": "31be412e410ff7be0543c2b9c5ff332ef77540de242070d6d2b1271ab0a6446c",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md",
+      "bytes": 3911,
+      "sha256": "9395286d8272ba1c841bc7960cc0e06b93affcfbacc2037cf0a8f0df9fcb1fe8",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_G_R2_BRIEF.md",
+      "bytes": 7477,
+      "sha256": "a3c647f6adb5e14fa221d8dae2190e8286d64709b9baaa3e158798e2c1781864",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+      "bytes": 18282,
+      "sha256": "5e396796f2947305d76a1c0db9d5c2a17ce68abde7c2e76a72004805b33b6a32",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+      "bytes": 15118,
+      "sha256": "ea23e457d50b890f671cd8ca27cfb002090985711a643e38ee757d3e61bda2a8",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+      "bytes": 10604,
+      "sha256": "b1512a730609e4842df4040141e7249bdd9fe18cab8692e2edb0c2dce30b7a47",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/Lingxi_R05_完整执行与验收提示词_2026-10-02.md",
+      "bytes": 76252,
+      "sha256": "371fffc32310ff7fdd6f8b383d437d327b6ab3b8848f78154011cad3719bdfdb",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/01_通用执行约束.md",
+      "bytes": 8145,
+      "sha256": "d4f07185735acda91b73a2aa97a42ca7ce5795babf1104968c83671131cf871c",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/02_目标架构与强制契约.md",
+      "bytes": 11718,
+      "sha256": "53dbf699675d9981b60ea5c982c4d0507afffd5184e6bebac875aae40d173c4d",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R05_模型协议、凭证、流式处理与最小完整闭环.md",
+      "bytes": 17336,
+      "sha256": "a10490c115d00f1f0c5bbcf1a5e2f6b8740397103d8b8ad5cc029a3427f1a3e0",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/04_阶段依赖与接口交接.md",
+      "bytes": 4233,
+      "sha256": "940c896508e929ec5f25c2b9020c06c2035c3f9800f43b78b1fd5e303e92bde3",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/06_风险、技术决策与退出条件.md",
+      "bytes": 4454,
+      "sha256": "6c92962e5bcb739509630eb8c9cf8b96fabf67c0d51315717ae048d9b87786f0",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R06_上下文、会话语义、记忆与知识库.md",
+      "bytes": 17423,
+      "sha256": "d54e7fcc638b62fc4303ce4af8f01ba8c358fd1a90d0f85a491bfd4a439bbd2e",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/05_验收与性能协议.md",
+      "bytes": 10299,
+      "sha256": "d86c51f4b8571f94f0e9b457e74e79d9281d5c846e7a37d1f39edfdf47324b61",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/03_功能与所有权矩阵.md",
+      "bytes": 5882,
+      "sha256": "6e84fc77a9f3124d51fe4d088fda6c8dcb96989e43d280634b94b7fc1d778560",
+      "readScope": "R06 only predecessor conditions and consumer contract; other inherited specifications fully read."
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "time": "2026-10-07T02:15:19.564256+00:00",
+  "reportLinks": 10,
+  "missingReportLinks": [],
+  "observedChangeRecords": 8,
+  "byteChangeRecords": 4,
+  "rawTargetExits": {
+    "a01_smoke": 1,
+    "a13_redaction_scan": 1
+  },
+  "probeDriverExit": 0,
+  "notExecuted": [
+    "repair",
+    "new repair acceptance",
+    "build",
+    "full stage",
+    "full default negative suite",
+    "system permission",
+    "Git mutation"
+  ],
+  "status": "TRIAGE_COMPLETE_NO_REPAIR_PASS",
+  "registrySnapshotsExact": 4,
+  "binaryFinalSHA256": "7d9190d27d1b6a019abfbe97049d6855a3f225494124fee43ef8988e032ae78b"
+}

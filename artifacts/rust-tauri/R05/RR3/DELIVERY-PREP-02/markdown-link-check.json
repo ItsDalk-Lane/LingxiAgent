@@ -1,0 +1,157 @@
+[
+  {
+    "source": "REPORT.md",
+    "target": "REFRESH_RULES.md",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REPORT.md",
+    "target": "decisions.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REPORT.md",
+    "target": "classification-rules.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REPORT.md",
+    "target": "supplemental-corrections.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REPORT.md",
+    "target": "merged-paths.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REPORT.md",
+    "target": "include-paths.txt",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REPORT.md",
+    "target": "local-paths.txt",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REPORT.md",
+    "target": "unknown-paths.txt",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REPORT.md",
+    "target": "local-originals.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REPORT.md",
+    "target": "references-with-delivery-boundary.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REPORT.md",
+    "target": "QA.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REPORT.md",
+    "target": "MANIFEST.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REPORT.md",
+    "target": "finish-receipt.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REPORT.md",
+    "target": "commands.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REPORT.md",
+    "target": "classification-command.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "README.md",
+    "target": "REPORT.md",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "README.md",
+    "target": "decisions.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "README.md",
+    "target": "supplemental-corrections.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "README.md",
+    "target": "merged-paths.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "README.md",
+    "target": "include-paths.txt",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "README.md",
+    "target": "local-paths.txt",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "README.md",
+    "target": "local-originals.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "README.md",
+    "target": "references-with-delivery-boundary.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "README.md",
+    "target": "REFRESH_RULES.md",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "README.md",
+    "target": "classification-rules.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "README.md",
+    "target": "summary.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "README.md",
+    "target": "QA.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "README.md",
+    "target": "MANIFEST.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "README.md",
+    "target": "finish-receipt.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REFRESH_RULES.md",
+    "target": "classification-rules.json",
+    "presentOrPlanned": true
+  },
+  {
+    "source": "REFRESH_RULES.md",
+    "target": "classify.py",
+    "presentOrPlanned": true
+  }
+]

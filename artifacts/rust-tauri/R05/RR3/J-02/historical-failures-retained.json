@@ -1,0 +1,36 @@
+[
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/REVIEW.md",
+    "sha256": "2b8b1dbb1c44e8561e9a296333017702008a0b0d60ec9d4f9a27dbed46a560f3",
+    "bytes": 11322,
+    "enospcMentions": 1
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/full-production-prepare/clone.log",
+    "exists": false
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/legacy-directed.stdout.log",
+    "sha256": "ed7897ceb412348ddc7fb5d1b50bdf1067de821e3bd562fb59616c07f6d7993f",
+    "bytes": 809,
+    "enospcMentions": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/legacy-directed.stderr.log",
+    "sha256": "1b82268e7dcf21a848a50824b8b17bbca4227377842f095191ae9ab1c01258b6",
+    "bytes": 33089,
+    "enospcMentions": 28
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/LEGACY_DIRECTED/legacy-entry/e0-base-checkout.log",
+    "sha256": "84c258cf553287e08f7f216decbffd2b6c89cbd5cefa63bbddb12fd3eae8dbf4",
+    "bytes": 2910,
+    "enospcMentions": 28
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/clone.log",
+    "sha256": "d41bc0740516667a692360f7aaa73418ccb211698f52af1fcd2c67c31f7859d3",
+    "bytes": 2226,
+    "enospcMentions": 19
+  }
+]

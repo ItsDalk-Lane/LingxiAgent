@@ -1,0 +1,1 @@
+xtask: verify-stage R03 [cargo test --manifest-path rust/Cargo.toml --workspace --locked] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05/R04_REGRESSION/R03_REGRESSION/rust_test_workspace

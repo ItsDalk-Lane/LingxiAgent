@@ -1,0 +1,3 @@
+== N03: exactly one authoritative pin count lowered; old/new saved in mutation.json ==
+case R05-GATE-N03: exit=101 gap-named=OK verdict=OK (权威表唯一目标降钉恰一次 → 镜像单测红点名漂移)
+PASS N03 restore: authoritative table byte-equal, exact mirror 1/1 green

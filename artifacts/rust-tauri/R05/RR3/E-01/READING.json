@@ -1,0 +1,277 @@
+{
+  "recordedAt": "2026-10-07T01:19:08.048499+00:00",
+  "entries": [
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_E_BRIEF.md",
+      "sha256": "83db95a21fe67ecaca2fa289aa3577623c8d93f616fadd8ea95616cb56448d9c",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_BRIEF.md",
+      "sha256": "31be412e410ff7be0543c2b9c5ff332ef77540de242070d6d2b1271ab0a6446c",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md",
+      "sha256": "9395286d8272ba1c841bc7960cc0e06b93affcfbacc2037cf0a8f0df9fcb1fe8",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_MASTER_PROMPT_2026-10-04.md",
+      "sha256": "7fc077f1b370660f582d964977685d5a619fa988befd26f8a4915f409529f2bc",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_MASTER_PROMPT_2026-10-06.md",
+      "sha256": "35802f225728954cccedd12ef0453090948afd18db9cb0f8f31cc9d896e92545",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_BRIEF.md",
+      "sha256": "89c312ff936cc582b944c97d6166e7c6ffc6a57f8481aee0653d1bc9815b05fb",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_FINAL_REPORT.md",
+      "sha256": "6bcdff2135a8a93bd3a7e44c98ae663c971fc0e93f5b083495d190621d5c2706",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_PROGRESS.md",
+      "sha256": "cc51a8db03f30c9aec46201cbffe5c8cab3fbe6ae256485a5a1d9426b9d9111d",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_LEAF_DEVIATIONS.md",
+      "sha256": "3e95ce7cdc958023ceffea7ba0bfbb6742c2dafd7e40e42fd89227b6546b8f05",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_BRIEF.md",
+      "sha256": "1ee083e21a23a69109cb96810377dba2a9615f7df00a89232dc276631808ff98",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_ISSUE_MATRIX.json",
+      "sha256": "c2f0475ebf998ae225ac300393e58a3365419fb07347861ff78f3a5f0d0c8dbd",
+      "method": "全文/分段阅读；JSON为完整顶层及10条issue全字段"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_PROGRESS.md",
+      "sha256": "90f1bb1b1cbf0b0cf42114e83e768a4f943723155a7144e061d330a43b649e1e",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_HANDOFF.md",
+      "sha256": "3560187fb5b114c90a958ef844c204619c5292099d2647fab83e43eca559b044",
+      "method": "全文分段阅读"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/Lingxi_R05_完整执行与验收提示词_2026-10-02.md",
+      "sha256": "371fffc32310ff7fdd6f8b383d437d327b6ab3b8848f78154011cad3719bdfdb",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/01_通用执行约束.md",
+      "sha256": "d4f07185735acda91b73a2aa97a42ca7ce5795babf1104968c83671131cf871c",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/02_目标架构与强制契约.md",
+      "sha256": "53dbf699675d9981b60ea5c982c4d0507afffd5184e6bebac875aae40d173c4d",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R05_模型协议、凭证、流式处理与最小完整闭环.md",
+      "sha256": "a10490c115d00f1f0c5bbcf1a5e2f6b8740397103d8b8ad5cc029a3427f1a3e0",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/04_阶段依赖与接口交接.md",
+      "sha256": "940c896508e929ec5f25c2b9020c06c2035c3f9800f43b78b1fd5e303e92bde3",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/06_风险、技术决策与退出条件.md",
+      "sha256": "6c92962e5bcb739509630eb8c9cf8b96fabf67c0d51315717ae048d9b87786f0",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R06_上下文、会话语义、记忆与知识库.md",
+      "sha256": "d54e7fcc638b62fc4303ce4af8f01ba8c358fd1a90d0f85a491bfd4a439bbd2e",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/05_验收与性能协议.md",
+      "sha256": "d86c51f4b8571f94f0e9b457e74e79d9281d5c846e7a37d1f39edfdf47324b61",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/03_功能与所有权矩阵.md",
+      "sha256": "6e84fc77a9f3124d51fe4d088fda6c8dcb96989e43d280634b94b7fc1d778560",
+      "method": "全文分段阅读原规格（只读，不按R06任务书启动实现）"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+      "sha256": "a41f1108e6eb6cdbc56c90b3f50df5daaf6709a552fb73d49b2271d2719de161",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+      "sha256": "0f5911462089380b8eb94d137b98f8d2382d062564c43d54cd84338b0852191e",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/STAGE_REVIEW.md",
+      "sha256": "0489d596b1c5eea78ada9480baca0112041d9608e1d9ba48f00dcab58dcfa0fb",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md",
+      "sha256": "b9faa6a18136982a90e0e169a8092e9c1d97228012abc18c3bb3ebe64b42e629",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md",
+      "sha256": "f12ec6e1f7aba629f244e6c42a3ba25b6128fed4d6e5fda784c1dbd967960008",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+      "sha256": "8e83638b0b24ed5d98a8bd9acc2d632d5eb07fcba0df431350f20108777c72a1",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/C-01/REPORT.md",
+      "sha256": "07e42bdaa5d332edeb9028a399c227f01f97f9cc11d996f8f26d4f6623d6192e",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+      "sha256": "c67fb4795cd3934283ec8ce319e428127c95557584d487f9dae405c3dd31787d",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json",
+      "sha256": "7394927e21e332f9a151d999a9e740bbcb6c466758c7378125a5387ac806931b",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json",
+      "sha256": "7740090dcefd823fea5126cc8bfcab1a7d23e9cf2b9779db97a4e2db1be86656",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md",
+      "sha256": "75fe8d084c6524c2a2390f6f6eb48db1510eddb082bb1e1c4fc111e16c78e91b",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json",
+      "sha256": "0f2d2aab36ba252c429ac8bebfa042a69215c552b7e8036f32d1cb1817780af3",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/f27-resource-series.json",
+      "sha256": "bcc0620794f4384196d74b7844098c063a96947147be48897a1076b9d6a50b7b",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/F46-01/resources-01/runtime-binding.json",
+      "sha256": "7be7185c83ee92a6834da5e73f5503767a4b99a9692ec938d6f303b25463bbd3",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/result.json",
+      "sha256": "6bd69752fb4e9aabc8cbbc17cc0df0d65185b53bd731c255fe65cc674a480a87",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/D-01/REPORT.md",
+      "sha256": "5ddc3c80e7e7ad7f88df714c6bb0d3c22502119cbe87fa5c0186eedbdf54be52",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR3/D-01/PREPARED-ALLOW.md",
+      "sha256": "b0f25a7b61b0028650631611044139eba84bd2722697160ab43c9ede450dae0f",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
+      "sha256": "420e01cb179e2003353c24fbe6e8fc8541739e38accb47d146eec44699fb456f",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md",
+      "sha256": "ba6a7c79b0f7776b7d94640888527113eed2a641e135a46b87ee8c3a516eb961",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md",
+      "sha256": "e9d6de071aa6f08e56a7f27d8b200fe915a4e9468e81361d778660cb97bd954d",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md",
+      "sha256": "55e701cd0015c05ac58e1fc5618c4f67f09603d8541d7f781bd1307b133e1147",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+      "sha256": "c3564b891ceeb29fe356b879d7b1728f2a810e7614e462af4ab1a40d7e0647ad",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log",
+      "sha256": "c4e121c337d4a069d4ba1c6b1750cbb6eba76f49b1d410eaffa3fa2837a1ce09",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-binding-exclusions.txt",
+      "sha256": "54d86880869d15a7272dc1c6d8d5316531a38bf723e5812d7f4c95e8ab9995ec",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-run-output-sinks.txt",
+      "sha256": "3c7c4003c7a6d5dad0c9837cbb2e6758411b9a3b53714139488dcc1919ba8da6",
+      "method": "报告/映射全文；JSON与原始资源全对象解析、有效回执/关键日志/哈希核对；不冒称逐行审完所有cargo日志"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/D-R2/probe/zz_lanprobe.c",
+      "sha256": "016664ce87b705450f19379d73c401d17ac7fcae75565fe5a52eda973ddb8a0d",
+      "method": "全文只读"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/D-R2/probe/zz_lanprobe.py",
+      "sha256": "9dfdded8763afe98bbcf7afe083ad8818edf677591f433cd80eddcedba1cc6a7",
+      "method": "全文只读"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR2/D-R2/probe/probe-suite.log",
+      "sha256": "c688090b8b104c5407ffa4f7857d73798d16edfceeb243c1abb5d87a78359c13",
+      "method": "全文只读"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json",
+      "sha256": "6196fdd0c6ebe5d3250ab6e3c39931fe734dbefcb260f4c51f9d192b5ac9887b",
+      "method": "顶层基线/计数/独立终审及E相关F27/F28/F40/F42、继承关闭与证据入口全字段；未冒称全文逐条人工重新验收所有F-ID"
+    }
+  ],
+  "owned_before_refs": [
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_REPORT.md",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_BLOCKERS.md",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_HANDOFF.json",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_TEST_MAP.json",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+    "artifacts/rust-tauri/R05/RR3/E-01/before/docs/rust-tauri/ORCHESTRATOR_PROGRESS.json"
+  ],
+  "large_ledger_method": "现行大型账本完整JSON解析，历史字段/字节前缀全量比对；语义只查本E相关当前块及引用，不重新验收全部旧用例。"
+}

@@ -1,0 +1,5 @@
+ rust/crates/lingxi-service/src/lib.rs       |  9 ++-
+ rust/crates/lingxi-service/src/logging.rs   | 85 ++++++++++++++++++++++++++++-
+ rust/crates/lingxi-service/src/redaction.rs | 75 ++++++++++++++++++++++++-
+ scripts/rust-tauri/r02_t01_service_smoke.sh |  4 ++
+ 4 files changed, 165 insertions(+), 8 deletions(-)

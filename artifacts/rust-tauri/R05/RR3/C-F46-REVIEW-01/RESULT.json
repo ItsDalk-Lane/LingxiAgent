@@ -1,0 +1,16 @@
+{
+  "utc": "2026-10-07T01:16:04.872818+00:00",
+  "reviewer": "rr3_cf46_review_01",
+  "verdict": "PASS",
+  "packageVerdicts": {
+    "C/F27/I10-package": "PASS",
+    "F46": "PASS"
+  },
+  "mustFix": [],
+  "stageVerdict": "NOT_REVIEWED_BY_THIS_PACKAGE",
+  "R06_READY": false,
+  "sourceDigest": "825282a067bcdd054e60dbd0e9ddca7ceceb063c8182fac0b976b7f8522810f8",
+  "resourceRawSha256": "e6c7c080cb25e5bf14edaf2dd6e0eada76d1b07d971804fde84a115bb0ef066d",
+  "reviewSha256": "c59ac409a316f5a1affbd29afbb68784c9a1ad48a80bce12a9608a600866de1e",
+  "scope": "包级独立签收；不是阶段放行"
+}

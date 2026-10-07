@@ -1,0 +1,17 @@
+{
+  "case": "old-fixed-seven",
+  "command": [
+    "python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial/old-fixed-seven/input.tsv",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial/old-fixed-seven/mutation.json"
+  ],
+  "startedAt": "2026-10-07T00:23:50.090258+00:00",
+  "endedAt": "2026-10-07T00:23:50.119688+00:00",
+  "exitCode": 0,
+  "expectedExit": 0,
+  "beforeSha256": "871414735616c149037c489037be4c6a8c3306184634dcc8e41a883cb4aeb3b4",
+  "afterSha256": "f5ba163b832a69858cf52c6d31bd129f44403799834f3ef80fd9061fce8d53aa",
+  "receiptPresent": true,
+  "status": "PASS"
+}

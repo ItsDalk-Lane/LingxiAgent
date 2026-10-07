@@ -1,0 +1,164 @@
+{
+  "status": "PASS",
+  "startedUtc": "2026-10-07T03:21:45.828257+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-q359j9fp/source",
+      "startedUtc": "2026-10-07T03:21:45.828583+00:00",
+      "finishedUtc": "2026-10-07T03:21:45.835831+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "1f54acfa1ae47ce1574091b71a9530de630d3a1da731c1479a905ef78263cc15",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-q359j9fp/restored",
+      "startedUtc": "2026-10-07T03:21:45.836011+00:00",
+      "finishedUtc": "2026-10-07T03:21:45.843088+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "76dc2a10e3916315b027cef6f7270c661bde3d11be7f4ef039b7bb323fc831f8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-q359j9fp/source",
+      "startedUtc": "2026-10-07T03:21:45.843250+00:00",
+      "finishedUtc": "2026-10-07T03:21:45.849651+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "61d6221fa5b1b57ce3891ff1e01be4598f15c5cc271083f75ae74b083df0997f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-q359j9fp/restored",
+      "startedUtc": "2026-10-07T03:21:45.849766+00:00",
+      "finishedUtc": "2026-10-07T03:21:45.856827+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "61d6221fa5b1b57ce3891ff1e01be4598f15c5cc271083f75ae74b083df0997f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "node",
+        "--version"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-q359j9fp/source",
+      "startedUtc": "2026-10-07T03:21:45.861809+00:00",
+      "finishedUtc": "2026-10-07T03:21:45.877876+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "a8f8f7ba69d43285857a0ea34017ef8dadd3ba012404bb7dd188fc773cf63ee2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "npm",
+        "--version"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-q359j9fp/source",
+      "startedUtc": "2026-10-07T03:21:45.878015+00:00",
+      "finishedUtc": "2026-10-07T03:21:45.941228+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3dbc807e13de125e909bea5877613d5d67989a43fb8e982fd79ba0efa46ac952",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "node",
+        "-e",
+        "const s=require('./node_modules/semver');const p=require('./package.json');if(!s.satisfies(process.version,p.engines.node)||!s.satisfies(process.argv[1],'>=11.10.0 <12'))process.exit(1)",
+        "11.13.0"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-q359j9fp/source",
+      "startedUtc": "2026-10-07T03:21:45.941536+00:00",
+      "finishedUtc": "2026-10-07T03:21:45.976479+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import WebSocket from 'ws';import {createRequire} from 'node:module';const r=createRequire(process.cwd()+'/package.json');console.log(JSON.stringify({ws:r.resolve('ws'),type:typeof WebSocket}));if(typeof WebSocket!=='function')process.exit(1)"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-q359j9fp/restored",
+      "startedUtc": "2026-10-07T03:21:47.640464+00:00",
+      "finishedUtc": "2026-10-07T03:21:47.676785+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3916f012e831160d205c79791303550bf6388a3a6d32f5d321d1334bb4eaa99f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-q359j9fp/restored/node_modules/.bin/vitest",
+        "--version"
+      ],
+      "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-q359j9fp/restored",
+      "startedUtc": "2026-10-07T03:21:47.677105+00:00",
+      "finishedUtc": "2026-10-07T03:21:47.754495+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "598067fbcf6196ad687fd8bcf57f31dc16964266ce417cf2baed637915ec3ddc",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "source": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-q359j9fp/source",
+  "copy": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r05-node-selfcheck-q359j9fp/restored",
+  "sourceHead": "85a0fa3e54985d881dcd6b8ef541f8d62cbb9d89",
+  "copyHead": "85a0fa3e54985d881dcd6b8ef541f8d62cbb9d89",
+  "inputs": {
+    "package.json": "4ba1a1fa16a7ccc2e80724afccd14f60ceb12478a79a5d51d8a977089ce899db",
+    "package-lock.json": "9fadd23a43c76b5d860c3f1636847e6029ac6692ca5d34adc258f175485e3808",
+    ".npmrc": "f6d6be450cc3239fe9569e975697ba7c4264b62ce00f99e3dee8b0845a829d72"
+  },
+  "metadata": {
+    "installedPackages": 92,
+    "absentOptionalPackages": [],
+    "obsoleteExtraneousMetadata": [],
+    "installedLockRootVersion": "old-root-version",
+    "candidateVersion": "1.0.0"
+  },
+  "node": "v24.16.0",
+  "npm": "11.13.0",
+  "tools": {
+    "node": {
+      "path": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+      "sha256": "1ee75375e33b94fc34b3b19aede049e11dae90efb63b374dc96d6bdace70c4b8"
+    },
+    "npm": {
+      "path": "/Users/study_superior/.nvm/versions/node/v24.16.0/lib/node_modules/npm/bin/npm-cli.js",
+      "sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7"
+    }
+  },
+  "dependencyManifest": "dependency-files.json",
+  "dependencyManifestSha256": "19dcff33be6edddf531db7deb77f955a65cca9aceaadc57834b6118e02668f88",
+  "copyMethod": {
+    "cowFiles": 2892,
+    "copiedFiles": 0,
+    "links": 10,
+    "bytes": 57905854
+  },
+  "finishedUtc": "2026-10-07T03:21:48.057035+00:00"
+}

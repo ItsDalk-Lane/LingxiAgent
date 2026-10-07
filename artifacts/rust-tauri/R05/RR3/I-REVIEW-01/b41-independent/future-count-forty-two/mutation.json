@@ -1,0 +1,15 @@
+{
+  "caseId": "R05-GATE-N03",
+  "findingId": "F45",
+  "target": "svc:r05_t01_model_plane",
+  "table": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/b41-independent/future-count-forty-two/input.tsv",
+  "line": 1,
+  "matches": 1,
+  "mutations": 1,
+  "old": 42,
+  "new": 41,
+  "oldRow": "pin svc:r05_t01_model_plane 42 r05_t01_model_plane",
+  "newRow": "pin svc:r05_t01_model_plane 41 r05_t01_model_plane",
+  "beforeSha256": "5fc779edd8bc4bfc8296fd3bd8016cb6a3ed43a23d5c859a0d67cf82a5b14ee0",
+  "afterSha256": "b2fca308eddb990270c14ad882ff1e1ba371bb91fdc07a3c5de5e79eed4f9af3"
+}

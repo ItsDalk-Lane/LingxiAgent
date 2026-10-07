@@ -1,0 +1,44 @@
+{
+  "argv": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "late_result_fence",
+    "r03_a07_late_result_after_cancel_and_next_run_pollutes_nothing",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "UTC_start": "2026-10-07T03:18:15.067027+00:00",
+  "UTC_end": "2026-10-07T03:18:38.615640+00:00",
+  "exit": 0,
+  "counts": [
+    "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.08s"
+  ],
+  "leafCounts": [],
+  "inputEqual": true,
+  "actualSourceEqual": true,
+  "inputBeforeDigest": "c5d252ca46c1b02c68842406f3e38ddcdb4f70807e1fff2eb6da44f7a92416ae",
+  "inputAfterDigest": "c5d252ca46c1b02c68842406f3e38ddcdb4f70807e1fff2eb6da44f7a92416ae",
+  "environment": {
+    "PATH": "/Users/study_superior/.cargo/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.codex/tmp/arg0/codex-arg0DGK2fd:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/study_superior/.lmstudio/bin",
+    "CARGO_TARGET_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target",
+    "CARGO_NET_OFFLINE": "true",
+    "TMPDIR": "/tmp",
+    "RUST_LOG": "warn"
+  },
+  "stdoutSHA256": "cbc24d275f1eb8f77bb7415358587adcb016a95d602befa1c4e07f795af722da",
+  "stderrSHA256": "6982d3469683b52c0213b62cc067f78affc64309b6813a3335d505a393393e7e",
+  "binary": {
+    "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+    "sha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e"
+  },
+  "boundary": "本轮亲跑；实际source见cwd与actual-source前后；共享主cache可被本隔离构建重写并须收尾恢复；dispatch/动态docs/发布/缓存不属于冻结输入；无外发",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b"
+}

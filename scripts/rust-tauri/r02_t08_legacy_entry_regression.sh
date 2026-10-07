@@ -214,11 +214,9 @@
 #       NO throwaway-copy exception, and the R4 construction used exactly
 #       those inside the copy. The baseline is now BUILT FRESH from exact
 #       git content instead of inherit-then-clean: the copy gets its own
-#       CoW-cloned .git store with the stale index re-initialized (the one
-#       file removed is the copy's own stale metadata, never a worktree
-#       path), a NON-forced `checkout --detach BASE_SHA` over an EMPTY
-#       worktree (nothing to overwrite, nothing to delete — the copy never
-#       contains the candidate files at all), and an isolated CoW copy of
+#       独立 HEAD/index、共享只读 Git 对象，并完整物化准确 BASE_SHA：
+#       逐字节等于历史对象的普通文件才借用 CoW，差异必须读取历史对象。
+#       新目录不含候选脏文件，无须覆盖或清理，再添加独立 CoW copy of
 #       node_modules (ignored deps reused, never written back to the
 #       invoking repo). Before anything runs, the baseline must prove it
 #       is a pristine checkout: HEAD == BASE_SHA, index clean,
@@ -452,6 +450,18 @@ EVIDENCE_ROOT="${1:-artifacts/rust-tauri/R02/T08/A16-direct}"
 if [ -e "$EVIDENCE_ROOT" ] || [ -L "$EVIDENCE_ROOT" ]; then
   fail "evidence root already exists (or is a symlink): $EVIDENCE_ROOT"
 fi
+# 创建前检查字面路径，不让链接解析把源码目录变成排除根。
+python3 - "$EVIDENCE_ROOT" <<'PYFRESH'
+import os
+import sys
+current = os.path.sep
+for component in os.path.abspath(sys.argv[1]).split(os.path.sep):
+    if not component:
+        continue
+    current = os.path.join(current, component)
+    if os.path.islink(current):
+        raise SystemExit("evidence root crosses a symlink: " + current)
+PYFRESH
 mkdir -p "$(dirname "$EVIDENCE_ROOT")"
 mkdir "$EVIDENCE_ROOT" || fail "cannot create a new evidence root: $EVIDENCE_ROOT"
 EVIDENCE_DIR="$EVIDENCE_ROOT/legacy-entry"
@@ -573,10 +583,27 @@ validate_run_output_unit() {
       return 1
       ;;
   esac
-  if [ -n "$(git -C "$repo" ls-files -- "$unit")" ]; then
-    printf 'covers INDEX-TRACKED content (candidate source / committed evidence must stay bound)\n' >&2
-    return 1
-  fi
+  python3 - "$repo" "$unit" <<'PYLINK' || return 1
+import os
+import subprocess
+import sys
+current = sys.argv[1]
+for component in sys.argv[2].split("/"):
+    if component in ("", ".", ".."):
+        raise SystemExit("output root is not a plain relative path")
+    current = os.path.join(current, component)
+    if os.path.islink(current):
+        raise SystemExit("output root crosses a symlink: " + current)
+try:
+    query = subprocess.run(["git", "--literal-pathspecs", "-C", sys.argv[1], "ls-files", "--", sys.argv[2]], capture_output=True)
+except OSError as error:
+    raise SystemExit("git ls-files query failed: " + str(error))
+# 此查询只允许成功且没有异常提示；无法确认归属时必须拒绝排除。
+if query.returncode != 0 or query.stderr:
+    raise SystemExit(f"git ls-files query failed (exit {query.returncode}): " + query.stderr.decode("utf-8", "replace").strip())
+if query.stdout:
+    raise SystemExit("covers INDEX-TRACKED content (candidate source / committed evidence must stay bound)")
+PYLINK
   return 0
 }
 
@@ -590,7 +617,7 @@ validate_run_output_unit() {
 #                      index-tracked content under it, and every file
 #                      currently under it attributable to THIS run (itself
 #                      a discovered sink, inside the gate's own evidence
-#                      subtree, or inside another sink directory). The
+#                      subtree, or inside another fully proved sink directory). The
 #                      verify-stage per-command layout qualifies; a shared
 #                      dir that already holds foreign/previous-run files
 #                      NEVER qualifies (F42: old evidence must stay bound);
@@ -608,153 +635,7 @@ validate_run_output_unit() {
 # request — never rely on a platform implicitly emitting fd rows) is the
 # darwin fallback. argv: <repo-abs> <gate-evidence-dir-abs>.
 discover_run_output_sinks() {
-  python3 - "$MAIN_REPO" "$EVIDENCE_DIR" <<'PYDISC'
-import os
-import subprocess
-import sys
-
-repo = os.path.realpath(sys.argv[1])
-evidence_dir = os.path.realpath(sys.argv[2])
-ev_rel = os.path.relpath(evidence_dir, repo)
-if ev_rel == "." or ev_rel == ".." or ev_rel.startswith(".." + os.sep):
-    ev_rel = ""                                   # evidence root outside the repo
-
-# this process tree: self up to (excluding) pid 1, cycle- and depth-capped
-pids, cur, seen = [], os.getpid(), set()
-while cur > 1 and cur not in seen and len(pids) < 64:
-    seen.add(cur)
-    pids.append(cur)
-    try:
-        out = subprocess.run(
-            ["ps", "-o", "ppid=", "-p", str(cur)],
-            capture_output=True, text=True,
-        ).stdout.strip()
-        cur = int(out.split()[0]) if out else 1
-    except Exception:
-        cur = 1
-
-# fd 1/2 file targets per pid — /proc fast path, lsof fallback (darwin)
-resolved_any = False
-fd_targets = set()
-have_proc = os.path.isdir("/proc")
-for pid in pids:
-    fds = {}
-    if have_proc:
-        for fd in ("1", "2"):
-            try:
-                fds[fd] = os.path.realpath(os.readlink("/proc/%d/fd/%s" % (pid, fd)))
-            except OSError:
-                pass
-    if not fds:
-        try:
-            out = subprocess.run(
-                ["lsof", "-a", "-p", str(pid), "-d", "1,2", "-Fpfn"],
-                capture_output=True, text=True,
-            ).stdout
-        except Exception:
-            out = ""
-        cur_fd = None
-        for line in out.splitlines():
-            if line.startswith("p"):
-                cur_fd = None
-            elif line.startswith("f") and line[1:] in ("1", "2"):
-                cur_fd = line[1:]
-            elif line.startswith("n") and cur_fd is not None:
-                fds[cur_fd] = line[1:]
-                cur_fd = None
-    if fds:
-        resolved_any = True
-        for target in fds.values():
-            fd_targets.add(target)
-
-if not resolved_any:
-    print("DISCOVERY-UNAVAILABLE")
-    sys.exit(0)
-
-def tracked(path):
-    # index-tracked entries under path (ls-files: also works on an
-    # unborn-HEAD scratch repo); an unreadable answer is fail-closed
-    try:
-        out = subprocess.run(
-            ["git", "-C", repo, "ls-files", "--", path],
-            check=True, capture_output=True, text=True,
-        ).stdout
-    except Exception:
-        return True
-    return out.strip() != ""
-
-sinks = []                                        # repo-relative sink files
-for target in sorted(fd_targets):
-    if not target.startswith("/"):
-        continue                                  # pipe / device / unnamed target
-    real = os.path.realpath(target)
-    if real == repo or not real.startswith(repo + os.sep):
-        continue                                  # outside this repository
-    if not os.path.isfile(real):
-        continue                                  # directories/devices carry no output
-    sinks.append(os.path.relpath(real, repo))
-
-for rel in sinks:
-    if tracked(rel):
-        print("TRACKED-SINK %s" % rel)
-
-# DIR-unit candidacy, under the F42 fences. Candidate attribution dirs:
-# every sink's directory plus the gate's own evidence dir — a file under
-# a candidate DIR unit is attributable to THIS run only when it is itself
-# a sink, or some directory STRICTLY BELOW the unit (never the unit
-# itself — loose foreign files directly under a non-dedicated dir must
-# not inherit its candidacy) is an attribution dir.
-attribution_dirs = set(os.path.dirname(r) for r in sinks)
-if ev_rel:
-    attribution_dirs.add(ev_rel)
-sink_set = set(sinks)
-
-def dedicated(unit):
-    base = os.path.join(repo, unit)
-    if not os.path.isdir(base):
-        return False
-    for root, dirs, files in os.walk(base):
-        for d in dirs:
-            if os.path.islink(os.path.join(root, d)):
-                return False                      # a symlinked dir could shadow content
-        for f in files:
-            fr = os.path.relpath(os.path.join(root, f), repo)
-            if fr in sink_set:
-                continue                          # itself a discovered sink
-            d_ = os.path.dirname(fr)
-            attributed = False
-            while d_ and d_ != unit:
-                if d_ in attribution_dirs:
-                    attributed = True
-                    break
-                d_ = os.path.dirname(d_)
-            if not attributed:
-                return False                      # foreign/pre-existing file — not dedicated
-    return True
-
-dir_units = set()
-for cand in sorted(attribution_dirs):
-    if not cand or not cand.startswith("artifacts/"):
-        continue                                  # DIR units only inside the evidence tree
-    if len(cand.split("/")) < 4:
-        continue                                  # artifacts / artifacts/<area> / a bare stage dir can never be a unit
-    if tracked(cand):
-        continue                                  # tracked content must stay bound
-    if cand == ev_rel or dedicated(cand):
-        dir_units.add(cand)
-
-emitted_dir = set()
-for rel in sinks:
-    if tracked(rel):
-        continue                                  # already reported as TRACKED-SINK
-    du = os.path.dirname(rel)
-    if du in dir_units:
-        if du not in emitted_dir:
-            emitted_dir.add(du)
-            print("DIR %s" % du)
-    else:
-        print("FILE %s" % rel)
-PYDISC
+  python3 "$MAIN_REPO/scripts/rust-tauri/run_output_sinks.py" "$MAIN_REPO" "$EVIDENCE_DIR"
 }
 
 # validate_declared_run_root <repo> <unit>: an R02_A16_RUN_OUTPUT_ROOTS
@@ -781,10 +662,27 @@ validate_declared_run_root() {
       ;;
   esac
   [ -d "$repo/$unit" ] || { printf 'not an existing directory\n' >&2; return 1; }
-  if [ -n "$(git -C "$repo" ls-files -- "$unit")" ]; then
-    printf 'covers INDEX-TRACKED content (candidate source / committed evidence must stay bound)\n' >&2
-    return 1
-  fi
+  python3 - "$repo" "$unit" <<'PYLINK' || return 1
+import os
+import subprocess
+import sys
+current = sys.argv[1]
+for component in sys.argv[2].split("/"):
+    if component in ("", ".", ".."):
+        raise SystemExit("output root is not a plain relative path")
+    current = os.path.join(current, component)
+    if os.path.islink(current):
+        raise SystemExit("output root crosses a symlink: " + current)
+try:
+    query = subprocess.run(["git", "--literal-pathspecs", "-C", sys.argv[1], "ls-files", "--", sys.argv[2]], capture_output=True)
+except OSError as error:
+    raise SystemExit("git ls-files query failed: " + str(error))
+# exit 0 附带 stderr 也无法证明查询可靠，不能把它当成合法空结果。
+if query.returncode != 0 or query.stderr:
+    raise SystemExit(f"git ls-files query failed (exit {query.returncode}): " + query.stderr.decode("utf-8", "replace").strip())
+if query.stdout:
+    raise SystemExit("covers INDEX-TRACKED content (candidate source / committed evidence must stay bound)")
+PYLINK
   return 0
 }
 
@@ -891,32 +789,22 @@ bind_worktree "$CAND_COPY" "$WORK/candidate-copy-binding.tsv" "$(cat "$BINDING_E
 cmp -s "$EVIDENCE_DIR/e0-candidate-binding.tsv" "$WORK/candidate-copy-binding.tsv" \
   || fail "candidate copy does not mirror the invoking worktree (tracked+untracked content binding differs)"
 
-# Baseline copy: exact historical git content of BASE_SHA and NOTHING else,
-# constructed without ever inheriting the candidate files:
-#   1. own .git object store (CoW clone of the invoking repo's store — new
-#      directory entries in this copy; object blobs are immutable and are
-#      never written back);
-#   2. the copy's stale index file is re-initialized (the ONE file removed
-#      here is the copy's own metadata copied in step 1 — no worktree path,
-#      no candidate file, nothing the invoking repo owns);
-#   3. `checkout --detach BASE_SHA` (NOT -f) over the still-EMPTY worktree:
-#      git populates exactly the tracked files of BASE_SHA. There is
-#      nothing to overwrite and nothing to delete — no `clean -fd` exists
-#      in this gate because nothing untracked ever enters the copy;
-#   4. dependencies: an isolated CoW copy of node_modules (ignored path,
-#      reused as-is, never written back to the invoking repo).
-mkdir -p "$BASE_COPY"
-cp -Rc "$MAIN_REPO/.git" "$BASE_COPY/.git"
-rm -f "$BASE_COPY/.git/index"
-git -C "$BASE_COPY" checkout --detach "$BASE_SHA" > "$EVIDENCE_DIR/e0-base-checkout.log" 2>&1 \
-  || { cat "$EVIDENCE_DIR/e0-base-checkout.log" >&2; fail "cannot check out base $BASE_SHA in the isolated copy"; }
+# 历史基线完整物化：指定提交的全部对象/模式/链接保留；只有确证相同的
+# 普通文件借用独立 CoW，脏文件或缺文件由准确 Git 对象恢复。来源只读，
+# 新副本拥有独立 HEAD/index，明确拒绝共享对象失效、复制失败和来源漂移。
+# 系统 TMPDIR 可能使用 /var 别名；只解析本次已创建的父目录，助手仍拒绝链接路径。
+BASE_COPY="$(cd "$WORK" && pwd -P)/repo-base" || fail "cannot resolve fresh baseline parent"
+python3 "$MAIN_REPO/scripts/rust-tauri/prepare_git_copy.py" \
+  --source "$MAIN_REPO" --copy "$BASE_COPY" --revision "$BASE_SHA" \
+  --evidence "$EVIDENCE_DIR/e0-base-materialization" > "$EVIDENCE_DIR/e0-base-checkout.log" 2>&1 \
+  || { cat "$EVIDENCE_DIR/e0-base-checkout.log" >&2; fail "cannot materialize complete base $BASE_SHA in the isolated copy"; }
 cp -Rc "$MAIN_REPO/node_modules" "$BASE_COPY/node_modules"
 {
   echo "HEAD=$(git -C "$BASE_COPY" rev-parse HEAD)"
   echo "diff-vs-base: $(git -C "$BASE_COPY" diff --quiet "$BASE_SHA" -- && echo empty || echo NONEMPTY)"
   echo "index: $(git -C "$BASE_COPY" diff --cached --quiet && echo clean || echo DIRTY)"
   echo "status-all: $(git -C "$BASE_COPY" status --porcelain --untracked-files=all | wc -l | tr -d ' ') entries"
-  echo "construction: fresh .git CoW store + index re-init + non-forced detach checkout + isolated node_modules (no checkout -f, no clean -fd, no commit)"
+  echo "construction: shared immutable Git objects + independent HEAD/index + complete verified BASE materialization (CoW only for identical blobs) + isolated node_modules (no checkout -f, no clean -fd, no commit)"
 } > "$EVIDENCE_DIR/e0-base-purity.txt"
 [ "$(git -C "$BASE_COPY" rev-parse HEAD)" = "$BASE_SHA" ] || fail "base copy HEAD mismatch"
 git -C "$BASE_COPY" diff --quiet "$BASE_SHA" -- \
@@ -2776,6 +2664,9 @@ cmp -s "$SELFCHECK/bind-fu2.tsv" "$SELFCHECK/bind-fu3.tsv" \
   echo "binding exclusion (F42): run-output-root validation OK — fresh untracked dir accepted; tracked source dir (rust/), tracked path, repo root, absolute and parent-relative paths all REJECTED; declared roots fenced — dedicated artifacts/-inside run root accepted, the whole evidence tree (artifacts / artifacts/rust-tauri), a bare stage dir, rust/, outside-artifacts dirs and non-existent paths all REJECTED; multi-unit exclusion — growth under any excluded run root invisible, non-excluded content change still detected, one # header row per unit; FILE units — own sink growth invisible, sibling content change still detected (minimal attribution)"
   echo "baseline construction: proven by the E0 purity asserts on the real fresh copy (no checkout -f / clean -fd anywhere)"
 } | tee -a "$EVIDENCE_DIR/e0s-self-checks.log"
+# 真实 OS fd 反例与父子日志对照随正式入口永久执行。
+python3 "$MAIN_REPO/scripts/rust-tauri/r02_run_output_regression.py" --evidence "$EVIDENCE_DIR/f42-real-fd"
+note "PASS E0s-real-OS-fd-attribution (4 real fd discovery/binder cases, source-copy symmetric, 7 illegal roots rejected, 24 production validator Git-query normal/fault/restored controls; raw bindings and units: f42-real-fd/)"
 note "PASS E0s-gate-self-checks (62 classifier fixtures incl. every REAL guard failure sentence, the zero-payload shapes, the R7 same-line/same-block mixes, the real direct-guard shape, the R8 structural-mixing negatives (compact Error:EACCES token, list/warning/matcher/wrapper tails, foreign/misplaced wrapper) and the producer-binding negatives (body lines without their lead) plus the REAL matcher-summary/diff-body positives, the R9-F01 firstDiff structure fixtures (legal bracket/comma/escape/non-ASCII paths pure, non-JSON/mixed/truncated/empty/4-element/trailing-junk payloads fail closed), the repair-group10 guard-tail-window fixtures (the two gate-r2 round2/round3 REAL 500-point windows + the derived complete-end variant classify seal+uncommitted; single-point mutations — off-by-one char, trailing junk, sentence-material fragment, wrong producer wrapper, deleted listing line — all fail closed to UNRECOGNIZED), the RR2 patch-too-large form-evolution fixtures (the two REAL s5-full-4 shapes — round2's complete 6-row RuntimeError traceback and round3's bare SystemExit line — classify seal; truncated sentence, other git error text, foreign SystemExit message, cross-producer both ways, mutated frame and node-guard producer all fail closed to UNRECOGNIZED) + no-block-rows rejection + green positive control + parseability predicate incl. exit-0 summary completeness and summary/exit consistency with the R9-F01 one-directional header-loss rule (suite-error no-arrow header and multi-error headers are PARSABLE; headers < Tests-failed is CONTRADICTORY) and the R10-F01 floors (headers < Test-Files-failed count — the zero-header suite-error summary hole — and Tests-failed>0 with Test-Files-failed==0 incoherence — both CONTRADICTORY; counts side-channel records files_failed/distinct_files/verdict) + exact-identity family membership checks + no-commit binding checks + F42 run-output-root validation (fresh artifacts/ dir accepted; tracked source dir / tracked path / repo root / absolute / parent-relative rejected), declared-root fencing (dedicated artifacts/-inside run root accepted; the whole evidence tree, a bare stage dir, rust/, outside-artifacts and non-existent rejected) and multi-unit/FILE-unit exclusion fixtures (growth under any excluded run root invisible, non-excluded and sibling changes still detected, one # header row per unit); details in e0s-self-checks.log)"
 
 # ── E1: default-entry-not-switched proofs (inside the candidate copy, so

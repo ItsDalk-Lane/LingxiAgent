@@ -1,0 +1,14 @@
+label: cmd-02-clippy
+argv: /Users/study_superior/.cargo/bin/cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings
+cwd: /Users/study_superior/Desktop/Code/LingxiAgent
+HOME: /Users/study_superior
+user: study_superior
+utcStart: 2026-10-07T13:28:18.661331000Z
+dfBefore: /dev/disk3s5       926  344       556    39% 5095522 5839319720    0%   /System/Volumes/Data
+utcEnd: 2026-10-07T13:28:19.212734000Z
+exit: 0
+stdoutBytes: 0
+stderrBytes: 72
+stdoutSha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+stderrSha256: 7a7c5f339ce35cb7811e73ee64d146487d7e72eb2090f8175330980b4fb58593
+dfAfter: /dev/disk3s5       926  344       556    39% 5095524 5839315360    0%   /System/Volumes/Data

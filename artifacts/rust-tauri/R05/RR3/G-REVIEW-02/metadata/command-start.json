@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "bash",
+    "scripts/rust-tauri/r05_t08_negative_gate.sh",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "start": "2026-10-07T04:24:34.372421+00:00",
+  "environment": {
+    "CARGO_INCREMENTAL": "0",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "R02_LEGACY_REGRESSION_MODE": null
+  },
+  "removedInheritedLegacyMode": null
+}

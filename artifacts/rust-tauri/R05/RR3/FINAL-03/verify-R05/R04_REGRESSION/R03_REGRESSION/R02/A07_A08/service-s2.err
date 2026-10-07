@@ -1,0 +1,8 @@
+2026-10-07T15:27:06.682551Z  INFO lingxi_service: data root resolved [token] source=cli ignored_sources=none
+2026-10-07T15:27:06.682737Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) [token] [token]
+2026-10-07T15:27:06.682906Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=5c769b51529d4898 pid=1367 entropy="os-random-device" lock=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-bin-wlvJTy/lingxi-service/instance.lock network_mode=loopback
+2026-10-07T15:27:06.683212Z  INFO lingxi_service: data-epoch gate passed [token] decision=ProceedSteady(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-10-07T15:27:06.695507Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-bin-wlvJTy/lingxi-service/local-token.json run_database=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-bin-wlvJTy/lingxi-service/data/runs.db
+2026-10-07T15:27:06.705029Z  INFO lingxi_service: instance record published (atomic write) record=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-bin-wlvJTy/lingxi-service/instance.json bind_addr=127.0.0.1:58889
+2026-10-07T15:27:06.787529Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a116f9b822_000002 session_id="sess_local_beta" outcome=completed.no_final.no_provider_configured input_chars=16 input_bytes=16
+2026-10-07T15:27:06.787704Z  INFO lingxi_service: request handled request_id="req-fa783f4e21c4f1e654e2279e307d50a9" method=POST [token] status=200

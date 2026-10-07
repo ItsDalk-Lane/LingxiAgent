@@ -1,0 +1,45 @@
+[
+  {
+    "fresh": false,
+    "target": {
+      "kind": [
+        "lib"
+      ],
+      "crate_types": [
+        "lib"
+      ],
+      "name": "lingxi_service",
+      "src_path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs",
+      "edition": "2021",
+      "doc": true,
+      "doctest": true,
+      "test": true
+    },
+    "filenames": [
+      "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/liblingxi_service.rlib",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/liblingxi_service-d1b960a1b85442c2.rmeta"
+    ],
+    "executable": null
+  },
+  {
+    "fresh": false,
+    "target": {
+      "kind": [
+        "bin"
+      ],
+      "crate_types": [
+        "bin"
+      ],
+      "name": "lingxi-service",
+      "src_path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/main.rs",
+      "edition": "2021",
+      "doc": true,
+      "doctest": false,
+      "test": true
+    },
+    "filenames": [
+      "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+    ],
+    "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+  }
+]

@@ -38,6 +38,10 @@ fi
 mkdir -p "$EVIDENCE_DIR"
 TARGET_DIR="${CARGO_TARGET_DIR:-${TMPDIR:-/tmp}/rust-target-r02-t01}"
 
+# 选根与来源是 INFO 诊断，也是下方原保护断言的必需前置。
+# 固定有效配置，避免调用者的 warn 过滤把真实拒启误报为切根失败。
+export RUST_LOG=info
+
 TOOLCHAIN="$(sed -n 's/^channel[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' rust-toolchain.toml | head -n 1)"
 if [ -z "$TOOLCHAIN" ]; then
   echo "ERROR: cannot parse toolchain channel from rust-toolchain.toml" >&2

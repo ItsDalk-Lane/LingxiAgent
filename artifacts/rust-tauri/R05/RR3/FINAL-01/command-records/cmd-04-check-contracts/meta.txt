@@ -1,0 +1,11 @@
+label: cmd-04-check-contracts
+argv: /Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-contracts
+cwd: /Users/study_superior/Desktop/Code/LingxiAgent
+HOME: /Users/study_superior
+utcStart: 2026-10-07T11:31:30.526621000Z
+unixStartMs: 17913726903N
+dfBefore: /dev/disk3s5       926  344       557    39% 5088922 5841707720    0%   /System/Volumes/Data
+utcEnd: 2026-10-07T11:31:33.945328000Z
+unixEndMs: 17913726933N
+exit: 0
+dfAfter: /dev/disk3s5       926  344       557    39% 5089222 5841145920    0%   /System/Volumes/Data

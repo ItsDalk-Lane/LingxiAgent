@@ -1,0 +1,6 @@
+upgrade-bad-bearer status=401
+PASS upgrade with invalid bearer refused 401
+upgrade-valid status=101
+error frame opcode=1 payload={"code":"invalid_message","message":"first frame is not a valid ClientHello: expected ident at line 1 column 2","retryab
+close frame opcode=8 code=4409
+PASS malformed first frame -> error frame + close

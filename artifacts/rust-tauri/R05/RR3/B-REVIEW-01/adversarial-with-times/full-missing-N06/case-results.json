@@ -1,0 +1,151 @@
+{
+ "schema": "lingxi.r05-negative-gate.v1",
+ "isolatedCopy": "local git clone (read-only on the source) + uncommitted working-tree overlay under $HOME; the main working tree carries ZERO injections (reset_copy restores every mutated file from the pristine snapshot)",
+ "scope": "ALL",
+ "isolatedCopyPath": "fixture only",
+ "expectedCases": [
+  "R05-GATE-N01",
+  "R05-GATE-N02",
+  "R05-GATE-N03",
+  "R05-GATE-N04",
+  "R05-GATE-N05",
+  "R05-GATE-N06",
+  "R05-GATE-N07",
+  "R05-GATE-N08",
+  "R05-GATE-N09",
+  "R05-GATE-N10",
+  "R05-GATE-N11",
+  "R05-GATE-N12",
+  "R05-GATE-N13",
+  "R05-GATE-N14",
+  "R05-GATE-N15",
+  "R05-GATE-N16"
+ ],
+ "unexecutedCases": [],
+ "controls": [
+  {
+   "name": "xtask-r05-mirror",
+   "exitCode": 0,
+   "expected": 0
+  },
+  {
+   "name": "n03-restored-mirror",
+   "exitCode": 0,
+   "expected": 0
+  },
+  {
+   "name": "binary-wiring-suite",
+   "exitCode": 0,
+   "expected": 0
+  }
+ ],
+ "cases": [
+  {
+   "case": "R05-GATE-N01",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  },
+  {
+   "case": "R05-GATE-N02",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  },
+  {
+   "case": "R05-GATE-N03",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  },
+  {
+   "case": "R05-GATE-N04",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  },
+  {
+   "case": "R05-GATE-N05",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  },
+  {
+   "case": "R05-GATE-N07",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  },
+  {
+   "case": "R05-GATE-N08",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  },
+  {
+   "case": "R05-GATE-N09",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  },
+  {
+   "case": "R05-GATE-N10",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  },
+  {
+   "case": "R05-GATE-N11",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  },
+  {
+   "case": "R05-GATE-N12",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  },
+  {
+   "case": "R05-GATE-N13",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  },
+  {
+   "case": "R05-GATE-N14",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  },
+  {
+   "case": "R05-GATE-N15",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  },
+  {
+   "case": "R05-GATE-N16",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK",
+   "note": "independent fixture"
+  }
+ ],
+ "allRefused": false,
+ "controlsGreen": true
+}

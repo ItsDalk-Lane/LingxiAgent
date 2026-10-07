@@ -1,0 +1,174 @@
+{
+  "utc": "2026-10-07T02:01:29.236012+00:00",
+  "mode": "current",
+  "checks": [
+    {
+      "check": "same current docs/rust-tauri/R05/R05_HANDOFF.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "same current docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "same current docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "same current docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "same current docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "same current docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "same current docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "closed latest A",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "real PASS report A",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "real review SHA A",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "closed latest B",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "real PASS report B",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "closed latest C_F46",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "real PASS report C_F46",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "real review SHA C_F46",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "closed A/C removed from unresolved",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "not accepted / empty accepted",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "only R05 next scope",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "E correct pending independent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "E first FAIL preserved",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "G no fake result/SHA",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "FINAL no fake result/SHA",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "G real running observed",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "FINAL not run",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "D preparation vs gate distinction",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "D identity precise",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "D disk object hash",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "current latest reports R05_REPORT.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "current latest reports R05_INDEPENDENT_REVIEW.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "current latest reports R05_BLOCKERS.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "current latest reports R05_NEGATIVE_GATE_REPORT.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "current latest reports MODEL_USAGE_SEMANTICS.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "history snapshot explicit",
+      "ok": true,
+      "detail": null
+    }
+  ],
+  "passed": 33,
+  "failed": 0,
+  "boundary": "independent document/source/evidence assertions; no Cargo tests executed"
+}

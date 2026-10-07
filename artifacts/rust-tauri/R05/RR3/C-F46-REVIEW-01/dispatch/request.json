@@ -1,0 +1,47 @@
+{
+  "argv": [
+    "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+    "exec",
+    "--ephemeral",
+    "--json",
+    "--color",
+    "never",
+    "--sandbox",
+    "danger-full-access",
+    "-c",
+    "approval_policy=\"never\"",
+    "-C",
+    "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "-o",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/dispatch/final.txt",
+    "-"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "createdAt": "2026-10-07T00:54:16.940536+00:00",
+  "freshHistory": true,
+  "ephemeral": true,
+  "modelOverride": null,
+  "permissionProfile": "same danger-full-access / never; no hook bypass or rules bypass",
+  "collaborationErrors": [
+    "root spawn agent thread limit reached",
+    "D branch spawn agent thread limit reached"
+  ],
+  "result": "COMPLETED",
+  "startedAt": "2026-10-07T00:54:32.128339+00:00",
+  "exitCode": 0,
+  "endedAt": "2026-10-07T01:17:06.043943+00:00",
+  "logs": {
+    "prompt.txt": {
+      "sha256": "36d9a0c876547bcff6109d79bf0d675f713d2cefd3088f07ada1d0a290cc6a93",
+      "bytes": 536
+    },
+    "events.jsonl": {
+      "sha256": "115312ac39d66b105c82de591186ac2ac5a09c4f337334b1bfea73be2256ecce",
+      "bytes": 2008258
+    },
+    "stderr.log": {
+      "sha256": "29f1e1338ae1eb863ac726315cf108bd88b8ea0dfb006db7c8a5df35354fc3bd",
+      "bytes": 1754
+    }
+  }
+}

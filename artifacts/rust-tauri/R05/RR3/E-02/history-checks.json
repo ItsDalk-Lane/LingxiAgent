@@ -1,0 +1,406 @@
+[
+  {
+    "check": "only planned current fields docs/rust-tauri/R05/R05_HANDOFF.json",
+    "ok": true
+  },
+  {
+    "check": "E01 current snapshot retained historical docs/rust-tauri/R05/R05_HANDOFF.json",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json schemaVersion",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json artifactKind",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json stage_id",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json baseline",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json interfaces",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json consumer_guidance_r06",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json deferred_registrations",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json stage_gate_registration",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json rr1_repair_round",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json rr2_repair_round",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json source_sha",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json source_sha_semantics",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json working_tree_digest",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json protocol_version",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json data_epoch",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json storage_schema_version",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json dependency_locks",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json accepted_tasks",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json accepted_tasks_semantics",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json consumer_contract",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_HANDOFF.json historical_generated_metadata",
+    "ok": true
+  },
+  {
+    "check": "only planned current fields docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+    "ok": true
+  },
+  {
+    "check": "E01 current snapshot retained historical docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/PROGRESS_LEDGER.json schemaVersion",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/PROGRESS_LEDGER.json artifactKind",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/PROGRESS_LEDGER.json stage_id",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/PROGRESS_LEDGER.json generated_by",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/PROGRESS_LEDGER.json generated_at",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/PROGRESS_LEDGER.json baseline",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/PROGRESS_LEDGER.json tasks",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/PROGRESS_LEDGER.json gates_terminal_state",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/PROGRESS_LEDGER.json environment_items",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/PROGRESS_LEDGER.json followup_obligations_for_t03_plus",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/PROGRESS_LEDGER.json rr1_repair_round",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/PROGRESS_LEDGER.json rr2_repair_round",
+    "ok": true
+  },
+  {
+    "check": "original large ledger byte prefix docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+    "ok": true
+  },
+  {
+    "check": "only planned current fields docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+    "ok": true
+  },
+  {
+    "check": "E01 current snapshot retained historical docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json schemaVersion",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json artifactKind",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json stage_id",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json generated_by",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json generated_at",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json baseline",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json note",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json acceptances",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json rr2_repair_round",
+    "ok": true
+  },
+  {
+    "check": "original large ledger byte prefix docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+    "ok": true
+  },
+  {
+    "check": "only planned current fields docs/rust-tauri/R05/R05_TEST_MAP.json",
+    "ok": true
+  },
+  {
+    "check": "E01 current snapshot retained historical docs/rust-tauri/R05/R05_TEST_MAP.json",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_TEST_MAP.json schemaVersion",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_TEST_MAP.json artifactKind",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_TEST_MAP.json stage_id",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_TEST_MAP.json generated_by",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_TEST_MAP.json generated_at",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_TEST_MAP.json structure",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_TEST_MAP.json aIndex",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_TEST_MAP.json entries",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_TEST_MAP.json oldProductUntouchedDiff",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_TEST_MAP.json ledgerNameCorrections",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_TEST_MAP.json aIndexNote",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_TEST_MAP.json registryNote",
+    "ok": true
+  },
+  {
+    "check": "original large ledger byte prefix docs/rust-tauri/R05/R05_TEST_MAP.json",
+    "ok": true
+  },
+  {
+    "check": "only planned current fields docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+    "ok": true
+  },
+  {
+    "check": "E01 current snapshot retained historical docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json schemaVersion",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json artifactKind",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json stage_id",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json generated_by",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json generated_at",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json honestyRule",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json preregisteredThresholds",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json measured",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json notClaimed",
+    "ok": true
+  },
+  {
+    "check": "only planned current fields docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+    "ok": true
+  },
+  {
+    "check": "E01 current snapshot retained historical docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json schemaVersion",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json artifactKind",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json stage_id",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json generated_by",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json generated_at",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json policy",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json status",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json statusVocabulary",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json whatIsBlocked",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json whatIsNotBlocked",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json deferredObligation",
+    "ok": true
+  },
+  {
+    "check": "full historical field equal docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json platformVerification",
+    "ok": true
+  },
+  {
+    "check": "ORCH all task records preserved",
+    "ok": true
+  },
+  {
+    "check": "ORCH all other root fields preserved",
+    "ok": true
+  },
+  {
+    "check": "ORCH non-R05 stages preserved",
+    "ok": true
+  },
+  {
+    "check": "ORCH E01 historical snapshot preserved",
+    "ok": true
+  },
+  {
+    "check": "old Markdown historical body verbatim R05_REPORT.md",
+    "ok": true
+  },
+  {
+    "check": "old Markdown historical body verbatim R05_BLOCKERS.md",
+    "ok": true
+  },
+  {
+    "check": "old Markdown historical body verbatim R05_INDEPENDENT_REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "old Markdown historical body verbatim R05_NEGATIVE_GATE_REPORT.md",
+    "ok": true
+  },
+  {
+    "check": "interface evolution unchanged",
+    "ok": true
+  },
+  {
+    "check": "6.2 all interface fields/sample/error/unknown/cancel/recovery/budget preserved",
+    "ok": true
+  },
+  {
+    "check": "all authority scope/pins/CIDs/leaf unchanged",
+    "ok": true
+  }
+]

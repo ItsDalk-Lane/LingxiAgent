@@ -1,0 +1,37 @@
+{
+  "time": "2026-10-07T03:16:51.066827+00:00",
+  "json": [
+    {
+      "file": "raw-reference-digests.json",
+      "jsonParse": true
+    },
+    {
+      "file": "interruption-index.json",
+      "jsonParse": true
+    },
+    {
+      "file": "default-index.json",
+      "jsonParse": true
+    },
+    {
+      "file": "supplement-index.json",
+      "jsonParse": true
+    },
+    {
+      "file": "registration-readback.json",
+      "jsonParse": true
+    },
+    {
+      "file": "r02-and-binding-index.json",
+      "jsonParse": true
+    },
+    {
+      "file": "producer-index.json",
+      "jsonParse": true
+    }
+  ],
+  "localLinksExist": true,
+  "historicalDefaultExit": 2,
+  "supplementReceipts": 28,
+  "scope": "只验交付内容和原摘要，不执行业务测试"
+}

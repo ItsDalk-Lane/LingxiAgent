@@ -1,0 +1,21 @@
+{
+  "name": "probe-c-lan",
+  "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe",
+    "192.168.3.5"
+  ],
+  "timeout": 15,
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startUTC": "2026-10-07T01:18:45.358850+00:00",
+  "endUTC": "2026-10-07T01:18:51.462271+00:00",
+  "elapsedSeconds": 6.103256541,
+  "parentPID": 86500,
+  "actualExitCode": 1,
+  "supervisorTimedOut": false,
+  "supervisorExitCode": 1,
+  "signalsSent": [],
+  "observedBinaryProcesses": [],
+  "counts": null,
+  "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/probe-c-lan.log",
+  "logSha256": "84acc61ec8e41e0e2a5fa9b7ea1d51599dc99d476dd6f88488426f3a3b148082"
+}

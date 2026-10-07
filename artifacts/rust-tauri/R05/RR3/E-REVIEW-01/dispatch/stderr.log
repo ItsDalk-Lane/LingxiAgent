@@ -1,0 +1,9 @@
+2026-10-07T01:24:42.586559Z  WARN codex_skills::interface: ignoring interface.icon_small: icon path with '..' must resolve under plugin assets/
+2026-10-07T01:24:42.586628Z  WARN codex_skills::interface: ignoring interface.icon_large: icon path with '..' must resolve under plugin assets/
+2026-10-07T01:24:42.594611Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
+2026-10-07T01:24:42.821261Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: HTTP error: 426 Upgrade Required, url: ws://127.0.0.1:15721/v1/responses
+2026-10-07T01:24:42.821338Z  WARN codex_core::client: falling back to HTTP
+2026-10-07T01:24:44.686967Z  WARN codex_skills::interface: ignoring interface.icon_small: icon path with '..' must resolve under plugin assets/
+2026-10-07T01:24:44.687004Z  WARN codex_skills::interface: ignoring interface.icon_large: icon path with '..' must resolve under plugin assets/
+2026-10-07T01:30:04.582265Z  WARN codex_analytics::client: failed to send events request: error sending request for url (https://chatgpt.com/backend-api/codex/analytics-events/events)
+2026-10-07T01:36:05.599098Z  WARN codex_core::shell_snapshot: Failed to delete shell snapshot at AbsolutePathBuf("/Users/study_superior/.codex/shell_snapshots/01a113f6-79d4-73b2-b2b0-713abd85f4ad.1791336282588770000.sh"): Os { code: 2, kind: NotFound, message: "No such file or directory" }

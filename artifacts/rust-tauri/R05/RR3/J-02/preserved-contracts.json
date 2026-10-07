@@ -1,0 +1,27 @@
+{
+  "negative-pristine-through-final": {
+    "byteEqual": true,
+    "sha256": "185482ae2362d8b8ab52e1c2b2fc4e378c96a8779908efb84c408521c1b1c65b",
+    "bytes": 31553
+  },
+  "legacy-binder-discovery-exclusions-candidate-mirror": {
+    "byteEqual": true,
+    "sha256": "92fe4d2b6282b88fe19a2db7314b290e98e8bc1d73754b2459b8a0b432496e6d",
+    "bytes": 14476
+  },
+  "legacy-E0-purity-assertions-E0s-E1-through-E5": {
+    "byteEqual": true,
+    "sha256": "af21e0e046d656ce860ec70fc6eec873bbc992b422a36f6d82bb9f06da053ec1",
+    "bytes": 158110
+  },
+  "node-helper": {
+    "byteEqual": true,
+    "sha256": "51abc64c8be5e90b1af7e35a475f3ea9e37cbb37033b9c256b5093333fd8c082",
+    "bytes": 13339
+  },
+  "OS-discovery-regression": {
+    "byteEqual": true,
+    "sha256": "fcee14b8c529d502d9885a4b7a31e8c5f90ade22ab92e149402d52585272fd99",
+    "bytes": 15852
+  }
+}

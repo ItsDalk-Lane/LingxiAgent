@@ -1,0 +1,162 @@
+[
+  {
+    "check": "A actual independent report PASS",
+    "ok": true
+  },
+  {
+    "check": "C/F46 actual independent result PASS",
+    "ok": true
+  },
+  {
+    "check": "actual current closed A",
+    "ok": true
+  },
+  {
+    "check": "actual current closed B",
+    "ok": true
+  },
+  {
+    "check": "actual current closed C_F46",
+    "ok": true
+  },
+  {
+    "check": "A report real SHA",
+    "ok": true
+  },
+  {
+    "check": "C/F46 report real SHA",
+    "ok": true
+  },
+  {
+    "check": "unresolved only remaining packages",
+    "ok": true
+  },
+  {
+    "check": "unresolved consumes latest packages",
+    "ok": true
+  },
+  {
+    "check": "D real natural exit101 remains",
+    "ok": true
+  },
+  {
+    "check": "D is not granted environment PASS",
+    "ok": true
+  },
+  {
+    "check": "D new identity from raw prepared object",
+    "ok": true
+  },
+  {
+    "check": "E no independent self-sign",
+    "ok": true
+  },
+  {
+    "check": "E first independent FAIL retained",
+    "ok": true
+  },
+  {
+    "check": "no stage/R06 acceptance",
+    "ok": true
+  },
+  {
+    "check": "FINAL tested SHA and result empty",
+    "ok": true
+  },
+  {
+    "check": "G not finished; real running no invented result",
+    "ok": true
+  },
+  {
+    "check": "no stale re-review obligations",
+    "ok": true
+  },
+  {
+    "check": "6.2 field source_sha",
+    "ok": true
+  },
+  {
+    "check": "6.2 field working_tree_digest",
+    "ok": true
+  },
+  {
+    "check": "6.2 field protocol_version",
+    "ok": true
+  },
+  {
+    "check": "6.2 field data_epoch",
+    "ok": true
+  },
+  {
+    "check": "6.2 field dependency_locks",
+    "ok": true
+  },
+  {
+    "check": "6.2 field accepted_tasks",
+    "ok": true
+  },
+  {
+    "check": "6.2 field unresolved_items",
+    "ok": true
+  },
+  {
+    "check": "6.2 field allowed_next_scope",
+    "ok": true
+  },
+  {
+    "check": "6.2 field artifact_hashes",
+    "ok": true
+  },
+  {
+    "check": "current equal docs/rust-tauri/R05/R05_HANDOFF.json",
+    "ok": true
+  },
+  {
+    "check": "current equal docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+    "ok": true
+  },
+  {
+    "check": "current equal docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+    "ok": true
+  },
+  {
+    "check": "current equal docs/rust-tauri/R05/R05_TEST_MAP.json",
+    "ok": true
+  },
+  {
+    "check": "current equal docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+    "ok": true
+  },
+  {
+    "check": "current equal docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+    "ok": true
+  },
+  {
+    "check": "current equal docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+    "ok": true
+  },
+  {
+    "check": "no stale current A/C pending R05_REPORT.md",
+    "ok": true
+  },
+  {
+    "check": "no stale current A/C pending R05_BLOCKERS.md",
+    "ok": true
+  },
+  {
+    "check": "no stale current A/C pending R05_INDEPENDENT_REVIEW.md",
+    "ok": true
+  },
+  {
+    "check": "no stale current A/C pending R05_NEGATIVE_GATE_REPORT.md",
+    "ok": true
+  },
+  {
+    "check": "no stale current A/C pending MODEL_USAGE_SEMANTICS.md",
+    "ok": true
+  },
+  {
+    "check": "report current G running",
+    "ok": true
+  }
+]

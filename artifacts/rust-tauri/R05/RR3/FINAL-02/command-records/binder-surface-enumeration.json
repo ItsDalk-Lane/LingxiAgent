@@ -1,0 +1,14 @@
+{
+ "repo_root": "/Users/study_superior/Desktop/Code/LingxiAgent",
+ "enumeration_command": "git --no-optional-locks ls-files --cached --others --exclude-standard -z",
+ "total_entries": 69075,
+ "ok_plain_files": 69074,
+ "failing_kinds": {
+  "symlink_final": 1
+ },
+ "failures": {
+  "symlink_final": [
+   "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-validator-bin/python3"
+  ]
+ }
+}

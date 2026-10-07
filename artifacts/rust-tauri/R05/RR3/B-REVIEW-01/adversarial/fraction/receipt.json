@@ -1,0 +1,17 @@
+{
+  "case": "fraction",
+  "command": [
+    "python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial/fraction/input.tsv",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial/fraction/mutation.json"
+  ],
+  "startedAt": "2026-10-07T00:23:50.330668+00:00",
+  "endedAt": "2026-10-07T00:23:50.357882+00:00",
+  "exitCode": 1,
+  "expectedExit": 1,
+  "beforeSha256": "de69273043156b5fb02023aee54d42ea700d433f59439ebd2f2cbb1b5c7bbfa6",
+  "afterSha256": "de69273043156b5fb02023aee54d42ea700d433f59439ebd2f2cbb1b5c7bbfa6",
+  "receiptPresent": false,
+  "status": "PASS"
+}

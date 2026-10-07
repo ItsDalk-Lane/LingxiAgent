@@ -1,0 +1,54 @@
+[
+  {
+    "name": "independent-index-inode",
+    "ok": true
+  },
+  {
+    "name": "independent-head-inode",
+    "ok": true
+  },
+  {
+    "name": "index-entries-equal",
+    "ok": true
+  },
+  {
+    "name": "shared-alternate-exact-main",
+    "ok": true
+  },
+  {
+    "name": "tracked-mode-equal",
+    "ok": true
+  },
+  {
+    "name": "source-scope-candidate-byte-equal",
+    "ok": true
+  },
+  {
+    "name": "real-binder-detects-isolated-mutation",
+    "ok": true
+  },
+  {
+    "name": "main-source-no-writeback",
+    "ok": true
+  },
+  {
+    "name": "real-binder-restored",
+    "ok": true
+  },
+  {
+    "name": "cache-no-source-writeback",
+    "ok": true
+  },
+  {
+    "name": "dependency-no-source-writeback",
+    "ok": true
+  },
+  {
+    "name": "content-red-named",
+    "ok": true
+  },
+  {
+    "name": "shared-object-red-named",
+    "ok": true
+  }
+]

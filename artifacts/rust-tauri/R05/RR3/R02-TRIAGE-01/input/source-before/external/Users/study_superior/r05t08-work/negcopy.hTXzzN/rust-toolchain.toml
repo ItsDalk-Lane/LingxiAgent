@@ -1,0 +1,13 @@
+# Lingxi Rust 工具链锁定（R01-T03）
+#
+# 核心（rust/ headless workspace）与桌面（desktop/src-tauri，R09 建立）必须使用
+# 同一固定 stable 工具链。本文件由 rustup 读取并强制生效；任何 cargo/rustc 调用
+# 只要经过 rustup 代理（~/.cargo/bin 在 PATH 中）即自动选择下方版本。
+#
+# 锁定版本：rustc/cargo 1.98.1 (48a229cea 2026-09-01)，stable-aarch64-apple-darwin
+# 于 2026-09-25 实测安装并编译验证（证据 artifacts/rust-tauri/R01/T03/）。
+# 注意：本机 Homebrew rust 1.93.0（/opt/homebrew/bin）不读取本文件；CI/开发者
+# 必须经 rustup 调用工具链，否则锁定不生效（见 DEPENDENCY_DECISIONS.md）。
+[toolchain]
+channel = "1.98.1"
+components = ["rustfmt", "clippy"]

@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "cat",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a01_smoke/stdout.log",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a01_smoke/stderr.log",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a13_redaction_scan/stdout.log",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a13_redaction_scan/stderr.log"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "start": "2026-10-07T01:56:56.732412+00:00",
+  "end": "2026-10-07T01:56:56.735748+00:00"
+}

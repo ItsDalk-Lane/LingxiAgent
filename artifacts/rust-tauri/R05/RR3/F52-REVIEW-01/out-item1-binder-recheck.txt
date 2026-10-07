@@ -1,0 +1,15 @@
+== files in F52-REVIEW-01/ at enumeration moment ==
+       7
+commands.jsonl
+err-env-info.txt
+err-item1-binder-recheck.txt
+out-env-info.txt
+out-item1-binder-recheck.txt
+rec.py
+review_classify.py
+== independent classifier run (assert-clean) ==
+{"total": 69140, "counts": {"regular_file": 69140, "final_symlink": 0, "ancestor_symlink": 0, "directory_entry": 0, "ancestor_not_dir": 0, "irregular": 0, "missing": 0}, "clean": true, "elapsed_s": 0.586}
+classifier_exit=0
+== cross counts ==
+   38066
+0

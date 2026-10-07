@@ -1,0 +1,6 @@
+pid=70152 bind=0.0.0.0:50241 connect=192.168.3.5:50241
+client connected
+client send=4
+client recv=-1 errno=35 (Resource temporarily unavailable)
+server poll=0 revents=0
+PROBE RESULT: blocked accepted=0

@@ -1,0 +1,24 @@
+[
+  {
+    "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/verify-stage-result.json",
+    "sha256": "b9c115415225b03d19929708095bc3cd3cfae6c8677804a541a6a909ff732d40",
+    "overall": "FAIL",
+    "stable": false,
+    "checkpointCount": 8,
+    "unstableCount": 8,
+    "changedPaths": [
+      "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/r04_regression_gate/stdout.log"
+    ]
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+    "sha256": "157d8cd5e1f03d19f57f5d35ce0041904503c5809964ae1b2900abcd292d6803",
+    "overall": "FAIL",
+    "stable": false,
+    "checkpointCount": 15,
+    "unstableCount": 15,
+    "changedPaths": [
+      "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/r03_regression_gate/stdout.log"
+    ]
+  }
+]

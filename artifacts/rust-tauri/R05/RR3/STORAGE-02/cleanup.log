@@ -1,0 +1,36 @@
+deleted 250 freeGiB 3.6672744750976562
+deleted 500 freeGiB 3.8212127685546875
+deleted 750 freeGiB 3.8488388061523438
+deleted 1000 freeGiB 3.8559913635253906
+deleted 1500 freeGiB 3.8569374084472656
+deleted 1750 freeGiB 3.8546714782714844
+deleted 2000 freeGiB 3.8561172485351562
+deleted 2500 freeGiB 3.854961395263672
+deleted 2750 freeGiB 3.853191375732422
+deleted 3000 freeGiB 3.854442596435547
+deleted 3250 freeGiB 3.8529815673828125
+deleted 3750 freeGiB 3.8529586791992188
+deleted 4000 freeGiB 3.8514671325683594
+deleted 4500 freeGiB 3.851543426513672
+deleted 4750 freeGiB 3.8504066467285156
+deleted 5000 freeGiB 3.8519821166992188
+deleted 5750 freeGiB 3.85076904296875
+deleted 6000 freeGiB 3.849384307861328
+deleted 6250 freeGiB 3.8504562377929688
+deleted 6500 freeGiB 3.849212646484375
+deleted 7500 freeGiB 3.8500900268554688
+deleted 8250 freeGiB 3.8482627868652344
+deleted 8500 freeGiB 3.849964141845703
+deleted 9750 freeGiB 3.8463363647460938
+deleted 12500 freeGiB 3.8470230102539062
+deleted 14000 freeGiB 3.8444671630859375
+deleted 15250 freeGiB 3.8428077697753906
+deleted 15500 freeGiB 3.844860076904297
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/STORAGE-02/cleanup.py", line 56, in <module>
+    else:a={'path':str(p),'bytes':p.stat().st_size,'sha256':sha(p)}
+                                                            ~~~^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/STORAGE-02/cleanup.py", line 10, in sha
+    for b in iter(lambda:f.read(4*1024*1024),b''):h.update(b)
+                                                  ~~~~~~~~^^^
+KeyboardInterrupt

@@ -1,0 +1,21 @@
+{
+  "capturedAt": "2026-10-07T00:37:43.697797+00:00",
+  "status": "SELF_CHECKED_PARTIAL_F46_OPEN_NOT_INDEPENDENTLY_ACCEPTED",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "scope": "C-owned final test assertions plus readonly production/shared hook bindings; does not freeze concurrent candidate",
+  "hashes": {
+    "rust/crates/lingxi-service/tests/r05_t08_resources.rs": "23b03f56bef900fc0563b3348596e61437995f7c05cc25a5173455f11a23e33f",
+    "rust/crates/lingxi-service/tests/support/r05_resource_sampler.rs": "1f6601122e5d7841f3975ec68ea8c60adb653fc939ca4e65cc3da7565c269274",
+    "rust/crates/lingxi-service/src/logging.rs": "5f0aa8ccabc62295d64ff0ca6b61a5fc9a384e6a4bdd6e092d70a15ab73b6be1",
+    "rust/Cargo.lock": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+    "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+    "docs/rust-tauri/PERFORMANCE_THRESHOLDS.json": "bf40009e347df014dba1d2a2ecb7505bf4bdccfdef1992fc99b144749a992331",
+    "docs/rust-tauri/R05/r05_stage_pins.tsv": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+    "rust/crates/xtask/src/stage_maps/R05.json": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+    "scripts/rust-tauri/r05_t08_stage_suites.sh": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e"
+  },
+  "measurementChangedInputs": [
+    "rust/crates/lingxi-service/tests/r05_t08_resources.rs"
+  ],
+  "finalFullResourceTest": "NOT_RUN_AFTER_ADDED_LOG_ASSERTIONS; real directed F46 red saved; independent full160 rerun required after production repair"
+}

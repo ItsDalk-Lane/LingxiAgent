@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/E-03/update.py", line 47, in <module>
+    for p in resources.values():assert (ROOT/p).is_file(),p
+                                       ~~~~~~~~~~~~~~~~^^
+AssertionError: artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/late-result-recovery/command.json

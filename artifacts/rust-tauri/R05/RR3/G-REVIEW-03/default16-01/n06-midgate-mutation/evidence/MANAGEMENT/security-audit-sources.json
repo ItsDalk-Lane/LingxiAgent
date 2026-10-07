@@ -1,0 +1,186 @@
+{
+  "deviceIntents": [
+    {
+      "action": "access.mobile_credential.issue",
+      "atUnixMs": 1791359369754,
+      "metadata": {
+        "credentialId": "cred_71e2e62f35f38f73e3fb55589d878423",
+        "scopes": [
+          "chat",
+          "resources.read",
+          "files.read",
+          "files.write"
+        ]
+      },
+      "target": "device_fa3194087a2ccaf0870e6410cebf7440"
+    },
+    {
+      "action": "access.desktop_credential.issue",
+      "atUnixMs": 1791359372078,
+      "metadata": {
+        "credentialId": "cred_70ba3b71502e19dbbc488162897b27c9",
+        "scopes": [
+          "chat",
+          "resources.read",
+          "files.read",
+          "files.write",
+          "studio.owner",
+          "settings.read",
+          "settings.write",
+          "providers.manage",
+          "secrets.write",
+          "bridge.manage"
+        ]
+      },
+      "target": "device_409623890ec7c95a9c5c9f892848b42f"
+    },
+    {
+      "action": "devices.credential.revoke",
+      "atUnixMs": 1791359373266,
+      "metadata": {
+        "deviceId": "device_409623890ec7c95a9c5c9f892848b42f"
+      },
+      "target": "cred_70ba3b71502e19dbbc488162897b27c9"
+    },
+    {
+      "action": "access.desktop_credential.issue",
+      "atUnixMs": 1791359374510,
+      "metadata": {
+        "credentialId": "cred_f3df72538823f5ffbae7f25187ba3f15",
+        "scopes": [
+          "chat",
+          "resources.read",
+          "files.read",
+          "files.write",
+          "studio.owner",
+          "settings.read",
+          "settings.write",
+          "providers.manage",
+          "secrets.write",
+          "bridge.manage"
+        ]
+      },
+      "target": "device_521575f3cc563a1a1f0804a459f1fa7d"
+    },
+    {
+      "action": "devices.revoke",
+      "atUnixMs": 1791359375683,
+      "metadata": {},
+      "target": "device_fa3194087a2ccaf0870e6410cebf7440"
+    },
+    {
+      "action": "devices.pairing.create",
+      "atUnixMs": 1791359364980,
+      "metadata": {
+        "deviceKind": "mobile"
+      },
+      "target": "pair_Urx6yJmVeXlV5RiCQI86UA"
+    },
+    {
+      "action": "devices.pairing.approve",
+      "atUnixMs": 1791359364980,
+      "metadata": {
+        "credentialId": "cred_c982fd08e8359b2c7f30dc86dd132f90",
+        "pairingSessionId": "pair_Urx6yJmVeXlV5RiCQI86UA",
+        "scopes": [
+          "chat",
+          "resources.read"
+        ]
+      },
+      "target": "device_d3c462232085cce2d0eec1f35bb2e776"
+    },
+    {
+      "action": "devices.pairing.create",
+      "atUnixMs": 1791359364980,
+      "metadata": {
+        "deviceKind": "desktop"
+      },
+      "target": "pair_6xusFqpv1z4Eh_xP_CPbYw"
+    },
+    {
+      "action": "devices.pairing.approve",
+      "atUnixMs": 1791359364980,
+      "metadata": {
+        "credentialId": "cred_ad29018ca09147067abf6f71e6a8aa10",
+        "pairingSessionId": "pair_6xusFqpv1z4Eh_xP_CPbYw",
+        "scopes": [
+          "chat",
+          "resources.read",
+          "files.read",
+          "files.write"
+        ]
+      },
+      "target": "device_63a1d9f0b3ffa9d199e5202322987cf1"
+    },
+    {
+      "action": "devices.pairing.create",
+      "atUnixMs": 1792568964981,
+      "metadata": {
+        "deviceKind": "mobile"
+      },
+      "target": "pair_DKQi0CT6A0FAH9A8PakPZg"
+    }
+  ],
+  "managementIntents": [
+    {
+      "action": "access.account.profile.update",
+      "atUnixMs": 1791359364980,
+      "metadata": {},
+      "target": "user_local"
+    },
+    {
+      "action": "access.network.update",
+      "atUnixMs": 1791359364980,
+      "metadata": {
+        "listenPort": 14500,
+        "mode": "lan"
+      },
+      "target": "server-network"
+    },
+    {
+      "action": "access.network.update",
+      "atUnixMs": 1791359364980,
+      "metadata": {
+        "listenPort": 14500,
+        "mode": "loopback"
+      },
+      "target": "server-network"
+    },
+    {
+      "action": "access.network.update",
+      "atUnixMs": 1791359364980,
+      "metadata": {
+        "listenPort": 14500,
+        "mode": "lan"
+      },
+      "target": "server-network"
+    },
+    {
+      "action": "access.account.password.update",
+      "atUnixMs": 1791359364980,
+      "metadata": {},
+      "target": "user_local"
+    },
+    {
+      "action": "access.account.password.clear",
+      "atUnixMs": 1791359364980,
+      "metadata": {},
+      "target": "user_local"
+    },
+    {
+      "action": "access.account.password.update",
+      "atUnixMs": 1791359364980,
+      "metadata": {},
+      "target": "user_local"
+    },
+    {
+      "action": "access.network.update",
+      "atUnixMs": 1792568964983,
+      "metadata": {
+        "listenPort": 49172,
+        "mode": "loopback"
+      },
+      "target": "server-network"
+    }
+  ]
+}

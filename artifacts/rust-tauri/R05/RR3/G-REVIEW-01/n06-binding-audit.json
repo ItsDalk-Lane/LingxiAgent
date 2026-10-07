@@ -1,0 +1,115 @@
+{
+  "utc": "2026-10-07T02:02:09.437873+00:00",
+  "resultSHA256": "b35306cc22a5edf077606aa714ae97aab8315770bb8ca1dcae405b257961a2a7",
+  "overall": "FAIL",
+  "stable": false,
+  "runner": "PASS",
+  "checkpointCount": 20,
+  "stableCheckpointCount": 0,
+  "changedPaths": [
+    "rust/crates/lingxi-kernel/src/lib.rs"
+  ],
+  "commands": [
+    {
+      "key": "a01_smoke",
+      "status": "FAIL",
+      "exitCode": 1
+    },
+    {
+      "key": "a02_boundary_negative",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "key": "a03_dual_instance",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "key": "a04_path_priority",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "key": "a05_a06_auth_matrix",
+      "status": "FAIL",
+      "exitCode": 1
+    },
+    {
+      "key": "a07_a08_storage_tx",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "key": "a07_live_fault_01_test",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "key": "a07_live_fault_02_check",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "key": "a09_a10_events_matrix",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "key": "a11_backup_restore",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "key": "a12_recovery_drill",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "key": "a13_redaction_scan",
+      "status": "FAIL",
+      "exitCode": 1
+    },
+    {
+      "key": "a14_slow_subscriber",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "key": "a15_full_chain",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "key": "a16_legacy_regression",
+      "status": "FAIL",
+      "exitCode": 1
+    },
+    {
+      "key": "supplemental_client_matrix",
+      "status": "FAIL",
+      "exitCode": 1
+    },
+    {
+      "key": "supplemental_cli_rust_matrix",
+      "status": "FAIL",
+      "exitCode": 1
+    },
+    {
+      "key": "supplemental_cli_sessions_matrix",
+      "status": "FAIL",
+      "exitCode": 1
+    },
+    {
+      "key": "supplemental_management_matrix",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "key": "supplemental_static_web_matrix",
+      "status": "PASS",
+      "exitCode": 0
+    }
+  ],
+  "boundary": "实际N06绑定目标红；R02业务失败独立，不作为!stable强制FAIL唯一证据"
+}

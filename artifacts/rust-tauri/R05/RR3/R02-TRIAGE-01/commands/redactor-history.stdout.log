@@ -1,0 +1,196 @@
+diff --git a/rust/crates/lingxi-service/src/redaction.rs b/rust/crates/lingxi-service/src/redaction.rs
+index 153be67ca..d51d45c81 100644
+--- a/rust/crates/lingxi-service/src/redaction.rs
++++ b/rust/crates/lingxi-service/src/redaction.rs
+@@ -30,22 +30,25 @@
+ //! F02 — listed here so R05 re-checks them BEFORE wiring real provider
+ //! credentials; none is reachable with the current R02 credential shapes):
+ //!
+-//! 1. PRECISE LONG-TOKEN BOUNDARY (measured against the incumbent, same
+-//!    input pair): `/` and `=` are NOT in this port's token character
+-//!    class (the incumbent's is). Two concrete consequences, both proven
+-//!    by node-vs-Rust probes during the R02-T07 review:
+-//!    - a >=40-char token containing a literal `/` (which splits it into
+-//!      two <40 segments, or abuts `.`/`-`) is caught by the incumbent
+-//!      but MISSED by this port;
+-//!    - plain hex64 / base64url WITHOUT `/`/`=`/`.` adjacency IS caught
+-//!      here (the old "no / no . no = survives" claim was wrong — the
+-//!      real miss condition is `/`/`=` splitting the candidate into <40
+-//!      segments or boundary adjacency).
++//! 1. PRECISE LONG-TOKEN BOUNDARY — **FIXED IN R05-T02**
++//!    (RR-R05-REDACTION-BOUNDARY). The port's token character class now
++//!    matches the incumbent's `[A-Za-z0-9+/_=-]`: `/` and `=` are token
++//!    characters, so a standard-base64 token containing literal `/` or
++//!    padding `=` can no longer escape the 40+ long-token rule by being
++//!    split into sub-40 segments. (The pre-fix port excluded both —
++//!    measured against the incumbent during the R02-T07 review; the
++//!    R02-scope credential shapes never contained `/` so the gap was
++//!    unreachable until R05's provider material.) Pinned by
++//!    `r05_t02_base64_tokens_with_slash_and_padding_are_redacted`.
+ //!
+-//!    R02-scope credentials (base64url unpadded / hex / `hana_*`-prefixed)
+-//!    never contain `/`, so R02 surfaces are safe; an R05 provider token
+-//!    that is standard base64 WITH padding/literal `/` would NOT be
+-//!    redacted here — re-verify before R05 logs any provider material.
++//!    History of the investigation: the R05-T01 re-check found and fixed a
++//!    REAL defect in the case-insensitive plumbing — the direct
++//!    `replace_each_ci` passes handed the original-case text to the finders
++//!    where the lowercased haystack belonged, so mixed-case KEYS
++//!    (`apiKey`, `Password`, `TOKEN`) escaped the assignment/query/header-
++//!    word scans (and redacted heads came out lowercased). Fixed at the
++//!    call sites; pinned by `r05_secret_key_words_match_case_insensitively`
++//!    and `r05_provider_api_key_shapes_are_redacted`.
+ //! 2. INCUMBENT RULES NOT PORTED (omissions, currently unreachable because
+ //!    this service never logs CLI arguments, message bodies or PII):
+ //!    the incumbent's PII rules (email / credit-card / CN-ID / SSN),
+@@ -108,16 +111,18 @@ const CREDENTIAL_MIN_TAIL: usize = 12;
+ /// word character, `/`, `.` or `-`.
+ const LONG_RANDOM_MIN: usize = 40;
+ 
+-/// Token character class for the long-random/credential scans. Divergence
+-/// from the incumbent regex, documented for the R02 safe-log contract: `/`
+-/// and `=` are deliberately NOT token characters (the incumbent includes
+-/// both), so structured `key=value` diagnostics (`path=/lingxi/v1/…`,
+-/// `request_id=req-…`) survive while every credential shape this stack
+-/// mints (base64url WITHOUT padding, hex — never contains `/` or `=`)
+-/// still matches. `.` is likewise out (paths and file names), as in the
+-/// incumbent class. The `data:…;base64` rule covers padded blobs.
++/// Token character class for the long-random/credential scans. R05-T02
++/// (RR-R05-REDACTION-BOUNDARY) closed the divergence from the incumbent
++/// regex: `/` and `=` ARE token characters now (the incumbent class is
++/// `[A-Za-z0-9+/_=-]`), so a standard-base64 token with literal `/` or
++/// padding `=` can no longer slip through the long-token rule split into
++/// sub-40 segments. The trade-off is deliberate and matches the incumbent:
++/// a `key=value` diagnostic whose key+value run reaches 40 chars is caught
++/// by the same rule (redaction errs toward the secret). `.` stays out
++/// (paths and file names), as in the incumbent class. The `data:…;base64`
++/// rule covers padded blobs regardless.
+ fn is_token_char(c: char) -> bool {
+-    c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '+')
++    c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '+' | '/' | '=')
+ }
+ 
+ /// Character that invalidates a long-token boundary (word chars, `/`, `.`,
+@@ -145,11 +150,15 @@ pub fn redact_text(text: &str, home: Option<&std::path::Path>) -> String {
+     // Personal user path segments (mirror of the incumbent /Users,/home rules).
+     out = replace_each(&out, find_user_path);
+     // data:…;base64 blobs.
+-    out = replace_each_ci(&out, find_data_uri);
++    out = replace_each_ci(&out, |lower, rest, from| find_data_uri(rest, lower, from));
+     // URL credentials scheme://user:password@.
+-    out = replace_each_ci(&out, find_url_credentials);
++    out = replace_each_ci(&out, |lower, rest, from| {
++        find_url_credentials(rest, lower, from)
++    });
+     // Secret-bearing URL query parameters.
+-    out = replace_each_ci(&out, find_url_query_secret);
++    out = replace_each_ci(&out, |lower, rest, from| {
++        find_url_query_secret(rest, lower, from)
++    });
+     // Authorization / Cookie header values (leftmost key wins, then the
+     // scanner resumes after it — several headers on one line are all
+     // redacted).
+@@ -160,9 +169,13 @@ pub fn redact_text(text: &str, home: Option<&std::path::Path>) -> String {
+         find_header_value(rest, lower, from, &["set-cookie", "cookie"])
+     });
+     // Bare Bearer tokens.
+-    out = replace_each_ci(&out, find_bare_bearer);
++    out = replace_each_ci(&out, |lower, rest, from| {
++        find_bare_bearer(rest, lower, from)
++    });
+     // secret key=value / key: value assignments.
+-    out = replace_each_ci(&out, find_secret_assignment);
++    out = replace_each_ci(&out, |lower, rest, from| {
++        find_secret_assignment(rest, lower, from)
++    });
+     // Well-known credential value shapes anywhere.
+     out = replace_each(&out, find_credential_value);
+     // Long random tokens (40+ base64-ish chars, word-bounded).
+@@ -823,6 +836,87 @@ mod tests {
+         assert_eq!(red, line, "short tails must not count as credential values");
+     }
+ 
++    // ── R05-T01: re-verification of the divergence-#1 note for the provider
++    //    credential shapes the model plane actually handles (the config
++    //    `apiKey` material and the `Authorization: Bearer` header the
++    //    openai-completions adapter sends). Provider credentials never enter
++    //    diagnostics by construction (the adapter logs nothing; the
++    //    bootstrap log prints a provider COUNT) — these tests pin the
++    //    defense-in-depth net for the day an exception appears. ────────────
++
++    #[test]
++    fn r05_provider_api_key_shapes_are_redacted() {
++        // The exact config-file fragment shape.
++        let line = r#"plane invalid near {"kind": "apiKey", "apiKey": "sk-live-0123456789abcdef"}"#;
++        let red = redact_line(line);
++        assert!(!red.contains("sk-live-0123456789abcdef"), "leaked: {red}");
++        // The Authorization header the adapter sends.
++        let line = "upstream saw Authorization: Bearer sk-live-0123456789abcdef";
++        let red = redact_line(line);
++        assert!(!red.contains("sk-live-0123456789abcdef"), "leaked: {red}");
++        assert!(red.contains("Bearer [redacted]"), "{red}");
++        // A standard-base64 key (contains `/` and `=` — the divergence-#1
++        // long-token miss): the ASSIGNMENT rule still redacts it because
++        // the value is keyed, closing the divergence for the shapes R05
++        // actually handles.
++        let key = "k7+9/ab=0123456789abcdef0123456789ab==";
++        let line = format!(r#"auth rejected for apiKey = "{key}" status=401"#);
++        let red = redact_line(&line);
++        assert!(!red.contains(key), "leaked base64 key: {red}");
++    }
++
++    #[test]
++    fn r05_secret_key_words_match_case_insensitively() {
++        // Regression pin for the R05 re-verification fix: the
++        // case-insensitive finder plumbing passed the original-case text
++        // where the lowercased haystack belonged, so a mixed-case KEY
++        // ("apiKey", "Password", "TOKEN") silently escaped redaction while
++        // the preserved replacement head came out lowercased. Every casing
++        // must redact and keep its original casing outside the value.
++        for key_word in ["apiKey", "API_KEY", "Password", "TOKEN", "Client_Secret"] {
++            let line = format!(r#"cfg {key_word}: "hunter2hunter2""#);
++            let red = redact_line(&line);
++            assert!(
++                !red.contains("hunter2hunter2"),
++                "{key_word}: leaked value: {red}"
++            );
++            assert!(
++                red.contains(key_word),
++                "{key_word}: key casing must survive: {red}"
++            );
++        }
++    }
++
++    // ── R05-T02 (RR-R05-REDACTION-BOUNDARY fix): the token class now matches
++    //    the incumbent's [A-Za-z0-9+/_=-] — a bare standard-base64 token with
++    //    literal `/` or padding `=` can no longer escape the long-token rule
++    //    by splitting into sub-40 segments. ─────────────────────────────────
++
++    #[test]
++    fn r05_t02_base64_tokens_with_slash_and_padding_are_redacted() {
++        // 44-char standard-base64 body WITH a literal `/` and `=` padding —
++        // the exact shape the pre-fix port missed when it appeared UNKEYED
++        // (a provider error echo, a stack-adjacent dump).
++        let bare = "k7+9/Ab=0123456789abcdef0123456789abCD==";
++        assert!(bare.len() >= 40);
++        let line = format!("provider answered 401 body={bare} trailing");
++        let red = redact_line(&line);
++        assert!(!red.contains(bare), "leaked bare base64 token: {red}");
++        // A `/` mid-token must not split the run into two safe-looking
++        // halves either: neither half may survive.
++        let left = "k7+9";
++        let right_half = "0123456789abcdef0123456789abCD==";
++        assert!(!red.contains(right_half), "right half survived: {red}");
++        assert!(
++            !red.contains(&format!("{left}/")),
++            "left half survived: {red}"
++        );
++        // The base64url sibling (no `/`, `-`/`_` instead) stays covered.
++        let urlsafe = "k7-9_Ab-0123456789abcdef0123456789abC123";
++        let red = redact_line(&format!("echo {urlsafe}"));
++        assert!(!red.contains(urlsafe), "leaked base64url token: {red}");
++    }
++
+     // ── R2-F02 regression: multi-byte UTF-8 must never split a char ────────
+ 
+     #[test]

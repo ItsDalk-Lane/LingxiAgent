@@ -1,0 +1,36 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.99s
+     Running `/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R02 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence`
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t01_service_smoke.sh {EVIDENCE}/A01] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a01_smoke
+xtask: verify-stage R02 [a01_smoke] FAIL
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t01_boundary_negative.sh {EVIDENCE}/A02] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a02_boundary_negative
+xtask: verify-stage R02 [a02_boundary_negative] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t02_dual_instance.sh {EVIDENCE}/A03] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a03_dual_instance
+xtask: verify-stage R02 [a03_dual_instance] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t02_path_priority.sh {EVIDENCE}/A04] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a04_path_priority
+xtask: verify-stage R02 [a04_path_priority] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t03_auth_matrix.sh {EVIDENCE}/A05_A06] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a05_a06_auth_matrix
+xtask: verify-stage R02 [a05_a06_auth_matrix] FAIL
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t04_storage_tx.sh {EVIDENCE}/A07_A08] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a07_a08_storage_tx
+xtask: verify-stage R02 [a07_a08_storage_tx] PASS
+xtask: verify-stage R02 [env CARGO_NET_OFFLINE=true R02_A07_LIVE_FAULT_EVIDENCE={EVIDENCE}/A07_LIVE_FAULT/case.json cargo test --manifest-path rust/Cargo.toml --locked --offline -p lingxi-service --test execute_concurrency http_running_storage_fault_has_no_success_event_or_restart_run -- --exact --nocapture] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a07_live_fault_01_test
+xtask: verify-stage R02 [a07_live_fault_01_test] PASS
+xtask: verify-stage R02 [python3 scripts/rust-tauri/r02_t04_live_fault_evidence.py {EVIDENCE}] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a07_live_fault_02_check
+xtask: verify-stage R02 [a07_live_fault_02_check] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t05_events_matrix.sh {EVIDENCE}/A09_A10] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a09_a10_events_matrix
+xtask: verify-stage R02 [a09_a10_events_matrix] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t06_backup_restore.sh {EVIDENCE}/A11] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a11_backup_restore
+xtask: verify-stage R02 [a11_backup_restore] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t06_recovery_drill.sh {EVIDENCE}/A12] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a12_recovery_drill
+xtask: verify-stage R02 [a12_recovery_drill] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t07_redaction_scan.sh {EVIDENCE}/A13] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a13_redaction_scan
+xtask: verify-stage R02 [a13_redaction_scan] FAIL
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t07_slow_subscriber.sh {EVIDENCE}/A14] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a14_slow_subscriber
+xtask: verify-stage R02 [a14_slow_subscriber] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t08_full_chain_smoke.sh {EVIDENCE}/A15] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a15_full_chain
+xtask: verify-stage R02 [a15_full_chain] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t08_legacy_entry_regression.sh {EVIDENCE}/A16] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a16_legacy_regression
+xtask: verify-stage R02 [a16_legacy_regression] FAIL
+xtask: verify-stage R02 [python3 scripts/rust-tauri/r02_client_leaf_matrix.py {EVIDENCE}/CLIENT] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/supplemental_client_matrix
+xtask: verify-stage R02 [supplemental_client_matrix] FAIL
+xtask: verify-stage R02 [python3 scripts/rust-tauri/r02_cli_rust_matrix.py {EVIDENCE}/CLI_RUST] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/supplemental_cli_rust_matrix

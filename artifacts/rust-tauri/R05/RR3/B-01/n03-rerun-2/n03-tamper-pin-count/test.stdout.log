@@ -1,0 +1,24 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.Gz0rkR/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.27s
+     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 1 test
+test stage_map::map_tests::r05_stage_pin_table_matches_the_registered_suites ... FAILED
+
+failures:
+
+---- stage_map::map_tests::r05_stage_pin_table_matches_the_registered_suites stdout ----
+
+thread 'stage_map::map_tests::r05_stage_pin_table_matches_the_registered_suites' (20003981) panicked at crates/xtask/src/stage_map.rs:3295:9:
+assertion `left == right` failed: the R05 pin table's suite registrations drifted (dropped, added, or re-counted)
+  left: [("adp:r05_t02_oauth_flows", 21), ("adp:r05_t03_goldens", 3), ("adp:r05_t03_rr1_replay", 33), ("adp:r05_t04_rr1_batch_terminal", 10), ("adp:r05_t04_streaming", 18), ("adp:r05_t05_compat", 1), ("adp:r05_t05_timeouts", 13), ("adp:r05_t06_operations", 27), ("adp:r05_t07_rr1_usage_strict", 7), ("adp:r05_t07_usage_families", 14), ("svc:r05_t01_binary_wiring", 2), ("svc:r05_t01_model_plane", 23), ("svc:r05_t02_credentials", 38), ("svc:r05_t03_protocol_adapters", 12), ("svc:r05_t04_streaming", 18), ("svc:r05_t05_network", 21), ("svc:r05_t05_timeouts", 9), ("svc:r05_t06_operations", 7), ("svc:r05_t06_rr1_media_resource", 17), ("svc:r05_t06_rr1_system_speech", 10), ("svc:r05_t06_worker_model", 10), ("svc:r05_t07_persistence", 5), ("svc:r05_t07_rr1_usage_ledger", 15), ("svc:r05_t07_usage_trace", 9), ("svc:r05_t08_closed_loop", 11), ("svc:r05_t08_production_tools", 6), ("svc:r05_t08_resources", 2)]
+ right: [("adp:r05_t02_oauth_flows", 21), ("adp:r05_t03_goldens", 3), ("adp:r05_t03_rr1_replay", 33), ("adp:r05_t04_rr1_batch_terminal", 10), ("adp:r05_t04_streaming", 18), ("adp:r05_t05_compat", 1), ("adp:r05_t05_timeouts", 13), ("adp:r05_t06_operations", 27), ("adp:r05_t07_rr1_usage_strict", 7), ("adp:r05_t07_usage_families", 14), ("svc:r05_t01_binary_wiring", 2), ("svc:r05_t01_model_plane", 24), ("svc:r05_t02_credentials", 38), ("svc:r05_t03_protocol_adapters", 12), ("svc:r05_t04_streaming", 18), ("svc:r05_t05_network", 21), ("svc:r05_t05_timeouts", 9), ("svc:r05_t06_operations", 7), ("svc:r05_t06_rr1_media_resource", 17), ("svc:r05_t06_rr1_system_speech", 10), ("svc:r05_t06_worker_model", 10), ("svc:r05_t07_persistence", 5), ("svc:r05_t07_rr1_usage_ledger", 15), ("svc:r05_t07_usage_trace", 9), ("svc:r05_t08_closed_loop", 11), ("svc:r05_t08_production_tools", 6), ("svc:r05_t08_resources", 2)]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    stage_map::map_tests::r05_stage_pin_table_matches_the_registered_suites
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 116 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`

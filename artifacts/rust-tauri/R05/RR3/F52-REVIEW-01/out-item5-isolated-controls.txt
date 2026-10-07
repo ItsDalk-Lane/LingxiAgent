@@ -1,0 +1,29 @@
+== enumeration form ==
+fixture-bin/git
+fixture-bin/python3
+normal-dir/a.txt
+normal-dir/b.txt
+plain-note.txt
+tracked.txt
+== POSITIVE CONTROL: classifier must find the symlink and refuse clean ==
+{"total": 6, "counts": {"regular_file": 5, "final_symlink": 1, "ancestor_symlink": 0, "directory_entry": 0, "ancestor_not_dir": 0, "irregular": 0, "missing": 0}, "clean": false, "elapsed_s": 0.01}
+classifier-with-symlink exit: 1
+counts: {'ancestor_not_dir': 0, 'ancestor_symlink': 0, 'directory_entry': 0, 'final_symlink': 1, 'irregular': 0, 'missing': 0, 'regular_file': 5}
+offenders: [{'class': 'final_symlink', 'path': 'fixture-bin/python3'}]
+== POSITIVE CONTROL: binder simulation must reproduce FINAL-02 rejection form ==
+error: cannot snapshot candidate before stage gate: candidate path /private/tmp/f52-review-01-scratch/repo/fixture-bin/python3 crosses a symlink or reparse point
+BINDER-REJECTION-REPRODUCED (1 of 6 entries)
+binder-sim-with-symlink exit: 1
+== NEGATIVE CONTROL: relocate symlink out, everything must pass ==
+{"total": 5, "counts": {"regular_file": 5, "final_symlink": 0, "ancestor_symlink": 0, "directory_entry": 0, "ancestor_not_dir": 0, "irregular": 0, "missing": 0}, "clean": true, "elapsed_s": 0.01}
+classifier-clean exit: 0
+ALL 5 ENTRIES BINDABLE (regular files, hashable)
+binder-sim-clean exit: 0
+== EXTRA CONTROL: ancestor-symlink form ==
+{"total": 3, "counts": {"regular_file": 2, "final_symlink": 1, "ancestor_symlink": 0, "directory_entry": 0, "ancestor_not_dir": 0, "irregular": 0, "missing": 0}, "clean": false, "elapsed_s": 0.01}
+classifier-ancestor-symlink exit: 1
+counts: {'ancestor_not_dir': 0, 'ancestor_symlink': 0, 'directory_entry': 0, 'final_symlink': 1, 'irregular': 0, 'missing': 0, 'regular_file': 2}
+offenders: [{'class': 'final_symlink', 'path': 'dirlink'}]
+error: cannot snapshot candidate before stage gate: candidate path /private/tmp/f52-review-01-scratch/repo2/dirlink crosses a symlink or reparse point
+BINDER-REJECTION-REPRODUCED (1 of 3 entries)
+binder-sim-ancestor exit: 1

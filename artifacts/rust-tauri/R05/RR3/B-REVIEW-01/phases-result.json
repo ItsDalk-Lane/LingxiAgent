@@ -1,0 +1,17 @@
+{
+  "findingId": "F45",
+  "normalExit": 0,
+  "mutationExit": 0,
+  "redExit": 101,
+  "restoreExit": 0,
+  "onlyChangedInput": "docs/rust-tauri/R05/r05_stage_pins.tsv",
+  "restoredInputDigestEqual": true,
+  "binaryHashes": {
+    "normal": "ae943888174036c35957afaf810f3055c6e0f2037bc436a1ccbd49ca4bf8acf4",
+    "red": "ae943888174036c35957afaf810f3055c6e0f2037bc436a1ccbd49ca4bf8acf4",
+    "restored": "ae943888174036c35957afaf810f3055c6e0f2037bc436a1ccbd49ca4bf8acf4"
+  },
+  "copy": "/Users/study_superior/r05t08-work/negcopy.qcldNA",
+  "finishedAt": "2026-10-07T00:23:35.537875+00:00",
+  "status": "PASS"
+}

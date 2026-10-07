@@ -1,0 +1,98 @@
+[
+  {
+    "kind": "current",
+    "phase": "normal",
+    "actualExit": 0,
+    "expectedExit": 0,
+    "sha256": "87ea87b09f37bd073a6ed85df4dec6769e18cf41326c2541d20588ae834517c0",
+    "restoredBytesEqual": true
+  },
+  {
+    "kind": "current",
+    "phase": "mutated",
+    "actualExit": 1,
+    "expectedExit": 1,
+    "sha256": "397fc7d9f7832b4096624bd36c0a09b2b63b53be839e9c6ba2dbba1b8c3d49cc",
+    "restoredBytesEqual": true
+  },
+  {
+    "kind": "current",
+    "phase": "restored",
+    "actualExit": 0,
+    "expectedExit": 0,
+    "sha256": "87ea87b09f37bd073a6ed85df4dec6769e18cf41326c2541d20588ae834517c0",
+    "restoredBytesEqual": true
+  },
+  {
+    "kind": "wire",
+    "phase": "normal",
+    "actualExit": 0,
+    "expectedExit": 0,
+    "sha256": "2e36bfa19d2efab9c16080461a1bfb252df1566cba497ced6b9c2099d0949b17",
+    "restoredBytesEqual": true
+  },
+  {
+    "kind": "wire",
+    "phase": "mutated",
+    "actualExit": 1,
+    "expectedExit": 1,
+    "sha256": "2920c0d797c15b382aa747bb358ab561e559b6d22074e2f9a6a44af1dd844630",
+    "restoredBytesEqual": true
+  },
+  {
+    "kind": "wire",
+    "phase": "restored",
+    "actualExit": 0,
+    "expectedExit": 0,
+    "sha256": "2e36bfa19d2efab9c16080461a1bfb252df1566cba497ced6b9c2099d0949b17",
+    "restoredBytesEqual": true
+  },
+  {
+    "kind": "fields",
+    "phase": "normal",
+    "actualExit": 0,
+    "expectedExit": 0,
+    "sha256": "87ea87b09f37bd073a6ed85df4dec6769e18cf41326c2541d20588ae834517c0",
+    "restoredBytesEqual": true
+  },
+  {
+    "kind": "fields",
+    "phase": "mutated",
+    "actualExit": 1,
+    "expectedExit": 1,
+    "sha256": "4e08cea8d52cb1153b8e4b2895ba58f20e6f3fdea7baf49f4835ba86d3deb8a0",
+    "restoredBytesEqual": true
+  },
+  {
+    "kind": "fields",
+    "phase": "restored",
+    "actualExit": 0,
+    "expectedExit": 0,
+    "sha256": "87ea87b09f37bd073a6ed85df4dec6769e18cf41326c2541d20588ae834517c0",
+    "restoredBytesEqual": true
+  },
+  {
+    "kind": "hashes",
+    "phase": "normal",
+    "actualExit": 0,
+    "expectedExit": 0,
+    "sha256": "87ea87b09f37bd073a6ed85df4dec6769e18cf41326c2541d20588ae834517c0",
+    "restoredBytesEqual": true
+  },
+  {
+    "kind": "hashes",
+    "phase": "mutated",
+    "actualExit": 1,
+    "expectedExit": 1,
+    "sha256": "918713c3ac66142236efa8f2b0043267ca2b2b6d0f610b788d5ee86970cdb8e0",
+    "restoredBytesEqual": true
+  },
+  {
+    "kind": "hashes",
+    "phase": "restored",
+    "actualExit": 0,
+    "expectedExit": 0,
+    "sha256": "87ea87b09f37bd073a6ed85df4dec6769e18cf41326c2541d20588ae834517c0",
+    "restoredBytesEqual": true
+  }
+]

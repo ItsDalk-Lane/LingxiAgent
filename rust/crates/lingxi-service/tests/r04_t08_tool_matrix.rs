@@ -1859,9 +1859,36 @@ async fn native_tool_share_cases_on_the_real_chain() {
 
 // ── the PTY / write_stdin / terminal share cases ───────────────────────────
 
+/// How many times one sent marker becomes observable in the terminal's
+/// transcript: the terminal runs with the DEFAULT line discipline
+/// (canonical + ECHO — the spawn path sets no raw mode), so a written
+/// marker is reflected TWICE, in stream order: the kernel's input echo
+/// (emitted at write time) and the child `cat`'s loopback copy (written
+/// only once the child is scheduled to read the line and echo it back).
+const MARKER_OBSERVABLE_COPIES: usize = 2;
+
+fn count_occurrences(haystack: &str, needle: &str) -> usize {
+    haystack.matches(needle).count()
+}
+
 /// Sends one marker to the terminal and polls (empty-char writes are
-/// pure reads) until its echo is delivered — real PTY timing under a
-/// bounded deadline, never a fixed sleep.
+/// pure reads) until the marker's output has FULLY settled — real PTY
+/// timing under a bounded deadline, never a fixed sleep.
+///
+/// Readiness barrier: this helper returns only after EVERY observable
+/// copy of the marker has been delivered (`MARKER_OBSERVABLE_COPIES`),
+/// not after the first occurrence. The single sequential PTY read loop
+/// appends transcript bytes in stream order, the echo of a line is
+/// emitted before that line can become readable to the child, and a
+/// delivery of this pure-ASCII stream consumes every byte present — so
+/// once the LAST copy (the child's) is observed, every byte this write
+/// can ever produce has been appended AND consumed: the cursor is
+/// provably past the whole marker. Exiting at the FIRST observed copy
+/// instead leaves the second copy in flight under load, and it then
+/// legitimately lands in the NEXT send's delivery window — exactly the
+/// snapshot-case flake FINAL-03 recorded (the OLD marker reappearing in
+/// the new snapshot, `observed 0`): a barrier defect in this harness,
+/// not a cursor defect in the tool.
 async fn send_and_expect(h: &Harness, handle: &str, marker: &str) -> String {
     let first = gateway_call(
         h,
@@ -1875,10 +1902,11 @@ async fn send_and_expect(h: &Harness, handle: &str, marker: &str) -> String {
     .expect("write_stdin continues");
     let mut collected = text_of(&first);
     let deadline = std::time::Instant::now() + Duration::from_secs(5);
-    while !collected.contains(marker) {
+    while count_occurrences(&collected, marker) < MARKER_OBSERVABLE_COPIES {
         assert!(
             std::time::Instant::now() < deadline,
-            "marker never arrived; collected so far: {collected}"
+            "marker {marker} never settled (expected {MARKER_OBSERVABLE_COPIES} observable \
+             copies: line-discipline echo + child loopback); collected so far: {collected}"
         );
         tokio::time::sleep(Duration::from_millis(40)).await;
         let poll = gateway_call(

@@ -1,0 +1,14 @@
+label: supp-02-workspace-nofailfast
+argv: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --workspace --locked --no-fail-fast
+cwd: /Users/study_superior/Desktop/Code/LingxiAgent
+HOME: /Users/study_superior
+user: study_superior
+utcStart: 2026-10-07T15:53:55.567298000Z
+dfBefore: /dev/disk3s5       926  376       525    42% 5176571 5509039680    0%   /System/Volumes/Data
+utcEnd: 2026-10-07T16:08:29.338105000Z
+exit: 0
+stdoutBytes: 123070
+stderrBytes: 11982
+stdoutSha256: c4ea4cf6279f1a8df617c5fac43556b5a9fe2028c397253659a6bf7e03947d2d
+stderrSha256: 4e5b69a0872a082ebec8ce017bebbb48c8cd62b8c4faa9b1405c9f062436a475
+dfAfter: /dev/disk3s5       926  374       527    42% 5170896 5532509120    0%   /System/Volumes/Data

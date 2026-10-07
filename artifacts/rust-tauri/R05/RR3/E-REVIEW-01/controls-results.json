@@ -1,0 +1,86 @@
+[
+  {
+    "kind": "current",
+    "phase": "normal",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "fixture_sha256": "71298a2a987661726855f17c9f2b301d8245ff3be10ec0e9d353da8cc0dc71f7"
+  },
+  {
+    "kind": "current",
+    "phase": "mutated",
+    "expected_exit": 1,
+    "actual_exit": 1,
+    "fixture_sha256": "36d2d94fb90ebd3aff92c03f2667ec374de514bde9909bd60916d2567579f746"
+  },
+  {
+    "kind": "current",
+    "phase": "restored",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "fixture_sha256": "71298a2a987661726855f17c9f2b301d8245ff3be10ec0e9d353da8cc0dc71f7"
+  },
+  {
+    "kind": "fields",
+    "phase": "normal",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "fixture_sha256": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58"
+  },
+  {
+    "kind": "fields",
+    "phase": "mutated",
+    "expected_exit": 1,
+    "actual_exit": 1,
+    "fixture_sha256": "86ab31ce6ea120013ed25a5868d0ed482d74a61c908ff4a55959459f6be6e783"
+  },
+  {
+    "kind": "fields",
+    "phase": "restored",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "fixture_sha256": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58"
+  },
+  {
+    "kind": "hash",
+    "phase": "normal",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "fixture_sha256": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58"
+  },
+  {
+    "kind": "hash",
+    "phase": "mutated",
+    "expected_exit": 1,
+    "actual_exit": 1,
+    "fixture_sha256": "6cc81d00e58d9f72a3bca235379b2cd4df4a540dfd32171b8b3babd90e5dda9f"
+  },
+  {
+    "kind": "hash",
+    "phase": "restored",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "fixture_sha256": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58"
+  },
+  {
+    "kind": "history",
+    "phase": "normal",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "fixture_sha256": "6e7a2ab9fe0ca2c3da4b08d7aa96643dec1076987630197c468345d8e3a81fbf"
+  },
+  {
+    "kind": "history",
+    "phase": "mutated",
+    "expected_exit": 1,
+    "actual_exit": 1,
+    "fixture_sha256": "8f8e05abec63b3649e6bbdb228656d8b212fa03cdaa4dd5b059f1580dcf6e7f5"
+  },
+  {
+    "kind": "history",
+    "phase": "restored",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "fixture_sha256": "6e7a2ab9fe0ca2c3da4b08d7aa96643dec1076987630197c468345d8e3a81fbf"
+  }
+]

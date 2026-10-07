@@ -1,0 +1,4362 @@
+{
+  "candidateSourceBinding": {
+    "after": {
+      "atUnixMs": 1791369588019,
+      "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+      "fileCount": 38113,
+      "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-a/candidate-source-after.json",
+      "manifestSha256": "4e688445f0a8c53db781a64718913b5420dd519f1ee50873a7849bca061c186d"
+    },
+    "afterError": null,
+    "before": {
+      "atUnixMs": 1791368539336,
+      "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+      "fileCount": 38113,
+      "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-a/candidate-source-before.json",
+      "manifestSha256": "4e688445f0a8c53db781a64718913b5420dd519f1ee50873a7849bca061c186d"
+    },
+    "checkpointAfterEveryCommand": [
+      {
+        "atUnixMs": 1791368573722,
+        "changedPathBytesHex": [],
+        "commandKey": "a01_smoke",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791368595439,
+        "changedPathBytesHex": [],
+        "commandKey": "a02_boundary_negative",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791368627565,
+        "changedPathBytesHex": [],
+        "commandKey": "a03_dual_instance",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791368649610,
+        "changedPathBytesHex": [],
+        "commandKey": "a04_path_priority",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791368736452,
+        "changedPathBytesHex": [],
+        "commandKey": "a05_a06_auth_matrix",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791368758995,
+        "changedPathBytesHex": [],
+        "commandKey": "a07_a08_storage_tx",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791368782042,
+        "changedPathBytesHex": [],
+        "commandKey": "a07_live_fault_01_test",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791368801868,
+        "changedPathBytesHex": [],
+        "commandKey": "a07_live_fault_02_check",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791368838392,
+        "changedPathBytesHex": [],
+        "commandKey": "a09_a10_events_matrix",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791368861109,
+        "changedPathBytesHex": [],
+        "commandKey": "a11_backup_restore",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791368883605,
+        "changedPathBytesHex": [],
+        "commandKey": "a12_recovery_drill",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791368915436,
+        "changedPathBytesHex": [],
+        "commandKey": "a13_redaction_scan",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791368969018,
+        "changedPathBytesHex": [],
+        "commandKey": "a14_slow_subscriber",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791368990275,
+        "changedPathBytesHex": [],
+        "commandKey": "a15_full_chain",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791369333216,
+        "changedPathBytesHex": [],
+        "commandKey": "a16_legacy_regression",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791369355953,
+        "changedPathBytesHex": [],
+        "commandKey": "supplemental_client_matrix",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791369399364,
+        "changedPathBytesHex": [],
+        "commandKey": "supplemental_cli_rust_matrix",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791369486890,
+        "changedPathBytesHex": [],
+        "commandKey": "supplemental_cli_sessions_matrix",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791369546888,
+        "changedPathBytesHex": [],
+        "commandKey": "supplemental_management_matrix",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1791369568305,
+        "changedPathBytesHex": [],
+        "commandKey": "supplemental_static_web_matrix",
+        "digestSha256": "a3ec4a314bcd3993843147571003f9c1dc104437221f34d86c21bcf60ccbf16a",
+        "fileCount": 38113,
+        "stable": true
+      }
+    ],
+    "excluded": {
+      "evidenceOutputPathBytesHex": null,
+      "evidenceOutputRelativePath": null,
+      "policy": "This invocation's fresh --evidence subtree and exact real OS fd stdout/stderr files of this process and its ancestors are excluded. No ancestor sink directory is excluded. The set is fixed before binding; other tracked and non-ignored untracked paths stay bound.",
+      "runOutputFiles": []
+    },
+    "finalChangedPathBytesHex": [],
+    "headAtEndError": null,
+    "schema": "lingxi-candidate-source-binding-v1",
+    "stable": true,
+    "testedShaAtEnd": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b"
+  },
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t01_service_smoke.sh",
+        "{EVIDENCE}/A01"
+      ],
+      "cleanup": null,
+      "durationMs": 34280,
+      "evidencePaths": [
+        "{EVIDENCE}/A01/a01-health-check.log",
+        "{EVIDENCE}/A01/a01-shutdown.log",
+        "{EVIDENCE}/A01/a01-deptree-evidence.log",
+        "{EVIDENCE}/A01/a01-leaf-cases.json"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a01_smoke",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t01_boundary_negative.sh",
+        "{EVIDENCE}/A02"
+      ],
+      "cleanup": null,
+      "durationMs": 21716,
+      "evidencePaths": [
+        "{EVIDENCE}/A02/a02-summary.log",
+        "{EVIDENCE}/A02/a02-residue-check.log"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a02_boundary_negative",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t02_dual_instance.sh",
+        "{EVIDENCE}/A03"
+      ],
+      "cleanup": null,
+      "durationMs": 32126,
+      "evidencePaths": [
+        "{EVIDENCE}/A03/a03-summary.txt"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a03_dual_instance",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t02_path_priority.sh",
+        "{EVIDENCE}/A04"
+      ],
+      "cleanup": null,
+      "durationMs": 22044,
+      "evidencePaths": [
+        "{EVIDENCE}/A04/a04-summary.txt"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a04_path_priority",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+        "{EVIDENCE}/A05_A06"
+      ],
+      "cleanup": null,
+      "durationMs": 86841,
+      "evidencePaths": [
+        "{EVIDENCE}/A05_A06/summary.txt",
+        "{EVIDENCE}/A05_A06/ws-matrix.json",
+        "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "{EVIDENCE}/A05_A06/sessions-list-matrix.json"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a05_a06_auth_matrix",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t04_storage_tx.sh",
+        "{EVIDENCE}/A07_A08"
+      ],
+      "cleanup": null,
+      "durationMs": 22542,
+      "evidencePaths": [
+        "{EVIDENCE}/A07_A08/s1-counts-after-stop.json",
+        "{EVIDENCE}/A07_A08/s4-hashes-after.txt"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a07_a08_storage_tx",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "env",
+        "CARGO_NET_OFFLINE=true",
+        "R02_A07_LIVE_FAULT_EVIDENCE={EVIDENCE}/A07_LIVE_FAULT/case.json",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "execute_concurrency",
+        "http_running_storage_fault_has_no_success_event_or_restart_run",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "cleanup": null,
+      "durationMs": 23047,
+      "evidencePaths": [
+        "{EVIDENCE}/A07_LIVE_FAULT/case.json"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a07_live_fault_01_test",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/rust-tauri/r02_t04_live_fault_evidence.py",
+        "{EVIDENCE}"
+      ],
+      "cleanup": null,
+      "durationMs": 19825,
+      "evidencePaths": [
+        "{EVIDENCE}/A07_LIVE_FAULT/checked.json"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a07_live_fault_02_check",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t05_events_matrix.sh",
+        "{EVIDENCE}/A09_A10"
+      ],
+      "cleanup": null,
+      "durationMs": 36524,
+      "evidencePaths": [
+        "{EVIDENCE}/A09_A10/probe-matrix.jsonl",
+        "{EVIDENCE}/A09_A10/key-events-dump.json"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a09_a10_events_matrix",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t06_backup_restore.sh",
+        "{EVIDENCE}/A11"
+      ],
+      "cleanup": null,
+      "durationMs": 22716,
+      "evidencePaths": [
+        "{EVIDENCE}/A11/backup-restore/summary.txt"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a11_backup_restore",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t06_recovery_drill.sh",
+        "{EVIDENCE}/A12"
+      ],
+      "cleanup": null,
+      "durationMs": 22495,
+      "evidencePaths": [
+        "{EVIDENCE}/A12/recovery-drill/summary.txt"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a12_recovery_drill",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t07_redaction_scan.sh",
+        "{EVIDENCE}/A13"
+      ],
+      "cleanup": null,
+      "durationMs": 31831,
+      "evidencePaths": [
+        "{EVIDENCE}/A13/redaction-scan/summary.txt",
+        "{EVIDENCE}/A13/redaction-scan/inventory.txt"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a13_redaction_scan",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t07_slow_subscriber.sh",
+        "{EVIDENCE}/A14"
+      ],
+      "cleanup": null,
+      "durationMs": 53581,
+      "evidencePaths": [
+        "{EVIDENCE}/A14/slow-subscriber/storm-results.json"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a14_slow_subscriber",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t08_full_chain_smoke.sh",
+        "{EVIDENCE}/A15"
+      ],
+      "cleanup": null,
+      "durationMs": 21255,
+      "evidencePaths": [
+        "{EVIDENCE}/A15/full-chain/summary.txt"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a15_full_chain",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+        "{EVIDENCE}/A16"
+      ],
+      "cleanup": null,
+      "durationMs": 342939,
+      "evidencePaths": [
+        "{EVIDENCE}/A16/legacy-entry/summary.txt"
+      ],
+      "exitCode": 1,
+      "internalError": null,
+      "key": "a16_legacy_regression",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "FAIL",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/rust-tauri/r02_client_leaf_matrix.py",
+        "{EVIDENCE}/CLIENT"
+      ],
+      "cleanup": null,
+      "durationMs": 22736,
+      "evidencePaths": [
+        "{EVIDENCE}/CLIENT/leaf-cases.json",
+        "{EVIDENCE}/CLIENT/summary.json",
+        "{EVIDENCE}/CLIENT/sharing-cases.json",
+        "{EVIDENCE}/CLIENT/sharing-vitest.stdout.log",
+        "{EVIDENCE}/CLIENT/sharing-vitest.stderr.log",
+        "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stdout.log",
+        "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stderr.log",
+        "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stdout.log",
+        "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+        "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stdout.log",
+        "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "supplemental_client_matrix",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/rust-tauri/r02_cli_rust_matrix.py",
+        "{EVIDENCE}/CLI_RUST"
+      ],
+      "cleanup": null,
+      "durationMs": 43410,
+      "evidencePaths": [
+        "{EVIDENCE}/CLI_RUST/cli-rust-cases.json"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "supplemental_cli_rust_matrix",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/rust-tauri/r02_cli_sessions_leaf_matrix.py",
+        "{EVIDENCE}/CLI_SESSIONS"
+      ],
+      "cleanup": null,
+      "durationMs": 87525,
+      "evidencePaths": [
+        "{EVIDENCE}/CLI_SESSIONS/summary.json",
+        "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+        "{EVIDENCE}/CLI_SESSIONS/producer.stdout.log",
+        "{EVIDENCE}/CLI_SESSIONS/producer.stderr.log",
+        "{EVIDENCE}/CLI_SESSIONS/auth/sessions-list-matrix.json",
+        "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-owner.stdout.log",
+        "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-foreign.stdout.log",
+        "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-unauthorized.stderr.log",
+        "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-limit-case.json"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "supplemental_cli_sessions_matrix",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/rust-tauri/r02_management_leaf_matrix.py",
+        "{EVIDENCE}/MANAGEMENT"
+      ],
+      "cleanup": null,
+      "durationMs": 59997,
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json",
+        "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "{EVIDENCE}/MANAGEMENT/web-login-cases.json",
+        "{EVIDENCE}/MANAGEMENT/tls-web-login-cases.json",
+        "{EVIDENCE}/MANAGEMENT/tls-cargo.stdout.log",
+        "{EVIDENCE}/MANAGEMENT/tls-cargo.stderr.log",
+        "{EVIDENCE}/MANAGEMENT/security-audit-sources.json",
+        "{EVIDENCE}/MANAGEMENT/security-audit.jsonl",
+        "{EVIDENCE}/MANAGEMENT/cargo.stdout.log",
+        "{EVIDENCE}/MANAGEMENT/cargo.stderr.log"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "supplemental_management_matrix",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/rust-tauri/r02_static_web_leaf_matrix.py",
+        "{EVIDENCE}/STATIC_WEB"
+      ],
+      "cleanup": null,
+      "durationMs": 21416,
+      "evidencePaths": [
+        "{EVIDENCE}/STATIC_WEB/summary.json",
+        "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+        "{EVIDENCE}/STATIC_WEB/cargo.stdout.log",
+        "{EVIDENCE}/STATIC_WEB/cargo.stderr.log"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "supplemental_static_web_matrix",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    }
+  ],
+  "finishedAtUnixMs": 1791369590324,
+  "overall": "FAIL",
+  "platform": {
+    "arch": "aarch64",
+    "family": "unix",
+    "os": "macos"
+  },
+  "resultVersion": "lingxi.xtask.verify-stage.v1",
+  "runnerSourceBinding": {
+    "after": {
+      "compiledSourceFiles": [
+        {
+          "compiledAndDiskSha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+          "path": "scripts/rust-tauri/run_output_sinks.py"
+        },
+        {
+          "compiledAndDiskSha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+          "path": "rust/crates/xtask/src/main.rs"
+        },
+        {
+          "compiledAndDiskSha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+          "path": "rust/crates/xtask/src/verify.rs"
+        },
+        {
+          "compiledAndDiskSha256": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce",
+          "path": "rust/crates/xtask/src/stage_map.rs"
+        },
+        {
+          "compiledAndDiskSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+          "path": "rust/crates/xtask/src/candidate.rs"
+        },
+        {
+          "compiledAndDiskSha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+          "path": "rust/crates/xtask/src/runner_identity.rs"
+        },
+        {
+          "compiledAndDiskSha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+          "path": "rust/crates/xtask/src/stage_maps/R02.json"
+        },
+        {
+          "compiledAndDiskSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+          "path": "rust/crates/xtask/src/stage_maps/R03.json"
+        },
+        {
+          "compiledAndDiskSha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+          "path": "rust/crates/xtask/src/stage_maps/R04.json"
+        },
+        {
+          "compiledAndDiskSha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+          "path": "rust/crates/xtask/src/stage_maps/R05.json"
+        },
+        {
+          "compiledAndDiskSha256": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+          "path": "rust/crates/xtask/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+          "path": "rust/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+          "path": "rust-toolchain.toml"
+        }
+      ],
+      "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+      "schema": "lingxi-xtask-runner-source-v1",
+      "sourceInventory": [
+        "candidate.rs",
+        "candidate/tests.rs",
+        "main.rs",
+        "runner_identity.rs",
+        "stage_map.rs",
+        "stage_maps/R02.json",
+        "stage_maps/R03.json",
+        "stage_maps/R04.json",
+        "stage_maps/R05.json",
+        "verify.rs",
+        "verify/runner_tests.rs"
+      ],
+      "status": "PASS"
+    },
+    "afterError": null,
+    "before": {
+      "compiledSourceFiles": [
+        {
+          "compiledAndDiskSha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+          "path": "scripts/rust-tauri/run_output_sinks.py"
+        },
+        {
+          "compiledAndDiskSha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+          "path": "rust/crates/xtask/src/main.rs"
+        },
+        {
+          "compiledAndDiskSha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+          "path": "rust/crates/xtask/src/verify.rs"
+        },
+        {
+          "compiledAndDiskSha256": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce",
+          "path": "rust/crates/xtask/src/stage_map.rs"
+        },
+        {
+          "compiledAndDiskSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+          "path": "rust/crates/xtask/src/candidate.rs"
+        },
+        {
+          "compiledAndDiskSha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+          "path": "rust/crates/xtask/src/runner_identity.rs"
+        },
+        {
+          "compiledAndDiskSha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+          "path": "rust/crates/xtask/src/stage_maps/R02.json"
+        },
+        {
+          "compiledAndDiskSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+          "path": "rust/crates/xtask/src/stage_maps/R03.json"
+        },
+        {
+          "compiledAndDiskSha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+          "path": "rust/crates/xtask/src/stage_maps/R04.json"
+        },
+        {
+          "compiledAndDiskSha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+          "path": "rust/crates/xtask/src/stage_maps/R05.json"
+        },
+        {
+          "compiledAndDiskSha256": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+          "path": "rust/crates/xtask/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+          "path": "rust/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+          "path": "rust-toolchain.toml"
+        }
+      ],
+      "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+      "schema": "lingxi-xtask-runner-source-v1",
+      "sourceInventory": [
+        "candidate.rs",
+        "candidate/tests.rs",
+        "main.rs",
+        "runner_identity.rs",
+        "stage_map.rs",
+        "stage_maps/R02.json",
+        "stage_maps/R03.json",
+        "stage_maps/R04.json",
+        "stage_maps/R05.json",
+        "verify.rs",
+        "verify/runner_tests.rs"
+      ],
+      "status": "PASS"
+    },
+    "beforeError": null,
+    "status": "PASS"
+  },
+  "scenarios": [
+    {
+      "commandRefs": [
+        "a01_smoke"
+      ],
+      "id": "R02-A01",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a02_boundary_negative"
+      ],
+      "id": "R02-A02",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a03_dual_instance"
+      ],
+      "id": "R02-A03",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a04_path_priority"
+      ],
+      "id": "R02-A04",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a05_a06_auth_matrix"
+      ],
+      "id": "R02-A05",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a05_a06_auth_matrix"
+      ],
+      "id": "R02-A06",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a07_a08_storage_tx",
+        "a07_live_fault_01_test",
+        "a07_live_fault_02_check"
+      ],
+      "id": "R02-A07",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a07_a08_storage_tx"
+      ],
+      "id": "R02-A08",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a09_a10_events_matrix"
+      ],
+      "id": "R02-A09",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a09_a10_events_matrix"
+      ],
+      "id": "R02-A10",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a11_backup_restore"
+      ],
+      "id": "R02-A11",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a12_recovery_drill"
+      ],
+      "id": "R02-A12",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a13_redaction_scan"
+      ],
+      "id": "R02-A13",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a14_slow_subscriber"
+      ],
+      "id": "R02-A14",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a15_full_chain"
+      ],
+      "id": "R02-A15",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a16_legacy_regression"
+      ],
+      "id": "R02-A16",
+      "requirement": "REQUIRED",
+      "status": "FAIL"
+    }
+  ],
+  "stage": "R02",
+  "startedAtUnixMs": 1791368518978,
+  "supplementalLeafCoverage": {
+    "blocked": 0,
+    "commandsNotPassing": [
+      "a16_legacy_regression"
+    ],
+    "declaredInStageMap": 34,
+    "deferredLeafIds": [
+      "R00-T02-LA-000E6E1301C0",
+      "R00-T02-LA-2A1C298F62FC",
+      "R00-T02-LA-3291CFD5F7E2",
+      "R00-T02-LA-32FFEC05BAA7",
+      "R00-T02-LA-39AD35E1FD71",
+      "R00-T02-LA-8BC1A036AFAA",
+      "R00-T02-LA-8ED658F9DB9E",
+      "R00-T02-LA-B8A1AD32A8E1",
+      "R00-T02-LA-F8935B6B0221"
+    ],
+    "deferredToLaterStage": 0,
+    "deferredToR07": 9,
+    "expectedFromR00Ledger": 34,
+    "fail": 0,
+    "note": "R13-F01/R14-F01: this stage gate CONSUMES the R00 REQUIRED_SUPPLEMENTAL leaves bound to the stage (cross-checked for set equality AND per-leaf FULL-record equality — feature, kind, task/stage responsibility, status, result/test registries, then, assertions, due — against both R00 ledgers before any command ran). R02-final group 1 stage ownership: expected == pass + deferredToR07 + fail + blocked, and overall PASS requires PASS ∪ DEFERRED_TO_R07 to cover every leaf. DEFERRED_TO_R07 is NOT a waiver: the leaf stays REQUIRED and its acceptance belongs to R07, which must consume the remainder (deferredToStage + r07Share on each entry); the deferred set is verified EQUAL to the stage map's deferred_to_r07 declarations. Early-evidence producers of pre-implemented R07 behavior stay registered and run; any failing command (commandsNotPassing) still blocks overall PASS. A BLOCKED entry is an unresolved stage-boundary conflict, a generic-authentication leaf whose cases do not prove its original behavior, or a legacy partial-kind dual-stage leaf. A FAIL entry lacks legal evidence for its R02 share or its pinned cases did not hold as recorded in the producer's structured case file.",
+    "pass": 25,
+    "r00FeatureStageAcceptancePath": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+    "r00LedgerPath": "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+    "shareSatisfiedLeafIds": [
+      "R00-T02-LA-D3710D637C19",
+      "R00-T02-LA-3B86332B042C",
+      "R00-T02-LA-1B09760C2B1C",
+      "R00-T02-LA-200D4E5D52C9",
+      "R00-T02-LA-EEC1A2A5CD04",
+      "R00-T02-LA-D1BEE19A95BB",
+      "R00-T02-LA-5816DA563ED8",
+      "R00-T02-LA-093F22C4FF63",
+      "R00-T02-LA-747E0ADC941B",
+      "R00-T02-LA-4BCE8CCFD5DC",
+      "R00-T02-LA-D2657E4AB5FF",
+      "R00-T02-LA-25AB678E7108",
+      "R00-T02-LA-F1754C6F755B",
+      "R00-T02-LA-F006E094F028",
+      "R00-T02-LA-73CDC44696D3",
+      "R00-T02-LA-5E4A9CF58BED",
+      "R00-T02-LA-229B77A7BA69",
+      "R00-T02-LA-B8F8CF9E8AF5",
+      "R00-T02-LA-7498024422D7",
+      "R00-T02-LA-43A126149416",
+      "R00-T02-LA-756217C74101",
+      "R00-T02-LA-5E1C3363A070",
+      "R00-T02-LA-066B54983F6A",
+      "R00-T02-LA-C4E6F27D7873",
+      "R00-T02-LA-4C1A9735CF04"
+    ]
+  },
+  "supplementalLeafScenarios": [
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "a05-positive-control-owner-execute",
+            "expect": 200
+          },
+          {
+            "case": "a05-no-credential-execute",
+            "expect": 401
+          },
+          {
+            "case": "ws-ticket-legit-origin-upgrade",
+            "expect": 101
+          },
+          {
+            "case": "ws-session-read-owner",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "producerCommand": "a05_a06_auth_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 200,
+          "case": "a05-positive-control-owner-execute",
+          "expect": 200,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 401,
+          "case": "a05-no-credential-execute",
+          "expect": 401,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 101,
+          "case": "ws-ticket-legit-origin-upgrade",
+          "expect": 101,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "ws-session-read-owner",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a05_a06_auth_matrix",
+        "a09_a10_events_matrix",
+        "a15_full_chain"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "A05/A06 认证矩阵真实执行证据 + WS/exec 认证正负路径执行记录",
+      "featureId": "F-D20-CLI-CLI-CHAT-D3710D",
+      "id": "R00-T02-LA-D3710D637C19",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "选择或创建会话后通过 WS 提交消息，终端流式显示回复和工具进度",
+          "连接/身份失败返回非零；错会话帧不显示，Ctrl+C 只取消当前 stream"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-CLI-CLI-CHAT-D3710D",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "选择或创建会话后通过 WS 提交消息，终端流式显示回复和工具进度"
+      },
+      "r02Share": "R02 份额=认证 WS/execute 提交与有序事件流协议面（owner execute 200、无凭据 401、ws-ticket 合法 Origin 升级 101、session-read；A09/A10 事件快照与 A15 全链由 evidenceCommandRefs 强制通过）；份额图钉全过即本叶 R02 份额 PASS，终端流式显示与 R03-R05 真实回复内容归后续阶段",
+      "r07Share": "终端聊天客户端：流式显示回复与工具进度、Ctrl+C 只取消当前 stream、连接/身份失败非零退出",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 终端聊天客户端：流式显示回复与工具进度、Ctrl+C 只取消当前 stream、连接/身份失败非零退出",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "a05-sessions-list-owner",
+            "expect": 200
+          },
+          {
+            "case": "a05-cross-principal-read",
+            "expect": 403
+          },
+          {
+            "case": "a05-forged-session-id",
+            "expect": 404
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "producerCommand": "a05_a06_auth_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 200,
+          "case": "a05-sessions-list-owner",
+          "expect": 200,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 403,
+          "case": "a05-cross-principal-read",
+          "expect": 403,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 404,
+          "case": "a05-forged-session-id",
+          "expect": 404,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a05_a06_auth_matrix"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "A05/A06 认证矩阵真实执行证据 + 认证会话读取正负路径执行记录",
+      "featureId": "F-D20-CLI-CLI-CONTINUE-3B8633",
+      "id": "R00-T02-LA-3B86332B042C",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "解析目标会话后恢复其历史并可继续提交，终端显示该会话回复",
+          "会话不存在或跨权限时拒绝，不悄悄新建或串到其他会话"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-CLI-CLI-CONTINUE-3B8633",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "解析目标会话后恢复其历史并可继续提交，终端显示该会话回复"
+      },
+      "r02Share": "R02 份额=认证会话身份与历史读取面：sessions 按 principal 作用域（owner 200、跨主体读 403、伪造 sessionId 404 且无副作用——服务端不悄悄新建或串会话）；份额图钉全过即本叶 R02 份额 PASS，CLI 续接命令行为归 R07",
+      "r07Share": "CLI 续接命令：目标会话解析、历史恢复显示、会话不存在/跨权限拒绝且不悄悄新建",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: CLI 续接命令：目标会话解析、历史恢复显示、会话不存在/跨权限拒绝且不悄悄新建",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_r07",
+      "deferredR07Cases": [
+        {
+          "actual": 1,
+          "case": "cli-help-exit0-no-start",
+          "evidencePath": "{EVIDENCE}/CLIENT/leaf-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_client_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "cli-unknown-arg-exit1-no-start",
+          "evidencePath": "{EVIDENCE}/CLIENT/leaf-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_client_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "cli-serve-unknown-arg-exit1-no-start",
+          "evidencePath": "{EVIDENCE}/CLIENT/leaf-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_client_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        }
+      ],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": {
+        "commandRefs": [
+          "supplemental_client_matrix"
+        ],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of the pre-implemented R07 behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf in R02"
+      },
+      "earlyEvidenceCommandRefs": [
+        "supplemental_client_matrix"
+      ],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R02 不判本叶（DEFERRED_TO_R07，仍 REQUIRED，验收归 R07）：R07 阶段图必须消费本叶余款并按届时迁移后的客户端重验（本轮 Node CLI 证据仅作回归基线）。提前实现的 supplemental_client_matrix 保留注册照常运行（命令失败仍是命令 FAIL——提前实现的已提交代码必须保持健康），其 3 个案例仅作 earlyEvidence 观察记录于 deferredR07Cases，不作为 R02 PASS 前置",
+      "featureId": "F-D20-CLI-CLI-HELP-B8A1AD",
+      "id": "R00-T02-LA-B8A1AD32A8E1",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "打印命令与参数说明并以 0 退出",
+          "未知参数打印错误和帮助并以 1 退出；不启动服务"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-CLI-CLI-HELP-B8A1AD",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "打印命令与参数说明并以 0 退出"
+      },
+      "r02Share": "无 R02 服务份额：help 文本、未知参数错误与退出码、不启动服务均为 CLI 客户端参数面行为（node cli/entry.ts 子进程），不触及 Rust 服务原语；R02 的独立 CLI 测试入口/独立交付义务由 A01/A15/a01_smoke 家族覆盖",
+      "r07Share": "R07-T09 CLI help 完整行为：打印命令与参数说明以 0 退出；未知参数打印错误和帮助以 1 退出；不启动服务（合成数据根不变、无 server-info、无 READY 标记）",
+      "reason": "deferred to R07: this R00 leaf is still REQUIRED but has no R02 gating share; its acceptance belongs to the R07 stage, which must consume the remainder: R07-T09 CLI help 完整行为：打印命令与参数说明以 0 退出；未知参数打印错误和帮助以 1 退出；不启动服务（合成数据根不变、无 server-info、无 READY 标记）",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "DEFERRED_TO_R07"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "cli-rust-current-binary-build",
+            "expect": 1
+          },
+          {
+            "case": "cli-rust-candidate-unchanged-during-probe",
+            "expect": 1
+          },
+          {
+            "case": "cli-rust-serve-ready",
+            "expect": 1
+          },
+          {
+            "case": "cli-rust-channel-stable-selected",
+            "expect": 1
+          },
+          {
+            "case": "cli-rust-serve-sigterm-clean",
+            "expect": 1
+          },
+          {
+            "case": "cli-rust-serve-beta-no-silent-stable",
+            "expect": 1
+          },
+          {
+            "case": "cli-rust-serve-downgrade-refused",
+            "expect": 1
+          },
+          {
+            "case": "cli-rust-serve-startup-error",
+            "expect": 1
+          },
+          {
+            "case": "cli-rust-serve-newer-epoch-no-root-switch",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/CLI_RUST/cli-rust-cases.json",
+        "producerCommand": "supplemental_cli_rust_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "cli-rust-current-binary-build",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "cli-rust-candidate-unchanged-during-probe",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "cli-rust-serve-ready",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "cli-rust-channel-stable-selected",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "cli-rust-serve-sigterm-clean",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "cli-rust-serve-beta-no-silent-stable",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "cli-rust-serve-downgrade-refused",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "cli-rust-serve-startup-error",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "cli-rust-serve-newer-epoch-no-root-switch",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_cli_rust_matrix",
+        "a01_smoke",
+        "a02_boundary_negative",
+        "a03_dual_instance"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/CLI_RUST/cli-rust-cases.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_cli_rust_matrix 由当前源码构建隔离 Rust 服务，保留 CLI 原始 stdout/stderr、前后台进程身份和清理、指定 channel 与拒绝分支、原数据及备用根前后摘要；原两条断言由门禁逐项读取，真 TCP 获平台允许并运行前不得 PASS",
+      "featureId": "F-D20-CLI-CLI-SERVE-1B0976",
+      "id": "R00-T02-LA-1B09760C2B1C",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "以前台服务进程运行，保留指定 channel 与数据降级约束",
+          "启动/数据版本失败给错误，不偷偷切换数据目录"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-CLI-CLI-SERVE-1B0976",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "以前台服务进程运行，保留指定 channel 与数据降级约束"
+      },
+      "r02Share": "R02 份额=服务启动语义（R02-T02/T06 服务端义务经真实 CLI→Rust spawn 路径证明）：当前源码全新构建、候选不变、前台 serve ready 且 Rust 子进程身份、显式 stable channel、beta 缺失不静默回落 stable、降级拒绝、启动错误非零、过新 epoch 不切数据根、SIGTERM 干净退出；份额图钉全过即本叶 R02 份额 PASS，serve 命令客户端集成面归 R07",
+      "r07Share": "原排 R07 的 serve 客户端行为在 R02 提前实施；R07 新客户端集成仍须按届时正式候选重验",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的 serve 客户端行为在 R02 提前实施；R07 新客户端集成仍须按届时正式候选重验",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "a05-sessions-list-owner",
+            "expect": 200
+          },
+          {
+            "case": "a05-sessions-list-owner-contains-own-session",
+            "expect": 1
+          },
+          {
+            "case": "a05-sessions-list-foreign-principal",
+            "expect": 200
+          },
+          {
+            "case": "a05-sessions-list-foreign-excludes-owner-sessions",
+            "expect": 0
+          },
+          {
+            "case": "a05-sessions-list-empty-shape",
+            "expect": 1
+          },
+          {
+            "case": "a05-sessions-list-no-credential",
+            "expect": 401
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+        "producerCommand": "supplemental_cli_sessions_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 200,
+          "case": "a05-sessions-list-owner",
+          "expect": 200,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "a05-sessions-list-owner-contains-own-session",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 200,
+          "case": "a05-sessions-list-foreign-principal",
+          "expect": 200,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "case": "a05-sessions-list-foreign-excludes-owner-sessions",
+          "expect": 0,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "a05-sessions-list-empty-shape",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 401,
+          "case": "a05-sessions-list-no-credential",
+          "expect": 401,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [
+        {
+          "actual": 1,
+          "case": "a05-cli-sessions-owner-list",
+          "evidencePath": "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_cli_sessions_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "a05-cli-sessions-foreign-empty",
+          "evidencePath": "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_cli_sessions_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "a05-cli-sessions-unauthorized-error",
+          "evidencePath": "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_cli_sessions_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "a05-cli-sessions-limit-20",
+          "evidencePath": "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_cli_sessions_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        }
+      ],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_cli_sessions_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/CLI_SESSIONS/summary.json",
+        "{EVIDENCE}/CLI_SESSIONS/auth/sessions-list-matrix.json"
+      ],
+      "evidenceRequired": "专属 supplemental_cli_sessions_matrix 本轮真服务与 CLI 的 owner/foreign/无凭据原始输出；最多 20 条由真实 CLI 入口消费模拟 25 条成功响应仅核渲染分支，不冒充服务端 25 条；cli-sessions-cases.json 每案例由门禁核身份和实际值，真实 TCP 未获准前不得 PASS",
+      "featureId": "F-D20-CLI-CLI-SESSIONS-200D4E",
+      "id": "R00-T02-LA-200D4E5D52C9",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "从已认证服务读取并列出最多 20 个会话；空列表显示 No sessions yet",
+          "服务未连接或未授权时返回错误，不读取其他主体会话"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-CLI-CLI-SESSIONS-200D4E",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "从已认证服务读取并列出最多 20 个会话；空列表显示 No sessions yet"
+      },
+      "r02Share": "R02 份额=已认证会话列表的服务端份额：sessions 按 principal 过滤——owner 200 且含自身会话、foreign 200 且不含 owner 会话、空列表 shape、无凭据 401（不读其他主体会话的服务端保证）；4 个 CLI 渲染案例（owner-list/foreign-empty/unauthorized-error/limit-20）递延归 R07（deferredR07Cases 仅观察不判 R02）",
+      "r07Share": "后续 CLI 阶段维持并重新核验会话列表行为，不代替本阶段原始 due",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 后续 CLI 阶段维持并重新核验会话列表行为，不代替本阶段原始 due",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "a05-no-credential-me",
+            "expect": 401
+          },
+          {
+            "case": "a05-me-with-forged-header",
+            "expect": 200
+          },
+          {
+            "case": "a06-localhost-host-ok",
+            "expect": 200
+          },
+          {
+            "case": "a06-cli-query-token-local",
+            "expect": 200
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "producerCommand": "a05_a06_auth_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 401,
+          "case": "a05-no-credential-me",
+          "expect": 401,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 200,
+          "case": "a05-me-with-forged-header",
+          "expect": 200,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 200,
+          "case": "a06-localhost-host-ok",
+          "expect": 200,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 200,
+          "case": "a06-cli-query-token-local",
+          "expect": 200,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a05_a06_auth_matrix"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "A05/A06 认证矩阵真实执行证据 + /health、/me 认证路径执行记录",
+      "featureId": "F-D20-CLI-CLI-STATUS-EEC1A2",
+      "id": "R00-T02-LA-EEC1A2A5CD04",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "显示 URL、版本、Studio、Agent、模型和认证来源",
+          "服务不可达时返回诊断错误；身份读取失败可用健康信息但不伪造认证来源"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-CLI-CLI-STATUS-EEC1A2",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "显示 URL、版本、Studio、Agent、模型和认证来源"
+      },
+      "r02Share": "R02 份额=/lingxi/v1/health + /lingxi/v1/me + 本地 token 来源机制（无凭据 /me 401、伪造 principal 头被忽略仍 200、loopback Host 200、CLI query token 本机读取）；份额图钉全过即本叶 R02 份额 PASS，CLI status 终端显示与诊断归 R07",
+      "r07Share": "CLI 状态命令：URL/版本/Studio/Agent/模型/认证来源显示、不可达诊断、身份读取失败不伪造认证来源",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: CLI 状态命令：URL/版本/Studio/Agent/模型/认证来源显示、不可达诊断、身份读取失败不伪造认证来源",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "a05-ws-ticket-issue-owner",
+            "expect": 200
+          },
+          {
+            "case": "a05-no-credential-ws-ticket",
+            "expect": 403
+          },
+          {
+            "case": "ws-ticket-legit-origin-upgrade",
+            "expect": 101
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "producerCommand": "a05_a06_auth_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 200,
+          "case": "a05-ws-ticket-issue-owner",
+          "expect": 200,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 403,
+          "case": "a05-no-credential-ws-ticket",
+          "expect": 403,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 101,
+          "case": "ws-ticket-legit-origin-upgrade",
+          "expect": 101,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a05_a06_auth_matrix"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "A05/A06 认证矩阵真实执行证据 + ws-ticket 签发/消费执行记录",
+      "featureId": "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+      "id": "R00-T02-LA-D1BEE19A95BB",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "端口/短期令牌传给 renderer 后 HTTP/WS 连接可建立",
+          "服务重启需重取端口/令牌；令牌不应当作用户可见设置"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "端口/短期令牌传给 renderer 后 HTTP/WS 连接可建立"
+      },
+      "r02Share": "R02 份额=本地 token 引导与 ws-ticket 短期凭证签发原语（owner 签发 200、无凭据 403、合法 Origin 票据升级 101——renderer 接线依赖的全部服务端原语）；份额图钉全过即本叶 R02 份额 PASS，桌面壳接线与重启重取归 R07/R09",
+      "r07Share": "桌面壳 renderer 端口/短期令牌接线、HTTP/WS 连接建立、重启重取、令牌不作用户可见设置",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 桌面壳 renderer 端口/短期令牌接线、HTTP/WS 连接建立、重启重取、令牌不作用户可见设置",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "a05-no-credential-ws-ticket",
+            "expect": 403
+          },
+          {
+            "case": "a05-ws-ticket-issue-owner",
+            "expect": 200
+          },
+          {
+            "case": "a05-ws-ticket-insufficient-scope",
+            "expect": 403
+          },
+          {
+            "case": "ws-ticket-replay",
+            "expect": 401
+          },
+          {
+            "case": "ws-ticket-expired",
+            "expect": 401
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "producerCommand": "a05_a06_auth_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 403,
+          "case": "a05-no-credential-ws-ticket",
+          "expect": 403,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 200,
+          "case": "a05-ws-ticket-issue-owner",
+          "expect": 200,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 403,
+          "case": "a05-ws-ticket-insufficient-scope",
+          "expect": 403,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 401,
+          "case": "ws-ticket-replay",
+          "expect": 401,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 401,
+          "case": "ws-ticket-expired",
+          "expect": 401,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a05_a06_auth_matrix"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "该路由认证正负矩阵执行记录（无主体 403、绑定作用域）+ A05/A06 矩阵证据。R14-F01 闭环：服务已按 R00 原断言将无主体 POST /lingxi/v1/ws-ticket 改为 403（incumbent server/routes/ws-auth.ts 同行为），注册脚本 a05-no-credential-ws-ticket 断言 403，且本叶 assertionContract 由 verify-stage 机器消费该案例的实际值（actual==403）——命令 exit 0 本身不再足以判定本叶",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WS-AUTH-WS-TICKET-WEBSOCKET-5816DA",
+      "id": "R00-T02-LA-5816DA563ED8",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "给定目标与相应权限，执行“签发 WebSocket 临时票据”后核对：读取已认证主体并签发绑定连接类型及 /ws 的短期票据；无主体返回 403",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WS-AUTH-WS-TICKET-WEBSOCKET-5816DA",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "读取已认证主体并签发绑定连接类型及 /ws 的短期票据；无主体返回 403"
+      },
+      "r02Share": "R02 份额=WS 票据签发完整服务端语义（本叶原 then 本身就是服务器行为）：读取已认证主体签发绑定连接类型及 /ws 的短期票据、无主体 403、scope 不足 403、票据重放 401、过期 401；份额图钉全过即本叶 R02 份额 PASS，客户端票据消费与端到端入口归 R07",
+      "r07Share": "客户端票据消费与端到端连接行为（完整入口）",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 客户端票据消费与端到端连接行为（完整入口）",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-desktop-credential-secret-address-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-desktop-credential-invalid-unauthorized-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-desktop-credential-store-failure-no-secret",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-desktop-credential-secret-address-audit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-desktop-credential-invalid-unauthorized-unchanged",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-desktop-credential-store-failure-no-secret",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-path-failure-no-write-recovery",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-all-actions-identities-no-secrets",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；R02 份额图钉由 verify-stage 逐案机器消费，余款断言归 R07 验收，生产者原始日志/源码摘要/退出状态须有效",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-DESKTOP-CREDENTIAL-093F22",
+      "id": "R00-T02-LA-093F22C4FF63",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：登记设备/凭证并返回一次性 secret 和桌面访问地址",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-DESKTOP-CREDENTIAL-093F22",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "登记设备/凭证并返回一次性 secret 和桌面访问地址"
+      },
+      "r02Share": "R02 份额=桌面设备凭证签发服务端语义：本地主人登记设备/凭证、一次性 secret + 桌面访问地址返回、非法/越权不持久化、存储失败无 secret 泄漏、标准安全审计 JSONL；份额图钉全过即本叶 R02 份额 PASS，客户端投影/UI 接线归 R07",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-mobile-credential-secret-address-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-mobile-credential-invalid-unauthorized-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-mobile-credential-store-failure-no-secret",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-mobile-credential-secret-address-audit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-mobile-credential-invalid-unauthorized-unchanged",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-mobile-credential-store-failure-no-secret",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-path-failure-no-write-recovery",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-all-actions-identities-no-secrets",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；R02 份额图钉由 verify-stage 逐案机器消费，余款断言归 R07 验收，生产者原始日志/源码摘要/退出状态须有效",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-CREDENTIALS-747E0A",
+      "id": "R00-T02-LA-747E0ADC941B",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：登记设备/凭证并返回一次性 secret 和手机访问地址",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-CREDENTIALS-747E0A",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "登记设备/凭证并返回一次性 secret 和手机访问地址"
+      },
+      "r02Share": "R02 份额=手机设备凭证签发服务端语义：本地主人登记设备/凭证、一次性 secret + 手机访问地址返回、非法/越权不持久化、存储失败无 secret 泄漏、标准安全审计 JSONL；份额图钉全过即本叶 R02 份额 PASS，客户端投影/UI 接线归 R07",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-me-owner-version-identity-capabilities",
+            "expect": 1
+          },
+          {
+            "case": "management-me-device-version-identity-capabilities",
+            "expect": 1
+          },
+          {
+            "case": "management-me-forged-header-ignored",
+            "expect": 1
+          },
+          {
+            "case": "management-me-denied-no-state-change",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-me-owner-version-identity-capabilities",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-me-device-version-identity-capabilities",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-me-forged-header-ignored",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-me-denied-no-state-change",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix",
+        "a05_a06_auth_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "supplemental_management_matrix 真服务专属 /me 主人及设备投影、伪身份和无凭证拒绝的逐项结构化证据与管理/凭证存储前后对照，当前候选合法运行后方可通过",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-IDENTITY-SERVER-IDENTITY--4BCE8C",
+      "id": "R00-T02-LA-4BCE8CCFD5DC",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：返回版本、身份及按 principal 投影的能力",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-IDENTITY-SERVER-IDENTITY--4BCE8C",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "返回版本、身份及按 principal 投影的能力"
+      },
+      "r02Share": "R02 份额=服务器身份服务端语义：/lingxi/v1/me（兼 /server/identity 投影）返回版本、身份与按 principal/scopes 投影的能力、伪造头被忽略、拒绝时凭证库逐字节不变；份额图钉全过即本叶 R02 份额 PASS，客户端投影/UI 接线归 R07",
+      "r07Share": "原排 R07 的客户端身份呈现仍需在后续客户端阶段按当前候选核验；R02 本叶已提前登记完整真服务正反行为",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端身份呈现仍需在后续客户端阶段按当前候选核验；R02 本叶已提前登记完整真服务正反行为",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "a06-foreign-host-health",
+            "expect": 403
+          },
+          {
+            "case": "a06-evil-origin-health",
+            "expect": 403
+          },
+          {
+            "case": "a06-localhost-host-ok",
+            "expect": 200
+          },
+          {
+            "case": "a06-evil-origin-with-valid-token",
+            "expect": 403
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "producerCommand": "a05_a06_auth_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 403,
+          "case": "a06-foreign-host-health",
+          "expect": 403,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 403,
+          "case": "a06-evil-origin-health",
+          "expect": 403,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 200,
+          "case": "a06-localhost-host-ok",
+          "expect": 200,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 403,
+          "case": "a06-evil-origin-with-valid-token",
+          "expect": 403,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a05_a06_auth_matrix"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "A05/A06 + /health 执行记录（显式失败码）",
+      "featureId": "F-D20-UI_BEHAVIOR-UI-BEHAVIOR-SERVICE-CONNECTIVITY-D2657E",
+      "id": "R00-T02-LA-D2657E4AB5FF",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "连接状态、失败原因与重连结果在 UI 可见",
+          "端口/令牌无效、服务重启时显示断开并重试；不能静默假在线"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-UI_BEHAVIOR-UI-BEHAVIOR-SERVICE-CONNECTIVITY-D2657E",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "连接状态、失败原因与重连结果在 UI 可见"
+      },
+      "r02Share": "R02 份额=/health 与显式拒绝/失败码面（UI 判定连接状态的服务器依据）：foreign Host 403、evil Origin 403、evil Origin+有效 token 仍 403、loopback 200；份额图钉全过即本叶 R02 份额 PASS，UI 连接/重连完整行为归 R07/R08/R09",
+      "r07Share": "连接状态、失败原因与重连结果的完整 UI 行为（断开显示与重试、不静默假在线）",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 连接状态、失败原因与重连结果的完整 UI 行为（断开显示与重试、不静默假在线）",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-password-clear-account-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-password-clear-unauthorized-keeps-prior",
+            "expect": 1
+          },
+          {
+            "case": "management-password-clear-store-failure-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-password-clear-account-audit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-password-clear-unauthorized-keeps-prior",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-password-clear-store-failure-unchanged",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-path-failure-no-write-recovery",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-all-actions-identities-no-secrets",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；R02 份额图钉由 verify-stage 逐案机器消费，余款断言归 R07 验收，生产者原始日志/源码摘要/退出状态须有效",
+      "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-DELETE-25AB67",
+      "id": "R00-T02-LA-25AB678E7108",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "执行“移除本地账号密码”后核对：仅本地主人可清除密码；更新账号并记录安全审计，失败时返回错误",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-DELETE-25AB67",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "仅本地主人可清除密码；更新账号并记录安全审计，失败时返回错误"
+      },
+      "r02Share": "R02 份额=管理面服务端语义：业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret、重启去重，由 supplemental_management_matrix 份额图钉逐案证明；份额图钉全过即本叶 R02 份额 PASS，客户端投影余款归 R07",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-password-set-account-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-password-invalid-keeps-prior",
+            "expect": 1
+          },
+          {
+            "case": "management-password-set-store-failure-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-password-set-account-audit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-password-invalid-keeps-prior",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-password-set-store-failure-unchanged",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-path-failure-no-write-recovery",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-all-actions-identities-no-secrets",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；R02 份额图钉由 verify-stage 逐案机器消费，余款断言归 R07 验收，生产者原始日志/源码摘要/退出状态须有效",
+      "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-PUT-F1754C",
+      "id": "R00-T02-LA-F1754C6F755B",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "执行“设置本地账号密码”后核对：仅本地主人可设置密码；更新账号并记录安全审计，失败时返回错误",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-PUT-F1754C",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "仅本地主人可设置密码；更新账号并记录安全审计，失败时返回错误"
+      },
+      "r02Share": "R02 份额=管理面服务端语义：业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret、重启去重，由 supplemental_management_matrix 份额图钉逐案证明；份额图钉全过即本叶 R02 份额 PASS，客户端投影余款归 R07",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-profile-success-account-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-profile-invalid-and-unauthorized-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-profile-store-failure-unchanged",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-profile-success-account-audit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-profile-invalid-and-unauthorized-unchanged",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-profile-store-failure-unchanged",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_management_matrix 真服务 TCP 管理入口正反分支、合成数据根前后持久化、源摘要及原始日志；R02 份额图钉由 verify-stage 逐案机器消费，余款断言归 R07 验收",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-ACCOUNT-PROFILE-PU-F006E0",
+      "id": "R00-T02-LA-F006E094F028",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：保存 username/displayName 并返回 account",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-ACCOUNT-PROFILE-PU-F006E0",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "保存 username/displayName 并返回 account"
+      },
+      "r02Share": "R02 份额=管理面服务端语义：业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret、重启去重，由 supplemental_management_matrix 份额图钉逐案证明；份额图钉全过即本叶 R02 份额 PASS，客户端投影余款归 R07",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-network-success-summary-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-network-invalid-and-unauthorized-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-network-store-failure-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          },
+          {
+            "case": "management-network-saved-restart-real-bind-no-audit-duplicate",
+            "expect": 1
+          },
+          {
+            "case": "management-network-cli-override-real-bind",
+            "expect": 1
+          },
+          {
+            "case": "management-network-corrupt-saved-settings-refused",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-network-success-summary-audit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-network-invalid-and-unauthorized-unchanged",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-network-store-failure-unchanged",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-path-failure-no-write-recovery",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-all-actions-identities-no-secrets",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-network-saved-restart-real-bind-no-audit-duplicate",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-network-cli-override-real-bind",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-network-corrupt-saved-settings-refused",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；R02 份额图钉由 verify-stage 逐案机器消费，余款断言归 R07 验收，生产者原始日志/源码摘要/退出状态须有效",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-NETWORK-PUT-73CDC4",
+      "id": "R00-T02-LA-73CDC44696D3",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：保存网络配置、更新运行时摘要与安全审计",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-NETWORK-PUT-73CDC4",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "保存网络配置、更新运行时摘要与安全审计"
+      },
+      "r02Share": "R02 份额=管理面服务端语义：业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret、重启去重，由 supplemental_management_matrix 份额图钉逐案证明；份额图钉全过即本叶 R02 份额 PASS，客户端投影余款归 R07",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-mobile-qr-svg-present",
+            "expect": 1
+          },
+          {
+            "case": "management-mobile-qr-lan-unavailable-refused",
+            "expect": 1
+          },
+          {
+            "case": "management-mobile-qr-unauthorized-no-svg",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-mobile-qr-svg-present",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-mobile-qr-lan-unavailable-refused",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-mobile-qr-unauthorized-no-svg",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_management_matrix 真服务 TCP 管理入口正反分支、合成数据根前后持久化、源摘要及原始日志；R02 份额图钉由 verify-stage 逐案机器消费，余款断言归 R07 验收",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C",
+      "id": "R00-T02-LA-5E4A9CF58BED",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：返回手机访问地址 SVG，LAN 地址不可用为 400",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "返回手机访问地址 SVG，LAN 地址不可用为 400"
+      },
+      "r02Share": "R02 份额=管理面服务端语义：业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret、重启去重，由 supplemental_management_matrix 份额图钉逐案证明；份额图钉全过即本叶 R02 份额 PASS，客户端投影余款归 R07",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-summary-initial-real-state",
+            "expect": 1
+          },
+          {
+            "case": "management-summary-populated-matches-stores",
+            "expect": 1
+          },
+          {
+            "case": "management-summary-unauthorized-no-state-change",
+            "expect": 1
+          },
+          {
+            "case": "management-summary-registry-failure-not-empty",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-summary-initial-real-state",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-summary-populated-matches-stores",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-summary-unauthorized-no-state-change",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-summary-registry-failure-not-empty",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_management_matrix 真服务 TCP 管理入口正反分支、合成数据根前后持久化、源摘要及原始日志；R02 份额图钉由 verify-stage 逐案机器消费，余款断言归 R07 验收",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77",
+      "id": "R00-T02-LA-229B77A7BA69",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：返回网络、设备和账号概况",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "返回网络、设备和账号概况"
+      },
+      "r02Share": "R02 份额=管理面服务端语义：业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret、重启去重，由 supplemental_management_matrix 份额图钉逐案证明；份额图钉全过即本叶 R02 份额 PASS，客户端投影余款归 R07",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-device-list-redacts-secrets",
+            "expect": 1
+          },
+          {
+            "case": "management-device-list-includes-pending-pairing-redacted",
+            "expect": 1
+          },
+          {
+            "case": "management-device-list-unauthorized-refused",
+            "expect": 1
+          },
+          {
+            "case": "management-device-list-registry-failure-not-empty",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-device-list-redacts-secrets",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-device-list-includes-pending-pairing-redacted",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-device-list-unauthorized-refused",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-device-list-registry-failure-not-empty",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_management_matrix 真服务 TCP 管理入口正反分支、合成数据根前后持久化、源摘要及原始日志；R02 份额图钉由 verify-stage 逐案机器消费，余款断言归 R07 验收",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-B8F8CF",
+      "id": "R00-T02-LA-B8F8CF9E8AF5",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "给定目标与相应权限，执行“查看已配对设备和凭证”后核对：仅本地主人读取脱敏的设备、凭证与配对会话列表",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-B8F8CF",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "仅本地主人读取脱敏的设备、凭证与配对会话列表"
+      },
+      "r02Share": "R02 份额=管理面服务端语义：业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret、重启去重，由 supplemental_management_matrix 份额图钉逐案证明；份额图钉全过即本叶 R02 份额 PASS，客户端投影余款归 R07",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-device-revoke-target-auth-rejected",
+            "expect": 1
+          },
+          {
+            "case": "management-device-revoke-missing-no-side-effect",
+            "expect": 1
+          },
+          {
+            "case": "management-device-revoke-store-failure-target-still-active",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-device-revoke-target-auth-rejected",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-device-revoke-missing-no-side-effect",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-device-revoke-store-failure-target-still-active",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-path-failure-no-write-recovery",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-all-actions-identities-no-secrets",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；R02 份额图钉由 verify-stage 逐案机器消费，余款断言归 R07 验收，生产者原始日志/源码摘要/退出状态须有效",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-DEVICEID-REVOKE-749802",
+      "id": "R00-T02-LA-7498024422D7",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "给定目标与相应权限，执行“撤销设备”后核对：令设备失效并返回脱敏设备状态，记录安全审计",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-DEVICEID-REVOKE-749802",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "令设备失效并返回脱敏设备状态，记录安全审计"
+      },
+      "r02Share": "R02 份额=管理面服务端语义：业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret、重启去重，由 supplemental_management_matrix 份额图钉逐案证明；份额图钉全过即本叶 R02 份额 PASS，客户端投影余款归 R07",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-credential-revoke-target-only",
+            "expect": 1
+          },
+          {
+            "case": "management-credential-revoke-missing-no-side-effect",
+            "expect": 1
+          },
+          {
+            "case": "management-credential-revoke-store-failure-target-still-active",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-credential-revoke-target-only",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-credential-revoke-missing-no-side-effect",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-credential-revoke-store-failure-target-still-active",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-path-failure-no-write-recovery",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-all-actions-identities-no-secrets",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；R02 份额图钉由 verify-stage 逐案机器消费，余款断言归 R07 验收，生产者原始日志/源码摘要/退出状态须有效",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-CREDENTIALS-CRED-43A126",
+      "id": "R00-T02-LA-43A126149416",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "给定目标与相应权限，执行“撤销设备凭证”后核对：令指定凭证失效并返回脱敏状态，记录安全审计",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-CREDENTIALS-CRED-43A126",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "令指定凭证失效并返回脱敏状态，记录安全审计"
+      },
+      "r02Share": "R02 份额=管理面服务端语义：业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret、重启去重，由 supplemental_management_matrix 份额图钉逐案证明；份额图钉全过即本叶 R02 份额 PASS，客户端投影余款归 R07",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-pairing-create-code-expiry-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-pairing-create-invalid-unauthorized-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-pairing-create-store-failure-no-code",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-pairing-create-code-expiry-audit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-pairing-create-invalid-unauthorized-unchanged",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-pairing-create-store-failure-no-code",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-path-failure-no-write-recovery",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-all-actions-identities-no-secrets",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；R02 份额图钉由 verify-stage 逐案机器消费，余款断言归 R07 验收，生产者原始日志/源码摘要/退出状态须有效",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-756217",
+      "id": "R00-T02-LA-756217C74101",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "给定目标与相应权限，执行“创建设备配对会话”后核对：仅本地主人得到配对码及到期时间，注册记录并写安全审计",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-756217",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "仅本地主人得到配对码及到期时间，注册记录并写安全审计"
+      },
+      "r02Share": "R02 份额=管理面服务端语义：业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret、重启去重，由 supplemental_management_matrix 份额图钉逐案证明；份额图钉全过即本叶 R02 份额 PASS，客户端投影余款归 R07",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-pairing-approve-once-scope-secret-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-pairing-approve-wrong-code-scope-auth-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-pairing-approve-store-failure-still-pending",
+            "expect": 1
+          },
+          {
+            "case": "management-pairing-replay-does-not-sign",
+            "expect": 1
+          },
+          {
+            "case": "management-pairing-concurrent-only-one-credential",
+            "expect": 1
+          },
+          {
+            "case": "management-pairing-expired-code-does-not-sign",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-pairing-approve-once-scope-secret-audit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-pairing-approve-wrong-code-scope-auth-unchanged",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-pairing-approve-store-failure-still-pending",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-pairing-replay-does-not-sign",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-pairing-concurrent-only-one-credential",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-pairing-expired-code-does-not-sign",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-path-failure-no-write-recovery",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-standard-audit-all-actions-identities-no-secrets",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；R02 份额图钉由 verify-stage 逐案机器消费，余款断言归 R07 验收，生产者原始日志/源码摘要/退出状态须有效",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-5E1C33",
+      "id": "R00-T02-LA-5E1C3363A070",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "给定目标与相应权限，执行“批准设备配对”后核对：仅本地主人用配对码签发设备密钥，返回密钥一次及设备作用域并写安全审计",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-5E1C33",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "仅本地主人用配对码签发设备密钥，返回密钥一次及设备作用域并写安全审计"
+      },
+      "r02Share": "R02 份额=管理面服务端语义：业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret、重启去重，由 supplemental_management_matrix 份额图钉逐案证明；份额图钉全过即本叶 R02 份额 PASS，客户端投影余款归 R07",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_r07",
+      "deferredR07Cases": [
+        {
+          "actual": 1,
+          "case": "static-desktop-dist-page-assets",
+          "evidencePath": "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_static_web_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "static-desktop-guide-without-dist",
+          "evidencePath": "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_static_web_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "static-desktop-invalid-explicit-dist-503",
+          "evidencePath": "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_static_web_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "static-web-traversal-secret-refused",
+          "evidencePath": "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_static_web_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "static-web-oversized-asset-explicit-error",
+          "evidencePath": "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_static_web_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        }
+      ],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": {
+        "commandRefs": [
+          "supplemental_static_web_matrix"
+        ],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of the pre-implemented R07 behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf in R02"
+      },
+      "earlyEvidenceCommandRefs": [
+        "supplemental_static_web_matrix"
+      ],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R02 不判本叶（DEFERRED_TO_R07，仍 REQUIRED，验收归 R07）：R07 按届时构建产物重验全部正负路径。提前实现的 supplemental_static_web_matrix 保留注册照常运行（其路径穿越/超限错误与 R02 HTTP 安全面同源，运行即持续回归；命令失败仍是命令 FAIL），其 5 个案例仅作 earlyEvidence 观察记录于 deferredR07Cases，不计入 R02",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-DESKTOP-8BC1A0",
+      "id": "R00-T02-LA-8BC1A036AFAA",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "给定目标与相应权限，执行“打开浏览器桌面界面”后核对：有桌面构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-DESKTOP-8BC1A0",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "有桌面构建产物时服务静态页面及资源，否则按路由返回指引或错误"
+      },
+      "r02Share": "无独立 R02 份额：静态托管是 R07-T09 第 2 项“托管现役 Web/mobile 静态资源及 API”的入口服务能力，不属 R02 义务类别（认证/资源范围/WS-HTTP 原语/管理面服务端语义/存储/事件/备份/日志上限/独立交付）；R02 任务书 8 任务与 16 基础验收均不含静态托管，通用 HTTP 安全面（路径穿越拒绝、有界资源）已由 A02/A05/A06 家族在服务层覆盖",
+      "r07Share": "R07-T09 静态托管完整行为：有构建产物时服务页面与资源（内容类型/权限）、缺产物按路由返回指引、显式无效 dist 503、路径穿越拒绝、超限资源显式错误——R07 须对其届时产物重验；不得删除已实现的 static_web.rs 服务能力（继续不破坏）",
+      "reason": "deferred to R07: this R00 leaf is still REQUIRED but has no R02 gating share; its acceptance belongs to the R07 stage, which must consume the remainder: R07-T09 静态托管完整行为：有构建产物时服务页面与资源（内容类型/权限）、缺产物按路由返回指引、显式无效 dist 503、路径穿越拒绝、超限资源显式错误——R07 须对其届时产物重验；不得删除已实现的 static_web.rs 服务能力（继续不破坏）",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "DEFERRED_TO_R07"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_r07",
+      "deferredR07Cases": [
+        {
+          "actual": 1,
+          "case": "static-mobile-dist-page-assets",
+          "evidencePath": "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_static_web_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "static-mobile-guide-without-dist",
+          "evidencePath": "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_static_web_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "static-mobile-invalid-explicit-dist-503",
+          "evidencePath": "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_static_web_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "static-web-traversal-secret-refused",
+          "evidencePath": "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_static_web_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "static-web-oversized-asset-explicit-error",
+          "evidencePath": "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_static_web_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        }
+      ],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": {
+        "commandRefs": [
+          "supplemental_static_web_matrix"
+        ],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of the pre-implemented R07 behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf in R02"
+      },
+      "earlyEvidenceCommandRefs": [
+        "supplemental_static_web_matrix"
+      ],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R02 不判本叶（DEFERRED_TO_R07，仍 REQUIRED，验收归 R07）：R07 按届时构建产物重验全部正负路径。提前实现的 supplemental_static_web_matrix 保留注册照常运行（其路径穿越/超限错误与 R02 HTTP 安全面同源，运行即持续回归；命令失败仍是命令 FAIL），其 5 个案例仅作 earlyEvidence 观察记录于 deferredR07Cases，不计入 R02",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-MOBILE-3291CF",
+      "id": "R00-T02-LA-3291CFD5F7E2",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "给定目标与相应权限，执行“打开移动端界面”后核对：有移动端构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-MOBILE-3291CF",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "有移动端构建产物时服务静态页面及资源，否则按路由返回指引或错误"
+      },
+      "r02Share": "无独立 R02 份额：静态托管是 R07-T09 第 2 项“托管现役 Web/mobile 静态资源及 API”的入口服务能力，不属 R02 义务类别（认证/资源范围/WS-HTTP 原语/管理面服务端语义/存储/事件/备份/日志上限/独立交付）；R02 任务书 8 任务与 16 基础验收均不含静态托管，通用 HTTP 安全面（路径穿越拒绝、有界资源）已由 A02/A05/A06 家族在服务层覆盖",
+      "r07Share": "R07-T09 静态托管完整行为：有构建产物时服务页面与资源（内容类型/权限）、缺产物按路由返回指引、显式无效 dist 503、路径穿越拒绝、超限资源显式错误——R07 须对其届时产物重验；不得删除已实现的 static_web.rs 服务能力（继续不破坏）",
+      "reason": "deferred to R07: this R00 leaf is still REQUIRED but has no R02 gating share; its acceptance belongs to the R07 stage, which must consume the remainder: R07-T09 静态托管完整行为：有构建产物时服务页面与资源（内容类型/权限）、缺产物按路由返回指引、显式无效 dist 503、路径穿越拒绝、超限资源显式错误——R07 须对其届时产物重验；不得删除已实现的 static_web.rs 服务能力（继续不破坏）",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "DEFERRED_TO_R07"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_r07",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of the pre-implemented R07 behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf in R02"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R02 不判本叶（DEFERRED_TO_R07，仍 REQUIRED）：R06/R07 实现移动引导路由（内容权威 + 清理语义）后按原断言验收；通用 a05/a06 案例继续由 A05/A06 基础场景自身消费，不再按叶挂接",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-WORKBENCH-MOBILE-BOOTSTRA-2A1C29",
+      "id": "R00-T02-LA-2A1C298F62FC",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "给定目标与相应权限，执行“初始化移动端界面”后核对：返回当前 Agent、语言、头像可用性、工作区和偏好；顺带清理过期持久化",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-WORKBENCH-MOBILE-BOOTSTRA-2A1C29",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "返回当前 Agent、语言、头像可用性、工作区和偏好；顺带清理过期持久化"
+      },
+      "r02Share": "无 R02 专属份额：移动端 workbench 引导路由（Agent/语言/头像/工作区/偏好 + 过期持久化清理）在现行 Rust 服务不存在（全路由清单核实），其内容权威（Agent/工作区/偏好）属 R06/R07；通用认证原语已由 A05/A06 基础场景覆盖，不按叶重复图钉",
+      "r07Share": "R07-T09 移动端初始化完整入口：返回当前 Agent、语言、头像可用性、工作区和偏好；顺带清理过期持久化；拒绝/下游失败不冒空态",
+      "reason": "deferred to R07: this R00 leaf is still REQUIRED but has no R02 gating share; its acceptance belongs to the R07 stage, which must consume the remainder: R07-T09 移动端初始化完整入口：返回当前 Agent、语言、头像可用性、工作区和偏好；顺带清理过期持久化；拒绝/下游失败不冒空态",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "DEFERRED_TO_R07"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_r07",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of the pre-implemented R07 behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf in R02"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R02 不判本叶（DEFERRED_TO_R07，仍 REQUIRED）：取值语义权威归 R05/R06（真实取值、409 冲突、默认不追改旧会话），完整入口行为与 query 边界验收归 R07；已实现路由与 auth_matrix.rs 既有 503/400 cargo 断言保留运行不回退，R07 须在模型权威就位后按原断言验收",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-INDEX-API-SESSION-THINKIN-8ED658",
+      "id": "R00-T02-LA-8ED658F9DB9E",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功：执行“查看会话思考级别”后，返回指定会话或新会话默认级别",
+          "拒绝/边界：query.sessionPath 与 pendingNewSession=1 选择范围；不应错误扩大写入或披露范围"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-INDEX-API-SESSION-THINKIN-8ED658",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "返回指定会话或新会话默认级别"
+      },
+      "r02Share": "R02 无门禁份额：/lingxi/v1/session-thinking-level 路由现已提前实现（lingxi-service management.rs，get+post），但原断言的读取取值语义依赖模型状态权威——无模型配置时返回 503 model_state_unavailable（auth_matrix.rs 实测），完整原行为须等 R05/R06 模型配置权威，不在 R02 可证范围；现有叶案例生产者亦无 thinking-level 案例",
+      "r07Share": "R07-T09 完整入口行为：指定会话/新会话默认级别读取与设置、query 边界（sessionPath/pendingNewSession）不扩大披露、无效 level/409 不改变目标状态",
+      "reason": "deferred to R07: this R00 leaf is still REQUIRED but has no R02 gating share; its acceptance belongs to the R07 stage, which must consume the remainder: R07-T09 完整入口行为：指定会话/新会话默认级别读取与设置、query 边界（sessionPath/pendingNewSession）不扩大披露、无效 level/409 不改变目标状态",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "DEFERRED_TO_R07"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_r07",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of the pre-implemented R07 behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf in R02"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R02 不判本叶（DEFERRED_TO_R07，仍 REQUIRED）：取值语义权威归 R05/R06（真实取值、409 冲突、默认不追改旧会话），完整入口行为与 query 边界验收归 R07；已实现路由与 auth_matrix.rs 既有 503/400 cargo 断言保留运行不回退，R07 须在模型权威就位后按原断言验收",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-SET-F8935B",
+      "id": "R00-T02-LA-F8935B6B0221",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功：设置现有会话思考级别后，有 sessionPath 时只修改该会话，返回解析后的状态",
+          "边界：无效 level/冲突 409 不改变默认级别；拒绝时目标状态不变"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-SET-F8935B",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "有 sessionPath 时只修改该会话，返回解析后的状态"
+      },
+      "r02Share": "R02 无门禁份额：/lingxi/v1/session-thinking-level 路由现已提前实现（lingxi-service management.rs，get+post），但原断言的设置语义（有 sessionPath 时只改该会话）依赖模型状态权威——无模型配置时返回 503 model_state_unavailable（auth_matrix.rs 实测），完整原行为须等 R05/R06 模型配置权威，不在 R02 可证范围；现有叶案例生产者亦无 thinking-level 案例",
+      "r07Share": "R07-T09 完整入口行为：指定会话/新会话默认级别读取与设置、query 边界（sessionPath/pendingNewSession）不扩大披露、无效 level/409 不改变目标状态",
+      "reason": "deferred to R07: this R00 leaf is still REQUIRED but has no R02 gating share; its acceptance belongs to the R07 stage, which must consume the remainder: R07-T09 完整入口行为：指定会话/新会话默认级别读取与设置、query 边界（sessionPath/pendingNewSession）不扩大披露、无效 level/409 不改变目标状态",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "DEFERRED_TO_R07"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_r07",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of the pre-implemented R07 behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf in R02"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R02 不判本叶（DEFERRED_TO_R07，仍 REQUIRED）：取值语义权威归 R05/R06（真实取值、409 冲突、默认不追改旧会话），完整入口行为与 query 边界验收归 R07；已实现路由与 auth_matrix.rs 既有 503/400 cargo 断言保留运行不回退，R07 须在模型权威就位后按原断言验收",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-DEFAULT-S-39AD35",
+      "id": "R00-T02-LA-39AD35E1FD71",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功：设置新会话默认思考级别后，无 sessionPath 时修改默认级别，不追改旧会话",
+          "边界：无效 level/冲突 409 不改变已有会话；拒绝时目标状态不变"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-DEFAULT-S-39AD35",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "无 sessionPath 时修改默认级别，不追改旧会话"
+      },
+      "r02Share": "R02 无门禁份额：/lingxi/v1/session-thinking-level 路由现已提前实现（lingxi-service management.rs，get+post），但原断言的默认级别语义（无 sessionPath 时修改默认、不追改旧会话）依赖模型状态权威——无模型配置时返回 503 model_state_unavailable（auth_matrix.rs 实测），完整原行为须等 R05/R06 模型配置权威，不在 R02 可证范围；现有叶案例生产者亦无 thinking-level 案例",
+      "r07Share": "R07-T09 完整入口行为：指定会话/新会话默认级别读取与设置、query 边界（sessionPath/pendingNewSession）不扩大披露、无效 level/409 不改变目标状态",
+      "reason": "deferred to R07: this R00 leaf is still REQUIRED but has no R02 gating share; its acceptance belongs to the R07 stage, which must consume the remainder: R07-T09 完整入口行为：指定会话/新会话默认级别读取与设置、query 边界（sessionPath/pendingNewSession）不扩大披露、无效 level/409 不改变目标状态",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "DEFERRED_TO_R07"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-web-session-valid-sanitized",
+            "expect": 1
+          },
+          {
+            "case": "management-web-session-invalid-false",
+            "expect": 1
+          },
+          {
+            "case": "management-web-session-expired-false",
+            "expect": 1
+          },
+          {
+            "case": "management-web-session-mobile-scope-no-write",
+            "expect": 1
+          },
+          {
+            "case": "management-web-session-connection-mismatch-false",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-web-session-valid-sanitized",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-web-session-invalid-false",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-web-session-expired-false",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-web-session-mobile-scope-no-write",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-web-session-connection-mismatch-false",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "supplemental_management_matrix 本轮真服务专属五项逐条件案例、原始日志、源码摘要与退出状态；当前候选合法执行后才可通过",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-SESSION-READ-066B54",
+      "id": "R00-T02-LA-066B54983F6A",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功：执行“查看当前网页登录状态”后，有效 cookie 返回净化后的 principal；无效/过期返回 authenticated:false",
+          "拒绝/边界：cookie 与连接类型决定身份；不披露 session secret；不应错误扩大写入或披露范围"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-SESSION-READ-066B54",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "有效 cookie 返回净化后的 principal；无效/过期返回 authenticated:false"
+      },
+      "r02Share": "R02 份额=Web 会话读取服务端语义：有效 cookie 返回净化 principal、无效/过期 authenticated:false、mobile scope 最小化且不写盘、连接类型不匹配 false、secret 不泄漏；份额图钉全过即本叶 R02 份额 PASS，客户端显示归 R07",
+      "r07Share": "原排 R07 的客户端显示仍需在后续客户端阶段按当前候选核验；R02 本叶提前登记完整真服务行为",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端显示仍需在后续客户端阶段按当前候选核验；R02 本叶提前登记完整真服务行为",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-web-login-password-cookie-14day-desktop-scope",
+            "expect": 1
+          },
+          {
+            "case": "management-web-login-token-positive-14day-mobile-scope",
+            "expect": 1
+          },
+          {
+            "case": "web-login-https-password-secure-14day-cookie",
+            "expect": 1
+          },
+          {
+            "case": "web-login-https-session-logout-revoked",
+            "expect": 1
+          },
+          {
+            "case": "management-web-login-credential-priority-denies-invalid-token",
+            "expect": 1
+          },
+          {
+            "case": "management-web-session-mobile-scope-no-write",
+            "expect": 1
+          },
+          {
+            "case": "management-web-login-store-failure-no-session",
+            "expect": 1
+          },
+          {
+            "case": "management-lan-browser-origin-login-session-logout",
+            "expect": 1
+          },
+          {
+            "case": "web-login-foreign-origin-denied",
+            "expect": 1
+          },
+          {
+            "case": "web-login-http-forwarded-proto-denied",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/web-login-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-web-login-password-cookie-14day-desktop-scope",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-web-login-token-positive-14day-mobile-scope",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "web-login-https-password-secure-14day-cookie",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "web-login-https-session-logout-revoked",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-web-login-credential-priority-denies-invalid-token",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-web-session-mobile-scope-no-write",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-web-login-store-failure-no-session",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-lan-browser-origin-login-session-logout",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "web-login-foreign-origin-denied",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "web-login-http-forwarded-proto-denied",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/web-login-cases.json",
+        "{EVIDENCE}/MANAGEMENT/tls-web-login-cases.json",
+        "{EVIDENCE}/MANAGEMENT/tls-cargo.stdout.log",
+        "{EVIDENCE}/MANAGEMENT/tls-cargo.stderr.log"
+      ],
+      "evidenceRequired": "supplemental_management_matrix 的真实 TCP 管理案例与 tls_web_login HTTPS 集成案例、web-login-cases.json 原始断言逐项机器消费；平台真 TCP 禁令未解除前不得 PASS",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-LOGIN-POST-C4E6F2",
+      "id": "R00-T02-LA-C4E6F27D7873",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功：执行“登录网页/移动端”后，校验 token 或本地账号密码，创建 14 日 Web session 并设 HttpOnly cookie",
+          "拒绝/边界：body.credential 优先 token；否则 username/password；远端密码须 HTTPS；clientKind 决定 scope；不应错误扩大写入或披露范围"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-LOGIN-POST-C4E6F2",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "校验 token 或本地账号密码，创建 14 日 Web session 并设 HttpOnly cookie"
+      },
+      "r02Share": "R02 份额=Web 登录服务端语义：token/密码 + credential 优先级、14 日 Web session + HttpOnly cookie、clientKind 决定 scope、真实 HTTPS（tls_web_login）下密码安全、远端 HTTP/伪造 forwarded proto 拒绝、store 失败无 session、LAN browser origin 登录-会话-登出闭环；份额图钉全过即本叶 R02 份额 PASS，页面接线与跨设备体验归 R07",
+      "r07Share": "后续网页/移动端阶段继续核页面接线与跨设备体验，不代替本阶段原始 due",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 后续网页/移动端阶段继续核页面接线与跨设备体验，不代替本阶段原始 due",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "management-web-logout-only-current-cookie",
+            "expect": 1
+          },
+          {
+            "case": "management-lan-browser-origin-login-session-logout",
+            "expect": 1
+          },
+          {
+            "case": "management-web-logout-store-failure-session-alive",
+            "expect": 1
+          },
+          {
+            "case": "management-web-logout-invalid-cookie-no-other-revoke",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "producerCommand": "supplemental_management_matrix"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "management-web-logout-only-current-cookie",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-lan-browser-origin-login-session-logout",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-web-logout-store-failure-session-alive",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "management-web-logout-invalid-cookie-no-other-revoke",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "r02_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "supplemental_management_matrix"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json"
+      ],
+      "evidenceRequired": "本轮 supplemental_management_matrix 真服务 TCP 管理入口正反分支、合成数据根前后持久化、源摘要及原始日志；R02 份额图钉由 verify-stage 逐案机器消费，余款断言归 R07 验收",
+      "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-WEB-AUTH-WEB-AUTH-LOGOUT-POST-4C1A97",
+      "id": "R00-T02-LA-4C1A9735CF04",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "执行“退出网页登录”后核对：撤销当前 Web 会话并清除会话 Cookie，返回成功",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-WEB-AUTH-WEB-AUTH-LOGOUT-POST-4C1A97",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "撤销当前 Web 会话并清除会话 Cookie，返回成功"
+      },
+      "r02Share": "R02 份额=管理面服务端语义：业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret、重启去重，由 supplemental_management_matrix 份额图钉逐案证明；份额图钉全过即本叶 R02 份额 PASS，客户端投影余款归 R07",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "reason": "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED and moves with deferredToStage=R07: 原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_r07",
+      "deferredR07Cases": [],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of the pre-implemented R07 behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf in R02"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R02 不判本叶（DEFERRED_TO_R07，仍 REQUIRED）：服务端语义由管理面叶在本门禁证明；R07/R08 须按届时 UI 候选完成 7 条动作 × 三态完整 UI 验收（R17 局部组件证据仅作回归基线）",
+      "featureId": "F-D20-UI-UI-SETTINGS-ACCESS-000E6E",
+      "id": "R00-T02-LA-000E6E1301C0",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+          "打开页自动加载访问总览及账号/设备状态：成功核对 打开页只请求 /api/access/summary 并显示地址、模式、设备和凭证摘要；设备详情另由后续操作读取。；mobileUrl 可用且无需重启时二维码图片自动读取并显示。；空态/未初始化核对 尚未配置密钥/无设备显示空列表；无 mobileUrl 或 restartRequired 不渲染二维码图，不发该 GET。；错误/无权限核对 加载错误显示警告，不能当无设备",
+          "局域网开关、端口及公开地址保存：成功核对 保存并显示重启需求；空态/未初始化核对 未加载 summary 禁保存；错误/无权限核对 远端连接仅本机设置提示；失败 toast",
+          "生成手机/桌面连接凭证；同屏有地址时自动显示二维码：成功核对 新密钥/连接地址显示；同屏 mobileUrl 可用且无需重启时二维码自动显示，与生成凭证独立。；凭证生成后重读访问总览；若重读失败，即使生成已持久化仍显示失败 toast。；空态/未初始化核对 未生成凭证显示生成按钮；无 mobileUrl 或需重启时不渲染二维码。；错误/无权限核对 生成失败 toast，旧密钥不清除",
+          "复制地址和密钥、连接远端或返回本机：成功核对 复制按钮在剪贴板 API 存在且写入成功时显示 copied；连接远端成功后切换当前服务。；选择远端或本机连接成功后调用 reloadMainWindow 应用。；空态/未初始化核对 剪贴板 API 缺失时可跳过真实写入却仍显示 copied；远端地址或凭证缺失时连接不可完成。；错误/无权限核对 剪贴板写入 Promise 拒绝未捕获；远端连接失败由连接分支捕获提示且不切活跃服务，两种失败不能混写。；连接失败或本机连接不可用不重载。",
+          "撤销设备或单条凭证：成功核对 设备/凭证从总览移除；撤销成功后重读访问总览；若重读失败，即使撤销已持久化仍显示失败 toast。；空态/未初始化核对 无设备没有撤销控件；错误/无权限核对 失败保留条目并提示",
+          "编辑本地账号资料、设置或清除密码：成功核对 资料/密码状态刷新；空态/未初始化核对 空密码禁保存；错误/无权限核对 失败 toast；无权限不会回写成功态"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-UI-UI-SETTINGS-ACCESS-000E6E",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据"
+      },
+      "r02Share": "R02 份额已由管理面服务端语义叶覆盖（access summary、network、credentials、devices revoke、account profile/password 的服务端语义），本叶无独立门禁份额；设置访问页 7 条动作矩阵是 React UI 行为，R17 的 AccessTab 局部组件测试（access-ui-probe 系列）本身也是客户端证据",
+      "r07Share": "R07/R08 完整 UI 动作矩阵：容器自动初始化（缓存/15 秒超时/供应商摘要不阻塞）、访问总览与二维码自动显示、LAN/端口/公开地址保存、凭证生成与二维码、复制/连接远端、撤销设备/凭证、账号资料与密码编辑——每动作成功/空态/错误三态，失败不伪装空数据",
+      "reason": "deferred to R07: this R00 leaf is still REQUIRED but has no R02 gating share; its acceptance belongs to the R07 stage, which must consume the remainder: R07/R08 完整 UI 动作矩阵：容器自动初始化（缓存/15 秒超时/供应商摘要不阻塞）、访问总览与二维码自动显示、LAN/端口/公开地址保存、凭证生成与二维码、复制/连接远端、撤销设备/凭证、账号资料与密码编辑——每动作成功/空态/错误三态，失败不伪装空数据",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "DEFERRED_TO_R07"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_r07",
+      "deferredR07Cases": [
+        {
+          "actual": 1,
+          "case": "sharing-container-cold-cache-timeout-error",
+          "evidencePath": "{EVIDENCE}/CLIENT/leaf-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_client_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "sharing-color-success-default-denied",
+          "evidencePath": "{EVIDENCE}/CLIENT/leaf-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_client_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "sharing-width-success-default-denied",
+          "evidencePath": "{EVIDENCE}/CLIENT/leaf-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_client_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        },
+        {
+          "actual": 1,
+          "case": "sharing-font-limit-success-default-denied",
+          "evidencePath": "{EVIDENCE}/CLIENT/leaf-cases.json",
+          "expect": 1,
+          "producerCommand": "supplemental_client_matrix",
+          "recordedOk": true,
+          "status": "OBSERVED_HELD"
+        }
+      ],
+      "deferredToStage": "R07",
+      "deferredToStages": null,
+      "earlyEvidence": {
+        "commandRefs": [
+          "supplemental_client_matrix"
+        ],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of the pre-implemented R07 behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf in R02"
+      },
+      "earlyEvidenceCommandRefs": [
+        "supplemental_client_matrix"
+      ],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R02 不判本叶（DEFERRED_TO_R07，仍 REQUIRED，验收归 R07）：R07 须按届时 UI 候选重验分享设置页动作矩阵（含 localStorage 禁止存储的显式失败）。提前实现的 supplemental_client_matrix 保留注册照常运行（命令失败仍是命令 FAIL），其 4 个案例仅作 earlyEvidence 观察记录于 deferredR07Cases，不作为 R02 PASS 前置",
+      "featureId": "F-D20-UI-UI-SETTINGS-SHARING-32FFEC",
+      "id": "R00-T02-LA-32FFEC05BAA7",
+      "laterShare": "",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+          "截图配色卡（三色）：成功核对 颜色写 localStorage，预览图随即切换；空态/未初始化核对 默认 light；错误/无权限核对 当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。",
+          "截图宽度卡（手机/桌面）：成功核对 宽度写 localStorage，预览图切换；空态/未初始化核对 默认 mobile；错误/无权限核对 当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。",
+          "截图字体与分段字符上限：成功核对 字体、上限规范化后写本地存储；空态/未初始化核对 默认跟随阅读字体、默认上限；错误/无权限核对 当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "featureId": "F-D20-UI-UI-SETTINGS-SHARING-32FFEC",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "testIds": [],
+        "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据"
+      },
+      "r02Share": "无 R02 服务份额：截图配色/宽度/字体/分段上限均为客户端 localStorage 写入与渲染投影（React SettingsContent/SharingTab），无服务端原语参与",
+      "r07Share": "R07（UI 设置页）完整分享设置页行为：容器初始化（缓存/15 秒超时/错误 ready）、三色卡、宽度卡、字体与上限的默认/写入/拒绝投影及存储禁止时显式失败",
+      "reason": "deferred to R07: this R00 leaf is still REQUIRED but has no R02 gating share; its acceptance belongs to the R07 stage, which must consume the remainder: R07（UI 设置页）完整分享设置页行为：容器初始化（缓存/15 秒超时/错误 ready）、三色卡、宽度卡、字体与上限的默认/写入/拒绝投影及存储禁止时显式失败",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "",
+      "status": "DEFERRED_TO_R07"
+    }
+  ],
+  "testedSha": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "toolchainChannel": "1.98.1",
+  "worktreeDirty": true
+}

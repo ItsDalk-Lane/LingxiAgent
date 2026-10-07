@@ -1,0 +1,25 @@
+{
+ "utc": "2026-10-07T23:36:23.967560+00:00",
+ "availableBytesDataVolume": 546534588416,
+ "includeSet": {
+  "paths": 29158,
+  "rawLogicalBytes": 2490626419,
+  "uniqueFilteredBlobs": 8615,
+  "blobsAlreadyInRepository": 861,
+  "blobsMissing": 7754,
+  "missingFilteredBytes": 1199373418
+ },
+ "looseObjectBudget": {
+  "zlibLevel1Bytes": 205163658,
+  "perObject4KiBRounded": 205164544,
+  "note": "level-1 是当前 Git 默认 loose 压缩；4KiB 取整为数据块上界，未含 APFS 元数据"
+ },
+ "indexBudgetBytes": 9384352,
+ "indexEstimatedEntries": 67224,
+ "treeBudgetBytesConservative": 15675392,
+ "commitRefsHeadroomBytes": 4194304,
+ "pushPackReferenceLevel6Bytes": 182157535,
+ "pushNote": "smart HTTP chunked 上传通常不落整包本地盘；该值为传输量级参照，非强制本地占用",
+ "conservativeTotalLocalWrite": 234418592,
+ "conclusion": "513Gi 量级余量下预算占比极小；具体结论见 REPORT.md"
+}

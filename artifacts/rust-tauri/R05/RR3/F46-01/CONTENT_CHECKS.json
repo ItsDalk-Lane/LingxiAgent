@@ -1,0 +1,122 @@
+{
+  "reportLinksMissing": [],
+  "commandBindings": [
+    {
+      "path": "stage-pin-check-01/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": true
+    },
+    {
+      "path": "build-after/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "reopen-after-command/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "reopen-before-command-02/command.json",
+      "exitCode": 1,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "sampler-negative-command-01/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "stage-pin-list-01/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "resources-01/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "stage-pin-check-02/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "reopen-final-command/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "reopen-before-command/command.json",
+      "exitCode": 1,
+      "scopedInputsStable": true,
+      "invalid": true
+    },
+    {
+      "path": "formatting-01/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "resources-list-01/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "error-explicit-command-01/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "service-lib-list-01/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "build-before/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "logging-tests-final/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "clippy-01/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    },
+    {
+      "path": "logging-tests-01/command.json",
+      "exitCode": 0,
+      "scopedInputsStable": true,
+      "invalid": false
+    }
+  ],
+  "actualResourcesSummary": "SELF_CHECKED",
+  "selfCheckOnly": "IMPLEMENTER SELF_CHECKED only; independent joint C/F46 review pending",
+  "sourceFrozenInOwnedFile": true,
+  "controlsActualExits": [
+    0,
+    101,
+    101,
+    0
+  ]
+}

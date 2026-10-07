@@ -1,0 +1,71 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "cases": [
+  {
+   "case": "a01-build-locked-offline",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a01-deptree-desktop-free",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a01-service-start-ready",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a01-health-200",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "a01-sigterm-clean-exit-0",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "a01-no-leftover-children",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a01-port-closed-after-shutdown",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a01-startup-failure-no-ready",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a01-newer-data-epoch-refused",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a01-newer-data-epoch-explicit-error",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a01-newer-data-epoch-no-root-switch",
+   "expect": 1,
+   "actual": 0,
+   "ok": false
+  }
+ ]
+}

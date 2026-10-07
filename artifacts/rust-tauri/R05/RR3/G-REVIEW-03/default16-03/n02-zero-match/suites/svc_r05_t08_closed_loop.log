@@ -1,0 +1,18 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r05_t08_closed_loop.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t08_closed_loop-5899fb11bc7f965e)
+
+running 11 tests
+test c02_two_full_chain_runs_different_runtime_nonces ... ok
+test c01_read_edit_read_final_restart_five_way_chain ... ok
+test c03_allowed_and_denied_file_sentinels ... ok
+test c04_request_id_replay_and_conflict ... ok
+test c05_restart_reads_history_zero_reexecution ... ok
+test c06_crash_after_tool_effect_no_blind_redo ... ok
+test c08_two_sessions_shared_callid_isolated ... ok
+test c09_live_stream_and_history_projection_agree ... ok
+test c07_crash_midstream_honest_terminal ... ok
+test rr1_f13_normalized_final_survives_restart_on_the_real_binary ... ok
+test c12_repeated_cycles_stay_bounded ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.74s
+

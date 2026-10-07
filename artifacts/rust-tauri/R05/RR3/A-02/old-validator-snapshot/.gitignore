@@ -1,0 +1,154 @@
+# ═══════════════════════════════════════════
+# 用户数据（已迁移到 ~/.hanako/）
+# ═══════════════════════════════════════════
+agents/
+user/
+!skills2set/hana-plugin-creator/agents/
+!skills2set/hana-plugin-creator/agents/**
+!skills2set/office-documents/agents/
+!skills2set/office-documents/agents/**
+
+# ═══════════════════════════════════════════
+# 文档 / 参考文件
+# ═══════════════════════════════════════════
+.docs/
+CLAUDE.md
+AGENTS.md
+docs/superpowers/
+.superpowers/
+archived/
+devlog/
+research/
+handoff-*.md
+TODO.md
+# 各轮迁移/重构任务书文件夹（本地规划材料，不入库）
+/Lingxi_*_Taskbooks_*/
+
+# ═══════════════════════════════════════════
+# AI 生图原始素材
+# ═══════════════════════════════════════════
+**/jimeng-*.png
+
+# ═══════════════════════════════════════════
+# 构建产物
+# ═══════════════════════════════════════════
+# Rust workspace 构建产物（R02-T01 增补：R01-T08 核查发现根 .gitignore 未覆盖；
+# 门禁惯例仍要求 cargo 命令使用仓库外专属 CARGO_TARGET_DIR，见 RR-T08-F1）
+rust/target/
+dist/
+dist-server/
+dist-server-open/
+dist-server-artifact/
+dist-rust-service/
+bundled-bin/
+dist-renderer-artifact/
+dist-standalone/
+desktop/dist-splash/
+dist-server-bundle/
+dist-computer-use/
+dist-speech/
+dist-open-export/
+desktop/main.bundle.cjs
+desktop/preload.bundle.cjs
+# build/ 下的构建临时产物（被跟踪的是配置类 json/nsh/plist，产物不入库）
+build/.cli-closure-*
+build/*.mjs
+.cache/
+# 编辑器/同步工具生成的同名副本（"file 2.ts" 之类）
+*[ ][0-9]*.*
+desktop/dist-renderer/
+desktop/native/**/.build/
+vendor/
+inbox/
+
+# 运行时 / 依赖
+# ═══════════════════════════════════════════
+node_modules
+.pi/
+
+# IDE / 工具
+.claude/
+.agents/skills/
+*.code-workspace
+
+# 项目私有文件
+CLAUDE.md
+
+# 临时文件
+tmp/
+test-results/
+__pycache__/
+*.pyc
+/index.html
+homepage/
+desktop/src/react/animation-mockup/
+
+# 环境变量 / 凭证
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.crt
+credentials.json
+secrets.yaml
+secrets.json
+auth.json
+
+# 日志
+*.log
+logs/
+# F1-F12 修复轮交付证据例外（C03）：round2/round3 审计日志是测试依赖的交付物，
+# 随仓库分发；先重包含目录再重包含文件，其余运行日志继续按上面规则忽略。
+!artifacts/f1-f12-repair/round2/logs/
+!artifacts/f1-f12-repair/round2/logs/**
+!artifacts/f1-f12-repair/round3-c01-c03/logs/
+!artifacts/f1-f12-repair/round3-c01-c03/logs/**
+# refactor-2026 独立修复轮交付证据例外（R3）：EVIDENCE_SHA256.txt 引用的原始
+# 先红后绿/回归/打包日志必须在干净 checkout 可复核；已逐文件脱敏审计（见
+# recheck-r1-r2/redaction-audit.md），无密钥与真实用户数据。仅放行该证据树。
+!artifacts/refactor-2026/independent-fix/**/*.log
+# rust-tauri 迁移各阶段门禁/回归/审查证据日志例外：R00—R04 已按此惯例入库
+# （R04 含 1401 个 .log 与 200 个 logs/ 目录文件），R05 沿用同一证据分发口径。
+!artifacts/rust-tauri/**/*.log
+!artifacts/rust-tauri/**/logs/
+
+# 系统文件
+.DS_Store
+*.db
+
+# R02 真服务试跑的本机数据根含临时令牌、设备记录和 SQLite 辅助文件；
+# 保留原始取证文件在本机，不把凭证或用户态数据库加入提交。
+/artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-1/home-*/
+/artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-*/
+# A13 真实试跑返回的一次性 secret 原文只留本机；远端交付使用摘要与脱敏结果。
+/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p1-issue-credential.body
+
+# Codex reviews
+reviews/
+.superpowers/
+
+# 本地工具工作台状态（会话记忆类，不入库也不入证据 manifest）
+.workbuddy/
+
+# Codex environments
+.codex/
+
+# ZCode CLI working dir
+.zcode/
+
+# Reasonix 本地 agent 状态
+.reasonix/
+
+# Mimosa 安全扫描本地状态（finding-ledger / 扫描历史 / hook 状态，208MB+，不入库）
+.mimosa/
+
+# Playwright MCP 浏览器工具产物（控制台日志 / 截图 / 页面快照）
+.playwright-mcp/
+
+# GitGraphPanel 开发期设计稿（实现已入库，mockup 留本地）
+/git-graph-panel-mockup*.html
+desktop/native/LingxiSpeechPermissions/build/
+
+# R05 独立审查/终审探针隔离副本的 cargo 构建缓存（门禁惯例：CARGO_TARGET_DIR 仓库外）
+/artifacts/rust-tauri/R05/**/target/

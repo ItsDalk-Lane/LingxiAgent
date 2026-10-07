@@ -1,0 +1,27 @@
+{
+ "incident": "post-relocation single-file mutation of one fixture caused by this implementer's own verification command",
+ "entry": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/copy/",
+ "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_J-REVIEW-01_copy",
+ "mutated_file": ".git/index",
+ "cause": "verify-c spot check ran `git -C <fixture> status --porcelain` (output in verify-c.txt). git's opportunistic index stat-refresh rewrote .git/index in place at 2026-10-07T11:55:40Z. The digest loop in the same script had completed BEFORE that call and still matched the receipt (79736540a1201ae9...), so the relocation itself was byte-preserving; the mutation happened after verification, inside the verification command.",
+ "relocation_time_truth": {
+  "receipt_pre_tree_digest": "79736540a1201ae9fda8133baf4d1dfa41789e0ebca52e941b8acfc5f1bc9e8a",
+  "receipt_post_tree_digest": "79736540a1201ae9fda8133baf4d1dfa41789e0ebca52e941b8acfc5f1bc9e8a",
+  "independent_rescan_before_mutating_command_utc": "2026-10-07T11:56Z (verify-c.txt sample 3, same digest)"
+ },
+ "post_mutation_state": {
+  "current_tree_digest": "fee8e52b9a4965766eb4b3b3fd376f3da761e05d47db1d7eabd966815ea39e9b",
+  "current_file_count": 102887,
+  "current_total_bytes": 5130434169,
+  "note": "file_count and total_bytes unchanged vs receipt; only .git/index content bytes differ; digest stable across two full scans 20s apart (verify-c-incident-diagnosis2.txt)"
+ },
+ "bounded_evidence": [
+  "find over all 56 destinations for files newer than the relocation window end returned exactly one path: this .git/index (verify-c3-postmutation-audit.txt)",
+  ".git/index mtime 2026-10-07T11:55:40Z == the git status call; relocation finished 11:54:56Z",
+  "semantic index intact: git --no-optional-locks ls-files -s | sha256 = 3016f7ae9d18d93951f05a77adb68946cab99a92d0a122294d4c5cf096407d47, identical to the main repository index hash recorded in baseline-git-state.txt",
+  "all other 55 entries and every other file in this entry untouched"
+ ],
+ "restoration": "not possible byte-exactly: the pre-mutation .git/index bytes (stat-cache fields) were not archived anywhere and git rewrote the file in place; recorded honestly instead of fabricated",
+ "corrective_note_for_reviewers": "read-only inspection of nested-git fixtures must use `git --no-optional-locks` or plumbing commands only; `git status` writes .git/index",
+ "recorded_utc": "2026-10-07T11:58:30Z"
+}

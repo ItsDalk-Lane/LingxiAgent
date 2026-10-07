@@ -1,0 +1,83 @@
+{
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "branch": "codex/rust-tauri-migration",
+  "toolchain": {
+    "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+    "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "node": "v24.16.0",
+    "python": "Python 3.14.3"
+  },
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "inputs": [
+    {
+      "path": "rust-toolchain.toml",
+      "sha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37"
+    },
+    {
+      "path": "rust/Cargo.lock",
+      "sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd"
+    },
+    {
+      "path": "rust/crates/xtask/src/main.rs",
+      "sha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1"
+    },
+    {
+      "path": "rust/crates/xtask/src/candidate.rs",
+      "sha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86"
+    },
+    {
+      "path": "rust/crates/xtask/src/candidate/tests.rs",
+      "sha256": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233"
+    },
+    {
+      "path": "rust/crates/xtask/src/runner_identity.rs",
+      "sha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7"
+    },
+    {
+      "path": "rust/crates/xtask/src/verify.rs",
+      "sha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e"
+    },
+    {
+      "path": "rust/crates/xtask/src/verify/runner_tests.rs",
+      "sha256": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69"
+    },
+    {
+      "path": "scripts/rust-tauri/run_output_sinks.py",
+      "sha256": "8066046ae36cc77a3f7a1fd9f9fbe947b76bf3036a830fc060770cd6d1f26b1e"
+    },
+    {
+      "path": "scripts/rust-tauri/r02_run_output_regression.py",
+      "sha256": "b5c67acd431f9c255d12836227f85bd4eb056bda9e54a39697fad490e968192d"
+    },
+    {
+      "path": "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+      "sha256": "3aca4ae169fa06afc29e6aa89acef79ecd1ce2a6422cf479d7913643d190bf84"
+    },
+    {
+      "path": "rust/target/debug/xtask",
+      "sha256": "562b53f51514f41d7f041217e95faab059a12d48367b9497af910af849389119"
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R02.json",
+      "sha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2"
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R03.json",
+      "sha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea"
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R04.json",
+      "sha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86"
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R05.json",
+      "sha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798"
+    }
+  ],
+  "candidateBoundary": "本记录绑定A输入；并行B/C工作树未冻结。完整候选绑定由最终独立阶段运行记录。",
+  "allExpected": true
+}

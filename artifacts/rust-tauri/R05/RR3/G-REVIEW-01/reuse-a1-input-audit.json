@@ -1,0 +1,100 @@
+{
+  "utc": "2026-10-07T01:59:49.031087+00:00",
+  "manifest": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/input-manifest.json",
+  "manifestSHA256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+  "count": 1563,
+  "changes": [
+    {
+      "path": "scripts/rust-tauri/r02_run_output_regression.py",
+      "expected": "6696e8279a99a3e407d5d3c270cebd3e00c4d6031a8fbc71c4b875dfb03a5c3e",
+      "current": "fcee14b8c529d502d9885a4b7a31e8c5f90ade22ab92e149402d52585272fd99"
+    },
+    {
+      "path": "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+      "expected": "3aca4ae169fa06afc29e6aa89acef79ecd1ce2a6422cf479d7913643d190bf84",
+      "current": "53ff4eddd9af1844b7722c39dd369efcb42dbb6787adc9bb70497af48c10c8df"
+    },
+    {
+      "path": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "expected": "43419656975bc810639fbe5e4b4870c3a460fdc6d9a65fabe14a45dbb75b8429",
+      "current": "be5ee9671acc3cfcc458cd1ec2dd384ca6a7f31a9a1ab9ee5b21effad156694c"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "expected": "de950b466ac930d201f61bbb464a66a49a7b69afd79295931a7d753a637ae563",
+      "current": "08dd8c15aafb420668b2569a43084f038d1a0ddcec438f9e9e022f4f03648abc"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "expected": "11afe718db1c1c251fe915f77b378fe54450ed76a01966939b8df83b2bc5102b",
+      "current": "ba1942aa792f8f2629ad504218f6079fd118c960cd9e2cb87bfe29f7b1d08e89"
+    },
+    {
+      "path": "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "expected": "c219180aab39823c647f8758028fe91150bd2e5e76d735b3dd9000ab99ec7b37",
+      "current": "7eecc3908d9672d3d6b2588463c1f1ebbdd9a5451f62f58b98b45bb9f2844c43"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "expected": "c1fd4b03b677d033ddc6a19df1cae2e41be7ea46d3dfd3f4424b7bb2aea0801a",
+      "current": "f8eef564b4dc2981ab53cd68e1c1cfb7018cf8f159f23985fbf5d69ffa97a972"
+    },
+    {
+      "path": "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+      "expected": "027afa74e452e5839885ccd6d1412301b7ffcc19812fffaaea9ffd9bdd3f35c4",
+      "current": "2e36bfa19d2efab9c16080461a1bfb252df1566cba497ced6b9c2099d0949b17"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "expected": "c6b5da4a74938e66b6962b733a46a1d9ef8401cab36dc816ccbdb2de553bec99",
+      "current": "3def9a60679edb5de237a1b164adb08951ae3d3920abdd32f338f58a11c1c22d"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "expected": "0cfd02db2ab41fd1b876b694d705410dd90564265d56917413e98d28508a61f2",
+      "current": "472a278c59f1897ace517db9650a920041998da43feeceff3dc8d990ffee407a"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_HANDOFF.json",
+      "expected": "41eb3ad1a91a577511402736b80b38cc5529b937ca6574bbc074acc7d01376b1",
+      "current": "87ea87b09f37bd073a6ed85df4dec6769e18cf41326c2541d20588ae834517c0"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "expected": "6fc4c7096145a3bfa3d6f318b32721ad520f064162d34f007080a41a524c73d1",
+      "current": "ef28cb6a1f9d200381d94781a7ad5d594f349f95089ab7deb3f70bfd4984faca"
+    },
+    {
+      "path": "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "expected": "2c431b2bf9fa6ad83ca010f4392cc262844eca2e2366a6e6aa204e14b280f108",
+      "current": "a4e362636b909d4a5a7646f932c58408d149623cb041cde812f7d300f36f4f7d"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_REPORT.md",
+      "expected": "a13ca7342991da5725a721e93fa8dade0437b600a06e64814206254872a23907",
+      "current": "e1e73289c4e9abb0be2a3e094c60274225028082506adbb5f802966d711895dc"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "expected": "edaefa5b5a1d0f5afaa3c75760c264269fecadaa54acb2915793052e99557d2c",
+      "current": "1b5d6f3cfdb4ce089f21003cb40ecc44547e31c93837be7f43cc19b43cf91e26"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+      "expected": "31562e205d72ba8564fb9a8f3d6b3bdbdbc7e9ad86a978e32a6b5c2c5745dd1c",
+      "current": "71b1b6a3663100cc0d8a953b4939b47caf9f0970bd44a3d547b3d525dcb7d3fc"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+      "expected": "cc88fbcf40558f9a85d89164ef4e256bec7a3ca1d746d1b9d8065810eb145a18",
+      "current": "8c34eaa8d22f8bd7bf77ea99a87f961647a2ec9bd269e0014aaf654b885241ec"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+      "expected": "6ec4bf93ecb10d9762af472bb2191b9955c911829e28b11f398827ed15b6a1a4",
+      "current": "3d9d389e6cef875a781b1312e22f5856f14b2ad49866a8d670d9a8def834e80b"
+    }
+  ],
+  "equal": false,
+  "boundary": "广义首审1563输入观察不相等：包含两个已修脚本及并行metadata；不能整体复用。实际A1复用17输入另见reuse-a1-targeted-input-audit.json"
+}

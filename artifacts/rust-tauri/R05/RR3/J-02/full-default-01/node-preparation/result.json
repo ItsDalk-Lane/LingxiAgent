@@ -1,0 +1,283 @@
+{
+  "status": "PASS",
+  "startedUtc": "2026-10-07T03:55:26.915908+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T03:55:26.916270+00:00",
+      "finishedUtc": "2026-10-07T03:55:26.923805+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "82d8b685ab806b27b5cf0c3b770f86661adcb8958e59de111a5b9c73918573fc",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/j02-default-8zszvkmm",
+      "startedUtc": "2026-10-07T03:55:26.924018+00:00",
+      "finishedUtc": "2026-10-07T03:55:26.931545+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3e815b658e8d165cf6b809572daed31a51a3d42edce578c6a2a511b43cd49501",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T03:55:26.931706+00:00",
+      "finishedUtc": "2026-10-07T03:55:26.938774+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/j02-default-8zszvkmm",
+      "startedUtc": "2026-10-07T03:55:26.938938+00:00",
+      "finishedUtc": "2026-10-07T03:55:26.946128+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/j02-default-8zszvkmm",
+      "startedUtc": "2026-10-07T03:55:26.946252+00:00",
+      "finishedUtc": "2026-10-07T03:55:27.217144+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "node",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T03:55:27.513127+00:00",
+      "finishedUtc": "2026-10-07T03:55:27.530689+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "a8f8f7ba69d43285857a0ea34017ef8dadd3ba012404bb7dd188fc773cf63ee2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "npm",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T03:55:27.530822+00:00",
+      "finishedUtc": "2026-10-07T03:55:27.635915+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3dbc807e13de125e909bea5877613d5d67989a43fb8e982fd79ba0efa46ac952",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "node",
+        "-e",
+        "const s=require('./node_modules/semver');const p=require('./package.json');if(!s.satisfies(process.version,p.engines.node)||!s.satisfies(process.argv[1],'>=11.10.0'))process.exit(1)",
+        "11.13.0"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "startedUtc": "2026-10-07T03:55:27.636082+00:00",
+      "finishedUtc": "2026-10-07T03:55:27.680169+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import WebSocket from 'ws';import {createRequire} from 'node:module';const r=createRequire(process.cwd()+'/package.json');console.log(JSON.stringify({ws:r.resolve('ws'),type:typeof WebSocket}));if(typeof WebSocket!=='function')process.exit(1)"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/j02-default-8zszvkmm",
+      "startedUtc": "2026-10-07T03:56:08.496484+00:00",
+      "finishedUtc": "2026-10-07T03:56:08.532395+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "6f417902cec0dcbe7d6ed8ec20b71146a40ec0d5197c7db86742a2b8c3730b6c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/Users/study_superior/r05t08-work/j02-default-8zszvkmm/node_modules/.bin/vitest",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/j02-default-8zszvkmm",
+      "startedUtc": "2026-10-07T03:56:08.532515+00:00",
+      "finishedUtc": "2026-10-07T03:56:08.710197+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "598067fbcf6196ad687fd8bcf57f31dc16964266ce417cf2baed637915ec3ddc",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "source": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "copy": "/Users/study_superior/r05t08-work/j02-default-8zszvkmm",
+  "sourceHead": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "copyHead": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "inputs": {
+    "package.json": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+    "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+    ".npmrc": "ce00fe5025692993005d3a5350ff13f8a568d604158041df74f1d229a2dfb607"
+  },
+  "metadata": {
+    "installedLockEntries": 1281,
+    "installedPackages": 1277,
+    "absentOptionalPackages": [
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/aix-ppc64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/android-arm",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/android-arm64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/android-x64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/darwin-x64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/freebsd-arm64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/freebsd-x64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/linux-arm",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/linux-arm64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/linux-ia32",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/linux-loong64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/linux-mips64el",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/linux-ppc64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/linux-riscv64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/linux-s390x",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/linux-x64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/netbsd-arm64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/netbsd-x64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/openbsd-arm64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/openbsd-x64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/openharmony-arm64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/sunos-x64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/win32-arm64",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/win32-ia32",
+      "node_modules/@earendil-works/chord/node_modules/@esbuild/win32-x64",
+      "node_modules/@emnapi/core",
+      "node_modules/@emnapi/runtime",
+      "node_modules/@emnapi/wasi-threads",
+      "node_modules/@esbuild/aix-ppc64",
+      "node_modules/@esbuild/android-arm",
+      "node_modules/@esbuild/android-arm64",
+      "node_modules/@esbuild/android-x64",
+      "node_modules/@esbuild/darwin-x64",
+      "node_modules/@esbuild/freebsd-arm64",
+      "node_modules/@esbuild/freebsd-x64",
+      "node_modules/@esbuild/linux-arm",
+      "node_modules/@esbuild/linux-arm64",
+      "node_modules/@esbuild/linux-ia32",
+      "node_modules/@esbuild/linux-loong64",
+      "node_modules/@esbuild/linux-mips64el",
+      "node_modules/@esbuild/linux-ppc64",
+      "node_modules/@esbuild/linux-riscv64",
+      "node_modules/@esbuild/linux-s390x",
+      "node_modules/@esbuild/linux-x64",
+      "node_modules/@esbuild/netbsd-arm64",
+      "node_modules/@esbuild/netbsd-x64",
+      "node_modules/@esbuild/openbsd-arm64",
+      "node_modules/@esbuild/openbsd-x64",
+      "node_modules/@esbuild/openharmony-arm64",
+      "node_modules/@esbuild/sunos-x64",
+      "node_modules/@esbuild/win32-arm64",
+      "node_modules/@esbuild/win32-ia32",
+      "node_modules/@esbuild/win32-x64",
+      "node_modules/@firecrawl/anydoc-darwin-x64",
+      "node_modules/@firecrawl/anydoc-linux-arm64-gnu",
+      "node_modules/@firecrawl/anydoc-linux-arm64-musl",
+      "node_modules/@firecrawl/anydoc-linux-x64-gnu",
+      "node_modules/@firecrawl/anydoc-linux-x64-musl",
+      "node_modules/@firecrawl/anydoc-win32-x64-msvc",
+      "node_modules/@napi-rs/wasm-runtime",
+      "node_modules/@node-rs/jieba-android-arm-eabi",
+      "node_modules/@node-rs/jieba-android-arm64",
+      "node_modules/@node-rs/jieba-darwin-x64",
+      "node_modules/@node-rs/jieba-freebsd-x64",
+      "node_modules/@node-rs/jieba-linux-arm-gnueabihf",
+      "node_modules/@node-rs/jieba-linux-arm64-gnu",
+      "node_modules/@node-rs/jieba-linux-arm64-musl",
+      "node_modules/@node-rs/jieba-linux-x64-gnu",
+      "node_modules/@node-rs/jieba-linux-x64-musl",
+      "node_modules/@node-rs/jieba-wasm32-wasi",
+      "node_modules/@node-rs/jieba-win32-arm64-msvc",
+      "node_modules/@node-rs/jieba-win32-ia32-msvc",
+      "node_modules/@node-rs/jieba-win32-x64-msvc",
+      "node_modules/@rollup/rollup-android-arm-eabi",
+      "node_modules/@rollup/rollup-android-arm64",
+      "node_modules/@rollup/rollup-darwin-x64",
+      "node_modules/@rollup/rollup-freebsd-arm64",
+      "node_modules/@rollup/rollup-freebsd-x64",
+      "node_modules/@rollup/rollup-linux-arm-gnueabihf",
+      "node_modules/@rollup/rollup-linux-arm-musleabihf",
+      "node_modules/@rollup/rollup-linux-arm64-gnu",
+      "node_modules/@rollup/rollup-linux-arm64-musl",
+      "node_modules/@rollup/rollup-linux-loong64-gnu",
+      "node_modules/@rollup/rollup-linux-loong64-musl",
+      "node_modules/@rollup/rollup-linux-ppc64-gnu",
+      "node_modules/@rollup/rollup-linux-ppc64-musl",
+      "node_modules/@rollup/rollup-linux-riscv64-gnu",
+      "node_modules/@rollup/rollup-linux-riscv64-musl",
+      "node_modules/@rollup/rollup-linux-s390x-gnu",
+      "node_modules/@rollup/rollup-linux-x64-gnu",
+      "node_modules/@rollup/rollup-linux-x64-musl",
+      "node_modules/@rollup/rollup-openbsd-x64",
+      "node_modules/@rollup/rollup-openharmony-arm64",
+      "node_modules/@rollup/rollup-win32-arm64-msvc",
+      "node_modules/@rollup/rollup-win32-ia32-msvc",
+      "node_modules/@rollup/rollup-win32-x64-gnu",
+      "node_modules/@rollup/rollup-win32-x64-msvc",
+      "node_modules/@tybys/wasm-util"
+    ],
+    "obsoleteExtraneousMetadata": [
+      "packages/plugin-components",
+      "packages/plugin-protocol",
+      "packages/plugin-runtime",
+      "packages/plugin-sdk"
+    ],
+    "installedLockRootVersion": "0.1.40-experimental.1",
+    "candidateVersion": "0.1.43"
+  },
+  "node": "v24.16.0",
+  "npm": "11.13.0",
+  "tools": {
+    "node": {
+      "path": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+      "sha256": "1ee75375e33b94fc34b3b19aede049e11dae90efb63b374dc96d6bdace70c4b8"
+    },
+    "npm": {
+      "path": "/Users/study_superior/.nvm/versions/node/v24.16.0/lib/node_modules/npm/bin/npm-cli.js",
+      "sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7"
+    }
+  },
+  "dependencyManifest": "dependency-files.json",
+  "dependencyManifestSha256": "a7194de703eabe3832f360f856d613e1ee1e4df7191250726c115ee6bb289408",
+  "copyMethod": {
+    "cowFiles": 64645,
+    "copiedFiles": 0,
+    "links": 115,
+    "bytes": 1379047525
+  },
+  "finishedUtc": "2026-10-07T03:56:16.302571+00:00"
+}

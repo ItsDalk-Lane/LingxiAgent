@@ -1,0 +1,69 @@
+{
+ "control_root": "/private/tmp/rr3-ereview05-controls",
+ "cases": [
+  {
+   "case": "阳性1: 字节相同副本 strict 解析",
+   "expect": "PASS",
+   "got": "PASS",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "阳性2: 字节相同副本六元组检查",
+   "expect": "PASS",
+   "got": "PASS",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "阴性1: R06_READY 篡改为 false 被六元组检查 FLAG",
+   "expect": "FLAG",
+   "got": "FLAG",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "阴性2: 顶层真重复键 schemaVersion 被严格解析器 FLAG",
+   "expect": "FLAG",
+   "got": "FLAG: duplicate keys ['schemaVersion']",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "阴性2b: naive json.loads 静默 last-wins（佐证严格解析必要）",
+   "expect": "9.9.9-tampered",
+   "got": "9.9.9-tampered",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "阴性3: 冻结输入单 SHA 篡改被相等检查 FLAG",
+   "expect": "FLAG",
+   "got": "FLAG",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "阴性3b: 未篡改清单同一方法为 PASS",
+   "expect": "PASS",
+   "got": "PASS",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "阴性4: 七处 rr3_current 之一被篡改被逐字节相等检查 FLAG",
+   "expect": "FLAG",
+   "got": "FLAG",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "阴性4b: 七处原样为 PASS",
+   "expect": "PASS",
+   "got": "PASS",
+   "ok": true,
+   "detail": ""
+  }
+ ],
+ "method_validated": true
+}

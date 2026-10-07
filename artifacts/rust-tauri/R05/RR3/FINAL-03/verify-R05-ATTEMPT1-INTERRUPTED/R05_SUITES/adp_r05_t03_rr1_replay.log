@@ -1,0 +1,41 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.57s
+     Running tests/r05_t03_rr1_replay.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r05-t08/debug/deps/r05_t03_rr1_replay-03bbfcc2b4dbef61)
+
+running 33 tests
+test rr1_f06_buffered_empty_thinking_preserves_signature_on_next_request ... ok
+test rr1_f06_stream_absent_placeholder_signature_accepts_the_final_delta ... ok
+test rr1_f06_stream_identical_signature_resend_is_tolerated ... ok
+test rr1_f06_byte_split_stream_keeps_the_signed_thinking_block ... ok
+test rr1_f06_stream_two_different_final_signatures_are_a_true_conflict ... ok
+test rr1_f06_stream_placeholder_signature_accepts_the_final_signature_delta ... ok
+test rr1_f07_empty_text_signature_part_round_trips_verbatim ... ok
+test rr1_f07_consecutive_rounds_and_reverse_results_group_per_round ... ok
+test rr1_f07_f10_unmatched_or_duplicated_anchors_fail_loudly ... ok
+test rr1_f07_function_call_signature_survives_both_wire_modes ... ok
+test rr1_f07_interleaved_parts_keep_original_order ... ok
+test rr1_f08_buffered_reasoning_content_reaches_the_canonical ... ok
+test rr1_f07_parallel_results_form_one_user_content ... ok
+test rr1_f08_missing_required_reasoning_fails_closed_before_dispatch ... ok
+test rr1_f08_deepseek_reasoning_replays_through_renderer_and_compat ... ok
+test rr1_f09_responses_reasoning_item_never_crosses_providers ... ok
+test rr1_f09_same_family_other_provider_never_receives_the_signature ... ok
+test rr1_f08_no_contract_provider_never_receives_the_carrier ... ok
+test rr1_f09_same_model_id_different_provider_refuses ... ok
+test rr1_f09_same_provider_other_model_refuses ... ok
+test rr1_f09_same_origin_replays_the_signature_verbatim ... ok
+test rr1_f10_codex_replay_keeps_text_reasoning_tool_order ... ok
+test rr1_f10_responses_keep_reasoning_text_tool_order ... ok
+test rr1_f10_responses_keep_text_reasoning_tool_order ... ok
+test rr1_f10_responses_multi_segment_interleave_keeps_positions ... ok
+test rr1_f10_responses_tools_interspersed_keep_positions ... ok
+test rr1_f32_declared_non_reasoning_model_strips_the_carrier ... ok
+test rr1_f32_off_level_deepseek_round_without_carrier_is_exempt ... ok
+test rr1_f32_no_origin_family_state_refused_on_all_three_gated_families ... ok
+test rr1_f32_responses_duplicated_function_call_anchor_is_refused ... ok
+test rr1_f32_utility_mode_deepseek_round_without_carrier_is_exempt ... ok
+test rr1_f32_off_level_strips_a_present_deepseek_carrier ... ok
+test rr1_f32_utility_mode_strips_a_present_deepseek_carrier ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

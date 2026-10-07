@@ -1,0 +1,1018 @@
+{
+ "utc": "2026-10-07T23:36:24.227683+00:00",
+ "prep02LocalOriginalsPointer": "artifacts/rust-tauri/R05/RR3/DELIVERY-PREP-02/local-originals.json (2,036 项旧排除原件登记，本轮不重复展开)",
+ "f51Externalized": {
+  "receipt": "artifacts/rust-tauri/R05/RR3/F51-01/RELOCATION-RECEIPT.json",
+  "entries": 56,
+  "files": 110071,
+  "symlinks": 121,
+  "bytes": 5324827710,
+  "allDigestsEqual": true,
+  "destinationRoot": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures",
+  "matchedInPrep02GoneList": 52,
+  "localOnly": true,
+  "remoteOriginalAvailable": false,
+  "entriesSample": [
+   {
+    "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-02/copy-delete-rename/",
+    "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_copy-delete-rename",
+    "tree_digest_equal": true
+   },
+   {
+    "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-02/extra/external-fresh/repo/",
+    "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_external-fresh_repo",
+    "tree_digest_equal": true
+   },
+   {
+    "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-tracked-grandchild/repo/",
+    "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust-tauri_R05_RR3_A-02_extra_external-old-tracked-grandchild_repo",
+    "tree_digest_equal": true
+   }
+  ]
+ },
+ "f52Externalized": {
+  "receipt": "artifacts/rust-tauri/R05/RR3/F52-01/RELOCATION-RECEIPT-F52.json",
+  "entries": 1,
+  "files": 1,
+  "symlinks": 1,
+  "destinationRoot": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures",
+  "localOnly": true,
+  "remoteOriginalAvailable": false
+ },
+ "removedSincePrep02": [
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-02/copy-delete-rename/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-02/extra/external-fresh/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-tracked-grandchild/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-02/extra/external-old-untracked-grandchild/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-02/extra/internal-fresh/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-tracked-grandchild/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-02/extra/internal-old-untracked-grandchild/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename-02/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/copy-delete-rename/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-fresh/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-old-tracked-grandchild/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/external-old-untracked-grandchild/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-fresh/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-old-tracked-grandchild/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra-02/internal-old-untracked-grandchild/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-fresh/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-old-tracked-grandchild/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/external-old-untracked-grandchild/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-fresh/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-old-tracked-grandchild/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/extra/internal-old-untracked-grandchild/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/validator-fault-repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 128,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-fresh/candidate-copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-fresh/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-untracked/candidate-copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-02/internal-untracked/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-fresh/candidate-copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-fresh/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-tracked/candidate-copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-tracked/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-untracked/candidate-copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/external-untracked/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-fresh/candidate-copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-fresh/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-tracked/candidate-copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-tracked/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-untracked/candidate-copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-03/internal-untracked/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-validator-bin/git",
+   "prep02Category": "INCLUDE_EVIDENCE",
+   "prep02Bytes": 255,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-validator-bin/python3",
+   "prep02Category": "LOCAL_SYMLINK",
+   "prep02Bytes": 62,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-validator-repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 128,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent/internal-fresh/repo/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 320,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-01/copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 224,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 224,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/runner-copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 256,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 224,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/runner-copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 256,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 224,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/runner-copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 256,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 224,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/runner-copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 256,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 224,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 288,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-01/i-restore-final/copy/",
+   "prep02Category": "LOCAL_NESTED_REPOSITORY",
+   "prep02Bytes": 224,
+   "status": "RELOCATED_EXTERNAL_LOCALONLY",
+   "remoteOriginalAvailable": false,
+   "localOnly": true
+  }
+ ],
+ "oversizeOriginalsStillLocal": [
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/build/liblingxi_service.rlib",
+   "sha256": "ef146b51dfad8d246f6359e8b5df896731e7db6fd7c281d26a1f08653cb30881",
+   "bytes": 134457480,
+   "localOnly": true,
+   "remoteOriginalAvailable": false
+  }
+ ],
+ "newExcludedThisRound": [
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-ticket.body",
+   "sha256": "e228135b37f38c21b9cb2dd331b0136df8e9737fc1856bc24e31871df74be4e4",
+   "bytes": 96,
+   "category": "LOCAL_ONLY",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "A13 真实运行时在合成测试 home 签发的临时票据响应原件（PREP02 同名 17 项先例）：仅登记 SHA/size/来源，不输出票据原文"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-help-exit0-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-help-exit0-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLIENT/cli-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main/lingxi-service/local-token.json",
+   "sha256": "9f6435afd31f8f7c67c3fc1ef4b98d48f60b3a5edd00e49ee10d82a19e46a040",
+   "bytes": 184,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "合成测试 home 内真实运行时本地 token（PREP02 LOCAL_RUNTIME_STATE 同角色先例）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n16-binding-drift/run-a/A13/redaction-scan/p1-ticket.body",
+   "sha256": "b8ffe9c50b46c824206083014242aadd1162fc0d2acc2918632272f213b04c0d",
+   "bytes": 96,
+   "category": "LOCAL_ONLY",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "A13 真实运行时在合成测试 home 签发的临时票据响应原件（PREP02 同名 17 项先例）：仅登记 SHA/size/来源，不输出票据原文"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n16-binding-drift/run-a/CLIENT/cli-help-exit0-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n16-binding-drift/run-a/CLIENT/cli-help-exit0-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n16-binding-drift/run-a/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n16-binding-drift/run-a/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n16-binding-drift/run-a/CLIENT/cli-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n16-binding-drift/run-a/CLIENT/cli-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-01/n16-binding-drift/run-a/CLI_RUST/home-main/lingxi-service/local-token.json",
+   "sha256": "bd81095adbc82f8948b383748cad20e79b9f19285d0197a879f190e2b234bc87",
+   "bytes": 184,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "合成测试 home 内真实运行时本地 token（PREP02 LOCAL_RUNTIME_STATE 同角色先例）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n06-midgate-mutation/evidence/A13/redaction-scan/p1-ticket.body",
+   "sha256": "2b2fd78824ae67f25dbd6e871b089fc1cf5060a70637a55913f2acc6ba8c391c",
+   "bytes": 96,
+   "category": "LOCAL_ONLY",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "A13 真实运行时在合成测试 home 签发的临时票据响应原件（PREP02 同名 17 项先例）：仅登记 SHA/size/来源，不输出票据原文"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n06-midgate-mutation/evidence/CLIENT/cli-help-exit0-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n06-midgate-mutation/evidence/CLIENT/cli-help-exit0-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n06-midgate-mutation/evidence/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n06-midgate-mutation/evidence/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n06-midgate-mutation/evidence/CLIENT/cli-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n06-midgate-mutation/evidence/CLIENT/cli-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n06-midgate-mutation/evidence/CLI_RUST/home-main/lingxi-service/local-token.json",
+   "sha256": "69a1f9a17acdd3b3a5d417cb28e414735b616b7b6ead69fbb825f381eb8dae7b",
+   "bytes": 184,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "合成测试 home 内真实运行时本地 token（PREP02 LOCAL_RUNTIME_STATE 同角色先例）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-a/A13/redaction-scan/p1-ticket.body",
+   "sha256": "47bc9c948b2b826badb65a7c6c413146a0611420dc6e95fd903c7d692d9df180",
+   "bytes": 96,
+   "category": "LOCAL_ONLY",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "A13 真实运行时在合成测试 home 签发的临时票据响应原件（PREP02 同名 17 项先例）：仅登记 SHA/size/来源，不输出票据原文"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-a/CLIENT/cli-help-exit0-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-a/CLIENT/cli-help-exit0-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-a/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-a/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-a/CLIENT/cli-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-a/CLIENT/cli-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-a/CLI_RUST/home-main/lingxi-service/local-token.json",
+   "sha256": "b2edad7a45403f23dfd034c1b60c18220e8d371f76b374388cedc86f487edcd0",
+   "bytes": 184,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "合成测试 home 内真实运行时本地 token（PREP02 LOCAL_RUNTIME_STATE 同角色先例）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-b/A13/redaction-scan/p1-ticket.body",
+   "sha256": "1b1a8ae314e9f6bc696954ec6654d2f1ff750f3712d523168ac63ed20c02a81b",
+   "bytes": 96,
+   "category": "LOCAL_ONLY",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "A13 真实运行时在合成测试 home 签发的临时票据响应原件（PREP02 同名 17 项先例）：仅登记 SHA/size/来源，不输出票据原文"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-b/CLIENT/cli-help-exit0-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-b/CLIENT/cli-help-exit0-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-b/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-b/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-b/CLIENT/cli-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-b/CLIENT/cli-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-03/default16-03/n16-binding-drift/run-b/CLI_RUST/home-main/lingxi-service/local-token.json",
+   "sha256": "2e078e66a44180941b1312136babddabbc9470c2b04c3c12dc02f3423ae92f20",
+   "bytes": 184,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "合成测试 home 内真实运行时本地 token（PREP02 LOCAL_RUNTIME_STATE 同角色先例）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/CLIENT/cli-help-exit0-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/CLIENT/cli-help-exit0-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/CLIENT/cli-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/CLIENT/cli-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/CLI_RUST_MIN/home/lingxi-service/local-token.json",
+   "sha256": "416e55f136b62ce4bef3e09b5e8935ced8d6d8d11eac0584bda7f5e641faa2b2",
+   "bytes": 184,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "合成测试 home 内真实运行时本地 token（PREP02 LOCAL_RUNTIME_STATE 同角色先例）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/client-cli-cases/cli-help-exit0-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/client-cli-cases/cli-help-exit0-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/client-cli-cases/cli-serve-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/client-cli-cases/cli-serve-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/client-cli-cases/cli-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/client-cli-cases/cli-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-02/CLIENT/cli-help-exit0-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-02/CLIENT/cli-help-exit0-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-02/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-02/CLIENT/cli-serve-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-02/CLIENT/cli-unknown-arg-exit1-no-start/home-after.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/J-REVIEW-02/CLIENT/cli-unknown-arg-exit1-no-start/home-before.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "bytes": 2,
+   "category": "LOCAL_RUNTIME_STATE",
+   "localOnly": true,
+   "remoteOriginalAvailable": false,
+   "basis": "运行 home 状态快照标记（PREP02 对同名 2 字节文件判 LOCAL_RUNTIME_STATE 的先例，角色一致继承）"
+  }
+ ]
+}

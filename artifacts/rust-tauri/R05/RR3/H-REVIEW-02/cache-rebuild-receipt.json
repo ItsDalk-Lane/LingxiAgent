@@ -1,0 +1,33 @@
+{
+  "UTC": "2026-10-07T03:17:18.658340+00:00",
+  "action": "仅使本轮自产三个16字节Cargo指纹失效；旧二进制/原证全部保留；不改主源码字节或mtime",
+  "rows": [
+    {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/.fingerprint/lingxi-service-d1b960a1b85442c2/lib-lingxi_service",
+      "bytes": 16,
+      "sha256": "d22b7deb2fe07a0b69673015673178b564630cd788804c3c17a6094059514e95",
+      "mtimeUTC": "2026-10-07T03:14:20.236533+00:00",
+      "owningCommand": "f46-restored-green-build",
+      "sourceCwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated",
+      "savedBeforeDeletion": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/cache-invalidated/lingxi-service-d1b960a1b85442c2-lib-lingxi_service"
+    },
+    {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/.fingerprint/lingxi-service-f70d3da7f61fe4be/bin-lingxi-service",
+      "bytes": 16,
+      "sha256": "91799ab427e530311ff58aff15f046a2aa67fda46214f17dc413132580f5d443",
+      "mtimeUTC": "2026-10-07T03:14:24.178191+00:00",
+      "owningCommand": "f46-restored-green-build",
+      "sourceCwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated",
+      "savedBeforeDeletion": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/cache-invalidated/lingxi-service-f70d3da7f61fe4be-bin-lingxi-service"
+    },
+    {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/.fingerprint/lingxi-service-0532c49ca08cc763/test-lib-lingxi_service",
+      "bytes": 16,
+      "sha256": "2d8bb0702ac99151a4c6787b999f3755761a9b674acda292e338ba05d1786853",
+      "mtimeUTC": "2026-10-07T03:13:31.304374+00:00",
+      "owningCommand": "f48-boundary-unit-red",
+      "sourceCwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/isolated",
+      "savedBeforeDeletion": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/cache-invalidated/lingxi-service-0532c49ca08cc763-test-lib-lingxi_service"
+    }
+  ]
+}

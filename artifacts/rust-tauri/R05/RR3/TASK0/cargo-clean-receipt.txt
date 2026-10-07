@@ -1,0 +1,38 @@
+=== cargo clean receipt (RR3 resume, master controller) ===
+2026-10-07T05:32:30Z
+df before:
+/dev/disk3s5   971350180 944880272    752140   100% 15057315 7521400   67%   /System/Volumes/Data
+rust/target size before: 178645508 KiB
+
+=== after clean ===
+2026-10-07T05:35:21Z
+/dev/disk3s5   971350180 932228528  13403884    99% 14662696 134038840   10%   /System/Volumes/Data
+rust/target removed/empty
+
+=== RR1/RR2-era /private/tmp scratch recovery (closed rounds; evidence archived&committed in artifacts/) ===
+2026-10-07T05:37:05Z
+13708	/private/tmp/r05-rr2-e-mut
+10289	/private/tmp/r05-rr2-c-mut
+8573	/private/tmp/r05-rr2-g
+4052	/private/tmp/r05-t05-frozen
+3425	/private/tmp/r05t01-accept
+1964	/private/tmp/r05-t03-probe
+1950	/private/tmp/rr2a-review
+1584	/private/tmp/r05t02-audit-current
+1540	/private/tmp/r05t02-audit-frozen
+1529	/private/tmp/r05t02-oneshot-probe
+1517	/private/tmp/r05-t03-r2-accept
+1509	/private/tmp/r05-t03-accept-probe
+852	/private/tmp/r05-rr2-c-accept
+816	/private/tmp/r05-t05-accept-r1
+763	/private/tmp/r05t06-review-probe
+743	/private/tmp/r05t06-fix-probe
+717	/private/tmp/r05-t03-accept-extra
+385	/private/tmp/r05-node-selfcheck-bz5g0665
+
+=== FINAL space state ===
+2026-10-07T06:49:00Z
+APFS async reconciliation: cargo clean 280.7GiB materialized (was showing 13GiB immediately after).
+rm of RR2-era /tmp scratch partially executed (e-mut 13708->6027MB) then stopped: space already sufficient, no further deletion needed (minimal intervention).
+/dev/disk3s5   926Gi   317Gi   585Gi    36%    4.4M  6.1G    0%   /System/Volumes/Data
+NEG_TARGET ~/.cache/lingxi-r05-neg-target retained (21G, warm cache for G03).

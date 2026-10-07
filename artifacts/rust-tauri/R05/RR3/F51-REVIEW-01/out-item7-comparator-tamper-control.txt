@@ -1,0 +1,16 @@
+== comparator on UNTAMPERED receipt (expect ALL_EQUAL True, exit 0) ==
+entry: artifacts/rust-tauri/R05/RR3/A-02/copy-delete-rename/
+  file_count     fresh=33 receipt=33 EQUAL=True
+  symlink_count  fresh=1 receipt=1 EQUAL=True
+  total_bytes    fresh=34456 receipt=34456 EQUAL=True
+  tree_digest    fresh=291f53295f8d67a4005b96cb7989baf56eb7c4591bdd6e48ced40c81b8122ca4 receipt=291f53295f8d67a4005b96cb7989baf56eb7c4591bdd6e48ced40c81b8122ca4 EQUAL=True
+  ALL_EQUAL: True mode: normal
+exit=0
+== comparator with one receipt digest deliberately altered in memory (expect tree_digest EQUAL=False, exit 1) ==
+entry: artifacts/rust-tauri/R05/RR3/A-02/copy-delete-rename/
+  file_count     fresh=33 receipt=33 EQUAL=True
+  symlink_count  fresh=1 receipt=1 EQUAL=True
+  total_bytes    fresh=34456 receipt=34456 EQUAL=True
+  tree_digest    fresh=291f53295f8d67a4005b96cb7989baf56eb7c4591bdd6e48ced40c81b8122ca4 receipt=091f53295f8d67a4005b96cb7989baf56eb7c4591bdd6e48ced40c81b8122ca4 EQUAL=False
+  ALL_EQUAL: False mode: tamper
+exit=1

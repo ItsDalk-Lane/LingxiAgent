@@ -1,0 +1,17 @@
+{
+  "case": "non-decimal",
+  "command": [
+    "python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial-with-times/non-decimal/input.tsv",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial-with-times/non-decimal/mutation.json"
+  ],
+  "startedAt": "2026-10-07T00:24:35.908598+00:00",
+  "endedAt": "2026-10-07T00:24:35.933029+00:00",
+  "exitCode": 1,
+  "expectedExit": 1,
+  "beforeSha256": "2b3f46686f43eb2066f2d13959742a4dba307ab6be4d11bdc22bc5e37ce57196",
+  "afterSha256": "2b3f46686f43eb2066f2d13959742a4dba307ab6be4d11bdc22bc5e37ce57196",
+  "receiptPresent": false,
+  "status": "PASS"
+}

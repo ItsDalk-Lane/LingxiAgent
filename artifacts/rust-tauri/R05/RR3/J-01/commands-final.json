@@ -1,0 +1,90 @@
+[
+  {
+    "name": "syntax-final",
+    "argv": [
+      "bash",
+      "-n",
+      "scripts/rust-tauri/r05_t08_negative_gate.sh"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startedUtc": "2026-10-07T03:25:22.933219+00:00",
+    "finishedUtc": "2026-10-07T03:25:22.938831+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "i-restore-final",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/rust-tauri/r05_t08_restore_selfcheck.py",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-01/i-restore-final"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startedUtc": "2026-10-07T03:25:22.939096+00:00",
+    "finishedUtc": "2026-10-07T03:25:25.207383+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "b146b238216813fea33a51d50735d4e0ba99495341ab805d51d8b92ab6d76c16",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "b15-final",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startedUtc": "2026-10-07T03:25:25.207628+00:00",
+    "finishedUtc": "2026-10-07T03:25:25.671734+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "f31e047a630251c463af9532ab7283b05e7f21048fdf6fde94edfcc8754e05ed",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "final-git-status",
+    "argv": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startedUtc": "2026-10-07T03:25:25.671985+00:00",
+    "finishedUtc": "2026-10-07T03:25:25.904363+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "ac4fa8275ed52df20de5553a2c5a98713643169d15531af774a2b4196035c487",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "final-head",
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startedUtc": "2026-10-07T03:25:25.904583+00:00",
+    "finishedUtc": "2026-10-07T03:25:25.912395+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "final-diff",
+    "argv": [
+      "git",
+      "diff",
+      "--no-index",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-01/negative-before.sh",
+      "scripts/rust-tauri/r05_t08_negative_gate.sh"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startedUtc": "2026-10-07T03:25:25.912595+00:00",
+    "finishedUtc": "2026-10-07T03:25:25.921525+00:00",
+    "exitCode": 1,
+    "stdoutSha256": "7bbc6c832b696d9d36412eff987dca46f0ff0c1fb4e7dee066842b638f1a7722",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

@@ -1,0 +1,90 @@
+{
+  "mainHead": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "mainOverallFrozen": false,
+  "reason": "F46并行；本审查绑定隔离快照A输入，不作为阶段冻结",
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "python": "3.14.3",
+  "toolchainLog": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/toolchain.log",
+  "rustcLog": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-01/rustc.log",
+  "inputManifestSha256": "df1a03c45597249f9566ccefbb68065751c74436ae48ae7426a0d50fb297b399",
+  "AInputEquality": [
+    {
+      "path": "rust/crates/xtask/src/candidate.rs",
+      "mainSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+      "snapshotSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/candidate/tests.rs",
+      "mainSha256": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+      "snapshotSha256": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/main.rs",
+      "mainSha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+      "snapshotSha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/verify.rs",
+      "mainSha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+      "snapshotSha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/verify/runner_tests.rs",
+      "mainSha256": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69",
+      "snapshotSha256": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/runner_identity.rs",
+      "mainSha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+      "snapshotSha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+      "equal": true
+    },
+    {
+      "path": "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+      "mainSha256": "3aca4ae169fa06afc29e6aa89acef79ecd1ce2a6422cf479d7913643d190bf84",
+      "snapshotSha256": "3aca4ae169fa06afc29e6aa89acef79ecd1ce2a6422cf479d7913643d190bf84",
+      "equal": true
+    },
+    {
+      "path": "scripts/rust-tauri/run_output_sinks.py",
+      "mainSha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+      "snapshotSha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+      "equal": true
+    },
+    {
+      "path": "scripts/rust-tauri/r02_run_output_regression.py",
+      "mainSha256": "6696e8279a99a3e407d5d3c270cebd3e00c4d6031a8fbc71c4b875dfb03a5c3e",
+      "snapshotSha256": "6696e8279a99a3e407d5d3c270cebd3e00c4d6031a8fbc71c4b875dfb03a5c3e",
+      "equal": true
+    },
+    {
+      "path": ".gitignore",
+      "mainSha256": "8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd",
+      "snapshotSha256": "8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd",
+      "equal": true
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "mainSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "snapshotSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "equal": true
+    },
+    {
+      "path": "rust/Cargo.lock",
+      "mainSha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "snapshotSha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "equal": true
+    }
+  ],
+  "mainNotStableForceFail": {
+    "check": "源码审计；原正式cmd_verify_stage独立强制overall FAIL分支仍在",
+    "sha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+    "occurrences": 1,
+    "runtimeBoundary": "Scope旧行为目标红覆盖真实Scope+verify受控编排；不把受控RX映射记正式业务gate"
+  }
+}

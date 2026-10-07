@@ -1,0 +1,7 @@
+{
+  "method": "GET",
+  "url": "http://127.0.0.1:55355/lingxi/v1/me",
+  "headers": {
+    "Authorization": "Bearer a13-triage-synthetic-invalid-credential"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "utc": "2026-10-07T02:06:21.406834+00:00",
+  "mode": "wire",
+  "checks": [
+    {
+      "check": "two different actual fields",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "example ordered actual fields",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "kind and op example",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "source actual kind dispatch",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "source required op and default fields",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "actual unexpected kind rejected",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "fixture separate fields and normal purpose",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "no imagined op validation",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "host authority preserved",
+      "ok": true,
+      "detail": null
+    }
+  ],
+  "passed": 9,
+  "failed": 0,
+  "boundary": "independent document/source/evidence assertions; no Cargo tests executed"
+}

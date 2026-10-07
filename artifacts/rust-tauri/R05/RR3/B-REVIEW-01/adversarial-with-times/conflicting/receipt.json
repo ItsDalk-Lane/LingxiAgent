@@ -1,0 +1,17 @@
+{
+  "case": "conflicting",
+  "command": [
+    "python3",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_mutate_pin.py",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial-with-times/conflicting/input.tsv",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial-with-times/conflicting/mutation.json"
+  ],
+  "startedAt": "2026-10-07T00:24:35.883832+00:00",
+  "endedAt": "2026-10-07T00:24:35.908160+00:00",
+  "exitCode": 1,
+  "expectedExit": 1,
+  "beforeSha256": "c86ce2548df27d6ca59ca3dfb1f778594c1aa361c3d5244769b4df4db728d2e2",
+  "afterSha256": "c86ce2548df27d6ca59ca3dfb1f778594c1aa361c3d5244769b4df4db728d2e2",
+  "receiptPresent": false,
+  "status": "PASS"
+}

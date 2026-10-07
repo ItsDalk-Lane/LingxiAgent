@@ -1,0 +1,202 @@
+[
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a05_a06_auth_matrix/stderr.log",
+    "sha256": "6a63b05e2116113ffdbe7aa6da153d30fcf9522e86d469c5335447e99009f738",
+    "bytes": 71
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a05_a06_auth_matrix/stdout.log",
+    "sha256": "0d1dfe9038da3dfa96806c686fd2684024027ff5a303c56e1ced47f088a3203e",
+    "bytes": 4793
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a16_legacy_regression/stderr.log",
+    "sha256": "689f691e5525c343da2f84450ce2cda0ea8626079d4b375a8dec4c932f61457e",
+    "bytes": 93
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/a16_legacy_regression/stdout.log",
+    "sha256": "a1e38a1bf796c2dd1b36e004623bbb0430b8af6f8466ea555dd213bf1e2d1f50",
+    "bytes": 767
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/supplemental_client_matrix/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/supplemental_client_matrix/stdout.log",
+    "sha256": "e7f9796cba1481bd6b99d287e3fc4dc0df0d55bcaca20af6b6e144da472172d4",
+    "bytes": 50
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/supplemental_cli_rust_matrix/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/supplemental_cli_rust_matrix/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/supplemental_cli_sessions_matrix/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/supplemental_cli_sessions_matrix/stdout.log",
+    "sha256": "6e83d418cdecb9da7bd76dc38ec91fe10efe10285f380f9a17f271563a2e0b2b",
+    "bytes": 38
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/a05_a06_auth_matrix/stderr.log",
+    "sha256": "6a63b05e2116113ffdbe7aa6da153d30fcf9522e86d469c5335447e99009f738",
+    "bytes": 71
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/a05_a06_auth_matrix/stdout.log",
+    "sha256": "65141bb5d8996fc31263d4dc4bf51fc06aab06d8f0ade86cdf6a79c2af636434",
+    "bytes": 4793
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/a16_legacy_regression/stderr.log",
+    "sha256": "689f691e5525c343da2f84450ce2cda0ea8626079d4b375a8dec4c932f61457e",
+    "bytes": 93
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/a16_legacy_regression/stdout.log",
+    "sha256": "71c123013fe76bdacc91abdc57abc86cbb45b182c7ebaa0492544b5692857f2d",
+    "bytes": 766
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/supplemental_client_matrix/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/supplemental_client_matrix/stdout.log",
+    "sha256": "e7f9796cba1481bd6b99d287e3fc4dc0df0d55bcaca20af6b6e144da472172d4",
+    "bytes": 50
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/supplemental_cli_rust_matrix/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/supplemental_cli_rust_matrix/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/supplemental_cli_sessions_matrix/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/supplemental_cli_sessions_matrix/stdout.log",
+    "sha256": "6e83d418cdecb9da7bd76dc38ec91fe10efe10285f380f9a17f271563a2e0b2b",
+    "bytes": 38
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/a05_a06_auth_matrix/stderr.log",
+    "sha256": "6a63b05e2116113ffdbe7aa6da153d30fcf9522e86d469c5335447e99009f738",
+    "bytes": 71
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/a05_a06_auth_matrix/stdout.log",
+    "sha256": "84f41686fa506dca45d28aee8b5cf07329eaccc4ac77627036e1adc5c2e12f96",
+    "bytes": 4793
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/a16_legacy_regression/stderr.log",
+    "sha256": "689f691e5525c343da2f84450ce2cda0ea8626079d4b375a8dec4c932f61457e",
+    "bytes": 93
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/a16_legacy_regression/stdout.log",
+    "sha256": "dc80c7d84cc5aa96b9b3fa78861613af849cf955b714f0aa24370a758fbc35fc",
+    "bytes": 767
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/supplemental_client_matrix/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/supplemental_client_matrix/stdout.log",
+    "sha256": "e7f9796cba1481bd6b99d287e3fc4dc0df0d55bcaca20af6b6e144da472172d4",
+    "bytes": 50
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/supplemental_cli_rust_matrix/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/supplemental_cli_rust_matrix/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/supplemental_cli_sessions_matrix/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/supplemental_cli_sessions_matrix/stdout.log",
+    "sha256": "6e83d418cdecb9da7bd76dc38ec91fe10efe10285f380f9a17f271563a2e0b2b",
+    "bytes": 38
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/a05_a06_auth_matrix/stderr.log",
+    "sha256": "6a63b05e2116113ffdbe7aa6da153d30fcf9522e86d469c5335447e99009f738",
+    "bytes": 71
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/a05_a06_auth_matrix/stdout.log",
+    "sha256": "159b69442cded43ddd368bcb934b2d6941e51301a5da0688b1e4cfa3336aa82e",
+    "bytes": 4793
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/a16_legacy_regression/stderr.log",
+    "sha256": "689f691e5525c343da2f84450ce2cda0ea8626079d4b375a8dec4c932f61457e",
+    "bytes": 93
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/a16_legacy_regression/stdout.log",
+    "sha256": "bf05ead37a09ee1ccb33c9eadae023f2d6fdce8a95f29da39d45ab31375213e8",
+    "bytes": 767
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/supplemental_client_matrix/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/supplemental_client_matrix/stdout.log",
+    "sha256": "e7f9796cba1481bd6b99d287e3fc4dc0df0d55bcaca20af6b6e144da472172d4",
+    "bytes": 50
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/supplemental_cli_rust_matrix/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/supplemental_cli_rust_matrix/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/supplemental_cli_sessions_matrix/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/supplemental_cli_sessions_matrix/stdout.log",
+    "sha256": "6e83d418cdecb9da7bd76dc38ec91fe10efe10285f380f9a17f271563a2e0b2b",
+    "bytes": 38
+  }
+]

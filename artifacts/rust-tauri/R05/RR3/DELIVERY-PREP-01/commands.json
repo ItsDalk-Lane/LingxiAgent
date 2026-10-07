@@ -1,0 +1,135 @@
+[
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T03:33:26.855395+00:00",
+    "endUTC": "2026-10-07T03:33:26.863095+00:00",
+    "exitCode": 0,
+    "stdout": "head.stdout",
+    "stdoutSHA256": "35e2fbb1cfcb12e219f38352ab600b43209bfa4f48bfd15d8f2c6a5bddbae552",
+    "stderr": "head.stderr",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T03:33:26.863151+00:00",
+    "endUTC": "2026-10-07T03:33:26.870873+00:00",
+    "exitCode": 0,
+    "stdout": "branch.stdout",
+    "stdoutSHA256": "2ad51d278d71d6840dbe83cfd1e80739413fdca39a745d2742603709273fe1fa",
+    "stderr": "branch.stderr",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain=v1",
+      "-z",
+      "--untracked-files=all"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T03:33:26.870915+00:00",
+    "endUTC": "2026-10-07T03:33:27.243627+00:00",
+    "exitCode": 0,
+    "stdout": "status.stdout",
+    "stdoutSHA256": "be5b158d9106b1ee735bcb9652f7ffa0e055790015a9fd757f94527929619bf6",
+    "stderr": "status.stderr",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "ls-files",
+      "--others",
+      "--exclude-standard",
+      "-z"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T03:33:27.244504+00:00",
+    "endUTC": "2026-10-07T03:33:27.573326+00:00",
+    "exitCode": 0,
+    "stdout": "untracked.stdout",
+    "stdoutSHA256": "d6d045029d84efd3cf449d43cc8ae02acc1daa419e8e6ed18d7bb149ccd4c4cd",
+    "stderr": "untracked.stderr",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--name-only",
+      "-z"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T03:33:27.576727+00:00",
+    "endUTC": "2026-10-07T03:33:27.676568+00:00",
+    "exitCode": 0,
+    "stdout": "modified.stdout",
+    "stdoutSHA256": "c09d629c95aee40e8032eeee99b065535b7f6e7e56c0e0934c91810316461a20",
+    "stderr": "modified.stderr",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--cached",
+      "--name-only",
+      "-z"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T03:33:27.676634+00:00",
+    "endUTC": "2026-10-07T03:33:27.687694+00:00",
+    "exitCode": 0,
+    "stdout": "staged.stdout",
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr": "staged.stderr",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "ls-files",
+      "--others",
+      "--ignored",
+      "--exclude-standard",
+      "--directory",
+      "-z",
+      "--",
+      "artifacts/rust-tauri/R05/RR3/"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T03:33:27.687752+00:00",
+    "endUTC": "2026-10-07T03:33:27.825203+00:00",
+    "exitCode": 0,
+    "stdout": "ignored-directories.stdout",
+    "stdoutSHA256": "f8bcea0e667da816494004c7202d6619f8452cfe5bc2527f16f1a209eeb0a5d5",
+    "stderr": "ignored-directories.stderr",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--stat"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T03:33:27.825442+00:00",
+    "endUTC": "2026-10-07T03:33:27.956614+00:00",
+    "exitCode": 0,
+    "stdout": "diff-stat.stdout",
+    "stdoutSHA256": "8924a8607efc2a0ea0159fedaf9fcae664963a2e66fd98d81bd1858cb2f65e1a",
+    "stderr": "diff-stat.stderr",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

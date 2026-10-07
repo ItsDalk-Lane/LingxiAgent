@@ -1,0 +1,328 @@
+{
+  "utc": "2026-10-07T03:24:39.155204+00:00",
+  "rawSha256": "e298d8978e36973715c5c2ee5b96139c961f41847f4a2809746dd88bcfa7f762",
+  "checks": {
+    "counts": true,
+    "loadDistribution": true,
+    "originalThresholds": true,
+    "allBinaryAbsoluteBounds": true,
+    "growth": true,
+    "allTreeGrowthFromBaseline": true,
+    "ownerAbsoluteAndGrowthBounds": true,
+    "everyOwnerTreeSum": true,
+    "everyTreeSum": true,
+    "binary15LiveAndReleased": true,
+    "owner15RealPeaks": true,
+    "owner45Steady": true,
+    "allLogsBound": true,
+    "finalRestartLogs": true,
+    "realWritesAndRotations": true,
+    "noTemporaryFilesSteady": true,
+    "cancelConnections": true,
+    "budgetVsOrdinaryHonest": true,
+    "actualFinalReapAndRootsRemoved": true,
+    "participatingPidsGone": true
+  },
+  "status": "PASS",
+  "seriesPhaseCounts": {
+    "baseline": 1,
+    "cancel-live": 6,
+    "cancel": 6,
+    "error": 6,
+    "ok": 3,
+    "worker-live": 15,
+    "worker-released": 15,
+    "worker-final": 1,
+    "post-restart": 1
+  },
+  "ownerPhaseCounts": {
+    "baseline": 1,
+    "worker-and-queued-live": 15,
+    "released-steady": 45
+  },
+  "cyclePhaseCounts": {
+    "cancel": 60,
+    "error": 60,
+    "ok": 15,
+    "long": 10,
+    "worker": 15
+  },
+  "ranges": {
+    "rssKiB": [
+      27232,
+      54352
+    ],
+    "fds": [
+      15,
+      19
+    ]
+  },
+  "treeRanges": {
+    "rssKiB": [
+      27232,
+      56928
+    ],
+    "fds": [
+      15,
+      22
+    ]
+  },
+  "ownerTreeRanges": {
+    "rssKiB": [
+      29248,
+      34672
+    ],
+    "fds": [
+      15,
+      23
+    ],
+    "establishedTcpCount": [
+      0,
+      2
+    ]
+  },
+  "logCounts": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3
+  ],
+  "ownerLogCounts": [
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3
+  ],
+  "postRestartLogs": [
+    {
+      "bytes": 65358,
+      "path": "lingxi-service/logs/service-000003.log"
+    },
+    {
+      "bytes": 33642,
+      "path": "lingxi-service/logs/service-000004.log"
+    },
+    {
+      "bytes": 0,
+      "path": "lingxi-service/logs/service-000005.log"
+    }
+  ],
+  "knownPids": [
+    65305,
+    65713,
+    68787,
+    70826,
+    71157,
+    71486,
+    71818,
+    72147,
+    72479,
+    72806,
+    73139,
+    73466,
+    73798,
+    74128,
+    74462,
+    74793,
+    75125,
+    75452,
+    75921,
+    76112,
+    76445,
+    76786,
+    77137,
+    77465,
+    77817,
+    78150,
+    78480,
+    78812,
+    79142,
+    79470,
+    79802,
+    80130,
+    80458,
+    80788
+  ],
+  "pidReadbackCommand": [
+    "ps",
+    "-axo",
+    "pid=,ppid=,comm="
+  ],
+  "pidReadbackExitCode": 0,
+  "remainingPids": [],
+  "cleanup": {
+    "configRemoved": true,
+    "equipmentStubStopped": true,
+    "filesBeforeCleanup": {
+      "home": [
+        {
+          "bytes": 162,
+          "path": "data-epoch.json"
+        },
+        {
+          "bytes": 22138880,
+          "path": "lingxi-service/data/runs.db"
+        },
+        {
+          "bytes": 157,
+          "path": "lingxi-service/device-credentials.json"
+        },
+        {
+          "bytes": 113,
+          "path": "lingxi-service/devices.json"
+        },
+        {
+          "bytes": 0,
+          "path": "lingxi-service/instance.lock"
+        },
+        {
+          "bytes": 184,
+          "path": "lingxi-service/local-token.json"
+        },
+        {
+          "bytes": 65358,
+          "path": "lingxi-service/logs/service-000003.log"
+        },
+        {
+          "bytes": 33642,
+          "path": "lingxi-service/logs/service-000004.log"
+        },
+        {
+          "bytes": 0,
+          "path": "lingxi-service/logs/service-000005.log"
+        },
+        {
+          "bytes": 531,
+          "path": "lingxi-service/management.json"
+        },
+        {
+          "bytes": 0,
+          "path": "logs/security-audit.jsonl"
+        }
+      ],
+      "workspace": [
+        {
+          "bytes": 13,
+          "path": "input.txt"
+        },
+        {
+          "bytes": 11,
+          "path": "loop.txt"
+        }
+      ]
+    },
+    "homeRemoved": true,
+    "lastServiceExit": 0,
+    "lastServicePid": 75921,
+    "serviceStopped": true,
+    "workspaceRemoved": true
+  },
+  "boundary": "independent full raw analysis; binary tree and in-process owners kept separate; no second resource management authority"
+}

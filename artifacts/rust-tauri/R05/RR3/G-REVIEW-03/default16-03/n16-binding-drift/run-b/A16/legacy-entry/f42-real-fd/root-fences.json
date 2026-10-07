@@ -1,0 +1,40 @@
+{
+  "rejections": [
+    {
+      "unit": "rust",
+      "exit": 1,
+      "reason": "not a dedicated run-output root strictly inside artifacts/ at run-root depth (>= artifacts/<area>/<stage>/\u2026): excluding the whole evidence tree or foreign directories is forbidden\n"
+    },
+    {
+      "unit": "artifacts",
+      "exit": 1,
+      "reason": "not a dedicated run-output root strictly inside artifacts/ at run-root depth (>= artifacts/<area>/<stage>/\u2026): excluding the whole evidence tree or foreign directories is forbidden\n"
+    },
+    {
+      "unit": "artifacts/rust-tauri",
+      "exit": 1,
+      "reason": "not a dedicated run-output root strictly inside artifacts/ at run-root depth (>= artifacts/<area>/<stage>/\u2026): excluding the whole evidence tree or foreign directories is forbidden\n"
+    },
+    {
+      "unit": "artifacts/rust-tauri/R05",
+      "exit": 1,
+      "reason": "not a dedicated run-output root strictly inside artifacts/ at run-root depth (>= artifacts/<area>/<stage>/\u2026): excluding the whole evidence tree or foreign directories is forbidden\n"
+    },
+    {
+      "unit": "artifacts/rust-tauri/R05/link-run",
+      "exit": 1,
+      "reason": "output root crosses a symlink: /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rr3-output-regression-zlbsusnz/root-fences/artifacts/rust-tauri/R05/link-run\n"
+    },
+    {
+      "unit": "../escape",
+      "exit": 1,
+      "reason": "not a plain repo-relative directory path\n"
+    },
+    {
+      "unit": "artifacts/rust-tauri/R05/missing",
+      "exit": 1,
+      "reason": "not an existing directory\n"
+    }
+  ],
+  "legalFreshRootExit": 0
+}

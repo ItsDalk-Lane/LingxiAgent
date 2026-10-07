@@ -1,0 +1,4 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy.f8U5qz/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.85s
+     Running tests/tls_web_login.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/tls_web_login-825639f87369fd21)
+LINGXI_TRANSPORT_REJECTED request_id="req-865edf75081b12ecc8a73f819cb90d12" method=POST path=/lingxi/v1/web-auth/login status=403 reason=bad_origin origin=https://evil.example host=lan.example.test remote=127.0.0.1:55051

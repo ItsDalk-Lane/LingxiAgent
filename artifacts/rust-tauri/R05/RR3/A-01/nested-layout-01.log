@@ -1,0 +1,52 @@
+    Blocking waiting for file lock on build directory
+   Compiling xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.89s
+     Running unittests src/main.rs (rust/target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 1 test
+
+thread 'verify::runner_tests::rr3_real_fd_standard_nested_layout_has_stable_checkpoints_at_every_layer' (20021180) panicked at crates/xtask/src/verify/runner_tests.rs:2357:5:
+
+running 1 test
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-25475-1791332420413501000/artifacts/rust-tauri/R05/run001/verify-R05/bounded-control-0
+本层真实 stdout 在 checkpoint 前增长：0/bounded-control-0
+xtask: verify-stage RX [bounded-control-0] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-25475-1791332420413501000/artifacts/rust-tauri/R05/run001/verify-R05/bounded-control-1
+本层真实 stdout 在 checkpoint 前增长：0/bounded-control-1
+xtask: verify-stage RX [bounded-control-1] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-25475-1791332420413501000/artifacts/rust-tauri/R05/run001/verify-R05/bounded-control-2
+本层真实 stdout 在 checkpoint 前增长：0/bounded-control-2
+xtask: verify-stage RX [bounded-control-2] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-25475-1791332420413501000/artifacts/rust-tauri/R05/run001/verify-R05/bounded-control-3
+本层真实 stdout 在 checkpoint 前增长：0/bounded-control-3
+xtask: verify-stage RX [bounded-control-3] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-25475-1791332420413501000/artifacts/rust-tauri/R05/run001/verify-R05/bounded-control-4
+本层真实 stdout 在 checkpoint 前增长：0/bounded-control-4
+xtask: verify-stage RX [bounded-control-4] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-25475-1791332420413501000/artifacts/rust-tauri/R05/run001/verify-R05/bounded-control-5
+本层真实 stdout 在 checkpoint 前增长：0/bounded-control-5
+xtask: verify-stage RX [bounded-control-5] PASS
+xtask: verify-stage RX [env LINGXI_NESTED_LEVEL=1 LINGXI_NESTED_EVIDENCE=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-25475-1791332420413501000/artifacts/rust-tauri/R05/run001/verify-R05/R04_REGRESSION /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/xtask-ad766de8ea03e62c --exact verify::runner_tests::rr3_nested_process_probe --nocapture] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-25475-1791332420413501000/artifacts/rust-tauri/R05/run001/verify-R05/r04_regression_gate
+本层真实 stdout 在 checkpoint 前增长：0/r04_regression_gate
+xtask: verify-stage RX [r04_regression_gate] FAIL
+test verify::runner_tests::rr3_nested_process_probe ... FAILED
+
+failures:
+
+failures:
+    verify::runner_tests::rr3_nested_process_probe
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 3.87s
+
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test verify::runner_tests::rr3_real_fd_standard_nested_layout_has_stable_checkpoints_at_every_layer ... FAILED
+
+failures:
+
+failures:
+    verify::runner_tests::rr3_real_fd_standard_nested_layout_has_stable_checkpoints_at_every_layer
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 3.91s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`

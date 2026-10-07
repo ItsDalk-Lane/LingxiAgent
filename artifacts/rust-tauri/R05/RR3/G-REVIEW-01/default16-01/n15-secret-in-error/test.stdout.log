@@ -1,0 +1,23 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.81s
+     Running unittests src/lib.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-0532c49ca08cc763)
+
+running 1 test
+test credentials::tests::handle_refusal_texts_carry_no_material ... FAILED
+
+failures:
+
+---- credentials::tests::handle_refusal_texts_carry_no_material stdout ----
+
+thread 'credentials::tests::handle_refusal_texts_carry_no_material' (20844442) panicked at crates/lingxi-service/src/credentials/mod.rs:1618:9:
+assertion failed: !text.contains("sk-")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    credentials::tests::handle_refusal_texts_carry_no_material
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p lingxi-service --lib`

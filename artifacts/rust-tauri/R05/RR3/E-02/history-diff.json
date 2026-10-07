@@ -1,0 +1,51 @@
+{
+  "changedCurrentFields": {
+    "docs/rust-tauri/R05/R05_HANDOFF.json": [
+      "generated_by",
+      "generated_at",
+      "review_status",
+      "historical_record_notice",
+      "rr3_current",
+      "working_tree_digest_scope",
+      "unresolved_items",
+      "allowed_next_scope",
+      "artifact_hashes"
+    ],
+    "docs/rust-tauri/R05/PROGRESS_LEDGER.json": [
+      "historical_record_notice",
+      "rr3_current"
+    ],
+    "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json": [
+      "historical_record_notice",
+      "rr3_current"
+    ],
+    "docs/rust-tauri/R05/R05_TEST_MAP.json": [
+      "historical_record_notice",
+      "rr3_current",
+      "rr3_I10_mapping"
+    ],
+    "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json": [
+      "historical_record_notice",
+      "rr3_current",
+      "rr3_resource_selfcheck"
+    ],
+    "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json": [
+      "historical_record_notice",
+      "rr3_current",
+      "rr3_platform_verification"
+    ]
+  },
+  "externalOwnerChangesObserved": [
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+      "before": "ca4de02ad2ff68656967d90bd60cd77061b15ca19b0ee82279bc98c4d5503c38",
+      "after": "dafc8fdc737e3418039af961db98c4a4f50a87d8066e09e9f70bb372f06bae83"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+      "before": "f9eb4898057fd6530a1fcec040dab54a2e4d6690425a707d8c48b6579f47b4e8",
+      "after": "3dbe467748dbeb5da2e528b7a60667923632cc456a048f4edc87c0099a5f4691"
+    }
+  ],
+  "scope": "总控并发变化只观察；本E不写，不将其当全树静默。"
+}

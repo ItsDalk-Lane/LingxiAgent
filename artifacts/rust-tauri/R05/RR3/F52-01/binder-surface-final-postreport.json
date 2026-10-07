@@ -1,0 +1,32 @@
+{
+ "all_regular_files": true,
+ "assert_clean": true,
+ "clean": true,
+ "counts": {
+  "ancestor_not_dir": 0,
+  "ancestor_symlink": 0,
+  "directory_entry": 0,
+  "final_symlink": 0,
+  "irregular": 0,
+  "missing": 0,
+  "regular_file": 69131
+ },
+ "elapsed_seconds": 1.238,
+ "enumeration_argv": [
+  "/usr/bin/git",
+  "--no-optional-locks",
+  "ls-files",
+  "--cached",
+  "--others",
+  "--exclude-standard",
+  "-z"
+ ],
+ "finished_utc": "2026-10-07T13:06:05.396978+00:00",
+ "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+ "non_regular_samples": [],
+ "repo_root": "/Users/study_superior/Desktop/Code/LingxiAgent",
+ "semantics": "candidate.rs:326-369 component-wise lstat (symlink_metadata) walk; final component must be a regular file",
+ "started_utc": "2026-10-07T13:06:04.148040+00:00",
+ "tool": "F52 classify_binder_surface.py",
+ "total_entries": 69131
+}

@@ -1,0 +1,28 @@
+{
+  "busy": {
+    "http": 503,
+    "keyEvents": 0,
+    "liveEvents": 0,
+    "reason": "db_busy",
+    "runs": 0
+  },
+  "disk": {
+    "keyEvents": 1,
+    "runs": 1,
+    "status": "running"
+  },
+  "restart": {
+    "keyEvents": 2,
+    "runId": "run_000001a114279125_000002",
+    "runs": 1,
+    "status": "interrupted_needs_attention"
+  },
+  "schema": "lingxi.r02-a07-live-fault.v1",
+  "terminal": {
+    "http": 500,
+    "liveEvents": 1,
+    "reason": "db_failure",
+    "runId": "run_000001a114279125_000002",
+    "storedStatus": "running"
+  }
+}

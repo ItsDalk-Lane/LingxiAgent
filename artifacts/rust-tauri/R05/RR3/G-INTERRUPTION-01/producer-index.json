@@ -1,0 +1,763 @@
+{
+  "declared": {
+    "utc": "2026-10-07T02:45:23.718119+00:00",
+    "commandExit": 0,
+    "runs": 91,
+    "passed": 427,
+    "failed": 0,
+    "ignored": 0,
+    "resource": {
+      "load": {
+        "cancelCycles": 60,
+        "cancelDanglingActive": 60,
+        "cancelSettled": 0,
+        "errorCycles": 60,
+        "errorRuns": 60,
+        "longResponseCycles": 10,
+        "okCycles": 15,
+        "sessions": [
+          "sess_local_alpha",
+          "sess_local_beta"
+        ],
+        "workerCycles": 15
+      },
+      "series": 54,
+      "cycles": 160,
+      "owners": 61,
+      "sha256": "7363dac1b2ea4d39adc3c078646a22aee0e63e61129a7e925c0bb73ea11431ca",
+      "phases": {
+        "baseline": 1,
+        "cancel-live": 6,
+        "cancel": 6,
+        "error": 6,
+        "ok": 3,
+        "worker-live": 15,
+        "worker-released": 15,
+        "worker-final": 1,
+        "post-restart": 1
+      },
+      "cleanup": {
+        "configRemoved": true,
+        "equipmentStubStopped": true,
+        "filesBeforeCleanup": {
+          "home": [
+            {
+              "bytes": 162,
+              "path": "data-epoch.json"
+            },
+            {
+              "bytes": 22138880,
+              "path": "lingxi-service/data/runs.db"
+            },
+            {
+              "bytes": 157,
+              "path": "lingxi-service/device-credentials.json"
+            },
+            {
+              "bytes": 113,
+              "path": "lingxi-service/devices.json"
+            },
+            {
+              "bytes": 0,
+              "path": "lingxi-service/instance.lock"
+            },
+            {
+              "bytes": 184,
+              "path": "lingxi-service/local-token.json"
+            },
+            {
+              "bytes": 65358,
+              "path": "lingxi-service/logs/service-000003.log"
+            },
+            {
+              "bytes": 33642,
+              "path": "lingxi-service/logs/service-000004.log"
+            },
+            {
+              "bytes": 0,
+              "path": "lingxi-service/logs/service-000005.log"
+            },
+            {
+              "bytes": 531,
+              "path": "lingxi-service/management.json"
+            },
+            {
+              "bytes": 0,
+              "path": "logs/security-audit.jsonl"
+            }
+          ],
+          "workspace": [
+            {
+              "bytes": 13,
+              "path": "input.txt"
+            },
+            {
+              "bytes": 11,
+              "path": "loop.txt"
+            }
+          ]
+        },
+        "homeRemoved": true,
+        "lastServiceExit": 0,
+        "lastServicePid": 11525,
+        "serviceStopped": true,
+        "workspaceRemoved": true
+      }
+    },
+    "inputBeforeAfterEqual": true,
+    "boundary": "旧冻结隔离输入完全恢复的当前亲跑；不是新H/I current main或正式R05整阶段通过"
+  },
+  "actualLogs": [
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__config__tests__credential_is_explicit_and_never_defaulted.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t07_rr1_usage_ledger.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.28s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_credentials__store__tests__a_failed_write_keeps_the_previous_state_and_reports.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__compat__tests__anthropic_max_effort_raises_the_implicit_one_third_cap.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/adp_r05_t04_streaming.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__egress__tests__scheme_userinfo_and_host_shapes_refuse.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t05_network.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.05s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__anthropic_messages__tests__cross_family_opaque_state_is_never_echoed.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t06_worker_model.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.01s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-kernel_model_exchange__tests__snapshot_declares_only_callable_resident_targets_at_the_pinned_generation.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__egress__tests__the_endpoint_origin_exception_lets_the_loopback_stub_through.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/adp_r05_t03_goldens.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/adp_r05_t05_timeouts.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.71s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t08_production_tools.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.96s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__gateway__tests__chat_and_auxiliary_routes_resolve_independently.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-kernel_toolcatalog__tests__same_name_two_sources_never_overwrites_and_name_only_is_ambiguous.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__openai_completions__tests__unknown_wire_names_are_protocol_violations_never_guesses.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t06_rr1_system_speech.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.85s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__compat__tests__volcengine_disable_guard_passes_through_without_controls.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t01_model_plane.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.52s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__compat__tests__codex_strips_budget_and_temperature_fields.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/adp_r05_t07_usage_families.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_credentials__tests__resolve_refreshes_at_most_once_when_every_mint_is_already_expired.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/adp_r05_t05_compat.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__dispatch__tests__error_status_classification_matches_the_incumbent.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_redaction__tests__r05_secret_key_words_match_case_insensitively.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/adp_r05_t06_operations.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-kernel_toolcatalog__tests__stale_catalog_generation_refuses_and_requires_refresh.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_credentials__tests__a_cancelled_waiter_does_not_disturb_the_flight.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/adp_r05_t07_rr1_usage_strict.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__tool_render__tests__the_four_base_states_keep_the_t01_vocabulary.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__streaming__tests__a_leading_bom_is_stripped_once.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__tool_render__tests__success_renders_resources_status_and_truncation_last.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t06_operations.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t03_protocol_adapters.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.17s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_redaction__tests__r05_provider_api_key_shapes_are_redacted.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__openai_responses__tests__reasoning_items_roundtrip_verbatim_with_summary_as_reasoning.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__egress__tests__guarded_ipv4_literals_refuse_outside_the_endpoint_exception.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_credentials__tests__handle_refusal_texts_carry_no_material.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/adp_r05_t04_rr1_batch_terminal.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_credentials__tests__an_expired_handle_is_refused.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__gateway__tests__the_pin_pair_rule_never_guesses_a_provider_from_a_model.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__openai_codex_responses__tests__codex_body_pins_store_stream_and_instructions.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t04_streaming.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.32s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__openai_responses__tests__request_shape_instructions_tools_and_no_server_state.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t01_binary_wiring.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.77s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-kernel_model_exchange__tests__wire_name_sanitization_fits_the_strictest_protocol_face.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__streaming__tests__the_per_frame_bound_is_loud_across_lines_and_chunks.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.01s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t02_credentials.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.19s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__compat__tests__dispatch_is_first_match_in_incumbent_order.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_credentials__tests__resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t07_persistence.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__compat__tests__ollama_bridges_response_format_and_num_ctx.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_redaction__tests__r05_t02_base64_tokens_with_slash_and_padding_are_redacted.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__anthropic_messages__tests__thinking_and_signature_roundtrip_as_state_never_text.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__compat__tests__anthropic_marks_system_and_two_recent_user_messages.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__google_generative_ai__tests__thoughts_signatures_and_function_calls_parse_in_order.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__streaming__tests__comments_and_id_and_retry_fields_are_ignored.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__streaming__tests__simple_frames_dispatch_on_blank_lines.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_credentials__store__tests__a_version_conflict_is_loud.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__egress__tests__ipv4_parsing_is_strict_and_default_ports_elide.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_credentials__tests__forged_handles_and_provider_references_are_refused.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_credentials__store__tests__missing_file_loads_empty_and_round_trips.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_credentials__store__tests__unknown_fields_survive_a_write.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t05_timeouts.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.81s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/adp_r05_t03_rr1_replay.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__streaming__tests__multi_line_data_joins_and_chunks_may_split_anywhere.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-kernel_toolcatalog__tests__update_cannot_change_the_target_identity.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t06_rr1_media_resource.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__tool_render__tests__running_and_stop_unconfirmed_statuses_are_honest.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t08_closed_loop.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.36s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t08_resources.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 334.42s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/svc_r05_t07_usage_trace.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.85s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__gateway__tests__reload_swaps_atomically_and_bumps_the_generation.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-kernel_toolcatalog__tests__aliases_resolve_to_the_authoritative_identity_and_share_permissions.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__streaming__tests__the_buffer_bound_is_loud.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_credentials__tests__a_reload_replacing_the_cell_discards_the_late_writeback.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_credentials__tests__revoke_fences_a_late_writeback.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__egress__tests__https_public_passes_and_plain_http_is_same_origin_only.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__compat__tests__openrouter_adaptive_disable_is_a_loud_refusal.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_credentials__tests__a_rotated_credential_is_reused_without_a_second_refresh.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-service_credentials__tests__concurrent_401s_merge_into_one_refresh.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-kernel_model_exchange__tests__empty_snapshot_is_generation_zero.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__openai_completions__tests__final_answer_identity_comes_from_the_driver_not_the_response.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__gateway__tests__unconfigured_operations_are_loud_route_gaps.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-kernel_toolcatalog__tests__disable_and_uninstall_change_callability_and_generation.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__gateway__tests__a_family_outside_the_operations_matrix_is_loud.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__openai_completions__tests__parses_tool_calls_with_usage_and_identity_from_the_driver.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-adapters_models__openai_completions__tests__a_history_target_missing_from_the_snapshot_fails_loudly.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/adp_r05_t02_oauth_flows.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s"
+      ]
+    },
+    {
+      "path": "supplements/producer-restored-full/suites/lib-kernel_model_exchange__tests__wire_name_collisions_resolve_deterministically_or_fail_loudly.log",
+      "sha256Matches": true,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.00s"
+      ]
+    }
+  ],
+  "summary": "== building the R05 stage suites (rustup 1.98.1, /Users/study_superior/.cache/lingxi-r05-neg-target, --locked, offline) ==\nPASS build (locked, offline)\n== running adp:r05_t02_oauth_flows (pinned 21) ==\nPASS adp:r05_t02_oauth_flows: 21/21 tests green\n== running adp:r05_t03_goldens (pinned 3) ==\nPASS adp:r05_t03_goldens: 3/3 tests green\n== running adp:r05_t03_rr1_replay (pinned 33) ==\nPASS adp:r05_t03_rr1_replay: 33/33 tests green\n== running adp:r05_t04_rr1_batch_terminal (pinned 10) ==\nPASS adp:r05_t04_rr1_batch_terminal: 10/10 tests green\n== running adp:r05_t04_streaming (pinned 18) ==\nPASS adp:r05_t04_streaming: 18/18 tests green\n== running adp:r05_t05_compat (pinned 1) ==\nPASS adp:r05_t05_compat: 1/1 tests green\n== running adp:r05_t05_timeouts (pinned 13) ==\nPASS adp:r05_t05_timeouts: 13/13 tests green\n== running adp:r05_t06_operations (pinned 27) ==\nPASS adp:r05_t06_operations: 27/27 tests green\n== running adp:r05_t07_rr1_usage_strict (pinned 7) ==\nPASS adp:r05_t07_rr1_usage_strict: 7/7 tests green\n== running adp:r05_t07_usage_families (pinned 14) ==\nPASS adp:r05_t07_usage_families: 14/14 tests green\n== running lib-adapters/models::anthropic_messages::tests::cross_family_opaque_state_is_never_echoed (pinned 1) ==\nPASS lib-adapters/models::anthropic_messages::tests::cross_family_opaque_state_is_never_echoed: 1/1 tests green\n== running lib-adapters/models::anthropic_messages::tests::thinking_and_signature_roundtrip_as_state_never_text (pinned 1) ==\nPASS lib-adapters/models::anthropic_messages::tests::thinking_and_signature_roundtrip_as_state_never_text: 1/1 tests green\n== running lib-adapters/models::compat::tests::anthropic_marks_system_and_two_recent_user_messages (pinned 1) ==\nPASS lib-adapters/models::compat::tests::anthropic_marks_system_and_two_recent_user_messages: 1/1 tests green\n== running lib-adapters/models::compat::tests::anthropic_max_effort_raises_the_implicit_one_third_cap (pinned 1) ==\nPASS lib-adapters/models::compat::tests::anthropic_max_effort_raises_the_implicit_one_third_cap: 1/1 tests green\n== running lib-adapters/models::compat::tests::codex_strips_budget_and_temperature_fields (pinned 1) ==\nPASS lib-adapters/models::compat::tests::codex_strips_budget_and_temperature_fields: 1/1 tests green\n== running lib-adapters/models::compat::tests::dispatch_is_first_match_in_incumbent_order (pinned 1) ==\nPASS lib-adapters/models::compat::tests::dispatch_is_first_match_in_incumbent_order: 1/1 tests green\n== running lib-adapters/models::compat::tests::ollama_bridges_response_format_and_num_ctx (pinned 1) ==\nPASS lib-adapters/models::compat::tests::ollama_bridges_response_format_and_num_ctx: 1/1 tests green\n== running lib-adapters/models::compat::tests::openrouter_adaptive_disable_is_a_loud_refusal (pinned 1) ==\nPASS lib-adapters/models::compat::tests::openrouter_adaptive_disable_is_a_loud_refusal: 1/1 tests green\n== running lib-adapters/models::compat::tests::volcengine_disable_guard_passes_through_without_controls (pinned 1) ==\nPASS lib-adapters/models::compat::tests::volcengine_disable_guard_passes_through_without_controls: 1/1 tests green\n== running lib-adapters/models::config::tests::credential_is_explicit_and_never_defaulted (pinned 1) ==\nPASS lib-adapters/models::config::tests::credential_is_explicit_and_never_defaulted: 1/1 tests green\n== running lib-adapters/models::dispatch::tests::error_status_classification_matches_the_incumbent (pinned 1) ==\nPASS lib-adapters/models::dispatch::tests::error_status_classification_matches_the_incumbent: 1/1 tests green\n== running lib-adapters/models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception (pinned 1) ==\nPASS lib-adapters/models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception: 1/1 tests green\n== running lib-adapters/models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only (pinned 1) ==\nPASS lib-adapters/models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only: 1/1 tests green\n== running lib-adapters/models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide (pinned 1) ==\nPASS lib-adapters/models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide: 1/1 tests green\n== running lib-adapters/models::egress::tests::scheme_userinfo_and_host_shapes_refuse (pinned 1) ==\nPASS lib-adapters/models::egress::tests::scheme_userinfo_and_host_shapes_refuse: 1/1 tests green\n== running lib-adapters/models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through (pinned 1) ==\nPASS lib-adapters/models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through: 1/1 tests green\n== running lib-adapters/models::gateway::tests::a_family_outside_the_operations_matrix_is_loud (pinned 1) ==\nPASS lib-adapters/models::gateway::tests::a_family_outside_the_operations_matrix_is_loud: 1/1 tests green\n== running lib-adapters/models::gateway::tests::chat_and_auxiliary_routes_resolve_independently (pinned 1) ==\nPASS lib-adapters/models::gateway::tests::chat_and_auxiliary_routes_resolve_independently: 1/1 tests green\n== running lib-adapters/models::gateway::tests::reload_swaps_atomically_and_bumps_the_generation (pinned 1) ==\nPASS lib-adapters/models::gateway::tests::reload_swaps_atomically_and_bumps_the_generation: 1/1 tests green\n== running lib-adapters/models::gateway::tests::the_pin_pair_rule_never_guesses_a_provider_from_a_model (pinned 1) ==\nPASS lib-adapters/models::gateway::tests::the_pin_pair_rule_never_guesses_a_provider_from_a_model: 1/1 tests green\n== running lib-adapters/models::gateway::tests::unconfigured_operations_are_loud_route_gaps (pinned 1) ==\nPASS lib-adapters/models::gateway::tests::unconfigured_operations_are_loud_route_gaps: 1/1 tests green\n== running lib-adapters/models::google_generative_ai::tests::thoughts_signatures_and_function_calls_parse_in_order (pinned 1) ==\nPASS lib-adapters/models::google_generative_ai::tests::thoughts_signatures_and_function_calls_parse_in_order: 1/1 tests green\n== running lib-adapters/models::openai_codex_responses::tests::codex_body_pins_store_stream_and_instructions (pinned 1) ==\nPASS lib-adapters/models::openai_codex_responses::tests::codex_body_pins_store_stream_and_instructions: 1/1 tests green\n== running lib-adapters/models::openai_completions::tests::a_history_target_missing_from_the_snapshot_fails_loudly (pinned 1) ==\nPASS lib-adapters/models::openai_completions::tests::a_history_target_missing_from_the_snapshot_fails_loudly: 1/1 tests green\n== running lib-adapters/models::openai_completions::tests::final_answer_identity_comes_from_the_driver_not_the_response (pinned 1) ==\nPASS lib-adapters/models::openai_completions::tests::final_answer_identity_comes_from_the_driver_not_the_response: 1/1 tests green\n== running lib-adapters/models::openai_completions::tests::parses_tool_calls_with_usage_and_identity_from_the_driver (pinned 1) ==\nPASS lib-adapters/models::openai_completions::tests::parses_tool_calls_with_usage_and_identity_from_the_driver: 1/1 tests green\n== running lib-adapters/models::openai_completions::tests::unknown_wire_names_are_protocol_violations_never_guesses (pinned 1) ==\nPASS lib-adapters/models::openai_completions::tests::unknown_wire_names_are_protocol_violations_never_guesses: 1/1 tests green\n== running lib-adapters/models::openai_responses::tests::reasoning_items_roundtrip_verbatim_with_summary_as_reasoning (pinned 1) ==\nPASS lib-adapters/models::openai_responses::tests::reasoning_items_roundtrip_verbatim_with_summary_as_reasoning: 1/1 tests green\n== running lib-adapters/models::openai_responses::tests::request_shape_instructions_tools_and_no_server_state (pinned 1) ==\nPASS lib-adapters/models::openai_responses::tests::request_shape_instructions_tools_and_no_server_state: 1/1 tests green\n== running lib-adapters/models::streaming::tests::a_leading_bom_is_stripped_once (pinned 1) ==\nPASS lib-adapters/models::streaming::tests::a_leading_bom_is_stripped_once: 1/1 tests green\n== running lib-adapters/models::streaming::tests::comments_and_id_and_retry_fields_are_ignored (pinned 1) ==\nPASS lib-adapters/models::streaming::tests::comments_and_id_and_retry_fields_are_ignored: 1/1 tests green\n== running lib-adapters/models::streaming::tests::multi_line_data_joins_and_chunks_may_split_anywhere (pinned 1) ==\nPASS lib-adapters/models::streaming::tests::multi_line_data_joins_and_chunks_may_split_anywhere: 1/1 tests green\n== running lib-adapters/models::streaming::tests::simple_frames_dispatch_on_blank_lines (pinned 1) ==\nPASS lib-adapters/models::streaming::tests::simple_frames_dispatch_on_blank_lines: 1/1 tests green\n== running lib-adapters/models::streaming::tests::the_buffer_bound_is_loud (pinned 1) ==\nPASS lib-adapters/models::streaming::tests::the_buffer_bound_is_loud: 1/1 tests green\n== running lib-adapters/models::streaming::tests::the_per_frame_bound_is_loud_across_lines_and_chunks (pinned 1) ==\nPASS lib-adapters/models::streaming::tests::the_per_frame_bound_is_loud_across_lines_and_chunks: 1/1 tests green\n== running lib-adapters/models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest (pinned 1) ==\nPASS lib-adapters/models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest: 1/1 tests green\n== running lib-adapters/models::tool_render::tests::success_renders_resources_status_and_truncation_last (pinned 1) ==\nPASS lib-adapters/models::tool_render::tests::success_renders_resources_status_and_truncation_last: 1/1 tests green\n== running lib-adapters/models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary (pinned 1) ==\nPASS lib-adapters/models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary: 1/1 tests green\n== running lib-kernel/model_exchange::tests::empty_snapshot_is_generation_zero (pinned 1) ==\nPASS lib-kernel/model_exchange::tests::empty_snapshot_is_generation_zero: 1/1 tests green\n== running lib-kernel/model_exchange::tests::snapshot_declares_only_callable_resident_targets_at_the_pinned_generation (pinned 1) ==\nPASS lib-kernel/model_exchange::tests::snapshot_declares_only_callable_resident_targets_at_the_pinned_generation: 1/1 tests green\n== running lib-kernel/model_exchange::tests::wire_name_collisions_resolve_deterministically_or_fail_loudly (pinned 1) ==\nPASS lib-kernel/model_exchange::tests::wire_name_collisions_resolve_deterministically_or_fail_loudly: 1/1 tests green\n== running lib-kernel/model_exchange::tests::wire_name_sanitization_fits_the_strictest_protocol_face (pinned 1) ==\nPASS lib-kernel/model_exchange::tests::wire_name_sanitization_fits_the_strictest_protocol_face: 1/1 tests green\n== running lib-kernel/toolcatalog::tests::aliases_resolve_to_the_authoritative_identity_and_share_permissions (pinned 1) ==\nPASS lib-kernel/toolcatalog::tests::aliases_resolve_to_the_authoritative_identity_and_share_permissions: 1/1 tests green\n== running lib-kernel/toolcatalog::tests::disable_and_uninstall_change_callability_and_generation (pinned 1) ==\nPASS lib-kernel/toolcatalog::tests::disable_and_uninstall_change_callability_and_generation: 1/1 tests green\n== running lib-kernel/toolcatalog::tests::same_name_two_sources_never_overwrites_and_name_only_is_ambiguous (pinned 1) ==\nPASS lib-kernel/toolcatalog::tests::same_name_two_sources_never_overwrites_and_name_only_is_ambiguous: 1/1 tests green\n== running lib-kernel/toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh (pinned 1) ==\nPASS lib-kernel/toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh: 1/1 tests green\n== running lib-kernel/toolcatalog::tests::update_cannot_change_the_target_identity (pinned 1) ==\nPASS lib-kernel/toolcatalog::tests::update_cannot_change_the_target_identity: 1/1 tests green\n== running lib-service/credentials::store::tests::a_failed_write_keeps_the_previous_state_and_reports (pinned 1) ==\nPASS lib-service/credentials::store::tests::a_failed_write_keeps_the_previous_state_and_reports: 1/1 tests green\n== running lib-service/credentials::store::tests::a_version_conflict_is_loud (pinned 1) ==\nPASS lib-service/credentials::store::tests::a_version_conflict_is_loud: 1/1 tests green\n== running lib-service/credentials::store::tests::missing_file_loads_empty_and_round_trips (pinned 1) ==\nPASS lib-service/credentials::store::tests::missing_file_loads_empty_and_round_trips: 1/1 tests green\n== running lib-service/credentials::store::tests::unknown_fields_survive_a_write (pinned 1) ==\nPASS lib-service/credentials::store::tests::unknown_fields_survive_a_write: 1/1 tests green\n== running lib-service/credentials::tests::a_cancelled_waiter_does_not_disturb_the_flight (pinned 1) ==\nPASS lib-service/credentials::tests::a_cancelled_waiter_does_not_disturb_the_flight: 1/1 tests green\n== running lib-service/credentials::tests::a_reload_replacing_the_cell_discards_the_late_writeback (pinned 1) ==\nPASS lib-service/credentials::tests::a_reload_replacing_the_cell_discards_the_late_writeback: 1/1 tests green\n== running lib-service/credentials::tests::a_rotated_credential_is_reused_without_a_second_refresh (pinned 1) ==\nPASS lib-service/credentials::tests::a_rotated_credential_is_reused_without_a_second_refresh: 1/1 tests green\n== running lib-service/credentials::tests::an_expired_handle_is_refused (pinned 1) ==\nPASS lib-service/credentials::tests::an_expired_handle_is_refused: 1/1 tests green\n== running lib-service/credentials::tests::concurrent_401s_merge_into_one_refresh (pinned 1) ==\nPASS lib-service/credentials::tests::concurrent_401s_merge_into_one_refresh: 1/1 tests green\n== running lib-service/credentials::tests::forged_handles_and_provider_references_are_refused (pinned 1) ==\nPASS lib-service/credentials::tests::forged_handles_and_provider_references_are_refused: 1/1 tests green\n== running lib-service/credentials::tests::handle_refusal_texts_carry_no_material (pinned 1) ==\nPASS lib-service/credentials::tests::handle_refusal_texts_carry_no_material: 1/1 tests green\n== running lib-service/credentials::tests::resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit (pinned 1) ==\nPASS lib-service/credentials::tests::resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit: 1/1 tests green\n== running lib-service/credentials::tests::resolve_refreshes_at_most_once_when_every_mint_is_already_expired (pinned 1) ==\nPASS lib-service/credentials::tests::resolve_refreshes_at_most_once_when_every_mint_is_already_expired: 1/1 tests green\n== running lib-service/credentials::tests::revoke_fences_a_late_writeback (pinned 1) ==\nPASS lib-service/credentials::tests::revoke_fences_a_late_writeback: 1/1 tests green\n== running lib-service/redaction::tests::r05_provider_api_key_shapes_are_redacted (pinned 1) ==\nPASS lib-service/redaction::tests::r05_provider_api_key_shapes_are_redacted: 1/1 tests green\n== running lib-service/redaction::tests::r05_secret_key_words_match_case_insensitively (pinned 1) ==\nPASS lib-service/redaction::tests::r05_secret_key_words_match_case_insensitively: 1/1 tests green\n== running lib-service/redaction::tests::r05_t02_base64_tokens_with_slash_and_padding_are_redacted (pinned 1) ==\nPASS lib-service/redaction::tests::r05_t02_base64_tokens_with_slash_and_padding_are_redacted: 1/1 tests green\n== running svc:r05_t01_binary_wiring (pinned 2) ==\nPASS svc:r05_t01_binary_wiring: 2/2 tests green\n== running svc:r05_t01_model_plane (pinned 24) ==\nPASS svc:r05_t01_model_plane: 24/24 tests green\n== running svc:r05_t02_credentials (pinned 38) ==\nPASS svc:r05_t02_credentials: 38/38 tests green\n== running svc:r05_t03_protocol_adapters (pinned 12) ==\nPASS svc:r05_t03_protocol_adapters: 12/12 tests green\n== running svc:r05_t04_streaming (pinned 18) ==\nPASS svc:r05_t04_streaming: 18/18 tests green\n== running svc:r05_t05_network (pinned 21) ==\nPASS svc:r05_t05_network: 21/21 tests green\n== running svc:r05_t05_timeouts (pinned 9) ==\nPASS svc:r05_t05_timeouts: 9/9 tests green\n== running svc:r05_t06_operations (pinned 7) ==\nPASS svc:r05_t06_operations: 7/7 tests green\n== running svc:r05_t06_rr1_media_resource (pinned 17) ==\nPASS svc:r05_t06_rr1_media_resource: 17/17 tests green\n== running svc:r05_t06_rr1_system_speech (pinned 10) ==\nPASS svc:r05_t06_rr1_system_speech: 10/10 tests green\n== running svc:r05_t06_worker_model (pinned 10) ==\nPASS svc:r05_t06_worker_model: 10/10 tests green\n== running svc:r05_t07_persistence (pinned 5) ==\nPASS svc:r05_t07_persistence: 5/5 tests green\n== running svc:r05_t07_rr1_usage_ledger (pinned 15) ==\nPASS svc:r05_t07_rr1_usage_ledger: 15/15 tests green\n== running svc:r05_t07_usage_trace (pinned 9) ==\nPASS svc:r05_t07_usage_trace: 9/9 tests green\n== running svc:r05_t08_closed_loop (pinned 11) ==\nPASS svc:r05_t08_closed_loop: 11/11 tests green\n== running svc:r05_t08_production_tools (pinned 6) ==\nPASS svc:r05_t08_production_tools: 6/6 tests green\n== running svc:r05_t08_resources (pinned 2) ==\nPASS svc:r05_t08_resources: 2/2 tests green\nPASS case files assembled (r05-cases.json + leaf-cases.json; every executed test owned by exactly one C-ID)\nRESULT: all R05 stage runs green with exact pinned counts (27 suites + 64 lib pins; 93 cid-owned + 10 command-bound = 103 required C-IDs; 130 leaves / 137 leaf cases)\nPASS F27 raw resource series preserved (/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/producer-restored-full/suites/f27-resource-series.json)\n",
+  "seriesKeys": [
+    "caseId",
+    "cleanup",
+    "cycleResults",
+    "environment",
+    "load",
+    "ownerResourceSeries",
+    "sampler",
+    "schema",
+    "series",
+    "thresholds"
+  ],
+  "seriesSHA256": "7363dac1b2ea4d39adc3c078646a22aee0e63e61129a7e925c0bb73ea11431ca"
+}

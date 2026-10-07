@@ -1,0 +1,89 @@
+{
+  "capturedAt": "2026-10-07T00:43:09.139057+00:00",
+  "servicePid": 95828,
+  "equipmentPid": 81588,
+  "observedCommand": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+    "--home",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-home-81588-1791333557941665000",
+    "--config",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-cfg-81588-1791333557941958000/service.json",
+    "--bind",
+    "127.0.0.1:0",
+    "--log-max-bytes",
+    "65536",
+    "--log-max-files",
+    "3"
+  ],
+  "inputHashes": {
+    "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service": "b180d47abeeecef4e6d677b9501fde0828cd4061f74276d8e5e2a2a9afb33d81",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/r04_t07_fixture": "0b9e45e0c4e6530bbf02959f7d7f23704e7a9d9c82cd590dabbd899ae55cc794",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-cfg-81588-1791333557941958000/service.json": "89727cebb72414ed74b3b28e93e96b7e169b421829682c0555ef449e8d7beab6",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-ws-81588-1791333557941772000/input.txt": "2345eadeac4a82fa26e3b1ac4dc8e1643f0217fe935fb61d299da9d78c8a46d5",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-ws-81588-1791333557941772000/loop.txt": "0994f6f1a054151ea2e00e59cc2ca1f1ce93b4581cd320f6f9f77cf677fc47e4",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r05_t08_resources-f66968a3ba499b0b": "323456600dc961ee6e4d20b60cf7cf9964526bfcd4153090c7b4e89c0bf2e3a1"
+  },
+  "redactedConfig": {
+    "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-home-81588-1791333557941665000",
+    "workspace": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-ws-81588-1791333557941772000",
+    "providers": {
+      "main": {
+        "protocol": "openai-completions",
+        "endpoint": "http://127.0.0.1:52128/v1",
+        "auth": {
+          "kind": "apiKey",
+          "apiKey": "[synthetic-redacted]"
+        }
+      },
+      "aux": {
+        "protocol": "openai-completions",
+        "endpoint": "http://127.0.0.1:52128/v1",
+        "auth": {
+          "kind": "apiKey",
+          "apiKey": "[synthetic-redacted]"
+        }
+      }
+    },
+    "models": {
+      "chat": {
+        "provider": "main",
+        "model": "stub-model-f27",
+        "capabilities": {
+          "tools": true
+        }
+      },
+      "summarize": {
+        "provider": "aux",
+        "model": "summarize-model-f27"
+      }
+    },
+    "workers": {
+      "localName": "probe",
+      "op": "probe",
+      "description": "F27 load worker",
+      "argv": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/r04_t07_fixture",
+        "ask_model"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "input"
+        ],
+        "additionalProperties": false
+      },
+      "pathArgs": [
+        "input"
+      ],
+      "allowedModelPurposes": [
+        "summarize"
+      ]
+    }
+  },
+  "boundary": "actual process command and strict on-disk isolated fixture during same full run; no ServiceDeps injection into formal binary"
+}

@@ -1,0 +1,20 @@
+2026-10-07T03:24:50.793021Z  INFO lingxi_service: data-epoch gate passed home=/private/tmp/lingxi-r02t07-a13.bqhX7C decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-10-07T03:24:50.844961Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/tmp/lingxi-r02t07-a13.bqhX7C/lingxi-service/data/runs.db applied=[1, 2, 3, 4, 5, 6, 7] version=7
+2026-10-07T03:24:50.845597Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/tmp/lingxi-r02t07-a13.bqhX7C/lingxi-service/local-token.json run_database=/private/tmp/lingxi-r02t07-a13.bqhX7C/lingxi-service/data/runs.db
+2026-10-07T03:24:50.853794Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r02t07-a13.bqhX7C/lingxi-service/instance.json bind_addr=127.0.0.1:64574
+2026-10-07T03:24:50.943679Z  INFO lingxi_service: request handled request_id="req-c2b09b816fcc6aa1301920fb012e00ac" method=GET path=/lingxi/v1/me status=200
+2026-10-07T03:24:50.980731Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a1146477a3_000001 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=212 input_bytes=212
+2026-10-07T03:24:50.980931Z  INFO lingxi_service: request handled request_id="req-9ae48f94e307213f35ac05a51847ac32" method=POST [token] status=200
+2026-10-07T03:24:52.287544Z  INFO lingxi_service: request handled request_id="req-0fc3ec59b8c4001be52a8443f871bf3c" method=POST path=/lingxi/v1/devices/credentials status=201
+2026-10-07T03:24:52.323458Z  INFO lingxi_service: request handled request_id="req-a0295980f28f0e5fb34eeb3758cb8a90" method=POST path=/lingxi/v1/ws-ticket status=200
+2026-10-07T03:24:52.357348Z  INFO lingxi_service: request handled request_id="req-2165e7a3c9b0713747bf2405caaf2bcf" method=GET path=/lingxi/v1/me status=401
+2026-10-07T03:24:52.369854Z  INFO lingxi_service: request handled request_id="req-e63138e63d9f321906208c9f631cd089" method=GET path=/lingxi/v1/me status=401
+2026-10-07T03:24:52.382869Z  INFO lingxi_service: request handled request_id="req-3eb67b0619d06c5ac160f1e3e4d825d9" method=GET path=/lingxi/v1/ws status=401
+2026-10-07T03:24:53.668806Z  INFO lingxi_service: request handled request_id="req-ea32feecd115d3cc5fb0a90ceeeb0f71" method=GET [token] status=403
+2026-10-07T03:24:53.683148Z  INFO lingxi_service: request handled request_id="req-cc23bc5c429c6be0aed95e29c6a57c05" method=GET [token] status=404
+2026-10-07T03:24:53.765639Z  INFO lingxi_service: request handled request_id="req-2aadc366f6044dcfdd8bcb64089c05d3" method=GET path=/lingxi/v1/ws status=401
+2026-10-07T03:24:53.766360Z  INFO lingxi_service: request handled request_id="req-b2625a447e03b323e718b99cd17f4367" method=GET path=/lingxi/v1/ws status=101
+2026-10-07T03:24:53.786102Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-10-07T03:24:53.787647Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-10-07T03:24:53.787912Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-10-07T03:24:53.787991Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

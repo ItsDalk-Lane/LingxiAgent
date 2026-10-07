@@ -1,0 +1,10 @@
+== preparing the isolated copy at /Users/study_superior/r05t08-work/negcopy.HwNE95 (local clone of HEAD b3ac0e6ae + uncommitted working-tree overlay) ==
+== copy ready (branch codex/rust-tauri-migration, HEAD b3ac0e6ae, worktree dirty=68 files) ==
+== CONTROL: xtask r05 mirror tests green in the copy ==
+PASS control: xtask r05_ tests green (exit 0)
+== CONTROL: the binary-wiring suite is green in the copy (for N08/N10) ==
+PASS control: r05_t01_binary_wiring green (exit 0)
+== N01: deleted the R05-A16 scenario from the copy's map; xtask map-pinning tests: ==
+case R05-GATE-N01: exit=101 gap-named=OK verdict=OK (删 A16 → 镜像单测红并点名 R05-A16)
+== N02: pin path mutated to match zero tests; the producer must fail naming the 0-match run (full producer run) ==
+case R05-GATE-N02: exit=1 gap-named=MISSING:filter matched 0 tests verdict=BAD (零匹配筛选词 → 生产者非零并点名 running=0)

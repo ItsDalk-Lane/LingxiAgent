@@ -1,0 +1,24 @@
+{
+  "reviewer": "rr3_j_review_01",
+  "reviewRound": "J-REVIEW-01",
+  "status": "BLOCKED_ENVIRONMENT",
+  "localNodeAndMinimumBusiness": "PASS",
+  "defaultPreparation": "BLOCKED_ENOSPC",
+  "legacyDirected": "BLOCKED_ENOSPC_BASE_CHECKOUT",
+  "R06_READY": false,
+  "productMustFix": [],
+  "blockingNextSteps": [
+    "new implementation and new independent review for full default isolated checkout under actual disk limits",
+    "preserve exact historical BASE content/purity and all original legacy assertions while resolving its checkout space requirement",
+    "fresh G02 default N01–N16 and complete affected R02 after preparation is independently accepted"
+  ],
+  "sourceFileCount": 504,
+  "sourceFilesUnchanged": true,
+  "sourceHead": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "binarySha256": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e",
+  "commandReceipts": 28,
+  "fullMainGitUnchanged": false,
+  "gitDifferenceReceipt": "main-git-differences.json",
+  "finalizedUtc": "2026-10-07T03:47:07.830495+00:00",
+  "stopWritingAfterDelivery": true
+}

@@ -1,0 +1,21 @@
+{
+  "status": "FAIL",
+  "startedUtc": "2026-10-07T04:00:05.799855+00:00",
+  "commands": [],
+  "platform": "darwin",
+  "argv": [
+    "/Users/study_superior/r05t08-work/j02-default-uqbqoj24/scripts/rust-tauri/prepare_git_copy.py",
+    "--source",
+    "/Users/study_superior/r05t08-work/j02-default-uqbqoj24",
+    "--copy",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//r02-a16.lSm6tU/repo-base",
+    "--revision",
+    "201584f2917a7fd96d6ea603bdeddbd420082cfe",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-02/legacy-directed-01/legacy-entry/e0-base-materialization"
+  ],
+  "cwd": "/Users/study_superior/r05t08-work/j02-default-uqbqoj24",
+  "spaceNote": "\u5b9e\u9645\u6587\u4ef6\u7cfb\u7edf\u53ef\u7528\u7a7a\u95f4\u622a\u70b9\uff0c\u4e0d\u80fd\u89e3\u91ca\u4e3a\u6b64\u526f\u672c\u72ec\u5360\u7269\u7406\u5757",
+  "error": "path crosses symlink: /var",
+  "finishedUtc": "2026-10-07T04:00:05.800095+00:00"
+}

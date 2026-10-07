@@ -1,0 +1,338 @@
+[
+  {
+    "path": "rust/crates/lingxi-service/src/lib.rs",
+    "gitState": "modified",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 203323,
+    "mtimeNs": 1791340804507525000,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+    "workPackageCandidates": [
+      "F46/H/F47/F48"
+    ]
+  },
+  {
+    "path": "rust/crates/lingxi-service/src/logging.rs",
+    "gitState": "modified",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 22354,
+    "mtimeNs": 1791333538955322877,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+    "workPackageCandidates": [
+      "F46/H/F47/F48"
+    ]
+  },
+  {
+    "path": "rust/crates/lingxi-service/src/redaction.rs",
+    "gitState": "modified",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 41935,
+    "mtimeNs": 1791339950864912186,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "5b192ab43df13d6add0705a9f1eb2ead45da1131f012c3afb61dd9f90ac10b7a",
+    "workPackageCandidates": [
+      "F46/H/F47/F48"
+    ]
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/r05_t08_resources.rs",
+    "gitState": "modified",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 70474,
+    "mtimeNs": 1791333164075831027,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "23b03f56bef900fc0563b3348596e61437995f7c05cc25a5173455f11a23e33f",
+    "workPackageCandidates": [
+      "C/F27/I10"
+    ]
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/support/r05_resource_sampler.rs",
+    "gitState": "untracked",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 5353,
+    "mtimeNs": 1791332311286396767,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "1f6601122e5d7841f3975ec68ea8c60adb653fc939ca4e65cc3da7565c269274",
+    "workPackageCandidates": [
+      "C/F27/I10"
+    ]
+  },
+  {
+    "path": "rust/crates/xtask/src/candidate.rs",
+    "gitState": "modified",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 23258,
+    "mtimeNs": 1791332578725873714,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+    "workPackageCandidates": [
+      "A/F42"
+    ]
+  },
+  {
+    "path": "rust/crates/xtask/src/candidate/tests.rs",
+    "gitState": "modified",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 12443,
+    "mtimeNs": 1791332854256248878,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+    "workPackageCandidates": [
+      "A/F42"
+    ]
+  },
+  {
+    "path": "rust/crates/xtask/src/main.rs",
+    "gitState": "modified",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 20978,
+    "mtimeNs": 1791332335791918854,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+    "workPackageCandidates": [
+      "A/F42"
+    ]
+  },
+  {
+    "path": "rust/crates/xtask/src/runner_identity.rs",
+    "gitState": "modified",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 6854,
+    "mtimeNs": 1791332280145418168,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+    "workPackageCandidates": [
+      "A/F42"
+    ]
+  },
+  {
+    "path": "rust/crates/xtask/src/verify/runner_tests.rs",
+    "gitState": "modified",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 96139,
+    "mtimeNs": 1791332854301225263,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69",
+    "workPackageCandidates": [
+      "A/F42"
+    ]
+  },
+  {
+    "path": "scripts/rust-tauri/r02_run_output_regression.py",
+    "gitState": "untracked",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 15852,
+    "mtimeNs": 1791334229060258652,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "fcee14b8c529d502d9885a4b7a31e8c5f90ade22ab92e149402d52585272fd99",
+    "workPackageCandidates": [
+      "A/F42"
+    ]
+  },
+  {
+    "path": "scripts/rust-tauri/r02_t01_log_level_regression.py",
+    "gitState": "untracked",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 3625,
+    "mtimeNs": 1791339902442719094,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "02bde1c1f2e2519739aa229d7135f44b0ffe90966f66836052399fcd99f4082d",
+    "workPackageCandidates": [
+      "F46/H/F47/F48"
+    ]
+  },
+  {
+    "path": "scripts/rust-tauri/r02_t01_service_smoke.sh",
+    "gitState": "modified",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 22014,
+    "mtimeNs": 1791339902014309112,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "76f3e9fd143842b4f9ef7577bf3c857ddaee29e02ec849b9b93d2cc14afede1c",
+    "workPackageCandidates": [
+      "F46/H/F47/F48"
+    ]
+  },
+  {
+    "path": "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+    "gitState": "modified",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 207621,
+    "mtimeNs": 1791334317428468147,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "53ff4eddd9af1844b7722c39dd369efcb42dbb6787adc9bb70497af48c10c8df",
+    "workPackageCandidates": [
+      "A/F42"
+    ]
+  },
+  {
+    "path": "scripts/rust-tauri/r05_t08_mutate_pin.py",
+    "gitState": "untracked",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 2526,
+    "mtimeNs": 1791332154073833537,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "7785b41ebadfdc6d6415ee1d337ea48621e25d1bbb1ed1c16456004545279609",
+    "workPackageCandidates": [
+      "B→I→J/F45/F49/F50"
+    ]
+  },
+  {
+    "path": "scripts/rust-tauri/r05_t08_negative_gate.sh",
+    "gitState": "modified",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 35957,
+    "mtimeNs": 1791343522901716146,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "026a1bca836ff070ad5994d3753fdfe06dcfcda3a04def81ec86471148b46b9d",
+    "workPackageCandidates": [
+      "B→I→J/F45/F49/F50"
+    ]
+  },
+  {
+    "path": "scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py",
+    "gitState": "untracked",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 5131,
+    "mtimeNs": 1791332247533610207,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "f94f76721e77bf5a738b1270bd875569fd3f9ba3cc552795033ac057a8ee1867",
+    "workPackageCandidates": [
+      "B→I→J/F45/F49/F50"
+    ]
+  },
+  {
+    "path": "scripts/rust-tauri/r05_t08_node_selfcheck.py",
+    "gitState": "untracked",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 14991,
+    "mtimeNs": 1791343793833834971,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "0429d60f3a32370377bd9c6864f5c81e2329d1f41ee2a3caab35db545f120614",
+    "workPackageCandidates": [
+      "B→I→J/F45/F49/F50"
+    ]
+  },
+  {
+    "path": "scripts/rust-tauri/r05_t08_prepare_node.py",
+    "gitState": "untracked",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 13339,
+    "mtimeNs": 1791343623234477303,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "51abc64c8be5e90b1af7e35a475f3ea9e37cbb37033b9c256b5093333fd8c082",
+    "workPackageCandidates": [
+      "B→I→J/F45/F49/F50"
+    ]
+  },
+  {
+    "path": "scripts/rust-tauri/r05_t08_restore_selfcheck.py",
+    "gitState": "untracked",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 17026,
+    "mtimeNs": 1791340437664538149,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "0cd24624bf7d6079e3cf7b4e6cf693222026db8261ffc60691bdc77fde0f57a4",
+    "workPackageCandidates": [
+      "B→I→J/F45/F49/F50"
+    ]
+  },
+  {
+    "path": "scripts/rust-tauri/run_output_sinks.py",
+    "gitState": "untracked",
+    "owner": "production",
+    "category": "INCLUDE_PRODUCTION",
+    "type": "regular",
+    "bytes": 5875,
+    "mtimeNs": 1791332957989118861,
+    "reason": "生产修复/永久回归候选，当前仍需最终冻结复核",
+    "over100MiB": false,
+    "referenceSources": [],
+    "sha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+    "workPackageCandidates": [
+      "A/F42"
+    ]
+  }
+]

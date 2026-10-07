@@ -1,0 +1,122 @@
+{
+  "utc": "2026-10-07T01:50:20.994493+00:00",
+  "files": {
+    "rust/crates/lingxi-service/src/workerrpc.rs": {
+      "sha256": "4a158b5321da63d2c6a36d88da8ec7cfd21622c914fa38f7ad6dd674d4cb0788",
+      "bytes": 83449
+    },
+    "rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs": {
+      "sha256": "c569a06220d6672432e2dc1871f2f6c9f2d2b4d5eeae2c5773fec98e0a2d4e2f",
+      "bytes": 18189
+    },
+    "rust/crates/lingxi-kernel/src/model_exchange.rs": {
+      "sha256": "62bb3b1b3ad42f5ea46961ab5c5b1d98d54f22c0a359f8d099ad1e323a6d4c6b",
+      "bytes": 46172
+    },
+    "rust/crates/lingxi-kernel/src/lib.rs": {
+      "sha256": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+      "bytes": 40216
+    },
+    "rust/crates/lingxi-kernel/src/ports.rs": {
+      "sha256": "3f32e8c7c0a617d6bcb73ed11ab5eb468acfbb383ac844964a9ad52a75fa3936",
+      "bytes": 80389
+    },
+    "rust/crates/lingxi-kernel/src/usage.rs": {
+      "sha256": "209bc2f127595674ed86c64cbf92d7fc1632bcbbfcc446909cd0f632cf470f3b",
+      "bytes": 24017
+    },
+    "rust/crates/lingxi-adapters/src/models/credentials.rs": {
+      "sha256": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+      "bytes": 16217
+    },
+    "rust/crates/lingxi-adapters/src/models/auxiliary.rs": {
+      "sha256": "504cc229598a737f260eb09b308b052aa9c9d196acaa471a8fd21281cdc46c04",
+      "bytes": 11160
+    },
+    "rust/crates/lingxi-adapters/src/models/operations/embedding.rs": {
+      "sha256": "b410cfe1bddcad6ba82506ff0cda702741bab7588f13d2c6ab9c86cbcb613e47",
+      "bytes": 18377
+    },
+    "rust/crates/lingxi-service/src/operations.rs": {
+      "sha256": "bbb2054886f6e08093aeba416570ecadee866891db06e59a6d5406815b965639",
+      "bytes": 102060
+    },
+    "rust/crates/lingxi-service/src/lib.rs": {
+      "sha256": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756",
+      "bytes": 203023
+    },
+    "rust/crates/lingxi-service/src/runs.rs": {
+      "sha256": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+      "bytes": 210703
+    },
+    "rust/crates/lingxi-service/src/workermodel.rs": {
+      "sha256": "85b25b95f026dd9ce53119bd0caff44e4df4ef5f90c6e3b2abfad5e89932af29",
+      "bytes": 21016
+    },
+    "rust/crates/lingxi-adapters/src/storage/migrations.rs": {
+      "sha256": "df9519611c4020c5eed3acccedc92287feeb9f6b0af477ee69e1317ef089859d",
+      "bytes": 38639
+    },
+    "rust/crates/lingxi-adapters/src/storage/run_store.rs": {
+      "sha256": "542973c1a89e0b458b0bacd73bb594934d4a97369bc2785d7c4723caaad06496",
+      "bytes": 148766
+    },
+    "rust/crates/lingxi-protocol/src/handshake.rs": {
+      "sha256": "17bb9902607d3d94fa2356cd2b55a32ad76b6eda38377b8d181be931af25d51d",
+      "bytes": 8093
+    },
+    "rust/crates/lingxi-protocol/src/wire.rs": {
+      "sha256": "a3509c6d31fe584980bef21cc615e21a56afe44ab57266108b3f5d2d7c71d3ff",
+      "bytes": 31447
+    },
+    "rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs": {
+      "sha256": "395ac7a42923d4f85a22eff80fe571ab71dec0ddd225fe354c8f90379ecc9f5f",
+      "bytes": 122629
+    }
+  },
+  "worker_segments": [
+    {
+      "path": "rust/crates/lingxi-service/src/workerrpc.rs",
+      "startLine": 11,
+      "endLine": 24,
+      "content": "//! Envelope (JSON lines, length-capped on both sides):\n//!\n//! ```text\n//! host→worker  {\"kind\":\"request\",\"id\":\"<csprng-hex>\",\"op\":...,\n//!               \"deadline_unix_ms\":...,\"max_output_bytes\":...,\n//!               \"resources\":[{\"path\":...,\"op\":\"read|write\"}],\"args\":{...}}\n//! worker→host  {\"kind\":\"callback\",\"cb_id\":...,\"op\":\"model.complete\",\n//!               \"purpose\":...,\"prompt\":...,\"max_output_tokens\":...}\n//! host→worker  {\"kind\":\"callback_result\",\"cb_id\":...,\"ok\":false,\n//!               \"error\":{\"code\":\"model_capability_not_configured\",...}}\n//! worker→host  {\"kind\":\"result\",\"id\":...,\"ok\":true,\n//!               \"content\":[{\"type\":\"text\",\"text\":...}],\n//!               \"structured\":{...},\"claimed_files\":[...]}\n//! host→worker  {\"kind\":\"cancel\",\"id\":...}"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/workerrpc.rs",
+      "startLine": 529,
+      "endLine": 541,
+      "content": "pub struct WorkerCallbackLine {\n    pub kind: String,\n    pub cb_id: String,\n    pub op: String,\n    #[serde(default)]\n    pub purpose: String,\n    #[serde(default)]\n    pub prompt: String,\n    #[serde(default)]\n    pub max_output_tokens: u32,\n}\n\n#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/workerrpc.rs",
+      "startLine": 1285,
+      "endLine": 1302,
+      "content": "                        match parsed.get(\"kind\").and_then(|k| k.as_str()) {\n                            Some(\"callback\") => {\n                                // C09: identity-claiming fields make the\n                                // callback a loud refusal (the invocation\n                                // survives; the worker learns the host —\n                                // not the payload — owns identity).\n                                let forged = parsed.as_object().and_then(|obj| {\n                                    obj.keys().find(|key| {\n                                        FORBIDDEN_CALLBACK_IDENTITY_KEYS.contains(&key.as_str())\n                                    })\n                                });\n                                if let Some(field) = forged {\n                                    let refusal = WorkerModelRefusal::IdentityNotNegotiable {\n                                        field: field.clone(),\n                                    };\n                                    let reply_line = serde_json::json!({\n                                        \"kind\": \"callback_result\",\n                                        \"cb_id\": parsed.get(\"cb_id\").and_then(|v| v.as_str()).unwrap_or(\"\"),"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/workerrpc.rs",
+      "startLine": 1320,
+      "endLine": 1361,
+      "content": "                                }\n                                let cb: WorkerCallbackLine = match serde_json::from_value(parsed) {\n                                    Ok(cb) => cb,\n                                    Err(e) => {\n                                        violation = Some(format!(\"malformed callback: {e}\"));\n                                        break;\n                                    }\n                                };\n                                callback_count += 1;\n                                if callback_count > limits.max_callbacks {\n                                    violation = Some(format!(\n                                        \"more than {} model callbacks in one invocation\",\n                                        limits.max_callbacks\n                                    ));\n                                    break;\n                                }\n                                // C09: the purpose must be one the HOST\n                                // granted this worker at registration —\n                                // the payload never widens the grant. The\n                                // refusal is a normal callback_result (the\n                                // invocation survives; the count was\n                                // already charged above).\n                                if !self.spec.allowed_model_purposes.contains(&cb.purpose) {\n                                    let refusal = WorkerModelRefusal::PurposeNotGranted {\n                                        purpose: cb.purpose.clone(),\n                                    };\n                                    let reply_line = serde_json::json!({\n                                        \"kind\": \"callback_result\",\n                                        \"cb_id\": cb.cb_id,\n                                        \"ok\": false,\n                                        \"error\": {\n                                            \"code\": refusal.code(),\n                                            \"message\": refusal.message(),\n                                        },\n                                    });\n                                    let serialized = serde_json::to_string(&reply_line)\n                                        .expect(\"callback reply serializes\");\n                                    if let Err(e) =\n                                        stdin.write_all(format!(\"{serialized}\\n\").as_bytes()).await\n                                    {\n                                        violation =\n                                            Some(format!(\"callback reply write failed: {e}\"));"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/workerrpc.rs",
+      "startLine": 1388,
+      "endLine": 1418,
+      "content": "                                            cb_id: cb.cb_id.clone(),\n                                            parent_tool_call: call.clone(),\n                                            purpose: cb.purpose.clone(),\n                                            started_at_unix_ms: self.runtime.clock.now_unix_ms(),\n                                        },\n                                    )),\n                                };\n                                let answer = match tokio::time::timeout_at(\n                                    deadline,\n                                    self.spec.model.complete(\n                                        ctx,\n                                        &self.spec.plugin_id,\n                                        &request_id,\n                                        &cb.cb_id,\n                                        call,\n                                        &WorkerModelRequest {\n                                            purpose: cb.purpose,\n                                            prompt: cb.prompt,\n                                            max_output_tokens: cb.max_output_tokens,\n                                            deadline_unix_ms: Some(envelope.deadline_unix_ms),\n                                        },\n                                    ),\n                                )\n                                .await\n                                {\n                                    Ok(answer) => answer,\n                                    Err(_) => {\n                                        // Deadline expiry: `timeout_at`\n                                        // already dropped the in-flight\n                                        // `complete()` future. The row is\n                                        // written HERE, deterministically"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/workerrpc.rs",
+      "startLine": 1515,
+      "endLine": 1541,
+      "content": "                            other => {\n                                violation = Some(format!(\n                                    \"unexpected line kind {other:?} (only callback/result are \\\n                                     allowed)\"\n                                ));\n                                break;\n                            }\n                        }\n                    }\n                }\n            }\n\n            // Reap the child before settling (no zombie workers).\n            child.kill_if_alive().await;\n            let _ = child.wait_bounded().await;\n            drop(_permit);\n\n            if let Some(detail) = violation {\n                return ToolExecutionResult::of_ctx(\n                    ctx,\n                    ToolOutcome::Failed {\n                        error: WorkerFailure::ProtocolViolation { detail }.to_protocol_error(),\n                    },\n                );\n            }\n            let Some(result) = result_line else {\n                return ToolExecutionResult::of_ctx("
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs",
+      "startLine": 149,
+      "endLine": 158,
+      "content": "        \"ask_model_tagged\" => {\n            send_line(&serde_json::json!({\n                \"kind\": \"callback\", \"cb_id\": \"cb-1\", \"op\": \"model.complete\",\n                \"purpose\": \"summarize\",\n                \"prompt\": format!(\"Summarize the granted input. (tag {extra})\"),\n                \"max_output_tokens\": 64,\n            }));\n            let reply = read_line_stdin();\n            send_line(&serde_json::json!({\n                \"kind\": \"result\", \"id\": request[\"id\"], \"ok\": true,"
+    }
+  ],
+  "boundary": "源码字段/声明/真实分流/fixture与原始运行消费自检；未重新Cargo或启动worker。"
+}

@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "cdd213078",
+    "HEAD",
+    "--",
+    "rust/crates/lingxi-service/src/redaction.rs"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "start": "2026-10-07T02:08:09.467975+00:00",
+  "end": "2026-10-07T02:08:09.475993+00:00"
+}

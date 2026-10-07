@@ -1,0 +1,47 @@
+{
+  "affectedSourceStable": false,
+  "changedAffectedInputs": [
+    "rust/crates/lingxi-service/tests/r05_t08_resources.rs"
+  ],
+  "commandsInputStable": {
+    "build-02": true,
+    "clippy-01": true,
+    "clippy-final-01": true,
+    "f46-directed-command-01": true,
+    "fmt-01": true,
+    "fmt-final-01": true,
+    "measurement-01": true,
+    "negative-fd-zero-run": true,
+    "negative-tcp-zero-run": true,
+    "ordinary-cancel-late-result-01": true,
+    "ordinary-cancel-subagent-01": true,
+    "restored-controls-01": true
+  },
+  "rawCycleResults": 160,
+  "rawPoints": 54,
+  "ownerPoints": 61,
+  "workerLiveExactly2": true,
+  "workerReleasedExactly1": true,
+  "steadyTcp0": true,
+  "maxConcurrentLogFiles": 4,
+  "noTempFileResidueAtWorkerSteady": true,
+  "cleanup": {
+    "configRemoved": true,
+    "equipmentStubStopped": true,
+    "homeRemoved": true,
+    "lastServiceExit": 0,
+    "lastServicePid": 55703,
+    "serviceStopped": true,
+    "workspaceRemoved": true
+  },
+  "schemaVersionBoundary": "resource-series.v1 retained; additive serviceTree/files/cycleResults/ownerResourceSeries only; producer copies existing single filename",
+  "build02Boundary": "build02 before/after inputs are identical; later main-test additions use different hashes. Measurement01 supersedes no-run build for its measured version; final clippy compiles final assertions but is not a full resource run.",
+  "resourceOverall": "FAIL_F46_OPEN",
+  "implementationStatus": "SELF_CHECKED",
+  "independentAcceptance": "NOT_RUN",
+  "measurementToFinalBoundary": "Only the resource test gains required ≤3 log assertions after measurement01; source inventory comparison above is captured at FINAL_SOURCE_BINDING timestamp, not a later global candidate freeze.",
+  "finalFullResourceTest": "NOT_RUN_AFTER_LOG_ASSERTIONS",
+  "finalSourceBinding": "FINAL_SOURCE_BINDING.json",
+  "productionInputsStableAtFinalBinding": true,
+  "expectedFinalTestAssertionChange": true
+}

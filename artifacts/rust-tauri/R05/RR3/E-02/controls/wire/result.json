@@ -1,0 +1,25 @@
+{
+  "kind": "wire",
+  "rows": [
+    {
+      "phase": "normal",
+      "exitCode": 0,
+      "fixtureSha256": "2e36bfa19d2efab9c16080461a1bfb252df1566cba497ced6b9c2099d0949b17",
+      "commandLabel": "20-wire-normal"
+    },
+    {
+      "phase": "target-red",
+      "exitCode": 1,
+      "fixtureSha256": "0e5599e3102fa5cd2715ebb0745a92de60237280329ed9576ea1245b9fbf0a2b",
+      "commandLabel": "20-wire-target-red"
+    },
+    {
+      "phase": "restored",
+      "exitCode": 0,
+      "fixtureSha256": "2e36bfa19d2efab9c16080461a1bfb252df1566cba497ced6b9c2099d0949b17",
+      "commandLabel": "20-wire-restored"
+    }
+  ],
+  "normalSha256": "2e36bfa19d2efab9c16080461a1bfb252df1566cba497ced6b9c2099d0949b17",
+  "restoredByteEqual": true
+}

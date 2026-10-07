@@ -1,0 +1,236 @@
+{
+  "at": "2026-10-07T04:36:27.317965+00:00",
+  "commandStart": {
+    "argv": [
+      "bash",
+      "scripts/rust-tauri/r05_t08_negative_gate.sh",
+      "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "start": "2026-10-07T04:24:34.372421+00:00",
+    "environment": {
+      "CARGO_INCREMENTAL": "0",
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "R02_LEGACY_REGRESSION_MODE": null
+    },
+    "removedInheritedLegacyMode": null
+  },
+  "defaultRawExit": "UNKNOWN",
+  "recorderExit": 1,
+  "observerExit": 143,
+  "defaultVerdict": "BLOCKED_BY_STORAGE_NOT_ACCEPTED",
+  "recordedCaseRows": [
+    "R05-GATE-N01\t101\tOK\tOK\t删 A16 → 镜像单测红并点名 R05-A16",
+    "R05-GATE-N02\t1\tMISSING:filter matched 0 tests\tBAD\t零匹配筛选词 → 生产者非零并点名 running=0"
+  ],
+  "completedValidNegativeTargets": [
+    "N01"
+  ],
+  "invalidNegativeTargets": [
+    "N02"
+  ],
+  "notExecuted": [
+    "N03",
+    "N04",
+    "N05",
+    "N06",
+    "N07",
+    "N08",
+    "N09",
+    "N10",
+    "N11",
+    "N12",
+    "N13",
+    "N14",
+    "N15",
+    "N16"
+  ],
+  "restoredExecution": "NOT RUN: bytes for N01 map restored before N02, but no post-N01 restored Cargo check; complete final restore was not reached.",
+  "fullR02": "NOT RUN",
+  "fullE5": "NOT RUN",
+  "records": [
+    {
+      "name": "control-xtask",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--bin",
+        "xtask",
+        "r05_"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.HwNE95",
+      "exit": 0,
+      "exitSource": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01/control-xtask/exit-code.txt",
+      "log": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01/control-xtask/test.stdout.log",
+      "sha256": "80a7da395d4fac1650e0f33aa9a329555c2acc6198da4dff767511fb18269625",
+      "counts": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 113 filtered out; finished in 0.04s"
+      ],
+      "names": [
+        "test stage_map::map_tests::r05_stage_pin_table_matches_the_registered_suites ... ok",
+        "test stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim ... ok",
+        "test stage_map::map_tests::r05_production_map_registers_the_supplemental_duty_scenarios ... ok",
+        "test stage_map::map_tests::r05_map_declares_no_live_lane_and_only_offline_commands ... ok",
+        "test stage_map::map_tests::r05_production_map_registers_the_suite_producer_and_r04_regression_gate ... ok",
+        "test stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once ... ok",
+        "test stage_map::map_tests::r05_scope_matrix_covers_every_r05_bound_leaf_honestly ... ok",
+        "test stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05 ... ok",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 113 filtered out; finished in 0.04s"
+      ],
+      "startUtc": null,
+      "endUtc": null,
+      "logLastWriteUtc": "2026-10-07T04:26:43.428834+00:00",
+      "utcLimit": "Per-command start/end was not instrumented in the unchanged production shell; log mtime is a filesystem observation, not an exact process interval. See whole-command start and process observations."
+    },
+    {
+      "name": "control-binwiring",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r05_t01_binary_wiring"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.HwNE95",
+      "exit": 0,
+      "exitSource": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01/control-binwiring/exit-code.txt",
+      "log": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01/control-binwiring/test.stdout.log",
+      "sha256": "76bd53863f0c488ec03db8d8e398c4cdc55e0dcd8da9f7af0600c9ba41a45fa0",
+      "counts": [
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.32s"
+      ],
+      "names": [
+        "test c03_real_binary_without_plane_settles_unconfigured ... ok",
+        "test c02_real_binary_full_chain_through_authenticated_endpoint ... ok",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.32s"
+      ],
+      "startUtc": null,
+      "endUtc": null,
+      "logLastWriteUtc": "2026-10-07T04:27:39.298185+00:00",
+      "utcLimit": "Per-command start/end was not instrumented in the unchanged production shell; log mtime is a filesystem observation, not an exact process interval. See whole-command start and process observations."
+    },
+    {
+      "name": "n01-delete-a16",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--bin",
+        "xtask",
+        "r05_production_map_keeps_the_sixteen"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.HwNE95",
+      "exit": 101,
+      "exitSource": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01/n01-delete-a16/exit-code.txt",
+      "log": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01/n01-delete-a16/test.stdout.log",
+      "sha256": "17bfda8aeae49bf5e263d78bcd9435f342fafa5e491ee1aedcbabbbb79443c9e",
+      "counts": [
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+      ],
+      "names": [
+        "test stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim ... FAILED",
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+      ],
+      "startUtc": null,
+      "endUtc": null,
+      "logLastWriteUtc": "2026-10-07T04:27:50.851880+00:00",
+      "utcLimit": "Per-command start/end was not instrumented in the unchanged production shell; log mtime is a filesystem observation, not an exact process interval. See whole-command start and process observations."
+    },
+    {
+      "name": "n02-zero-match",
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r05_t08_stage_suites.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01/n02-zero-match/suites"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.HwNE95",
+      "exit": 1,
+      "exitSource": "Actual console and case-results.tsv captured N02_EXIT=1; separate exit-code.txt write failed ENOSPC.",
+      "runtimeSuitesCompleted": 0,
+      "targetReached": false,
+      "target": "filter matched 0 tests",
+      "targetTextPresent": false,
+      "buildCommand": [
+        "env",
+        "-u",
+        "all_proxy",
+        "-u",
+        "ALL_PROXY",
+        "-u",
+        "http_proxy",
+        "-u",
+        "HTTP_PROXY",
+        "-u",
+        "https_proxy",
+        "-u",
+        "HTTPS_PROXY",
+        "CARGO_NET_OFFLINE=true",
+        "CARGO_TARGET_DIR=/Users/study_superior/.cache/lingxi-r05-neg-target",
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "lingxi-service",
+        "-p",
+        "lingxi-adapters",
+        "--tests",
+        "--no-run"
+      ],
+      "buildLog": {
+        "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01/n02-zero-match/suites/build.log",
+        "sha256": "e6d74b718d18903209768d83bef371b58a3084a0a5c068349f57813dbaa443b8",
+        "bytes": 150815
+      },
+      "compileFailureLines": [
+        "error: could not compile `lingxi-service` (test \"r00_static_web_leaves\")",
+        "error: could not compile `lingxi-service` (test \"request_dedup\")",
+        "error: could not compile `lingxi-service` (test \"recovery_startup_scan\")",
+        "error: could not compile `lingxi-service` (test \"r04_t05_process_tools\")",
+        "error: could not compile `lingxi-service` (test \"cancel_terminal_race\")",
+        "error: could not compile `lingxi-service` (test \"r05_t01_binary_wiring\")",
+        "error: could not compile `lingxi-service` (test \"r04_t01_tool_catalog\")",
+        "error: could not compile `lingxi-service` (test \"r05_t08_closed_loop\")",
+        "error: could not compile `lingxi-service` (test \"r05_t08_production_tools\")",
+        "error: could not compile `lingxi-service` (test \"auth_matrix\")",
+        "error: could not compile `lingxi-service` (test \"cancel_link_inheritance\")",
+        "error: could not compile `lingxi-service` (test \"invocation_journal\")",
+        "error: could not compile `lingxi-service` (test \"shutdown_coordinator\")",
+        "error: could not compile `lingxi-service` (test \"session_serialization\")",
+        "error: could not compile `lingxi-service` (test \"r05_t07_persistence\")",
+        "error: could not compile `lingxi-service` (lib test)",
+        "error: could not compile `lingxi-service` (test \"r04_rr1_f02_reaper_cleanup\")",
+        "error: could not compile `lingxi-service` (test \"admission_dedup_consistency\")",
+        "error: could not compile `lingxi-service` (test \"r04_t07_mcp_and_workers\")",
+        "error: could not compile `lingxi-service` (test \"exit_race_rejections\")",
+        "error: could not compile `lingxi-service` (test \"r05_t07_rr1_usage_ledger\")",
+        "error: could not compile `lingxi-service` (test \"r05_t04_streaming\")",
+        "error: could not compile `lingxi-service` (bin \"lingxi-service\") due to 1 previous error",
+        "error: could not compile `lingxi-service` (test \"r05_t07_usage_trace\")",
+        "error: could not compile `lingxi-service` (test \"r05_t03_protocol_adapters\") due to 1 previous error",
+        "error: could not compile `lingxi-service` (test \"execute_concurrency\") due to 1 previous error",
+        "error: could not compile `lingxi-service` (test \"r04_rr1_f03_stop_honesty\") due to 1 previous error",
+        "error: could not compile `lingxi-service` (test \"late_result_fence\") due to 1 previous error"
+      ],
+      "classification": "ENVIRONMENT_FAILURE_NOT_VALID_NEGATIVE_RED"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "status": "FAIL",
+  "startedUtc": "2026-10-07T03:38:55.182240+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "startedUtc": "2026-10-07T03:38:55.182501+00:00",
+      "finishedUtc": "2026-10-07T03:38:55.189580+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "a0067d02359c46ac965a8166d6a5ce8e948682ce7d5561119fb84bd6f2781e4b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/shared-object-check",
+      "startedUtc": "2026-10-07T03:38:55.189724+00:00",
+      "finishedUtc": "2026-10-07T03:38:55.196206+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "8dbea67b80dcf317c6705d6b8d14827f51fc08b031e3c56c8b1435baa2ef4ebd",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+      "startedUtc": "2026-10-07T03:38:55.196345+00:00",
+      "finishedUtc": "2026-10-07T03:38:55.202830+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "9c1156879a415e9d193e98144bcbbc8fcf5a667b4ab5d9936aa5f28c9e7c9944",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/shared-object-check",
+      "startedUtc": "2026-10-07T03:38:55.202934+00:00",
+      "finishedUtc": "2026-10-07T03:38:55.209570+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "9c1156879a415e9d193e98144bcbbc8fcf5a667b4ab5d9936aa5f28c9e7c9944",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "git",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/private/tmp/r05-node-selfcheck-bz5g0665/shared-object-check",
+      "startedUtc": "2026-10-07T03:38:55.209675+00:00",
+      "finishedUtc": "2026-10-07T03:38:55.234992+00:00",
+      "exitCode": 10,
+      "stdoutSha256": "c1743421a04de2a0a8a9450c81dd68feea8de10cf6df41dd163e661931be297c",
+      "stderrSha256": "9ca9aba7060d79321ab0be8bde1654aeb09192ebf4e789574169a93e5171d1ca"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "source": "/private/tmp/r05-node-selfcheck-bz5g0665/source",
+  "copy": "/private/tmp/r05-node-selfcheck-bz5g0665/shared-object-check",
+  "sourceHead": "3e082ada3f2c392c4f865bc93fd8b799cbe10959",
+  "copyHead": "3e082ada3f2c392c4f865bc93fd8b799cbe10959",
+  "error": "command failed (10): ['git', 'fsck', '--connectivity-only', '--no-dangling']; see /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/selfcheck-outside/shared-objects-unavailable/command-04.stderr.log",
+  "finishedUtc": "2026-10-07T03:38:55.235138+00:00"
+}

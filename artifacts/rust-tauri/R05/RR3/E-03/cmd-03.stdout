@@ -1,0 +1,70 @@
+ M docs/rust-tauri/ORCHESTRATOR_PROGRESS.json
+ M docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md
+ M docs/rust-tauri/R05/PROGRESS_LEDGER.json
+ M docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json
+ M docs/rust-tauri/R05/R05_BLOCKERS.md
+ M docs/rust-tauri/R05/R05_HANDOFF.json
+ M docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md
+ M docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json
+ M docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md
+ M docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json
+ M docs/rust-tauri/R05/R05_REPORT.md
+ M docs/rust-tauri/R05/R05_TEST_MAP.json
+ M docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md
+ M rust/crates/lingxi-service/src/lib.rs
+ M rust/crates/lingxi-service/src/logging.rs
+ M rust/crates/lingxi-service/src/redaction.rs
+ M rust/crates/lingxi-service/tests/r05_t08_resources.rs
+ M rust/crates/xtask/src/candidate.rs
+ M rust/crates/xtask/src/candidate/tests.rs
+ M rust/crates/xtask/src/main.rs
+ M rust/crates/xtask/src/runner_identity.rs
+ M rust/crates/xtask/src/verify/runner_tests.rs
+ M scripts/rust-tauri/r02_t01_service_smoke.sh
+ M scripts/rust-tauri/r02_t08_legacy_entry_regression.sh
+ M scripts/rust-tauri/r05_t08_negative_gate.sh
+?? artifacts/rust-tauri/R05/RR3/
+?? docs/rust-tauri/R05/repair-current/RR3_A_R2_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_CF46_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_DELIVERY_FINAL_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_DELIVERY_PREP_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_DELIVERY_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_D_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_E_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_E_R2_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_E_R2_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_E_R3_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_E_R3_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_FINAL_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_G_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_G_INTERRUPTION_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_G_R2_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md
+?? docs/rust-tauri/R05/repair-current/RR3_H_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_H_R2_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_H_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json
+?? docs/rust-tauri/R05/repair-current/RR3_I_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_I_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_J_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_J_R2_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_J_R2_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_J_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md
+?? docs/rust-tauri/R05/repair-current/RR3_R02_TRIAGE_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_STORAGE_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_STORAGE_R2_BRIEF.md
+?? rust/crates/lingxi-service/tests/support/
+?? scripts/rust-tauri/prepare_git_copy.py
+?? scripts/rust-tauri/prepare_git_copy_selfcheck.py
+?? scripts/rust-tauri/r02_run_output_regression.py
+?? scripts/rust-tauri/r02_t01_log_level_regression.py
+?? scripts/rust-tauri/r05_t08_mutate_pin.py
+?? scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py
+?? scripts/rust-tauri/r05_t08_node_selfcheck.py
+?? scripts/rust-tauri/r05_t08_prepare_node.py
+?? scripts/rust-tauri/r05_t08_restore_selfcheck.py
+?? scripts/rust-tauri/run_output_sinks.py

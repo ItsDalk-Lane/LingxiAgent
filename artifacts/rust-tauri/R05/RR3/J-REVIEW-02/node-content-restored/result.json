@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "startedUtc": "2026-10-07T04:18:07.374113+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/j-review02-gvphliks",
+      "startedUtc": "2026-10-07T04:18:14.878864+00:00",
+      "finishedUtc": "2026-10-07T04:18:15.175462+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "receipt": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/default-prefix/node-preparation/result.json",
+  "receiptSha256": "ebaf56c0cc0021a26b084f90d5d490218258d7afd39db6c35e5b2da0631b5ba3",
+  "checkedFiles": 64760,
+  "finishedUtc": "2026-10-07T04:18:15.226033+00:00"
+}

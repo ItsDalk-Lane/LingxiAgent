@@ -1,0 +1,2145 @@
+{
+  "utc": "2026-10-07T01:16:40.629145+00:00",
+  "root": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01",
+  "files": {
+    "prepare_isolated.py": {
+      "sha256": "375ab983890a1372aca37b1b50019ead979850cfe814a47b1b6d34939f497ab2",
+      "bytes": 822
+    },
+    "REVIEW_TOOLING_NOTES.md": {
+      "sha256": "21c5fdfece954953031be69787ebb224d73f3967cb5641a4265d543cdc36b36b",
+      "bytes": 965
+    },
+    "RESOURCE_ANALYSIS.json": {
+      "sha256": "60a547be3375594b1b65e646d08ae3fcf3ece889845af0ce202da7ed90dde76d",
+      "bytes": 4951
+    },
+    "dispatch-request-at-review.json": {
+      "sha256": "bebdf23c8fcc6467bc3789626b7262d2d7dec343dd7180ae51af6de09eeaa6df",
+      "bytes": 944
+    },
+    "SOURCE_AUDIT.json": {
+      "sha256": "c15aa4fc47a940e4aed5af1d0004e9217b8759899bb67f033a6df1b90ad581ef",
+      "bytes": 881
+    },
+    "RESULT.json": {
+      "sha256": "2911df548517598fed8fbd7bfed51735a1799bff183c56295600af45012c1c99",
+      "bytes": 589
+    },
+    "pid-readback.log": {
+      "sha256": "528b5d1b270f8a8d0df6371fb9a45fe797841a7c6846b4f22da39dba038d0be1",
+      "bytes": 90603
+    },
+    "pin_audit.py": {
+      "sha256": "e3ccdf73d5f0465f27e7af5d7de105e82320062c181f0297ccf7c8cde8e09a1c",
+      "bytes": 2361
+    },
+    "runtime_snapshot.py": {
+      "sha256": "e4a424c4ba8e040a24e32e15ce7febe63e7081af6e6d27b61ccf639e2f2de00e",
+      "bytes": 1230
+    },
+    "analyze_resources.py": {
+      "sha256": "8854d186a72bce9613db7ac05d26bea627a552bdb6efc91c8a5e3a2fb3a53595",
+      "bytes": 6136
+    },
+    "restoration.json": {
+      "sha256": "09931320ba07b93b17b2ce874c556c40c0a36491310b5b263e4a0bbf8fbfa853",
+      "bytes": 236
+    },
+    "HISTORICAL_AUDIT.json": {
+      "sha256": "642f551ce5590413550b779086485eaf57925783dc2296e8cc580a3aae2afeb1",
+      "bytes": 73701
+    },
+    "FINAL_SOURCE_BINDING.json": {
+      "sha256": "16f6a9ea432c0b22b2e23473634c4e2fe5d93a7dc1f967a683f6e3a3807e2fbf",
+      "bytes": 111121
+    },
+    "binary_probe.py": {
+      "sha256": "2ef5a866943dc64ff1eb42764955d9ee2acabe5e9b271f4669650f2f4822b74a",
+      "bytes": 2675
+    },
+    "model-settings-readback.json": {
+      "sha256": "833ac68b877fabb3414e69e7384213c2442ee1bfcee211defb7e1127d17f592a",
+      "bytes": 337
+    },
+    "PIN_AUDIT.json": {
+      "sha256": "d3ae76c907ba7f93aaa6daff5201ed59cbdd3de7d2da15ef121f7de78223a3db",
+      "bytes": 30042
+    },
+    "isolated_build.py": {
+      "sha256": "5cfa242d841ece5461773e88e46423e2d8ad6bfe4bcbce478855c38e60e7cdd3",
+      "bytes": 2522
+    },
+    "finalize_review.py": {
+      "sha256": "7b0a40b971c54029d85305f1aae2ca3bb8439c42a479f308ea4be038f8f1e21d",
+      "bytes": 21793
+    },
+    "DELIVERY_QA.json": {
+      "sha256": "e07ecc8925c9af34c0d27d7fa77425fc8d7e22708cf08d126713380d6d1e802d",
+      "bytes": 546
+    },
+    "review_capture.py": {
+      "sha256": "6a1d818f981fddaa2e4c96dc25ae5365a8f348f41b6043ae4b8b2963b0e27449",
+      "bytes": 2530
+    },
+    "isolated-source-manifest.json": {
+      "sha256": "9371397f135761e3c230313a4052ff9016a341a6873b67c8b7c5b95f088598bc",
+      "bytes": 41100
+    },
+    "historical_audit.py": {
+      "sha256": "568376b1f524f277bb7ac75886e3d718ffd5ff7902a97c625dc7c3f3ace7bb12",
+      "bytes": 2107
+    },
+    "thresholds-before.json": {
+      "sha256": "21108397cdcf1789953363a3370702e32afd9189a3f181fadec0eb03430e5e61",
+      "bytes": 525
+    },
+    "sampler_negative_probe.py": {
+      "sha256": "7a49943f37a8b9953c783d24f821ed939b934d24a94f99a3cecc647d7d10f870",
+      "bytes": 4326
+    },
+    "source.diff": {
+      "sha256": "d9a56dc983600af6b607afdc6690093f6367881587d29384a97e4dcf06cf425b",
+      "bytes": 35739
+    },
+    "COMMAND_INDEX.json": {
+      "sha256": "1b2a8f834c2b7146bbe35dc140f83bc7474d469f889ec2097c99f0b4f3a72a9e",
+      "bytes": 209064
+    },
+    "verify_delivery.py": {
+      "sha256": "295dedf23da101fe2ec27641ffbd55c5af8abeb93489536655fddd550b8f71d2",
+      "bytes": 3977
+    },
+    "REVIEW.md": {
+      "sha256": "c59ac409a316f5a1affbd29afbb68784c9a1ad48a80bce12a9608a600866de1e",
+      "bytes": 14814
+    },
+    "logging-frozen.rs": {
+      "sha256": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+      "bytes": 22354
+    },
+    "mutation.json": {
+      "sha256": "3d41faae8a17efd06542bb75d3888d9d2c760cf6e20b8be7eb66abdfad7de942",
+      "bytes": 318
+    },
+    "environment.json": {
+      "sha256": "b1c50a79ddcdaf94306d4017bff290a852542f5666a79e51b1164f0a0eac4996",
+      "bytes": 65800
+    },
+    "isolated-restored-build/command.json": {
+      "sha256": "650d9f4eaf5dd60f75bbdf14ff2f9844f291c2646671537aad6714e391565172",
+      "bytes": 50869
+    },
+    "isolated-restored-build/build-0.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "isolated-restored-build/build-1.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "isolated-normal/service-1-stdout.log": {
+      "sha256": "55a5a38e8518bb88086fd7f3a6d9af9f381637019eabb4ea69dbfece6407e68d",
+      "bytes": 171
+    },
+    "isolated-normal/service-5-stderr.log": {
+      "sha256": "d4943bd1305d2a8bf1b19e92d1bfe66961d2df1d916329bdc686c6ae175e8849",
+      "bytes": 1810
+    },
+    "isolated-normal/result.json": {
+      "sha256": "9bab7d2e7e97db7bef279c8fa511e2be48765941e00065a4939f6f0680c90dde",
+      "bytes": 8129
+    },
+    "isolated-normal/service-0-stderr.log": {
+      "sha256": "d895a13cce87dd0fbaec6b615a5e1164eeb23cc6710c9ad76dac696342613a7d",
+      "bytes": 1990
+    },
+    "isolated-normal/service-4-stdout.log": {
+      "sha256": "4d9a6f84e14cb5794d678f630533482fa1ae0b520b82e54f5cebfd8f2a71423b",
+      "bytes": 171
+    },
+    "isolated-normal/service-3-stdout.log": {
+      "sha256": "6fd9ffa2e3d2a49260cff4eb4a1a85b7eb96357c058b611f755a239aba230a88",
+      "bytes": 171
+    },
+    "isolated-normal/service-2-stderr.log": {
+      "sha256": "27867c1206cc94ccff6903d41cfc6a95f6788046d9378616c5dea442886b26bf",
+      "bytes": 1810
+    },
+    "isolated-normal/service-5-stdout.log": {
+      "sha256": "ad1db928ef6e8007b00e12a22d9ef2442b6522974790c71d748341a7b0f729ae",
+      "bytes": 171
+    },
+    "isolated-normal/service-1-stderr.log": {
+      "sha256": "db658067716a198d5c32fcffd0116ab6160b524678394944285948fe6f802d12",
+      "bytes": 1810
+    },
+    "isolated-normal/service-4-stderr.log": {
+      "sha256": "b538e179ccb0db65c6382024e603bd3fe73d820bea9b5592dff5cc1dbce5d5b9",
+      "bytes": 1810
+    },
+    "isolated-normal/service-0-stdout.log": {
+      "sha256": "6af2416d5049f0707b2c212f799bcfc2941616fd0bc6f86af6bfd3655359e94f",
+      "bytes": 171
+    },
+    "isolated-normal/service-3-stderr.log": {
+      "sha256": "dd551215920596a8fe09f84cd8a981e67ea561dd180f687a9d9e86b921caaa25",
+      "bytes": 1810
+    },
+    "isolated-normal/service-2-stdout.log": {
+      "sha256": "c94b5fc1e1762016cf3e5cc5b4bf7535de2df146e067b4c8c943ff581f235e18",
+      "bytes": 171
+    },
+    "binary-error/result.json": {
+      "sha256": "92276f9f02ca18a7a7843324573cfffa67540848a3d58779c85db6eacdc85b58",
+      "bytes": 1847
+    },
+    "binary-error/service-0-stderr.log": {
+      "sha256": "0e8b6a506384ccad5e37cd8c5ac1bd864a506ad58994bf619098b49e4b698d86",
+      "bytes": 2369
+    },
+    "binary-error/service-0-stdout.log": {
+      "sha256": "28c5548074696d122fa835aa420e6bb6e886b718abbd3c2301f97095163f105a",
+      "bytes": 168
+    },
+    "crash-stream/input-before.json": {
+      "sha256": "3a4d8629640028fa797c9f5fc68f7e9a1fc60e5eca583296d1cb378536b0d433",
+      "bytes": 61515
+    },
+    "crash-stream/stdout.log": {
+      "sha256": "9ed1e4f0709efd228833882064f8a7729a20416d3eecf3c13674771a44470bfd",
+      "bytes": 338
+    },
+    "crash-stream/input-after.json": {
+      "sha256": "8b8cd593d50f37715b52c0840f74b5808a378a544f1250a02ad20eb37c412c6c",
+      "bytes": 61515
+    },
+    "crash-stream/command.json": {
+      "sha256": "5cf60404ee35b4bb6b875bb0aece578134eb36e676bbf06e724c8d961f682abc",
+      "bytes": 3250
+    },
+    "binary-three-command/input-before.json": {
+      "sha256": "f74c46a2c01b026dfe70c123258a56b86a4267d86e079b871972e4196e66c45a",
+      "bytes": 61515
+    },
+    "binary-three-command/stdout.log": {
+      "sha256": "1c110a73f352d845fdca0a0d212a9462044f7eced7cb382c68293f3b377157cd",
+      "bytes": 51
+    },
+    "binary-three-command/input-after.json": {
+      "sha256": "03f410c3d8662da5940390a6fafd6ef7d2ffffa3937a44e02af0bc334e5d4a1a",
+      "bytes": 61515
+    },
+    "binary-three-command/command.json": {
+      "sha256": "5c460b9d5928c1b7e93b6cacfcb655a98f61152d6dfed535e6038d0864791e8a",
+      "bytes": 3022
+    },
+    "binary-error-command/input-before.json": {
+      "sha256": "da9003768a65b057d6886297710e27963e5bdad6ed46e4ecc7838e98d888d2bc",
+      "bytes": 61515
+    },
+    "binary-error-command/stdout.log": {
+      "sha256": "05583517287c46ee461b3f2452ecd22148e4a5c22aec1e96b62efc9b9593a4c0",
+      "bytes": 51
+    },
+    "binary-error-command/input-after.json": {
+      "sha256": "b15568817b71e77f9f75cd7e3117f3ebb80181fe130b1e69da8799831ca92345",
+      "bytes": 61515
+    },
+    "binary-error-command/command.json": {
+      "sha256": "b9e69bad6e2353b249d0cf007b619c8dc524b61462ce035771c6e595da5c13cb",
+      "bytes": 3022
+    },
+    "crash-effect/input-before.json": {
+      "sha256": "7363fafbe96273b84e8e8885ec2c317a72b9e9a8b3af7e5f21d29190610d31a5",
+      "bytes": 61515
+    },
+    "crash-effect/stdout.log": {
+      "sha256": "810194f89a767f9ccf4c0264ace34f65a2f821ba795daf9c7c5dba08db9ada83",
+      "bytes": 455
+    },
+    "crash-effect/input-after.json": {
+      "sha256": "5a372cbf0e001f74dc7442c0c39ddb07a96da6b253432c3a38b7371686f17961",
+      "bytes": 61515
+    },
+    "crash-effect/command.json": {
+      "sha256": "cc72981ee04a1037e1f044c9687910ba01a0760552d42a3e97de0f0a0389de5b",
+      "bytes": 3256
+    },
+    "isolated-normal-command/input-before.json": {
+      "sha256": "7abbec18a93490a3b1716371da4dd10a43a17e6012e1d373a2c4c9163592cb86",
+      "bytes": 61515
+    },
+    "isolated-normal-command/stdout.log": {
+      "sha256": "09e2b72e1de5dca778ba6387a317dea684f30f02505a02616d09b6a8c5596f86",
+      "bytes": 64
+    },
+    "isolated-normal-command/input-after.json": {
+      "sha256": "304ec1e3390d3e851400a69dc689521a9dc5ca5b7cf12d8dd43cf05654e217e9",
+      "bytes": 61515
+    },
+    "isolated-normal-command/command.json": {
+      "sha256": "a578dc8520c3dc02b1f0d325d3bce76d66da85e001f299d1a9f939f158915a7d",
+      "bytes": 3065
+    },
+    "isolated-old-command/input-before.json": {
+      "sha256": "43d3fa606c1643540704f4ca8d9918e13936c250f12ef321c031263d0f466ff5",
+      "bytes": 61515
+    },
+    "isolated-old-command/stdout.log": {
+      "sha256": "112209d884b041a26bb13f82a70ec118adb74e127d40c766e575fa40b0567166",
+      "bytes": 64
+    },
+    "isolated-old-command/input-after.json": {
+      "sha256": "56b6966388d71a66476c1ed543cbe3f4fcc83a555754161bf8ea5ff19766859a",
+      "bytes": 61515
+    },
+    "isolated-old-command/command.json": {
+      "sha256": "d87621822a4b88e5fffc0fac97663c4c75aa5f897cb8132bdf9b75dec157c5bd",
+      "bytes": 3062
+    },
+    "isolated-old/service-1-stdout.log": {
+      "sha256": "cdcbdaf388a842637f12f1c1565b6e67942b5084bfc1e23eda1a6f8b9844f7b4",
+      "bytes": 168
+    },
+    "isolated-old/service-5-stderr.log": {
+      "sha256": "b42d89a25d0ac9de6ca24b1ab63bdffc377e5e461095bba66519d7aad5472e01",
+      "bytes": 1807
+    },
+    "isolated-old/result.json": {
+      "sha256": "013f526bfc761f77dbc0c67e2b80ecaf0e4627722ba17c448d6fd6867a06eff7",
+      "bytes": 8729
+    },
+    "isolated-old/service-0-stderr.log": {
+      "sha256": "316e46286dbd126fee79158ea458709f8ae43d11d40cb5ec2494d3832bbb3f3f",
+      "bytes": 1987
+    },
+    "isolated-old/service-4-stdout.log": {
+      "sha256": "de6ba5d457c0acaa0a96dfb0483a3c887975f81cecf69fc35b13a13d45897d6a",
+      "bytes": 168
+    },
+    "isolated-old/service-3-stdout.log": {
+      "sha256": "6e5f7650cc51e7533fef7e5826f8577e217fff9f3a55f54b6a58b958441999df",
+      "bytes": 168
+    },
+    "isolated-old/service-2-stderr.log": {
+      "sha256": "942512cec73c3c1bbf50e1f80262fd335f01435a0f111a964437518f2bff01e7",
+      "bytes": 1807
+    },
+    "isolated-old/service-5-stdout.log": {
+      "sha256": "cf9d84213cc2417526086b0b3ae6ab92293d859a1ce6de3f60ca5ba365d57ed1",
+      "bytes": 168
+    },
+    "isolated-old/service-1-stderr.log": {
+      "sha256": "4ef41a2d044d122c0537c36220f8a3e4f39142bd2747b2837efd4ed63d7fac79",
+      "bytes": 1807
+    },
+    "isolated-old/service-4-stderr.log": {
+      "sha256": "dc7ffe5f3a541920ce7df12285762b27be46dd0ade2454fb51b5f94a3c39da80",
+      "bytes": 1807
+    },
+    "isolated-old/service-0-stdout.log": {
+      "sha256": "05f5b96a6b6febf92c906a74f9bdc1b792f8767f84d541631044971ebcb546f8",
+      "bytes": 168
+    },
+    "isolated-old/service-3-stderr.log": {
+      "sha256": "6c4b2950a6ef762b0a80974c90fbfa6d4248dfd0a0b722af3359bb277448c1a5",
+      "bytes": 1807
+    },
+    "isolated-old/service-2-stdout.log": {
+      "sha256": "b6ddbcc34d0f116aada7f863843b82a303370d84d46e8cb32ed8db3ce43b9427",
+      "bytes": 168
+    },
+    "isolated-restored/service-1-stdout.log": {
+      "sha256": "3ec54d2a64f54bcad62c524e9332dd8076ad11049812e0a7a7d15d1d25240618",
+      "bytes": 173
+    },
+    "isolated-restored/service-5-stderr.log": {
+      "sha256": "e0ef2458809be12905b809e6d9736de80d7891a3173749c184b7d34d69653828",
+      "bytes": 1812
+    },
+    "isolated-restored/result.json": {
+      "sha256": "e8866755e8e94ec3288c25c10d10742e197fa6949dd1e0b04dea63bd501bc4c8",
+      "bytes": 8141
+    },
+    "isolated-restored/service-0-stderr.log": {
+      "sha256": "8e0d2c880568b317560ae7ecdf5700924d964f5d9b1ac7a8d179177d79e862b7",
+      "bytes": 1992
+    },
+    "isolated-restored/service-4-stdout.log": {
+      "sha256": "f68ce3519952dffc18ed794d332e8d784121d6e2965fdba9643d27c39836fe6f",
+      "bytes": 173
+    },
+    "isolated-restored/service-3-stdout.log": {
+      "sha256": "b6545cca635fda37eaef491426cc530dc2bcef48b6e80b00e72417ca01f8ea8d",
+      "bytes": 173
+    },
+    "isolated-restored/service-2-stderr.log": {
+      "sha256": "32b9e68833fd844366f93c6412b70fa54e4b11fdb1298cca2756c31ba29cea86",
+      "bytes": 1812
+    },
+    "isolated-restored/service-5-stdout.log": {
+      "sha256": "2e3357270acfe480cd4b83da81130c62f91a11003cee3f16864db5264ee1a53c",
+      "bytes": 173
+    },
+    "isolated-restored/service-1-stderr.log": {
+      "sha256": "3df5a2f757de09a5b8a239cf3e1038184ea98d0517a14fc9539056900e9bc4d7",
+      "bytes": 1812
+    },
+    "isolated-restored/service-4-stderr.log": {
+      "sha256": "22881c73842577304cf7907fc741ff9584ac8cc768911c28950e1e60f9e86735",
+      "bytes": 1812
+    },
+    "isolated-restored/service-0-stdout.log": {
+      "sha256": "7e381ab4a4fbec5bb17740473a74a6159bce05e4617c4501c9581f1f25a7f52b",
+      "bytes": 173
+    },
+    "isolated-restored/service-3-stderr.log": {
+      "sha256": "9380e8def17814f379f2217b6b63df268e85553295b1e5119572bb0f61f2487e",
+      "bytes": 1812
+    },
+    "isolated-restored/service-2-stdout.log": {
+      "sha256": "edaca998f7340fdd73f24df31369092cc471bd5ece3fdd42a01f6209693168fb",
+      "bytes": 173
+    },
+    "ordinary-late/input-before.json": {
+      "sha256": "a93221182624d6632f05865ac4cff429c2cf80612e622b6304e3a75564169eee",
+      "bytes": 61515
+    },
+    "ordinary-late/stdout.log": {
+      "sha256": "710fa9cca563024f4608e6053a09263937ccf09433d2e7cfa6f22c0eaf913154",
+      "bytes": 602
+    },
+    "ordinary-late/input-after.json": {
+      "sha256": "28c44f2b8d80fdfd0d5393b6bbebe118724afb65804abb256ef87c062ea584e1",
+      "bytes": 61515
+    },
+    "ordinary-late/command.json": {
+      "sha256": "7bbcea0ba08fa66262af6393c6888644e9013ce9a873a6c0db44c3b0e1b1545b",
+      "bytes": 3274
+    },
+    "binary-three/result.json": {
+      "sha256": "49f716353aa0db3829ccca2f12ad9c196e42cb3973338e7cd557f8f3de90b7aa",
+      "bytes": 1708
+    },
+    "binary-three/service-0-stderr.log": {
+      "sha256": "13246fca09ea5b43e572eb193665591dc7215b9efb864f723ce79b3084964f48",
+      "bytes": 1931
+    },
+    "binary-three/service-0-stdout.log": {
+      "sha256": "090dd8a3a8b2acbae1c87dab42bfce466b8c0f01e00d7f624c299706c3f8058f",
+      "bytes": 168
+    },
+    "binary-six-command/input-before.json": {
+      "sha256": "7c777ed5aadd58f86af79744ee10a8692b368fd12f01ce61b72ef086cb554152",
+      "bytes": 61515
+    },
+    "binary-six-command/stdout.log": {
+      "sha256": "09e2b72e1de5dca778ba6387a317dea684f30f02505a02616d09b6a8c5596f86",
+      "bytes": 64
+    },
+    "binary-six-command/input-after.json": {
+      "sha256": "234df288354692c3590b888b9babb91f04567eb5ffefcd42741b3c9db3aa6043",
+      "bytes": 61515
+    },
+    "binary-six-command/command.json": {
+      "sha256": "0200462a0684eb73a46f9ba4f9b71d47994ec74edb92a5ddd67082e64c1f8874",
+      "bytes": 3018
+    },
+    "isolated-normal-build/command.json": {
+      "sha256": "a3b4b91a8361156da697abde559d0c74f68c6f208b89beced62f2ca82f832fd0",
+      "bytes": 50869
+    },
+    "isolated-normal-build/build-0.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "isolated-normal-build/build-1.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "service-list/input-before.json": {
+      "sha256": "8f7532eaab57e236bd19844691b7b0963b5ad57ecddeb58834474766ee30ee61",
+      "bytes": 61515
+    },
+    "service-list/stdout.log": {
+      "sha256": "cf4b5eb62aa9e85432da627e15d57885f85c623077c7ac54980b3f9ba26a908a",
+      "bytes": 25848
+    },
+    "service-list/input-after.json": {
+      "sha256": "19d21577f61d4d1db69351901e79a9c04aedd6a35339d2ac1bb20605e2298d06",
+      "bytes": 61515
+    },
+    "service-list/command.json": {
+      "sha256": "d56623433e871160063abc01b30ad1f8aac8ed3af68b5dfc0a117e7b9b09da94",
+      "bytes": 3055
+    },
+    "ordinary-subagent/input-before.json": {
+      "sha256": "6456c9f7d8ae9f78b39e66c35a5ebc04b5968f1c6bbc422d0512120a56bf36ee",
+      "bytes": 61515
+    },
+    "ordinary-subagent/stdout.log": {
+      "sha256": "7662a822a298eaed88cb857c663e9a341adf60d46d745db87f6faf65602da842",
+      "bytes": 475
+    },
+    "ordinary-subagent/input-after.json": {
+      "sha256": "e3fac0ff03ecde05f5a08b025969d7611ff87bbd1f69ff6a501f0db099a34560",
+      "bytes": 61515
+    },
+    "ordinary-subagent/command.json": {
+      "sha256": "626036b78be6c59f7661018a061a6dac3a78a3c98737f3960ef01bb05d9df1a2",
+      "bytes": 3278
+    },
+    "kernel-list/input-before.json": {
+      "sha256": "66c8990f34b20845db1bfff279bea45fa4b74041914b38a9a2422a020ab8ad7d",
+      "bytes": 61515
+    },
+    "kernel-list/stdout.log": {
+      "sha256": "325b155794c261d19b6db239978854feacf671ceca397904b88847dc2e51dfe8",
+      "bytes": 6374
+    },
+    "kernel-list/input-after.json": {
+      "sha256": "15675aab2eb3455877c81cfdc8a4b0f98f9acb1f29aed512d03d6a8ad86c8333",
+      "bytes": 61515
+    },
+    "kernel-list/command.json": {
+      "sha256": "7de860727fab3fcb46a746a559508f663d69f6ce935c607b68d3c6a5d2c62325",
+      "bytes": 3054
+    },
+    "resources-01/runtime-binding.json": {
+      "sha256": "3aa670523056516cc1b52f38f16c301e453a50a2a15b68a753e28feccc81c8a7",
+      "bytes": 65819
+    },
+    "resources-01/input-before.json": {
+      "sha256": "1033c9c3df5e194e02e419e5637a7b88989528227221b5621bd90ec1f241215f",
+      "bytes": 61515
+    },
+    "resources-01/f27-resource-series.json": {
+      "sha256": "e6c7c080cb25e5bf14edaf2dd6e0eada76d1b07d971804fde84a115bb0ef066d",
+      "bytes": 289819
+    },
+    "resources-01/stdout.log": {
+      "sha256": "d9df3d479e2b8384ff12a5d690395d1ae649098d8678d40116817bf7835b7d68",
+      "bytes": 1350
+    },
+    "resources-01/input-after.json": {
+      "sha256": "a0b75347ab72a0d223dadc956308b0702a5347e3d2bb76d09ec0f2fd455d0d31",
+      "bytes": 61515
+    },
+    "resources-01/command.json": {
+      "sha256": "878d77d034fdf46ec58e1d779b601323789f9b425ab2c456fd872f32b42dd321",
+      "bytes": 3215
+    },
+    "request-replay/input-before.json": {
+      "sha256": "38f82c49df0570b98206099e210c98b2b66e39ef45099f824f67ff1d531c2de4",
+      "bytes": 61515
+    },
+    "request-replay/stdout.log": {
+      "sha256": "e9ed45c0ea4092a6d0a4b5e4d70a5fef5fffb7ac935172f24707540258daa178",
+      "bytes": 337
+    },
+    "request-replay/input-after.json": {
+      "sha256": "d134cad9826c3695dc24a513207c7ddc2c9892192ae758210d2b68f98269aa09",
+      "bytes": 61515
+    },
+    "request-replay/command.json": {
+      "sha256": "d422695a5f43a3270c9e9ea9f85c1a8e0f674d875af7d69999e199fb7bac827d",
+      "bytes": 3249
+    },
+    "media-cancel/input-before.json": {
+      "sha256": "4b87689aae540a97c31036cf096b351bc55e6d7d3df3a6b41e4c1ba28ca1635e",
+      "bytes": 61515
+    },
+    "media-cancel/stdout.log": {
+      "sha256": "9b69b055d530ede3bb178e30aee3455b0d5d7395f3b49a17be269a10886a3fdc",
+      "bytes": 887
+    },
+    "media-cancel/input-after.json": {
+      "sha256": "a83aff03a9432ae52004844cbbb5d45359fdfe22b825fddfe8cebba033346252",
+      "bytes": 61515
+    },
+    "media-cancel/command.json": {
+      "sha256": "cf18139d3bf737fbd7f7e81b0cd2bae65593a8c79f208a3cee476bd99d91f5e3",
+      "bytes": 3253
+    },
+    "logging-nine/input-before.json": {
+      "sha256": "9f21b7b3039a2644cb71a99c1c4153db038ce8773ea0fabe9953b0bcf6b5e05f",
+      "bytes": 61515
+    },
+    "logging-nine/stdout.log": {
+      "sha256": "03c69f5e86c63910d63c9388cd9c91295a248a5619bb71ca13a730ee6b2036a4",
+      "bytes": 965
+    },
+    "logging-nine/input-after.json": {
+      "sha256": "22c8ec88028de6da78b13440e0ee72a57818bf0a2e9c289520926d4d7d3a3912",
+      "bytes": 61515
+    },
+    "logging-nine/command.json": {
+      "sha256": "f0112fa2109e520e667f8ae6e9e6a1bd0bb355cd73fb9bab30b07398f4e3863b",
+      "bytes": 3213
+    },
+    "isolated-old-build/command.json": {
+      "sha256": "5786077e7c2dd899dd6893c2d3e4d5c1e56b15ffe05a6eb40c02817a3eead714",
+      "bytes": 50869
+    },
+    "isolated-old-build/build-0.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "isolated-old-build/build-1.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tmp/lingxi-r05t08-c04-home-66836-1791335176385139000/data-epoch.json": {
+      "sha256": "3c6365a1cf38407330b1faf9e76c6ac929953fcc48526a97dab21ed146aa3068",
+      "bytes": 162
+    },
+    "tmp/lingxi-r05t08-c04-home-66836-1791335176385139000/logs/security-audit.jsonl": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tmp/lingxi-r05t08-c04-home-66836-1791335176385139000/lingxi-service/local-token.json": {
+      "sha256": "cb976628204497df309f79df90ddc29f347ca36c9fe998294994ca8c4ee7c89d",
+      "bytes": 184
+    },
+    "tmp/lingxi-r05t08-c04-home-66836-1791335176385139000/lingxi-service/management.json": {
+      "sha256": "aecb5eb93c92e00709b05aac89d8710b7bf0b58f0fc608aefd209257b0234ccb",
+      "bytes": 531
+    },
+    "tmp/lingxi-r05t08-c04-home-66836-1791335176385139000/lingxi-service/device-credentials.json": {
+      "sha256": "7e7ab806dee03e7f0eba28a00762660325c3199dd19b174544d70b64e35fdda4",
+      "bytes": 157
+    },
+    "tmp/lingxi-r05t08-c04-home-66836-1791335176385139000/lingxi-service/instance.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tmp/lingxi-r05t08-c04-home-66836-1791335176385139000/lingxi-service/devices.json": {
+      "sha256": "7516dcafd6a6d4a91ee241f8a90569b868258f21c7a31b269e2a2ed67f5027c0",
+      "bytes": 113
+    },
+    "tmp/lingxi-r05t08-c04-home-66836-1791335176385139000/lingxi-service/logs/service-000001.log": {
+      "sha256": "3cc5dbcb10a115415a6508f91825f3c2f09f70021c48c71709d116e4d16c00e7",
+      "bytes": 3308
+    },
+    "tmp/lingxi-r05t08-c04-home-66836-1791335176385139000/lingxi-service/data/runs.db": {
+      "sha256": "83ee50d3db81f0c54ee43cad3ad8b99a1e8414ebbfd2f38b063f01aad5462069",
+      "bytes": 167936
+    },
+    "tmp/lingxi-r05t08-c04-ws-66836-1791335176385241000/delta.txt": {
+      "sha256": "2a97c40af8a9f9ca34e26cebb8cc9145d452deec21bd1c09cd0e936f98049a61",
+      "bytes": 9
+    },
+    "tmp/lingxi-r05t08-c07-home-66393-1791335174404069000/data-epoch.json": {
+      "sha256": "31d70b0cbade45446bc7336b4dded06baedd71e35e1ebfd30d178204974aaa9c",
+      "bytes": 162
+    },
+    "tmp/lingxi-r05t08-c07-home-66393-1791335174404069000/logs/security-audit.jsonl": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tmp/lingxi-r05t08-c07-home-66393-1791335174404069000/lingxi-service/local-token.json": {
+      "sha256": "bce3df244163fdd147ab89496d3e855059837fac290b811c2dfffc1e39c910ff",
+      "bytes": 184
+    },
+    "tmp/lingxi-r05t08-c07-home-66393-1791335174404069000/lingxi-service/management.json": {
+      "sha256": "a32e0d8724fcbec4a2916e9a486021e3a98ca7a068d53c3771776771b3b97d29",
+      "bytes": 531
+    },
+    "tmp/lingxi-r05t08-c07-home-66393-1791335174404069000/lingxi-service/device-credentials.json": {
+      "sha256": "7c3fed16810d48208b88a06f045a2e5e56996d8d0d46ddb81acf408f9d813e0e",
+      "bytes": 157
+    },
+    "tmp/lingxi-r05t08-c07-home-66393-1791335174404069000/lingxi-service/instance.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tmp/lingxi-r05t08-c07-home-66393-1791335174404069000/lingxi-service/devices.json": {
+      "sha256": "f0901f6d33d253f6c0bd137d301c2b48481822a72947bcf9e8b1a91ebbd6ef1c",
+      "bytes": 113
+    },
+    "tmp/lingxi-r05t08-c07-home-66393-1791335174404069000/lingxi-service/instance.stale.json": {
+      "sha256": "718ebb3d82909d517ec81a8bfe0c62114c333d42ad4802753a474913845da0da",
+      "bytes": 510
+    },
+    "tmp/lingxi-r05t08-c07-home-66393-1791335174404069000/lingxi-service/logs/service-000002.log": {
+      "sha256": "0c2af907e55036905f5dca67949f8eaba56aeed7e4d0718fa6be1d5663c439c0",
+      "bytes": 1896
+    },
+    "tmp/lingxi-r05t08-c07-home-66393-1791335174404069000/lingxi-service/logs/service-000001.log": {
+      "sha256": "ecca23457eb5a7e2f1d2f303e192dc08367cb56e3be46a24dcac98720cebbec2",
+      "bytes": 1336
+    },
+    "tmp/lingxi-r05t08-c07-home-66393-1791335174404069000/lingxi-service/data/runs.db": {
+      "sha256": "80b92b5c42258b591dba810c3fbd03cd06cdb8dd47bb8243b96e34f173854ec0",
+      "bytes": 167936
+    },
+    "tmp/lingxi-r05f27-f27-series-37500-1791334602215179000/f27-resource-series.json": {
+      "sha256": "e6c7c080cb25e5bf14edaf2dd6e0eada76d1b07d971804fde84a115bb0ef066d",
+      "bytes": 289819
+    },
+    "tmp/lingxi-r05t08-c06-cfg-65948-1791335172682784000/service.json": {
+      "sha256": "83249333c15484d4617a7a7b526d8b23c35b59d9ff4d8c54bc2cb99126abfb61",
+      "bytes": 718
+    },
+    "tmp/lingxi-r05t08-c06-home-65948-1791335172682586000/data-epoch.json": {
+      "sha256": "d835a95d92f957cf017171a8bcd610ed38b35dbf1794fd4ec8241e46756a6d1a",
+      "bytes": 162
+    },
+    "tmp/lingxi-r05t08-c06-home-65948-1791335172682586000/logs/security-audit.jsonl": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tmp/lingxi-r05t08-c06-home-65948-1791335172682586000/lingxi-service/local-token.json": {
+      "sha256": "ad77e0a3b41f3b9d2513fe5c4985faac7ca90de81145d67e9c57184334e1c308",
+      "bytes": 184
+    },
+    "tmp/lingxi-r05t08-c06-home-65948-1791335172682586000/lingxi-service/management.json": {
+      "sha256": "f37bd3bd231f4212c24e5c50b5f4302e7b6372754518e37df97da3add65aaf70",
+      "bytes": 531
+    },
+    "tmp/lingxi-r05t08-c06-home-65948-1791335172682586000/lingxi-service/device-credentials.json": {
+      "sha256": "c729f466361a1db14216c2bcec8f025172b89cacb0deaa4b4e06a85321cee08f",
+      "bytes": 157
+    },
+    "tmp/lingxi-r05t08-c06-home-65948-1791335172682586000/lingxi-service/instance.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tmp/lingxi-r05t08-c06-home-65948-1791335172682586000/lingxi-service/devices.json": {
+      "sha256": "079a587ab22c4e32bf3d5ba71bf978c5e9924b525da0a209cdfcdfb0dc9bad25",
+      "bytes": 113
+    },
+    "tmp/lingxi-r05t08-c06-home-65948-1791335172682586000/lingxi-service/instance.stale.json": {
+      "sha256": "79afb9dc6c2e2ca344ab1e5b35cb136c62bc73b538ac2e2919642937dae449c7",
+      "bytes": 510
+    },
+    "tmp/lingxi-r05t08-c06-home-65948-1791335172682586000/lingxi-service/logs/service-000002.log": {
+      "sha256": "7815d0913f53f479b7cecc677c4171336f9b73e74b84ef1902b2f5728c62a0a7",
+      "bytes": 1896
+    },
+    "tmp/lingxi-r05t08-c06-home-65948-1791335172682586000/lingxi-service/logs/service-000001.log": {
+      "sha256": "ead0bec80486d4a40bf1e9b974851716815de673dac8fe57f2173b6bf7abbf52",
+      "bytes": 2245
+    },
+    "tmp/lingxi-r05t08-c06-home-65948-1791335172682586000/lingxi-service/data/runs.db": {
+      "sha256": "2479804e193935e120064e7bc7c66f503c3f826ae2d0554f024df72ee3ea5ba7",
+      "bytes": 167936
+    },
+    "tmp/lingxi-r05t08-c07-ws-66393-1791335174404159000/note.txt": {
+      "sha256": "d2f06ea49b2b652f57aec7c230da56065ca72f0479968041e2ce415a79763314",
+      "bytes": 4
+    },
+    "tmp/lingxi-r05t06-c07-67731-0/ws/input.txt": {
+      "sha256": "a24d7b3628e0a0a42b5fe3d8ab6a1a1739cf60a9c013e1e7e15de17bec684b7e",
+      "bytes": 16
+    },
+    "tmp/lingxi-r05t08-c04-cfg-66836-1791335176385304000/service.json": {
+      "sha256": "a5cb9a0b4a060f919855d7a86cd05064c7474df40647be16421c0ee88105d586",
+      "bytes": 718
+    },
+    "tmp/lingxi-r05t08-c06-ws-65948-1791335172682712000/crash.txt": {
+      "sha256": "3fe8c825f6b7f1da6136dcb4611816058907a9019e9c6b7195e3881576dc8984",
+      "bytes": 66
+    },
+    "tmp/lingxi-r05t08-c07-cfg-66393-1791335174404210000/service.json": {
+      "sha256": "25152da78578fa3e351aa2fadec25c3e694ec49cdda17ed4fd66fa97b612845b",
+      "bytes": 718
+    },
+    "sampler-negative-isolated/result.json": {
+      "sha256": "acc1de921087cf450bcc3a42998088fe03697409751b54ba9c2cac186a07971e",
+      "bytes": 4981
+    },
+    "sampler-negative-isolated/r05_t08_resources": {
+      "sha256": "323456600dc961ee6e4d20b60cf7cf9964526bfcd4153090c7b4e89c0bf2e3a1",
+      "bytes": 47691408
+    },
+    "sampler-negative-isolated/restored/stdout.log": {
+      "sha256": "47071378f57dfd3844c61b7f64fc2cc49bc1e0448c387e37735974ba12135bcc",
+      "bytes": 656
+    },
+    "sampler-negative-isolated/restored/command.json": {
+      "sha256": "745f5a284c227c5625602e2b9bd5dbac31d2e05a89b0ca635828a13f4f5cbbeb",
+      "bytes": 1070
+    },
+    "sampler-negative-isolated/fake-tcp-zero/stdout.log": {
+      "sha256": "16a4841b58d2fcc533d45255186666a26d79c18ef8e685aca7fbd8237c62b068",
+      "bytes": 585
+    },
+    "sampler-negative-isolated/fake-tcp-zero/command.json": {
+      "sha256": "722a4726fa442ab89cd340c0d1e19d518fd8459ba6d99adb3e2b30054fe4e340",
+      "bytes": 1102
+    },
+    "sampler-negative-isolated/fake-tcp-zero/calls.jsonl": {
+      "sha256": "1045dbdaa23c0ecbe05557106c004d49353ef3039f4a8ba091bd544ad26082ed",
+      "bytes": 322
+    },
+    "sampler-negative-isolated/fake-tcp-zero/bin/lsof": {
+      "sha256": "624d6f81b6fb6620f972f62677eb9d3fac23cd0843df3678546d240ae8d50eba",
+      "bytes": 550
+    },
+    "sampler-negative-isolated/fake-fd-zero/stdout.log": {
+      "sha256": "0b3a3819b74b0e6a39fd4c312ff7709db13fe2a6c8abfe4992c490f0ced19bab",
+      "bytes": 647
+    },
+    "sampler-negative-isolated/fake-fd-zero/command.json": {
+      "sha256": "c2f26c898b147ec17a49da4b6c2432b09d23ebc649c5bbd804b8819f66066fb6",
+      "bytes": 1101
+    },
+    "sampler-negative-isolated/fake-fd-zero/calls.jsonl": {
+      "sha256": "9a8a7d279e2ed5e07d1d34ae4b91cbb4000263a66707ad05d729cfb1269d356e",
+      "bytes": 52
+    },
+    "sampler-negative-isolated/fake-fd-zero/bin/lsof": {
+      "sha256": "b2a9faa4a9402f8997dd38d82fd3b4e36834c21911aba36b96077fa5fe069f04",
+      "bytes": 547
+    },
+    "sampler-negative-isolated/normal/stdout.log": {
+      "sha256": "4dbbff1a920bf1fb3c7574e406b16d7e1000bbf65b3e38f9de4da9c5cc3f32a3",
+      "bytes": 656
+    },
+    "sampler-negative-isolated/normal/command.json": {
+      "sha256": "96902cc47bd26368115333a3d53123120628d8a6ffa321bbd306c5c4406e8f64",
+      "bytes": 1070
+    },
+    "isolated/rust-toolchain.toml": {
+      "sha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "bytes": 772
+    },
+    "isolated/rust/Cargo.toml": {
+      "sha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+      "bytes": 3231
+    },
+    "isolated/rust/Cargo.lock": {
+      "sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "bytes": 77319
+    },
+    "isolated/rust/crates/lingxi-adapters/Cargo.toml": {
+      "sha256": "f7252fdd642075333d050340c3d2b4687d936c92a3ac07c6e2019fd8c71f5c61",
+      "bytes": 4217
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/r05_t03_goldens.rs": {
+      "sha256": "bdc9a14343d95631712b08396f972aca327cb9cadbba8c0e54dda9bc14b59ce1",
+      "bytes": 37860
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/migration_idempotency.rs": {
+      "sha256": "70ca3682ca23ffa0848f4f3ca3f26dae3d72e4e9150cf33ced58e1b2d394c4e1",
+      "bytes": 8978
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/r05_t05_timeouts.rs": {
+      "sha256": "0b948c04ac47d3041e7400a51c162303e8aad74c109557d6a9000c407bac1543",
+      "bytes": 27196
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/r05_t04_streaming.rs": {
+      "sha256": "4ed807ea8d0be9858c972ddcbebe2a3f5ba2dab262e72ffcdee69317f483558e",
+      "bytes": 68474
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/run_id_allocator.rs": {
+      "sha256": "71104dfdce36a4227a480d5f323932f7a18ccb33241a34373389679fce94d73c",
+      "bytes": 13575
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/run_finalize_property.rs": {
+      "sha256": "9d0368782ecc7db598a6ca6cd5a7f29a90828cf163df4ac7050bb770ae1ce54c",
+      "bytes": 17501
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/backup_faults.rs": {
+      "sha256": "df1f9821437122f2d0f0b74470b2d75d5f45424b6901a6a1e76792fb1705c0ad",
+      "bytes": 9021
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/r05_t06_operations.rs": {
+      "sha256": "dc698ec3e92811d6cbdcb7023aa60e6b68e0110ffa1ffad22e0183f0b3fc15d7",
+      "bytes": 68785
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/r05_t07_rr1_usage_strict.rs": {
+      "sha256": "27365cdb2862329fd7b24dc28a90ff7b6e936a959dc3f02853d91c0e0a1b3304",
+      "bytes": 13091
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/late_result_fencing_property.rs": {
+      "sha256": "9557f1c0605650fade30f6ec3c20c0b0e1b1d909fcf1e1310385ea9c1678dcf0",
+      "bytes": 29066
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/disk_full_fault.rs": {
+      "sha256": "6b3baaee4f77138c51a3645a4a8ea05c1db3905801960f999bac7b65a2c09f6a",
+      "bytes": 11141
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/r05_t02_oauth_flows.rs": {
+      "sha256": "44793a7fc79e16921c9a2dc126b8bb1a53cca9a6212f0f183718ba5a00374dff",
+      "bytes": 49280
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/run_lineage_store.rs": {
+      "sha256": "966d7756a5c9f26c627f21b27c5c3234cf3f329b1c9bd6c8416acae83dbcb8d5",
+      "bytes": 7226
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/event_store_reads.rs": {
+      "sha256": "5d6d551d274a2f72335a40dc7ba3b89a7e45d510d82f28e396a8e3402d5931a2",
+      "bytes": 7768
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/storage_transactions.rs": {
+      "sha256": "63c73782df10cbac03ee945f2a906d9355c9981e4bde00ec181bf092620f2dff",
+      "bytes": 17947
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/active_run_listing.rs": {
+      "sha256": "598225daad3623a5fb685b533057ee7f136e6e1445e04c4969a4f22194aa436f",
+      "bytes": 5909
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/invocation_journal_store.rs": {
+      "sha256": "a2ad122a7d1c44620df5af96d6a064edc4b66eba3a876c0872eca2af83f3744a",
+      "bytes": 18954
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/r05_t05_compat.rs": {
+      "sha256": "bcb02209baf887df3a4538427871529dbcfa85795b1f590f0ef56f308d803347",
+      "bytes": 8110
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/r05_t04_rr1_batch_terminal.rs": {
+      "sha256": "a8bbed5cb25b90c4f43952c78d6a51e153e01cecd5b9684cab01469b8f786619",
+      "bytes": 28079
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/backup_restore.rs": {
+      "sha256": "81c7ec221bd7840194d26a64ead2e0204684778deb30bb825719a547dd5fb198",
+      "bytes": 29875
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/r05_t07_usage_families.rs": {
+      "sha256": "9aab61502ab41a8c5ffa624cdc7b483cc4eaf2d67c3bacb028cf448d29c95106",
+      "bytes": 27545
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs": {
+      "sha256": "dea6c1959112e19a5a4de2494b2b4cb6cefd975846c8eb2d6a4fa85c5467baad",
+      "bytes": 66892
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/zhipu__clear-replay-policy-round-trips.json": {
+      "sha256": "43b42a4cfda87e65bb2a52d158ef03a4763f35e11049a97ebc5bea383dd60760",
+      "bytes": 1378
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/volcengine__auto-level-maps-medium.json": {
+      "sha256": "d517f3609df5520dce8d318637a5a9c0b93f365829c14fcc2c1751582613c76c",
+      "bytes": 720
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/volcengine__existing-effort-remapped-into-vocabulary.json": {
+      "sha256": "b16498592d905430d9203981344b6e093cf9aba6065573de3e5e2028d86087a3",
+      "bytes": 737
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/agnes__strips-thinking-fields-and-blocks.json": {
+      "sha256": "7d871f32669d169a2fdb3ced8ee74b68c3069a5f1df020b1bb8ac0af90915032",
+      "bytes": 1158
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/ollama__response-format-bridge.json": {
+      "sha256": "485f98bf016bd3551202357ba118ad81ae1ff401badebd81a6006e90b62af9af",
+      "bytes": 991
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/openrouter__adaptive-verbosity-defaults-high.json": {
+      "sha256": "feced10be230cba8dd0c5c36b1ce9893fde72c6375d5b4db3cfe84b561f67cd5",
+      "bytes": 810
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/mimo__utility-mode-disables.json": {
+      "sha256": "45570da8e4493a79acf83b9f6355357fe7378fe350ed010ccad15ece8bb27cc2",
+      "bytes": 647
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/kimi__utility-mode-pins-temperature-and-disables.json": {
+      "sha256": "73bdec7265e7d4b9153d50f3cf021d07d58ab87ff6774cbeaa45b3423852dce7",
+      "bytes": 686
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/openrouter__disable-level-refuses-loudly.json": {
+      "sha256": "2b230dc8dfaca5ac4f71da80e4afdee51b02bbaafd2148f18ed982ad2a1bb57a",
+      "bytes": 684
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/qwen__chat-level-passes-through.json": {
+      "sha256": "614c6365e9bdcc5dbb01cb4ec54bc73e87424d6592426acfc4db10a91a701873",
+      "bytes": 609
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/ollama__oversized-context-window-skips-num-ctx.json": {
+      "sha256": "834f7494fc5ac99dbe83c5dd05ff7213dfe69bc38adcd54c5b715e41756a90cc",
+      "bytes": 557
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/zhipu__declared-reasoning-enables-and-strips-store.json": {
+      "sha256": "6ed4e58de427fca49972269219af0f1f92770663dab83e033e48d9a27b0c6449",
+      "bytes": 715
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/mimo__no-thinking-signals-pass-through.json": {
+      "sha256": "40ec5906f8dc49cc5db5b4cc0d0b56f91ac977c80b09c6219395b58ceda74a2b",
+      "bytes": 558
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/anthropic__utility-mode-disables-thinking.json": {
+      "sha256": "ada314edd0a47d9f62a9ea9a913e8451528ff04dcd943737eb38ef514dac35e0",
+      "bytes": 758
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/anthropic__max-effort-raises-the-implicit-one-third-cap.json": {
+      "sha256": "27ce5cae96f803b286d000ba62ee4c8d318f408ccec017889e601f49e57375e7",
+      "bytes": 1153
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/openrouter__low-level-maps-low-and-reasoning-is-normalized.json": {
+      "sha256": "3100c6fa224c5a9fa79d71a393a8874ffe59f8d00a079251a796eb41a3ba5459",
+      "bytes": 893
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/deepseek__level-enables-and-keeps-budget.json": {
+      "sha256": "2e3be25a01b5022bacda2f30e61e7470f6defabb17e863b8dde02db86c511e61",
+      "bytes": 783
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/codex-responses__clean-payload-passes-through.json": {
+      "sha256": "be8ae6185d41b59e944f58838512b890a8197643b73e848e6bf817d47f91dfef",
+      "bytes": 611
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/deepseek-responses__disable-level-forces-none-effort.json": {
+      "sha256": "9a2fecef240bd6d7b4be34742f465e39e5c9ca907653ee617cb2fd49f17a8722",
+      "bytes": 794
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/zhipu__off-level-disables-and-strips.json": {
+      "sha256": "e8abb53ba5b80447cf0cd325b5ffaac721c8633253d78bea531c1c7133862d32",
+      "bytes": 847
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/qwen__off-level-forces-enable-thinking-false.json": {
+      "sha256": "a99d7dad7a909f3049124aee77aa993ade71d652165334f4fa361c9dc78d40ed",
+      "bytes": 682
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/qwen__utility-mode-adds-the-switch.json": {
+      "sha256": "410074719dde578e7c9cc5ee7efad76fbedded1f341a16a674084a36f15819fc",
+      "bytes": 617
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/kimi__k3-omits-temperature.json": {
+      "sha256": "3d93d6d4968c6d0111861e976625c4a08711446588b81135cdc4a6e24e01390f",
+      "bytes": 691
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/deepseek-responses__effort-minimal-translates-low.json": {
+      "sha256": "0db96001b2fcf82634a42d5653d310e979d05c84a416af14f7da678df8427c37",
+      "bytes": 823
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/kimi__off-level-disables-and-strips.json": {
+      "sha256": "14b5b9204c378947e9a7cd51781c41762b32826132bb3d4faf3025da6be5e9eb",
+      "bytes": 916
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/kimi__level-enables-with-keep-all.json": {
+      "sha256": "fa891ee38eb1d4a67eb2bbec19496836c3abe8fdf6424354a86b1f371afaeb2d",
+      "bytes": 726
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/ollama__num-ctx-bridge-merges-options.json": {
+      "sha256": "98723fd6f19954ff02230f6017117dccf023b265170bbfbaceb1c2a087bfbb2f",
+      "bytes": 676
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/zhipu__opencode-go-never-emits-clear-thinking.json": {
+      "sha256": "b89d34f10f8f9922e856d6e3d6ae69d28dcb8d7bdda85230efe08d3a605276dd",
+      "bytes": 1391
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/deepseek__missing-budget-fills-default.json": {
+      "sha256": "45339e4c908f1e61cd116eb5bef97d2c5a78f30e6bc971c60b6fe26687a7caa4",
+      "bytes": 733
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/anthropic__user-sourced-budget-vetoes-the-raise.json": {
+      "sha256": "0f90669e211fae4b54152afd9e9821d9a457401b99959d9628fa650b88bdf502",
+      "bytes": 1179
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/qwen__dashscope-video-route-matches-without-quirks.json": {
+      "sha256": "dfeed1f43a5ab6eee029c77ab0d7f9ad36e06ba8ee1359f378274efa9acb3fbe",
+      "bytes": 618
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/kimi__mfjs-root-anyof-folds-into-description.json": {
+      "sha256": "f5cd6d81e7be3b1f26b5ddea0a2eab9b7a981d4b41b1151757a2e86921701064",
+      "bytes": 1844
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/deepseek-responses__clean-payload-passes-through.json": {
+      "sha256": "7c01eb9b644e85410b404e81c531f10ca4a264e99b52e72f4f6b26f3c68a2afc",
+      "bytes": 768
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/kimi__max-tokens-renames-and-keep-preserved.json": {
+      "sha256": "f640098789d2fca9b03e366b723a9d557663fb5296b7230d0f2a5323ffc87725",
+      "bytes": 811
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/codex-responses__strips-budget-and-temperature.json": {
+      "sha256": "5186ae3597066bd7e853b6ff910bf5b7ac606780f6894fbc1ac9743c28141abc",
+      "bytes": 691
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/zhipu__tools-strict-stripped-and-max-tokens-renamed.json": {
+      "sha256": "4d82b5e6f0442ecda355f6bbfce6591620037c242f8a0ceee3708122f9edcdf5",
+      "bytes": 1147
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/deepseek__max-completion-tokens-renames.json": {
+      "sha256": "e06e16a171c083487ff4f39d4f6ccc9a45a00208647385f7ba17093ddd6c2b98",
+      "bytes": 608
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/deepseek__off-level-disables-and-strips.json": {
+      "sha256": "c05881188f1a30cd835f2f349d62c5a5138a225111a62aa5692341248ae7d005",
+      "bytes": 899
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/deepseek__anthropic-profile-effort-and-budget.json": {
+      "sha256": "c118f4fc76a6e9840ab60c96b9dfe5144abb18d004af514263ef8c90205fa591",
+      "bytes": 888
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/kimi__thinking-level-map-overrides-the-default-vocabulary.json": {
+      "sha256": "f0bb0c3bc68128ff9e71ac904c89a790ce64fdc27783e32cd06bd35465660990",
+      "bytes": 825
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/zhipu__preserve-marks-clear-false-with-tool-history.json": {
+      "sha256": "2889b3d31044454b79978ff6396fd658e16e5ead0979584fe93fdfcabe55800f",
+      "bytes": 1275
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/mimo__off-level-disables-and-strips.json": {
+      "sha256": "dc8ee5d6e0da8344f0eb23a1931bdfa646e0b1680cf142ad0ad5bb99437621bb",
+      "bytes": 975
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/none__unknown-provider-passes-through-unmatched.json": {
+      "sha256": "9cf8d670b53a12b42517c85ebae3c08c01a5d56c6b6e042eb003c4a932506fbd",
+      "bytes": 588
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/volcengine__off-level-disables-and-strips.json": {
+      "sha256": "bb75cf2e0c9d10c53262a74deac8311c41dd7e7886ff77e88fca4db003701599",
+      "bytes": 917
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/deepseek__utility-mode-disables.json": {
+      "sha256": "9432d0a06fd5f6dbe3fa70f570b8a2dd03d4946e43ff14173adeea878b1f3922",
+      "bytes": 671
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/anthropic__cache-control-marks-system-and-two-recent-users.json": {
+      "sha256": "526486ed3bd505fdd3be1999121bde940952556543bc47e02a524e280560da05",
+      "bytes": 1882
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/volcengine__level-enables-with-mapped-effort.json": {
+      "sha256": "f35fe86f2d3f1dea2e3f643a248eea484164ab05db8d2d82d3e677fd8d121bb0",
+      "bytes": 728
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/mimo__declared-reasoning-enables-kwargs.json": {
+      "sha256": "13a9f1615aca46e1a0cddec933d927275be3400980e92c2757bae89f914a8606",
+      "bytes": 690
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden-compat/deepseek-responses__missing-budget-fills-default.json": {
+      "sha256": "a82adc6a57fb4062e13d05ac58d04e2633a3bc8da074b6d0f32a7d295b670677",
+      "bytes": 634
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/openai-completions/error.json": {
+      "sha256": "b149d2257c78d6c12e416353268791e680e6f60c2b8537be4487ac6a7077d33d",
+      "bytes": 824
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/openai-completions/forward.json": {
+      "sha256": "60b06ec0050d33c9c8494b1988ffa2b97a63d63bf0c47d1cc19d4688624b1582",
+      "bytes": 4303
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/openai-completions/tool_roundtrip.json": {
+      "sha256": "5393895d4455838eb33e81830f5d6e9576350ab470abcd1d0543827245cf9210",
+      "bytes": 7804
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/.mimosa/hook-state/sess_dwf-dwfrun-00aefa84-fc46-429c-8d78-6a9e011d7647-actor_2_4.json": {
+      "sha256": "cc9b05469a6af4ddc7d7af191ffd0f06ab3ba3ddc27dc891f556004562147ea5",
+      "bytes": 218
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/google-generative-ai/error.json": {
+      "sha256": "f3a109c927b34c8aa5221d31105ed85a78180f25683b2b99adf67aa7c9321d45",
+      "bytes": 977
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/google-generative-ai/forward.json": {
+      "sha256": "32af7519e8e73479b9b7093a1f98ea44b83a14736f16426a2b82da10e93f12b5",
+      "bytes": 4481
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/google-generative-ai/tool_roundtrip.json": {
+      "sha256": "71f4afedccbeb3f0ea09e53f6aa359c1d4efb3bfe6ae63be593437978ee182b9",
+      "bytes": 6783
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/openai-codex-responses/error.json": {
+      "sha256": "0e08a26329a70648c42f02bacc040640656a6a0719f8622d80851d3bb6a4dc22",
+      "bytes": 942
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/openai-codex-responses/forward.json": {
+      "sha256": "81bb7c31792e89ed029489d0f0698eb100aad501945d9dafac48ce2ca96f9d0e",
+      "bytes": 1639
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/openai-codex-responses/tool_roundtrip.json": {
+      "sha256": "cf898d39dbd3b8d6aa2b4830b5d2f9860082ee3f2b53463da7cb1e0d32ae7734",
+      "bytes": 3824
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/anthropic-messages/error.json": {
+      "sha256": "3f5d4a98bcc1d7fa2617af74d7bd9c34dfc8e5d26f26766a8a839123bf5d2363",
+      "bytes": 886
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/anthropic-messages/forward.json": {
+      "sha256": "5bbdbb06699a990f8d47a4235f550c1ade5d5563abcc95ce519c2a04604b54b0",
+      "bytes": 3939
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/anthropic-messages/tool_roundtrip.json": {
+      "sha256": "967d2ede8e75b49c7cf2ee2e4a328f1eaf6e58763933b6b19f23db8a8ae43ce3",
+      "bytes": 5279
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/openai-responses/error.json": {
+      "sha256": "6452f2c0878469993ca507607d17dc857f0239b13babb5d96440a293bfbb4e5b",
+      "bytes": 789
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/openai-responses/forward.json": {
+      "sha256": "5412c74fab7d673cd2dffd71fc0c7f09ead45cb72c351410dbcb99d941ff366b",
+      "bytes": 4494
+    },
+    "isolated/rust/crates/lingxi-adapters/tests/golden/openai-responses/tool_roundtrip.json": {
+      "sha256": "9fdc98afdfb56130a73d06a00b848c8913852f5496bf24f05791e0954e8062cc",
+      "bytes": 4921
+    },
+    "isolated/rust/crates/lingxi-adapters/src/lib.rs": {
+      "sha256": "b7abdb77d7a3bbf8ed5caac833ae9322804591bb4696c0e5a53d2a2e146559f7",
+      "bytes": 815
+    },
+    "isolated/rust/crates/lingxi-adapters/src/bin/lingxi-storage-inspect.rs": {
+      "sha256": "ce38f8f7442142e14567331270a70901662fd32da0fae311d19536fdf78756d1",
+      "bytes": 12026
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/dispatch.rs": {
+      "sha256": "877badc332ed687c59f183e0fe2097d4f19daef37858b3d61889791bcc74fef1",
+      "bytes": 37270
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/config.rs": {
+      "sha256": "09f5f6533911cb76dbbe8a77844fdebd816fbe5b1006fd92a077b75ede91e144",
+      "bytes": 47640
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/compat.rs": {
+      "sha256": "be1229f65e2e462ad37ddccc6cbaee08d49e12dcd6144fc1c8a763822e3a25ca",
+      "bytes": 126119
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/openai_completions.rs": {
+      "sha256": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+      "bytes": 71475
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/openai_responses.rs": {
+      "sha256": "2bedaf6c8d437eebc9937e0868d93db554094c48db7fbf579294498b9ecf8880",
+      "bytes": 55512
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/anthropic_messages.rs": {
+      "sha256": "abca1b0fb608c74be9fb5da690a2843891a58cff1a744f0bf2523b3cc38fa59d",
+      "bytes": 76090
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/credentials.rs": {
+      "sha256": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+      "bytes": 16217
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/provider.rs": {
+      "sha256": "c31ac88b7d4dd5d391928c222dc543d4cf8e506c2b1b4216e58221b69ea3e657",
+      "bytes": 25959
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/openai_codex_responses.rs": {
+      "sha256": "89ce79f6b73f18f1e77ebb8bd299eb5478cadad33f76d03192bdfea650751b4c",
+      "bytes": 17545
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/gateway.rs": {
+      "sha256": "23e97214cc66a75fca73e957a3a19b5bf2142c72ea6448db827f32c8ab8c5deb",
+      "bytes": 21580
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/egress.rs": {
+      "sha256": "209ddd869203fdf198970353a2832b1765b7b02fb01b1394cf91be4cbee67c67",
+      "bytes": 37112
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/auxiliary.rs": {
+      "sha256": "504cc229598a737f260eb09b308b052aa9c9d196acaa471a8fd21281cdc46c04",
+      "bytes": 11160
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/usage.rs": {
+      "sha256": "0a6a1340f0160206ed65e555a941fbfee67d9ff26e352e08a8cf58019184230a",
+      "bytes": 24114
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/mod.rs": {
+      "sha256": "6ca2aa31b3bc52b4f2d4a471edc0ac19eca41159b883c74a1ecbcbb754aec400",
+      "bytes": 3721
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/oauth.rs": {
+      "sha256": "df4a8db93d629c20826c9316114e03eaa615d1c9286b61a1cadf34fb15fa047a",
+      "bytes": 49395
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/streaming.rs": {
+      "sha256": "8b17798d3239d6243f399dae25830aaddc0da4877d04680ef3d35d3427efaa76",
+      "bytes": 16123
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/batch_admission.rs": {
+      "sha256": "d6944a71609ac765625c7b549f5508d9a0e4bdeb7197eb8a234e977f612320e6",
+      "bytes": 3020
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/network.rs": {
+      "sha256": "38eb8d28653957bb2eddfe1bfeb2df45bffd663514399b078cec2652c6d9ace5",
+      "bytes": 41265
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/google_generative_ai.rs": {
+      "sha256": "494e92ed53b58754f05ad763b8cb7d66cca8a2768029cb14e517efbfb23e18cc",
+      "bytes": 66120
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/tool_render.rs": {
+      "sha256": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+      "bytes": 10410
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/operations/embedding.rs": {
+      "sha256": "b410cfe1bddcad6ba82506ff0cda702741bab7588f13d2c6ab9c86cbcb613e47",
+      "bytes": 18377
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/operations/rerank.rs": {
+      "sha256": "551c6b2029dcd5069bd01eb48428275f90000540e14e81a9c064c28ba5859f57",
+      "bytes": 11485
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/operations/image.rs": {
+      "sha256": "dc6c426b1a9ef7de4219c711922f5f47669b0c0ee3e998943f045d4350d60ae6",
+      "bytes": 86552
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/operations/video.rs": {
+      "sha256": "f4940723e287b031a527d980809de0c08763658545e4936fee9e252b7c505e31",
+      "bytes": 17741
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/operations/mod.rs": {
+      "sha256": "2cc0e91acbb8a189959c1013afafe9d4bfc09fbd101258b07b39b16bec248320",
+      "bytes": 25599
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/operations/tiers.rs": {
+      "sha256": "2571a2a1879b72c249678d3d44923e4c84c7f76c5a08b7cc854ff0a2b33b4e21",
+      "bytes": 22909
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/operations/speech.rs": {
+      "sha256": "5265559b851dcf965879a2c7ae9be73b7d4ee2691550b804ef705b89c3bbcf29",
+      "bytes": 11590
+    },
+    "isolated/rust/crates/lingxi-adapters/src/models/operations/transcribe.rs": {
+      "sha256": "96fea443459a93bacbda54b3ca976522133db269b4917afba7de772951735aba",
+      "bytes": 12654
+    },
+    "isolated/rust/crates/lingxi-adapters/src/storage/queue.rs": {
+      "sha256": "705b588721103bb4a97ff66ac0eef43d1dc57ba1b2b9156692c05518107fd24c",
+      "bytes": 43145
+    },
+    "isolated/rust/crates/lingxi-adapters/src/storage/backup.rs": {
+      "sha256": "7c0b4e696d3cdac3811d788e9c3e1234d3f370c11657dfb9a510e0ef423f2d51",
+      "bytes": 23247
+    },
+    "isolated/rust/crates/lingxi-adapters/src/storage/run_store.rs": {
+      "sha256": "542973c1a89e0b458b0bacd73bb594934d4a97369bc2785d7c4723caaad06496",
+      "bytes": 148766
+    },
+    "isolated/rust/crates/lingxi-adapters/src/storage/mod.rs": {
+      "sha256": "9dbca03fe05bddd352dddc3588601afe8682d4b825c74af128b4768b45939a92",
+      "bytes": 1447
+    },
+    "isolated/rust/crates/lingxi-adapters/src/storage/windows_acl.rs": {
+      "sha256": "96b06d6bcdbefb4c97ce2d8ab670f37af794dc1dd4d1d85a4d97a26940f33479",
+      "bytes": 31303
+    },
+    "isolated/rust/crates/lingxi-adapters/src/storage/migrations.rs": {
+      "sha256": "df9519611c4020c5eed3acccedc92287feeb9f6b0af477ee69e1317ef089859d",
+      "bytes": 38639
+    },
+    "isolated/rust/crates/lingxi-kernel/Cargo.toml": {
+      "sha256": "2fab453351437b78d219d01c19f4a0c1f6f522869de1a2e1ce9941731deff0df",
+      "bytes": 674
+    },
+    "isolated/rust/crates/lingxi-kernel/src/toolcatalog.rs": {
+      "sha256": "2b7505387b6b45aebc9ff7a0c836d49d24573df1d2de2e3137549eab5983ad1f",
+      "bytes": 121297
+    },
+    "isolated/rust/crates/lingxi-kernel/src/ports.rs": {
+      "sha256": "3f32e8c7c0a617d6bcb73ed11ab5eb468acfbb383ac844964a9ad52a75fa3936",
+      "bytes": 80389
+    },
+    "isolated/rust/crates/lingxi-kernel/src/recovery.rs": {
+      "sha256": "796cc13cfbfe0ef9aa021e3f7c47668d9374468a1defb1dfa0d046b853803268",
+      "bytes": 18019
+    },
+    "isolated/rust/crates/lingxi-kernel/src/subagent.rs": {
+      "sha256": "0287c242edc782989e1232046661a956216f5576e1247f94a4ea669c0edc0276",
+      "bytes": 37832
+    },
+    "isolated/rust/crates/lingxi-kernel/src/lib.rs": {
+      "sha256": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+      "bytes": 40216
+    },
+    "isolated/rust/crates/lingxi-kernel/src/usage.rs": {
+      "sha256": "209bc2f127595674ed86c64cbf92d7fc1632bcbbfcc446909cd0f632cf470f3b",
+      "bytes": 24017
+    },
+    "isolated/rust/crates/lingxi-kernel/src/model_exchange.rs": {
+      "sha256": "62bb3b1b3ad42f5ea46961ab5c5b1d98d54f22c0a359f8d099ad1e323a6d4c6b",
+      "bytes": 46172
+    },
+    "isolated/rust/crates/lingxi-kernel/src/invocation.rs": {
+      "sha256": "a964426e6d70bd9213a6475e7ca817193d32a22a3cc0630a0648adcdfa522292",
+      "bytes": 20497
+    },
+    "isolated/rust/crates/lingxi-browser-spike/Cargo.toml": {
+      "sha256": "74ec57bbd9395ea26ba4df5f2f15195188e9ce0d52235fd5cbb50b8fa629a236",
+      "bytes": 1208
+    },
+    "isolated/rust/crates/lingxi-browser-spike/src/pdf.rs": {
+      "sha256": "701ed875e8c9ed518d65635d43d95889c64f3463979e8f59e8566cdbce7f0ede",
+      "bytes": 23239
+    },
+    "isolated/rust/crates/lingxi-browser-spike/src/cdp.rs": {
+      "sha256": "aa1b8bf28ddf32454832642a9c431485e4a18a3fcaa115603277a6fbcdfce2c7",
+      "bytes": 10466
+    },
+    "isolated/rust/crates/lingxi-browser-spike/src/lib.rs": {
+      "sha256": "5a3bc4f030cb25ba4cf21ca9312e0855e08a749e7464dbe5bdd8d1762f4e817d",
+      "bytes": 1033
+    },
+    "isolated/rust/crates/lingxi-browser-spike/src/launcher.rs": {
+      "sha256": "d654818941f7779b2d4060f547c25785f48de243551d7247641aa47e4045cf2f",
+      "bytes": 2583
+    },
+    "isolated/rust/crates/lingxi-browser-spike/src/snapshot_source.rs": {
+      "sha256": "8340d1f13e023954fbf260aacdff0287544fe4ba131f87cbd9005f9055887c6b",
+      "bytes": 3022
+    },
+    "isolated/rust/crates/lingxi-browser-spike/src/ops.rs": {
+      "sha256": "b01d04a73e9abde4bde451d5aadbba338eb5ec26b4d0e2393c084ec27babee54",
+      "bytes": 13847
+    },
+    "isolated/rust/crates/lingxi-browser-spike/src/bin/spike_pdf.rs": {
+      "sha256": "d47f1a1d5747403fedf8c30ebdedace1398c66b88673506c86e0346b9a0120f7",
+      "bytes": 14212
+    },
+    "isolated/rust/crates/lingxi-browser-spike/src/bin/spike_browser.rs": {
+      "sha256": "b3a3b38676fd3dc154c682daaca17b7aa5562fc51fbf7d321d2dde622cc783c7",
+      "bytes": 66149
+    },
+    "isolated/rust/crates/xtask/Cargo.toml": {
+      "sha256": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+      "bytes": 1096
+    },
+    "isolated/rust/crates/xtask/src/runner_identity.rs": {
+      "sha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+      "bytes": 6854
+    },
+    "isolated/rust/crates/xtask/src/stage_map.rs": {
+      "sha256": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce",
+      "bytes": 158313
+    },
+    "isolated/rust/crates/xtask/src/verify.rs": {
+      "sha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+      "bytes": 94672
+    },
+    "isolated/rust/crates/xtask/src/candidate.rs": {
+      "sha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+      "bytes": 23258
+    },
+    "isolated/rust/crates/xtask/src/main.rs": {
+      "sha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+      "bytes": 20978
+    },
+    "isolated/rust/crates/xtask/src/stage_maps/R04.json": {
+      "sha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "bytes": 231496
+    },
+    "isolated/rust/crates/xtask/src/stage_maps/R05.json": {
+      "sha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "bytes": 306003
+    },
+    "isolated/rust/crates/xtask/src/stage_maps/R02.json": {
+      "sha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+      "bytes": 100387
+    },
+    "isolated/rust/crates/xtask/src/stage_maps/R03.json": {
+      "sha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+      "bytes": 96434
+    },
+    "isolated/rust/crates/xtask/src/candidate/tests.rs": {
+      "sha256": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+      "bytes": 12443
+    },
+    "isolated/rust/crates/xtask/src/verify/runner_tests.rs": {
+      "sha256": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69",
+      "bytes": 96139
+    },
+    "isolated/rust/crates/lingxi-service/Cargo.toml": {
+      "sha256": "c778bbe5821bc8d7dc1e5d22292879f3f3cb2ac6af480316acc1bad705b08b17",
+      "bytes": 7442
+    },
+    "isolated/rust/crates/lingxi-service/tests/event_subscription.rs": {
+      "sha256": "02d1e5c83cb813b4789d5a360b34d9291d136a54acd0253432cbbcc6ae041ee6",
+      "bytes": 60765
+    },
+    "isolated/rust/crates/lingxi-service/tests/session_serialization.rs": {
+      "sha256": "307e905a2fef749810e02620ba40a27fe065a64c88bf716aea630844fec38013",
+      "bytes": 37790
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t08_resources.rs": {
+      "sha256": "23b03f56bef900fc0563b3348596e61437995f7c05cc25a5173455f11a23e33f",
+      "bytes": 70474
+    },
+    "isolated/rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs": {
+      "sha256": "7e5b7cf50a74e73c08e391b9a328706c35b41c55ebaba67f5760c2404d67c53e",
+      "bytes": 66782
+    },
+    "isolated/rust/crates/lingxi-service/tests/subagent_lifecycle.rs": {
+      "sha256": "9579706a8a93486e0532a6bd5adf91ddb20c76a36b499611b26f98c2bf062462",
+      "bytes": 22463
+    },
+    "isolated/rust/crates/lingxi-service/tests/r04_rr1_f02_reaper_cleanup.rs": {
+      "sha256": "d7a24abf8de764f86acac624f5fcb69dd6b670412cde1bc1e12b9bda5ac784a3",
+      "bytes": 48587
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs": {
+      "sha256": "282a9f23ffe14cdc3f553534c2582ffc47e519224ac6330c24d6351c564ddca0",
+      "bytes": 56842
+    },
+    "isolated/rust/crates/lingxi-service/tests/auth_matrix.rs": {
+      "sha256": "9ab38f9fd5630313ab4e3b1a69014afa338b5a52f02d10147bfbac85ab0f3e0e",
+      "bytes": 79628
+    },
+    "isolated/rust/crates/lingxi-service/tests/cancel_link_inheritance.rs": {
+      "sha256": "c14272566afcee269520ffef460eac0361fde8a54235466fc4315a37dc4fdb43",
+      "bytes": 37056
+    },
+    "isolated/rust/crates/lingxi-service/tests/late_result_fence.rs": {
+      "sha256": "d550e29b660affbc836a531d9ea58c88591c47cf236f02b4728b91d40d0efac9",
+      "bytes": 43093
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t05_timeouts.rs": {
+      "sha256": "52e26995c5b031d0e6c1704972e2d1e79f69f2905d859ac5c2d6443707ee5f81",
+      "bytes": 30783
+    },
+    "isolated/rust/crates/lingxi-service/tests/execute_concurrency.rs": {
+      "sha256": "5fba456edb789b036393e631add70861d69eabd0a1ab3a78adf467096556861c",
+      "bytes": 24930
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t07_persistence.rs": {
+      "sha256": "c2398130d85569c85be19edd9bfc037ca68c6d46f7cb2d12f93f80c93c3fbfa8",
+      "bytes": 29879
+    },
+    "isolated/rust/crates/lingxi-service/tests/service_persistence.rs": {
+      "sha256": "d894ad0a7f65458bb2a3417d43c49cb7227ddd48425d8aba484c2762711e0194",
+      "bytes": 6385
+    },
+    "isolated/rust/crates/lingxi-service/tests/r04_t01_tool_catalog.rs": {
+      "sha256": "f58d7bcdb4270cbbc814a723dcbede2de6c97921e0a55617ad3c2aeba859d1de",
+      "bytes": 32770
+    },
+    "isolated/rust/crates/lingxi-service/tests/recovery_crash_points.rs": {
+      "sha256": "f6b8f9a31e1e9d6c9535d7ac72f7a4b8151401fa35ae3ee469c5c9356040a9da",
+      "bytes": 39151
+    },
+    "isolated/rust/crates/lingxi-service/tests/config_bounds.rs": {
+      "sha256": "86356ff1725791d987a3995414ecca88c5ab0cc10fbbb145cdf8280f6ff15d14",
+      "bytes": 4421
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t04_streaming.rs": {
+      "sha256": "6e09ff3a5f354aa7819c0b29cac742bd529a5b41d408a1609ad0837559bb74b3",
+      "bytes": 79502
+    },
+    "isolated/rust/crates/lingxi-service/tests/request_id_canonicalization.rs": {
+      "sha256": "370350ac150dd1cb88bf6c9e61461210756a2747798ff0d52fdfee89964a3b22",
+      "bytes": 59045
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t03_protocol_adapters.rs": {
+      "sha256": "55474557db29c644f1fe806a8f4057a0490ef9cc561a604bca1395ac5d50b828",
+      "bytes": 62685
+    },
+    "isolated/rust/crates/lingxi-service/tests/tool_receipt_unknown.rs": {
+      "sha256": "94753e058542abe2e07db6dad23633598b322468ba9f0b90d5827652f06f449a",
+      "bytes": 54062
+    },
+    "isolated/rust/crates/lingxi-service/tests/input_budget_refusal.rs": {
+      "sha256": "ab4b706a338ae0efae10789f636637f968fff6645e9ad8d4527b9aad0a87f4d5",
+      "bytes": 14763
+    },
+    "isolated/rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs": {
+      "sha256": "69aaa7925a7064288b45c7d39e25ee5d17a8b90b6efaf02bcaf30a299ead9e33",
+      "bytes": 88163
+    },
+    "isolated/rust/crates/lingxi-service/tests/shutdown_coordinator.rs": {
+      "sha256": "e0e5b281ffb2c1ec6ffc7c97650f0ce8e387f30deaff33762b607c306060e0b6",
+      "bytes": 19872
+    },
+    "isolated/rust/crates/lingxi-service/tests/r04_t04_file_tools.rs": {
+      "sha256": "b37e2fa214ce6493cda571e970c1f8a5d01fae67154f21f76b90f5194b06fbcc",
+      "bytes": 63680
+    },
+    "isolated/rust/crates/lingxi-service/tests/r04_t05_registry_capacity.rs": {
+      "sha256": "9460df947fc522ce6ca811e3d30cabf21d10df645ec50b26fbeb84e5634a0374",
+      "bytes": 48173
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t06_operations.rs": {
+      "sha256": "97170bcb71d25feda122e17f299e832644556ae30eeadec582d813d937cc3b15",
+      "bytes": 33267
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t01_model_plane.rs": {
+      "sha256": "101c02bf149534abe150154b17ef7a5cc0588e9a7580aba17d1f6aaa5efae9e0",
+      "bytes": 117514
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t02_credentials.rs": {
+      "sha256": "8a7f7f23e30aa22b23a51138d4ac2817e9dca78fa63889d4fa82dd82a0e35541",
+      "bytes": 165447
+    },
+    "isolated/rust/crates/lingxi-service/tests/request_dedup.rs": {
+      "sha256": "0eed4984400b1a45852fc147bf03ff070db9c2d43ceda9f88a4674cc09011a35",
+      "bytes": 14223
+    },
+    "isolated/rust/crates/lingxi-service/tests/background_steering.rs": {
+      "sha256": "3df708126e4231146ec53cfb63159e219dafa92c105c2935ae3e1147d60c87b6",
+      "bytes": 52023
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t05_network.rs": {
+      "sha256": "478d81c1dd77527ad2c7955e3da3edfa202335dfe8f6b282e16018d92901300c",
+      "bytes": 65412
+    },
+    "isolated/rust/crates/lingxi-service/tests/r04_rr1_f05_spill_failure.rs": {
+      "sha256": "3570f4fe224d338851274dd384c8704d414f0dddc9650f097fe323d770c1cd8c",
+      "bytes": 12564
+    },
+    "isolated/rust/crates/lingxi-service/tests/resource_limits.rs": {
+      "sha256": "a8fcbdea6f8dbc040b5ec2c8a6bca736d9f3270bd04a8f9481ddc57dff29dc5f",
+      "bytes": 33994
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t06_rr1_system_speech.rs": {
+      "sha256": "1cbbc1d6ffd5e37f2523efd99adfe94c8eaed768e7321bdb1d84ebb95f6487c9",
+      "bytes": 27202
+    },
+    "isolated/rust/crates/lingxi-service/tests/r00_static_web_leaves.rs": {
+      "sha256": "d9874fcc0f7801522c509f115ac16680b5fa8aec17a0b230c5ecb811ca23b0b4",
+      "bytes": 11759
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs": {
+      "sha256": "395ac7a42923d4f85a22eff80fe571ab71dec0ddd225fe354c8f90379ecc9f5f",
+      "bytes": 122629
+    },
+    "isolated/rust/crates/lingxi-service/tests/r04_rr1_f03_stop_honesty.rs": {
+      "sha256": "fe40e6c3f765fa19524c14dfdef4c583be4680c825c660addc117320ee6b2f98",
+      "bytes": 50905
+    },
+    "isolated/rust/crates/lingxi-service/tests/r04_t06_sandbox.rs": {
+      "sha256": "f1c7f450e939c26278453b314d8532b460ce70dc08f4fe7961ba1b5b26f7bb38",
+      "bytes": 39350
+    },
+    "isolated/rust/crates/lingxi-service/tests/instance_lifecycle.rs": {
+      "sha256": "0eed3931c005bdbc5b5e8ac6c547876cffbd89604cb3d1e99d5f4e41d503b63a",
+      "bytes": 10531
+    },
+    "isolated/rust/crates/lingxi-service/tests/admission_dedup_consistency.rs": {
+      "sha256": "1d542d7ccebc67884bcb011885d5e2e219d07f32e831aa9bce643b93d6d99526",
+      "bytes": 36445
+    },
+    "isolated/rust/crates/lingxi-service/tests/r04_t02_tool_gateway.rs": {
+      "sha256": "b25d2a63956410774051531cbd21c2dabf0f8aaf32ac82384893e0cc55743911",
+      "bytes": 72160
+    },
+    "isolated/rust/crates/lingxi-service/tests/service_health.rs": {
+      "sha256": "cf7d1ab9f3013a4be262f6e83f2c8f3a51f7c00766520d63f1a0cd59a1b773f4",
+      "bytes": 14993
+    },
+    "isolated/rust/crates/lingxi-service/tests/background_disconnect_recovery.rs": {
+      "sha256": "af97db4ea9c8e2438449883e97fb555234a8ff7be84dde949ea1c34fa9f28913",
+      "bytes": 21062
+    },
+    "isolated/rust/crates/lingxi-service/tests/tls_web_login.rs": {
+      "sha256": "b70fbf9b0879529a56c92ca4be3523d99459364bd2512c24a4d8ab247b274e63",
+      "bytes": 11482
+    },
+    "isolated/rust/crates/lingxi-service/tests/subagent_closeout.rs": {
+      "sha256": "be74628bd47c4fea91c61294783188ab59ca00123237f1686ec6ddfd550c7d41",
+      "bytes": 49869
+    },
+    "isolated/rust/crates/lingxi-service/tests/input_payload_fidelity.rs": {
+      "sha256": "8dfb74f368cf3f2684b12e02a473bec9ac6354e34254101f44b1ebab124ed163",
+      "bytes": 22734
+    },
+    "isolated/rust/crates/lingxi-service/tests/r04_t03_approval_service.rs": {
+      "sha256": "617d6f36d5862441258ca5f5e9cdf45adb1182f91fc289c1bf737d7d43cb8a9d",
+      "bytes": 70402
+    },
+    "isolated/rust/crates/lingxi-service/tests/cancel_terminal_race.rs": {
+      "sha256": "7d6a95f1d2de4fa1e32103fffa2e82d72b416da4f2383c04314937a11465d1ca",
+      "bytes": 52387
+    },
+    "isolated/rust/crates/lingxi-service/tests/invocation_journal.rs": {
+      "sha256": "3b8627dfcd9f7b419dd9e6e1fceaac7249adfe80f0e191043002f57f90b0ece9",
+      "bytes": 44153
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t08_closed_loop.rs": {
+      "sha256": "e48cacb5f1c5c4f77cc7a41ac267c85f2485c040c3c666f72b5e388f0814a836",
+      "bytes": 93683
+    },
+    "isolated/rust/crates/lingxi-service/tests/subagent_permission_inheritance.rs": {
+      "sha256": "e749ba788ab948562d59df75be045a1ba6721dd24e9167a1be626ce26d504bc2",
+      "bytes": 30020
+    },
+    "isolated/rust/crates/lingxi-service/tests/r04_rr1_f05_output_integrity.rs": {
+      "sha256": "ca08d067e649152ec75cbf320c9399158476bfde4fec89e071e4c0d64d5f8726",
+      "bytes": 28431
+    },
+    "isolated/rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs": {
+      "sha256": "98e2a672103242033f82f4182de3662a3c2d9a57c883e835132b3c8589aa8d1a",
+      "bytes": 83419
+    },
+    "isolated/rust/crates/lingxi-service/tests/r04_t05_process_tools.rs": {
+      "sha256": "ad2b9d816bc34acc937a11d8e7ea259ab91c0a7c6ad51c5b54eb363266b76d7a",
+      "bytes": 60141
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t08_production_tools.rs": {
+      "sha256": "584ad879f4aa5ae8cad7cbdde70cda79f95ab2f5f1602059839a39a0c5093d68",
+      "bytes": 49264
+    },
+    "isolated/rust/crates/lingxi-service/tests/recovery_startup_scan.rs": {
+      "sha256": "62905768045be3a7b0ca86296b3800ca486a7d46d513d0b23078368f4f4ba6b7",
+      "bytes": 20557
+    },
+    "isolated/rust/crates/lingxi-service/tests/cancellation_tree.rs": {
+      "sha256": "d107a05d3f3b33f492a9be4e37d9c93e2566318abe4e285bba1f180fa0cf7eee",
+      "bytes": 76602
+    },
+    "isolated/rust/crates/lingxi-service/tests/r04_rr1_f04_pty_consumption.rs": {
+      "sha256": "26d37af280ba9b78b2968b3197783e1893434cb52ecab977e3439063615957b8",
+      "bytes": 16078
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs": {
+      "sha256": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571",
+      "bytes": 27007
+    },
+    "isolated/rust/crates/lingxi-service/tests/run_lifecycle.rs": {
+      "sha256": "1678e32936755408f553c10d05a3c91a880614aadd8a1b6d9833cd3c98df6e06",
+      "bytes": 36342
+    },
+    "isolated/rust/crates/lingxi-service/tests/r00_management_leaves.rs": {
+      "sha256": "3e72c2a2d16287549a2727a355642ec279c09595d42d6ec42d9c5585c8d2f453",
+      "bytes": 88806
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t06_worker_model.rs": {
+      "sha256": "6d67feea5ce3de2f14eaa882e5076acbe4e5fc145953939360be91f590871791",
+      "bytes": 38241
+    },
+    "isolated/rust/crates/lingxi-service/tests/r05_t07_usage_trace.rs": {
+      "sha256": "5ae7877a139e960a6b4d1c30b1bf8703133fd9fd60257150dd6c0bcf2045cb12",
+      "bytes": 59243
+    },
+    "isolated/rust/crates/lingxi-service/tests/admission_dedup_adversarial.rs": {
+      "sha256": "f9d10e146c912a65a17eaa29181587eb2459188b40790e0925e376f53fd29c61",
+      "bytes": 40387
+    },
+    "isolated/rust/crates/lingxi-service/tests/exit_race_rejections.rs": {
+      "sha256": "7dfd5cc7eb0028d7a35281d41d7fab5b2079b5bcdf040d9565728a60fbf9bccf",
+      "bytes": 20080
+    },
+    "isolated/rust/crates/lingxi-service/tests/recovery_support/harness.rs": {
+      "sha256": "0482ebce472f79e7402dde15ed3eafc8262c29ad68a04ebc042ef01dd60a3764",
+      "bytes": 8194
+    },
+    "isolated/rust/crates/lingxi-service/tests/.mimosa/hook-state/sess_dwf-dwfrun-00aefa84-fc46-429c-8d78-6a9e011d7647-actor_2_4.json": {
+      "sha256": "4b0f0163702e7523d84e8d96bdee4abbf4154d78b070aeef67d59cfa59a58a96",
+      "bytes": 1073
+    },
+    "isolated/rust/crates/lingxi-service/tests/.mimosa/hook-state/sess_dwf-dwfrun-00aefa84-fc46-429c-8d78-6a9e011d7647-actor_2_4.muu9lto1-86738-a7058991e4.baseline/b7b5ed9bf6dc438d4dc63e178e384e920f522ed2afb62581627269688847f0af.source": {
+      "sha256": "1f52fce0fd3154c3721f1896f046f62bcf51c978de8e43554f9eb34a86570958",
+      "bytes": 86286
+    },
+    "isolated/rust/crates/lingxi-service/tests/.mimosa/hook-status/sess_dwf-dwfrun-00aefa84-fc46-429c-8d78-6a9e011d7647-actor_2_4-6583438546.json": {
+      "sha256": "07d70b6cfeafba362ea6cd10b178e6a11e225f55fadc2e9cabe1ce649eeec0d3",
+      "bytes": 412
+    },
+    "isolated/rust/crates/lingxi-service/tests/support/r05_resource_sampler.rs": {
+      "sha256": "1f6601122e5d7841f3975ec68ea8c60adb653fc939ca4e65cc3da7565c269274",
+      "bytes": 5353
+    },
+    "isolated/rust/crates/lingxi-service/src/task_supervisor.rs": {
+      "sha256": "2f78d303b89b4df43899f4ccd593e0f71ea6e82535d44455f71bf462a11998c1",
+      "bytes": 47828
+    },
+    "isolated/rust/crates/lingxi-service/src/serve.rs": {
+      "sha256": "95faa3f52bb1c1a33738501b33038bda41e0e29eca6eee541fadb84b202847b8",
+      "bytes": 17546
+    },
+    "isolated/rust/crates/lingxi-service/src/shutdown.rs": {
+      "sha256": "401ab707932219fc2a6c174e978705b4c16d57aafa09a0b276580be5d7f4113f",
+      "bytes": 25413
+    },
+    "isolated/rust/crates/lingxi-service/src/background.rs": {
+      "sha256": "1e642710a45e4e4360f34ed5588f16eb847ae74bd2a66cabb0b6f8e972db69a5",
+      "bytes": 16566
+    },
+    "isolated/rust/crates/lingxi-service/src/approval_service.rs": {
+      "sha256": "cc0ee1fafa087a37801a626008215638214b59f6bbe8cc2284e8897dd114ae72",
+      "bytes": 51480
+    },
+    "isolated/rust/crates/lingxi-service/src/workerrpc.rs": {
+      "sha256": "4a158b5321da63d2c6a36d88da8ec7cfd21622c914fa38f7ad6dd674d4cb0788",
+      "bytes": 83449
+    },
+    "isolated/rust/crates/lingxi-service/src/security_audit.rs": {
+      "sha256": "ec34626d0c03a8e86cc1beb69cea951a55571bddd92624284e896f8654506cdf",
+      "bytes": 23220
+    },
+    "isolated/rust/crates/lingxi-service/src/events.rs": {
+      "sha256": "709b9adc34ba6d35252ff1ebf8332981b47f9defb0d178e3880bf5caffd855a4",
+      "bytes": 89992
+    },
+    "isolated/rust/crates/lingxi-service/src/artifactverify.rs": {
+      "sha256": "3b4e84802fd3dda9719295f3d3e95a2218fca520a88d4b2ea610865113c049d7",
+      "bytes": 15924
+    },
+    "isolated/rust/crates/lingxi-service/src/toolgateway.rs": {
+      "sha256": "17e9c05aec1d03cdc68db66b97ec84947cccf3d49a8759bca2fa126db6f2bc84",
+      "bytes": 85806
+    },
+    "isolated/rust/crates/lingxi-service/src/procsupervisor.rs": {
+      "sha256": "d586aa01efa0085f5890e73dcd056431ae84abf1b5b8aa379ce8159ff2ca7b37",
+      "bytes": 160447
+    },
+    "isolated/rust/crates/lingxi-service/src/recovery.rs": {
+      "sha256": "37a268ac26b368e27fac3e81a173f6d29a4d2789603259df2968a4a72be79e45",
+      "bytes": 14619
+    },
+    "isolated/rust/crates/lingxi-service/src/config.rs": {
+      "sha256": "960365bee86e48825681bf6962730ac0f67f48dab870656cde174ff44981cd8d",
+      "bytes": 94038
+    },
+    "isolated/rust/crates/lingxi-service/src/subagents.rs": {
+      "sha256": "2c97b7964cdd0ecbf6dda0881cd6510ba880a6a3fd428274e936441b469f44d7",
+      "bytes": 42829
+    },
+    "isolated/rust/crates/lingxi-service/src/streaming_norm.rs": {
+      "sha256": "bca91fd70a29eaef7cc9c7210f13c5e6f13e5844f256fa10aa18e9bf0fb360c3",
+      "bytes": 54470
+    },
+    "isolated/rust/crates/lingxi-service/src/transport.rs": {
+      "sha256": "d4a5fe9ac17e2f0e2e666bc04658008002fa48d1f661875fa41121f5ff012c95",
+      "bytes": 20309
+    },
+    "isolated/rust/crates/lingxi-service/src/cancel.rs": {
+      "sha256": "45db14322dc7daa18b1926acc5d87ed153682c7830a991210c0838534f7e1872",
+      "bytes": 51093
+    },
+    "isolated/rust/crates/lingxi-service/src/lib.rs": {
+      "sha256": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756",
+      "bytes": 203023
+    },
+    "isolated/rust/crates/lingxi-service/src/limits.rs": {
+      "sha256": "93d7bbd0a1bc22417cfb800d75601c61e8ee396ff8801218382738938d6767c5",
+      "bytes": 15683
+    },
+    "isolated/rust/crates/lingxi-service/src/paths.rs": {
+      "sha256": "10b13d4d0639e134c118f0ef421648f55e3d9498dd210d7ad0428e009e89008e",
+      "bytes": 15190
+    },
+    "isolated/rust/crates/lingxi-service/src/logging.rs": {
+      "sha256": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+      "bytes": 22354
+    },
+    "isolated/rust/crates/lingxi-service/src/instance.rs": {
+      "sha256": "f329de65613332af3024763e0fb17ce7f545962252233c10ba2400aabda7f846",
+      "bytes": 36654
+    },
+    "isolated/rust/crates/lingxi-service/src/redaction.rs": {
+      "sha256": "9d749fc88d7c653399db7908b4fddd1bcca3264362c9da3a6a7ba49318c6a1ed",
+      "bytes": 38972
+    },
+    "isolated/rust/crates/lingxi-service/src/auth.rs": {
+      "sha256": "5d9408afc747e3249f0d7b7d9148be8fe3c22eb1aac3815835b466c409cf31e8",
+      "bytes": 97357
+    },
+    "isolated/rust/crates/lingxi-service/src/invocations.rs": {
+      "sha256": "42826a77c2a9625fea27ea085b822949946777db6ac7c8bd2b7a00ccd04a32d8",
+      "bytes": 9485
+    },
+    "isolated/rust/crates/lingxi-service/src/sessions.rs": {
+      "sha256": "61d032f1d3407f973360738c150c03ac49d780efc79afec49bf5e9ff6ab83c4f",
+      "bytes": 109688
+    },
+    "isolated/rust/crates/lingxi-service/src/quotas.rs": {
+      "sha256": "5830926c2c1f61792c5269e622680b78f146d50997a4b609ffdf214a446b48cc",
+      "bytes": 30037
+    },
+    "isolated/rust/crates/lingxi-service/src/static_web.rs": {
+      "sha256": "65341c5ddce91341687c922c3116c1e48423605d16112cfc7b3864900e885d6d",
+      "bytes": 8714
+    },
+    "isolated/rust/crates/lingxi-service/src/resourceaccess.rs": {
+      "sha256": "9cb2b2267e581eff500b4e9a995541ea055a56f217955fd910cd7dd0e2c7766f",
+      "bytes": 30074
+    },
+    "isolated/rust/crates/lingxi-service/src/runs.rs": {
+      "sha256": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+      "bytes": 210703
+    },
+    "isolated/rust/crates/lingxi-service/src/main.rs": {
+      "sha256": "9ea695ee5b2eef4163db16df4b584b363df6a375ca334f02c9160886ed1b5f5b",
+      "bytes": 45662
+    },
+    "isolated/rust/crates/lingxi-service/src/exectools.rs": {
+      "sha256": "433584042b95dcb51b9b4f40509bce0123de078b6b0d85edeeb8ec7c3af64e98",
+      "bytes": 68303
+    },
+    "isolated/rust/crates/lingxi-service/src/mcpbridge.rs": {
+      "sha256": "e3312f6ab87ad6562233c3ec71a14e1925685a28c9879999b99731ddfa6f6fbf",
+      "bytes": 54398
+    },
+    "isolated/rust/crates/lingxi-service/src/approval.rs": {
+      "sha256": "70040aaec9a0a6ca41e059113b2c53275361ad8cbc6e40b3d0fdfa339b5bed3e",
+      "bytes": 4417
+    },
+    "isolated/rust/crates/lingxi-service/src/management.rs": {
+      "sha256": "c9402d83a16f3b0c4f6f193968b099fe29c6121968b337d6109dfeeb14c8c27d",
+      "bytes": 102566
+    },
+    "isolated/rust/crates/lingxi-service/src/operations.rs": {
+      "sha256": "bbb2054886f6e08093aeba416570ecadee866891db06e59a6d5406815b965639",
+      "bytes": 102060
+    },
+    "isolated/rust/crates/lingxi-service/src/sandbox.rs": {
+      "sha256": "57dbdcb309fa17878e58ea360cc9e5d69cdb126d7907f2d9aaa82bc68888b676",
+      "bytes": 55141
+    },
+    "isolated/rust/crates/lingxi-service/src/ws.rs": {
+      "sha256": "03c9a6887b0d194127a4401bf92c26fb6debcc344cfe9b3b091a7503b1186b20",
+      "bytes": 35094
+    },
+    "isolated/rust/crates/lingxi-service/src/epoch.rs": {
+      "sha256": "9c29d9ee8924d7b514a9bc4b7f8d374d420287f25b1b36f5295619c0f882b855",
+      "bytes": 58094
+    },
+    "isolated/rust/crates/lingxi-service/src/filetools.rs": {
+      "sha256": "4803fe5164ad448860b162d58a374f945fc8920dad0f526aa70f73c2c64fd116",
+      "bytes": 92560
+    },
+    "isolated/rust/crates/lingxi-service/src/dedup.rs": {
+      "sha256": "f80cd8a86451f5563217bc293aa2dfa3afc97a6666dba068b5196470e7aecf82",
+      "bytes": 39077
+    },
+    "isolated/rust/crates/lingxi-service/src/workermodel.rs": {
+      "sha256": "85b25b95f026dd9ce53119bd0caff44e4df4ef5f90c6e3b2abfad5e89932af29",
+      "bytes": 21016
+    },
+    "isolated/rust/crates/lingxi-service/src/session_supervisor.rs": {
+      "sha256": "fcf0822ceef2000057b41d3a0a7d67581815db0aef2908629f146d0a44e8ef74",
+      "bytes": 22908
+    },
+    "isolated/rust/crates/lingxi-service/src/inject.rs": {
+      "sha256": "c440a0c38f5710500b3aa3c557ca33d9503db485d13fc1555416a7efb4c560e4",
+      "bytes": 5726
+    },
+    "isolated/rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs": {
+      "sha256": "c569a06220d6672432e2dc1871f2f6c9f2d2b4d5eeae2c5773fec98e0a2d4e2f",
+      "bytes": 18189
+    },
+    "isolated/rust/crates/lingxi-service/src/.mimosa/hook-state/sess_dwf-dwfrun-00aefa84-fc46-429c-8d78-6a9e011d7647-actor_2_5.json": {
+      "sha256": "1bd0c2a81fb90f188c4d6b381d328b8913884f853e77601d4e395315a50f0700",
+      "bytes": 2314
+    },
+    "isolated/rust/crates/lingxi-service/src/.mimosa/hook-state/sess_dwf-dwfrun-00aefa84-fc46-429c-8d78-6a9e011d7647-actor_2_5.muui4pu0-63087-38c3a996e4.baseline/9177877afee1a3106b0dd6843541f808678413a3a09e942ec8a13c877db1e3f1.source": {
+      "sha256": "011bac318bc0eba3d7d8d88c9895637c0978d19590a47da4dc0d4dc4546ade4b",
+      "bytes": 43352
+    },
+    "isolated/rust/crates/lingxi-service/src/.mimosa/hook-state/sess_dwf-dwfrun-00aefa84-fc46-429c-8d78-6a9e011d7647-actor_2_5.muui4pu0-63087-38c3a996e4.baseline/c7ed13333c61fd3072ba2a44f6ba6407f600424d2fca86cf4aba0964d7322ece.source": {
+      "sha256": "f95100fe95c0eabbdd928035dc395e200270df42a4a9d9c8df906f31ea2d5ad4",
+      "bytes": 200315
+    },
+    "isolated/rust/crates/lingxi-service/src/.mimosa/hook-state/sess_dwf-dwfrun-00aefa84-fc46-429c-8d78-6a9e011d7647-actor_2_5.muui4pu0-63087-38c3a996e4.baseline/0544fc952eefa8d170bbd200b75827f5bb58e39b132e7c871c1bc8a9d5e09ce5.source": {
+      "sha256": "f0df744eb6bdf2bedc46fec8723e1f448ce3c2b6f3d1c3cc493658ff98771c7d",
+      "bytes": 187886
+    },
+    "isolated/rust/crates/lingxi-service/src/.mimosa/hook-state/sess_dwf-dwfrun-00aefa84-fc46-429c-8d78-6a9e011d7647-actor_2_5.muui4pu0-63087-38c3a996e4.baseline/7ae2f0d19ed9e470da687f424a56df218c18bddeea0c9817f3470326bde901ff.source": {
+      "sha256": "c04289e8501a31999e11404a9c3b93bd6f3f0e57cf737f235fa9e050dae14e3b",
+      "bytes": 100978
+    },
+    "isolated/rust/crates/lingxi-service/src/.mimosa/hook-status/sess_dwf-dwfrun-00aefa84-fc46-429c-8d78-6a9e011d7647-actor_2_5-be895868db.json": {
+      "sha256": "bd0e25bbdb7101cc26d7dd3a154a2b3faec5d7175369f5130524f258056639eb",
+      "bytes": 494
+    },
+    "isolated/rust/crates/lingxi-service/src/credentials/store.rs": {
+      "sha256": "a69b4d4e2bab340055e30907cfece32bbd58c54da1898fe8c72d133eb253696f",
+      "bytes": 16655
+    },
+    "isolated/rust/crates/lingxi-service/src/credentials/mod.rs": {
+      "sha256": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+      "bytes": 75040
+    },
+    "isolated/rust/crates/lingxi-service/src/credentials/login.rs": {
+      "sha256": "397b40157707c9bbee786ae86dff15b6989aca7c3a3942583caf71bae8276bf8",
+      "bytes": 30694
+    },
+    "isolated/rust/crates/lingxi-spike/Cargo.toml": {
+      "sha256": "6a63f3596f63a2e21735fff068adc228f5ae653dbae206d671df93086282ca48",
+      "bytes": 1857
+    },
+    "isolated/rust/crates/lingxi-spike/src/lib.rs": {
+      "sha256": "8c71c6cbadcfa9aa6f1d1c13dd228713b03e20c1ab52324c86a5f66e282d7c7c",
+      "bytes": 386
+    },
+    "isolated/rust/crates/lingxi-spike/src/queue.rs": {
+      "sha256": "06e475d6f058f4dc1ba74385c0b67a7da887a7c7f5642cd7f4fdfa45afce51ad",
+      "bytes": 14617
+    },
+    "isolated/rust/crates/lingxi-spike/src/schema.rs": {
+      "sha256": "ae47842f9ad56f6a7ae2cadfd6ed54c4f4fab77ca86bf89947ea17723f4d7403",
+      "bytes": 3229
+    },
+    "isolated/rust/crates/lingxi-spike/src/bin/spike_sqlite_queue.rs": {
+      "sha256": "e9f4300f5cb23937808137687f61c546750f971586812624a1874ef2ee7b6814",
+      "bytes": 2972
+    },
+    "isolated/rust/crates/lingxi-spike/src/bin/spike_health.rs": {
+      "sha256": "70e78dc7751cec49390571d350afc033fbecd1fbf122bd80f3ea4b83c0bde1df",
+      "bytes": 2770
+    },
+    "isolated/rust/crates/lingxi-spike/src/bin/spike_tls_probe.rs": {
+      "sha256": "739f2fc2c95d4244843f3bbd32b0b19f2fc40b24d26b43cf51fe36ef383b5133",
+      "bytes": 2037
+    },
+    "isolated/rust/crates/lingxi-spike/src/bin/spike_schema_validate.rs": {
+      "sha256": "0c9e6767ba8d422914cfd0681f951c90197f64da49c4354c72b296184a215e27",
+      "bytes": 2109
+    },
+    "isolated/rust/crates/lingxi-spike/src/bin/spike_check_deps.rs": {
+      "sha256": "53c94d2b284c821380dc76c36bbf4291191d435830dbc3cb63aa201deddb4703",
+      "bytes": 5809
+    },
+    "isolated/rust/crates/lingxi-spike/src/bin/spike_mcp_handshake.rs": {
+      "sha256": "252907eba94763808ba76825f6b151d93ad239e30adce67ae0c948fac61f5fae",
+      "bytes": 2842
+    },
+    "isolated/rust/crates/lingxi-protocol/Cargo.toml": {
+      "sha256": "55ec1b90bb8aa610bf507d70e168a1fdf73e84e8771defe9018ab6f2b0fc4ddc",
+      "bytes": 754
+    },
+    "isolated/rust/crates/lingxi-protocol/src/lib.rs": {
+      "sha256": "7dc6fe93e4c9aa29da6ca4690e039f647c23938599557c374d185f047c62fce2",
+      "bytes": 18350
+    },
+    "isolated/rust/crates/lingxi-protocol/src/handshake.rs": {
+      "sha256": "17bb9902607d3d94fa2356cd2b55a32ad76b6eda38377b8d181be931af25d51d",
+      "bytes": 8093
+    },
+    "isolated/rust/crates/lingxi-protocol/src/canon.rs": {
+      "sha256": "2c1bb1c229a3bd0eafe6ab6d911cf8e41c158717fc4632f390e0684a3d1cea71",
+      "bytes": 9485
+    },
+    "isolated/rust/crates/lingxi-protocol/src/devgate.rs": {
+      "sha256": "292ed1cb45356234a6a7423c9ef60dfe908eb9573c5d5580fd32b1d85d411749",
+      "bytes": 4408
+    },
+    "isolated/rust/crates/lingxi-protocol/src/wire.rs": {
+      "sha256": "a3509c6d31fe584980bef21cc615e21a56afe44ab57266108b3f5d2d7c71d3ff",
+      "bytes": 31447
+    },
+    "isolated/rust/crates/lingxi-protocol/src/bin/lingxi-proto-server.rs": {
+      "sha256": "1aeddfa2c4d4a8eab8ab75aed8a2555288c6ce2e1ebe05584b307d0cc0760aa3",
+      "bytes": 14568
+    },
+    "isolated/rust/crates/lingxi-protocol/src/bin/lingxi-protocol-verify.rs": {
+      "sha256": "b68c1d1a0fbf2d0e9355f34e7f89582d902650ce9721390b7311b317ac103e3c",
+      "bytes": 6361
+    },
+    "isolated/rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs": {
+      "sha256": "8af4fb30089bae8e55fb62b18412a05e172b55f966cd4b6f5aaa1ef8952cee05",
+      "bytes": 30554
+    },
+    "isolated/build/liblingxi_service.rlib": {
+      "sha256": "ef146b51dfad8d246f6359e8b5df896731e7db6fd7c281d26a1f08653cb30881",
+      "bytes": 134457480
+    },
+    "isolated/build/lingxi-service": {
+      "sha256": "7d9190d27d1b6a019abfbe97049d6855a3f225494124fee43ef8988e032ae78b",
+      "bytes": 59478432
+    },
+    "adapters-list/input-before.json": {
+      "sha256": "84695b4166cd63175b63e96f52342f99e9873e83fa191c590b0792ecb8f16688",
+      "bytes": 61515
+    },
+    "adapters-list/stdout.log": {
+      "sha256": "31b05e503a7dc83007a44f07398f5c54545ecb7217df723dce45ec74479b2cb0",
+      "bytes": 9894
+    },
+    "adapters-list/input-after.json": {
+      "sha256": "87b0808610688a934d58b8e6783e52066beef9079b80269134e71fc8366ab4ee",
+      "bytes": 61515
+    },
+    "adapters-list/command.json": {
+      "sha256": "779462972173f3115569c2454c445adcd99961af8b3c47b87b5389afd1c6ff87",
+      "bytes": 3056
+    },
+    "isolated-restored-command/input-before.json": {
+      "sha256": "29d9b85c23585d180a77b626c830b34815e5c36f47c6eee38f32a7502694df1d",
+      "bytes": 61515
+    },
+    "isolated-restored-command/stdout.log": {
+      "sha256": "09e2b72e1de5dca778ba6387a317dea684f30f02505a02616d09b6a8c5596f86",
+      "bytes": 64
+    },
+    "isolated-restored-command/input-after.json": {
+      "sha256": "a1795cdb099108fb36fc844feef6bc8b969c307fd8f713c33fe2b1856c9adbb2",
+      "bytes": 61515
+    },
+    "isolated-restored-command/command.json": {
+      "sha256": "a82b145c29f4f9bcfa23c084404bdf31b01fd6045eb0d2fa84329dec74a80bc2",
+      "bytes": 3067
+    },
+    "sampler-negative-command/input-before.json": {
+      "sha256": "19f408a6d99290970576fc6b2038272a04c76b6dbf39773773bae51ea56f9729",
+      "bytes": 61515
+    },
+    "sampler-negative-command/stdout.log": {
+      "sha256": "4b0de6d3def9e3189a5c19fd94f6b08a4f3e71c5ab2edb8f948d9453005762d7",
+      "bytes": 85
+    },
+    "sampler-negative-command/input-after.json": {
+      "sha256": "8726aaaa1180c2e94557b796ea67c1a18f50aba415dbb51c1ffcbc0f038ed66e",
+      "bytes": 61515
+    },
+    "sampler-negative-command/command.json": {
+      "sha256": "66a5b17512fbbc401fd7f26c22c4821658879106727d0ed717b52c32ac2a2c45",
+      "bytes": 2959
+    },
+    "binary-six/service-1-stdout.log": {
+      "sha256": "5d86832aa07eab8abc81f8ff3268d5706e41585a22cd624abde1fc3c9d982a81",
+      "bytes": 166
+    },
+    "binary-six/service-5-stderr.log": {
+      "sha256": "a7a7bc19b5377512f75d052881b7a78726ef6801a6241f176c0ffc12c088b521",
+      "bytes": 1749
+    },
+    "binary-six/result.json": {
+      "sha256": "c9f849fa7b4ccb9341024585f347c34a0d2a766f3a21214f6df4b28d70932182",
+      "bytes": 7805
+    },
+    "binary-six/service-0-stderr.log": {
+      "sha256": "d636881189555772c667874533f2616b526c95e2c4df8c501275e2bdae23059e",
+      "bytes": 1929
+    },
+    "binary-six/service-4-stdout.log": {
+      "sha256": "4702dc4ebb2eba4690f22437789bc2d88c110ad29b7bf5e45070a323ca2a517f",
+      "bytes": 166
+    },
+    "binary-six/service-3-stdout.log": {
+      "sha256": "6e60f2773a177e2bfd262abd3368a610bd13c122638bcd278368d22224b9805d",
+      "bytes": 166
+    },
+    "binary-six/service-2-stderr.log": {
+      "sha256": "24c5b98d60ab7b6f50340970c59a7b74478cf20c68f8d90015957b263994c0fe",
+      "bytes": 1749
+    },
+    "binary-six/service-5-stdout.log": {
+      "sha256": "8386d49a9538a565302e7e0d8ed6b4a583e5132088af8612bb5ecf15a092a8b6",
+      "bytes": 166
+    },
+    "binary-six/service-1-stderr.log": {
+      "sha256": "2c27d26130dc48ae540419a740231c90a9c88fb38bc66716526289199e0f18a0",
+      "bytes": 1749
+    },
+    "binary-six/service-4-stderr.log": {
+      "sha256": "726ef11d830f74b9cbad62adc7f0cf44d78f1a68d6618dcd1aedd297df92c641",
+      "bytes": 1749
+    },
+    "binary-six/service-0-stdout.log": {
+      "sha256": "ceee81b84707c8a6e48bbe49bb6a14cc14a4cc4fa0cabbf6ed33b468c3215a34",
+      "bytes": 166
+    },
+    "binary-six/service-3-stderr.log": {
+      "sha256": "68660f075deb991363321ddcc753e646d6e23884a993ba65471366e8aebc342e",
+      "bytes": 1749
+    },
+    "binary-six/service-2-stdout.log": {
+      "sha256": "fc7e197beb3ba219b7c4921cfdb5d04ea3faf871c6bd54fcf331bd21ee4b843b",
+      "bytes": 166
+    },
+    "callback-replay/input-before.json": {
+      "sha256": "f56c172080d70091f5c06d19b8e06dde373bcdfe48641b23beac6016f7701e06",
+      "bytes": 61515
+    },
+    "callback-replay/stdout.log": {
+      "sha256": "96b3c9a3f7fd3b2d2116e185ee54345df4cb233052d92f9e6c56230509615e4a",
+      "bytes": 470
+    },
+    "callback-replay/input-after.json": {
+      "sha256": "1a41003c4ff719c47f541403749a90092fa33c4864b8a4586cf0a590500afc5d",
+      "bytes": 61515
+    },
+    "callback-replay/command.json": {
+      "sha256": "023f57d79edd3531a8423ae7bade1e545ecffc730568f00a29b131157683c734",
+      "bytes": 3270
+    }
+  },
+  "excluded": [
+    "MANIFEST.json（自身）",
+    "MANIFEST_CHECK.json（清单验证输出）",
+    "dispatch/**（派发者仍可能追加的外层会话流；request已另存定格副本）",
+    "__pycache__/**（解释器派生缓存）"
+  ],
+  "boundary": "只读取本包自有证据；历史报告清单另见HISTORICAL_AUDIT，主树输入另见FINAL_SOURCE_BINDING"
+}

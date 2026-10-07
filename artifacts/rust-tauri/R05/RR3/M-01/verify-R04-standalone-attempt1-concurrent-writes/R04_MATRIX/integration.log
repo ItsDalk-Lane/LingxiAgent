@@ -1,0 +1,18 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r04_t08_tool_matrix.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-t08-matrix/debug/deps/r04_t08_tool_matrix-94e01f57d41763de)
+
+running 10 tests
+test a15_gateway_registration_audit_converts_fake_refs ... ok
+test a16_disabled_state_covers_every_route ... ok
+test a15_empty_and_invalid_products_never_register ... ok
+test matrix_future_tools_honest_in_catalog ... ok
+test matrix_tools_x_permission_x_entry_consistency ... ok
+test mcp_mechanism_face_share_cases ... ok
+test native_tool_share_cases_on_the_real_chain ... ok
+test outcome_semantics_and_receipts_unified ... ok
+test terminal_family_share_cases ... ok
+test approval_face_share_cases has been running for over 60 seconds
+test approval_face_share_cases ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 300.56s
+

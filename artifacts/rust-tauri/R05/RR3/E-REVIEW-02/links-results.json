@@ -1,0 +1,509 @@
+{
+  "utc": "2026-10-07T02:00:35.247195+00:00",
+  "mode": "links",
+  "checks": [
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md R05_REPORT.md#rr3-current",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/command.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/E-02/REPORT.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/E-REVIEW-01/REVIEW.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/F46-01/resources-01/f27-resource-series.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/F46-01/resources-01/runtime-binding.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/result.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/f27-resource-series.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/runtime-binding.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/result.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/MANIFEST.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-subagent/command.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-late/command.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_REPORT.md R05_HANDOFF.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md R05_REPORT.md#rr3-current",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md R05_REPORT.md#rr3-current",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_BLOCKERS.md R05_REPORT.md#rr3-current",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_BLOCKERS.md R05_REPORT.md#rr3-current",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md R05_REPORT.md#rr3-current",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md ../../../artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md ../../../rust/crates/lingxi-service/src/workerrpc.rs",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md ../../../rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md R05_HANDOFF.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md R05_HANDOFF.json",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "local MD link docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md R05_REPORT.md#rr3-current",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/gateway/source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-kernel/src/model_exchange.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/credentials/source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-adapters/src/models/credentials.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/context/source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-kernel/src/lib.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/model_turn/source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-kernel/src/model_exchange.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/model_turn/runtime_source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-service/src/runs.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/model_turn/port_source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-kernel/src/ports.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/exchange_and_messages/source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-kernel/src/model_exchange.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/exchange_and_messages/normalizer_source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-service/src/streaming_norm.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/auxiliary/source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-adapters/src/models/auxiliary.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/embedding/source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-service/src/operations.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/embedding/request_source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-adapters/src/models/operations/embedding.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/embedding/normal_sample_source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/usage_query/source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-kernel/src/usage.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/usage_query/storage_source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-adapters/src/storage/run_store.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/usage_query/port_source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-kernel/src/ports.rs"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/error_unknown_cancel_recovery_budget/ordinary_recovery_refs/0",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/error_unknown_cancel_recovery_budget/ordinary_recovery_refs/1",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json"
+    },
+    {
+      "check": "JSON source/evidence path consumer_contract/versions_source",
+      "ok": true,
+      "detail": "rust/crates/lingxi-adapters/src/storage/migrations.rs"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/historical_audit",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/rr2_final",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/rr2_final_review",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/STAGE_REVIEW.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/a2",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/A-02/REPORT.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/a1_review",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/b_review",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/c",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/i10",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/ordinary_cancel",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-subagent/command.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/late_result",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-late/command.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/f46",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/resource_receipt",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/command.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/resource_raw",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/f27-resource-series.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/runtime_binding",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/runtime-binding.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/resource_negative",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/result.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/d",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/d_prepared",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/rr2_b_review",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/rr2_d_review",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/rr2_i",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/rr2_negative",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/rr2_r02_summary",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/rr2_r02_stdout",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/rr2_r02_exclusions",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-binding-exclusions.txt"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/rr2_r02_sinks",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-run-output-sinks.txt"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/a_review",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/a_manifest",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/manifest.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/cf46_review",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/cf46_manifest",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/MANIFEST.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/cf46_result",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/RESULT.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/cf46_resource_receipt",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/command.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/cf46_resource_raw",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/f27-resource-series.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/cf46_analysis",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/RESOURCE_ANALYSIS.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/cf46_runtime_binding",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/runtime-binding.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/cf46_negative",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/result.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/cf46_ordinary_cancel",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-subagent/command.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/cf46_late_result",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-late/command.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/d_review",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/d_manifest",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/evidence-manifest.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/d_current_prepared",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/d_current_object",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/prepared-object.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/d_current_receipt",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/r00-formal-01.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/e_first_fail",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/REVIEW.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/e_first_manifest",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/E-REVIEW-01/manifest.json"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/e_round2",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/E-02/REPORT.md"
+    },
+    {
+      "check": "JSON source/evidence path current/evidence_refs/e_consumption",
+      "ok": true,
+      "detail": "artifacts/rust-tauri/R05/RR3/E-02/manifest-consumption.json"
+    }
+  ],
+  "passed": 100,
+  "failed": 0,
+  "boundary": "independent document/source/evidence assertions; no Cargo tests executed"
+}

@@ -1,0 +1,7 @@
+pid=86500 bind=0.0.0.0:60179 connect=192.168.3.5:60179 listening=true
+phase=connect poll=1 revents=4 remaining_ms=5999
+client connected
+phase=client-write poll=1 revents=4 remaining_ms=5999
+phase=client-write transferred=4 errno=36
+phase=listener-accept poll=0 revents=0 remaining_ms=5999
+PROBE RESULT: blocked-or-error accepted=0

@@ -1,0 +1,12 @@
+{
+  "command": [
+    "bash",
+    "-n",
+    "scripts/rust-tauri/r05_t08_negative_gate.sh"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedAt": "2026-10-07T00:22:53.601193+00:00",
+  "endedAt": "2026-10-07T00:22:53.606172+00:00",
+  "exitCode": 0,
+  "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

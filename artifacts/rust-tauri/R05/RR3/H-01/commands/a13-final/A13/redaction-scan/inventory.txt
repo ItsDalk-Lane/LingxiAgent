@@ -1,0 +1,61 @@
+evidence files:
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/build.log
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/inventory.txt
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-execute-ok.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-execute-ok.headers
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-execute-request.json
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-issue-credential.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-issue-credential.headers
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-issue-request.json
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-me-ok.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-me-ok.headers
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-ticket-request.json
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-ticket.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-ticket.headers
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-me-bad-bearer.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-me-bad-bearer.headers
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-me-no-auth.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-me-no-auth.headers
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-session-cross.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-session-cross.headers
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-session-missing.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-session-missing.headers
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-ws-bad-query.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-ws-bad-query.headers
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-ws-transcript.txt
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p3-burst-1.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p3-burst-2.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p3-burst-3.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p3-burst-4.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p3-burst-5.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p3-burst-6.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p3-burst-7.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p3-burst-8.body
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p3-execute-request.json
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p3-lock.log
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p3-status-codes.txt
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-logs/retention-manifest.txt
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-logs/service-000001.log
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-logs/service-000002.log
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-logs/service-000003.log
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-p1.addr
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-p1.err
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-p1.out
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-p3.addr
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-p3.err
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-p3.out
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-p4.err
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-p4.out
+artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/summary.txt
+retained rotating log files (content sha256):
+6a0d4ff7b03fe9d805e3e6d129020461fbed5a3a92390a262e3cf6c62abcdecc  artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-logs/retention-manifest.txt
+317eb66af5c68c81da2237e96233f4053eda41d3fc37b64a5bc9db20dc3bf7a6  artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-logs/service-000001.log
+83c2255f5866a0f07b56737d8de8eec91e8a6f0be2883ce07eb302dcc535d448  artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-logs/service-000002.log
+fcefd5b1327e98a32f2f88a584ad8f45d7e82614606f24ed4d36de1cefa5e551  artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/service-logs/service-000003.log
+rotated log files in home (at inventory time):
+total 24
+drwx------@  5 study_superior  wheel   160 Oct  7 10:42 .
+drwx------@ 10 study_superior  wheel   320 Oct  7 10:42 ..
+-rw-------@  1 study_superior  wheel  3392 Oct  7 10:41 service-000001.log
+-rw-------@  1 study_superior  wheel  3735 Oct  7 10:42 service-000002.log
+-rw-------@  1 study_superior  wheel   157 Oct  7 10:42 service-000003.log

@@ -1,0 +1,106 @@
+{
+  "counts": {
+    "control-xtask": {
+      "actualCounts": [
+        8,
+        0,
+        0,
+        113
+      ],
+      "logSha256": "3dcf7097f7896e67ef9954eee604d31bb565ed4a2917ee3279529ba01b30fd56",
+      "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/deps/xtask-ad766de8ea03e62c",
+      "binarySha256": "751afe48cb7e4a7dde76c614dc348413078beec0f8d107afc1888aed6ce1d63f",
+      "exitCode": 0
+    },
+    "n03-tamper-pin-count": {
+      "actualCounts": [
+        0,
+        1,
+        0,
+        120
+      ],
+      "logSha256": "b0a8ddae662d1d911c8a28ce652bbfab29921c15565b3d37ea2d54a30f47645a",
+      "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/deps/xtask-ad766de8ea03e62c",
+      "binarySha256": "751afe48cb7e4a7dde76c614dc348413078beec0f8d107afc1888aed6ce1d63f",
+      "exitCode": 101
+    },
+    "n03-restored": {
+      "actualCounts": [
+        1,
+        0,
+        0,
+        120
+      ],
+      "logSha256": "a1e1a4b41be36b8adf2542fe5a653f18eb303d132e02c58a28288e1bf47d8aa7",
+      "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/deps/xtask-ad766de8ea03e62c",
+      "binarySha256": "751afe48cb7e4a7dde76c614dc348413078beec0f8d107afc1888aed6ce1d63f",
+      "exitCode": 0
+    }
+  },
+  "mutation": {
+    "caseId": "R05-GATE-N03",
+    "findingId": "F45",
+    "target": "svc:r05_t01_model_plane",
+    "table": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy/docs/rust-tauri/R05/r05_stage_pins.tsv",
+    "line": 76,
+    "matches": 1,
+    "mutations": 1,
+    "old": 24,
+    "new": 23,
+    "oldRow": "pin svc:r05_t01_model_plane 24 r05_t01_model_plane",
+    "newRow": "pin svc:r05_t01_model_plane 23 r05_t01_model_plane",
+    "beforeSha256": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+    "afterSha256": "42a0c4def01d824a8a9a554228e0ac6d211f032a2020b281353ae35ee6609c2b"
+  },
+  "summary": {
+    "schema": "lingxi.r05-negative-gate.v1",
+    "isolatedCopy": "local git clone (read-only on the source) + uncommitted working-tree overlay under $HOME; the main working tree carries ZERO injections (reset_copy restores every mutated file from the pristine snapshot)",
+    "scope": "N03",
+    "isolatedCopyPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/runner-copy",
+    "expectedCases": [
+      "R05-GATE-N03"
+    ],
+    "unexecutedCases": [
+      "R05-GATE-N01",
+      "R05-GATE-N02",
+      "R05-GATE-N04",
+      "R05-GATE-N05",
+      "R05-GATE-N06",
+      "R05-GATE-N07",
+      "R05-GATE-N08",
+      "R05-GATE-N09",
+      "R05-GATE-N10",
+      "R05-GATE-N11",
+      "R05-GATE-N12",
+      "R05-GATE-N13",
+      "R05-GATE-N14",
+      "R05-GATE-N15",
+      "R05-GATE-N16"
+    ],
+    "controls": [
+      {
+        "name": "xtask-r05-mirror",
+        "exitCode": 0,
+        "expected": 0
+      },
+      {
+        "name": "n03-restored-mirror",
+        "exitCode": 0,
+        "expected": 0
+      }
+    ],
+    "cases": [
+      {
+        "case": "R05-GATE-N03",
+        "exitCode": 101,
+        "gapNamed": "OK",
+        "verdict": "OK",
+        "note": "权威表唯一目标降钉恰一次 → 镜像单测红点名漂移"
+      }
+    ],
+    "allRefused": true,
+    "controlsGreen": true
+  },
+  "inputsRestored": true,
+  "boundary": "真实cargo/原run_n03/reset/write_results函数；不执行clone准备/共享NEG_TARGET/其他15项。完整入口须新G。"
+}

@@ -1,0 +1,40 @@
+{
+  "at": "2026-10-07T04:55:31.273639+00:00",
+  "historical_review_ref": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/history-audit.json",
+  "historical_review_sha256": "336a4302251335aecbeea2c8603005c8ac89235bbbb660ace7a5a44d832e18a8",
+  "historical_checked": 8284,
+  "original_manifest_count": 8284,
+  "differences": [
+    {
+      "path": "dispatch/events.jsonl",
+      "old_manifest": {
+        "sha256": "7d4930232a0ccd5ac27e1db1740b4796c830520b15a2acee52a8531ade44b5df",
+        "bytes": 661457
+      },
+      "current_sha256": "a846b6ea079b7f3defea7d5da2279da99fa7703b18fe2b4ac6bebd3d0faab738",
+      "current_bytes": 665912,
+      "equal": false
+    },
+    {
+      "path": "dispatch/request.json",
+      "old_manifest": {
+        "sha256": "8d3439de6441491213d12a95f4346d4f56c2dc86e3a6bdd190dd3a551d7faab1",
+        "bytes": 801
+      },
+      "current_sha256": "80a96954b1c417686c7ea281f96cc0098eb4158cfc30157135963a951f56866a",
+      "current_bytes": 1282,
+      "equal": false
+    },
+    {
+      "path": "dispatch/stderr.log",
+      "old_manifest": {
+        "sha256": "d03993d320d303ac5fe3ef3cc47b26157c61648efeb5a871a5f3c455da4eac9e",
+        "bytes": 1886
+      },
+      "current_sha256": "12dd9410f3cf1cb5cf901263c7962c014fd9bb1e71b611043a17bb382f32c4fc",
+      "current_bytes": 2070,
+      "equal": false
+    }
+  ],
+  "scope": "Only the three previously recorded dynamic dispatch differences were newly rehashed. The previous independent 8281 unchanged non-dispatch files are a historical statement, not a new complete manifest audit. Original manifest unmodified."
+}

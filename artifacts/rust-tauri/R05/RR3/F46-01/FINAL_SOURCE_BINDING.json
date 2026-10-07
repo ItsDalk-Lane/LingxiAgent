@@ -1,0 +1,325 @@
+{
+  "capturedAt": "2026-10-07T00:48:07.816301+00:00",
+  "role": "IMPLEMENTER SELF_CHECKED only; independent joint C/F46 review pending",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "branch": "codex/rust-tauri-migration",
+  "gitStatus": " M rust/crates/lingxi-service/src/logging.rs\n M rust/crates/lingxi-service/tests/r05_t08_resources.rs\n M rust/crates/xtask/src/candidate.rs\n M rust/crates/xtask/src/candidate/tests.rs\n M rust/crates/xtask/src/main.rs\n M rust/crates/xtask/src/runner_identity.rs\n M rust/crates/xtask/src/verify/runner_tests.rs\n M scripts/rust-tauri/r02_t08_legacy_entry_regression.sh\n M scripts/rust-tauri/r05_t08_negative_gate.sh\n?? artifacts/rust-tauri/R05/RR3/\n?? docs/rust-tauri/R05/repair-current/RR3_A_R2_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_E_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_G_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md\n?? docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json\n?? docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md\n?? docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md\n?? rust/crates/lingxi-service/tests/support/\n?? scripts/rust-tauri/r02_run_output_regression.py\n?? scripts/rust-tauri/r05_t08_mutate_pin.py\n?? scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py\n?? scripts/rust-tauri/run_output_sinks.py\n",
+  "productionChangedPaths": [
+    "rust/crates/lingxi-service/src/logging.rs"
+  ],
+  "loggingSourceSha256": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+  "runtime_input_digest": "32f9fb59d396e3272a4e7c0a6e2810344632ccefd8435d39857cb43ece1c540b",
+  "runtimeInputCount": 322,
+  "trackedWorkingTreeDiffSha256AtCapture": "258e702c9720c3daf75a5f08aa8608e59cd6c6858a0e74481a036f1d17becc00",
+  "candidateFreezeBoundary": "scoped pre/post command inputs + expanded322runtime during/post manifest unchanged; other A/B/E work may change and must be integrated/frozen separately",
+  "commands": {
+    "stage-pin-check-01": {
+      "exitCode": 0,
+      "summaries": [
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 121 filtered out; finished in 0.00s"
+      ],
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "stage_map::tests::r05_stage_",
+        "--",
+        "--nocapture"
+      ],
+      "sha256": "e5cd029eb54cf06d3720ba17d87f2e5845b70a05b925b51056bd58786e209e6f"
+    },
+    "build-after": {
+      "exitCode": 0,
+      "summaries": [],
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--bin",
+        "lingxi-service"
+      ],
+      "sha256": "b5a9e23927508769680fae28396aed5085ccca65331cbd33654b893f4f05eed4"
+    },
+    "reopen-after-command": {
+      "exitCode": 0,
+      "summaries": [],
+      "command": [
+        "python3",
+        "artifacts/rust-tauri/R05/RR3/F46-01/reopen_probe.py",
+        "reopen-after"
+      ],
+      "sha256": "89e600c7decb50a519beb208ad71db15e0626b9e23826586a69fd7a88281c9f1"
+    },
+    "reopen-before-command-02": {
+      "exitCode": 1,
+      "summaries": [],
+      "command": [
+        "python3",
+        "artifacts/rust-tauri/R05/RR3/F46-01/reopen_probe.py",
+        "reopen-before"
+      ],
+      "sha256": "25e20a799d67994d2e919e39e3ecce587955a2d2b836e9e37a5b00c57480da0a"
+    },
+    "sampler-negative-command-01": {
+      "exitCode": 0,
+      "summaries": [],
+      "command": [
+        "python3",
+        "artifacts/rust-tauri/R05/RR3/F46-01/sampler_negative_probe.py"
+      ],
+      "sha256": "f7a40ed80271524856ab7e25b9665a3e4152e7e0b2ab3aabbd5b1b13fcb89a99"
+    },
+    "stage-pin-list-01": {
+      "exitCode": 0,
+      "summaries": [],
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "--list"
+      ],
+      "sha256": "7925782bb456eed13ce7d73315c50f801cf4770489cbb3c0fa92684b067c9073"
+    },
+    "resources-01": {
+      "exitCode": 0,
+      "summaries": [
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 335.40s"
+      ],
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r05_t08_resources",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "sha256": "0f2d2aab36ba252c429ac8bebfa042a69215c552b7e8036f32d1cb1817780af3"
+    },
+    "stage-pin-check-02": {
+      "exitCode": 0,
+      "summaries": [
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 119 filtered out; finished in 0.02s"
+      ],
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "stage_map::map_tests::r05_stage_",
+        "--",
+        "--nocapture"
+      ],
+      "sha256": "0bc1fe964b9e3e3b8a4b66e2cd114d0cd7cc70394287190610ac352ea6c302f9"
+    },
+    "reopen-final-command": {
+      "exitCode": 0,
+      "summaries": [],
+      "command": [
+        "python3",
+        "artifacts/rust-tauri/R05/RR3/F46-01/reopen_probe.py",
+        "reopen-final"
+      ],
+      "sha256": "96855a842c9801f9ba1c1c84b3985b5617ef920368975c76a238602b372b4e4d"
+    },
+    "reopen-before-command": {
+      "exitCode": 1,
+      "summaries": [],
+      "command": [
+        "python3",
+        "artifacts/rust-tauri/R05/RR3/F46-01/reopen_probe.py",
+        "reopen-before"
+      ],
+      "sha256": "799f648020ad032129ec168b513c3da8e3e7ece39b48fa722f5fb27dd44173e7"
+    },
+    "formatting-01": {
+      "exitCode": 0,
+      "summaries": [],
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "fmt",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "sha256": "d328d93b3a5c5d23d058efbcfdbb6defb65ddc4ebb168e1a1e44551d7c98c0ad"
+    },
+    "resources-list-01": {
+      "exitCode": 0,
+      "summaries": [],
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r05_t08_resources",
+        "--",
+        "--list"
+      ],
+      "sha256": "00c213584efa8c706674426d40ee4667fd4e22c9df1205a985785ad7306afa89"
+    },
+    "error-explicit-command-01": {
+      "exitCode": 0,
+      "summaries": [],
+      "command": [
+        "python3",
+        "artifacts/rust-tauri/R05/RR3/F46-01/error_probe.py"
+      ],
+      "sha256": "f7058dc8b88d2e91809d87ca39dae9de2fd9be61a68249966a9ed7f04ac474a2"
+    },
+    "service-lib-list-01": {
+      "exitCode": 0,
+      "summaries": [],
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--lib",
+        "--",
+        "--list"
+      ],
+      "sha256": "1d7db42d64fae2da724ef0f004c874dfe105b8bcaef7ae80992d3a5488dba79e"
+    },
+    "build-before": {
+      "exitCode": 0,
+      "summaries": [],
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--bin",
+        "lingxi-service"
+      ],
+      "sha256": "3777eb9e3739f4428beb02f95df0684c0b04a9237d0133c2a746fe37a8ede7c3"
+    },
+    "logging-tests-final": {
+      "exitCode": 0,
+      "summaries": [
+        "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 349 filtered out; finished in 0.11s"
+      ],
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--lib",
+        "logging::tests",
+        "--",
+        "--nocapture"
+      ],
+      "sha256": "fb9d860f173b94526f56be644ce6b885007e2b7e10a79cf2ebec4cc78f693f32"
+    },
+    "clippy-01": {
+      "exitCode": 0,
+      "summaries": [],
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "clippy",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--lib",
+        "--test",
+        "r05_t08_resources",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "sha256": "21f0b97e2f38d68a7c8da7378fbcf3daf1b6656431f42d65b0886d6fcfdce672"
+    },
+    "logging-tests-01": {
+      "exitCode": 0,
+      "summaries": [
+        "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 349 filtered out; finished in 0.13s"
+      ],
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--lib",
+        "logging::tests",
+        "--",
+        "--nocapture"
+      ],
+      "sha256": "b469a5cb0a49db462b859a88aad14e33181a91ba89b13650071836e203175f59"
+    }
+  },
+  "invalidRecords": {
+    "reopen-before-command": "INVALID harness path construction failed before binary start; preserved; replaced by reopen-before-command-02 actual six-cycle target red",
+    "stage-pin-check-01": "INVALID zero tests due mistaken module filter; exit0 not evidence of pass; replaced by listed actual module stage-pin-check-02"
+  },
+  "pinCompatibility": {
+    "resourceActualNames": [
+      "f27_sampler_controls_detect_growth_release_and_failure",
+      "f27_sustained_cancel_error_worker_load_stays_bounded"
+    ],
+    "resourceExpectedCount": 2,
+    "loggingActualNames": [
+      "logging::tests::log_files_are_owner_only",
+      "logging::tests::opening_at_the_file_limit_prunes_the_oldest_and_preserves_newer_contents",
+      "logging::tests::prune_keeps_only_max_files",
+      "logging::tests::reopened_sequence_continues_and_never_truncates_old_files",
+      "logging::tests::repeated_open_without_writes_is_bounded_from_the_new_directory",
+      "logging::tests::rotation_config_validation_is_loud",
+      "logging::tests::rotation_respects_max_bytes_and_files_are_complete_lines",
+      "logging::tests::router_redacts_lines_and_fans_out_to_file",
+      "logging::tests::startup_prune_and_rotation_open_failures_are_returned"
+    ],
+    "registeredIntegrationSuites": 27,
+    "registeredLibPins": 64,
+    "libPinsEachExact": true,
+    "loggingRegisteredPin": false,
+    "mirrorRun": "stage-pin-check-02 2/2",
+    "requiredCidCount": 103,
+    "newInlineTestCount": 3,
+    "pinOrCidChangeRequired": false
+  },
+  "ownedSourceBeforeSha256": "5f0aa8ccabc62295d64ff0ca6b61a5fc9a384e6a4bdd6e092d70a15ab73b6be1",
+  "binaryOldSha256": "9628ba09d14e66ab9ba7824b4f3afeb1844e568ae1d66b88f95a57a8a02d119b",
+  "binaryFinalSha256": "b180d47abeeecef4e6d677b9501fde0828cd4061f74276d8e5e2a2a9afb33d81",
+  "sourceDiffSha256": "856cf23d3a6302c59bf8e65220d0ccd0fae7a8a2b28aa8c754a48885e2918bc9"
+}

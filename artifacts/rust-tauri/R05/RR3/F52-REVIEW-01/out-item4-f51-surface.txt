@@ -1,0 +1,8 @@
+F51 receipt entries: 56
+destination root entries now: 57
+destination = exactly F51-56 + F52-1: OK
+post-F52-start writes in destination (excl new entry, excl root): 0
+RELOCATED-F51.json markers: 41
+all 41 F51 markers older than F52 start: OK
+RELOCATED-F52.json markers: 1 -> ['/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/RELOCATED-F52.json']
+RESULT: PASS

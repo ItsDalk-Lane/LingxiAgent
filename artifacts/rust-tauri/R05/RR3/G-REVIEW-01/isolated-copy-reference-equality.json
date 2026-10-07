@@ -1,0 +1,24 @@
+{
+  "utc": "2026-10-07T02:43:31.529844+00:00",
+  "inputs": [
+    {
+      "label": "A19",
+      "count": 19,
+      "changes": [],
+      "equal": true
+    },
+    {
+      "label": "C321",
+      "count": 321,
+      "changes": [],
+      "equal": true
+    },
+    {
+      "label": "B4",
+      "count": 4,
+      "changes": [],
+      "equal": true
+    }
+  ],
+  "boundary": "只旧冻结隔离输入；当前main B/C已变，不能签新候选"
+}

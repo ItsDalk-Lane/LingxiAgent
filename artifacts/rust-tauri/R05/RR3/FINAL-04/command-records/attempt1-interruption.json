@@ -1,0 +1,18 @@
+{
+  "attempt": 1,
+  "label": "cmd-06-verify-stage-R05-attempt1",
+  "evidenceRoot": "artifacts/rust-tauri/R05/RR3/FINAL-04/verify-R05 (renamed after kill to FINAL-04/verify-R05-ATTEMPT1-INTERRUPTED)",
+  "launch_utc": "2026-10-07T20:13:41Z",
+  "launch_mode": "python subprocess Popen start_new_session=True via run-cmd-style launcher (exec_52c7de56)",
+  "killed_utc_approx": "2026-10-07T21:23:31Z",
+  "kill_evidence": "host task notification 'stopped' for exec_52c7de56; xtask pid 38381 gone at 21:23:33Z check; no cargo/xtask/r00/rustc processes remained",
+  "lesson": "start_new_session detached the gate from the launcher's session/process group, but the host cleaned up the entire descendant process TREE, killing the session-leader xtask anyway (one level deeper than FINAL-03 attempt-1 which had no detachment at all)",
+  "gate_progress_at_kill": "R05 layer complete (workspace 115 suites + suites + fmt/clippy/contracts/boundaries); R04 layer complete except nested R03; R03 nested layer rust_test_workspace in progress (~85/115 suites ok in its stdout at last sample 21:23:25Z); no verify-stage-result.json produced anywhere",
+  "gate_verdict": "UNKNOWN (no layer result JSON; not a gate FAIL)",
+  "files_preserved": 192,
+  "sha_manifest": "/private/tmp/rr3-final04-dir/attempt1-partial-manifest-sha256.txt (archived copy in command-records/)",
+  "stdout_capture": "cmd-06-verify-stage-R05.stdout (external; xtask progress goes to per-command evidence logs, launcher stdout file remains as captured)",
+  "stderr_capture": "cmd-06-verify-stage-R05.stderr (cargo run build+launch lines only, 188 bytes)",
+  "disposition": "same-volume rename verbatim to verify-R05-ATTEMPT1-INTERRUPTED, freeing the mandated evidence root path for attempt-2, per FINAL-03 attempt-1 precedent",
+  "attempt2_launch_mode": "double-fork daemonize (orphaned to launchd, no ancestry link to host session; exit code recorded to external file by wrapper shell)"
+}

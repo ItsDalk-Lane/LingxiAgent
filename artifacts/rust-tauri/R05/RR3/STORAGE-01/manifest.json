@@ -1,0 +1,45 @@
+{
+  "createdAtUTC": "2026-10-07T03:13:39.672398+00:00",
+  "files": {
+    "before.json": {
+      "sha256": "30156e58e5fbc187138081d2cffa3e803616972b75cb7c9457088f1a3eb6fd9d",
+      "bytes": 3600586
+    },
+    "deleted-files.jsonl": {
+      "sha256": "4733071d700297ff108f34fde1603ac260a4bf30309461ec1aa32df1c9cc6e79",
+      "bytes": 1610074
+    },
+    "deleted-summary.json": {
+      "sha256": "ce087f4fdb28ae837e5cf2e9bfa4946bf3cc5acb3f4c52c6d8f44b41a37360a0",
+      "bytes": 371
+    },
+    "REPORT.md": {
+      "sha256": "7bd7e4121cf22e46264b51e0279e9d402bad48f086e3b16f0fa59d325bee8f8f",
+      "bytes": 4514
+    },
+    "pre-delete-checks.json": {
+      "sha256": "0fa30a9e4176c99f2675330540428cc2f9c3de05393920925ad86ac3b598ade7",
+      "bytes": 175183
+    },
+    "cleanup.py": {
+      "sha256": "3bddfdc36ecb74a03a46d521e74a4f9ea3566a5b047023fccdc19cfa31a33de6",
+      "bytes": 4046
+    },
+    "after.json": {
+      "sha256": "91e247bbee569bffde8ddada02465723308487556266369a12440c8bc1c72b2f",
+      "bytes": 1314
+    },
+    "preserved-after.json": {
+      "sha256": "a1b192f3179aa8f6276d2db930aed71acc5b1f723468f61d19608dad9d644a37",
+      "bytes": 1654331
+    },
+    "prepare.py": {
+      "sha256": "cac9c9c40d2dea3dc05c26e03f1aa924d3e93f0e4c335c0d418163c73c6740dc",
+      "bytes": 4676
+    },
+    "readonly-candidates.json": {
+      "sha256": "3ef40012555c5fc5676b0edc087d289cd5dee7e8fa0067de4e4d288071e586bb",
+      "bytes": 1080
+    }
+  }
+}

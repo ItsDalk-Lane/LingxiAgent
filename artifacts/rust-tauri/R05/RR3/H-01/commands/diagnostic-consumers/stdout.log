@@ -1,0 +1,5 @@
+scripts/rust-tauri/r02_t03_auth_matrix.sh:820:MARKERS="$(grep -c "LINGXI_AUTH_REJECTED\|LINGXI_TRANSPORT_REJECTED" "$EVIDENCE_DIR/server-stderr.log" || true)"
+scripts/rust-tauri/r02_t07_redaction_scan.sh:715:#    service's captured stderr marker line (LINGXI_AUTH_REJECTED).
+scripts/rust-tauri/r02_t07_redaction_scan.sh:720:    request_id in line and "LINGXI_AUTH_REJECTED" in line
+scripts/rust-tauri/r02_t07_redaction_scan.sh:724:assert found, f"requestId {request_id} from the error body not found in an auth marker line"
+scripts/rust-tauri/r02_t07_redaction_scan.sh:740:print(f"CORRELATION PASS: requestId {request_id} present in marker line; "

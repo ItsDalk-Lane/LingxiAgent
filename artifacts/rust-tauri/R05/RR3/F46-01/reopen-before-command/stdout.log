@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/F46-01/reopen_probe.py", line 3, in <module>
+    ev=root/"artifacts/rust-tauri/R05/RR3/F46-01/"+sys.argv[1]+""
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~
+TypeError: unsupported operand type(s) for +: 'PosixPath' and 'str'

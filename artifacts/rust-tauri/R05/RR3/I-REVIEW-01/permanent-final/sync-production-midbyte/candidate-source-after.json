@@ -1,0 +1,2094 @@
+{
+  "digestSha256": "9f06771f29fe0e0b7b97a89ce708cf006069b00291194006e1f694c0efe75301",
+  "entries": [
+    {
+      "display": ".gitignore",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "2e67697469676e6f7265",
+      "sha256": "8103e799eb2756a25459d1f2e6fa4f913f67b766668aa9b5770594543815cffd"
+    },
+    {
+      "display": "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "646f63732f727573742d74617572692f5230302f414343455054414e43455f4d41502e6a736f6e",
+      "sha256": "96f70219d1df88249e8df073f4dfe211f8562cef20f7e45b1c03064feb5362be"
+    },
+    {
+      "display": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "646f63732f727573742d74617572692f5230302f464541545552455f53544147455f414343455054414e43452e6a736f6e",
+      "sha256": "699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9"
+    },
+    {
+      "display": "docs/rust-tauri/R05/r05_stage_pins.tsv",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "646f63732f727573742d74617572692f5230352f7230355f73746167655f70696e732e747376",
+      "sha256": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5"
+    },
+    {
+      "display": "rust-toolchain.toml",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742d746f6f6c636861696e2e746f6d6c",
+      "sha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37"
+    },
+    {
+      "display": "rust/Cargo.lock",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f436172676f2e6c6f636b",
+      "sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3"
+    },
+    {
+      "display": "rust/Cargo.toml",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f436172676f2e746f6d6c",
+      "sha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/Cargo.toml",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f436172676f2e746f6d6c",
+      "sha256": "f7252fdd642075333d050340c3d2b4687d936c92a3ac07c6e2019fd8c71f5c61"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/bin/lingxi-storage-inspect.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f62696e2f6c696e6778692d73746f726167652d696e73706563742e7273",
+      "sha256": "ce38f8f7442142e14567331270a70901662fd32da0fae311d19536fdf78756d1"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/lib.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6c69622e7273",
+      "sha256": "b7abdb77d7a3bbf8ed5caac833ae9322804591bb4696c0e5a53d2a2e146559f7"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/anthropic_messages.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f616e7468726f7069635f6d657373616765732e7273",
+      "sha256": "abca1b0fb608c74be9fb5da690a2843891a58cff1a744f0bf2523b3cc38fa59d"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/auxiliary.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f617578696c696172792e7273",
+      "sha256": "504cc229598a737f260eb09b308b052aa9c9d196acaa471a8fd21281cdc46c04"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/batch_admission.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f62617463685f61646d697373696f6e2e7273",
+      "sha256": "d6944a71609ac765625c7b549f5508d9a0e4bdeb7197eb8a234e977f612320e6"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/compat.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f636f6d7061742e7273",
+      "sha256": "be1229f65e2e462ad37ddccc6cbaee08d49e12dcd6144fc1c8a763822e3a25ca"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/config.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f636f6e6669672e7273",
+      "sha256": "09f5f6533911cb76dbbe8a77844fdebd816fbe5b1006fd92a077b75ede91e144"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/credentials.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f63726564656e7469616c732e7273",
+      "sha256": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/dispatch.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f64697370617463682e7273",
+      "sha256": "877badc332ed687c59f183e0fe2097d4f19daef37858b3d61889791bcc74fef1"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/egress.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6567726573732e7273",
+      "sha256": "209ddd869203fdf198970353a2832b1765b7b02fb01b1394cf91be4cbee67c67"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/gateway.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f676174657761792e7273",
+      "sha256": "23e97214cc66a75fca73e957a3a19b5bf2142c72ea6448db827f32c8ab8c5deb"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/google_generative_ai.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f676f6f676c655f67656e657261746976655f61692e7273",
+      "sha256": "494e92ed53b58754f05ad763b8cb7d66cca8a2768029cb14e517efbfb23e18cc"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/mod.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6d6f642e7273",
+      "sha256": "6ca2aa31b3bc52b4f2d4a471edc0ac19eca41159b883c74a1ecbcbb754aec400"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/network.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6e6574776f726b2e7273",
+      "sha256": "38eb8d28653957bb2eddfe1bfeb2df45bffd663514399b078cec2652c6d9ace5"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/oauth.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6f617574682e7273",
+      "sha256": "df4a8db93d629c20826c9316114e03eaa615d1c9286b61a1cadf34fb15fa047a"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/openai_codex_responses.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6f70656e61695f636f6465785f726573706f6e7365732e7273",
+      "sha256": "89ce79f6b73f18f1e77ebb8bd299eb5478cadad33f76d03192bdfea650751b4c"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6f70656e61695f636f6d706c6574696f6e732e7273",
+      "sha256": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/openai_responses.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6f70656e61695f726573706f6e7365732e7273",
+      "sha256": "2bedaf6c8d437eebc9937e0868d93db554094c48db7fbf579294498b9ecf8880"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/operations/embedding.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6f7065726174696f6e732f656d62656464696e672e7273",
+      "sha256": "b410cfe1bddcad6ba82506ff0cda702741bab7588f13d2c6ab9c86cbcb613e47"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/operations/image.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6f7065726174696f6e732f696d6167652e7273",
+      "sha256": "dc6c426b1a9ef7de4219c711922f5f47669b0c0ee3e998943f045d4350d60ae6"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/operations/mod.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6f7065726174696f6e732f6d6f642e7273",
+      "sha256": "2cc0e91acbb8a189959c1013afafe9d4bfc09fbd101258b07b39b16bec248320"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/operations/rerank.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6f7065726174696f6e732f726572616e6b2e7273",
+      "sha256": "551c6b2029dcd5069bd01eb48428275f90000540e14e81a9c064c28ba5859f57"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/operations/speech.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6f7065726174696f6e732f7370656563682e7273",
+      "sha256": "5265559b851dcf965879a2c7ae9be73b7d4ee2691550b804ef705b89c3bbcf29"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/operations/tiers.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6f7065726174696f6e732f74696572732e7273",
+      "sha256": "2571a2a1879b72c249678d3d44923e4c84c7f76c5a08b7cc854ff0a2b33b4e21"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/operations/transcribe.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6f7065726174696f6e732f7472616e7363726962652e7273",
+      "sha256": "96fea443459a93bacbda54b3ca976522133db269b4917afba7de772951735aba"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/operations/video.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f6f7065726174696f6e732f766964656f2e7273",
+      "sha256": "f4940723e287b031a527d980809de0c08763658545e4936fee9e252b7c505e31"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/provider.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f70726f76696465722e7273",
+      "sha256": "c31ac88b7d4dd5d391928c222dc543d4cf8e506c2b1b4216e58221b69ea3e657"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/streaming.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f73747265616d696e672e7273",
+      "sha256": "8b17798d3239d6243f399dae25830aaddc0da4877d04680ef3d35d3427efaa76"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/tool_render.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f746f6f6c5f72656e6465722e7273",
+      "sha256": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/models/usage.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f6d6f64656c732f75736167652e7273",
+      "sha256": "0a6a1340f0160206ed65e555a941fbfee67d9ff26e352e08a8cf58019184230a"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/storage/backup.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f73746f726167652f6261636b75702e7273",
+      "sha256": "7c0b4e696d3cdac3811d788e9c3e1234d3f370c11657dfb9a510e0ef423f2d51"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/storage/migrations.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f73746f726167652f6d6967726174696f6e732e7273",
+      "sha256": "df9519611c4020c5eed3acccedc92287feeb9f6b0af477ee69e1317ef089859d"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/storage/mod.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f73746f726167652f6d6f642e7273",
+      "sha256": "9dbca03fe05bddd352dddc3588601afe8682d4b825c74af128b4768b45939a92"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/storage/queue.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f73746f726167652f71756575652e7273",
+      "sha256": "705b588721103bb4a97ff66ac0eef43d1dc57ba1b2b9156692c05518107fd24c"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f73746f726167652f72756e5f73746f72652e7273",
+      "sha256": "542973c1a89e0b458b0bacd73bb594934d4a97369bc2785d7c4723caaad06496"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/src/storage/windows_acl.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f7372632f73746f726167652f77696e646f77735f61636c2e7273",
+      "sha256": "96b06d6bcdbefb4c97ce2d8ab670f37af794dc1dd4d1d85a4d97a26940f33479"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/active_run_listing.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f6163746976655f72756e5f6c697374696e672e7273",
+      "sha256": "598225daad3623a5fb685b533057ee7f136e6e1445e04c4969a4f22194aa436f"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/backup_faults.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f6261636b75705f6661756c74732e7273",
+      "sha256": "df1f9821437122f2d0f0b74470b2d75d5f45424b6901a6a1e76792fb1705c0ad"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/backup_restore.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f6261636b75705f726573746f72652e7273",
+      "sha256": "81c7ec221bd7840194d26a64ead2e0204684778deb30bb825719a547dd5fb198"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/disk_full_fault.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f6469736b5f66756c6c5f6661756c742e7273",
+      "sha256": "6b3baaee4f77138c51a3645a4a8ea05c1db3905801960f999bac7b65a2c09f6a"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/event_store_reads.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f6576656e745f73746f72655f72656164732e7273",
+      "sha256": "5d6d551d274a2f72335a40dc7ba3b89a7e45d510d82f28e396a8e3402d5931a2"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/agnes__strips-thinking-fields-and-blocks.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f61676e65735f5f7374726970732d7468696e6b696e672d6669656c64732d616e642d626c6f636b732e6a736f6e",
+      "sha256": "7d871f32669d169a2fdb3ced8ee74b68c3069a5f1df020b1bb8ac0af90915032"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/anthropic__cache-control-marks-system-and-two-recent-users.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f616e7468726f7069635f5f63616368652d636f6e74726f6c2d6d61726b732d73797374656d2d616e642d74776f2d726563656e742d75736572732e6a736f6e",
+      "sha256": "526486ed3bd505fdd3be1999121bde940952556543bc47e02a524e280560da05"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/anthropic__max-effort-raises-the-implicit-one-third-cap.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f616e7468726f7069635f5f6d61782d6566666f72742d7261697365732d7468652d696d706c696369742d6f6e652d74686972642d6361702e6a736f6e",
+      "sha256": "27ce5cae96f803b286d000ba62ee4c8d318f408ccec017889e601f49e57375e7"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/anthropic__user-sourced-budget-vetoes-the-raise.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f616e7468726f7069635f5f757365722d736f75726365642d6275646765742d7665746f65732d7468652d72616973652e6a736f6e",
+      "sha256": "0f90669e211fae4b54152afd9e9821d9a457401b99959d9628fa650b88bdf502"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/anthropic__utility-mode-disables-thinking.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f616e7468726f7069635f5f7574696c6974792d6d6f64652d64697361626c65732d7468696e6b696e672e6a736f6e",
+      "sha256": "ada314edd0a47d9f62a9ea9a913e8451528ff04dcd943737eb38ef514dac35e0"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/codex-responses__clean-payload-passes-through.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f636f6465782d726573706f6e7365735f5f636c65616e2d7061796c6f61642d7061737365732d7468726f7567682e6a736f6e",
+      "sha256": "be8ae6185d41b59e944f58838512b890a8197643b73e848e6bf817d47f91dfef"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/codex-responses__strips-budget-and-temperature.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f636f6465782d726573706f6e7365735f5f7374726970732d6275646765742d616e642d74656d70657261747572652e6a736f6e",
+      "sha256": "5186ae3597066bd7e853b6ff910bf5b7ac606780f6894fbc1ac9743c28141abc"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/deepseek-responses__clean-payload-passes-through.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f646565707365656b2d726573706f6e7365735f5f636c65616e2d7061796c6f61642d7061737365732d7468726f7567682e6a736f6e",
+      "sha256": "7c01eb9b644e85410b404e81c531f10ca4a264e99b52e72f4f6b26f3c68a2afc"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/deepseek-responses__disable-level-forces-none-effort.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f646565707365656b2d726573706f6e7365735f5f64697361626c652d6c6576656c2d666f726365732d6e6f6e652d6566666f72742e6a736f6e",
+      "sha256": "9a2fecef240bd6d7b4be34742f465e39e5c9ca907653ee617cb2fd49f17a8722"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/deepseek-responses__effort-minimal-translates-low.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f646565707365656b2d726573706f6e7365735f5f6566666f72742d6d696e696d616c2d7472616e736c617465732d6c6f772e6a736f6e",
+      "sha256": "0db96001b2fcf82634a42d5653d310e979d05c84a416af14f7da678df8427c37"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/deepseek-responses__missing-budget-fills-default.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f646565707365656b2d726573706f6e7365735f5f6d697373696e672d6275646765742d66696c6c732d64656661756c742e6a736f6e",
+      "sha256": "a82adc6a57fb4062e13d05ac58d04e2633a3bc8da074b6d0f32a7d295b670677"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/deepseek__anthropic-profile-effort-and-budget.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f646565707365656b5f5f616e7468726f7069632d70726f66696c652d6566666f72742d616e642d6275646765742e6a736f6e",
+      "sha256": "c118f4fc76a6e9840ab60c96b9dfe5144abb18d004af514263ef8c90205fa591"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/deepseek__level-enables-and-keeps-budget.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f646565707365656b5f5f6c6576656c2d656e61626c65732d616e642d6b656570732d6275646765742e6a736f6e",
+      "sha256": "2e3be25a01b5022bacda2f30e61e7470f6defabb17e863b8dde02db86c511e61"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/deepseek__max-completion-tokens-renames.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f646565707365656b5f5f6d61782d636f6d706c6574696f6e2d746f6b656e732d72656e616d65732e6a736f6e",
+      "sha256": "e06e16a171c083487ff4f39d4f6ccc9a45a00208647385f7ba17093ddd6c2b98"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/deepseek__missing-budget-fills-default.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f646565707365656b5f5f6d697373696e672d6275646765742d66696c6c732d64656661756c742e6a736f6e",
+      "sha256": "45339e4c908f1e61cd116eb5bef97d2c5a78f30e6bc971c60b6fe26687a7caa4"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/deepseek__off-level-disables-and-strips.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f646565707365656b5f5f6f66662d6c6576656c2d64697361626c65732d616e642d7374726970732e6a736f6e",
+      "sha256": "c05881188f1a30cd835f2f349d62c5a5138a225111a62aa5692341248ae7d005"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/deepseek__utility-mode-disables.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f646565707365656b5f5f7574696c6974792d6d6f64652d64697361626c65732e6a736f6e",
+      "sha256": "9432d0a06fd5f6dbe3fa70f570b8a2dd03d4946e43ff14173adeea878b1f3922"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/kimi__k3-omits-temperature.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6b696d695f5f6b332d6f6d6974732d74656d70657261747572652e6a736f6e",
+      "sha256": "3d93d6d4968c6d0111861e976625c4a08711446588b81135cdc4a6e24e01390f"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/kimi__level-enables-with-keep-all.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6b696d695f5f6c6576656c2d656e61626c65732d776974682d6b6565702d616c6c2e6a736f6e",
+      "sha256": "fa891ee38eb1d4a67eb2bbec19496836c3abe8fdf6424354a86b1f371afaeb2d"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/kimi__max-tokens-renames-and-keep-preserved.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6b696d695f5f6d61782d746f6b656e732d72656e616d65732d616e642d6b6565702d7072657365727665642e6a736f6e",
+      "sha256": "f640098789d2fca9b03e366b723a9d557663fb5296b7230d0f2a5323ffc87725"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/kimi__mfjs-root-anyof-folds-into-description.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6b696d695f5f6d666a732d726f6f742d616e796f662d666f6c64732d696e746f2d6465736372697074696f6e2e6a736f6e",
+      "sha256": "f5cd6d81e7be3b1f26b5ddea0a2eab9b7a981d4b41b1151757a2e86921701064"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/kimi__off-level-disables-and-strips.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6b696d695f5f6f66662d6c6576656c2d64697361626c65732d616e642d7374726970732e6a736f6e",
+      "sha256": "14b5b9204c378947e9a7cd51781c41762b32826132bb3d4faf3025da6be5e9eb"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/kimi__thinking-level-map-overrides-the-default-vocabulary.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6b696d695f5f7468696e6b696e672d6c6576656c2d6d61702d6f76657272696465732d7468652d64656661756c742d766f636162756c6172792e6a736f6e",
+      "sha256": "f0bb0c3bc68128ff9e71ac904c89a790ce64fdc27783e32cd06bd35465660990"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/kimi__utility-mode-pins-temperature-and-disables.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6b696d695f5f7574696c6974792d6d6f64652d70696e732d74656d70657261747572652d616e642d64697361626c65732e6a736f6e",
+      "sha256": "73bdec7265e7d4b9153d50f3cf021d07d58ab87ff6774cbeaa45b3423852dce7"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/mimo__declared-reasoning-enables-kwargs.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6d696d6f5f5f6465636c617265642d726561736f6e696e672d656e61626c65732d6b77617267732e6a736f6e",
+      "sha256": "13a9f1615aca46e1a0cddec933d927275be3400980e92c2757bae89f914a8606"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/mimo__no-thinking-signals-pass-through.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6d696d6f5f5f6e6f2d7468696e6b696e672d7369676e616c732d706173732d7468726f7567682e6a736f6e",
+      "sha256": "40ec5906f8dc49cc5db5b4cc0d0b56f91ac977c80b09c6219395b58ceda74a2b"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/mimo__off-level-disables-and-strips.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6d696d6f5f5f6f66662d6c6576656c2d64697361626c65732d616e642d7374726970732e6a736f6e",
+      "sha256": "dc8ee5d6e0da8344f0eb23a1931bdfa646e0b1680cf142ad0ad5bb99437621bb"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/mimo__utility-mode-disables.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6d696d6f5f5f7574696c6974792d6d6f64652d64697361626c65732e6a736f6e",
+      "sha256": "45570da8e4493a79acf83b9f6355357fe7378fe350ed010ccad15ece8bb27cc2"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/none__unknown-provider-passes-through-unmatched.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6e6f6e655f5f756e6b6e6f776e2d70726f76696465722d7061737365732d7468726f7567682d756e6d6174636865642e6a736f6e",
+      "sha256": "9cf8d670b53a12b42517c85ebae3c08c01a5d56c6b6e042eb003c4a932506fbd"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/ollama__num-ctx-bridge-merges-options.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6f6c6c616d615f5f6e756d2d6374782d6272696467652d6d65726765732d6f7074696f6e732e6a736f6e",
+      "sha256": "98723fd6f19954ff02230f6017117dccf023b265170bbfbaceb1c2a087bfbb2f"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/ollama__oversized-context-window-skips-num-ctx.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6f6c6c616d615f5f6f76657273697a65642d636f6e746578742d77696e646f772d736b6970732d6e756d2d6374782e6a736f6e",
+      "sha256": "834f7494fc5ac99dbe83c5dd05ff7213dfe69bc38adcd54c5b715e41756a90cc"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/ollama__response-format-bridge.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6f6c6c616d615f5f726573706f6e73652d666f726d61742d6272696467652e6a736f6e",
+      "sha256": "485f98bf016bd3551202357ba118ad81ae1ff401badebd81a6006e90b62af9af"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/openrouter__adaptive-verbosity-defaults-high.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6f70656e726f757465725f5f61646170746976652d766572626f736974792d64656661756c74732d686967682e6a736f6e",
+      "sha256": "feced10be230cba8dd0c5c36b1ce9893fde72c6375d5b4db3cfe84b561f67cd5"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/openrouter__disable-level-refuses-loudly.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6f70656e726f757465725f5f64697361626c652d6c6576656c2d726566757365732d6c6f75646c792e6a736f6e",
+      "sha256": "2b230dc8dfaca5ac4f71da80e4afdee51b02bbaafd2148f18ed982ad2a1bb57a"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/openrouter__low-level-maps-low-and-reasoning-is-normalized.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f6f70656e726f757465725f5f6c6f772d6c6576656c2d6d6170732d6c6f772d616e642d726561736f6e696e672d69732d6e6f726d616c697a65642e6a736f6e",
+      "sha256": "3100c6fa224c5a9fa79d71a393a8874ffe59f8d00a079251a796eb41a3ba5459"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/qwen__chat-level-passes-through.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f7177656e5f5f636861742d6c6576656c2d7061737365732d7468726f7567682e6a736f6e",
+      "sha256": "614c6365e9bdcc5dbb01cb4ec54bc73e87424d6592426acfc4db10a91a701873"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/qwen__dashscope-video-route-matches-without-quirks.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f7177656e5f5f6461736873636f70652d766964656f2d726f7574652d6d6174636865732d776974686f75742d717569726b732e6a736f6e",
+      "sha256": "dfeed1f43a5ab6eee029c77ab0d7f9ad36e06ba8ee1359f378274efa9acb3fbe"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/qwen__off-level-forces-enable-thinking-false.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f7177656e5f5f6f66662d6c6576656c2d666f726365732d656e61626c652d7468696e6b696e672d66616c73652e6a736f6e",
+      "sha256": "a99d7dad7a909f3049124aee77aa993ade71d652165334f4fa361c9dc78d40ed"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/qwen__utility-mode-adds-the-switch.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f7177656e5f5f7574696c6974792d6d6f64652d616464732d7468652d7377697463682e6a736f6e",
+      "sha256": "410074719dde578e7c9cc5ee7efad76fbedded1f341a16a674084a36f15819fc"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/volcengine__auto-level-maps-medium.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f766f6c63656e67696e655f5f6175746f2d6c6576656c2d6d6170732d6d656469756d2e6a736f6e",
+      "sha256": "d517f3609df5520dce8d318637a5a9c0b93f365829c14fcc2c1751582613c76c"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/volcengine__existing-effort-remapped-into-vocabulary.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f766f6c63656e67696e655f5f6578697374696e672d6566666f72742d72656d61707065642d696e746f2d766f636162756c6172792e6a736f6e",
+      "sha256": "b16498592d905430d9203981344b6e093cf9aba6065573de3e5e2028d86087a3"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/volcengine__level-enables-with-mapped-effort.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f766f6c63656e67696e655f5f6c6576656c2d656e61626c65732d776974682d6d61707065642d6566666f72742e6a736f6e",
+      "sha256": "f35fe86f2d3f1dea2e3f643a248eea484164ab05db8d2d82d3e677fd8d121bb0"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/volcengine__off-level-disables-and-strips.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f766f6c63656e67696e655f5f6f66662d6c6576656c2d64697361626c65732d616e642d7374726970732e6a736f6e",
+      "sha256": "bb75cf2e0c9d10c53262a74deac8311c41dd7e7886ff77e88fca4db003701599"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/zhipu__clear-replay-policy-round-trips.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f7a686970755f5f636c6561722d7265706c61792d706f6c6963792d726f756e642d74726970732e6a736f6e",
+      "sha256": "43b42a4cfda87e65bb2a52d158ef03a4763f35e11049a97ebc5bea383dd60760"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/zhipu__declared-reasoning-enables-and-strips-store.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f7a686970755f5f6465636c617265642d726561736f6e696e672d656e61626c65732d616e642d7374726970732d73746f72652e6a736f6e",
+      "sha256": "6ed4e58de427fca49972269219af0f1f92770663dab83e033e48d9a27b0c6449"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/zhipu__off-level-disables-and-strips.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f7a686970755f5f6f66662d6c6576656c2d64697361626c65732d616e642d7374726970732e6a736f6e",
+      "sha256": "e8abb53ba5b80447cf0cd325b5ffaac721c8633253d78bea531c1c7133862d32"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/zhipu__opencode-go-never-emits-clear-thinking.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f7a686970755f5f6f70656e636f64652d676f2d6e657665722d656d6974732d636c6561722d7468696e6b696e672e6a736f6e",
+      "sha256": "b89d34f10f8f9922e856d6e3d6ae69d28dcb8d7bdda85230efe08d3a605276dd"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/zhipu__preserve-marks-clear-false-with-tool-history.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f7a686970755f5f70726573657276652d6d61726b732d636c6561722d66616c73652d776974682d746f6f6c2d686973746f72792e6a736f6e",
+      "sha256": "2889b3d31044454b79978ff6396fd658e16e5ead0979584fe93fdfcabe55800f"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden-compat/zhipu__tools-strict-stripped-and-max-tokens-renamed.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2d636f6d7061742f7a686970755f5f746f6f6c732d7374726963742d73747269707065642d616e642d6d61782d746f6b656e732d72656e616d65642e6a736f6e",
+      "sha256": "4d82b5e6f0442ecda355f6bbfce6591620037c242f8a0ceee3708122f9edcdf5"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/anthropic-messages/error.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f616e7468726f7069632d6d657373616765732f6572726f722e6a736f6e",
+      "sha256": "3f5d4a98bcc1d7fa2617af74d7bd9c34dfc8e5d26f26766a8a839123bf5d2363"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/anthropic-messages/forward.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f616e7468726f7069632d6d657373616765732f666f72776172642e6a736f6e",
+      "sha256": "5bbdbb06699a990f8d47a4235f550c1ade5d5563abcc95ce519c2a04604b54b0"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/anthropic-messages/tool_roundtrip.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f616e7468726f7069632d6d657373616765732f746f6f6c5f726f756e64747269702e6a736f6e",
+      "sha256": "967d2ede8e75b49c7cf2ee2e4a328f1eaf6e58763933b6b19f23db8a8ae43ce3"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/google-generative-ai/error.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f676f6f676c652d67656e657261746976652d61692f6572726f722e6a736f6e",
+      "sha256": "f3a109c927b34c8aa5221d31105ed85a78180f25683b2b99adf67aa7c9321d45"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/google-generative-ai/forward.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f676f6f676c652d67656e657261746976652d61692f666f72776172642e6a736f6e",
+      "sha256": "32af7519e8e73479b9b7093a1f98ea44b83a14736f16426a2b82da10e93f12b5"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/google-generative-ai/tool_roundtrip.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f676f6f676c652d67656e657261746976652d61692f746f6f6c5f726f756e64747269702e6a736f6e",
+      "sha256": "71f4afedccbeb3f0ea09e53f6aa359c1d4efb3bfe6ae63be593437978ee182b9"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/openai-codex-responses/error.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f6f70656e61692d636f6465782d726573706f6e7365732f6572726f722e6a736f6e",
+      "sha256": "0e08a26329a70648c42f02bacc040640656a6a0719f8622d80851d3bb6a4dc22"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/openai-codex-responses/forward.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f6f70656e61692d636f6465782d726573706f6e7365732f666f72776172642e6a736f6e",
+      "sha256": "81bb7c31792e89ed029489d0f0698eb100aad501945d9dafac48ce2ca96f9d0e"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/openai-codex-responses/tool_roundtrip.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f6f70656e61692d636f6465782d726573706f6e7365732f746f6f6c5f726f756e64747269702e6a736f6e",
+      "sha256": "cf898d39dbd3b8d6aa2b4830b5d2f9860082ee3f2b53463da7cb1e0d32ae7734"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/openai-completions/error.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f6f70656e61692d636f6d706c6574696f6e732f6572726f722e6a736f6e",
+      "sha256": "b149d2257c78d6c12e416353268791e680e6f60c2b8537be4487ac6a7077d33d"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/openai-completions/forward.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f6f70656e61692d636f6d706c6574696f6e732f666f72776172642e6a736f6e",
+      "sha256": "60b06ec0050d33c9c8494b1988ffa2b97a63d63bf0c47d1cc19d4688624b1582"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/openai-completions/tool_roundtrip.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f6f70656e61692d636f6d706c6574696f6e732f746f6f6c5f726f756e64747269702e6a736f6e",
+      "sha256": "5393895d4455838eb33e81830f5d6e9576350ab470abcd1d0543827245cf9210"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/openai-responses/error.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f6f70656e61692d726573706f6e7365732f6572726f722e6a736f6e",
+      "sha256": "6452f2c0878469993ca507607d17dc857f0239b13babb5d96440a293bfbb4e5b"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/openai-responses/forward.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f6f70656e61692d726573706f6e7365732f666f72776172642e6a736f6e",
+      "sha256": "5412c74fab7d673cd2dffd71fc0c7f09ead45cb72c351410dbcb99d941ff366b"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/golden/openai-responses/tool_roundtrip.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f676f6c64656e2f6f70656e61692d726573706f6e7365732f746f6f6c5f726f756e64747269702e6a736f6e",
+      "sha256": "9fdc98afdfb56130a73d06a00b848c8913852f5496bf24f05791e0954e8062cc"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/invocation_journal_store.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f696e766f636174696f6e5f6a6f75726e616c5f73746f72652e7273",
+      "sha256": "a2ad122a7d1c44620df5af96d6a064edc4b66eba3a876c0872eca2af83f3744a"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/late_result_fencing_property.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f6c6174655f726573756c745f66656e63696e675f70726f70657274792e7273",
+      "sha256": "9557f1c0605650fade30f6ec3c20c0b0e1b1d909fcf1e1310385ea9c1678dcf0"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/migration_idempotency.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f6d6967726174696f6e5f6964656d706f74656e63792e7273",
+      "sha256": "70ca3682ca23ffa0848f4f3ca3f26dae3d72e4e9150cf33ced58e1b2d394c4e1"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/r05_t02_oauth_flows.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f7230355f7430325f6f617574685f666c6f77732e7273",
+      "sha256": "44793a7fc79e16921c9a2dc126b8bb1a53cca9a6212f0f183718ba5a00374dff"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/r05_t03_goldens.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f7230355f7430335f676f6c64656e732e7273",
+      "sha256": "bdc9a14343d95631712b08396f972aca327cb9cadbba8c0e54dda9bc14b59ce1"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f7230355f7430335f7272315f7265706c61792e7273",
+      "sha256": "dea6c1959112e19a5a4de2494b2b4cb6cefd975846c8eb2d6a4fa85c5467baad"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/r05_t04_rr1_batch_terminal.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f7230355f7430345f7272315f62617463685f7465726d696e616c2e7273",
+      "sha256": "a8bbed5cb25b90c4f43952c78d6a51e153e01cecd5b9684cab01469b8f786619"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/r05_t04_streaming.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f7230355f7430345f73747265616d696e672e7273",
+      "sha256": "4ed807ea8d0be9858c972ddcbebe2a3f5ba2dab262e72ffcdee69317f483558e"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/r05_t05_compat.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f7230355f7430355f636f6d7061742e7273",
+      "sha256": "bcb02209baf887df3a4538427871529dbcfa85795b1f590f0ef56f308d803347"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/r05_t05_timeouts.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f7230355f7430355f74696d656f7574732e7273",
+      "sha256": "0b948c04ac47d3041e7400a51c162303e8aad74c109557d6a9000c407bac1543"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/r05_t06_operations.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f7230355f7430365f6f7065726174696f6e732e7273",
+      "sha256": "dc698ec3e92811d6cbdcb7023aa60e6b68e0110ffa1ffad22e0183f0b3fc15d7"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/r05_t07_rr1_usage_strict.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f7230355f7430375f7272315f75736167655f7374726963742e7273",
+      "sha256": "27365cdb2862329fd7b24dc28a90ff7b6e936a959dc3f02853d91c0e0a1b3304"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/r05_t07_usage_families.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f7230355f7430375f75736167655f66616d696c6965732e7273",
+      "sha256": "9aab61502ab41a8c5ffa624cdc7b483cc4eaf2d67c3bacb028cf448d29c95106"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/run_finalize_property.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f72756e5f66696e616c697a655f70726f70657274792e7273",
+      "sha256": "9d0368782ecc7db598a6ca6cd5a7f29a90828cf163df4ac7050bb770ae1ce54c"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/run_id_allocator.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f72756e5f69645f616c6c6f6361746f722e7273",
+      "sha256": "71104dfdce36a4227a480d5f323932f7a18ccb33241a34373389679fce94d73c"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/run_lineage_store.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f72756e5f6c696e656167655f73746f72652e7273",
+      "sha256": "966d7756a5c9f26c627f21b27c5c3234cf3f329b1c9bd6c8416acae83dbcb8d5"
+    },
+    {
+      "display": "rust/crates/lingxi-adapters/tests/storage_transactions.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d61646170746572732f74657374732f73746f726167655f7472616e73616374696f6e732e7273",
+      "sha256": "63c73782df10cbac03ee945f2a906d9355c9981e4bde00ec181bf092620f2dff"
+    },
+    {
+      "display": "rust/crates/lingxi-browser-spike/Cargo.toml",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d62726f777365722d7370696b652f436172676f2e746f6d6c",
+      "sha256": "74ec57bbd9395ea26ba4df5f2f15195188e9ce0d52235fd5cbb50b8fa629a236"
+    },
+    {
+      "display": "rust/crates/lingxi-browser-spike/src/bin/spike_browser.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d62726f777365722d7370696b652f7372632f62696e2f7370696b655f62726f777365722e7273",
+      "sha256": "b3a3b38676fd3dc154c682daaca17b7aa5562fc51fbf7d321d2dde622cc783c7"
+    },
+    {
+      "display": "rust/crates/lingxi-browser-spike/src/bin/spike_pdf.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d62726f777365722d7370696b652f7372632f62696e2f7370696b655f7064662e7273",
+      "sha256": "d47f1a1d5747403fedf8c30ebdedace1398c66b88673506c86e0346b9a0120f7"
+    },
+    {
+      "display": "rust/crates/lingxi-browser-spike/src/cdp.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d62726f777365722d7370696b652f7372632f6364702e7273",
+      "sha256": "aa1b8bf28ddf32454832642a9c431485e4a18a3fcaa115603277a6fbcdfce2c7"
+    },
+    {
+      "display": "rust/crates/lingxi-browser-spike/src/launcher.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d62726f777365722d7370696b652f7372632f6c61756e636865722e7273",
+      "sha256": "d654818941f7779b2d4060f547c25785f48de243551d7247641aa47e4045cf2f"
+    },
+    {
+      "display": "rust/crates/lingxi-browser-spike/src/lib.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d62726f777365722d7370696b652f7372632f6c69622e7273",
+      "sha256": "5a3bc4f030cb25ba4cf21ca9312e0855e08a749e7464dbe5bdd8d1762f4e817d"
+    },
+    {
+      "display": "rust/crates/lingxi-browser-spike/src/ops.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d62726f777365722d7370696b652f7372632f6f70732e7273",
+      "sha256": "b01d04a73e9abde4bde451d5aadbba338eb5ec26b4d0e2393c084ec27babee54"
+    },
+    {
+      "display": "rust/crates/lingxi-browser-spike/src/pdf.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d62726f777365722d7370696b652f7372632f7064662e7273",
+      "sha256": "701ed875e8c9ed518d65635d43d95889c64f3463979e8f59e8566cdbce7f0ede"
+    },
+    {
+      "display": "rust/crates/lingxi-browser-spike/src/snapshot_source.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d62726f777365722d7370696b652f7372632f736e617073686f745f736f757263652e7273",
+      "sha256": "8340d1f13e023954fbf260aacdff0287544fe4ba131f87cbd9005f9055887c6b"
+    },
+    {
+      "display": "rust/crates/lingxi-kernel/Cargo.toml",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d6b65726e656c2f436172676f2e746f6d6c",
+      "sha256": "2fab453351437b78d219d01c19f4a0c1f6f522869de1a2e1ce9941731deff0df"
+    },
+    {
+      "display": "rust/crates/lingxi-kernel/src/invocation.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f696e766f636174696f6e2e7273",
+      "sha256": "a964426e6d70bd9213a6475e7ca817193d32a22a3cc0630a0648adcdfa522292"
+    },
+    {
+      "display": "rust/crates/lingxi-kernel/src/lib.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273",
+      "sha256": "0a5f0c3aee15f437cae03cca5eb182680f6e57aa64e3dcd95fbb5561a243720f"
+    },
+    {
+      "display": "rust/crates/lingxi-kernel/src/model_exchange.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6d6f64656c5f65786368616e67652e7273",
+      "sha256": "62bb3b1b3ad42f5ea46961ab5c5b1d98d54f22c0a359f8d099ad1e323a6d4c6b"
+    },
+    {
+      "display": "rust/crates/lingxi-kernel/src/ports.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f706f7274732e7273",
+      "sha256": "3f32e8c7c0a617d6bcb73ed11ab5eb468acfbb383ac844964a9ad52a75fa3936"
+    },
+    {
+      "display": "rust/crates/lingxi-kernel/src/recovery.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f7265636f766572792e7273",
+      "sha256": "796cc13cfbfe0ef9aa021e3f7c47668d9374468a1defb1dfa0d046b853803268"
+    },
+    {
+      "display": "rust/crates/lingxi-kernel/src/subagent.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f7375626167656e742e7273",
+      "sha256": "0287c242edc782989e1232046661a956216f5576e1247f94a4ea669c0edc0276"
+    },
+    {
+      "display": "rust/crates/lingxi-kernel/src/toolcatalog.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f746f6f6c636174616c6f672e7273",
+      "sha256": "2b7505387b6b45aebc9ff7a0c836d49d24573df1d2de2e3137549eab5983ad1f"
+    },
+    {
+      "display": "rust/crates/lingxi-kernel/src/usage.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f75736167652e7273",
+      "sha256": "209bc2f127595674ed86c64cbf92d7fc1632bcbbfcc446909cd0f632cf470f3b"
+    },
+    {
+      "display": "rust/crates/lingxi-protocol/Cargo.toml",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d70726f746f636f6c2f436172676f2e746f6d6c",
+      "sha256": "55ec1b90bb8aa610bf507d70e168a1fdf73e84e8771defe9018ab6f2b0fc4ddc"
+    },
+    {
+      "display": "rust/crates/lingxi-protocol/src/bin/lingxi-proto-server.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d70726f746f636f6c2f7372632f62696e2f6c696e6778692d70726f746f2d7365727665722e7273",
+      "sha256": "1aeddfa2c4d4a8eab8ab75aed8a2555288c6ce2e1ebe05584b307d0cc0760aa3"
+    },
+    {
+      "display": "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d70726f746f636f6c2f7372632f62696e2f6c696e6778692d70726f746f636f6c2d67656e2e7273",
+      "sha256": "8af4fb30089bae8e55fb62b18412a05e172b55f966cd4b6f5aaa1ef8952cee05"
+    },
+    {
+      "display": "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-verify.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d70726f746f636f6c2f7372632f62696e2f6c696e6778692d70726f746f636f6c2d7665726966792e7273",
+      "sha256": "b68c1d1a0fbf2d0e9355f34e7f89582d902650ce9721390b7311b317ac103e3c"
+    },
+    {
+      "display": "rust/crates/lingxi-protocol/src/canon.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d70726f746f636f6c2f7372632f63616e6f6e2e7273",
+      "sha256": "2c1bb1c229a3bd0eafe6ab6d911cf8e41c158717fc4632f390e0684a3d1cea71"
+    },
+    {
+      "display": "rust/crates/lingxi-protocol/src/devgate.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d70726f746f636f6c2f7372632f646576676174652e7273",
+      "sha256": "292ed1cb45356234a6a7423c9ef60dfe908eb9573c5d5580fd32b1d85d411749"
+    },
+    {
+      "display": "rust/crates/lingxi-protocol/src/handshake.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d70726f746f636f6c2f7372632f68616e647368616b652e7273",
+      "sha256": "17bb9902607d3d94fa2356cd2b55a32ad76b6eda38377b8d181be931af25d51d"
+    },
+    {
+      "display": "rust/crates/lingxi-protocol/src/lib.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d70726f746f636f6c2f7372632f6c69622e7273",
+      "sha256": "7dc6fe93e4c9aa29da6ca4690e039f647c23938599557c374d185f047c62fce2"
+    },
+    {
+      "display": "rust/crates/lingxi-protocol/src/wire.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d70726f746f636f6c2f7372632f776972652e7273",
+      "sha256": "a3509c6d31fe584980bef21cc615e21a56afe44ab57266108b3f5d2d7c71d3ff"
+    },
+    {
+      "display": "rust/crates/lingxi-service/Cargo.toml",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f436172676f2e746f6d6c",
+      "sha256": "c778bbe5821bc8d7dc1e5d22292879f3f3cb2ac6af480316acc1bad705b08b17"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/approval.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f617070726f76616c2e7273",
+      "sha256": "70040aaec9a0a6ca41e059113b2c53275361ad8cbc6e40b3d0fdfa339b5bed3e"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/approval_service.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f617070726f76616c5f736572766963652e7273",
+      "sha256": "cc0ee1fafa087a37801a626008215638214b59f6bbe8cc2284e8897dd114ae72"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/artifactverify.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f61727469666163747665726966792e7273",
+      "sha256": "3b4e84802fd3dda9719295f3d3e95a2218fca520a88d4b2ea610865113c049d7"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/auth.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f617574682e7273",
+      "sha256": "5d9408afc747e3249f0d7b7d9148be8fe3c22eb1aac3815835b466c409cf31e8"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/background.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f6261636b67726f756e642e7273",
+      "sha256": "1e642710a45e4e4360f34ed5588f16eb847ae74bd2a66cabb0b6f8e972db69a5"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f62696e2f7230345f7430375f666978747572652e7273",
+      "sha256": "c569a06220d6672432e2dc1871f2f6c9f2d2b4d5eeae2c5773fec98e0a2d4e2f"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/cancel.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f63616e63656c2e7273",
+      "sha256": "45db14322dc7daa18b1926acc5d87ed153682c7830a991210c0838534f7e1872"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/config.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f636f6e6669672e7273",
+      "sha256": "960365bee86e48825681bf6962730ac0f67f48dab870656cde174ff44981cd8d"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/credentials/login.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f63726564656e7469616c732f6c6f67696e2e7273",
+      "sha256": "397b40157707c9bbee786ae86dff15b6989aca7c3a3942583caf71bae8276bf8"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/credentials/mod.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f63726564656e7469616c732f6d6f642e7273",
+      "sha256": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/credentials/store.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f63726564656e7469616c732f73746f72652e7273",
+      "sha256": "a69b4d4e2bab340055e30907cfece32bbd58c54da1898fe8c72d133eb253696f"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/dedup.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f64656475702e7273",
+      "sha256": "f80cd8a86451f5563217bc293aa2dfa3afc97a6666dba068b5196470e7aecf82"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/epoch.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f65706f63682e7273",
+      "sha256": "9c29d9ee8924d7b514a9bc4b7f8d374d420287f25b1b36f5295619c0f882b855"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/events.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f6576656e74732e7273",
+      "sha256": "709b9adc34ba6d35252ff1ebf8332981b47f9defb0d178e3880bf5caffd855a4"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/exectools.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f65786563746f6f6c732e7273",
+      "sha256": "433584042b95dcb51b9b4f40509bce0123de078b6b0d85edeeb8ec7c3af64e98"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/filetools.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f66696c65746f6f6c732e7273",
+      "sha256": "4803fe5164ad448860b162d58a374f945fc8920dad0f526aa70f73c2c64fd116"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/inject.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f696e6a6563742e7273",
+      "sha256": "c440a0c38f5710500b3aa3c557ca33d9503db485d13fc1555416a7efb4c560e4"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/instance.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f696e7374616e63652e7273",
+      "sha256": "f329de65613332af3024763e0fb17ce7f545962252233c10ba2400aabda7f846"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/invocations.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f696e766f636174696f6e732e7273",
+      "sha256": "42826a77c2a9625fea27ea085b822949946777db6ac7c8bd2b7a00ccd04a32d8"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/lib.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f6c69622e7273",
+      "sha256": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/limits.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f6c696d6974732e7273",
+      "sha256": "93d7bbd0a1bc22417cfb800d75601c61e8ee396ff8801218382738938d6767c5"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/logging.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f6c6f6767696e672e7273",
+      "sha256": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/main.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f6d61696e2e7273",
+      "sha256": "9ea695ee5b2eef4163db16df4b584b363df6a375ca334f02c9160886ed1b5f5b"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/management.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f6d616e6167656d656e742e7273",
+      "sha256": "c9402d83a16f3b0c4f6f193968b099fe29c6121968b337d6109dfeeb14c8c27d"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/mcpbridge.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f6d63706272696467652e7273",
+      "sha256": "e3312f6ab87ad6562233c3ec71a14e1925685a28c9879999b99731ddfa6f6fbf"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/operations.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f6f7065726174696f6e732e7273",
+      "sha256": "bbb2054886f6e08093aeba416570ecadee866891db06e59a6d5406815b965639"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/paths.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f70617468732e7273",
+      "sha256": "10b13d4d0639e134c118f0ef421648f55e3d9498dd210d7ad0428e009e89008e"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/procsupervisor.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f70726f6373757065727669736f722e7273",
+      "sha256": "d586aa01efa0085f5890e73dcd056431ae84abf1b5b8aa379ce8159ff2ca7b37"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/quotas.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f71756f7461732e7273",
+      "sha256": "5830926c2c1f61792c5269e622680b78f146d50997a4b609ffdf214a446b48cc"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/recovery.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f7265636f766572792e7273",
+      "sha256": "37a268ac26b368e27fac3e81a173f6d29a4d2789603259df2968a4a72be79e45"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/redaction.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f726564616374696f6e2e7273",
+      "sha256": "5b192ab43df13d6add0705a9f1eb2ead45da1131f012c3afb61dd9f90ac10b7a"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/resourceaccess.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f7265736f757263656163636573732e7273",
+      "sha256": "9cb2b2267e581eff500b4e9a995541ea055a56f217955fd910cd7dd0e2c7766f"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/runs.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f72756e732e7273",
+      "sha256": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/sandbox.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f73616e64626f782e7273",
+      "sha256": "57dbdcb309fa17878e58ea360cc9e5d69cdb126d7907f2d9aaa82bc68888b676"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/security_audit.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f73656375726974795f61756469742e7273",
+      "sha256": "ec34626d0c03a8e86cc1beb69cea951a55571bddd92624284e896f8654506cdf"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/serve.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f73657276652e7273",
+      "sha256": "95faa3f52bb1c1a33738501b33038bda41e0e29eca6eee541fadb84b202847b8"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/session_supervisor.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f73657373696f6e5f73757065727669736f722e7273",
+      "sha256": "fcf0822ceef2000057b41d3a0a7d67581815db0aef2908629f146d0a44e8ef74"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/sessions.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f73657373696f6e732e7273",
+      "sha256": "61d032f1d3407f973360738c150c03ac49d780efc79afec49bf5e9ff6ab83c4f"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/shutdown.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f73687574646f776e2e7273",
+      "sha256": "401ab707932219fc2a6c174e978705b4c16d57aafa09a0b276580be5d7f4113f"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/static_web.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f7374617469635f7765622e7273",
+      "sha256": "65341c5ddce91341687c922c3116c1e48423605d16112cfc7b3864900e885d6d"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/streaming_norm.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f73747265616d696e675f6e6f726d2e7273",
+      "sha256": "bca91fd70a29eaef7cc9c7210f13c5e6f13e5844f256fa10aa18e9bf0fb360c3"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/subagents.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f7375626167656e74732e7273",
+      "sha256": "2c97b7964cdd0ecbf6dda0881cd6510ba880a6a3fd428274e936441b469f44d7"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f7461736b5f73757065727669736f722e7273",
+      "sha256": "2f78d303b89b4df43899f4ccd593e0f71ea6e82535d44455f71bf462a11998c1"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/toolgateway.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f746f6f6c676174657761792e7273",
+      "sha256": "17e9c05aec1d03cdc68db66b97ec84947cccf3d49a8759bca2fa126db6f2bc84"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/transport.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f7472616e73706f72742e7273",
+      "sha256": "d4a5fe9ac17e2f0e2e666bc04658008002fa48d1f661875fa41121f5ff012c95"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/workermodel.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f776f726b65726d6f64656c2e7273",
+      "sha256": "85b25b95f026dd9ce53119bd0caff44e4df4ef5f90c6e3b2abfad5e89932af29"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/workerrpc.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f776f726b65727270632e7273",
+      "sha256": "4a158b5321da63d2c6a36d88da8ec7cfd21622c914fa38f7ad6dd674d4cb0788"
+    },
+    {
+      "display": "rust/crates/lingxi-service/src/ws.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f7372632f77732e7273",
+      "sha256": "03c9a6887b0d194127a4401bf92c26fb6debcc344cfe9b3b091a7503b1186b20"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/admission_dedup_adversarial.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f61646d697373696f6e5f64656475705f616476657273617269616c2e7273",
+      "sha256": "f9d10e146c912a65a17eaa29181587eb2459188b40790e0925e376f53fd29c61"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/admission_dedup_consistency.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f61646d697373696f6e5f64656475705f636f6e73697374656e63792e7273",
+      "sha256": "1d542d7ccebc67884bcb011885d5e2e219d07f32e831aa9bce643b93d6d99526"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/auth_matrix.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f617574685f6d61747269782e7273",
+      "sha256": "9ab38f9fd5630313ab4e3b1a69014afa338b5a52f02d10147bfbac85ab0f3e0e"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/background_disconnect_recovery.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f6261636b67726f756e645f646973636f6e6e6563745f7265636f766572792e7273",
+      "sha256": "af97db4ea9c8e2438449883e97fb555234a8ff7be84dde949ea1c34fa9f28913"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/background_steering.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f6261636b67726f756e645f7374656572696e672e7273",
+      "sha256": "3df708126e4231146ec53cfb63159e219dafa92c105c2935ae3e1147d60c87b6"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f63616e63656c5f6c696e6b5f696e6865726974616e63652e7273",
+      "sha256": "c14272566afcee269520ffef460eac0361fde8a54235466fc4315a37dc4fdb43"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/cancel_terminal_race.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f63616e63656c5f7465726d696e616c5f726163652e7273",
+      "sha256": "7d6a95f1d2de4fa1e32103fffa2e82d72b416da4f2383c04314937a11465d1ca"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/cancellation_tree.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f63616e63656c6c6174696f6e5f747265652e7273",
+      "sha256": "d107a05d3f3b33f492a9be4e37d9c93e2566318abe4e285bba1f180fa0cf7eee"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/config_bounds.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f636f6e6669675f626f756e64732e7273",
+      "sha256": "86356ff1725791d987a3995414ecca88c5ab0cc10fbbb145cdf8280f6ff15d14"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/event_subscription.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f6576656e745f737562736372697074696f6e2e7273",
+      "sha256": "02d1e5c83cb813b4789d5a360b34d9291d136a54acd0253432cbbcc6ae041ee6"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/execute_concurrency.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f657865637574655f636f6e63757272656e63792e7273",
+      "sha256": "5fba456edb789b036393e631add70861d69eabd0a1ab3a78adf467096556861c"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/exit_race_rejections.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f657869745f726163655f72656a656374696f6e732e7273",
+      "sha256": "7dfd5cc7eb0028d7a35281d41d7fab5b2079b5bcdf040d9565728a60fbf9bccf"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/input_budget_refusal.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f696e7075745f6275646765745f7265667573616c2e7273",
+      "sha256": "ab4b706a338ae0efae10789f636637f968fff6645e9ad8d4527b9aad0a87f4d5"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/input_payload_fidelity.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f696e7075745f7061796c6f61645f666964656c6974792e7273",
+      "sha256": "8dfb74f368cf3f2684b12e02a473bec9ac6354e34254101f44b1ebab124ed163"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/instance_lifecycle.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f696e7374616e63655f6c6966656379636c652e7273",
+      "sha256": "0eed3931c005bdbc5b5e8ac6c547876cffbd89604cb3d1e99d5f4e41d503b63a"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/invocation_journal.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f696e766f636174696f6e5f6a6f75726e616c2e7273",
+      "sha256": "3b8627dfcd9f7b419dd9e6e1fceaac7249adfe80f0e191043002f57f90b0ece9"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/late_result_fence.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f6c6174655f726573756c745f66656e63652e7273",
+      "sha256": "d550e29b660affbc836a531d9ea58c88591c47cf236f02b4728b91d40d0efac9"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r00_management_leaves.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230305f6d616e6167656d656e745f6c65617665732e7273",
+      "sha256": "3e72c2a2d16287549a2727a355642ec279c09595d42d6ec42d9c5585c8d2f453"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r00_static_web_leaves.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230305f7374617469635f7765625f6c65617665732e7273",
+      "sha256": "d9874fcc0f7801522c509f115ac16680b5fa8aec17a0b230c5ecb811ca23b0b4"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230335f7430385f616363657074616e63655f6d61747269782e7273",
+      "sha256": "7e5b7cf50a74e73c08e391b9a328706c35b41c55ebaba67f5760c2404d67c53e"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r04_rr1_f02_reaper_cleanup.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230345f7272315f6630325f7265617065725f636c65616e75702e7273",
+      "sha256": "d7a24abf8de764f86acac624f5fcb69dd6b670412cde1bc1e12b9bda5ac784a3"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r04_rr1_f03_stop_honesty.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230345f7272315f6630335f73746f705f686f6e657374792e7273",
+      "sha256": "fe40e6c3f765fa19524c14dfdef4c583be4680c825c660addc117320ee6b2f98"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r04_rr1_f04_pty_consumption.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230345f7272315f6630345f7074795f636f6e73756d7074696f6e2e7273",
+      "sha256": "26d37af280ba9b78b2968b3197783e1893434cb52ecab977e3439063615957b8"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r04_rr1_f05_output_integrity.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230345f7272315f6630355f6f75747075745f696e746567726974792e7273",
+      "sha256": "ca08d067e649152ec75cbf320c9399158476bfde4fec89e071e4c0d64d5f8726"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r04_rr1_f05_spill_failure.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230345f7272315f6630355f7370696c6c5f6661696c7572652e7273",
+      "sha256": "3570f4fe224d338851274dd384c8704d414f0dddc9650f097fe323d770c1cd8c"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r04_t01_tool_catalog.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230345f7430315f746f6f6c5f636174616c6f672e7273",
+      "sha256": "f58d7bcdb4270cbbc814a723dcbede2de6c97921e0a55617ad3c2aeba859d1de"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r04_t02_tool_gateway.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230345f7430325f746f6f6c5f676174657761792e7273",
+      "sha256": "b25d2a63956410774051531cbd21c2dabf0f8aaf32ac82384893e0cc55743911"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r04_t03_approval_service.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230345f7430335f617070726f76616c5f736572766963652e7273",
+      "sha256": "617d6f36d5862441258ca5f5e9cdf45adb1182f91fc289c1bf737d7d43cb8a9d"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230345f7430345f66696c655f746f6f6c732e7273",
+      "sha256": "b37e2fa214ce6493cda571e970c1f8a5d01fae67154f21f76b90f5194b06fbcc"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r04_t05_process_tools.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230345f7430355f70726f636573735f746f6f6c732e7273",
+      "sha256": "ad2b9d816bc34acc937a11d8e7ea259ab91c0a7c6ad51c5b54eb363266b76d7a"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r04_t05_registry_capacity.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230345f7430355f72656769737472795f63617061636974792e7273",
+      "sha256": "9460df947fc522ce6ca811e3d30cabf21d10df645ec50b26fbeb84e5634a0374"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r04_t06_sandbox.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230345f7430365f73616e64626f782e7273",
+      "sha256": "f1c7f450e939c26278453b314d8532b460ce70dc08f4fe7961ba1b5b26f7bb38"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230345f7430375f6d63705f616e645f776f726b6572732e7273",
+      "sha256": "98e2a672103242033f82f4182de3662a3c2d9a57c883e835132b3c8589aa8d1a"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230345f7430385f746f6f6c5f6d61747269782e7273",
+      "sha256": "69aaa7925a7064288b45c7d39e25ee5d17a8b90b6efaf02bcaf30a299ead9e33"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430315f62696e6172795f776972696e672e7273",
+      "sha256": "56c3706bcf106a2aef0d082319f5400100c8299c16f6cb2b20c3a1afa7ffa571"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t01_model_plane.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430315f6d6f64656c5f706c616e652e7273",
+      "sha256": "101c02bf149534abe150154b17ef7a5cc0588e9a7580aba17d1f6aaa5efae9e0"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t02_credentials.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430325f63726564656e7469616c732e7273",
+      "sha256": "8a7f7f23e30aa22b23a51138d4ac2817e9dca78fa63889d4fa82dd82a0e35541"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t03_protocol_adapters.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430335f70726f746f636f6c5f61646170746572732e7273",
+      "sha256": "55474557db29c644f1fe806a8f4057a0490ef9cc561a604bca1395ac5d50b828"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t04_streaming.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430345f73747265616d696e672e7273",
+      "sha256": "6e09ff3a5f354aa7819c0b29cac742bd529a5b41d408a1609ad0837559bb74b3"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t05_network.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430355f6e6574776f726b2e7273",
+      "sha256": "478d81c1dd77527ad2c7955e3da3edfa202335dfe8f6b282e16018d92901300c"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t05_timeouts.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430355f74696d656f7574732e7273",
+      "sha256": "52e26995c5b031d0e6c1704972e2d1e79f69f2905d859ac5c2d6443707ee5f81"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t06_operations.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430365f6f7065726174696f6e732e7273",
+      "sha256": "97170bcb71d25feda122e17f299e832644556ae30eeadec582d813d937cc3b15"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430365f7272315f6d656469615f7265736f757263652e7273",
+      "sha256": "282a9f23ffe14cdc3f553534c2582ffc47e519224ac6330c24d6351c564ddca0"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t06_rr1_system_speech.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430365f7272315f73797374656d5f7370656563682e7273",
+      "sha256": "1cbbc1d6ffd5e37f2523efd99adfe94c8eaed768e7321bdb1d84ebb95f6487c9"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t06_worker_model.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430365f776f726b65725f6d6f64656c2e7273",
+      "sha256": "6d67feea5ce3de2f14eaa882e5076acbe4e5fc145953939360be91f590871791"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t07_persistence.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430375f70657273697374656e63652e7273",
+      "sha256": "c2398130d85569c85be19edd9bfc037ca68c6d46f7cb2d12f93f80c93c3fbfa8"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430375f7272315f75736167655f6c65646765722e7273",
+      "sha256": "395ac7a42923d4f85a22eff80fe571ab71dec0ddd225fe354c8f90379ecc9f5f"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t07_usage_trace.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430375f75736167655f74726163652e7273",
+      "sha256": "5ae7877a139e960a6b4d1c30b1bf8703133fd9fd60257150dd6c0bcf2045cb12"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t08_closed_loop.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430385f636c6f7365645f6c6f6f702e7273",
+      "sha256": "e48cacb5f1c5c4f77cc7a41ac267c85f2485c040c3c666f72b5e388f0814a836"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t08_production_tools.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430385f70726f64756374696f6e5f746f6f6c732e7273",
+      "sha256": "584ad879f4aa5ae8cad7cbdde70cda79f95ab2f5f1602059839a39a0c5093d68"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/r05_t08_resources.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7230355f7430385f7265736f75726365732e7273",
+      "sha256": "23b03f56bef900fc0563b3348596e61437995f7c05cc25a5173455f11a23e33f"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/recovery_crash_points.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7265636f766572795f63726173685f706f696e74732e7273",
+      "sha256": "f6b8f9a31e1e9d6c9535d7ac72f7a4b8151401fa35ae3ee469c5c9356040a9da"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/recovery_startup_scan.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7265636f766572795f737461727475705f7363616e2e7273",
+      "sha256": "62905768045be3a7b0ca86296b3800ca486a7d46d513d0b23078368f4f4ba6b7"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/recovery_support/harness.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7265636f766572795f737570706f72742f6861726e6573732e7273",
+      "sha256": "0482ebce472f79e7402dde15ed3eafc8262c29ad68a04ebc042ef01dd60a3764"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/request_dedup.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f726571756573745f64656475702e7273",
+      "sha256": "0eed4984400b1a45852fc147bf03ff070db9c2d43ceda9f88a4674cc09011a35"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/request_id_canonicalization.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f726571756573745f69645f63616e6f6e6963616c697a6174696f6e2e7273",
+      "sha256": "370350ac150dd1cb88bf6c9e61461210756a2747798ff0d52fdfee89964a3b22"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/resource_limits.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7265736f757263655f6c696d6974732e7273",
+      "sha256": "a8fcbdea6f8dbc040b5ec2c8a6bca736d9f3270bd04a8f9481ddc57dff29dc5f"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/run_lifecycle.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f72756e5f6c6966656379636c652e7273",
+      "sha256": "1678e32936755408f553c10d05a3c91a880614aadd8a1b6d9833cd3c98df6e06"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/service_health.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f736572766963655f6865616c74682e7273",
+      "sha256": "cf7d1ab9f3013a4be262f6e83f2c8f3a51f7c00766520d63f1a0cd59a1b773f4"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/service_persistence.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f736572766963655f70657273697374656e63652e7273",
+      "sha256": "d894ad0a7f65458bb2a3417d43c49cb7227ddd48425d8aba484c2762711e0194"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/session_serialization.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f73657373696f6e5f73657269616c697a6174696f6e2e7273",
+      "sha256": "307e905a2fef749810e02620ba40a27fe065a64c88bf716aea630844fec38013"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/shutdown_coordinator.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f73687574646f776e5f636f6f7264696e61746f722e7273",
+      "sha256": "e0e5b281ffb2c1ec6ffc7c97650f0ce8e387f30deaff33762b607c306060e0b6"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/subagent_closeout.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7375626167656e745f636c6f73656f75742e7273",
+      "sha256": "be74628bd47c4fea91c61294783188ab59ca00123237f1686ec6ddfd550c7d41"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/subagent_lifecycle.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7375626167656e745f6c6966656379636c652e7273",
+      "sha256": "9579706a8a93486e0532a6bd5adf91ddb20c76a36b499611b26f98c2bf062462"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/subagent_permission_inheritance.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f7375626167656e745f7065726d697373696f6e5f696e6865726974616e63652e7273",
+      "sha256": "e749ba788ab948562d59df75be045a1ba6721dd24e9167a1be626ce26d504bc2"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/support/r05_resource_sampler.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f737570706f72742f7230355f7265736f757263655f73616d706c65722e7273",
+      "sha256": "1f6601122e5d7841f3975ec68ea8c60adb653fc939ca4e65cc3da7565c269274"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/tls_web_login.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f746c735f7765625f6c6f67696e2e7273",
+      "sha256": "b70fbf9b0879529a56c92ca4be3523d99459364bd2512c24a4d8ab247b274e63"
+    },
+    {
+      "display": "rust/crates/lingxi-service/tests/tool_receipt_unknown.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d736572766963652f74657374732f746f6f6c5f726563656970745f756e6b6e6f776e2e7273",
+      "sha256": "94753e058542abe2e07db6dad23633598b322468ba9f0b90d5827652f06f449a"
+    },
+    {
+      "display": "rust/crates/lingxi-spike/Cargo.toml",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d7370696b652f436172676f2e746f6d6c",
+      "sha256": "6a63f3596f63a2e21735fff068adc228f5ae653dbae206d671df93086282ca48"
+    },
+    {
+      "display": "rust/crates/lingxi-spike/src/bin/spike_check_deps.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d7370696b652f7372632f62696e2f7370696b655f636865636b5f646570732e7273",
+      "sha256": "53c94d2b284c821380dc76c36bbf4291191d435830dbc3cb63aa201deddb4703"
+    },
+    {
+      "display": "rust/crates/lingxi-spike/src/bin/spike_health.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d7370696b652f7372632f62696e2f7370696b655f6865616c74682e7273",
+      "sha256": "70e78dc7751cec49390571d350afc033fbecd1fbf122bd80f3ea4b83c0bde1df"
+    },
+    {
+      "display": "rust/crates/lingxi-spike/src/bin/spike_mcp_handshake.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d7370696b652f7372632f62696e2f7370696b655f6d63705f68616e647368616b652e7273",
+      "sha256": "252907eba94763808ba76825f6b151d93ad239e30adce67ae0c948fac61f5fae"
+    },
+    {
+      "display": "rust/crates/lingxi-spike/src/bin/spike_schema_validate.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d7370696b652f7372632f62696e2f7370696b655f736368656d615f76616c69646174652e7273",
+      "sha256": "0c9e6767ba8d422914cfd0681f951c90197f64da49c4354c72b296184a215e27"
+    },
+    {
+      "display": "rust/crates/lingxi-spike/src/bin/spike_sqlite_queue.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d7370696b652f7372632f62696e2f7370696b655f73716c6974655f71756575652e7273",
+      "sha256": "e9f4300f5cb23937808137687f61c546750f971586812624a1874ef2ee7b6814"
+    },
+    {
+      "display": "rust/crates/lingxi-spike/src/bin/spike_tls_probe.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d7370696b652f7372632f62696e2f7370696b655f746c735f70726f62652e7273",
+      "sha256": "739f2fc2c95d4244843f3bbd32b0b19f2fc40b24d26b43cf51fe36ef383b5133"
+    },
+    {
+      "display": "rust/crates/lingxi-spike/src/lib.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d7370696b652f7372632f6c69622e7273",
+      "sha256": "8c71c6cbadcfa9aa6f1d1c13dd228713b03e20c1ab52324c86a5f66e282d7c7c"
+    },
+    {
+      "display": "rust/crates/lingxi-spike/src/queue.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d7370696b652f7372632f71756575652e7273",
+      "sha256": "06e475d6f058f4dc1ba74385c0b67a7da887a7c7f5642cd7f4fdfa45afce51ad"
+    },
+    {
+      "display": "rust/crates/lingxi-spike/src/schema.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f6c696e6778692d7370696b652f7372632f736368656d612e7273",
+      "sha256": "ae47842f9ad56f6a7ae2cadfd6ed54c4f4fab77ca86bf89947ea17723f4d7403"
+    },
+    {
+      "display": "rust/crates/xtask/Cargo.toml",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f787461736b2f436172676f2e746f6d6c",
+      "sha256": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776"
+    },
+    {
+      "display": "rust/crates/xtask/src/candidate.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f787461736b2f7372632f63616e6469646174652e7273",
+      "sha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86"
+    },
+    {
+      "display": "rust/crates/xtask/src/candidate/tests.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f787461736b2f7372632f63616e6469646174652f74657374732e7273",
+      "sha256": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233"
+    },
+    {
+      "display": "rust/crates/xtask/src/main.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f787461736b2f7372632f6d61696e2e7273",
+      "sha256": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1"
+    },
+    {
+      "display": "rust/crates/xtask/src/runner_identity.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f787461736b2f7372632f72756e6e65725f6964656e746974792e7273",
+      "sha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7"
+    },
+    {
+      "display": "rust/crates/xtask/src/stage_map.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f787461736b2f7372632f73746167655f6d61702e7273",
+      "sha256": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce"
+    },
+    {
+      "display": "rust/crates/xtask/src/stage_maps/R02.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f787461736b2f7372632f73746167655f6d6170732f5230322e6a736f6e",
+      "sha256": "8b68fb977c57ffa35ad32add751b6c65419bca901faa21f3c1b06adcf22cf8ef"
+    },
+    {
+      "display": "rust/crates/xtask/src/stage_maps/R03.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f787461736b2f7372632f73746167655f6d6170732f5230332e6a736f6e",
+      "sha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea"
+    },
+    {
+      "display": "rust/crates/xtask/src/stage_maps/R04.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f787461736b2f7372632f73746167655f6d6170732f5230342e6a736f6e",
+      "sha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86"
+    },
+    {
+      "display": "rust/crates/xtask/src/stage_maps/R05.json",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f787461736b2f7372632f73746167655f6d6170732f5230352e6a736f6e",
+      "sha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798"
+    },
+    {
+      "display": "rust/crates/xtask/src/verify.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f787461736b2f7372632f7665726966792e7273",
+      "sha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e"
+    },
+    {
+      "display": "rust/crates/xtask/src/verify/runner_tests.rs",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "727573742f6372617465732f787461736b2f7372632f7665726966792f72756e6e65725f74657374732e7273",
+      "sha256": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69"
+    },
+    {
+      "display": "scripts/rust-tauri/r05_t08_stage_suites.sh",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "736372697074732f727573742d74617572692f7230355f7430385f73746167655f7375697465732e7368",
+      "sha256": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e"
+    },
+    {
+      "display": "scripts/rust-tauri/run_output_sinks.py",
+      "kind": "file",
+      "mode": 420,
+      "pathBytesHex": "736372697074732f727573742d74617572692f72756e5f6f75747075745f73696e6b732e7079",
+      "sha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061"
+    }
+  ],
+  "fileCount": 298,
+  "pathEncoding": "unix-bytes-hex",
+  "schema": "lingxi-candidate-source-v1"
+}

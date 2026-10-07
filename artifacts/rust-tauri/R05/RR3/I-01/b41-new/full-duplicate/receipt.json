@@ -1,0 +1,18 @@
+{
+  "case": "full-duplicate",
+  "command": [
+    "bash",
+    "-c",
+    "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+    "independent-summary",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-new/summary-function.sh",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-01/b41-new/full-duplicate",
+    "ALL"
+  ],
+  "startedAt": "2026-10-07T02:30:18.394536+00:00",
+  "endedAt": "2026-10-07T02:30:18.424460+00:00",
+  "exitCode": 1,
+  "expectedExit": 1,
+  "status": "PASS",
+  "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+}

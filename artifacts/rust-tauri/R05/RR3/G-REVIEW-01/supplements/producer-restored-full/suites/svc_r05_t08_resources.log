@@ -1,0 +1,14 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.19s
+     Running tests/r05_t08_resources.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t08_resources-f66968a3ba499b0b)
+
+running 2 tests
+F27 raw resource series: /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-series-92220-1791340668349575000/f27-resource-series.json
+F27 sampler controls: {"deadProcessTree":"UNKNOWN","emptyAndWrongIdentity":"UNKNOWN","fdBaseline":3,"fdReleased":"UNKNOWN (dead/reaped PID)","fdRetained":6,"filesReleased":[],"filesRetained":[{"bytes":17,"path":"held-0.tmp"},{"bytes":17,"path":"held-1.tmp"},{"bytes":17,"path":"held-2.tmp"}],"liveProcessTree":{"establishedTcpCount":0,"fds":3,"processes":[{"establishedTcp":[],"fds":3,"pid":92478,"rssKiB":1472}],"rootPid":92478,"rssKiB":1472},"tcpReleased":0,"tcpRetained":2}
+test f27_sampler_controls_detect_growth_release_and_failure ... ok
+test f27_sustained_cancel_error_worker_load_stays_bounded has been running for over 60 seconds
+F27 cancel phase: hits=62 dropped=60 settled=0 dangling=60
+F27 raw resource series: /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-series-92220-1791340668349575000/f27-resource-series.json
+test f27_sustained_cancel_error_worker_load_stays_bounded ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 334.42s
+

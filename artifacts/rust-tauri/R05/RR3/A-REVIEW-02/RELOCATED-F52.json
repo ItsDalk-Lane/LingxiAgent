@@ -1,0 +1,13 @@
+{
+ "marker": "RELOCATED-F52",
+ "receipt": "artifacts/rust-tauri/R05/RR3/F52-01/RELOCATION-RECEIPT-F52.json",
+ "relocated_children": [
+  {
+   "name": "independent-validator-bin/",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-fixtures/artifacts_rust_tauri_R05_RR3_A-REVIEW-02_independent-validator-bin",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/A-REVIEW-02/independent-validator-bin/"
+  }
+ ],
+ "task": "RR3 F52: symlink-bearing untracked fixture directory (independent-validator-bin, FINAL-02 sole binder-surface symlink) relocated out of the main tree",
+ "written_utc": "2026-10-07T13:02:16.662240+00:00"
+}

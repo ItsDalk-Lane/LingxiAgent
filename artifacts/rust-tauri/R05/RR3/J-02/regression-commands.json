@@ -1,0 +1,48 @@
+[
+  {
+    "name": "a-fd",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/rust-tauri/r02_run_output_regression.py",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-02/a-fd"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startedUtc": "2026-10-07T03:54:22.035149+00:00",
+    "finishedUtc": "2026-10-07T03:54:30.345388+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "fba7a9e8b4f9901358b6cc2eb7d35fc9f21fc638e5ec316cd1e10c0b0177390a",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "i-restore",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/rust-tauri/r05_t08_restore_selfcheck.py",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-02/i-restore"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startedUtc": "2026-10-07T03:54:30.345837+00:00",
+    "finishedUtc": "2026-10-07T03:54:32.773146+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "07b815f21d7c19cf44723604a38b3bc73c5166b25355097764393ab764e3c4b6",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "b-negative",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startedUtc": "2026-10-07T03:54:32.773538+00:00",
+    "finishedUtc": "2026-10-07T03:54:33.254296+00:00",
+    "exitCode": 0,
+    "stdoutSha256": "f31e047a630251c463af9532ab7283b05e7f21048fdf6fde94edfcc8754e05ed",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

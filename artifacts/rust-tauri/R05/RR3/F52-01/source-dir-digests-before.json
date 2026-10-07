@@ -1,0 +1,31 @@
+{
+ "captured_utc": "2026-10-07T13:01:30.803731+00:00",
+ "git": {
+  "lstat": {
+   "dev": 16777231,
+   "gid": 20,
+   "ino": 276456367,
+   "mode": "0o100755",
+   "mtime_ns": 1791334791598252451,
+   "size": 255,
+   "uid": 501
+  },
+  "name": "git",
+  "sha256": "f9dc56ed2d08e1f687ed2e39c70e00f629cd485136bdea7e21b2bfaa1c0afbf8",
+  "type": "regular_file"
+ },
+ "python3": {
+  "lstat": {
+   "dev": 16777231,
+   "gid": 20,
+   "ino": 276456368,
+   "mode": "0o120755",
+   "mtime_ns": 1791334791598365243,
+   "size": 62,
+   "uid": 501
+  },
+  "name": "python3",
+  "readlink_target": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+  "type": "symlink"
+ }
+}

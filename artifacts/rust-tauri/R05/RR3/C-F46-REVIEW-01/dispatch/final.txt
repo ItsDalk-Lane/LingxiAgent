@@ -1,0 +1,7 @@
+独立验收 **PASS**：C/F27 与 F46 联合通过，无待修阻断项。
+
+已亲跑完整160轮、六次连续重启、取消恢复及9项日志回归；故意恢复旧问题和伪造零占用均确实失败，还原后通过。
+
+[独立 REVIEW](artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md) · [533项真实证据清单](artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/MANIFEST.json)
+
+其他所有者的汇总变化已实际记录，321项冻结执行输入保持相同。未改生产源码、总控文档、Git或系统。本结论仅覆盖本包的 macOS 验收，不代表 R05 阶段放行。

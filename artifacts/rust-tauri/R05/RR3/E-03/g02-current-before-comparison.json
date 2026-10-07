@@ -1,0 +1,95 @@
+{
+  "at": "2026-10-07T04:46:18.521424+00:00",
+  "baseline_ref": "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/metadata/source-before.json",
+  "baseline_count": 1068,
+  "baseline_digest": "878533ef3fe5b8fd5e50bdb633a22b8e17451f4d80f8510ab9b7b8058571e69e",
+  "changed": [
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_BRIEF.md",
+      "before": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_BRIEF.md",
+        "sha256": "7e4e363d7e5f53cd1e98640a5ce1d06e26cf096f892726c7a668cab8d2cb609b",
+        "link": null,
+        "bytes": 4376,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_BRIEF.md",
+        "sha256": "04121285aa6bb2a9bbc81c21b00e222b7027a5170a7171b510d946b3444ac4a5",
+        "bytes": 6192,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_REVIEW_BRIEF.md",
+      "before": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_REVIEW_BRIEF.md",
+        "sha256": "98daf5d74b479a3a52e459f2430b26103ce43ef6c7f1a72fa015eb3fbae85376",
+        "link": null,
+        "bytes": 1438,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_REVIEW_BRIEF.md",
+        "sha256": "a5a58474633d05ae020cad73b9d837c9a8e2e9beb56f4a5d4e510d1a34251654",
+        "bytes": 2085,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+      "before": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+        "sha256": "b1512a730609e4842df4040141e7249bdd9fe18cab8692e2edb0c2dce30b7a47",
+        "link": null,
+        "bytes": 10604,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+        "sha256": "92e51a4bfc3b6ea366bb52a2962d122c3f04a1f9213bab5b91ad6a4f3f43ca09",
+        "bytes": 11474,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+      "before": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+        "sha256": "5e396796f2947305d76a1c0db9d5c2a17ce68abde7c2e76a72004805b33b6a32",
+        "link": null,
+        "bytes": 18282,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+        "sha256": "b00ab1fb75b431294f5d9a04112c1256c7ab2503e33a4e6bb5555f138b64c6f9",
+        "bytes": 19714,
+        "mode": 420,
+        "link": null
+      }
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+      "before": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+        "sha256": "ea23e457d50b890f671cd8ca27cfb002090985711a643e38ee757d3e61bda2a8",
+        "link": null,
+        "bytes": 15118,
+        "mode": 420
+      },
+      "after": {
+        "path": "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+        "sha256": "c6a69274a8344da0e473924f9cb8a3874f7bc4540ca9705d5f8b8e21044bf2ce",
+        "bytes": 16089,
+        "mode": 420,
+        "link": null
+      }
+    }
+  ],
+  "whole_candidate_equal": false,
+  "qualification": "This retained G inventory is not full candidateSourceBinding. Changed metadata listed honestly; additional E03/storage/coordination evidence also changes whole candidate membership. Old G facts retain original tested HEAD+dirty, never rebound to a later commit."
+}

@@ -1,0 +1,575 @@
+{
+  "at": "2026-10-07T04:35:33.455505+00:00",
+  "scope": "Reusable F25/F26 registration and preflight mechanisms only; not a current whole producer or default sixteen-case result.",
+  "inputs": [
+    {
+      "path": "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+      "prior": "96f70219d1df88249e8df073f4dfe211f8562cef20f7e45b1c03064feb5362be",
+      "current": "96f70219d1df88249e8df073f4dfe211f8562cef20f7e45b1c03064feb5362be",
+      "equal": true
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_leaf_case_map.tsv",
+      "prior": "a4f5866d11a833a7bbcd7224e898baaaa047a485cf4b2c66c515af25348db64f",
+      "current": "a4f5866d11a833a7bbcd7224e898baaaa047a485cf4b2c66c515af25348db64f",
+      "equal": true
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_required_cids.tsv",
+      "prior": "1a046aa162d62bc1fdefdd286a6211d37c15852a2683073df9c629d26190676c",
+      "current": "1a046aa162d62bc1fdefdd286a6211d37c15852a2683073df9c629d26190676c",
+      "equal": true
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_stage_cids.tsv",
+      "prior": "ffffbe56313a1d5e50e7b216499cd851b1efc988da811a57d4fe0b07cc0be556",
+      "current": "ffffbe56313a1d5e50e7b216499cd851b1efc988da811a57d4fe0b07cc0be556",
+      "equal": true
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_stage_pins.tsv",
+      "prior": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+      "current": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+      "equal": true
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "prior": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "current": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "equal": true
+    },
+    {
+      "path": "rust/Cargo.lock",
+      "prior": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "current": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "equal": true
+    },
+    {
+      "path": "rust/Cargo.toml",
+      "prior": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+      "current": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/Cargo.toml",
+      "prior": "f7252fdd642075333d050340c3d2b4687d936c92a3ac07c6e2019fd8c71f5c61",
+      "current": "f7252fdd642075333d050340c3d2b4687d936c92a3ac07c6e2019fd8c71f5c61",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/lingxi-browser-spike/Cargo.toml",
+      "prior": "74ec57bbd9395ea26ba4df5f2f15195188e9ce0d52235fd5cbb50b8fa629a236",
+      "current": "74ec57bbd9395ea26ba4df5f2f15195188e9ce0d52235fd5cbb50b8fa629a236",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/Cargo.toml",
+      "prior": "2fab453351437b78d219d01c19f4a0c1f6f522869de1a2e1ce9941731deff0df",
+      "current": "2fab453351437b78d219d01c19f4a0c1f6f522869de1a2e1ce9941731deff0df",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/Cargo.toml",
+      "prior": "55ec1b90bb8aa610bf507d70e168a1fdf73e84e8771defe9018ab6f2b0fc4ddc",
+      "current": "55ec1b90bb8aa610bf507d70e168a1fdf73e84e8771defe9018ab6f2b0fc4ddc",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/Cargo.toml",
+      "prior": "c778bbe5821bc8d7dc1e5d22292879f3f3cb2ac6af480316acc1bad705b08b17",
+      "current": "c778bbe5821bc8d7dc1e5d22292879f3f3cb2ac6af480316acc1bad705b08b17",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/lingxi-spike/Cargo.toml",
+      "prior": "6a63f3596f63a2e21735fff068adc228f5ae653dbae206d671df93086282ca48",
+      "current": "6a63f3596f63a2e21735fff068adc228f5ae653dbae206d671df93086282ca48",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/Cargo.toml",
+      "prior": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+      "current": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/candidate.rs",
+      "prior": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+      "current": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/candidate/tests.rs",
+      "prior": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+      "current": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/main.rs",
+      "prior": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+      "current": "1100a4c58aec623bba11b3f194a494622c3e8c7cc245a3e934f8e26bc05793c1",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/runner_identity.rs",
+      "prior": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+      "current": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_map.rs",
+      "prior": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce",
+      "current": "025b7160613ab9ada766492caa42c236b40f9707efcdcb641faebdcd587551ce",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R02.json",
+      "prior": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+      "current": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R03.json",
+      "prior": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+      "current": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R04.json",
+      "prior": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "current": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R05.json",
+      "prior": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "current": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/verify.rs",
+      "prior": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+      "current": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+      "equal": true
+    },
+    {
+      "path": "rust/crates/xtask/src/verify/runner_tests.rs",
+      "prior": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69",
+      "current": "46991822687790e069c71705d593d7a76e75c40b41a54a2c03794b989abb0a69",
+      "equal": true
+    },
+    {
+      "path": "scripts/rust-tauri/r05_t08_stage_suites.sh",
+      "prior": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e",
+      "current": "8a35225da60157b6e80cc67230acba277c888526f37c807bbb6b431c1f93fa9e",
+      "equal": true
+    }
+  ],
+  "inputCount": 27,
+  "inputDifferences": [],
+  "historicalRuns": [
+    {
+      "case": "F26-cid-rename",
+      "record": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-cid-rename/command.json",
+      "recordSha": "662d239af18750672f7765764ea85779893da02765e9ce5f7fcfc169343d4557",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--bin",
+        "xtask",
+        "r05_stage_cid_table_owns"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+      "start": "2026-10-07T02:57:17.025102+00:00",
+      "end": "2026-10-07T02:57:20.561791+00:00",
+      "exit": 101,
+      "counts": [
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+      ],
+      "logs": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-cid-rename/stdout.log",
+          "sha256": "55d04db9004a3519896f0b45b7d83cc9aba1f30c5d6d9910e524b13413214c30",
+          "matchesExpected": true
+        }
+      ],
+      "binary": [
+        {
+          "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+          "sha256": "aac06e942377ef8f8eda78dc13996952dd2368f2d31377407c71b56ecb4eba7d",
+          "bytes": 9370504
+        }
+      ]
+    },
+    {
+      "case": "F26-cid-rename-restored",
+      "record": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-cid-rename-restored/command.json",
+      "recordSha": "00316f1f587b914a173ae6597066a8399d7717edcf614868f05e4ddb7d71dae8",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--bin",
+        "xtask",
+        "r05_stage_cid_table_owns"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+      "start": "2026-10-07T02:57:20.682400+00:00",
+      "end": "2026-10-07T02:57:26.585486+00:00",
+      "exit": 0,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+      ],
+      "logs": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-cid-rename-restored/stdout.log",
+          "sha256": "21199fbf30304b03e4039e132e285b3270236e8f65a0353fc4cf8c04cf0c2ede",
+          "matchesExpected": true
+        }
+      ],
+      "binary": [
+        {
+          "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+          "sha256": "3bd3ef1da40d3d1355059dd69ea71415b932ca7d4decd2239457d4fbeeb7e424",
+          "bytes": 9370504
+        }
+      ]
+    },
+    {
+      "case": "F26-registry-missing",
+      "record": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-registry-missing/command.json",
+      "recordSha": "0cc827446988e5a0f85b1efa963dd93a0b422784d9c38caf1beebf2b5a74124f",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--bin",
+        "xtask",
+        "r05_stage_cid_table_owns"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+      "start": "2026-10-07T02:57:26.706555+00:00",
+      "end": "2026-10-07T02:57:32.842740+00:00",
+      "exit": 101,
+      "counts": [
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+      ],
+      "logs": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-registry-missing/stdout.log",
+          "sha256": "fac5fdd44f49fda17c5733c140e67651ba0842f8c0ceb24e8fe2c8fcdb8647d2",
+          "matchesExpected": true
+        }
+      ],
+      "binary": [
+        {
+          "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+          "sha256": "4f516ff981f395aa46d4fa261e3b52f969bb084220a72780259d19c7749f1a3f",
+          "bytes": 9370504
+        }
+      ]
+    },
+    {
+      "case": "F26-registry-missing-restored",
+      "record": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-registry-missing-restored/command.json",
+      "recordSha": "c1bed8700e5e82f5b27f4e4e92ac0bb4fef481b95fc0722f6a515c3c2c37f435",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--bin",
+        "xtask",
+        "r05_stage_cid_table_owns"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+      "start": "2026-10-07T02:57:32.959144+00:00",
+      "end": "2026-10-07T02:57:39.394763+00:00",
+      "exit": 0,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+      ],
+      "logs": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-registry-missing-restored/stdout.log",
+          "sha256": "7b2f40c2edd9bb4202e1f73a5e05844d421066e4f585ce8c0d3b834d4cf1f37e",
+          "matchesExpected": true
+        }
+      ],
+      "binary": [
+        {
+          "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+          "sha256": "cc12c95acafc2dd2c099a2659e1a51f664493023d3d8c970ebd20efb970835e8",
+          "bytes": 9370504
+        }
+      ]
+    },
+    {
+      "case": "F26-bogus-command",
+      "record": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-bogus-command/command.json",
+      "recordSha": "c9a3c70df91ed8e6d2a2b7c29658dd10df9c5955b213c36cd28bd84b72bb24e8",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--bin",
+        "xtask",
+        "r05_stage_cid_table_owns"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+      "start": "2026-10-07T02:57:39.521932+00:00",
+      "end": "2026-10-07T02:57:45.496967+00:00",
+      "exit": 101,
+      "counts": [
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+      ],
+      "logs": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-bogus-command/stdout.log",
+          "sha256": "a3337a9316a3d1745a93fc500550c049b90bdd06e55e88d3f1c5d8375631310f",
+          "matchesExpected": true
+        }
+      ],
+      "binary": [
+        {
+          "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+          "sha256": "6688a75be203e7fbd615c1e0bd13395ca9200da0a6c16be35e1d463cd0d682cc",
+          "bytes": 9370504
+        }
+      ]
+    },
+    {
+      "case": "F26-bogus-command-restored",
+      "record": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-bogus-command-restored/command.json",
+      "recordSha": "1e187d5b95252cb0b7e3960713b488bedb05b6cd6d0a1b2da008daa93e4c105d",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--bin",
+        "xtask",
+        "r05_stage_cid_table_owns"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+      "start": "2026-10-07T02:57:45.619678+00:00",
+      "end": "2026-10-07T02:57:52.143275+00:00",
+      "exit": 0,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+      ],
+      "logs": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-bogus-command-restored/stdout.log",
+          "sha256": "5ebfabde4ee68ab510740a1c4362a4826a47e731a5ba4f379ecf5ecffc4c7126",
+          "matchesExpected": true
+        }
+      ],
+      "binary": [
+        {
+          "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+          "sha256": "7bf0d657e6a278aef257e7f5c57e4d0e0c796ef2bc62e32d1104ef9e6851d46d",
+          "bytes": 9370504
+        }
+      ]
+    },
+    {
+      "case": "F25-exclusive-share",
+      "record": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F25-exclusive-share/command.json",
+      "recordSha": "03d7f0a7a95d37f8fbed2058207fd58a55a7fa0cd9478f69a10e5bf9dfc02b00",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--bin",
+        "xtask",
+        "r05_production_map_mirrors"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+      "start": "2026-10-07T02:57:52.262649+00:00",
+      "end": "2026-10-07T02:58:00.549786+00:00",
+      "exit": 101,
+      "counts": [
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+      ],
+      "logs": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F25-exclusive-share/stdout.log",
+          "sha256": "31ce6ae549208de7ea6e53b47b9655eb53824ca0ca25d84368650fb1a434e436",
+          "matchesExpected": true
+        }
+      ],
+      "binary": [
+        {
+          "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+          "sha256": "dd92a1eef8bd618e32363d17359b8f3acb03531e2c1280a5540352ac105aa032",
+          "bytes": 9370504
+        }
+      ]
+    },
+    {
+      "case": "F25-exclusive-share-restored",
+      "record": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F25-exclusive-share-restored/command.json",
+      "recordSha": "80cdc7fe345d896a353835bf41dfa185fa41815eeb016240924c0f1c447cf4d9",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--bin",
+        "xtask",
+        "r05_production_map_mirrors"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+      "start": "2026-10-07T02:58:00.673960+00:00",
+      "end": "2026-10-07T02:58:06.338370+00:00",
+      "exit": 0,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.04s"
+      ],
+      "logs": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F25-exclusive-share-restored/stdout.log",
+          "sha256": "e7fc427cea0a8ce00777f5caf8bc28dc541ff659b5ce3647e4290fb351df075a",
+          "matchesExpected": true
+        }
+      ],
+      "binary": [
+        {
+          "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+          "sha256": "e00923870c176f8e5db4acdbefacfe6a3250a8941eb696ef63d3284c0a7a34cf",
+          "bytes": 9370504
+        }
+      ]
+    },
+    {
+      "case": "F25-leafcase-missing",
+      "record": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F25-leafcase-missing/command.json",
+      "recordSha": "ac6ae567639ee3e03f43aac2c202b293db2210fc5853f7bcacc1759246eb6f16",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--bin",
+        "xtask",
+        "r05_production_map_mirrors"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+      "start": "2026-10-07T02:58:06.459760+00:00",
+      "end": "2026-10-07T02:58:13.849582+00:00",
+      "exit": 101,
+      "counts": [
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.03s"
+      ],
+      "logs": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F25-leafcase-missing/stdout.log",
+          "sha256": "bd26717b1d52b384e0b70854985d85459aed8b92c47fb608685a3821fbe73201",
+          "matchesExpected": true
+        }
+      ],
+      "binary": [
+        {
+          "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+          "sha256": "bc469687eab17dbb21ee8d1599cfe1379d8483527b405036e2b16493f92060cb",
+          "bytes": 9370504
+        }
+      ]
+    },
+    {
+      "case": "F25-leafcase-missing-restored",
+      "record": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F25-leafcase-missing-restored/command.json",
+      "recordSha": "02cded27594fb09818065e861906784eba3518beaff7361c36cb5b37338a0295",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--bin",
+        "xtask",
+        "r05_production_map_mirrors"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+      "start": "2026-10-07T02:58:13.971025+00:00",
+      "end": "2026-10-07T02:58:20.354177+00:00",
+      "exit": 0,
+      "counts": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.03s"
+      ],
+      "logs": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F25-leafcase-missing-restored/stdout.log",
+          "sha256": "a9d251040f2d138e300c6e35efa28422c98225d3f78a0bfc1d290c76c4748fdf",
+          "matchesExpected": true
+        }
+      ],
+      "binary": [
+        {
+          "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+          "sha256": "b462cc6e9ebef4e7e34a6188d2b1d7509af1d87d19b342029a41010ecc7d4f96",
+          "bytes": 9370504
+        }
+      ]
+    },
+    {
+      "case": "F26-producer-preflight",
+      "record": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-producer-preflight/command.json",
+      "recordSha": "46b593025c10ab89bf0a963d992da9512a6be7b41b495af84242fdf0d9501582",
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r05_t08_stage_suites.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-producer-preflight/suites"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+      "start": "2026-10-07T02:58:20.473587+00:00",
+      "end": "2026-10-07T02:58:20.522826+00:00",
+      "exit": 1,
+      "counts": [],
+      "logs": [
+        {
+          "path": "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-producer-preflight/stdout.log",
+          "sha256": "032ce8a2cdb12ccda6c0a565959f534b1ac6d517411a8d9561c5320b9bb73b11",
+          "matchesExpected": true
+        }
+      ],
+      "binary": []
+    }
+  ]
+}

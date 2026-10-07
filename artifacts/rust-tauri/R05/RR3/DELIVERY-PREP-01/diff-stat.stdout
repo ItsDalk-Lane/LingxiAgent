@@ -1,0 +1,26 @@
+ docs/rust-tauri/ORCHESTRATOR_PROGRESS.json         | 590 ++++++++++++++--
+ docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md       |  12 +-
+ docs/rust-tauri/R05/PROGRESS_LEDGER.json           | 413 +++++++++++-
+ docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json     | 413 +++++++++++-
+ docs/rust-tauri/R05/R05_BLOCKERS.md                |   8 +
+ docs/rust-tauri/R05/R05_HANDOFF.json               | 749 ++++++++++++++++++++-
+ docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md      |   8 +-
+ docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json     | 420 +++++++++++-
+ docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md    |   6 +
+ docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json   | 667 +++++++++++++++++-
+ docs/rust-tauri/R05/R05_REPORT.md                  |  58 +-
+ docs/rust-tauri/R05/R05_TEST_MAP.json              | 464 ++++++++++++-
+ docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md       |  21 +-
+ rust/crates/lingxi-service/src/lib.rs              |   9 +-
+ rust/crates/lingxi-service/src/logging.rs          |  85 ++-
+ rust/crates/lingxi-service/src/redaction.rs        |  75 ++-
+ .../lingxi-service/tests/r05_t08_resources.rs      | 527 ++++++++++++++-
+ rust/crates/xtask/src/candidate.rs                 | 121 +++-
+ rust/crates/xtask/src/candidate/tests.rs           | 118 ++++
+ rust/crates/xtask/src/main.rs                      |  15 +-
+ rust/crates/xtask/src/runner_identity.rs           |   9 +
+ rust/crates/xtask/src/verify/runner_tests.rs       | 193 ++++++
+ scripts/rust-tauri/r02_t01_service_smoke.sh        |   4 +
+ .../rust-tauri/r02_t08_legacy_entry_regression.sh  | 215 ++----
+ scripts/rust-tauri/r05_t08_negative_gate.sh        | 284 +++++---
+ 25 files changed, 5141 insertions(+), 343 deletions(-)

@@ -1,0 +1,10 @@
+2026-10-07T01:05:06.113615Z  INFO lingxi_service_binary: data root resolved effective_home=/Users/[user][token] source=cli ignored_sources=none
+2026-10-07T01:05:06.113799Z  INFO lingxi_service_binary: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/Users/[user][token] runtime_dir=/Users/[user][token][user]
+2026-10-07T01:05:06.113971Z  INFO lingxi_service_binary: single-writer lock acquired [token] start_nonce=8fc2b9322e013a41 pid=63522 entropy="os-random-device" lock=/Users/[user][token][user]/instance.lock network_mode=loopback
+2026-10-07T01:05:06.114350Z  INFO lingxi_service_binary: data-epoch gate passed home=/Users/[user][token] decision=ProceedSteady(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-10-07T01:05:06.126258Z  INFO lingxi_service_binary: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/Users/[user]/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated-restored/home/lingxi-service/local-token.json run_database=/Users/[user][token][user]/data/runs.db
+2026-10-07T01:05:06.136139Z  INFO lingxi_service_binary: instance record published (atomic write) record=/Users/[user][token][user]/instance.json bind_addr=127.0.0.1:57914
+2026-10-07T01:05:06.137362Z  INFO lingxi_service_binary: shutdown signal: SIGTERM
+2026-10-07T01:05:06.137954Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-10-07T01:05:06.138273Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-10-07T01:05:06.138396Z  INFO lingxi_service_binary: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

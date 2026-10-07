@@ -1,0 +1,10 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.04s
+     Running tests/r05_t06_worker_model.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t06_worker_model-209d0a13dc6d2262)
+
+running 2 tests
+test c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one ... ok
+test c06_a_held_global_model_permit_makes_the_callback_refuse_bounded_not_deadlock ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.73s
+

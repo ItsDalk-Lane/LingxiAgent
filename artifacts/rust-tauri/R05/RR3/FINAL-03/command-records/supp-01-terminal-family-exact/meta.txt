@@ -1,0 +1,14 @@
+label: supp-01-terminal-family-exact
+argv: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r04_t08_tool_matrix terminal_family_share_cases -- --exact
+cwd: /Users/study_superior/Desktop/Code/LingxiAgent
+HOME: /Users/study_superior
+user: study_superior
+utcStart: 2026-10-07T15:53:34.141953000Z
+dfBefore: /dev/disk3s5       926  375       526    42% 5174880 5522545680    0%   /System/Volumes/Data
+utcEnd: 2026-10-07T15:53:55.509166000Z
+exit: 0
+stdoutBytes: 152
+stderrBytes: 1490
+stdoutSha256: 952e6bbbcfb1ca8d3de3ac28e0efe61d51e94822255c9e7768d63903d887a500
+stderrSha256: 74c3a2816aa96483d81afefb7e8bdb3369176aaa2af355753d9ca1b5bcb23ffe
+dfAfter: /dev/disk3s5       926  376       525    42% 5176568 5509039920    0%   /System/Volumes/Data

@@ -1,0 +1,14 @@
+[
+  {
+    "name": "independent-index-inode",
+    "ok": true
+  },
+  {
+    "name": "independent-head-inode",
+    "ok": true
+  },
+  {
+    "name": "index-bytes-equal",
+    "ok": false
+  }
+]

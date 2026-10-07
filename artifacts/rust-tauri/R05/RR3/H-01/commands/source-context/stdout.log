@@ -1,0 +1,263 @@
+    next: Next,
+) -> Response {
+    let method = req.method().to_string();
+    let path = req.uri().path().to_string();
+    let request_id = req
+        .extensions()
+        .get::<RequestId>()
+        .map(|r| r.0.clone())
+        .unwrap_or_default();
+    let host = req
+        .headers()
+        .get(header::HOST)
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("")
+        .to_string();
+    let origin = req
+        .headers()
+        .get(header::ORIGIN)
+        .and_then(|v| v.to_str().ok())
+        .map(|v| v.to_string());
+    let secure = req
+        .extensions()
+        .get::<serve::SecureTransport>()
+        .is_some_and(|value| value.0);
+    // 只有实际运行中的本机网卡地址可作为局域网页面来源；网卡枚举失败时拒绝该来源。
+    let local_ips = if state.config.network_mode == NetworkMode::Lan
+        && check_origin(origin.as_deref()) == transport::OriginVerdict::Forbidden
+    {
+        if_addrs::get_if_addrs()
+            .map(|interfaces| {
+                interfaces
+                    .into_iter()
+                    .filter(|interface| interface.is_oper_up() && !interface.is_link_local())
+                    .map(|interface| interface.ip())
+                    .collect::<Vec<_>>()
+            })
+            .unwrap_or_default()
+    } else {
+        Vec::new()
+    };
+    let public_base_url = state.management.public_base_url();
+    let origin_verdict = transport::check_service_origin(
+        origin.as_deref(),
+        &host,
+        transport::ServiceOriginContext {
+            mode: state.config.network_mode,
+            actual_port: state.actual_port(),
+            secure,
+            bind_ip: state.config.bind_addr.ip(),
+            local_ips: &local_ips,
+            public_base_url: public_base_url.as_deref(),
+        },
+    );
+
+    let reject = |status: StatusCode, reason: &str, resp: EndpointError| {
+        // The marker line passes the redactor before printing: the marker
+        // vocabulary itself is secret-free, but any future field added
+        // here is structurally guarded.
+        eprintln!(
+            "{}",
+            redact_line(&format!(
+                "{TRANSPORT_REJECTED_MARKER} request_id={request_id} method={method} path={path} \
+                 status={} reason={reason} origin={} host={host} remote={remote}",
+                status.as_u16(),
+                origin.as_deref().unwrap_or("absent"),
+            ))
+        );
+        browser_cors_response(
+            resp.into_response(),
+            origin.as_deref(),
+            origin_verdict == transport::OriginVerdict::Allowed,
+        )
+                connection_kind,
+            }),
+        };
+        match auth_result {
+            Ok((principal, source)) => {
+                tracing::debug!(%source, request_id = %request_id, "ws upgrade authenticated");
+                principal
+            }
+            Err(denial) => {
+                let registry_failure = matches!(
+                    denial.reason,
+                    "auth_registry_unavailable" | "web_session_registry_unavailable"
+                );
+                eprintln!(
+                    "{}",
+                    redact_line(&format!(
+                        "{AUTH_REJECTED_MARKER} request_id={request_id} method={method} path={path} \
+                         status={} reason={} remote={remote}",
+                        if registry_failure { 500 } else { 401 },
+                        denial.reason
+                    ))
+                );
+                if registry_failure {
+                    return EndpointError::new(
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        ErrorCode::Internal,
+                        StatusCode::UNAUTHORIZED,
+                        EndpointError::unauthorized(denial.reason),
+                    )
+                };
+                eprintln!(
+                    "{}",
+                    redact_line(&format!(
+                        "{AUTH_REJECTED_MARKER} request_id={request_id} method={method} path={path} \
+                         status={status} reason={} remote={}",
+                        denial.reason,
+                        req.extensions()
+                            .get::<SocketAddr>()
+                            .map(|a| a.to_string())
+                            .unwrap_or_else(|| "unknown".to_string())
+                    ))
+                );
+                return err.into_response();
+            }
+        }
+    };
+
+    // Route-level authorization (shared with the WS path: same table).
+    if let Err(denial) = authorize_route(&method, &path, Some(&principal)) {
+        eprintln!(
+            "{}",
+            redact_line(&format!(
+                "{AUTH_REJECTED_MARKER} request_id={request_id} method={method} path={path} \
+                 status={} reason={} remote={}",
+                denial.status,
+                denial.reason,
+                req.extensions()
+                    .get::<SocketAddr>()
+                    .map(|a| a.to_string())
+                    .unwrap_or_else(|| "unknown".to_string())
+            ))
+        );
+        let mut err = EndpointError::forbidden(denial.reason);
+        if let Some(scope) = denial.required_scope {
+[package]
+name = "lingxi-service"
+description = "Rust independent service / composition root (R02-T01): process entrypoint, explicit configuration, transport wiring and port injection. The domain (lingxi-kernel) never reaches HTTP/UI/env/database directly - implementations are injected here as R02 storage/event tasks land them."
+version = "0.0.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+# R02-T01: every third-party crate below is already a locked member of the
+# workspace dependency tree (introduced by R01-T02/T03 for lingxi-protocol /
+# lingxi-spike); no new third-party version enters rust/Cargo.lock with this
+# crate. Exact versions: axum 0.8.9, tokio 1.53.1, serde 1.0.229,
+# serde_json 1.0.151, tracing 0.1.44, tracing-subscriber 0.3.23
+# (docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md total lock table).
+#
+# Deliberately NOT a dependency at R02-T01:
+#   - lingxi-kernel: no port implementation exists yet (storage is R02-T04,
+#     events R02-T05, auth R02-T03). An unused edge would be a fake
+#     "composition" - the edge is added by the first task that actually
+#     injects a port implementation.
+#   - reqwest / rusqlite: no outbound HTTP and no database access at T01.
+[dependencies]
+axum = "0.8.9"
+lingxi-protocol = { path = "../lingxi-protocol" }
+# R04-T07: the OFFICIAL MCP Rust SDK (R01 D-06), at the SAME locked
+# version and feature set lingxi-spike already validated
+# (default-features=false + client,server — in-process duplex initialize
+# handshake, negotiated protocol, tools/list, plus real stdio child
+# transports built on tokio's already-locked "process" feature). No new
+# package version enters rust/Cargo.lock: rmcp 3.4.1 and every dependency
+# of these features is already a locked member via lingxi-spike
+# (workspace feature unification). HTTP/SSE transports are deliberately
+# NOT enabled here (D-06: they would add unlocked packages; an
+# unsupported endpoint refuses loudly instead of falling back).
+rmcp = { version = "3.4.1", default-features = false, features = ["client", "server"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+# R04-T05: the "process" feature is added for tokio::process::Command
+# (async spawn/wait of the supervised children). Feature flags only —
+# tokio 1.53.1 and all its deps (bytes/libc/mio/...) are already locked;
+# no new package version enters rust/Cargo.lock (the serde_json R04-T01
+# precedent for lock-reuse).
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "net", "signal", "io-util", "time", "sync", "process"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["fmt", "env-filter"] }
+# R02-T03 additions — every crate below is ALREADY a locked member of the
+# workspace dependency tree at exactly this version (no new third-party
+# version enters rust/Cargo.lock with this task; the lock only gains
+# dependency references for this crate):
+#   - hyper 1.11.1: axum's own HTTP implementation, needed to name
+#     hyper::upgrade::OnUpgrade for the WebSocket upgrade path (axum's `ws`
+#     feature is deliberately NOT enabled — it would pull the unlocked
+#     tokio-tungstenite/tungstenite pair into Cargo.lock).
+#   - sha1 0.11.0 / base64 0.23.1: RFC 6455 Sec-WebSocket-Accept computation
+#     (the same roles they already serve in lingxi-protocol's handshake bins).
+#   - sha2 0.11.0: fixed-length digests so token comparison is length-safe
+#     and constant-time (hash-then-compare).
+# R02 stage-repair R2 (R2-F04): features made explicit — the transport
+# serving loop (src/serve.rs) names hyper's server builder,
+# TowerToHyperService and rt adapters directly. Every crate and version is
+# ALREADY in rust/Cargo.lock (h2 0.4.19, tower 0.5.3 included — pulled by
+# axum/hyper since R01); feature flags and references change nothing in
+# the lock.
+hyper = { version = "1.11.1", default-features = false, features = ["http1", "server"] }
+sha1 = "0.11.0"
+sha2 = "0.11.0"
+base64 = "0.23.1"
+#   - hyper-util 0.1.21 (axum's own runtime glue, same locked version):
+#     TokioIo adapts hyper's upgraded connection IO to tokio's
+#     AsyncRead/AsyncWrite for the WS frame codec; service +
+#     http1 serve the connection-level admission loop (R2-F04). R3-F01:
+#     the serving loop uses hyper's EXPLICIT http1 builder, so the
+#     "server"/"server-auto" features (hyper-util's auto version-sniffing
+#     server) are no longer enabled — the untimed ReadVersion state they
+#     provided was the defect.
+hyper-util = { version = "0.1.21", default-features = false, features = ["tokio", "http1", "service"] }
+tower = "0.5.3"
+rustls = "0.23.45"
+tokio-rustls = "0.26.5"
+scrypt = "=0.12.0"
+chrono = "=0.4.45"
+# R9-F05: getrandom 0.2.17 is ALREADY a locked member of the workspace tree
+# (pulled transitively by other crates); this edge adds no new version to
+# rust/Cargo.lock. It is the SYSTEM secure random source for every auth
+# credential (loopback token, device secret/salt, WS tickets): the old
+# hand-rolled reader silently degraded non-Unix builds — and any
+# /dev/urandom failure — to a predictable pid+time xorshift; the system
+# CSPRNG propagates its failures so credential issuance can REFUSE
+# (src/auth.rs).
+getrandom = "0.2"
+# R00 手机访问二维码：qrcodegen 1.8.0（MIT，无传递依赖）只生成标准 QR 模块；SVG 由本服务绘制。
+qrcodegen = "=1.8.0"
+libc = "0.2"
+# 各平台统一枚举实际网卡，供局域网地址与二维码选择使用。
+if-addrs = "=0.15.0"
+# R02-T04 additions — both are workspace members, zero third-party change:
+#   - lingxi-kernel: the StoragePort contract this composition root now
+#     injects (R02-T01 deliberately deferred the edge until a port
+#     implementation existed to inject).
+#   - lingxi-adapters: the SQLite-backed StoragePort implementation (new
+#     run/message database behind a bounded single-writer queue).
+lingxi-kernel = { path = "../lingxi-kernel" }
+lingxi-adapters = { path = "../lingxi-adapters" }
+# R02-T05 note: the event subscription service (src/events.rs) additionally
+# uses tokio's "sync" feature (Notify behind the bounded subscriber
+# mailboxes); same locked tokio version, feature flag only — no new lock
+# entries beyond this crate's existing references.
+
+# N06：Windows 安全审计日志逐层使用目录句柄相对打开，拒绝重解析点。
+# 版本已经存在于工作区锁文件；仅 Windows 目标需要 Native/Win32 声明。
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "=0.61.2", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_Security", "Win32_Security_Authorization", "Win32_Storage_FileSystem", "Win32_System_IO", "Win32_System_Threading", "Win32_System_WindowsProgramming"] }
+
+#
+# R02-T06 dev-only: rusqlite at the SAME locked version + bundled feature as
+# lingxi-adapters (zero new lock entries). Used exclusively by the shutdown
+# coordinator tests to hold a REAL external WAL write lock while proving the
+# deadline bounds a blocked DB close.
+[dev-dependencies]
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+# 测试时临时生成证书/密钥，仓库和证据中均不保存私钥。
+rcgen = "=0.14.10"
+# R04-T05 integration tests probe real process liveness (kill(pid, 0))
+# for the managed tree and the unrelated sentinel. Same locked libc
+# version as the [dependencies] edge — zero new lock entries.
+libc = "0.2"
+

@@ -1,0 +1,659 @@
+{
+  "utc": "2026-10-07T01:19:12.546002+00:00",
+  "manifestChecks": {
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/PREPARED-ALLOW.md": {
+      "sha256": "b0f25a7b61b0028650631611044139eba84bd2722697160ab43c9ede450dae0f",
+      "size": 3417,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/REPORT.md": {
+      "sha256": "5ddc3c80e7e7ad7f88df714c6bb0d3c22502119cbe87fa5c0186eedbdf54be52",
+      "size": 9525,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/build-environment.json": {
+      "sha256": "17f09fe2f2c0162c1e3dd625a2c157dd37c930608fa1ed5ffac6d21ee0be19fa",
+      "size": 638,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/compile-probe.json": {
+      "sha256": "8d648e8447af9af72af09f9d63b069a5e2a6fd731c6538b18f6183c2b0dcaf26",
+      "size": 727,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/compile-probe.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/identity-after.json": {
+      "sha256": "4a3b0cacb972af2532a9e275783bddf4b88cc8c2ccf88139eb15cf91d6c7c6bc",
+      "size": 65083,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/identity-before.json": {
+      "sha256": "2a5750976bc246c07ac7d2c7dd1edd0a220ab7178d9e0983898c050b0195d301",
+      "size": 65083,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/input-comparison.json": {
+      "sha256": "e9fdcce6fd3750721da67b54426e49b55641761f00cc2a318c539a81e1bc7215",
+      "size": 13142,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe": {
+      "sha256": "86d4f4f5fec48a66dfd38278331578e6764bf9edc2592e4315334294ab7b6b65",
+      "size": 34632,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe.c": {
+      "sha256": "9d6b3b25bc0d7a363e8c9efceb23cb17da022fd8fd72f2e801135a7d5bc96959",
+      "size": 2709,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe.py": {
+      "sha256": "9bac28fb72f376a6846c460289226e1cf62259713bfe9158103edf683f74f906",
+      "size": 1477,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/prebuild-r00.json": {
+      "sha256": "82735de951e514494f1fa4ee964b0b8ccbdefd676043b98ec406555f648571c5",
+      "size": 787,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/prebuild-r00.log": {
+      "sha256": "35f6b3c18ac7b13b9f36b4390dfea4588a2afe844bc1d759a4a2ac15463d5ec4",
+      "size": 196607,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/prepared-identity-check.json": {
+      "sha256": "7a7f0f8fff095b4a421682695d3c1c6a3921fba10448606b219fdcbc253561ec",
+      "size": 692,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/prepared-identity-check.log": {
+      "sha256": "b7b020bee5440dc373103d79f3e59ea2dfc5eb6fb0c7c689f460783675fb6bb4",
+      "size": 351,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-apple-lan.json": {
+      "sha256": "b68f217a7a9456fa5479abf34c975e3366b7b8fffa13720d7e62b8f33c73731c",
+      "size": 680,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-apple-lan.log": {
+      "sha256": "55ce46732c73cd0912a9cf46aa36c8c2c1fb3400336645b3c03463e7374705e8",
+      "size": 161,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-c-lan.json": {
+      "sha256": "84ffaeebab372054317e0bc1da02f5da7f9d006cb089f929cf319c4511834919",
+      "size": 645,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-c-lan.log": {
+      "sha256": "b49afda5b6751d4df292e3fe9a37da703452545138c3c9de4421ecfef6126f51",
+      "size": 202,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-c-loopback.json": {
+      "sha256": "642290a68f6f56f20a678ebedce98a7a9b99467feb96d2232247c45feaa33ed3",
+      "size": 653,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-c-loopback.log": {
+      "sha256": "98e974f6df695899c8588d773f8cee4d5fe3dd36a6b902f4856f0b88bb4fd36f",
+      "size": 209,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-identities.json": {
+      "sha256": "b911a3d9591892d4a2ef0b1c713cb05dbb7b1c4b9af7c1b908a7a60b8f1cd5e0",
+      "size": 5049,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/r00-formal-01-listeners.log": {
+      "sha256": "6faf3b2315428a8820284f138c6f4a04341d7ee7e87a066a4aa0466192dff5fc",
+      "size": 23565,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/r00-formal-01.json": {
+      "sha256": "a37c27a740ca39d13aae0d9a84643abdc797c46b843b59b5d1753d8cf7d20039",
+      "size": 796,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/r00-formal-01.log": {
+      "sha256": "895a83c72efdb5b1fa9542df1b90d5ac3b5b5e58fcb96e102123783c4f1f894e",
+      "size": 3288,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/run_capture.py": {
+      "sha256": "206052c4f8881bac43608b56ee8898bcb28aa83857454b8799cb6266340967b4",
+      "size": 2648,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/snapshot.py": {
+      "sha256": "3cac6314ab1340a7e681c9945a9ae4c7ab7e21ee13404205c12aaba4e58d0169",
+      "size": 3230,
+      "matches": true
+    },
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/verify_prepared_identity.py": {
+      "sha256": "3c16a2ce8850249d409e31b4f5c81942e1ca0d0b874129735580b47c10aff2f5",
+      "size": 1447,
+      "matches": true
+    }
+  },
+  "allMatched": true,
+  "commandResults": {
+    "compile-probe.json": {
+      "name": "compile-probe",
+      "argv": [
+        "/usr/bin/clang",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "artifacts/rust-tauri/R05/RR3/D-01/lan_probe.c",
+        "-o",
+        "artifacts/rust-tauri/R05/RR3/D-01/lan_probe"
+      ],
+      "timeout": 60,
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "start": "2026-10-07T08:28:50.465957+08:00",
+      "end": "2026-10-07T08:28:50.678052+08:00",
+      "elapsedSeconds": 0.212,
+      "pid": 63754,
+      "actualExitCode": 0,
+      "supervisorTimedOut": false,
+      "supervisorExitCode": 0,
+      "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/compile-probe.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "prebuild-r00.json": {
+      "name": "prebuild-r00",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "+1.98.1",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r00_management_leaves",
+        "--no-run",
+        "--message-format=json"
+      ],
+      "timeout": 1200,
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "start": "2026-10-07T08:27:24.246815+08:00",
+      "end": "2026-10-07T08:27:24.451830+08:00",
+      "elapsedSeconds": 0.205,
+      "pid": 60797,
+      "actualExitCode": 0,
+      "supervisorTimedOut": false,
+      "supervisorExitCode": 0,
+      "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/prebuild-r00.log",
+      "logSha256": "35f6b3c18ac7b13b9f36b4390dfea4588a2afe844bc1d759a4a2ac15463d5ec4"
+    },
+    "prepared-identity-check.json": {
+      "name": "prepared-identity-check",
+      "argv": [
+        "/usr/bin/python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/verify_prepared_identity.py"
+      ],
+      "timeout": 30,
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "start": "2026-10-07T08:33:12.990289+08:00",
+      "end": "2026-10-07T08:33:20.306689+08:00",
+      "elapsedSeconds": 7.316,
+      "pid": 80663,
+      "actualExitCode": 0,
+      "supervisorTimedOut": false,
+      "supervisorExitCode": 0,
+      "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/prepared-identity-check.log",
+      "logSha256": "b7b020bee5440dc373103d79f3e59ea2dfc5eb6fb0c7c689f460783675fb6bb4"
+    },
+    "probe-apple-lan.json": {
+      "name": "probe-apple-lan",
+      "argv": [
+        "/usr/bin/python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe.py",
+        "192.168.3.5"
+      ],
+      "timeout": 15,
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "start": "2026-10-07T08:29:16.043361+08:00",
+      "end": "2026-10-07T08:29:18.124380+08:00",
+      "elapsedSeconds": 2.081,
+      "pid": 70926,
+      "actualExitCode": 0,
+      "supervisorTimedOut": false,
+      "supervisorExitCode": 0,
+      "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-apple-lan.log",
+      "logSha256": "55ce46732c73cd0912a9cf46aa36c8c2c1fb3400336645b3c03463e7374705e8"
+    },
+    "probe-c-lan.json": {
+      "name": "probe-c-lan",
+      "argv": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe",
+        "192.168.3.5"
+      ],
+      "timeout": 15,
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "start": "2026-10-07T08:29:07.482809+08:00",
+      "end": "2026-10-07T08:29:13.509606+08:00",
+      "elapsedSeconds": 6.027,
+      "pid": 70152,
+      "actualExitCode": 1,
+      "supervisorTimedOut": false,
+      "supervisorExitCode": 1,
+      "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-c-lan.log",
+      "logSha256": "b49afda5b6751d4df292e3fe9a37da703452545138c3c9de4421ecfef6126f51"
+    },
+    "probe-c-loopback.json": {
+      "name": "probe-c-loopback",
+      "argv": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/lan_probe",
+        "127.0.0.1"
+      ],
+      "timeout": 15,
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "start": "2026-10-07T08:29:07.015245+08:00",
+      "end": "2026-10-07T08:29:07.431924+08:00",
+      "elapsedSeconds": 0.417,
+      "pid": 70055,
+      "actualExitCode": 0,
+      "supervisorTimedOut": false,
+      "supervisorExitCode": 0,
+      "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/probe-c-loopback.log",
+      "logSha256": "98e974f6df695899c8588d773f8cee4d5fe3dd36a6b902f4856f0b88bb4fd36f"
+    },
+    "r00-formal-01.json": {
+      "name": "r00-formal-01",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "+1.98.1",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r00_management_leaves",
+        "--",
+        "--nocapture"
+      ],
+      "timeout": 180,
+      "monitor": true,
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "start": "2026-10-07T08:27:53.849396+08:00",
+      "end": "2026-10-07T08:29:05.336051+08:00",
+      "elapsedSeconds": 71.486,
+      "pid": 60876,
+      "actualExitCode": 101,
+      "supervisorTimedOut": false,
+      "supervisorExitCode": 101,
+      "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/D-01/r00-formal-01.log",
+      "logSha256": "895a83c72efdb5b1fa9542df1b90d5ac3b5b5e58fcb96e102123783c4f1f894e"
+    }
+  },
+  "rawLogSummary": {
+    "compile-probe.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "bytes": 0,
+      "results": []
+    },
+    "prebuild-r00.log": {
+      "sha256": "35f6b3c18ac7b13b9f36b4390dfea4588a2afe844bc1d759a4a2ac15463d5ec4",
+      "lines": 245,
+      "bytes": 196607,
+      "results": []
+    },
+    "prepared-identity-check.log": {
+      "sha256": "b7b020bee5440dc373103d79f3e59ea2dfc5eb6fb0c7c689f460783675fb6bb4",
+      "lines": 1,
+      "bytes": 351,
+      "results": [
+        "{\"status\": \"MATCH\", \"binary\": \"/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0\", \"sha256\": \"c5975a452505bd4f90fcf87509902f812148f809b21674302e6dbd34886daa6a\", \"cdhash\": \"6eadd46c232408547f08e305c792f1c4c2614a94\", \"signatureExitCode\": 0, \"verifyExitCode\": 0, \"systemChangesExecuted\": false}"
+      ]
+    },
+    "probe-apple-lan.log": {
+      "sha256": "55ce46732c73cd0912a9cf46aa36c8c2c1fb3400336645b3c03463e7374705e8",
+      "lines": 7,
+      "bytes": 161,
+      "results": [
+        "PROBE RESULT: ok accepted=True"
+      ]
+    },
+    "probe-c-lan.log": {
+      "sha256": "b49afda5b6751d4df292e3fe9a37da703452545138c3c9de4421ecfef6126f51",
+      "lines": 6,
+      "bytes": 202,
+      "results": [
+        "PROBE RESULT: blocked accepted=0"
+      ]
+    },
+    "probe-c-loopback.log": {
+      "sha256": "98e974f6df695899c8588d773f8cee4d5fe3dd36a6b902f4856f0b88bb4fd36f",
+      "lines": 8,
+      "bytes": 209,
+      "results": [
+        "PROBE RESULT: ok accepted=1"
+      ]
+    },
+    "r00-formal-01-listeners.log": {
+      "sha256": "6faf3b2315428a8820284f138c6f4a04341d7ee7e87a066a4aa0466192dff5fc",
+      "lines": 310,
+      "bytes": 23565,
+      "results": [
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0",
+        "COMMAND ['/bin/ps', '-axo', 'pid,ppid,lstart,comm'] EXIT 0",
+        "COMMAND ['/usr/sbin/lsof', '-nP', '-iTCP', '-sTCP:LISTEN'] EXIT 0"
+      ]
+    },
+    "r00-formal-01.log": {
+      "sha256": "895a83c72efdb5b1fa9542df1b90d5ac3b5b5e58fcb96e102123783c4f1f894e",
+      "lines": 34,
+      "bytes": 3288,
+      "results": [
+        "request to 192.168.3.5:50220 stalled during write/read exchange (POST /lingxi/v1/web-auth/login, 0 bytes read so far) — if addr is a non-loopback self-address, the macOS application firewall / proxy TUN may be blocking inbound connections to this unsigned test binary; this is an environment failure surfaced honestly, not a skipped assertion",
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 54.62s"
+      ]
+    }
+  },
+  "oldIdentity": {
+    "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0",
+    "executableSha256": "c5975a452505bd4f90fcf87509902f812148f809b21674302e6dbd34886daa6a",
+    "codesign": {
+      "argv": [
+        "/usr/bin/codesign",
+        "-dvvv",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0"
+      ],
+      "exitCode": 0,
+      "output": "Executable=/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0\nIdentifier=r00_management_leaves-294787929158efb0\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=445215 flags=0x20002(adhoc,linker-signed) hashes=13909+0 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=6eadd46c232408547f08e305c792f1c4c2614a94\nCandidateCDHashFull sha256=6eadd46c232408547f08e305c792f1c4c2614a94482e343993cb869762f33aea\nHash choices=sha256\nCMSDigest=6eadd46c232408547f08e305c792f1c4c2614a94482e343993cb869762f33aea\nCMSDigestType=2\nCDHash=6eadd46c232408547f08e305c792f1c4c2614a94\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements=none\n"
+    },
+    "codesignVerification": {
+      "argv": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--verbose=4",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0"
+      ],
+      "exitCode": 0,
+      "output": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0: valid on disk\n/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0: satisfies its Designated Requirement\n"
+    },
+    "cargoArtifact": {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service#0.0.0",
+      "manifest_path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/Cargo.toml",
+      "target": {
+        "kind": [
+          "test"
+        ],
+        "crate_types": [
+          "bin"
+        ],
+        "name": "r00_management_leaves",
+        "src_path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r00_management_leaves.rs",
+        "edition": "2021",
+        "doc": false,
+        "doctest": false,
+        "test": true
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 2,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": true
+      },
+      "features": [],
+      "filenames": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0"
+      ],
+      "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0",
+      "fresh": true
+    }
+  },
+  "oldInputDifferences": {
+    "changedInputs": [
+      "scripts/rust-tauri/r02_run_output_regression.py",
+      "scripts/rust-tauri/run_output_sinks.py"
+    ],
+    "r00RelevantChangedInputs": [],
+    "r00RelevantInputs": {
+      "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "rust/Cargo.lock": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "rust/Cargo.toml": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+      "rust/crates/lingxi-adapters/src/bin/lingxi-storage-inspect.rs": "ce38f8f7442142e14567331270a70901662fd32da0fae311d19536fdf78756d1",
+      "rust/crates/lingxi-adapters/src/lib.rs": "b7abdb77d7a3bbf8ed5caac833ae9322804591bb4696c0e5a53d2a2e146559f7",
+      "rust/crates/lingxi-adapters/src/models/anthropic_messages.rs": "abca1b0fb608c74be9fb5da690a2843891a58cff1a744f0bf2523b3cc38fa59d",
+      "rust/crates/lingxi-adapters/src/models/auxiliary.rs": "504cc229598a737f260eb09b308b052aa9c9d196acaa471a8fd21281cdc46c04",
+      "rust/crates/lingxi-adapters/src/models/batch_admission.rs": "d6944a71609ac765625c7b549f5508d9a0e4bdeb7197eb8a234e977f612320e6",
+      "rust/crates/lingxi-adapters/src/models/compat.rs": "be1229f65e2e462ad37ddccc6cbaee08d49e12dcd6144fc1c8a763822e3a25ca",
+      "rust/crates/lingxi-adapters/src/models/config.rs": "09f5f6533911cb76dbbe8a77844fdebd816fbe5b1006fd92a077b75ede91e144",
+      "rust/crates/lingxi-adapters/src/models/credentials.rs": "c8de486b2f8f38e75fabad2f9f1fd5a3e8da689aac058f06b2908c883133e624",
+      "rust/crates/lingxi-adapters/src/models/dispatch.rs": "877badc332ed687c59f183e0fe2097d4f19daef37858b3d61889791bcc74fef1",
+      "rust/crates/lingxi-adapters/src/models/egress.rs": "209ddd869203fdf198970353a2832b1765b7b02fb01b1394cf91be4cbee67c67",
+      "rust/crates/lingxi-adapters/src/models/gateway.rs": "23e97214cc66a75fca73e957a3a19b5bf2142c72ea6448db827f32c8ab8c5deb",
+      "rust/crates/lingxi-adapters/src/models/google_generative_ai.rs": "494e92ed53b58754f05ad763b8cb7d66cca8a2768029cb14e517efbfb23e18cc",
+      "rust/crates/lingxi-adapters/src/models/mod.rs": "6ca2aa31b3bc52b4f2d4a471edc0ac19eca41159b883c74a1ecbcbb754aec400",
+      "rust/crates/lingxi-adapters/src/models/network.rs": "38eb8d28653957bb2eddfe1bfeb2df45bffd663514399b078cec2652c6d9ace5",
+      "rust/crates/lingxi-adapters/src/models/oauth.rs": "df4a8db93d629c20826c9316114e03eaa615d1c9286b61a1cadf34fb15fa047a",
+      "rust/crates/lingxi-adapters/src/models/openai_codex_responses.rs": "89ce79f6b73f18f1e77ebb8bd299eb5478cadad33f76d03192bdfea650751b4c",
+      "rust/crates/lingxi-adapters/src/models/openai_completions.rs": "e00c193720f60b67dfbaed8dfe0bea1b5064aa3449af52cee26f27f1603db761",
+      "rust/crates/lingxi-adapters/src/models/openai_responses.rs": "2bedaf6c8d437eebc9937e0868d93db554094c48db7fbf579294498b9ecf8880",
+      "rust/crates/lingxi-adapters/src/models/operations/embedding.rs": "b410cfe1bddcad6ba82506ff0cda702741bab7588f13d2c6ab9c86cbcb613e47",
+      "rust/crates/lingxi-adapters/src/models/operations/image.rs": "dc6c426b1a9ef7de4219c711922f5f47669b0c0ee3e998943f045d4350d60ae6",
+      "rust/crates/lingxi-adapters/src/models/operations/mod.rs": "2cc0e91acbb8a189959c1013afafe9d4bfc09fbd101258b07b39b16bec248320",
+      "rust/crates/lingxi-adapters/src/models/operations/rerank.rs": "551c6b2029dcd5069bd01eb48428275f90000540e14e81a9c064c28ba5859f57",
+      "rust/crates/lingxi-adapters/src/models/operations/speech.rs": "5265559b851dcf965879a2c7ae9be73b7d4ee2691550b804ef705b89c3bbcf29",
+      "rust/crates/lingxi-adapters/src/models/operations/tiers.rs": "2571a2a1879b72c249678d3d44923e4c84c7f76c5a08b7cc854ff0a2b33b4e21",
+      "rust/crates/lingxi-adapters/src/models/operations/transcribe.rs": "96fea443459a93bacbda54b3ca976522133db269b4917afba7de772951735aba",
+      "rust/crates/lingxi-adapters/src/models/operations/video.rs": "f4940723e287b031a527d980809de0c08763658545e4936fee9e252b7c505e31",
+      "rust/crates/lingxi-adapters/src/models/provider.rs": "c31ac88b7d4dd5d391928c222dc543d4cf8e506c2b1b4216e58221b69ea3e657",
+      "rust/crates/lingxi-adapters/src/models/streaming.rs": "8b17798d3239d6243f399dae25830aaddc0da4877d04680ef3d35d3427efaa76",
+      "rust/crates/lingxi-adapters/src/models/tool_render.rs": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0",
+      "rust/crates/lingxi-adapters/src/models/usage.rs": "0a6a1340f0160206ed65e555a941fbfee67d9ff26e352e08a8cf58019184230a",
+      "rust/crates/lingxi-adapters/src/storage/backup.rs": "7c0b4e696d3cdac3811d788e9c3e1234d3f370c11657dfb9a510e0ef423f2d51",
+      "rust/crates/lingxi-adapters/src/storage/migrations.rs": "df9519611c4020c5eed3acccedc92287feeb9f6b0af477ee69e1317ef089859d",
+      "rust/crates/lingxi-adapters/src/storage/mod.rs": "9dbca03fe05bddd352dddc3588601afe8682d4b825c74af128b4768b45939a92",
+      "rust/crates/lingxi-adapters/src/storage/queue.rs": "705b588721103bb4a97ff66ac0eef43d1dc57ba1b2b9156692c05518107fd24c",
+      "rust/crates/lingxi-adapters/src/storage/run_store.rs": "542973c1a89e0b458b0bacd73bb594934d4a97369bc2785d7c4723caaad06496",
+      "rust/crates/lingxi-adapters/src/storage/windows_acl.rs": "96b06d6bcdbefb4c97ce2d8ab670f37af794dc1dd4d1d85a4d97a26940f33479",
+      "rust/crates/lingxi-kernel/src/invocation.rs": "a964426e6d70bd9213a6475e7ca817193d32a22a3cc0630a0648adcdfa522292",
+      "rust/crates/lingxi-kernel/src/lib.rs": "8f6595e9be39865f74a91817089ab1d6b016beb84f31a6ed08ca58b96229d3e5",
+      "rust/crates/lingxi-kernel/src/model_exchange.rs": "62bb3b1b3ad42f5ea46961ab5c5b1d98d54f22c0a359f8d099ad1e323a6d4c6b",
+      "rust/crates/lingxi-kernel/src/ports.rs": "3f32e8c7c0a617d6bcb73ed11ab5eb468acfbb383ac844964a9ad52a75fa3936",
+      "rust/crates/lingxi-kernel/src/recovery.rs": "796cc13cfbfe0ef9aa021e3f7c47668d9374468a1defb1dfa0d046b853803268",
+      "rust/crates/lingxi-kernel/src/subagent.rs": "0287c242edc782989e1232046661a956216f5576e1247f94a4ea669c0edc0276",
+      "rust/crates/lingxi-kernel/src/toolcatalog.rs": "2b7505387b6b45aebc9ff7a0c836d49d24573df1d2de2e3137549eab5983ad1f",
+      "rust/crates/lingxi-kernel/src/usage.rs": "209bc2f127595674ed86c64cbf92d7fc1632bcbbfcc446909cd0f632cf470f3b",
+      "rust/crates/lingxi-protocol/src/bin/lingxi-proto-server.rs": "1aeddfa2c4d4a8eab8ab75aed8a2555288c6ce2e1ebe05584b307d0cc0760aa3",
+      "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs": "8af4fb30089bae8e55fb62b18412a05e172b55f966cd4b6f5aaa1ef8952cee05",
+      "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-verify.rs": "b68c1d1a0fbf2d0e9355f34e7f89582d902650ce9721390b7311b317ac103e3c",
+      "rust/crates/lingxi-protocol/src/canon.rs": "2c1bb1c229a3bd0eafe6ab6d911cf8e41c158717fc4632f390e0684a3d1cea71",
+      "rust/crates/lingxi-protocol/src/devgate.rs": "292ed1cb45356234a6a7423c9ef60dfe908eb9573c5d5580fd32b1d85d411749",
+      "rust/crates/lingxi-protocol/src/handshake.rs": "17bb9902607d3d94fa2356cd2b55a32ad76b6eda38377b8d181be931af25d51d",
+      "rust/crates/lingxi-protocol/src/lib.rs": "7dc6fe93e4c9aa29da6ca4690e039f647c23938599557c374d185f047c62fce2",
+      "rust/crates/lingxi-protocol/src/wire.rs": "a3509c6d31fe584980bef21cc615e21a56afe44ab57266108b3f5d2d7c71d3ff",
+      "rust/crates/lingxi-service/Cargo.toml": "c778bbe5821bc8d7dc1e5d22292879f3f3cb2ac6af480316acc1bad705b08b17",
+      "rust/crates/lingxi-service/src/approval.rs": "70040aaec9a0a6ca41e059113b2c53275361ad8cbc6e40b3d0fdfa339b5bed3e",
+      "rust/crates/lingxi-service/src/approval_service.rs": "cc0ee1fafa087a37801a626008215638214b59f6bbe8cc2284e8897dd114ae72",
+      "rust/crates/lingxi-service/src/artifactverify.rs": "3b4e84802fd3dda9719295f3d3e95a2218fca520a88d4b2ea610865113c049d7",
+      "rust/crates/lingxi-service/src/auth.rs": "5d9408afc747e3249f0d7b7d9148be8fe3c22eb1aac3815835b466c409cf31e8",
+      "rust/crates/lingxi-service/src/background.rs": "1e642710a45e4e4360f34ed5588f16eb847ae74bd2a66cabb0b6f8e972db69a5",
+      "rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs": "c569a06220d6672432e2dc1871f2f6c9f2d2b4d5eeae2c5773fec98e0a2d4e2f",
+      "rust/crates/lingxi-service/src/cancel.rs": "45db14322dc7daa18b1926acc5d87ed153682c7830a991210c0838534f7e1872",
+      "rust/crates/lingxi-service/src/config.rs": "960365bee86e48825681bf6962730ac0f67f48dab870656cde174ff44981cd8d",
+      "rust/crates/lingxi-service/src/credentials/login.rs": "397b40157707c9bbee786ae86dff15b6989aca7c3a3942583caf71bae8276bf8",
+      "rust/crates/lingxi-service/src/credentials/mod.rs": "5fa96ae62b17fe8695c137ae3183fb0cbc47cc5d1291c3386f37b640b4ab7a0c",
+      "rust/crates/lingxi-service/src/credentials/store.rs": "a69b4d4e2bab340055e30907cfece32bbd58c54da1898fe8c72d133eb253696f",
+      "rust/crates/lingxi-service/src/dedup.rs": "f80cd8a86451f5563217bc293aa2dfa3afc97a6666dba068b5196470e7aecf82",
+      "rust/crates/lingxi-service/src/epoch.rs": "9c29d9ee8924d7b514a9bc4b7f8d374d420287f25b1b36f5295619c0f882b855",
+      "rust/crates/lingxi-service/src/events.rs": "709b9adc34ba6d35252ff1ebf8332981b47f9defb0d178e3880bf5caffd855a4",
+      "rust/crates/lingxi-service/src/exectools.rs": "433584042b95dcb51b9b4f40509bce0123de078b6b0d85edeeb8ec7c3af64e98",
+      "rust/crates/lingxi-service/src/filetools.rs": "4803fe5164ad448860b162d58a374f945fc8920dad0f526aa70f73c2c64fd116",
+      "rust/crates/lingxi-service/src/inject.rs": "c440a0c38f5710500b3aa3c557ca33d9503db485d13fc1555416a7efb4c560e4",
+      "rust/crates/lingxi-service/src/instance.rs": "f329de65613332af3024763e0fb17ce7f545962252233c10ba2400aabda7f846",
+      "rust/crates/lingxi-service/src/invocations.rs": "42826a77c2a9625fea27ea085b822949946777db6ac7c8bd2b7a00ccd04a32d8",
+      "rust/crates/lingxi-service/src/lib.rs": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756",
+      "rust/crates/lingxi-service/src/limits.rs": "93d7bbd0a1bc22417cfb800d75601c61e8ee396ff8801218382738938d6767c5",
+      "rust/crates/lingxi-service/src/logging.rs": "5f0aa8ccabc62295d64ff0ca6b61a5fc9a384e6a4bdd6e092d70a15ab73b6be1",
+      "rust/crates/lingxi-service/src/main.rs": "9ea695ee5b2eef4163db16df4b584b363df6a375ca334f02c9160886ed1b5f5b",
+      "rust/crates/lingxi-service/src/management.rs": "c9402d83a16f3b0c4f6f193968b099fe29c6121968b337d6109dfeeb14c8c27d",
+      "rust/crates/lingxi-service/src/mcpbridge.rs": "e3312f6ab87ad6562233c3ec71a14e1925685a28c9879999b99731ddfa6f6fbf",
+      "rust/crates/lingxi-service/src/operations.rs": "bbb2054886f6e08093aeba416570ecadee866891db06e59a6d5406815b965639",
+      "rust/crates/lingxi-service/src/paths.rs": "10b13d4d0639e134c118f0ef421648f55e3d9498dd210d7ad0428e009e89008e",
+      "rust/crates/lingxi-service/src/procsupervisor.rs": "d586aa01efa0085f5890e73dcd056431ae84abf1b5b8aa379ce8159ff2ca7b37",
+      "rust/crates/lingxi-service/src/quotas.rs": "5830926c2c1f61792c5269e622680b78f146d50997a4b609ffdf214a446b48cc",
+      "rust/crates/lingxi-service/src/recovery.rs": "37a268ac26b368e27fac3e81a173f6d29a4d2789603259df2968a4a72be79e45",
+      "rust/crates/lingxi-service/src/redaction.rs": "9d749fc88d7c653399db7908b4fddd1bcca3264362c9da3a6a7ba49318c6a1ed",
+      "rust/crates/lingxi-service/src/resourceaccess.rs": "9cb2b2267e581eff500b4e9a995541ea055a56f217955fd910cd7dd0e2c7766f",
+      "rust/crates/lingxi-service/src/runs.rs": "b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3",
+      "rust/crates/lingxi-service/src/sandbox.rs": "57dbdcb309fa17878e58ea360cc9e5d69cdb126d7907f2d9aaa82bc68888b676",
+      "rust/crates/lingxi-service/src/security_audit.rs": "ec34626d0c03a8e86cc1beb69cea951a55571bddd92624284e896f8654506cdf",
+      "rust/crates/lingxi-service/src/serve.rs": "95faa3f52bb1c1a33738501b33038bda41e0e29eca6eee541fadb84b202847b8",
+      "rust/crates/lingxi-service/src/session_supervisor.rs": "fcf0822ceef2000057b41d3a0a7d67581815db0aef2908629f146d0a44e8ef74",
+      "rust/crates/lingxi-service/src/sessions.rs": "61d032f1d3407f973360738c150c03ac49d780efc79afec49bf5e9ff6ab83c4f",
+      "rust/crates/lingxi-service/src/shutdown.rs": "401ab707932219fc2a6c174e978705b4c16d57aafa09a0b276580be5d7f4113f",
+      "rust/crates/lingxi-service/src/static_web.rs": "65341c5ddce91341687c922c3116c1e48423605d16112cfc7b3864900e885d6d",
+      "rust/crates/lingxi-service/src/streaming_norm.rs": "bca91fd70a29eaef7cc9c7210f13c5e6f13e5844f256fa10aa18e9bf0fb360c3",
+      "rust/crates/lingxi-service/src/subagents.rs": "2c97b7964cdd0ecbf6dda0881cd6510ba880a6a3fd428274e936441b469f44d7",
+      "rust/crates/lingxi-service/src/task_supervisor.rs": "2f78d303b89b4df43899f4ccd593e0f71ea6e82535d44455f71bf462a11998c1",
+      "rust/crates/lingxi-service/src/toolgateway.rs": "17e9c05aec1d03cdc68db66b97ec84947cccf3d49a8759bca2fa126db6f2bc84",
+      "rust/crates/lingxi-service/src/transport.rs": "d4a5fe9ac17e2f0e2e666bc04658008002fa48d1f661875fa41121f5ff012c95",
+      "rust/crates/lingxi-service/src/workermodel.rs": "85b25b95f026dd9ce53119bd0caff44e4df4ef5f90c6e3b2abfad5e89932af29",
+      "rust/crates/lingxi-service/src/workerrpc.rs": "4a158b5321da63d2c6a36d88da8ec7cfd21622c914fa38f7ad6dd674d4cb0788",
+      "rust/crates/lingxi-service/src/ws.rs": "03c9a6887b0d194127a4401bf92c26fb6debcc344cfe9b3b091a7503b1186b20",
+      "rust/crates/lingxi-service/tests/r00_management_leaves.rs": "3e72c2a2d16287549a2727a355642ec279c09595d42d6ec42d9c5585c8d2f453"
+    },
+    "r00RelevantDigest": "33789b4d9829f38298c5112aab865fbd3ce8e13051afa9a19cc339d7da0cf636",
+    "binarySame": true
+  }
+}

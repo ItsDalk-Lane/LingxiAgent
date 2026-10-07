@@ -1,0 +1,132 @@
+[
+  {
+    "case": "epoch-cli-warn",
+    "source": "cli",
+    "RUST_LOG": "warn",
+    "exit": 2,
+    "ready": false,
+    "epochRefused": true,
+    "explicitError": true,
+    "selectedDataPreserved": true,
+    "fallbackPreserved": true,
+    "effectiveHomeDiagnostic": false,
+    "sourceDiagnostic": false,
+    "databaseCreated": false,
+    "localTokenCreated": false,
+    "before": {
+      "data-epoch.json": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8",
+      "app-data/existing.bin": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586"
+    },
+    "after": {
+      "data-epoch.json": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8",
+      "app-data/existing.bin": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586",
+      "lingxi-service/instance.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lingxi-service/logs/service-000001.log": "79d66cf6bf545821cbcc728583edcd7e56e748f100ecc4dbf8f4daa99f677e76"
+    },
+    "originalNoSwitchCheck": false
+  },
+  {
+    "case": "epoch-cli-info",
+    "source": "cli",
+    "RUST_LOG": "info",
+    "exit": 2,
+    "ready": false,
+    "epochRefused": true,
+    "explicitError": true,
+    "selectedDataPreserved": true,
+    "fallbackPreserved": true,
+    "effectiveHomeDiagnostic": false,
+    "sourceDiagnostic": true,
+    "databaseCreated": false,
+    "localTokenCreated": false,
+    "before": {
+      "data-epoch.json": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8",
+      "app-data/existing.bin": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586"
+    },
+    "after": {
+      "data-epoch.json": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8",
+      "app-data/existing.bin": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586",
+      "lingxi-service/instance.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lingxi-service/logs/service-000001.log": "fdb7f7d5d34eb1a28b678d1ce59d45f28ed428705eb1466a09417c40d3958a28"
+    },
+    "originalNoSwitchCheck": false
+  },
+  {
+    "case": "epoch-cli-unset",
+    "source": "cli",
+    "RUST_LOG": null,
+    "exit": 2,
+    "ready": false,
+    "epochRefused": true,
+    "explicitError": true,
+    "selectedDataPreserved": true,
+    "fallbackPreserved": true,
+    "effectiveHomeDiagnostic": false,
+    "sourceDiagnostic": true,
+    "databaseCreated": false,
+    "localTokenCreated": false,
+    "before": {
+      "data-epoch.json": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8",
+      "app-data/existing.bin": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586"
+    },
+    "after": {
+      "data-epoch.json": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8",
+      "app-data/existing.bin": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586",
+      "lingxi-service/instance.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lingxi-service/logs/service-000001.log": "ebcea065ab1f6d196aea39b7f8e4b2370d68aefea54554c428904902d1644286"
+    },
+    "originalNoSwitchCheck": false
+  },
+  {
+    "case": "epoch-env-info",
+    "source": "env",
+    "RUST_LOG": "info",
+    "exit": 2,
+    "ready": false,
+    "epochRefused": true,
+    "explicitError": true,
+    "selectedDataPreserved": true,
+    "fallbackPreserved": true,
+    "effectiveHomeDiagnostic": false,
+    "sourceDiagnostic": true,
+    "databaseCreated": false,
+    "localTokenCreated": false,
+    "before": {
+      "data-epoch.json": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8",
+      "app-data/existing.bin": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586"
+    },
+    "after": {
+      "data-epoch.json": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8",
+      "app-data/existing.bin": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586",
+      "lingxi-service/instance.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lingxi-service/logs/service-000001.log": "ffb997e81aa73f61b20a915a3769b49c5f621ca79b354e08749a4acb1687a570"
+    },
+    "originalNoSwitchCheck": false
+  },
+  {
+    "case": "epoch-config-file-info",
+    "source": "config-file",
+    "RUST_LOG": "info",
+    "exit": 2,
+    "ready": false,
+    "epochRefused": true,
+    "explicitError": true,
+    "selectedDataPreserved": true,
+    "fallbackPreserved": true,
+    "effectiveHomeDiagnostic": false,
+    "sourceDiagnostic": true,
+    "databaseCreated": false,
+    "localTokenCreated": false,
+    "before": {
+      "data-epoch.json": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8",
+      "app-data/existing.bin": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586"
+    },
+    "after": {
+      "data-epoch.json": "c092c7a53f7ad259527987c1e88315324c4e9d04fac1190a0aa4f81aca64dab8",
+      "app-data/existing.bin": "c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586",
+      "lingxi-service/instance.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lingxi-service/logs/service-000001.log": "c37ecc53f3f3f10c03fe21c6e6180776fa8bd0d8e8080fa4b2a9b247add4e04c"
+    },
+    "originalNoSwitchCheck": false
+  }
+]

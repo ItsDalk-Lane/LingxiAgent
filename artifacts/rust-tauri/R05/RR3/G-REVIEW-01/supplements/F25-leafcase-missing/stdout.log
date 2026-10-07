@@ -1,0 +1,24 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.56s
+     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 1 test
+test stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05 ... FAILED
+
+failures:
+
+---- stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05 stdout ----
+
+thread 'stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05' (21442960) panicked at crates/xtask/src/stage_map.rs:3223:9:
+assertion `left == right` failed: the leaf-case map drifted from 137
+  left: 136
+ right: 137
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    stage_map::map_tests::r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`

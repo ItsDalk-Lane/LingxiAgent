@@ -1,0 +1,16 @@
+{
+  "case": "single-only",
+  "command": [
+    "bash",
+    "-c",
+    "source \"$1\"; EV=\"$2\"; CASE_SCOPE=\"$3\"; COPY=\"fixture only\"; fail() { exit 1; }; write_results",
+    "independent-summary",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial/summary-function.sh",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial/single-only",
+    "N03"
+  ],
+  "exitCode": 0,
+  "expectedExit": 0,
+  "status": "PASS",
+  "boundary": "只测试正式脚本原汇总函数；TSV/controls是手写结果夹具，不表示真实执行这16项负测。"
+}

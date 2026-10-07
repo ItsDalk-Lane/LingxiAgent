@@ -1,0 +1,708 @@
+[
+  {
+    "path": "rust/crates/xtask/src/stage_maps/R05.json",
+    "sha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+    "commands": {
+      "rust_fmt": {
+        "argv": [
+          "cargo",
+          "fmt",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--all",
+          "--",
+          "--check"
+        ],
+        "timeoutSecs": 300,
+        "evidencePaths": [
+          "{EVIDENCE}/rust_fmt/stdout.log"
+        ]
+      },
+      "rust_clippy": {
+        "argv": [
+          "cargo",
+          "clippy",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--workspace",
+          "--all-targets",
+          "--locked",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "timeoutSecs": 1200,
+        "evidencePaths": [
+          "{EVIDENCE}/rust_clippy/stdout.log"
+        ]
+      },
+      "rust_test_workspace": {
+        "argv": [
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--workspace",
+          "--locked"
+        ],
+        "timeoutSecs": 2400,
+        "evidencePaths": [
+          "{EVIDENCE}/rust_test_workspace/stdout.log"
+        ]
+      },
+      "check_contracts": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r01-t02-check-generated.sh"
+        ],
+        "timeoutSecs": 900,
+        "evidencePaths": [
+          "{EVIDENCE}/check_contracts/stdout.log"
+        ]
+      },
+      "check_boundaries": {
+        "argv": [
+          "python3",
+          "-B",
+          "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+        ],
+        "timeoutSecs": 600,
+        "evidencePaths": [
+          "{EVIDENCE}/check_boundaries/stdout.log"
+        ]
+      },
+      "r05_stage_suites": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r05_t08_stage_suites.sh",
+          "{EVIDENCE}/R05_SUITES"
+        ],
+        "timeoutSecs": 3600,
+        "evidencePaths": [
+          "{EVIDENCE}/R05_SUITES/r05-cases.json",
+          "{EVIDENCE}/R05_SUITES/leaf-cases.json",
+          "{EVIDENCE}/R05_SUITES/summary.txt",
+          "{EVIDENCE}/R05_SUITES/pin-table.txt",
+          "{EVIDENCE}/R05_SUITES/cid-table.txt"
+        ]
+      },
+      "r04_regression_gate": {
+        "argv": [
+          "cargo",
+          "run",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "xtask",
+          "--",
+          "verify-stage",
+          "R04",
+          "--evidence",
+          "{EVIDENCE}/R04_REGRESSION"
+        ],
+        "timeoutSecs": 10800,
+        "evidencePaths": [
+          "{EVIDENCE}/R04_REGRESSION/verify-stage-result.json"
+        ]
+      }
+    }
+  },
+  {
+    "path": "rust/crates/xtask/src/stage_maps/R04.json",
+    "sha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+    "commands": {
+      "rust_fmt": {
+        "argv": [
+          "cargo",
+          "fmt",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--all",
+          "--",
+          "--check"
+        ],
+        "timeoutSecs": 300,
+        "evidencePaths": [
+          "{EVIDENCE}/rust_fmt/stdout.log"
+        ]
+      },
+      "rust_clippy": {
+        "argv": [
+          "cargo",
+          "clippy",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--workspace",
+          "--all-targets",
+          "--locked",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "timeoutSecs": 1200,
+        "evidencePaths": [
+          "{EVIDENCE}/rust_clippy/stdout.log"
+        ]
+      },
+      "rust_test_workspace": {
+        "argv": [
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--workspace",
+          "--locked"
+        ],
+        "timeoutSecs": 2400,
+        "evidencePaths": [
+          "{EVIDENCE}/rust_test_workspace/stdout.log"
+        ]
+      },
+      "check_contracts": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r01-t02-check-generated.sh"
+        ],
+        "timeoutSecs": 900,
+        "evidencePaths": [
+          "{EVIDENCE}/check_contracts/stdout.log"
+        ]
+      },
+      "check_boundaries": {
+        "argv": [
+          "python3",
+          "-B",
+          "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+        ],
+        "timeoutSecs": 600,
+        "evidencePaths": [
+          "{EVIDENCE}/check_boundaries/stdout.log"
+        ]
+      },
+      "r04_tool_matrix": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r04_t08_matrix.sh",
+          "{EVIDENCE}/R04_MATRIX"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/R04_MATRIX/leaf-cases.json",
+          "{EVIDENCE}/R04_MATRIX/matrix-counts.json",
+          "{EVIDENCE}/R04_MATRIX/integration.log",
+          "{EVIDENCE}/R04_MATRIX/summary.txt"
+        ]
+      },
+      "r03_regression_gate": {
+        "argv": [
+          "cargo",
+          "run",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "xtask",
+          "--",
+          "verify-stage",
+          "R03",
+          "--evidence",
+          "{EVIDENCE}/R03_REGRESSION"
+        ],
+        "timeoutSecs": 5400,
+        "evidencePaths": [
+          "{EVIDENCE}/R03_REGRESSION/verify-stage-result.json"
+        ]
+      },
+      "r04_rr1_repair_suites": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r04_rr1_g05_repair_suites.sh",
+          "{EVIDENCE}/R04_RR1_REPAIR"
+        ],
+        "timeoutSecs": 2400,
+        "evidencePaths": [
+          "{EVIDENCE}/R04_RR1_REPAIR/rr1-cases.json",
+          "{EVIDENCE}/R04_RR1_REPAIR/summary.txt"
+        ]
+      }
+    }
+  },
+  {
+    "path": "rust/crates/xtask/src/stage_maps/R03.json",
+    "sha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+    "commands": {
+      "rust_fmt": {
+        "argv": [
+          "cargo",
+          "fmt",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--all",
+          "--",
+          "--check"
+        ],
+        "timeoutSecs": 300,
+        "evidencePaths": [
+          "{EVIDENCE}/rust_fmt/stdout.log"
+        ]
+      },
+      "rust_clippy": {
+        "argv": [
+          "cargo",
+          "clippy",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--workspace",
+          "--all-targets",
+          "--locked",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "timeoutSecs": 1200,
+        "evidencePaths": [
+          "{EVIDENCE}/rust_clippy/stdout.log"
+        ]
+      },
+      "rust_test_workspace": {
+        "argv": [
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--workspace",
+          "--locked"
+        ],
+        "timeoutSecs": 2400,
+        "evidencePaths": [
+          "{EVIDENCE}/rust_test_workspace/stdout.log"
+        ]
+      },
+      "check_contracts": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r01-t02-check-generated.sh"
+        ],
+        "timeoutSecs": 900,
+        "evidencePaths": [
+          "{EVIDENCE}/check_contracts/stdout.log"
+        ]
+      },
+      "check_boundaries": {
+        "argv": [
+          "python3",
+          "-B",
+          "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+        ],
+        "timeoutSecs": 600,
+        "evidencePaths": [
+          "{EVIDENCE}/check_boundaries/stdout.log"
+        ]
+      },
+      "a15_combo_and_leaves": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r03_t08_matrix.sh",
+          "{EVIDENCE}/A15"
+        ],
+        "timeoutSecs": 1200,
+        "evidencePaths": [
+          "{EVIDENCE}/A15/leaf-cases.json",
+          "{EVIDENCE}/A15/combo-counts.json",
+          "{EVIDENCE}/A15/integration.log",
+          "{EVIDENCE}/A15/summary.txt"
+        ]
+      },
+      "a16_seed_mechanism": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r03_t08_a16_seed_mechanism.sh",
+          "{EVIDENCE}/A16"
+        ],
+        "timeoutSecs": 2400,
+        "evidencePaths": [
+          "{EVIDENCE}/A16/summary.txt",
+          "{EVIDENCE}/A16/captured-seed.txt",
+          "{EVIDENCE}/A16/seed-mechanism.json"
+        ]
+      },
+      "r02_auth_matrix": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+          "{EVIDENCE}/R02/A05_A06"
+        ],
+        "timeoutSecs": 900,
+        "evidencePaths": [
+          "{EVIDENCE}/R02/A05_A06/summary.txt",
+          "{EVIDENCE}/R02/A05_A06/leaf-cases.json",
+          "{EVIDENCE}/R02/A05_A06/ws-matrix.json",
+          "{EVIDENCE}/R02/A05_A06/sessions-list-matrix.json"
+        ]
+      },
+      "r02_storage_tx": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t04_storage_tx.sh",
+          "{EVIDENCE}/R02/A07_A08"
+        ],
+        "timeoutSecs": 900,
+        "evidencePaths": [
+          "{EVIDENCE}/R02/A07_A08/s1-counts-after-stop.json",
+          "{EVIDENCE}/R02/A07_A08/s4-hashes-after.txt"
+        ]
+      },
+      "r02_events_matrix": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t05_events_matrix.sh",
+          "{EVIDENCE}/R02/A09_A10"
+        ],
+        "timeoutSecs": 900,
+        "evidencePaths": [
+          "{EVIDENCE}/R02/A09_A10/probe-matrix.jsonl",
+          "{EVIDENCE}/R02/A09_A10/key-events-dump.json"
+        ]
+      },
+      "r02_backup_restore": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t06_backup_restore.sh",
+          "{EVIDENCE}/R02/A11"
+        ],
+        "timeoutSecs": 900,
+        "evidencePaths": [
+          "{EVIDENCE}/R02/A11/backup-restore/summary.txt"
+        ]
+      },
+      "r02_recovery_drill": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t06_recovery_drill.sh",
+          "{EVIDENCE}/R02/A12"
+        ],
+        "timeoutSecs": 900,
+        "evidencePaths": [
+          "{EVIDENCE}/R02/A12/recovery-drill/summary.txt"
+        ]
+      },
+      "r02_full_chain": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t08_full_chain_smoke.sh",
+          "{EVIDENCE}/R02/A15"
+        ],
+        "timeoutSecs": 1200,
+        "evidencePaths": [
+          "{EVIDENCE}/R02/A15/full-chain/summary.txt"
+        ]
+      },
+      "r02_legacy_regression": {
+        "argv": [
+          "env",
+          "R02_LEGACY_REGRESSION_MODE=directed-no-seal-family",
+          "bash",
+          "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+          "{EVIDENCE}/R02/A16"
+        ],
+        "timeoutSecs": 1200,
+        "evidencePaths": [
+          "{EVIDENCE}/R02/A16/legacy-entry/summary.txt"
+        ]
+      },
+      "repair_suites": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r03_g07_repair_suites.sh",
+          "{EVIDENCE}/G07_REPAIR"
+        ],
+        "timeoutSecs": 2400,
+        "evidencePaths": [
+          "{EVIDENCE}/G07_REPAIR/repair-cases.json",
+          "{EVIDENCE}/G07_REPAIR/summary.txt"
+        ]
+      }
+    }
+  },
+  {
+    "path": "rust/crates/xtask/src/stage_maps/R02.json",
+    "sha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+    "commands": {
+      "supplemental_static_web_matrix": {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_static_web_leaf_matrix.py",
+          "{EVIDENCE}/STATIC_WEB"
+        ],
+        "timeoutSecs": 720,
+        "evidencePaths": [
+          "{EVIDENCE}/STATIC_WEB/summary.json",
+          "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "{EVIDENCE}/STATIC_WEB/cargo.stdout.log",
+          "{EVIDENCE}/STATIC_WEB/cargo.stderr.log"
+        ]
+      },
+      "supplemental_management_matrix": {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_management_leaf_matrix.py",
+          "{EVIDENCE}/MANAGEMENT"
+        ],
+        "timeoutSecs": 1200,
+        "evidencePaths": [
+          "{EVIDENCE}/MANAGEMENT/summary.json",
+          "{EVIDENCE}/MANAGEMENT/management-cases.json",
+          "{EVIDENCE}/MANAGEMENT/web-login-cases.json",
+          "{EVIDENCE}/MANAGEMENT/tls-web-login-cases.json",
+          "{EVIDENCE}/MANAGEMENT/tls-cargo.stdout.log",
+          "{EVIDENCE}/MANAGEMENT/tls-cargo.stderr.log",
+          "{EVIDENCE}/MANAGEMENT/security-audit-sources.json",
+          "{EVIDENCE}/MANAGEMENT/security-audit.jsonl",
+          "{EVIDENCE}/MANAGEMENT/cargo.stdout.log",
+          "{EVIDENCE}/MANAGEMENT/cargo.stderr.log"
+        ]
+      },
+      "supplemental_client_matrix": {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_client_leaf_matrix.py",
+          "{EVIDENCE}/CLIENT"
+        ],
+        "timeoutSecs": 240,
+        "evidencePaths": [
+          "{EVIDENCE}/CLIENT/leaf-cases.json",
+          "{EVIDENCE}/CLIENT/summary.json",
+          "{EVIDENCE}/CLIENT/sharing-cases.json",
+          "{EVIDENCE}/CLIENT/sharing-vitest.stdout.log",
+          "{EVIDENCE}/CLIENT/sharing-vitest.stderr.log",
+          "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stderr.log",
+          "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+          "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log"
+        ]
+      },
+      "supplemental_cli_sessions_matrix": {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_cli_sessions_leaf_matrix.py",
+          "{EVIDENCE}/CLI_SESSIONS"
+        ],
+        "timeoutSecs": 1620,
+        "evidencePaths": [
+          "{EVIDENCE}/CLI_SESSIONS/summary.json",
+          "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+          "{EVIDENCE}/CLI_SESSIONS/producer.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/producer.stderr.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/sessions-list-matrix.json",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-owner.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-foreign.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-unauthorized.stderr.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-limit-case.json"
+        ]
+      },
+      "supplemental_cli_rust_matrix": {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_cli_rust_matrix.py",
+          "{EVIDENCE}/CLI_RUST"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/CLI_RUST/cli-rust-cases.json"
+        ]
+      },
+      "a01_smoke": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t01_service_smoke.sh",
+          "{EVIDENCE}/A01"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/A01/a01-health-check.log",
+          "{EVIDENCE}/A01/a01-shutdown.log",
+          "{EVIDENCE}/A01/a01-deptree-evidence.log",
+          "{EVIDENCE}/A01/a01-leaf-cases.json"
+        ]
+      },
+      "a02_boundary_negative": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t01_boundary_negative.sh",
+          "{EVIDENCE}/A02"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/A02/a02-summary.log",
+          "{EVIDENCE}/A02/a02-residue-check.log"
+        ]
+      },
+      "a03_dual_instance": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t02_dual_instance.sh",
+          "{EVIDENCE}/A03"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/A03/a03-summary.txt"
+        ]
+      },
+      "a04_path_priority": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t02_path_priority.sh",
+          "{EVIDENCE}/A04"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/A04/a04-summary.txt"
+        ]
+      },
+      "a05_a06_auth_matrix": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+          "{EVIDENCE}/A05_A06"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/A05_A06/summary.txt",
+          "{EVIDENCE}/A05_A06/ws-matrix.json",
+          "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "{EVIDENCE}/A05_A06/sessions-list-matrix.json"
+        ]
+      },
+      "a07_a08_storage_tx": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t04_storage_tx.sh",
+          "{EVIDENCE}/A07_A08"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_A08/s1-counts-after-stop.json",
+          "{EVIDENCE}/A07_A08/s4-hashes-after.txt"
+        ]
+      },
+      "a07_live_fault_01_test": {
+        "argv": [
+          "env",
+          "CARGO_NET_OFFLINE=true",
+          "R02_A07_LIVE_FAULT_EVIDENCE={EVIDENCE}/A07_LIVE_FAULT/case.json",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "--offline",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "execute_concurrency",
+          "http_running_storage_fault_has_no_success_event_or_restart_run",
+          "--",
+          "--exact",
+          "--nocapture"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_LIVE_FAULT/case.json"
+        ]
+      },
+      "a07_live_fault_02_check": {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_t04_live_fault_evidence.py",
+          "{EVIDENCE}"
+        ],
+        "timeoutSecs": 60,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_LIVE_FAULT/checked.json"
+        ]
+      },
+      "a09_a10_events_matrix": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t05_events_matrix.sh",
+          "{EVIDENCE}/A09_A10"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/A09_A10/probe-matrix.jsonl",
+          "{EVIDENCE}/A09_A10/key-events-dump.json"
+        ]
+      },
+      "a11_backup_restore": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t06_backup_restore.sh",
+          "{EVIDENCE}/A11"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/A11/backup-restore/summary.txt"
+        ]
+      },
+      "a12_recovery_drill": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t06_recovery_drill.sh",
+          "{EVIDENCE}/A12"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/A12/recovery-drill/summary.txt"
+        ]
+      },
+      "a13_redaction_scan": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t07_redaction_scan.sh",
+          "{EVIDENCE}/A13"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/A13/redaction-scan/summary.txt",
+          "{EVIDENCE}/A13/redaction-scan/inventory.txt"
+        ]
+      },
+      "a14_slow_subscriber": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t07_slow_subscriber.sh",
+          "{EVIDENCE}/A14"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/A14/slow-subscriber/storm-results.json"
+        ]
+      },
+      "a15_full_chain": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t08_full_chain_smoke.sh",
+          "{EVIDENCE}/A15"
+        ],
+        "timeoutSecs": 1800,
+        "evidencePaths": [
+          "{EVIDENCE}/A15/full-chain/summary.txt"
+        ]
+      },
+      "a16_legacy_regression": {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+          "{EVIDENCE}/A16"
+        ],
+        "timeoutSecs": 3600,
+        "evidencePaths": [
+          "{EVIDENCE}/A16/legacy-entry/summary.txt"
+        ]
+      }
+    }
+  }
+]

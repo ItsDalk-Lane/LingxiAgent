@@ -1,0 +1,80 @@
+{
+  "utc": "2026-10-07T04:10:01.514297+00:00",
+  "source": "/private/tmp/rr3-doc-input-boundary-1pgmn8m7",
+  "archive": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/DOC-INPUT-BOUNDARY-01",
+  "sourceOwner": "rr3_doc_input_boundary_01",
+  "archiveOwner": "root",
+  "sourceStopped": true,
+  "files": [
+    {
+      "relativePath": "BRIEF.md",
+      "sha256": "55df32fb981abf813ec56df1a9cd6f0b5f523eae15d40403cd67ec3fc072eeff",
+      "bytes": 2441
+    },
+    {
+      "relativePath": "MANIFEST.json",
+      "sha256": "7493221aaa69c1f1a83e9248db578a6cb6bd6fa6b9af56ceb54b66aa08d05488",
+      "bytes": 2085
+    },
+    {
+      "relativePath": "READ_QA.json",
+      "sha256": "dfe37fea0acdaeda7ab629240665bc4d5d07914e2675aa6716bc99f3f7588b9b",
+      "bytes": 357
+    },
+    {
+      "relativePath": "REPORT.md",
+      "sha256": "2e5ec58388810318bfe0e8ad1e568517fa7d23337816b1930428292420f77579",
+      "bytes": 23225
+    },
+    {
+      "relativePath": "document-boundaries.json",
+      "sha256": "4c7eb465cb73765f3380270e471e2eb9407b2ae3769ba3f108e997fb3b040178",
+      "bytes": 17051
+    },
+    {
+      "relativePath": "document-inputs.json",
+      "sha256": "e1e5236afd1614667519c8008d945a4200c9aab07eb8af9d305adb590610dd8e",
+      "bytes": 27546
+    },
+    {
+      "relativePath": "finalize_inputs.py",
+      "sha256": "89b45f27d7c399968e6176b16a9f8ba71ffdfcdbd7fe0cc22baea7b414e20c03",
+      "bytes": 2366
+    },
+    {
+      "relativePath": "inspect_inputs.py",
+      "sha256": "110554225c523233511ea6fda19ac3ba40122a64a469d3d2ea01124c5c41a5cb",
+      "bytes": 1891
+    },
+    {
+      "relativePath": "read-commands.jsonl",
+      "sha256": "a37c32ed1e26c510c0b838d4c7e41e0861c435e5b7b956a67d223811314feb82",
+      "bytes": 867805
+    },
+    {
+      "relativePath": "read-inputs.jsonl",
+      "sha256": "d577515e286d29551d35f4c6ace20a1e1d7783d6f927d5a123b98e6239cc5b36",
+      "bytes": 17290
+    },
+    {
+      "relativePath": "read_audit.py",
+      "sha256": "bd0101a502d17962fe1bc20a81e8e3645eca8f0bfbc1d04acbd05894d8c1a826",
+      "bytes": 1072
+    },
+    {
+      "relativePath": "source-read-stability.json",
+      "sha256": "b1dfe1b7d994ce016651d9a27b34eaca62a936d2aa65f051b8431d9a944152ae",
+      "bytes": 70253
+    },
+    {
+      "relativePath": "stage-command-graph.json",
+      "sha256": "dfd8b270488b2a3551eeb0dbd000d23f471d806b3279a41d98132d9b1ba5af86",
+      "bytes": 19815
+    },
+    {
+      "relativePath": "write_report.py",
+      "sha256": "cfe7ad70978d47ce8090f01846553bd5be928633b275c0e0071f440eb62d0cee",
+      "bytes": 24739
+    }
+  ]
+}

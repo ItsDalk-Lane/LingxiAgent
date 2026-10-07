@@ -1,0 +1,20 @@
+{
+  "utc": "2026-10-07T01:02:10.215820+00:00",
+  "source": "inherited immutable pre-run original thresholds; resources run before-binding already recorded these same source bytes",
+  "load": {
+    "cancel": 60,
+    "error": 60,
+    "normal": 15,
+    "long512KiB": 10,
+    "worker": 15,
+    "sessions": 2
+  },
+  "bounds": {
+    "rssKiB": 409600,
+    "rssGrowthKiB": 153600,
+    "fd": 400,
+    "fdGrowth": 64,
+    "logs": 3
+  },
+  "originalRegistrationHash": "aaa54f9ebc8620ffb46bbe7475160a51d6304df133df08ce105c024ac2b42d9b"
+}

@@ -1,0 +1,806 @@
+[
+  {
+    "name": "stable-normal",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--",
+      "verify-stage",
+      "R02",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-normal/evidence"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:28:49.003876+00:00",
+    "endUTC": "2026-10-07T02:29:55.498892+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {
+      "LINGXI_G_MUTATE": "0"
+    },
+    "logSHA256": "23c2cb0e12c85a7c5963bf6f8d7e1ad3e583e19a6c2d5e24b54a1a327b65f3c5",
+    "counts": [],
+    "cargoRunningBinaries": []
+  },
+  {
+    "name": "stable-midbyte-red",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--",
+      "verify-stage",
+      "R02",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-midbyte-red/evidence"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:29:55.610260+00:00",
+    "endUTC": "2026-10-07T02:31:03.038319+00:00",
+    "exitCode": 1,
+    "environmentOverrides": {
+      "LINGXI_G_MUTATE": "1"
+    },
+    "logSHA256": "e2a22e1b9fff3ba0638ec9cb054feb08b4427b4f88bf5309c9408e76bd145b3f",
+    "counts": [],
+    "cargoRunningBinaries": []
+  },
+  {
+    "name": "stable-restored",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--",
+      "verify-stage",
+      "R02",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-restored/evidence"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:31:03.216453+00:00",
+    "endUTC": "2026-10-07T02:32:11.146120+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {
+      "LINGXI_G_MUTATE": "0"
+    },
+    "logSHA256": "8fde904b200d92f484f1709eb27ad189e0f05c8b9abbbace6add85d3ce1c0dbc",
+    "counts": [],
+    "cargoRunningBinaries": []
+  },
+  {
+    "name": "rebuild-original-runner",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "build",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:32:11.305852+00:00",
+    "endUTC": "2026-10-07T02:32:12.427284+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "9e3eb19a516b51530be0da379a9577e59e171543a8a050f2e64a42d71731df26",
+    "counts": [],
+    "cargoRunningBinaries": []
+  },
+  {
+    "name": "xtask-restored-all",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:32:12.541479+00:00",
+    "endUTC": "2026-10-07T02:32:27.247734+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "5d1293e6d9a4956d47a316008de8bc11d012716ee3956853c892206fa46cb9e9",
+    "counts": [
+      "test result: ok. 121 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.11s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "e64aaf6af9d2f275b4e03f2fea8a4ea4cd45e5a0325b1a36c016c6fb3bc870f3",
+        "bytes": 9370504
+      }
+    ]
+  },
+  {
+    "name": "restore-N08-N10",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r05_t01_binary_wiring"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:32:27.360778+00:00",
+    "endUTC": "2026-10-07T02:32:39.854674+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "21bf6c9eea310de1dbc692db23dbaff3c85954329e2539220190966dff44cbb4",
+    "counts": [
+      "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.88s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t01_binary_wiring-accb1ca8bb78e736",
+        "sha256": "b29ee6cb47e1a0fb59e61b5c75447435a441281347622d1ac5c3f919c41a09d0",
+        "bytes": 7107400
+      }
+    ]
+  },
+  {
+    "name": "restore-N09",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r05_t03_protocol_adapters",
+      "c05_runtime_nonce"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:32:40.041340+00:00",
+    "endUTC": "2026-10-07T02:32:48.322180+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "3a079ebb3b4af4399f6390e54a62fb0693f61055c4a78aab00664f1c2c716872",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.16s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t03_protocol_adapters-2b7d5000bc3dad67",
+        "sha256": "c46275fc1bda85d442eee542dff1758c4429e180056b2eeef36bdf709eed193d",
+        "bytes": 46040424
+      }
+    ]
+  },
+  {
+    "name": "restore-N11",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-adapters",
+      "--lib",
+      "models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest",
+      "--",
+      "--exact"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:32:48.439461+00:00",
+    "endUTC": "2026-10-07T02:32:56.419341+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "0a7abc9a3bbcb71f96daa433b68706a91a94e070f0945d0931056a7ed18e54fa",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_adapters-25f1ae8b0ef7c0f1",
+        "sha256": "7a9d87206f08925c8b6a41a3244afe9c25688f4cba48726657310ba36e3d0ffe",
+        "bytes": 23017104
+      }
+    ]
+  },
+  {
+    "name": "restore-N12",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r05_t06_worker_model",
+      "c06_"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:32:56.537717+00:00",
+    "endUTC": "2026-10-07T02:33:03.465786+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "a1c90ef38bd0c9aa2101c4dd44b0c527cf303530e293deb187c9fb7eee06b800",
+    "counts": [
+      "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.73s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t06_worker_model-209d0a13dc6d2262",
+        "sha256": "55a2f022ee8ad1294ae770695d199bf035a56ca774abf57f9139c59ee7f8cd7a",
+        "bytes": 45673560
+      }
+    ]
+  },
+  {
+    "name": "restore-N04-N15",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::handle_refusal_texts_carry_no_material",
+      "--",
+      "--exact"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:33:03.587521+00:00",
+    "endUTC": "2026-10-07T02:33:12.700108+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "5b81d6f82b86ba1beeec79c2e14d32b1ae48aa8a2339c8c31e47d4bfcb9665cd",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-0532c49ca08cc763",
+        "sha256": "dc61fe658474314d78629ceecdf2a4d5d9a3015c210d6b6f2b4e734c05dbf8a1",
+        "bytes": 55056928
+      }
+    ]
+  },
+  {
+    "name": "producer-restored-full",
+    "argv": [
+      "bash",
+      "scripts/rust-tauri/r05_t08_stage_suites.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/producer-restored-full/suites"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:33:12.824363+00:00",
+    "endUTC": "2026-10-07T02:43:22.097562+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "3fb79f59ee2487849aca6b6e19e7fb81eb236fcd6440fb1f25f95f26ce9d9ebe",
+    "counts": [],
+    "cargoRunningBinaries": []
+  },
+  {
+    "name": "binding-restored-real-R02",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--",
+      "verify-stage",
+      "R02",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:43:22.211453+00:00",
+    "endUTC": "2026-10-07T02:56:16.383362+00:00",
+    "exitCode": 1,
+    "environmentOverrides": {},
+    "logSHA256": "881f2792f88201f4700e37ee97546cdae335fea8c89c00d2ff6f4d6c4b5cb683",
+    "counts": [],
+    "cargoRunningBinaries": []
+  },
+  {
+    "name": "N16-used-root-refusal-supplement",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--",
+      "verify-stage",
+      "R02",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:16.203127+00:00",
+    "endUTC": "2026-10-07T02:57:16.917359+00:00",
+    "exitCode": 1,
+    "environmentOverrides": {},
+    "logSHA256": "6126d69ca10a7b081d54740d95d05a55138ef8366c026371d87f49c5cdaef1a4",
+    "counts": [],
+    "cargoRunningBinaries": []
+  },
+  {
+    "name": "F26-cid-rename",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_stage_cid_table_owns"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:17.025102+00:00",
+    "endUTC": "2026-10-07T02:57:20.561791+00:00",
+    "exitCode": 101,
+    "environmentOverrides": {},
+    "logSHA256": "55d04db9004a3519896f0b45b7d83cc9aba1f30c5d6d9910e524b13413214c30",
+    "counts": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "aac06e942377ef8f8eda78dc13996952dd2368f2d31377407c71b56ecb4eba7d",
+        "bytes": 9370504
+      }
+    ]
+  },
+  {
+    "name": "F26-cid-rename-restored",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_stage_cid_table_owns"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:20.682400+00:00",
+    "endUTC": "2026-10-07T02:57:26.585486+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "21199fbf30304b03e4039e132e285b3270236e8f65a0353fc4cf8c04cf0c2ede",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "3bd3ef1da40d3d1355059dd69ea71415b932ca7d4decd2239457d4fbeeb7e424",
+        "bytes": 9370504
+      }
+    ]
+  },
+  {
+    "name": "F26-registry-missing",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_stage_cid_table_owns"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:26.706555+00:00",
+    "endUTC": "2026-10-07T02:57:32.842740+00:00",
+    "exitCode": 101,
+    "environmentOverrides": {},
+    "logSHA256": "fac5fdd44f49fda17c5733c140e67651ba0842f8c0ceb24e8fe2c8fcdb8647d2",
+    "counts": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "4f516ff981f395aa46d4fa261e3b52f969bb084220a72780259d19c7749f1a3f",
+        "bytes": 9370504
+      }
+    ]
+  },
+  {
+    "name": "F26-registry-missing-restored",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_stage_cid_table_owns"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:32.959144+00:00",
+    "endUTC": "2026-10-07T02:57:39.394763+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "7b2f40c2edd9bb4202e1f73a5e05844d421066e4f585ce8c0d3b834d4cf1f37e",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "cc12c95acafc2dd2c099a2659e1a51f664493023d3d8c970ebd20efb970835e8",
+        "bytes": 9370504
+      }
+    ]
+  },
+  {
+    "name": "F26-bogus-command",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_stage_cid_table_owns"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:39.521932+00:00",
+    "endUTC": "2026-10-07T02:57:45.496967+00:00",
+    "exitCode": 101,
+    "environmentOverrides": {},
+    "logSHA256": "a3337a9316a3d1745a93fc500550c049b90bdd06e55e88d3f1c5d8375631310f",
+    "counts": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "6688a75be203e7fbd615c1e0bd13395ca9200da0a6c16be35e1d463cd0d682cc",
+        "bytes": 9370504
+      }
+    ]
+  },
+  {
+    "name": "F26-bogus-command-restored",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_stage_cid_table_owns"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:45.619678+00:00",
+    "endUTC": "2026-10-07T02:57:52.143275+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "5ebfabde4ee68ab510740a1c4362a4826a47e731a5ba4f379ecf5ecffc4c7126",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "7bf0d657e6a278aef257e7f5c57e4d0e0c796ef2bc62e32d1104ef9e6851d46d",
+        "bytes": 9370504
+      }
+    ]
+  },
+  {
+    "name": "F25-exclusive-share",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_production_map_mirrors"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:57:52.262649+00:00",
+    "endUTC": "2026-10-07T02:58:00.549786+00:00",
+    "exitCode": 101,
+    "environmentOverrides": {},
+    "logSHA256": "31ce6ae549208de7ea6e53b47b9655eb53824ca0ca25d84368650fb1a434e436",
+    "counts": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.00s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "dd92a1eef8bd618e32363d17359b8f3acb03531e2c1280a5540352ac105aa032",
+        "bytes": 9370504
+      }
+    ]
+  },
+  {
+    "name": "F25-exclusive-share-restored",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_production_map_mirrors"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:00.673960+00:00",
+    "endUTC": "2026-10-07T02:58:06.338370+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "e7fc427cea0a8ce00777f5caf8bc28dc541ff659b5ce3647e4290fb351df075a",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.04s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "e00923870c176f8e5db4acdbefacfe6a3250a8941eb696ef63d3284c0a7a34cf",
+        "bytes": 9370504
+      }
+    ]
+  },
+  {
+    "name": "F25-leafcase-missing",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_production_map_mirrors"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:06.459760+00:00",
+    "endUTC": "2026-10-07T02:58:13.849582+00:00",
+    "exitCode": 101,
+    "environmentOverrides": {},
+    "logSHA256": "bd26717b1d52b384e0b70854985d85459aed8b92c47fb608685a3821fbe73201",
+    "counts": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.03s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "bc469687eab17dbb21ee8d1599cfe1379d8483527b405036e2b16493f92060cb",
+        "bytes": 9370504
+      }
+    ]
+  },
+  {
+    "name": "F25-leafcase-missing-restored",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_production_map_mirrors"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:13.971025+00:00",
+    "endUTC": "2026-10-07T02:58:20.354177+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "a9d251040f2d138e300c6e35efa28422c98225d3f78a0bfc1d290c76c4748fdf",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.03s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "b462cc6e9ebef4e7e34a6188d2b1d7509af1d87d19b342029a41010ecc7d4f96",
+        "bytes": 9370504
+      }
+    ]
+  },
+  {
+    "name": "F26-producer-preflight",
+    "argv": [
+      "bash",
+      "scripts/rust-tauri/r05_t08_stage_suites.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/F26-producer-preflight/suites"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:20.473587+00:00",
+    "endUTC": "2026-10-07T02:58:20.522826+00:00",
+    "exitCode": 1,
+    "environmentOverrides": {},
+    "logSHA256": "032ce8a2cdb12ccda6c0a565959f534b1ac6d517411a8d9561c5320b9bb73b11",
+    "counts": [],
+    "cargoRunningBinaries": []
+  },
+  {
+    "name": "extra-registry-restored-all",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "r05_"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:20.638018+00:00",
+    "endUTC": "2026-10-07T02:58:25.347147+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "c865ffb7f5572c306d1e05eda20beccb304b1b1056298cd0032c9ebfb7b6fd30",
+    "counts": [
+      "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 113 filtered out; finished in 0.04s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c",
+        "sha256": "f03e1cec32bfbbed868bc67130e9d9f1b9cd127b187ee01bcf2a21b7a4d76ef7",
+        "bytes": 9370504
+      }
+    ]
+  },
+  {
+    "name": "N04-direct-target-red",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::handle_refusal_texts_carry_no_material",
+      "--",
+      "--exact"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:25.484330+00:00",
+    "endUTC": "2026-10-07T02:58:37.866135+00:00",
+    "exitCode": 101,
+    "environmentOverrides": {},
+    "logSHA256": "dee7bee3324bfc9e9723909b3f8dfe06706df04a4174a99798483c37ca8a8d0e",
+    "counts": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-0532c49ca08cc763",
+        "sha256": "b7256246310997c3fd0d4c71cdf3c469ee1bb1fc8dcb7ab3cc476367f020de09",
+        "bytes": 55056928
+      }
+    ]
+  },
+  {
+    "name": "N04-direct-target-restored",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::handle_refusal_texts_carry_no_material",
+      "--",
+      "--exact"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:37.990930+00:00",
+    "endUTC": "2026-10-07T02:58:45.936191+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "8466b3c15de0543263a6796ba398d3660bebc42ebab38826ebabfc6db3fc81ec",
+    "counts": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-0532c49ca08cc763",
+        "sha256": "ce00852591b84ced93685cb9c5db00a6d825f6119128332187694f5c0c030589",
+        "bytes": 55056928
+      }
+    ]
+  },
+  {
+    "name": "I06-existing-approval",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r04_t03_approval_service"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/negcopy.hTXzzN",
+    "startUTC": "2026-10-07T02:58:46.063803+00:00",
+    "endUTC": "2026-10-07T02:59:04.341910+00:00",
+    "exitCode": 0,
+    "environmentOverrides": {},
+    "logSHA256": "7b6c1be0ad67c1e76080e183544a4e57ea2cb4ec21373269b0a740c7d2550bcf",
+    "counts": [
+      "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.51s"
+    ],
+    "cargoRunningBinaries": [
+      {
+        "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r04_t03_approval_service-a3cd2bd00f3a49b5",
+        "sha256": "e6eb51b9915cf26bd56ab29177dcfc83fae71973343988d7ac15293ab1f5e441",
+        "bytes": 44488120
+      }
+    ]
+  }
+]

@@ -1,0 +1,10 @@
+    Blocking waiting for file lock on build directory
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 23s
+     Running unittests src/main.rs (rust/target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 2 tests
+test stage_map::map_tests::r05_stage_pin_table_matches_the_registered_suites ... ok
+test stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 119 filtered out; finished in 0.02s
+

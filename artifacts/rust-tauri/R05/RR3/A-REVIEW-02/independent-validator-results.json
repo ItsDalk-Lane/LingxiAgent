@@ -1,0 +1,192 @@
+{
+  "actual": 29,
+  "passed": 29,
+  "cases": [
+    {
+      "function": "validate_run_output_unit",
+      "kind": "fresh",
+      "fault": "normal",
+      "exit": 0,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_run_output_unit",
+      "kind": "fresh",
+      "fault": "signal",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_run_output_unit",
+      "kind": "fresh",
+      "fault": "binary-stderr",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_run_output_unit",
+      "kind": "fresh",
+      "fault": "unexecutable",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_run_output_unit",
+      "kind": "fresh",
+      "fault": "restored",
+      "exit": 0,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_run_output_unit",
+      "kind": "tracked",
+      "fault": "normal",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_run_output_unit",
+      "kind": "tracked",
+      "fault": "signal",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_run_output_unit",
+      "kind": "tracked",
+      "fault": "binary-stderr",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_run_output_unit",
+      "kind": "tracked",
+      "fault": "unexecutable",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_run_output_unit",
+      "kind": "tracked",
+      "fault": "restored",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_run_output_unit",
+      "illegalRoot": "artifacts/rust-tauri/R05/linked",
+      "exit": 1
+    },
+    {
+      "function": "validate_run_output_unit",
+      "illegalRoot": ".",
+      "exit": 1
+    },
+    {
+      "function": "validate_run_output_unit",
+      "illegalRoot": "artifacts/rust-tauri/R05/missing/../fresh",
+      "exit": 1
+    },
+    {
+      "function": "validate_run_output_unit",
+      "illegalRoot": "../outside",
+      "exit": 1
+    },
+    {
+      "function": "validate_declared_run_root",
+      "kind": "fresh",
+      "fault": "normal",
+      "exit": 0,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_declared_run_root",
+      "kind": "fresh",
+      "fault": "signal",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_declared_run_root",
+      "kind": "fresh",
+      "fault": "binary-stderr",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_declared_run_root",
+      "kind": "fresh",
+      "fault": "unexecutable",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_declared_run_root",
+      "kind": "fresh",
+      "fault": "restored",
+      "exit": 0,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_declared_run_root",
+      "kind": "tracked",
+      "fault": "normal",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_declared_run_root",
+      "kind": "tracked",
+      "fault": "signal",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_declared_run_root",
+      "kind": "tracked",
+      "fault": "binary-stderr",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_declared_run_root",
+      "kind": "tracked",
+      "fault": "unexecutable",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_declared_run_root",
+      "kind": "tracked",
+      "fault": "restored",
+      "exit": 1,
+      "reasonValid": true
+    },
+    {
+      "function": "validate_declared_run_root",
+      "illegalRoot": "artifacts/rust-tauri/R05/linked",
+      "exit": 1
+    },
+    {
+      "function": "validate_declared_run_root",
+      "illegalRoot": ".",
+      "exit": 1
+    },
+    {
+      "function": "validate_declared_run_root",
+      "illegalRoot": "artifacts",
+      "exit": 1
+    },
+    {
+      "function": "validate_declared_run_root",
+      "illegalRoot": "artifacts/rust-tauri/R05/missing/../fresh",
+      "exit": 1
+    },
+    {
+      "function": "validate_declared_run_root",
+      "illegalRoot": "../outside",
+      "exit": 1
+    }
+  ],
+  "substituteBoundary": "真实Git索引/文件系统；仅隔离PATH目标Git信号终止、成功码二进制诊断、无法执行；正常恢复用真实Git"
+}

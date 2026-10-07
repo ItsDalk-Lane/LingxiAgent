@@ -1,0 +1,2 @@
+cid R05-T04-C04: run 'lib-adapters/models::streaming::tests::the_buffer_bound_is_loud' is not in the pin table
+run 'lib-adapters/models::streaming::tests::the_buffer_bound_is_loud_XYZ' pins 1 executed tests but the cid table owns 0 — every executed test must belong to exactly one C-ID

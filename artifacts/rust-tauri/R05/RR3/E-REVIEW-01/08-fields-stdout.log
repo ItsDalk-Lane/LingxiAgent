@@ -1,0 +1,368 @@
+{
+  "mode": "fields",
+  "checks": [
+    {
+      "name": "独立字段全序相等 ModelRouteRequest",
+      "pass": true,
+      "detail": {
+        "source": "rust/crates/lingxi-kernel/src/model_exchange.rs",
+        "actual": [
+          "operation",
+          "provider",
+          "model"
+        ],
+        "handoff": [
+          "operation",
+          "provider",
+          "model"
+        ]
+      }
+    },
+    {
+      "name": "独立字段全序相等 RunContext",
+      "pass": true,
+      "detail": {
+        "source": "rust/crates/lingxi-kernel/src/lib.rs",
+        "actual": [
+          "principal",
+          "session_id",
+          "run_id",
+          "attempt",
+          "generation"
+        ],
+        "handoff": [
+          "principal",
+          "session_id",
+          "run_id",
+          "attempt",
+          "generation"
+        ]
+      }
+    },
+    {
+      "name": "独立字段全序相等 ModelTurnInput",
+      "pass": true,
+      "detail": {
+        "source": "rust/crates/lingxi-kernel/src/model_exchange.rs",
+        "actual": [
+          "submission",
+          "system_prompt",
+          "turn",
+          "prior",
+          "tools",
+          "deadline_unix_ms",
+          "images",
+          "max_output_tokens"
+        ],
+        "handoff": [
+          "submission",
+          "system_prompt",
+          "turn",
+          "prior",
+          "tools",
+          "deadline_unix_ms",
+          "images",
+          "max_output_tokens"
+        ]
+      }
+    },
+    {
+      "name": "独立字段全序相等 AuxiliaryRequest",
+      "pass": true,
+      "detail": {
+        "source": "rust/crates/lingxi-adapters/src/models/auxiliary.rs",
+        "actual": [
+          "prompt",
+          "images",
+          "max_output_tokens",
+          "deadline_unix_ms"
+        ],
+        "handoff": [
+          "prompt",
+          "images",
+          "max_output_tokens",
+          "deadline_unix_ms"
+        ]
+      }
+    },
+    {
+      "name": "独立字段全序相等 EmbeddingRequest",
+      "pass": true,
+      "detail": {
+        "source": "rust/crates/lingxi-adapters/src/models/operations/embedding.rs",
+        "actual": [
+          "inputs",
+          "dimensions",
+          "context_window",
+          "input_type"
+        ],
+        "handoff": [
+          "inputs",
+          "dimensions",
+          "context_window",
+          "input_type"
+        ]
+      }
+    },
+    {
+      "name": "独立字段全序相等 OperationCallContext",
+      "pass": true,
+      "detail": {
+        "source": "rust/crates/lingxi-service/src/operations.rs",
+        "actual": [
+          "session_id",
+          "run_id",
+          "attempt",
+          "cause_ref"
+        ],
+        "handoff": [
+          "session_id",
+          "run_id",
+          "attempt",
+          "cause_ref"
+        ]
+      }
+    },
+    {
+      "name": "独立字段全序相等 ModelUsageQuery",
+      "pass": true,
+      "detail": {
+        "source": "rust/crates/lingxi-kernel/src/usage.rs",
+        "actual": [
+          "owner_user_id",
+          "session_id",
+          "run_id",
+          "purpose",
+          "model",
+          "recorded_from_unix_ms",
+          "recorded_to_unix_ms"
+        ],
+        "handoff": [
+          "owner_user_id",
+          "session_id",
+          "run_id",
+          "purpose",
+          "model",
+          "recorded_from_unix_ms",
+          "recorded_to_unix_ms"
+        ]
+      }
+    },
+    {
+      "name": "ExchangeItem完整字段 AssistantTurn",
+      "pass": true,
+      "detail": [
+        "call",
+        "content",
+        "tool_calls",
+        "origin"
+      ]
+    },
+    {
+      "name": "ExchangeItem完整字段 ToolResult",
+      "pass": true,
+      "detail": [
+        "tool_call_id",
+        "provider_call_id",
+        "outcome"
+      ]
+    },
+    {
+      "name": "wire真实常量 WIRE_PROTOCOL_MIN_SUPPORTED",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "wire真实常量 WIRE_PROTOCOL_MAX_SUPPORTED",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "wire name",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "event version",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "真实data epoch",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "legacy轴",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "schema版本实际max",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "kernel gateway",
+      "pass": true,
+      "detail": "rust/crates/lingxi-kernel/src/model_exchange.rs"
+    },
+    {
+      "name": "credential signature",
+      "pass": true,
+      "detail": "rust/crates/lingxi-adapters/src/models/credentials.rs"
+    },
+    {
+      "name": "credential 401 port",
+      "pass": true,
+      "detail": "rust/crates/lingxi-adapters/src/models/credentials.rs"
+    },
+    {
+      "name": "runtime input",
+      "pass": true,
+      "detail": "rust/crates/lingxi-service/src/runs.rs"
+    },
+    {
+      "name": "production trace",
+      "pass": true,
+      "detail": "rust/crates/lingxi-service/src/lib.rs"
+    },
+    {
+      "name": "共享配额释放",
+      "pass": true,
+      "detail": "rust/crates/lingxi-service/src/runs.rs"
+    },
+    {
+      "name": "先账后事件",
+      "pass": true,
+      "detail": "rust/crates/lingxi-service/src/runs.rs"
+    },
+    {
+      "name": "取消只账行",
+      "pass": true,
+      "detail": "rust/crates/lingxi-service/src/runs.rs"
+    },
+    {
+      "name": "owner JOIN",
+      "pass": true,
+      "detail": "rust/crates/lingxi-adapters/src/storage/run_store.rs"
+    },
+    {
+      "name": "owner过滤",
+      "pass": true,
+      "detail": "rust/crates/lingxi-adapters/src/storage/run_store.rs"
+    },
+    {
+      "name": "未知尝试NULL",
+      "pass": false,
+      "detail": "rust/crates/lingxi-adapters/src/storage/migrations.rs"
+    },
+    {
+      "name": "真实普通取消",
+      "pass": true,
+      "detail": "rust/crates/lingxi-service/tests/subagent_closeout.rs"
+    },
+    {
+      "name": "真实下一run恢复",
+      "pass": true,
+      "detail": "rust/crates/lingxi-service/tests/late_result_fence.rs"
+    },
+    {
+      "name": "实际调用签名 embed",
+      "pass": true,
+      "detail": "pub async fn embed(\n        &self,\n        request: dialects::embedding::EmbeddingRequest,\n        deadline_unix_ms: Option<u64>,\n        context: Option<&OperationCallContext>,\n    ) -> Result<dialects::embedding::EmbeddingOutcome, OperationFailure> {"
+    },
+    {
+      "name": "实际调用签名 rerank",
+      "pass": true,
+      "detail": "pub async fn rerank(\n        &self,\n        request: RerankRequest,\n        deadline_unix_ms: Option<u64>,\n        context: Option<&OperationCallContext>,\n    ) -> Result<dialects::rerank::RerankOutcome, OperationFailure> {"
+    },
+    {
+      "name": "opaque来源真防线 anthropic_messages.rs",
+      "pass": true,
+      "detail": "colError::new(ErrorCode::InvalidMessage, detail, false);\n    match origin {\n        Some(origin) if origin.authorizes(&route.provider, &route.model) => Ok(()),\n        Some(origin) => Err(invalid(format!(\n            \"the exchange history carries anthropic-messages opaque state (thinking signature / \\\n             redacted thinking) minted by provider {:?} model {:?}; this request targets provider \\\n             {:?} model {:?}. Same-protocol-family is NOT source authorization — replaying \\\n             another origin's signed state would corrupt the protocol round-trip. Restart or \\\n             compact the session onto one serving model, or"
+    },
+    {
+      "name": "opaque来源真防线 google_generative_ai.rs",
+      "pass": true,
+      "detail": "colError::new(ErrorCode::InvalidMessage, detail, false);\n    match origin {\n        Some(origin) if origin.authorizes(&route.provider, &route.model) => Ok(()),\n        Some(origin) => Err(invalid(format!(\n            \"the exchange history carries google-generative-ai opaque state (thought signature / \\\n             functionCall part state) minted by provider {:?} model {:?}; this request targets \\\n             provider {:?} model {:?}. Same-protocol-family is NOT source authorization — \\\n             replaying another origin's signed state would corrupt the protocol round-trip. \\\n             Restart or compact the session onto one serving mo"
+    },
+    {
+      "name": "opaque来源真防线 openai_responses.rs",
+      "pass": true,
+      "detail": "colError::new(ErrorCode::InvalidMessage, detail, false);\n    match origin {\n        Some(origin) if origin.authorizes(&route.provider, &route.model) => Ok(()),\n        Some(origin) => Err(invalid(format!(\n            \"the exchange history carries {family} opaque state (reasoning items / call \\\n             anchors) minted by provider {:?} model {:?}; this request targets provider {:?} \\\n             model {:?}. Same-protocol-family is NOT source authorization — replaying another \\\n             origin's encrypted state would corrupt the protocol round-trip. Restart or compact \\\n             the session onto one serving model, or re-route the r"
+    },
+    {
+      "name": "provider/model两个来源字段",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "正常样例实际源码 \"embedding\":[0.25,0.75]",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "正常样例实际源码 \"prompt_tokens\":5,\"total_tokens\":9",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "正常样例实际源码 dimensions: Some(2)",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "正常样例实际源码 context_window: None",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "正常样例实际源码 Some(&context)",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "正常样例实际源码 Some(\"sess_rr1_ctx\")",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "正常样例实际源码 Some(\"run-rr1-ctx\")",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "正常样例实际源码 CallOutcome::Succeeded",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "正常样例实际源码 started_at_unix_ms.is_some()",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "正常样例实际源码 input_tokens, Some(5)",
+      "pass": false,
+      "detail": null
+    },
+    {
+      "name": "正常样例实际源码 output_tokens, None",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "§6.2必需字段齐全",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "未accepted无虚列任务",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "passed": 46,
+  "failed": 2
+}

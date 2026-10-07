@@ -1,0 +1,20 @@
+[
+  {
+    "phase": "normal",
+    "exit": 0,
+    "sha256": "ef28cb6a1f9d200381d94781a7ad5d594f349f95089ab7deb3f70bfd4984faca",
+    "restoredBytesEqual": true
+  },
+  {
+    "phase": "mutated",
+    "exit": 1,
+    "sha256": "a1128340a0a98c3783d152af9219e0a91efd7b782cf85bb4bec391f1d2e13b9a",
+    "restoredBytesEqual": true
+  },
+  {
+    "phase": "restored",
+    "exit": 0,
+    "sha256": "ef28cb6a1f9d200381d94781a7ad5d594f349f95089ab7deb3f70bfd4984faca",
+    "restoredBytesEqual": true
+  }
+]

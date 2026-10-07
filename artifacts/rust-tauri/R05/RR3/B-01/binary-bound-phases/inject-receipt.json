@@ -1,0 +1,25 @@
+{
+  "name": "inject",
+  "command": [
+    "python3",
+    "/Users/study_superior/r05t08-work/negcopy.Gz0rkR/scripts/rust-tauri/r05_t08_mutate_pin.py",
+    "/Users/study_superior/r05t08-work/negcopy.Gz0rkR/docs/rust-tauri/R05/r05_stage_pins.tsv",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/B-01/binary-bound-phases/mutation.json"
+  ],
+  "exitCode": 0,
+  "expectedExitCode": 0,
+  "startedAt": "2026-10-07T00:19:15.082587+00:00",
+  "endedAt": "2026-10-07T00:19:15.167610+00:00",
+  "candidateHead": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "isolatedCopy": "/Users/study_superior/r05t08-work/negcopy.Gz0rkR",
+  "inputManifestDigest": "f3dbc9f413721bb942f5c60b8c6736e2e9f664b9bcbc5f773392232844b3e8f7",
+  "logSha256": "f21e6a0462964e0d4373928f54255ce7573586353b243a7f1fd7af555ab80894",
+  "lockSha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+  "toolchain": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "config": "N/A: xtask compile-time pin mirror, no service configuration or network",
+  "fixtureSha256": "42a0c4def01d824a8a9a554228e0ac6d211f032a2020b281353ae35ee6609c2b",
+  "schema": "xtask stage maps and compile-time TSV inputs are in inputManifest",
+  "binaryPath": null,
+  "binarySha256": null,
+  "testSummary": []
+}

@@ -1,0 +1,67 @@
+{
+  "round": "RR3/FINAL-01",
+  "reviewer": "rr3_final01_reviewer (fresh, no prior RR3 involvement; no subagents)",
+  "brief": "docs/rust-tauri/R05/repair-current/RR3_FINAL_BRIEF.md",
+  "candidate": {
+    "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+    "branch": "codex/rust-tauri-migration",
+    "remote": "same SHA (ls-remote, read-only)",
+    "dirtyEntries": 73,
+    "dirtyBreakdown": {"modified": 25, "untracked": 48},
+    "diffStat": "25 files changed, 8878 insertions(+), 370 deletions(-)",
+    "toolchain": "rustup cargo/rustc 1.98.1 via /Users/study_superior/.cargo/bin/cargo; rust-toolchain.toml pinned; all --locked",
+    "cargoLockSha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+    "coldCache": "rust/target absent at start (TASK0/cargo-clean-receipt 280.7GiB); target/ recreated by this round's cmd-02 (1.1G)"
+  },
+  "commands": [
+    {"n": 1, "argv": "/Users/study_superior/.cargo/bin/cargo fmt --manifest-path rust/Cargo.toml --all -- --check", "cwd": "repo root", "utcStart": "2026-10-07T11:13:34.689169Z", "utcEnd": "2026-10-07T11:13:35.895826Z", "exit": 0, "stdoutBytes": 0, "stderrBytes": 0, "note": "format all clean"},
+    {"n": 2, "argv": "/Users/study_superior/.cargo/bin/cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings", "cwd": "repo root", "utcStart": "2026-10-07T11:13:54.336866Z", "utcEnd": "2026-10-07T11:14:13.036632Z", "exit": 0, "stderrSha256": "328feac85fef37c6133392b2bd1d3d970b3ae1736eef8a31ead52ebc30bf4368", "note": "cold full workspace check 18.57s, 0 warnings 0 errors"},
+    {"n": 3, "argv": "/Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --workspace --locked", "cwd": "repo root", "utcStart": "2026-10-07T11:15:07.928548Z", "utcEnd": "2026-10-07T11:30:05.266553Z", "exit": 0, "groups": 115, "passed": 1486, "failed": 0, "ignored": 0, "measured": 0, "filteredOut": 0, "stdoutSha256": "aecffabb12310909acdf716563d66264bd26c0f6aeb614bfab3be1290f5c5e6f", "note": "r00_management_leaves PASSED incl. LAN assertions in 34.40s; slowest: resources 333.66s, closed_loop 300.49s"},
+    {"n": 4, "argv": "/Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-contracts", "cwd": "repo root", "utcStart": "2026-10-07T11:31:30.526621Z", "utcEnd": "2026-10-07T11:31:33.945328Z", "exit": 0, "note": "56 generated files drift-free; API_COMPAT_MATRIX 626 entries OK"},
+    {"n": 5, "argv": "/Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-boundaries", "cwd": "repo root", "utcStart": "2026-10-07T11:31:42.580062Z", "utcEnd": "2026-10-07T11:31:43.085117Z", "exit": 0, "note": "ownership + dependency rules + negative battery RESULT: OK"},
+    {"n": 6, "argv": "/Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R05/RR3/FINAL-01/verify-R05", "cwd": "repo root", "utcStart": "2026-10-07T11:32:22.612254Z", "utcEnd": "2026-10-07T11:32:43.713542Z", "exit": 1, "stderr": "error: cannot snapshot candidate before stage gate: candidate file /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-02/copy-delete-rename was replaced by a non-file", "note": "fail-closed at candidate snapshot; evidence root verify-R05 NOT created; no stage gate executed"}
+  ],
+  "noFailFastSupplement": "not required: command 3 exited 0 with zero failures; fail-fast never triggered; no unexecuted test-binary range exists (recorded honestly, not skipped)",
+  "verifyStageLayers": {
+    "produced": false,
+    "reason": "entry rejected at candidate snapshot before evidence-root creation",
+    "perLayer": {"R05": "NOT_PRODUCED", "R04": "NOT_PRODUCED", "R03": "NOT_PRODUCED", "R02": "NOT_PRODUCED", "RR1": "NOT_PRODUCED"},
+    "historicalReference": "RR2/FINAL-01/verify-r05-2 (R05 FAIL stable=true 7ckpt; R04 FAIL 8/8 unstable; R03 FAIL 15/15 unstable) remains latest main-tree full-chain layers; G-REVIEW-03 default16-03/N16 run-b 20/20 PASS was on isolated copies"
+  },
+  "allFailures": [
+    {"id": "FINAL01-CMD6-BINDER", "exit": 1, "firstFailingEntry": "artifacts/rust-tauri/R05/RR3/A-02/copy-delete-rename/", "mechanism": "git ls-files --cached --others --exclude-standard emits untracked nested-git fixture dirs as single dir entries (trailing slash); candidate binder hash_candidate_file (rust/crates/xtask/src/candidate.rs:266-393, error at :366) requires a regular file at the final component and fail-closes before creating the evidence root", "triggerSurface": "56 directory entries under A-02, A-REVIEW-01, A-REVIEW-02, I-01, I-REVIEW-01, J-01, J-02, J-REVIEW-01, J-REVIEW-02 evidence dirs (full list: command-records/frozen-inputs.json binder_observation.all_directory_entries)", "attribution": "candidate-tree/checker integration gap (binder enumeration vs RR3 leftover nested-.git fixtures); deterministic; NOT an OS/firewall/disk environment failure; fail-closed behavior itself correct", "resolutionOwners": ["A/F42 binder (new impl round + new independent review) OR A/I/J evidence owners (relocate/archive nested-.git fixtures with preserved hashes; blanket .gitignore/artifacts exclusion forbidden)"], "detectionContext": "first main-tree run of the official verify-stage entry since A-02/I/J fixtures landed; G-REVIEW-03 and package reviews ran on isolated copies, so this gap was structurally invisible until FINAL"}
+  ],
+  "r00ThisRound": {
+    "path": "rust/target/debug/deps/r00_management_leaves-590de196dceb15ce",
+    "noteOnName": "same deterministic cargo name suffix as RR2/D rounds; FILE is newly built this round (birth 2026-10-07T11:15:42Z)",
+    "sha256": "43d959700c53bfd91228f2b3720752aab00a8a05e4c2f495991142802f02b54f",
+    "cdhash": "4ab00dfeb4a4ae93531c857bfef40b879ac82201",
+    "cdhashFull": "4ab00dfeb4a4ae93531c857bfef40b879ac822010ec26bcfa8a2959eb13dc7f9",
+    "signature": "adhoc",
+    "listening": "TCP LISTEN observed (fd12) for full test lifetime (PID 6191, 11:16:38-11:17:13Z); exact port not captured (first sampler's field limitation, recorded honestly)",
+    "inboundBehavior": "ALL LAN assertions PASSED (non-loopback 192.168.3.5, LAN Origin/login/session/logout; 1 passed, 34.40s, no 20s/0-byte stall)",
+    "contrastWithHistory": {"blockedObjects": ["c5975a45... (D-01)", "9f7489029c91d1c232e3c204236854bd53c69cee2fef33d6fd778a27f44696d3 / CDHash d9676388... (D-REVIEW-01)"], "thisRound": "allowed for new identity 43d95970.../CDHash 4ab00dfe..."},
+    "dItemImplication": "ALF/D did NOT reproduce for this round's object; r00 is NOT a stage blocker this round; D-REVIEW-01 PREPARED-ALLOW binds the stale 9f748902... object and per its own rule is expired relative to this round's object; no user firewall action is currently evidenced as required (single-instance pass not extrapolated to permanent resolution; environment-observation item retained)",
+    "systemChanges": "none (no firewall/ALF/route/permission modifications at any point)"
+  },
+  "verdict": {
+    "offline_gate": "FAIL",
+    "independent_review": "FAIL",
+    "live_verification": "BLOCKED_NOT_AUTHORIZED",
+    "platform_verification": {"macOS_arm64": "real this round", "Linux_x86_64": "inherited registration, not re-verified", "Windows": "not verified"},
+    "stage_readiness": "NOT_ACCEPTED",
+    "R06_READY": false,
+    "release_state": "NOT_IN_SCOPE",
+    "soleRemainingBlocker": "FINAL01-CMD6-BINDER (candidate binder x nested-.git RR3 fixture dirs); the expected ALF/D blocker did NOT reproduce this round",
+    "nextCommand": "/Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R05/RR3/FINAL-02/verify-R05 (prerequisite: resolve binder/fixture gap per resolutionOwners; new reviewer; FINAL-01 failure preserved)"
+  },
+  "frozenProductionInputs": "command-records/frozen-inputs.json (30 entries incl. Cargo.toml/lock, rust-toolchain.toml, xtask candidate/main/verify + stage_maps R02-R05, negative_gate/stage_suites/legacy_entry_regression/check-generated scripts, restore/prepare/mutate helpers, R01 ownership checker, r00 test source, logging/redaction/lib, resources test, 4 R05 TSV authority tables)",
+  "archive": {
+    "externalDir": "/private/tmp/rr3-final01-dir",
+    "archiveDir": "artifacts/rust-tauri/R05/RR3/FINAL-01/command-records",
+    "files": 29,
+    "hashEquality": "EXTERNAL_TO_ARCHIVE_SHA256_EQUAL (MANIFEST-sha256.txt)",
+    "contains": ["6 command dirs (meta.txt/stdout.log/stderr.log each)", "run-cmd.sh + r00-monitor.sh/2.sh", "r00-monitor.jsonl + r00-monitor-2.jsonl", "audit-layers.py (layer auditor, unused this round: no layers produced)", "frozen-inputs.json", "git-state-at-final.txt", "MANIFEST-sha256.txt"]
+  },
+  "boundaries": ["repo write ONLY under artifacts/rust-tauri/R05/RR3/FINAL-01/ (verify-R05 never created by cmd-6; command-records + STAGE_REVIEW.md + this file are the only writes)", "no git writes/push/system changes/publishing/external messages/subagents", "no empty filters, no ignores, no swallowed exit codes, no replacement of tested production entries", "stopped writing after this report"]
+}

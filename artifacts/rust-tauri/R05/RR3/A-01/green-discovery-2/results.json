@@ -1,0 +1,58 @@
+{
+  "cases": [
+    {
+      "case": "old-untracked-parent-child",
+      "exit": 0,
+      "stableDuringLogGrowth": true,
+      "detectsCandidateChange": true,
+      "units": [
+        "artifacts/rust-tauri/R05/run001/child/stderr.log",
+        "artifacts/rust-tauri/R05/run001/child/stdout.log",
+        "artifacts/rust-tauri/R05/run001/stdout.log"
+      ],
+      "beforeSha256": "f958478583c31ba54025f602dd8aab8b59d9d396ebbb50423a4c4e8e1fec5696",
+      "afterSha256": "481c3139b957e7e138623fcdecf6a8661661f756c9eddf138146c69dc10a6c8b"
+    },
+    {
+      "case": "old-untracked-child-only",
+      "exit": 0,
+      "stableDuringLogGrowth": true,
+      "detectsCandidateChange": true,
+      "units": [
+        "artifacts/rust-tauri/R05/run001/child/stderr.log",
+        "artifacts/rust-tauri/R05/run001/child/stdout.log"
+      ],
+      "beforeSha256": "f102387a5edd63c9a4373ca5c09f8ed1e9bd07f2704c3d12110bc7d8d9d3ee8b",
+      "afterSha256": "a1d6617da1d57a5c586cc4ddff2f3f596d0d6616f4134c384e8cd468f744a857"
+    },
+    {
+      "case": "old-tracked-parent-child",
+      "exit": 0,
+      "stableDuringLogGrowth": true,
+      "detectsCandidateChange": true,
+      "units": [
+        "artifacts/rust-tauri/R05/run001/child/stderr.log",
+        "artifacts/rust-tauri/R05/run001/child/stdout.log",
+        "artifacts/rust-tauri/R05/run001/stdout.log"
+      ],
+      "beforeSha256": "3e27524ddab149849869a4fe8dc169629ea8bbcd7716ce9fa0b3ddfc5ee10c6d",
+      "afterSha256": "6c0431647cf05ff4614dc0737591aab0e00c0be95d4beb68b328bb882286d64a"
+    },
+    {
+      "case": "fresh-parent-child",
+      "exit": 0,
+      "stableDuringLogGrowth": true,
+      "detectsCandidateChange": true,
+      "units": [
+        "artifacts/rust-tauri/R05/run001/child",
+        "artifacts/rust-tauri/R05/run001"
+      ],
+      "beforeSha256": "b4402e94b957ef8a3026e779cdfa21c36083eff840b12aa04d82d5202dc83bd0",
+      "afterSha256": "8a42b1670cd6669d1d255edcad51098ed959e515627a00b80ec4e387326d204b"
+    }
+  ],
+  "actual": 4,
+  "ignored": 0,
+  "filtered": 0,
+  "substituteBoundary": "\u4ec5\u4e34\u65f6Git\u5de5\u4f5c\u533a\uff1b\u53d1\u73b0\u5668\u3001OS fd\u3001binder\u90fd\u662f\u751f\u4ea7\u5165\u53e3"
+}

@@ -1,0 +1,12 @@
+{
+ "at": "2026-10-07T11:06:04.017305+00:00",
+ "kind": "recompile-source-evidence",
+ "default16-03": {
+  "controlXtaskCompilingLines": 16,
+  "controlXtaskRunningBinaries": [
+   "xtask-2ada07f2097522dd"
+  ],
+  "n01Compiling": 1
+ },
+ "note": "NEG_TARGET was cold (deleted polluted round-created cache before default16-03); every binary recompiled from the fresh copy sources; no old-mtime reuse"
+}

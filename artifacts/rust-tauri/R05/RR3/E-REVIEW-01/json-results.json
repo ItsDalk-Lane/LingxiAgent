@@ -1,0 +1,132 @@
+{
+  "mode": "json",
+  "checks": [
+    {
+      "name": "重复键反控",
+      "pass": true,
+      "detail": "duplicate:status"
+    },
+    {
+      "name": "重复键反控",
+      "pass": true,
+      "detail": "duplicate:a"
+    },
+    {
+      "name": "JSON正常对照",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON docs/rust-tauri/R05/R05_HANDOFF.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON artifacts/rust-tauri/R05/RR3/E-01/before.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON artifacts/rust-tauri/R05/RR3/E-01/delivery-check.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON artifacts/rust-tauri/R05/RR3/E-01/changed-files.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON artifacts/rust-tauri/R05/RR3/E-01/implementation.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON artifacts/rust-tauri/R05/RR3/E-01/READING.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON artifacts/rust-tauri/R05/RR3/E-01/commands.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON artifacts/rust-tauri/R05/RR3/E-01/commands-03.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON artifacts/rust-tauri/R05/RR3/E-01/manifest.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON artifacts/rust-tauri/R05/RR3/E-01/commands-02.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON artifacts/rust-tauri/R05/RR3/E-01/source-evidence.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON artifacts/rust-tauri/R05/RR3/E-01/current-state.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON artifacts/rust-tauri/R05/RR3/E-01/inputhash-after.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON artifacts/rust-tauri/R05/RR3/E-01/protected-before.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON artifacts/rust-tauri/R05/RR3/E-01/inputhash-before.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "严格JSON docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "passed": 25,
+  "failed": 0
+}

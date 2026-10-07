@@ -1,0 +1,4746 @@
+[
+  {
+    "path": "default16-01/n06-midgate-mutation/evidence",
+    "sha256": "b35306cc22a5edf077606aa714ae97aab8315770bb8ca1dcae405b257961a2a7",
+    "overall": "FAIL",
+    "stable": false,
+    "runner": "PASS",
+    "checkpointCount": 20,
+    "stableCheckpointCount": 0,
+    "commands": [
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t01_service_smoke.sh",
+          "{EVIDENCE}/A01"
+        ],
+        "cleanup": null,
+        "durationMs": 27455,
+        "evidencePaths": [
+          "{EVIDENCE}/A01/a01-health-check.log",
+          "{EVIDENCE}/A01/a01-shutdown.log",
+          "{EVIDENCE}/A01/a01-deptree-evidence.log",
+          "{EVIDENCE}/A01/a01-leaf-cases.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a01_smoke",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t01_boundary_negative.sh",
+          "{EVIDENCE}/A02"
+        ],
+        "cleanup": null,
+        "durationMs": 22591,
+        "evidencePaths": [
+          "{EVIDENCE}/A02/a02-summary.log",
+          "{EVIDENCE}/A02/a02-residue-check.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a02_boundary_negative",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t02_dual_instance.sh",
+          "{EVIDENCE}/A03"
+        ],
+        "cleanup": null,
+        "durationMs": 33805,
+        "evidencePaths": [
+          "{EVIDENCE}/A03/a03-summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a03_dual_instance",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t02_path_priority.sh",
+          "{EVIDENCE}/A04"
+        ],
+        "cleanup": null,
+        "durationMs": 22610,
+        "evidencePaths": [
+          "{EVIDENCE}/A04/a04-summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a04_path_priority",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+          "{EVIDENCE}/A05_A06"
+        ],
+        "cleanup": null,
+        "durationMs": 36047,
+        "evidencePaths": [
+          "{EVIDENCE}/A05_A06/summary.txt",
+          "{EVIDENCE}/A05_A06/ws-matrix.json",
+          "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "{EVIDENCE}/A05_A06/sessions-list-matrix.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a05_a06_auth_matrix",
+        "missingEvidence": [
+          "{EVIDENCE}/A05_A06/ws-matrix.json",
+          "{EVIDENCE}/A05_A06/leaf-cases.json"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t04_storage_tx.sh",
+          "{EVIDENCE}/A07_A08"
+        ],
+        "cleanup": null,
+        "durationMs": 23404,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_A08/s1-counts-after-stop.json",
+          "{EVIDENCE}/A07_A08/s4-hashes-after.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a07_a08_storage_tx",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "env",
+          "CARGO_NET_OFFLINE=true",
+          "R02_A07_LIVE_FAULT_EVIDENCE={EVIDENCE}/A07_LIVE_FAULT/case.json",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "--offline",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "execute_concurrency",
+          "http_running_storage_fault_has_no_success_event_or_restart_run",
+          "--",
+          "--exact",
+          "--nocapture"
+        ],
+        "cleanup": null,
+        "durationMs": 27440,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_LIVE_FAULT/case.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a07_live_fault_01_test",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_t04_live_fault_evidence.py",
+          "{EVIDENCE}"
+        ],
+        "cleanup": null,
+        "durationMs": 20464,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_LIVE_FAULT/checked.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a07_live_fault_02_check",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t05_events_matrix.sh",
+          "{EVIDENCE}/A09_A10"
+        ],
+        "cleanup": null,
+        "durationMs": 37569,
+        "evidencePaths": [
+          "{EVIDENCE}/A09_A10/probe-matrix.jsonl",
+          "{EVIDENCE}/A09_A10/key-events-dump.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a09_a10_events_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t06_backup_restore.sh",
+          "{EVIDENCE}/A11"
+        ],
+        "cleanup": null,
+        "durationMs": 23256,
+        "evidencePaths": [
+          "{EVIDENCE}/A11/backup-restore/summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a11_backup_restore",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t06_recovery_drill.sh",
+          "{EVIDENCE}/A12"
+        ],
+        "cleanup": null,
+        "durationMs": 22745,
+        "evidencePaths": [
+          "{EVIDENCE}/A12/recovery-drill/summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a12_recovery_drill",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t07_redaction_scan.sh",
+          "{EVIDENCE}/A13"
+        ],
+        "cleanup": null,
+        "durationMs": 32072,
+        "evidencePaths": [
+          "{EVIDENCE}/A13/redaction-scan/summary.txt",
+          "{EVIDENCE}/A13/redaction-scan/inventory.txt"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a13_redaction_scan",
+        "missingEvidence": [
+          "{EVIDENCE}/A13/redaction-scan/inventory.txt"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t07_slow_subscriber.sh",
+          "{EVIDENCE}/A14"
+        ],
+        "cleanup": null,
+        "durationMs": 53995,
+        "evidencePaths": [
+          "{EVIDENCE}/A14/slow-subscriber/storm-results.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a14_slow_subscriber",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t08_full_chain_smoke.sh",
+          "{EVIDENCE}/A15"
+        ],
+        "cleanup": null,
+        "durationMs": 22147,
+        "evidencePaths": [
+          "{EVIDENCE}/A15/full-chain/summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a15_full_chain",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+          "{EVIDENCE}/A16"
+        ],
+        "cleanup": null,
+        "durationMs": 56295,
+        "evidencePaths": [
+          "{EVIDENCE}/A16/legacy-entry/summary.txt"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a16_legacy_regression",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_client_leaf_matrix.py",
+          "{EVIDENCE}/CLIENT"
+        ],
+        "cleanup": null,
+        "durationMs": 21503,
+        "evidencePaths": [
+          "{EVIDENCE}/CLIENT/leaf-cases.json",
+          "{EVIDENCE}/CLIENT/summary.json",
+          "{EVIDENCE}/CLIENT/sharing-cases.json",
+          "{EVIDENCE}/CLIENT/sharing-vitest.stdout.log",
+          "{EVIDENCE}/CLIENT/sharing-vitest.stderr.log",
+          "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stderr.log",
+          "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+          "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "supplemental_client_matrix",
+        "missingEvidence": [
+          "{EVIDENCE}/CLIENT/sharing-cases.json"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_cli_rust_matrix.py",
+          "{EVIDENCE}/CLI_RUST"
+        ],
+        "cleanup": null,
+        "durationMs": 45791,
+        "evidencePaths": [
+          "{EVIDENCE}/CLI_RUST/cli-rust-cases.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "supplemental_cli_rust_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_cli_sessions_leaf_matrix.py",
+          "{EVIDENCE}/CLI_SESSIONS"
+        ],
+        "cleanup": null,
+        "durationMs": 35298,
+        "evidencePaths": [
+          "{EVIDENCE}/CLI_SESSIONS/summary.json",
+          "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+          "{EVIDENCE}/CLI_SESSIONS/producer.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/producer.stderr.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/sessions-list-matrix.json",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-owner.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-foreign.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-unauthorized.stderr.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-limit-case.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "supplemental_cli_sessions_matrix",
+        "missingEvidence": [
+          "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-foreign.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-unauthorized.stderr.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-limit-case.json"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_management_leaf_matrix.py",
+          "{EVIDENCE}/MANAGEMENT"
+        ],
+        "cleanup": null,
+        "durationMs": 127049,
+        "evidencePaths": [
+          "{EVIDENCE}/MANAGEMENT/summary.json",
+          "{EVIDENCE}/MANAGEMENT/management-cases.json",
+          "{EVIDENCE}/MANAGEMENT/web-login-cases.json",
+          "{EVIDENCE}/MANAGEMENT/tls-web-login-cases.json",
+          "{EVIDENCE}/MANAGEMENT/tls-cargo.stdout.log",
+          "{EVIDENCE}/MANAGEMENT/tls-cargo.stderr.log",
+          "{EVIDENCE}/MANAGEMENT/security-audit-sources.json",
+          "{EVIDENCE}/MANAGEMENT/security-audit.jsonl",
+          "{EVIDENCE}/MANAGEMENT/cargo.stdout.log",
+          "{EVIDENCE}/MANAGEMENT/cargo.stderr.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "supplemental_management_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_static_web_leaf_matrix.py",
+          "{EVIDENCE}/STATIC_WEB"
+        ],
+        "cleanup": null,
+        "durationMs": 24383,
+        "evidencePaths": [
+          "{EVIDENCE}/STATIC_WEB/summary.json",
+          "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "{EVIDENCE}/STATIC_WEB/cargo.stdout.log",
+          "{EVIDENCE}/STATIC_WEB/cargo.stderr.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "supplemental_static_web_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      }
+    ],
+    "binding": {
+      "after": {
+        "atUnixMs": 1791338428391,
+        "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+        "fileCount": 38083,
+        "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/candidate-source-after.json",
+        "manifestSha256": "ff842488bc7d762e4a3deacbef5d285d840d53ab1f7622a056d75473314c08ea"
+      },
+      "afterError": null,
+      "before": {
+        "atUnixMs": 1791337691688,
+        "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+        "fileCount": 38083,
+        "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/candidate-source-before.json",
+        "manifestSha256": "f19373c42670ff597d181bba4e5eb8f84b860e33759021c8f93fd5cd2a7b912f"
+      },
+      "checkpointAfterEveryCommand": [
+        {
+          "atUnixMs": 1791337719246,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a01_smoke",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791337741837,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a02_boundary_negative",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791337775643,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a03_dual_instance",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791337798254,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a04_path_priority",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791337834302,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a05_a06_auth_matrix",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791337857706,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a07_a08_storage_tx",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791337885148,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a07_live_fault_01_test",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791337905612,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a07_live_fault_02_check",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791337943183,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a09_a10_events_matrix",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791337966439,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a11_backup_restore",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791337989185,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a12_recovery_drill",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791338021258,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a13_redaction_scan",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791338075254,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a14_slow_subscriber",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791338097402,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a15_full_chain",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791338153698,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "a16_legacy_regression",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791338175202,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "supplemental_client_matrix",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791338220993,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "supplemental_cli_rust_matrix",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791338256292,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "supplemental_cli_sessions_matrix",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791338383342,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "supplemental_management_matrix",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        },
+        {
+          "atUnixMs": 1791338407726,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "supplemental_static_web_matrix",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": false
+        }
+      ],
+      "excluded": {
+        "evidenceOutputPathBytesHex": null,
+        "evidenceOutputRelativePath": null,
+        "policy": "This invocation's fresh --evidence subtree and exact real OS fd stdout/stderr files of this process and its ancestors are excluded. No ancestor sink directory is excluded. The set is fixed before binding; other tracked and non-ignored untracked paths stay bound.",
+        "runOutputFiles": []
+      },
+      "finalChangedPathBytesHex": [
+        "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+      ],
+      "headAtEndError": null,
+      "reason": "Candidate file bytes or HEAD changed during the registered stage checks, or a snapshot failed; stage PASS is forbidden.",
+      "schema": "lingxi-candidate-source-binding-v1",
+      "stable": false,
+      "testedShaAtEnd": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b"
+    },
+    "dependencyEvidence": [
+      {
+        "path": "A05_A06/cli-sessions-owner.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLIENT/cli-help-exit0-no-start/stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-invalid-bind.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-beta-unavailable.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-downgrade-refused.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-newer-epoch.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/sessions-after-shutdown.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_SESSIONS/auth/cli-sessions-owner.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "a16_legacy_regression/stderr.log",
+        "sha256": "689f691e5525c343da2f84450ce2cda0ea8626079d4b375a8dec4c932f61457e",
+        "reasonLines": [
+          "cp: /Users/study_superior/r05t08-work/negcopy.hTXzzN/node_modules: No such file or directory"
+        ]
+      }
+    ],
+    "clientSummary": {
+      "cliCaseCount": 3,
+      "sharingExit": 1,
+      "sharingError": "[Errno 2] No such file or directory: '/Users/study_superior/r05t08-work/negcopy.hTXzzN/node_modules/.bin/vitest'",
+      "sharingCleanupError": null,
+      "caseCount": 3,
+      "startUtc": "2026-10-07T01:55:53.733133+00:00",
+      "endUtc": "2026-10-07T01:55:53.882368+00:00",
+      "sourceChangedDuringRun": false,
+      "allCasesPass": false
+    },
+    "clientCases": [
+      {
+        "case": "cli-help-exit0-no-start",
+        "ok": false,
+        "exit": 1
+      },
+      {
+        "case": "cli-unknown-arg-exit1-no-start",
+        "ok": false,
+        "exit": 1
+      },
+      {
+        "case": "cli-serve-unknown-arg-exit1-no-start",
+        "ok": false,
+        "exit": 1
+      }
+    ],
+    "cliRustCases": [
+      {
+        "case": "cli-rust-current-binary-build",
+        "expect": 1,
+        "actual": 1,
+        "ok": true,
+        "observed": {
+          "exit": 0,
+          "binary": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-zoj6w908/debug/lingxi-service"
+        }
+      },
+      {
+        "case": "cli-rust-serve-ready",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "cliPid": 72270,
+          "rustPid": 0,
+          "rustBirth": "",
+          "rustParent": "",
+          "bindAddr": "",
+          "instanceTransport": "",
+          "instanceFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main/lingxi-service/instance.json"
+        }
+      },
+      {
+        "case": "cli-rust-channel-stable-selected",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "cliArgv": [
+            "node",
+            "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+            "serve",
+            "--runtime",
+            "rust",
+            "--channel",
+            "stable",
+            "--",
+            "--home",
+            "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+            "--bind",
+            "127.0.0.1:0"
+          ],
+          "ready": false,
+          "instanceTransport": ""
+        }
+      },
+      {
+        "case": "cli-rust-producer-internal",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "error": "CLI did not start a healthy foreground Rust service"
+        }
+      },
+      {
+        "case": "cli-rust-serve-sigterm-clean",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "bindAddr": "",
+          "rustPid": 0,
+          "rustChildStateBeforeCleanup": "unobservable",
+          "rustChildStateAfterCleanup": "unobservable",
+          "portClosed": null
+        }
+      },
+      {
+        "case": "cli-rust-serve-startup-error",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "before": {},
+          "after": {}
+        }
+      },
+      {
+        "case": "cli-rust-serve-beta-no-silent-stable",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "before": {},
+          "after": {}
+        }
+      },
+      {
+        "case": "cli-rust-serve-downgrade-refused",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "before": {},
+          "after": {}
+        }
+      },
+      {
+        "case": "cli-rust-serve-newer-epoch-no-root-switch",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "stampSha256": "fef1da12458d4f58e5ac150ea8cf9628d7234180c32d4ceed0b3b71d4e83f05e",
+          "fallbackBefore": {},
+          "fallbackAfter": {}
+        }
+      },
+      {
+        "case": "cli-rust-sessions-disconnected",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1
+        }
+      },
+      {
+        "case": "cli-rust-candidate-unchanged-during-probe",
+        "expect": 1,
+        "actual": 1,
+        "ok": true,
+        "observed": {
+          "sourceFiles": 145,
+          "changedPaths": []
+        }
+      }
+    ],
+    "cliRustCommands": [
+      {
+        "name": "build-current-service",
+        "argv": [
+          "/Users/study_superior/.cargo/bin/rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "build",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "--offline",
+          "-p",
+          "lingxi-service"
+        ],
+        "startedUtc": "2026-10-07T01:56:15.267026+00:00",
+        "endedUtc": "2026-10-07T01:56:39.232814+00:00",
+        "exit": 0,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "build-current-service.stdout.log",
+        "stderr": "build-current-service.stderr.log",
+        "environment": {
+          "CARGO_TARGET_DIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-zoj6w908",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-foreground",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--channel",
+          "stable",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T01:56:39.242352+00:00",
+        "pid": 72270,
+        "stdout": "serve.stdout.log",
+        "stderr": "serve.stderr.log",
+        "environment": {
+          "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-main",
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-zoj6w908/debug/lingxi-service"
+        },
+        "readyUtc": "2026-10-07T01:56:39.355379+00:00",
+        "bindAddr": "",
+        "endedUtc": "2026-10-07T01:56:39.355422+00:00"
+      },
+      {
+        "name": "serve-invalid-bind",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-bad-bind",
+          "--bind",
+          "not-an-address"
+        ],
+        "startedUtc": "2026-10-07T01:56:39.355864+00:00",
+        "endedUtc": "2026-10-07T01:56:39.402922+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-invalid-bind.stdout.log",
+        "stderr": "serve-invalid-bind.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-zoj6w908/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-beta-unavailable",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--channel",
+          "beta",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-beta",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T01:56:39.403511+00:00",
+        "endedUtc": "2026-10-07T01:56:39.449357+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-beta-unavailable.stdout.log",
+        "stderr": "serve-beta-unavailable.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-zoj6w908/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-downgrade-refused",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--allow-data-downgrade",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-downgrade",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T01:56:39.449891+00:00",
+        "endedUtc": "2026-10-07T01:56:39.501107+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-downgrade-refused.stdout.log",
+        "stderr": "serve-downgrade-refused.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-zoj6w908/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-newer-epoch",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-newer",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T01:56:39.501927+00:00",
+        "endedUtc": "2026-10-07T01:56:39.552270+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-newer-epoch.stdout.log",
+        "stderr": "serve-newer-epoch.stderr.log",
+        "environment": {
+          "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-fallback",
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-zoj6w908/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-fallback",
+          "XDG_DATA_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-fallback/xdg-data",
+          "XDG_CONFIG_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_RUST/home-fallback/xdg-config"
+        }
+      },
+      {
+        "name": "sessions-after-shutdown",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "sessions",
+          "--runtime",
+          "rust",
+          "--url",
+          "http://",
+          "--token",
+          "intentionally-invalid-token"
+        ],
+        "startedUtc": "2026-10-07T01:56:39.552774+00:00",
+        "endedUtc": "2026-10-07T01:56:39.603841+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "sessions-after-shutdown.stdout.log",
+        "stderr": "sessions-after-shutdown.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-zoj6w908/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      }
+    ],
+    "cliSessionsSummary": {
+      "schema": "lingxi.r02-cli-sessions-producer.v1",
+      "command": [
+        "bash",
+        "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/CLI_SESSIONS/auth"
+      ],
+      "startUtc": "2026-10-07T01:57:01.027481+00:00",
+      "endUtc": "2026-10-07T01:57:15.798560+00:00",
+      "exitCode": 1,
+      "timedOut": false,
+      "cleanupError": null,
+      "ownedGroupLeft": false,
+      "sourceChangedDuringRun": false,
+      "caseCount": 6,
+      "issues": [
+        "real service and CLI producer exited 1",
+        "real CLI sessions evidence invalid: original service and CLI case identities differ"
+      ],
+      "status": "FAIL"
+    }
+  },
+  {
+    "path": "default16-01/n16-binding-drift/run-a",
+    "sha256": "9867fb275be1716ae5a64bc712a3fb9af01f96b148c579ee4fb08d6558bf6449",
+    "overall": "FAIL",
+    "stable": true,
+    "runner": "PASS",
+    "checkpointCount": 20,
+    "stableCheckpointCount": 20,
+    "commands": [
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t01_service_smoke.sh",
+          "{EVIDENCE}/A01"
+        ],
+        "cleanup": null,
+        "durationMs": 30128,
+        "evidencePaths": [
+          "{EVIDENCE}/A01/a01-health-check.log",
+          "{EVIDENCE}/A01/a01-shutdown.log",
+          "{EVIDENCE}/A01/a01-deptree-evidence.log",
+          "{EVIDENCE}/A01/a01-leaf-cases.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a01_smoke",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t01_boundary_negative.sh",
+          "{EVIDENCE}/A02"
+        ],
+        "cleanup": null,
+        "durationMs": 22484,
+        "evidencePaths": [
+          "{EVIDENCE}/A02/a02-summary.log",
+          "{EVIDENCE}/A02/a02-residue-check.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a02_boundary_negative",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t02_dual_instance.sh",
+          "{EVIDENCE}/A03"
+        ],
+        "cleanup": null,
+        "durationMs": 28500,
+        "evidencePaths": [
+          "{EVIDENCE}/A03/a03-summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a03_dual_instance",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t02_path_priority.sh",
+          "{EVIDENCE}/A04"
+        ],
+        "cleanup": null,
+        "durationMs": 22553,
+        "evidencePaths": [
+          "{EVIDENCE}/A04/a04-summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a04_path_priority",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+          "{EVIDENCE}/A05_A06"
+        ],
+        "cleanup": null,
+        "durationMs": 34860,
+        "evidencePaths": [
+          "{EVIDENCE}/A05_A06/summary.txt",
+          "{EVIDENCE}/A05_A06/ws-matrix.json",
+          "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "{EVIDENCE}/A05_A06/sessions-list-matrix.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a05_a06_auth_matrix",
+        "missingEvidence": [
+          "{EVIDENCE}/A05_A06/ws-matrix.json",
+          "{EVIDENCE}/A05_A06/leaf-cases.json"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t04_storage_tx.sh",
+          "{EVIDENCE}/A07_A08"
+        ],
+        "cleanup": null,
+        "durationMs": 23756,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_A08/s1-counts-after-stop.json",
+          "{EVIDENCE}/A07_A08/s4-hashes-after.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a07_a08_storage_tx",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "env",
+          "CARGO_NET_OFFLINE=true",
+          "R02_A07_LIVE_FAULT_EVIDENCE={EVIDENCE}/A07_LIVE_FAULT/case.json",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "--offline",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "execute_concurrency",
+          "http_running_storage_fault_has_no_success_event_or_restart_run",
+          "--",
+          "--exact",
+          "--nocapture"
+        ],
+        "cleanup": null,
+        "durationMs": 28220,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_LIVE_FAULT/case.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a07_live_fault_01_test",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_t04_live_fault_evidence.py",
+          "{EVIDENCE}"
+        ],
+        "cleanup": null,
+        "durationMs": 20424,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_LIVE_FAULT/checked.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a07_live_fault_02_check",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t05_events_matrix.sh",
+          "{EVIDENCE}/A09_A10"
+        ],
+        "cleanup": null,
+        "durationMs": 37468,
+        "evidencePaths": [
+          "{EVIDENCE}/A09_A10/probe-matrix.jsonl",
+          "{EVIDENCE}/A09_A10/key-events-dump.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a09_a10_events_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t06_backup_restore.sh",
+          "{EVIDENCE}/A11"
+        ],
+        "cleanup": null,
+        "durationMs": 23228,
+        "evidencePaths": [
+          "{EVIDENCE}/A11/backup-restore/summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a11_backup_restore",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t06_recovery_drill.sh",
+          "{EVIDENCE}/A12"
+        ],
+        "cleanup": null,
+        "durationMs": 23653,
+        "evidencePaths": [
+          "{EVIDENCE}/A12/recovery-drill/summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a12_recovery_drill",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t07_redaction_scan.sh",
+          "{EVIDENCE}/A13"
+        ],
+        "cleanup": null,
+        "durationMs": 32856,
+        "evidencePaths": [
+          "{EVIDENCE}/A13/redaction-scan/summary.txt",
+          "{EVIDENCE}/A13/redaction-scan/inventory.txt"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a13_redaction_scan",
+        "missingEvidence": [
+          "{EVIDENCE}/A13/redaction-scan/inventory.txt"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t07_slow_subscriber.sh",
+          "{EVIDENCE}/A14"
+        ],
+        "cleanup": null,
+        "durationMs": 54010,
+        "evidencePaths": [
+          "{EVIDENCE}/A14/slow-subscriber/storm-results.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a14_slow_subscriber",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t08_full_chain_smoke.sh",
+          "{EVIDENCE}/A15"
+        ],
+        "cleanup": null,
+        "durationMs": 22803,
+        "evidencePaths": [
+          "{EVIDENCE}/A15/full-chain/summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a15_full_chain",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+          "{EVIDENCE}/A16"
+        ],
+        "cleanup": null,
+        "durationMs": 58663,
+        "evidencePaths": [
+          "{EVIDENCE}/A16/legacy-entry/summary.txt"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a16_legacy_regression",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_client_leaf_matrix.py",
+          "{EVIDENCE}/CLIENT"
+        ],
+        "cleanup": null,
+        "durationMs": 20505,
+        "evidencePaths": [
+          "{EVIDENCE}/CLIENT/leaf-cases.json",
+          "{EVIDENCE}/CLIENT/summary.json",
+          "{EVIDENCE}/CLIENT/sharing-cases.json",
+          "{EVIDENCE}/CLIENT/sharing-vitest.stdout.log",
+          "{EVIDENCE}/CLIENT/sharing-vitest.stderr.log",
+          "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stderr.log",
+          "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+          "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "supplemental_client_matrix",
+        "missingEvidence": [
+          "{EVIDENCE}/CLIENT/sharing-cases.json"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_cli_rust_matrix.py",
+          "{EVIDENCE}/CLI_RUST"
+        ],
+        "cleanup": null,
+        "durationMs": 45880,
+        "evidencePaths": [
+          "{EVIDENCE}/CLI_RUST/cli-rust-cases.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "supplemental_cli_rust_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_cli_sessions_leaf_matrix.py",
+          "{EVIDENCE}/CLI_SESSIONS"
+        ],
+        "cleanup": null,
+        "durationMs": 35473,
+        "evidencePaths": [
+          "{EVIDENCE}/CLI_SESSIONS/summary.json",
+          "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+          "{EVIDENCE}/CLI_SESSIONS/producer.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/producer.stderr.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/sessions-list-matrix.json",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-owner.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-foreign.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-unauthorized.stderr.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-limit-case.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "supplemental_cli_sessions_matrix",
+        "missingEvidence": [
+          "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-foreign.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-unauthorized.stderr.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-limit-case.json"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_management_leaf_matrix.py",
+          "{EVIDENCE}/MANAGEMENT"
+        ],
+        "cleanup": null,
+        "durationMs": 133338,
+        "evidencePaths": [
+          "{EVIDENCE}/MANAGEMENT/summary.json",
+          "{EVIDENCE}/MANAGEMENT/management-cases.json",
+          "{EVIDENCE}/MANAGEMENT/web-login-cases.json",
+          "{EVIDENCE}/MANAGEMENT/tls-web-login-cases.json",
+          "{EVIDENCE}/MANAGEMENT/tls-cargo.stdout.log",
+          "{EVIDENCE}/MANAGEMENT/tls-cargo.stderr.log",
+          "{EVIDENCE}/MANAGEMENT/security-audit-sources.json",
+          "{EVIDENCE}/MANAGEMENT/security-audit.jsonl",
+          "{EVIDENCE}/MANAGEMENT/cargo.stdout.log",
+          "{EVIDENCE}/MANAGEMENT/cargo.stderr.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "supplemental_management_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_static_web_leaf_matrix.py",
+          "{EVIDENCE}/STATIC_WEB"
+        ],
+        "cleanup": null,
+        "durationMs": 24105,
+        "evidencePaths": [
+          "{EVIDENCE}/STATIC_WEB/summary.json",
+          "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "{EVIDENCE}/STATIC_WEB/cargo.stdout.log",
+          "{EVIDENCE}/STATIC_WEB/cargo.stderr.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "supplemental_static_web_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      }
+    ],
+    "binding": {
+      "after": {
+        "atUnixMs": 1791339298520,
+        "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+        "fileCount": 38083,
+        "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/candidate-source-after.json",
+        "manifestSha256": "ff842488bc7d762e4a3deacbef5d285d840d53ab1f7622a056d75473314c08ea"
+      },
+      "afterError": null,
+      "before": {
+        "atUnixMs": 1791338555121,
+        "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+        "fileCount": 38083,
+        "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/candidate-source-before.json",
+        "manifestSha256": "ff842488bc7d762e4a3deacbef5d285d840d53ab1f7622a056d75473314c08ea"
+      },
+      "checkpointAfterEveryCommand": [
+        {
+          "atUnixMs": 1791338585351,
+          "changedPathBytesHex": [],
+          "commandKey": "a01_smoke",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791338607836,
+          "changedPathBytesHex": [],
+          "commandKey": "a02_boundary_negative",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791338636337,
+          "changedPathBytesHex": [],
+          "commandKey": "a03_dual_instance",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791338658891,
+          "changedPathBytesHex": [],
+          "commandKey": "a04_path_priority",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791338693751,
+          "changedPathBytesHex": [],
+          "commandKey": "a05_a06_auth_matrix",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791338717508,
+          "changedPathBytesHex": [],
+          "commandKey": "a07_a08_storage_tx",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791338745729,
+          "changedPathBytesHex": [],
+          "commandKey": "a07_live_fault_01_test",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791338766153,
+          "changedPathBytesHex": [],
+          "commandKey": "a07_live_fault_02_check",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791338803622,
+          "changedPathBytesHex": [],
+          "commandKey": "a09_a10_events_matrix",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791338826851,
+          "changedPathBytesHex": [],
+          "commandKey": "a11_backup_restore",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791338850504,
+          "changedPathBytesHex": [],
+          "commandKey": "a12_recovery_drill",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791338883361,
+          "changedPathBytesHex": [],
+          "commandKey": "a13_redaction_scan",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791338937372,
+          "changedPathBytesHex": [],
+          "commandKey": "a14_slow_subscriber",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791338960176,
+          "changedPathBytesHex": [],
+          "commandKey": "a15_full_chain",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339018841,
+          "changedPathBytesHex": [],
+          "commandKey": "a16_legacy_regression",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339039346,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_client_matrix",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339085227,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_cli_rust_matrix",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339120701,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_cli_sessions_matrix",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339254041,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_management_matrix",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339278147,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_static_web_matrix",
+          "digestSha256": "3353a1b48fa86cad062f7a078e718805811d71f389a7a530b96df2bccc7651dc",
+          "fileCount": 38083,
+          "stable": true
+        }
+      ],
+      "excluded": {
+        "evidenceOutputPathBytesHex": null,
+        "evidenceOutputRelativePath": null,
+        "policy": "This invocation's fresh --evidence subtree and exact real OS fd stdout/stderr files of this process and its ancestors are excluded. No ancestor sink directory is excluded. The set is fixed before binding; other tracked and non-ignored untracked paths stay bound.",
+        "runOutputFiles": []
+      },
+      "finalChangedPathBytesHex": [],
+      "headAtEndError": null,
+      "schema": "lingxi-candidate-source-binding-v1",
+      "stable": true,
+      "testedShaAtEnd": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b"
+    },
+    "dependencyEvidence": [
+      {
+        "path": "A05_A06/cli-sessions-owner.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLIENT/cli-help-exit0-no-start/stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-invalid-bind.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-beta-unavailable.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-downgrade-refused.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-newer-epoch.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/sessions-after-shutdown.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_SESSIONS/auth/cli-sessions-owner.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "a16_legacy_regression/stderr.log",
+        "sha256": "689f691e5525c343da2f84450ce2cda0ea8626079d4b375a8dec4c932f61457e",
+        "reasonLines": [
+          "cp: /Users/study_superior/r05t08-work/negcopy.hTXzzN/node_modules: No such file or directory"
+        ]
+      }
+    ],
+    "clientSummary": {
+      "cliCaseCount": 3,
+      "sharingExit": 1,
+      "sharingError": "[Errno 2] No such file or directory: '/Users/study_superior/r05t08-work/negcopy.hTXzzN/node_modules/.bin/vitest'",
+      "sharingCleanupError": null,
+      "caseCount": 3,
+      "startUtc": "2026-10-07T02:10:18.875694+00:00",
+      "endUtc": "2026-10-07T02:10:19.024630+00:00",
+      "sourceChangedDuringRun": false,
+      "allCasesPass": false
+    },
+    "clientCases": [
+      {
+        "case": "cli-help-exit0-no-start",
+        "ok": false,
+        "exit": 1
+      },
+      {
+        "case": "cli-unknown-arg-exit1-no-start",
+        "ok": false,
+        "exit": 1
+      },
+      {
+        "case": "cli-serve-unknown-arg-exit1-no-start",
+        "ok": false,
+        "exit": 1
+      }
+    ],
+    "cliRustCases": [
+      {
+        "case": "cli-rust-current-binary-build",
+        "expect": 1,
+        "actual": 1,
+        "ok": true,
+        "observed": {
+          "exit": 0,
+          "binary": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-9b__raqz/debug/lingxi-service"
+        }
+      },
+      {
+        "case": "cli-rust-serve-ready",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "cliPid": 13032,
+          "rustPid": 0,
+          "rustBirth": "",
+          "rustParent": "",
+          "bindAddr": "",
+          "instanceTransport": "",
+          "instanceFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/home-main/lingxi-service/instance.json"
+        }
+      },
+      {
+        "case": "cli-rust-channel-stable-selected",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "cliArgv": [
+            "node",
+            "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+            "serve",
+            "--runtime",
+            "rust",
+            "--channel",
+            "stable",
+            "--",
+            "--home",
+            "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/home-main",
+            "--bind",
+            "127.0.0.1:0"
+          ],
+          "ready": false,
+          "instanceTransport": ""
+        }
+      },
+      {
+        "case": "cli-rust-producer-internal",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "error": "CLI did not start a healthy foreground Rust service"
+        }
+      },
+      {
+        "case": "cli-rust-serve-sigterm-clean",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "bindAddr": "",
+          "rustPid": 0,
+          "rustChildStateBeforeCleanup": "unobservable",
+          "rustChildStateAfterCleanup": "unobservable",
+          "portClosed": null
+        }
+      },
+      {
+        "case": "cli-rust-serve-startup-error",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "before": {},
+          "after": {}
+        }
+      },
+      {
+        "case": "cli-rust-serve-beta-no-silent-stable",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "before": {},
+          "after": {}
+        }
+      },
+      {
+        "case": "cli-rust-serve-downgrade-refused",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "before": {},
+          "after": {}
+        }
+      },
+      {
+        "case": "cli-rust-serve-newer-epoch-no-root-switch",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "stampSha256": "fef1da12458d4f58e5ac150ea8cf9628d7234180c32d4ceed0b3b71d4e83f05e",
+          "fallbackBefore": {},
+          "fallbackAfter": {}
+        }
+      },
+      {
+        "case": "cli-rust-sessions-disconnected",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1
+        }
+      },
+      {
+        "case": "cli-rust-candidate-unchanged-during-probe",
+        "expect": 1,
+        "actual": 1,
+        "ok": true,
+        "observed": {
+          "sourceFiles": 145,
+          "changedPaths": []
+        }
+      }
+    ],
+    "cliRustCommands": [
+      {
+        "name": "build-current-service",
+        "argv": [
+          "/Users/study_superior/.cargo/bin/rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "build",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "--offline",
+          "-p",
+          "lingxi-service"
+        ],
+        "startedUtc": "2026-10-07T02:10:39.403794+00:00",
+        "endedUtc": "2026-10-07T02:11:03.831424+00:00",
+        "exit": 0,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "build-current-service.stdout.log",
+        "stderr": "build-current-service.stderr.log",
+        "environment": {
+          "CARGO_TARGET_DIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-9b__raqz",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-foreground",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--channel",
+          "stable",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/home-main",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T02:11:03.841825+00:00",
+        "pid": 13032,
+        "stdout": "serve.stdout.log",
+        "stderr": "serve.stderr.log",
+        "environment": {
+          "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/home-main",
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-9b__raqz/debug/lingxi-service"
+        },
+        "readyUtc": "2026-10-07T02:11:03.953272+00:00",
+        "bindAddr": "",
+        "endedUtc": "2026-10-07T02:11:03.953331+00:00"
+      },
+      {
+        "name": "serve-invalid-bind",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/home-bad-bind",
+          "--bind",
+          "not-an-address"
+        ],
+        "startedUtc": "2026-10-07T02:11:03.953913+00:00",
+        "endedUtc": "2026-10-07T02:11:04.011408+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-invalid-bind.stdout.log",
+        "stderr": "serve-invalid-bind.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-9b__raqz/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-beta-unavailable",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--channel",
+          "beta",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/home-beta",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T02:11:04.012048+00:00",
+        "endedUtc": "2026-10-07T02:11:04.067770+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-beta-unavailable.stdout.log",
+        "stderr": "serve-beta-unavailable.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-9b__raqz/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-downgrade-refused",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--allow-data-downgrade",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/home-downgrade",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T02:11:04.068389+00:00",
+        "endedUtc": "2026-10-07T02:11:04.121346+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-downgrade-refused.stdout.log",
+        "stderr": "serve-downgrade-refused.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-9b__raqz/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-newer-epoch",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/home-newer",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T02:11:04.122156+00:00",
+        "endedUtc": "2026-10-07T02:11:04.176167+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-newer-epoch.stdout.log",
+        "stderr": "serve-newer-epoch.stderr.log",
+        "environment": {
+          "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/home-fallback",
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-9b__raqz/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/home-fallback",
+          "XDG_DATA_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/home-fallback/xdg-data",
+          "XDG_CONFIG_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_RUST/home-fallback/xdg-config"
+        }
+      },
+      {
+        "name": "sessions-after-shutdown",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "sessions",
+          "--runtime",
+          "rust",
+          "--url",
+          "http://",
+          "--token",
+          "intentionally-invalid-token"
+        ],
+        "startedUtc": "2026-10-07T02:11:04.176715+00:00",
+        "endedUtc": "2026-10-07T02:11:04.231158+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "sessions-after-shutdown.stdout.log",
+        "stderr": "sessions-after-shutdown.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-9b__raqz/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      }
+    ],
+    "cliSessionsSummary": {
+      "schema": "lingxi.r02-cli-sessions-producer.v1",
+      "command": [
+        "bash",
+        "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/CLI_SESSIONS/auth"
+      ],
+      "startUtc": "2026-10-07T02:11:25.260093+00:00",
+      "endUtc": "2026-10-07T02:11:40.065178+00:00",
+      "exitCode": 1,
+      "timedOut": false,
+      "cleanupError": null,
+      "ownedGroupLeft": false,
+      "sourceChangedDuringRun": false,
+      "caseCount": 6,
+      "issues": [
+        "real service and CLI producer exited 1",
+        "real CLI sessions evidence invalid: original service and CLI case identities differ"
+      ],
+      "status": "FAIL"
+    }
+  },
+  {
+    "path": "default16-01/n16-binding-drift/run-b",
+    "sha256": "fddbec04d24def5b01fb5701a56a18dda7b4cfc709e777d2d134ebe38accdf75",
+    "overall": "FAIL",
+    "stable": true,
+    "runner": "PASS",
+    "checkpointCount": 20,
+    "stableCheckpointCount": 20,
+    "commands": [
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t01_service_smoke.sh",
+          "{EVIDENCE}/A01"
+        ],
+        "cleanup": null,
+        "durationMs": 33422,
+        "evidencePaths": [
+          "{EVIDENCE}/A01/a01-health-check.log",
+          "{EVIDENCE}/A01/a01-shutdown.log",
+          "{EVIDENCE}/A01/a01-deptree-evidence.log",
+          "{EVIDENCE}/A01/a01-leaf-cases.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a01_smoke",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t01_boundary_negative.sh",
+          "{EVIDENCE}/A02"
+        ],
+        "cleanup": null,
+        "durationMs": 23452,
+        "evidencePaths": [
+          "{EVIDENCE}/A02/a02-summary.log",
+          "{EVIDENCE}/A02/a02-residue-check.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a02_boundary_negative",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t02_dual_instance.sh",
+          "{EVIDENCE}/A03"
+        ],
+        "cleanup": null,
+        "durationMs": 32141,
+        "evidencePaths": [
+          "{EVIDENCE}/A03/a03-summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a03_dual_instance",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t02_path_priority.sh",
+          "{EVIDENCE}/A04"
+        ],
+        "cleanup": null,
+        "durationMs": 23222,
+        "evidencePaths": [
+          "{EVIDENCE}/A04/a04-summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a04_path_priority",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+          "{EVIDENCE}/A05_A06"
+        ],
+        "cleanup": null,
+        "durationMs": 35920,
+        "evidencePaths": [
+          "{EVIDENCE}/A05_A06/summary.txt",
+          "{EVIDENCE}/A05_A06/ws-matrix.json",
+          "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "{EVIDENCE}/A05_A06/sessions-list-matrix.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a05_a06_auth_matrix",
+        "missingEvidence": [
+          "{EVIDENCE}/A05_A06/ws-matrix.json",
+          "{EVIDENCE}/A05_A06/leaf-cases.json"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t04_storage_tx.sh",
+          "{EVIDENCE}/A07_A08"
+        ],
+        "cleanup": null,
+        "durationMs": 24170,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_A08/s1-counts-after-stop.json",
+          "{EVIDENCE}/A07_A08/s4-hashes-after.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a07_a08_storage_tx",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "env",
+          "CARGO_NET_OFFLINE=true",
+          "R02_A07_LIVE_FAULT_EVIDENCE={EVIDENCE}/A07_LIVE_FAULT/case.json",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "--offline",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "execute_concurrency",
+          "http_running_storage_fault_has_no_success_event_or_restart_run",
+          "--",
+          "--exact",
+          "--nocapture"
+        ],
+        "cleanup": null,
+        "durationMs": 24785,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_LIVE_FAULT/case.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a07_live_fault_01_test",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_t04_live_fault_evidence.py",
+          "{EVIDENCE}"
+        ],
+        "cleanup": null,
+        "durationMs": 21484,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_LIVE_FAULT/checked.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a07_live_fault_02_check",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t05_events_matrix.sh",
+          "{EVIDENCE}/A09_A10"
+        ],
+        "cleanup": null,
+        "durationMs": 37659,
+        "evidencePaths": [
+          "{EVIDENCE}/A09_A10/probe-matrix.jsonl",
+          "{EVIDENCE}/A09_A10/key-events-dump.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a09_a10_events_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t06_backup_restore.sh",
+          "{EVIDENCE}/A11"
+        ],
+        "cleanup": null,
+        "durationMs": 23781,
+        "evidencePaths": [
+          "{EVIDENCE}/A11/backup-restore/summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a11_backup_restore",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t06_recovery_drill.sh",
+          "{EVIDENCE}/A12"
+        ],
+        "cleanup": null,
+        "durationMs": 26404,
+        "evidencePaths": [
+          "{EVIDENCE}/A12/recovery-drill/summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a12_recovery_drill",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t07_redaction_scan.sh",
+          "{EVIDENCE}/A13"
+        ],
+        "cleanup": null,
+        "durationMs": 37023,
+        "evidencePaths": [
+          "{EVIDENCE}/A13/redaction-scan/summary.txt",
+          "{EVIDENCE}/A13/redaction-scan/inventory.txt"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a13_redaction_scan",
+        "missingEvidence": [
+          "{EVIDENCE}/A13/redaction-scan/inventory.txt"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t07_slow_subscriber.sh",
+          "{EVIDENCE}/A14"
+        ],
+        "cleanup": null,
+        "durationMs": 56067,
+        "evidencePaths": [
+          "{EVIDENCE}/A14/slow-subscriber/storm-results.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a14_slow_subscriber",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t08_full_chain_smoke.sh",
+          "{EVIDENCE}/A15"
+        ],
+        "cleanup": null,
+        "durationMs": 22343,
+        "evidencePaths": [
+          "{EVIDENCE}/A15/full-chain/summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a15_full_chain",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+          "{EVIDENCE}/A16"
+        ],
+        "cleanup": null,
+        "durationMs": 62130,
+        "evidencePaths": [
+          "{EVIDENCE}/A16/legacy-entry/summary.txt"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a16_legacy_regression",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_client_leaf_matrix.py",
+          "{EVIDENCE}/CLIENT"
+        ],
+        "cleanup": null,
+        "durationMs": 22637,
+        "evidencePaths": [
+          "{EVIDENCE}/CLIENT/leaf-cases.json",
+          "{EVIDENCE}/CLIENT/summary.json",
+          "{EVIDENCE}/CLIENT/sharing-cases.json",
+          "{EVIDENCE}/CLIENT/sharing-vitest.stdout.log",
+          "{EVIDENCE}/CLIENT/sharing-vitest.stderr.log",
+          "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stderr.log",
+          "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+          "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "supplemental_client_matrix",
+        "missingEvidence": [
+          "{EVIDENCE}/CLIENT/sharing-cases.json"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_cli_rust_matrix.py",
+          "{EVIDENCE}/CLI_RUST"
+        ],
+        "cleanup": null,
+        "durationMs": 47813,
+        "evidencePaths": [
+          "{EVIDENCE}/CLI_RUST/cli-rust-cases.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "supplemental_cli_rust_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_cli_sessions_leaf_matrix.py",
+          "{EVIDENCE}/CLI_SESSIONS"
+        ],
+        "cleanup": null,
+        "durationMs": 36960,
+        "evidencePaths": [
+          "{EVIDENCE}/CLI_SESSIONS/summary.json",
+          "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+          "{EVIDENCE}/CLI_SESSIONS/producer.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/producer.stderr.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/sessions-list-matrix.json",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-owner.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-foreign.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-unauthorized.stderr.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-limit-case.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "supplemental_cli_sessions_matrix",
+        "missingEvidence": [
+          "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-foreign.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-unauthorized.stderr.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-limit-case.json"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_management_leaf_matrix.py",
+          "{EVIDENCE}/MANAGEMENT"
+        ],
+        "cleanup": null,
+        "durationMs": 162681,
+        "evidencePaths": [
+          "{EVIDENCE}/MANAGEMENT/summary.json",
+          "{EVIDENCE}/MANAGEMENT/management-cases.json",
+          "{EVIDENCE}/MANAGEMENT/web-login-cases.json",
+          "{EVIDENCE}/MANAGEMENT/tls-web-login-cases.json",
+          "{EVIDENCE}/MANAGEMENT/tls-cargo.stdout.log",
+          "{EVIDENCE}/MANAGEMENT/tls-cargo.stderr.log",
+          "{EVIDENCE}/MANAGEMENT/security-audit-sources.json",
+          "{EVIDENCE}/MANAGEMENT/security-audit.jsonl",
+          "{EVIDENCE}/MANAGEMENT/cargo.stdout.log",
+          "{EVIDENCE}/MANAGEMENT/cargo.stderr.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "supplemental_management_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_static_web_leaf_matrix.py",
+          "{EVIDENCE}/STATIC_WEB"
+        ],
+        "cleanup": null,
+        "durationMs": 25573,
+        "evidencePaths": [
+          "{EVIDENCE}/STATIC_WEB/summary.json",
+          "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "{EVIDENCE}/STATIC_WEB/cargo.stdout.log",
+          "{EVIDENCE}/STATIC_WEB/cargo.stderr.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "supplemental_static_web_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      }
+    ],
+    "binding": {
+      "after": {
+        "atUnixMs": 1791340125736,
+        "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+        "fileCount": 38083,
+        "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/candidate-source-after.json",
+        "manifestSha256": "da9c29ced0fcf561075336a4fb1babe7fc43b0b12b56179e994095c4f0188073"
+      },
+      "afterError": null,
+      "before": {
+        "atUnixMs": 1791339323877,
+        "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+        "fileCount": 38083,
+        "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/candidate-source-before.json",
+        "manifestSha256": "da9c29ced0fcf561075336a4fb1babe7fc43b0b12b56179e994095c4f0188073"
+      },
+      "checkpointAfterEveryCommand": [
+        {
+          "atUnixMs": 1791339357410,
+          "changedPathBytesHex": [],
+          "commandKey": "a01_smoke",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339380863,
+          "changedPathBytesHex": [],
+          "commandKey": "a02_boundary_negative",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339413005,
+          "changedPathBytesHex": [],
+          "commandKey": "a03_dual_instance",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339436227,
+          "changedPathBytesHex": [],
+          "commandKey": "a04_path_priority",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339472148,
+          "changedPathBytesHex": [],
+          "commandKey": "a05_a06_auth_matrix",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339496319,
+          "changedPathBytesHex": [],
+          "commandKey": "a07_a08_storage_tx",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339521105,
+          "changedPathBytesHex": [],
+          "commandKey": "a07_live_fault_01_test",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339542590,
+          "changedPathBytesHex": [],
+          "commandKey": "a07_live_fault_02_check",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339580250,
+          "changedPathBytesHex": [],
+          "commandKey": "a09_a10_events_matrix",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339604032,
+          "changedPathBytesHex": [],
+          "commandKey": "a11_backup_restore",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339630436,
+          "changedPathBytesHex": [],
+          "commandKey": "a12_recovery_drill",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339667460,
+          "changedPathBytesHex": [],
+          "commandKey": "a13_redaction_scan",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339723529,
+          "changedPathBytesHex": [],
+          "commandKey": "a14_slow_subscriber",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339745873,
+          "changedPathBytesHex": [],
+          "commandKey": "a15_full_chain",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339808003,
+          "changedPathBytesHex": [],
+          "commandKey": "a16_legacy_regression",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339830641,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_client_matrix",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339878455,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_cli_rust_matrix",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791339915415,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_cli_sessions_matrix",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791340078097,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_management_matrix",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791340103671,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_static_web_matrix",
+          "digestSha256": "2ba5440c7380000d84678a296ea7382024bd78b38858d55e7ebbc8c43a1452d7",
+          "fileCount": 38083,
+          "stable": true
+        }
+      ],
+      "excluded": {
+        "evidenceOutputPathBytesHex": null,
+        "evidenceOutputRelativePath": null,
+        "policy": "This invocation's fresh --evidence subtree and exact real OS fd stdout/stderr files of this process and its ancestors are excluded. No ancestor sink directory is excluded. The set is fixed before binding; other tracked and non-ignored untracked paths stay bound.",
+        "runOutputFiles": []
+      },
+      "finalChangedPathBytesHex": [],
+      "headAtEndError": null,
+      "schema": "lingxi-candidate-source-binding-v1",
+      "stable": true,
+      "testedShaAtEnd": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b"
+    },
+    "dependencyEvidence": [
+      {
+        "path": "A05_A06/cli-sessions-owner.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLIENT/cli-help-exit0-no-start/stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-invalid-bind.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-beta-unavailable.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-downgrade-refused.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-newer-epoch.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/sessions-after-shutdown.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_SESSIONS/auth/cli-sessions-owner.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "a16_legacy_regression/stderr.log",
+        "sha256": "689f691e5525c343da2f84450ce2cda0ea8626079d4b375a8dec4c932f61457e",
+        "reasonLines": [
+          "cp: /Users/study_superior/r05t08-work/negcopy.hTXzzN/node_modules: No such file or directory"
+        ]
+      }
+    ],
+    "clientSummary": {
+      "cliCaseCount": 3,
+      "sharingExit": 1,
+      "sharingError": "[Errno 2] No such file or directory: '/Users/study_superior/r05t08-work/negcopy.hTXzzN/node_modules/.bin/vitest'",
+      "sharingCleanupError": null,
+      "caseCount": 3,
+      "startUtc": "2026-10-07T02:23:28.045412+00:00",
+      "endUtc": "2026-10-07T02:23:28.217898+00:00",
+      "sourceChangedDuringRun": false,
+      "allCasesPass": false
+    },
+    "clientCases": [
+      {
+        "case": "cli-help-exit0-no-start",
+        "ok": false,
+        "exit": 1
+      },
+      {
+        "case": "cli-unknown-arg-exit1-no-start",
+        "ok": false,
+        "exit": 1
+      },
+      {
+        "case": "cli-serve-unknown-arg-exit1-no-start",
+        "ok": false,
+        "exit": 1
+      }
+    ],
+    "cliRustCases": [
+      {
+        "case": "cli-rust-current-binary-build",
+        "expect": 1,
+        "actual": 1,
+        "ok": true,
+        "observed": {
+          "exit": 0,
+          "binary": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-syx6v_qq/debug/lingxi-service"
+        }
+      },
+      {
+        "case": "cli-rust-serve-ready",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "cliPid": 37171,
+          "rustPid": 0,
+          "rustBirth": "",
+          "rustParent": "",
+          "bindAddr": "",
+          "instanceTransport": "",
+          "instanceFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/home-main/lingxi-service/instance.json"
+        }
+      },
+      {
+        "case": "cli-rust-channel-stable-selected",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "cliArgv": [
+            "node",
+            "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+            "serve",
+            "--runtime",
+            "rust",
+            "--channel",
+            "stable",
+            "--",
+            "--home",
+            "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/home-main",
+            "--bind",
+            "127.0.0.1:0"
+          ],
+          "ready": false,
+          "instanceTransport": ""
+        }
+      },
+      {
+        "case": "cli-rust-producer-internal",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "error": "CLI did not start a healthy foreground Rust service"
+        }
+      },
+      {
+        "case": "cli-rust-serve-sigterm-clean",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "bindAddr": "",
+          "rustPid": 0,
+          "rustChildStateBeforeCleanup": "unobservable",
+          "rustChildStateAfterCleanup": "unobservable",
+          "portClosed": null
+        }
+      },
+      {
+        "case": "cli-rust-serve-startup-error",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "before": {},
+          "after": {}
+        }
+      },
+      {
+        "case": "cli-rust-serve-beta-no-silent-stable",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "before": {},
+          "after": {}
+        }
+      },
+      {
+        "case": "cli-rust-serve-downgrade-refused",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "before": {},
+          "after": {}
+        }
+      },
+      {
+        "case": "cli-rust-serve-newer-epoch-no-root-switch",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "stampSha256": "fef1da12458d4f58e5ac150ea8cf9628d7234180c32d4ceed0b3b71d4e83f05e",
+          "fallbackBefore": {},
+          "fallbackAfter": {}
+        }
+      },
+      {
+        "case": "cli-rust-sessions-disconnected",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1
+        }
+      },
+      {
+        "case": "cli-rust-candidate-unchanged-during-probe",
+        "expect": 1,
+        "actual": 1,
+        "ok": true,
+        "observed": {
+          "sourceFiles": 145,
+          "changedPaths": []
+        }
+      }
+    ],
+    "cliRustCommands": [
+      {
+        "name": "build-current-service",
+        "argv": [
+          "/Users/study_superior/.cargo/bin/rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "build",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "--offline",
+          "-p",
+          "lingxi-service"
+        ],
+        "startedUtc": "2026-10-07T02:23:50.711425+00:00",
+        "endedUtc": "2026-10-07T02:24:16.214634+00:00",
+        "exit": 0,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "build-current-service.stdout.log",
+        "stderr": "build-current-service.stderr.log",
+        "environment": {
+          "CARGO_TARGET_DIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-syx6v_qq",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-foreground",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--channel",
+          "stable",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/home-main",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T02:24:16.225888+00:00",
+        "pid": 37171,
+        "stdout": "serve.stdout.log",
+        "stderr": "serve.stderr.log",
+        "environment": {
+          "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/home-main",
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-syx6v_qq/debug/lingxi-service"
+        },
+        "readyUtc": "2026-10-07T02:24:16.333586+00:00",
+        "bindAddr": "",
+        "endedUtc": "2026-10-07T02:24:16.333631+00:00"
+      },
+      {
+        "name": "serve-invalid-bind",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/home-bad-bind",
+          "--bind",
+          "not-an-address"
+        ],
+        "startedUtc": "2026-10-07T02:24:16.334153+00:00",
+        "endedUtc": "2026-10-07T02:24:16.394237+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-invalid-bind.stdout.log",
+        "stderr": "serve-invalid-bind.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-syx6v_qq/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-beta-unavailable",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--channel",
+          "beta",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/home-beta",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T02:24:16.394894+00:00",
+        "endedUtc": "2026-10-07T02:24:16.447555+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-beta-unavailable.stdout.log",
+        "stderr": "serve-beta-unavailable.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-syx6v_qq/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-downgrade-refused",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--allow-data-downgrade",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/home-downgrade",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T02:24:16.448228+00:00",
+        "endedUtc": "2026-10-07T02:24:16.500672+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-downgrade-refused.stdout.log",
+        "stderr": "serve-downgrade-refused.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-syx6v_qq/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-newer-epoch",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/home-newer",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T02:24:16.501782+00:00",
+        "endedUtc": "2026-10-07T02:24:16.557359+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-newer-epoch.stdout.log",
+        "stderr": "serve-newer-epoch.stderr.log",
+        "environment": {
+          "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/home-fallback",
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-syx6v_qq/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/home-fallback",
+          "XDG_DATA_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/home-fallback/xdg-data",
+          "XDG_CONFIG_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_RUST/home-fallback/xdg-config"
+        }
+      },
+      {
+        "name": "sessions-after-shutdown",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "sessions",
+          "--runtime",
+          "rust",
+          "--url",
+          "http://",
+          "--token",
+          "intentionally-invalid-token"
+        ],
+        "startedUtc": "2026-10-07T02:24:16.558103+00:00",
+        "endedUtc": "2026-10-07T02:24:16.607907+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "sessions-after-shutdown.stdout.log",
+        "stderr": "sessions-after-shutdown.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-syx6v_qq/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      }
+    ],
+    "cliSessionsSummary": {
+      "schema": "lingxi.r02-cli-sessions-producer.v1",
+      "command": [
+        "bash",
+        "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/CLI_SESSIONS/auth"
+      ],
+      "startUtc": "2026-10-07T02:24:38.491375+00:00",
+      "endUtc": "2026-10-07T02:24:53.439578+00:00",
+      "exitCode": 1,
+      "timedOut": false,
+      "cleanupError": null,
+      "ownedGroupLeft": false,
+      "sourceChangedDuringRun": false,
+      "caseCount": 6,
+      "issues": [
+        "real service and CLI producer exited 1",
+        "real CLI sessions evidence invalid: original service and CLI case identities differ"
+      ],
+      "status": "FAIL"
+    }
+  },
+  {
+    "path": "supplements/binding-restored-real-R02/evidence",
+    "sha256": "c44a398156d4c69b95f1b5a3f5fa037eea5cd7d85e7fefeefdf6f3c549f03c00",
+    "overall": "FAIL",
+    "stable": true,
+    "runner": "PASS",
+    "checkpointCount": 20,
+    "stableCheckpointCount": 20,
+    "commands": [
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t01_service_smoke.sh",
+          "{EVIDENCE}/A01"
+        ],
+        "cleanup": null,
+        "durationMs": 24417,
+        "evidencePaths": [
+          "{EVIDENCE}/A01/a01-health-check.log",
+          "{EVIDENCE}/A01/a01-shutdown.log",
+          "{EVIDENCE}/A01/a01-deptree-evidence.log",
+          "{EVIDENCE}/A01/a01-leaf-cases.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a01_smoke",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t01_boundary_negative.sh",
+          "{EVIDENCE}/A02"
+        ],
+        "cleanup": null,
+        "durationMs": 23089,
+        "evidencePaths": [
+          "{EVIDENCE}/A02/a02-summary.log",
+          "{EVIDENCE}/A02/a02-residue-check.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a02_boundary_negative",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t02_dual_instance.sh",
+          "{EVIDENCE}/A03"
+        ],
+        "cleanup": null,
+        "durationMs": 29016,
+        "evidencePaths": [
+          "{EVIDENCE}/A03/a03-summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a03_dual_instance",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t02_path_priority.sh",
+          "{EVIDENCE}/A04"
+        ],
+        "cleanup": null,
+        "durationMs": 22816,
+        "evidencePaths": [
+          "{EVIDENCE}/A04/a04-summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a04_path_priority",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+          "{EVIDENCE}/A05_A06"
+        ],
+        "cleanup": null,
+        "durationMs": 37578,
+        "evidencePaths": [
+          "{EVIDENCE}/A05_A06/summary.txt",
+          "{EVIDENCE}/A05_A06/ws-matrix.json",
+          "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "{EVIDENCE}/A05_A06/sessions-list-matrix.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a05_a06_auth_matrix",
+        "missingEvidence": [
+          "{EVIDENCE}/A05_A06/ws-matrix.json",
+          "{EVIDENCE}/A05_A06/leaf-cases.json"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t04_storage_tx.sh",
+          "{EVIDENCE}/A07_A08"
+        ],
+        "cleanup": null,
+        "durationMs": 24578,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_A08/s1-counts-after-stop.json",
+          "{EVIDENCE}/A07_A08/s4-hashes-after.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a07_a08_storage_tx",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "env",
+          "CARGO_NET_OFFLINE=true",
+          "R02_A07_LIVE_FAULT_EVIDENCE={EVIDENCE}/A07_LIVE_FAULT/case.json",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "--offline",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "execute_concurrency",
+          "http_running_storage_fault_has_no_success_event_or_restart_run",
+          "--",
+          "--exact",
+          "--nocapture"
+        ],
+        "cleanup": null,
+        "durationMs": 28096,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_LIVE_FAULT/case.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a07_live_fault_01_test",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_t04_live_fault_evidence.py",
+          "{EVIDENCE}"
+        ],
+        "cleanup": null,
+        "durationMs": 21412,
+        "evidencePaths": [
+          "{EVIDENCE}/A07_LIVE_FAULT/checked.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a07_live_fault_02_check",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t05_events_matrix.sh",
+          "{EVIDENCE}/A09_A10"
+        ],
+        "cleanup": null,
+        "durationMs": 38290,
+        "evidencePaths": [
+          "{EVIDENCE}/A09_A10/probe-matrix.jsonl",
+          "{EVIDENCE}/A09_A10/key-events-dump.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a09_a10_events_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t06_backup_restore.sh",
+          "{EVIDENCE}/A11"
+        ],
+        "cleanup": null,
+        "durationMs": 23821,
+        "evidencePaths": [
+          "{EVIDENCE}/A11/backup-restore/summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a11_backup_restore",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t06_recovery_drill.sh",
+          "{EVIDENCE}/A12"
+        ],
+        "cleanup": null,
+        "durationMs": 23890,
+        "evidencePaths": [
+          "{EVIDENCE}/A12/recovery-drill/summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a12_recovery_drill",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t07_redaction_scan.sh",
+          "{EVIDENCE}/A13"
+        ],
+        "cleanup": null,
+        "durationMs": 33286,
+        "evidencePaths": [
+          "{EVIDENCE}/A13/redaction-scan/summary.txt",
+          "{EVIDENCE}/A13/redaction-scan/inventory.txt"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a13_redaction_scan",
+        "missingEvidence": [
+          "{EVIDENCE}/A13/redaction-scan/inventory.txt"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t07_slow_subscriber.sh",
+          "{EVIDENCE}/A14"
+        ],
+        "cleanup": null,
+        "durationMs": 55225,
+        "evidencePaths": [
+          "{EVIDENCE}/A14/slow-subscriber/storm-results.json"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a14_slow_subscriber",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t08_full_chain_smoke.sh",
+          "{EVIDENCE}/A15"
+        ],
+        "cleanup": null,
+        "durationMs": 22552,
+        "evidencePaths": [
+          "{EVIDENCE}/A15/full-chain/summary.txt"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "a15_full_chain",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "bash",
+          "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+          "{EVIDENCE}/A16"
+        ],
+        "cleanup": null,
+        "durationMs": 64253,
+        "evidencePaths": [
+          "{EVIDENCE}/A16/legacy-entry/summary.txt"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "a16_legacy_regression",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_client_leaf_matrix.py",
+          "{EVIDENCE}/CLIENT"
+        ],
+        "cleanup": null,
+        "durationMs": 21536,
+        "evidencePaths": [
+          "{EVIDENCE}/CLIENT/leaf-cases.json",
+          "{EVIDENCE}/CLIENT/summary.json",
+          "{EVIDENCE}/CLIENT/sharing-cases.json",
+          "{EVIDENCE}/CLIENT/sharing-vitest.stdout.log",
+          "{EVIDENCE}/CLIENT/sharing-vitest.stderr.log",
+          "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stderr.log",
+          "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+          "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stdout.log",
+          "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "supplemental_client_matrix",
+        "missingEvidence": [
+          "{EVIDENCE}/CLIENT/sharing-cases.json"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_cli_rust_matrix.py",
+          "{EVIDENCE}/CLI_RUST"
+        ],
+        "cleanup": null,
+        "durationMs": 49355,
+        "evidencePaths": [
+          "{EVIDENCE}/CLI_RUST/cli-rust-cases.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "supplemental_cli_rust_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_cli_sessions_leaf_matrix.py",
+          "{EVIDENCE}/CLI_SESSIONS"
+        ],
+        "cleanup": null,
+        "durationMs": 36725,
+        "evidencePaths": [
+          "{EVIDENCE}/CLI_SESSIONS/summary.json",
+          "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+          "{EVIDENCE}/CLI_SESSIONS/producer.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/producer.stderr.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/sessions-list-matrix.json",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-owner.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-foreign.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-unauthorized.stderr.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-limit-case.json"
+        ],
+        "exitCode": 1,
+        "internalError": null,
+        "key": "supplemental_cli_sessions_matrix",
+        "missingEvidence": [
+          "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-foreign.stdout.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-unauthorized.stderr.log",
+          "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-limit-case.json"
+        ],
+        "preExistingEvidence": [],
+        "status": "FAIL",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_management_leaf_matrix.py",
+          "{EVIDENCE}/MANAGEMENT"
+        ],
+        "cleanup": null,
+        "durationMs": 123272,
+        "evidencePaths": [
+          "{EVIDENCE}/MANAGEMENT/summary.json",
+          "{EVIDENCE}/MANAGEMENT/management-cases.json",
+          "{EVIDENCE}/MANAGEMENT/web-login-cases.json",
+          "{EVIDENCE}/MANAGEMENT/tls-web-login-cases.json",
+          "{EVIDENCE}/MANAGEMENT/tls-cargo.stdout.log",
+          "{EVIDENCE}/MANAGEMENT/tls-cargo.stderr.log",
+          "{EVIDENCE}/MANAGEMENT/security-audit-sources.json",
+          "{EVIDENCE}/MANAGEMENT/security-audit.jsonl",
+          "{EVIDENCE}/MANAGEMENT/cargo.stdout.log",
+          "{EVIDENCE}/MANAGEMENT/cargo.stderr.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "supplemental_management_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/rust-tauri/r02_static_web_leaf_matrix.py",
+          "{EVIDENCE}/STATIC_WEB"
+        ],
+        "cleanup": null,
+        "durationMs": 25172,
+        "evidencePaths": [
+          "{EVIDENCE}/STATIC_WEB/summary.json",
+          "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+          "{EVIDENCE}/STATIC_WEB/cargo.stdout.log",
+          "{EVIDENCE}/STATIC_WEB/cargo.stderr.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "supplemental_static_web_matrix",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      }
+    ],
+    "binding": {
+      "after": {
+        "atUnixMs": 1791341773884,
+        "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+        "fileCount": 38083,
+        "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/candidate-source-after.json",
+        "manifestSha256": "f19373c42670ff597d181bba4e5eb8f84b860e33759021c8f93fd5cd2a7b912f"
+      },
+      "afterError": null,
+      "before": {
+        "atUnixMs": 1791341024549,
+        "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+        "fileCount": 38083,
+        "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/candidate-source-before.json",
+        "manifestSha256": "f19373c42670ff597d181bba4e5eb8f84b860e33759021c8f93fd5cd2a7b912f"
+      },
+      "checkpointAfterEveryCommand": [
+        {
+          "atUnixMs": 1791341049073,
+          "changedPathBytesHex": [],
+          "commandKey": "a01_smoke",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341072163,
+          "changedPathBytesHex": [],
+          "commandKey": "a02_boundary_negative",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341101180,
+          "changedPathBytesHex": [],
+          "commandKey": "a03_dual_instance",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341123996,
+          "changedPathBytesHex": [],
+          "commandKey": "a04_path_priority",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341161575,
+          "changedPathBytesHex": [],
+          "commandKey": "a05_a06_auth_matrix",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341186153,
+          "changedPathBytesHex": [],
+          "commandKey": "a07_a08_storage_tx",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341214251,
+          "changedPathBytesHex": [],
+          "commandKey": "a07_live_fault_01_test",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341235664,
+          "changedPathBytesHex": [],
+          "commandKey": "a07_live_fault_02_check",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341273954,
+          "changedPathBytesHex": [],
+          "commandKey": "a09_a10_events_matrix",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341297776,
+          "changedPathBytesHex": [],
+          "commandKey": "a11_backup_restore",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341321667,
+          "changedPathBytesHex": [],
+          "commandKey": "a12_recovery_drill",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341354954,
+          "changedPathBytesHex": [],
+          "commandKey": "a13_redaction_scan",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341410179,
+          "changedPathBytesHex": [],
+          "commandKey": "a14_slow_subscriber",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341432732,
+          "changedPathBytesHex": [],
+          "commandKey": "a15_full_chain",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341496986,
+          "changedPathBytesHex": [],
+          "commandKey": "a16_legacy_regression",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341518523,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_client_matrix",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341567879,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_cli_rust_matrix",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341604605,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_cli_sessions_matrix",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341727878,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_management_matrix",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        },
+        {
+          "atUnixMs": 1791341753051,
+          "changedPathBytesHex": [],
+          "commandKey": "supplemental_static_web_matrix",
+          "digestSha256": "63681fc823965491668d8da23f6fc3fe2d8bfe66c7f4fe2234aded45c277b65b",
+          "fileCount": 38083,
+          "stable": true
+        }
+      ],
+      "excluded": {
+        "evidenceOutputPathBytesHex": null,
+        "evidenceOutputRelativePath": null,
+        "policy": "This invocation's fresh --evidence subtree and exact real OS fd stdout/stderr files of this process and its ancestors are excluded. No ancestor sink directory is excluded. The set is fixed before binding; other tracked and non-ignored untracked paths stay bound.",
+        "runOutputFiles": []
+      },
+      "finalChangedPathBytesHex": [],
+      "headAtEndError": null,
+      "schema": "lingxi-candidate-source-binding-v1",
+      "stable": true,
+      "testedShaAtEnd": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b"
+    },
+    "dependencyEvidence": [
+      {
+        "path": "A05_A06/cli-sessions-owner.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLIENT/cli-help-exit0-no-start/stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-invalid-bind.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-beta-unavailable.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-downgrade-refused.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/serve-newer-epoch.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_RUST/sessions-after-shutdown.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "CLI_SESSIONS/auth/cli-sessions-owner.stderr.log",
+        "sha256": "078bbf18002fb4fd115c920dca629d0dbb004dd188259bd24a3397af41df76b5",
+        "reasonLines": [
+          "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ws' imported from /Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/client.ts"
+        ]
+      },
+      {
+        "path": "a16_legacy_regression/stderr.log",
+        "sha256": "689f691e5525c343da2f84450ce2cda0ea8626079d4b375a8dec4c932f61457e",
+        "reasonLines": [
+          "cp: /Users/study_superior/r05t08-work/negcopy.hTXzzN/node_modules: No such file or directory"
+        ]
+      }
+    ],
+    "clientSummary": {
+      "cliCaseCount": 3,
+      "sharingExit": 1,
+      "sharingError": "[Errno 2] No such file or directory: '/Users/study_superior/r05t08-work/negcopy.hTXzzN/node_modules/.bin/vitest'",
+      "sharingCleanupError": null,
+      "caseCount": 3,
+      "startUtc": "2026-10-07T02:51:37.024827+00:00",
+      "endUtc": "2026-10-07T02:51:37.188906+00:00",
+      "sourceChangedDuringRun": false,
+      "allCasesPass": false
+    },
+    "clientCases": [
+      {
+        "case": "cli-help-exit0-no-start",
+        "ok": false,
+        "exit": 1
+      },
+      {
+        "case": "cli-unknown-arg-exit1-no-start",
+        "ok": false,
+        "exit": 1
+      },
+      {
+        "case": "cli-serve-unknown-arg-exit1-no-start",
+        "ok": false,
+        "exit": 1
+      }
+    ],
+    "cliRustCases": [
+      {
+        "case": "cli-rust-current-binary-build",
+        "expect": 1,
+        "actual": 1,
+        "ok": true,
+        "observed": {
+          "exit": 0,
+          "binary": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-qxh7gjgi/debug/lingxi-service"
+        }
+      },
+      {
+        "case": "cli-rust-serve-ready",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "cliPid": 47263,
+          "rustPid": 0,
+          "rustBirth": "",
+          "rustParent": "",
+          "bindAddr": "",
+          "instanceTransport": "",
+          "instanceFile": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/home-main/lingxi-service/instance.json"
+        }
+      },
+      {
+        "case": "cli-rust-channel-stable-selected",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "cliArgv": [
+            "node",
+            "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+            "serve",
+            "--runtime",
+            "rust",
+            "--channel",
+            "stable",
+            "--",
+            "--home",
+            "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/home-main",
+            "--bind",
+            "127.0.0.1:0"
+          ],
+          "ready": false,
+          "instanceTransport": ""
+        }
+      },
+      {
+        "case": "cli-rust-producer-internal",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "error": "CLI did not start a healthy foreground Rust service"
+        }
+      },
+      {
+        "case": "cli-rust-serve-sigterm-clean",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "bindAddr": "",
+          "rustPid": 0,
+          "rustChildStateBeforeCleanup": "unobservable",
+          "rustChildStateAfterCleanup": "unobservable",
+          "portClosed": null
+        }
+      },
+      {
+        "case": "cli-rust-serve-startup-error",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "before": {},
+          "after": {}
+        }
+      },
+      {
+        "case": "cli-rust-serve-beta-no-silent-stable",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "before": {},
+          "after": {}
+        }
+      },
+      {
+        "case": "cli-rust-serve-downgrade-refused",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "before": {},
+          "after": {}
+        }
+      },
+      {
+        "case": "cli-rust-serve-newer-epoch-no-root-switch",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1,
+          "stampSha256": "fef1da12458d4f58e5ac150ea8cf9628d7234180c32d4ceed0b3b71d4e83f05e",
+          "fallbackBefore": {},
+          "fallbackAfter": {}
+        }
+      },
+      {
+        "case": "cli-rust-sessions-disconnected",
+        "expect": 1,
+        "actual": 0,
+        "ok": false,
+        "observed": {
+          "exit": 1
+        }
+      },
+      {
+        "case": "cli-rust-candidate-unchanged-during-probe",
+        "expect": 1,
+        "actual": 1,
+        "ok": true,
+        "observed": {
+          "sourceFiles": 145,
+          "changedPaths": []
+        }
+      }
+    ],
+    "cliRustCommands": [
+      {
+        "name": "build-current-service",
+        "argv": [
+          "/Users/study_superior/.cargo/bin/rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "build",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "--offline",
+          "-p",
+          "lingxi-service"
+        ],
+        "startedUtc": "2026-10-07T02:51:58.590319+00:00",
+        "endedUtc": "2026-10-07T02:52:26.301448+00:00",
+        "exit": 0,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "build-current-service.stdout.log",
+        "stderr": "build-current-service.stderr.log",
+        "environment": {
+          "CARGO_TARGET_DIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-qxh7gjgi",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-foreground",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--channel",
+          "stable",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/home-main",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T02:52:26.311393+00:00",
+        "pid": 47263,
+        "stdout": "serve.stdout.log",
+        "stderr": "serve.stderr.log",
+        "environment": {
+          "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/home-main",
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-qxh7gjgi/debug/lingxi-service"
+        },
+        "readyUtc": "2026-10-07T02:52:26.424428+00:00",
+        "bindAddr": "",
+        "endedUtc": "2026-10-07T02:52:26.424475+00:00"
+      },
+      {
+        "name": "serve-invalid-bind",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/home-bad-bind",
+          "--bind",
+          "not-an-address"
+        ],
+        "startedUtc": "2026-10-07T02:52:26.424903+00:00",
+        "endedUtc": "2026-10-07T02:52:26.479763+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-invalid-bind.stdout.log",
+        "stderr": "serve-invalid-bind.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-qxh7gjgi/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-beta-unavailable",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--channel",
+          "beta",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/home-beta",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T02:52:26.480447+00:00",
+        "endedUtc": "2026-10-07T02:52:26.534480+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-beta-unavailable.stdout.log",
+        "stderr": "serve-beta-unavailable.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-qxh7gjgi/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-downgrade-refused",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--allow-data-downgrade",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/home-downgrade",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T02:52:26.535169+00:00",
+        "endedUtc": "2026-10-07T02:52:26.592579+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-downgrade-refused.stdout.log",
+        "stderr": "serve-downgrade-refused.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-qxh7gjgi/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      },
+      {
+        "name": "serve-newer-epoch",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "serve",
+          "--runtime",
+          "rust",
+          "--",
+          "--home",
+          "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/home-newer",
+          "--bind",
+          "127.0.0.1:0"
+        ],
+        "startedUtc": "2026-10-07T02:52:26.593461+00:00",
+        "endedUtc": "2026-10-07T02:52:26.650221+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "serve-newer-epoch.stdout.log",
+        "stderr": "serve-newer-epoch.stderr.log",
+        "environment": {
+          "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/home-fallback",
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-qxh7gjgi/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/home-fallback",
+          "XDG_DATA_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/home-fallback/xdg-data",
+          "XDG_CONFIG_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_RUST/home-fallback/xdg-config"
+        }
+      },
+      {
+        "name": "sessions-after-shutdown",
+        "argv": [
+          "node",
+          "/Users/study_superior/r05t08-work/negcopy.hTXzzN/cli/entry.ts",
+          "sessions",
+          "--runtime",
+          "rust",
+          "--url",
+          "http://",
+          "--token",
+          "intentionally-invalid-token"
+        ],
+        "startedUtc": "2026-10-07T02:52:26.650877+00:00",
+        "endedUtc": "2026-10-07T02:52:26.704953+00:00",
+        "exit": 1,
+        "timedOut": false,
+        "cleanupError": null,
+        "stdout": "sessions-after-shutdown.stdout.log",
+        "stderr": "sessions-after-shutdown.stderr.log",
+        "environment": {
+          "LINGXI_SERVICE_BIN": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-cli-rust-target-qxh7gjgi/debug/lingxi-service",
+          "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r05-neg-target",
+          "CARGO_NET_OFFLINE": "true",
+          "HOME": "/Users/study_superior"
+        }
+      }
+    ],
+    "cliSessionsSummary": {
+      "schema": "lingxi.r02-cli-sessions-producer.v1",
+      "command": [
+        "bash",
+        "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/CLI_SESSIONS/auth"
+      ],
+      "startUtc": "2026-10-07T02:52:47.911903+00:00",
+      "endUtc": "2026-10-07T02:53:02.957465+00:00",
+      "exitCode": 1,
+      "timedOut": false,
+      "cleanupError": null,
+      "ownedGroupLeft": false,
+      "sourceChangedDuringRun": false,
+      "caseCount": 6,
+      "issues": [
+        "real service and CLI producer exited 1",
+        "real CLI sessions evidence invalid: original service and CLI case identities differ"
+      ],
+      "status": "FAIL"
+    }
+  },
+  {
+    "path": "supplements/stable-normal/evidence",
+    "sha256": "18e4ef7a68dd2a0067e44babf472c10f5895e9972c5c628e5d877448c5911b7c",
+    "overall": "PASS",
+    "stable": true,
+    "runner": "PASS",
+    "checkpointCount": 1,
+    "stableCheckpointCount": 1,
+    "commands": [
+      {
+        "argv": [
+          "python3",
+          "-c",
+          "import os,pathlib; p=pathlib.Path('rust/crates/lingxi-kernel/src/lib.rs'); p.write_bytes(p.read_bytes()+b'\\n// G controlled mid-command byte change\\n') if os.environ.get('LINGXI_G_MUTATE')=='1' else None; print('controlled command exit zero')"
+        ],
+        "cleanup": null,
+        "durationMs": 20782,
+        "evidencePaths": [
+          "{EVIDENCE}/binding-control/stdout.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "binding-control",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      }
+    ],
+    "binding": {
+      "after": {
+        "atUnixMs": 1791340194224,
+        "digestSha256": "b5b066cf462f12540417fc927b74755329d4d4e958698c7dd8c29d487ffa9909",
+        "fileCount": 38083,
+        "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-normal/evidence/candidate-source-after.json",
+        "manifestSha256": "ccdfdc066437e2166542e35a9bc6109792eeac6a4df5041c0ae2c527818f9f31"
+      },
+      "afterError": null,
+      "before": {
+        "atUnixMs": 1791340152471,
+        "digestSha256": "b5b066cf462f12540417fc927b74755329d4d4e958698c7dd8c29d487ffa9909",
+        "fileCount": 38083,
+        "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-normal/evidence/candidate-source-before.json",
+        "manifestSha256": "ccdfdc066437e2166542e35a9bc6109792eeac6a4df5041c0ae2c527818f9f31"
+      },
+      "checkpointAfterEveryCommand": [
+        {
+          "atUnixMs": 1791340173361,
+          "changedPathBytesHex": [],
+          "commandKey": "binding-control",
+          "digestSha256": "b5b066cf462f12540417fc927b74755329d4d4e958698c7dd8c29d487ffa9909",
+          "fileCount": 38083,
+          "stable": true
+        }
+      ],
+      "excluded": {
+        "evidenceOutputPathBytesHex": null,
+        "evidenceOutputRelativePath": null,
+        "policy": "This invocation's fresh --evidence subtree and exact real OS fd stdout/stderr files of this process and its ancestors are excluded. No ancestor sink directory is excluded. The set is fixed before binding; other tracked and non-ignored untracked paths stay bound.",
+        "runOutputFiles": []
+      },
+      "finalChangedPathBytesHex": [],
+      "headAtEndError": null,
+      "schema": "lingxi-candidate-source-binding-v1",
+      "stable": true,
+      "testedShaAtEnd": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b"
+    }
+  },
+  {
+    "path": "supplements/stable-midbyte-red/evidence",
+    "sha256": "8f08f7be5d6ba082062d410480f157267a631104446ece48f6c67b04d31326b9",
+    "overall": "FAIL",
+    "stable": false,
+    "runner": "PASS",
+    "checkpointCount": 1,
+    "stableCheckpointCount": 0,
+    "commands": [
+      {
+        "argv": [
+          "python3",
+          "-c",
+          "import os,pathlib; p=pathlib.Path('rust/crates/lingxi-kernel/src/lib.rs'); p.write_bytes(p.read_bytes()+b'\\n// G controlled mid-command byte change\\n') if os.environ.get('LINGXI_G_MUTATE')=='1' else None; print('controlled command exit zero')"
+        ],
+        "cleanup": null,
+        "durationMs": 21503,
+        "evidencePaths": [
+          "{EVIDENCE}/binding-control/stdout.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "binding-control",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      }
+    ],
+    "binding": {
+      "after": {
+        "atUnixMs": 1791340261726,
+        "digestSha256": "89c6c504b3b8e432e6876d3f182ffe0f7606680c4379978fb617a0ab249dbfb6",
+        "fileCount": 38083,
+        "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-midbyte-red/evidence/candidate-source-after.json",
+        "manifestSha256": "0c796e4497dbf4be1d8a470afd4adfbe90dfb252b0096b5404e7189f222f96f7"
+      },
+      "afterError": null,
+      "before": {
+        "atUnixMs": 1791340218582,
+        "digestSha256": "b5b066cf462f12540417fc927b74755329d4d4e958698c7dd8c29d487ffa9909",
+        "fileCount": 38083,
+        "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-midbyte-red/evidence/candidate-source-before.json",
+        "manifestSha256": "ccdfdc066437e2166542e35a9bc6109792eeac6a4df5041c0ae2c527818f9f31"
+      },
+      "checkpointAfterEveryCommand": [
+        {
+          "atUnixMs": 1791340240201,
+          "changedPathBytesHex": [
+            "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+          ],
+          "commandKey": "binding-control",
+          "digestSha256": "89c6c504b3b8e432e6876d3f182ffe0f7606680c4379978fb617a0ab249dbfb6",
+          "fileCount": 38083,
+          "stable": false
+        }
+      ],
+      "excluded": {
+        "evidenceOutputPathBytesHex": null,
+        "evidenceOutputRelativePath": null,
+        "policy": "This invocation's fresh --evidence subtree and exact real OS fd stdout/stderr files of this process and its ancestors are excluded. No ancestor sink directory is excluded. The set is fixed before binding; other tracked and non-ignored untracked paths stay bound.",
+        "runOutputFiles": []
+      },
+      "finalChangedPathBytesHex": [
+        "727573742f6372617465732f6c696e6778692d6b65726e656c2f7372632f6c69622e7273"
+      ],
+      "headAtEndError": null,
+      "reason": "Candidate file bytes or HEAD changed during the registered stage checks, or a snapshot failed; stage PASS is forbidden.",
+      "schema": "lingxi-candidate-source-binding-v1",
+      "stable": false,
+      "testedShaAtEnd": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b"
+    }
+  },
+  {
+    "path": "supplements/stable-restored/evidence",
+    "sha256": "9d5cfc754a890d00061d3e697612b50446226d133ba278e5a744b32a64528391",
+    "overall": "PASS",
+    "stable": true,
+    "runner": "PASS",
+    "checkpointCount": 1,
+    "stableCheckpointCount": 1,
+    "commands": [
+      {
+        "argv": [
+          "python3",
+          "-c",
+          "import os,pathlib; p=pathlib.Path('rust/crates/lingxi-kernel/src/lib.rs'); p.write_bytes(p.read_bytes()+b'\\n// G controlled mid-command byte change\\n') if os.environ.get('LINGXI_G_MUTATE')=='1' else None; print('controlled command exit zero')"
+        ],
+        "cleanup": null,
+        "durationMs": 20954,
+        "evidencePaths": [
+          "{EVIDENCE}/binding-control/stdout.log"
+        ],
+        "exitCode": 0,
+        "internalError": null,
+        "key": "binding-control",
+        "missingEvidence": [],
+        "preExistingEvidence": [],
+        "status": "PASS",
+        "timedOut": false
+      }
+    ],
+    "binding": {
+      "after": {
+        "atUnixMs": 1791340329843,
+        "digestSha256": "b5b066cf462f12540417fc927b74755329d4d4e958698c7dd8c29d487ffa9909",
+        "fileCount": 38083,
+        "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-restored/evidence/candidate-source-after.json",
+        "manifestSha256": "ccdfdc066437e2166542e35a9bc6109792eeac6a4df5041c0ae2c527818f9f31"
+      },
+      "afterError": null,
+      "before": {
+        "atUnixMs": 1791340285644,
+        "digestSha256": "b5b066cf462f12540417fc927b74755329d4d4e958698c7dd8c29d487ffa9909",
+        "fileCount": 38083,
+        "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/stable-restored/evidence/candidate-source-before.json",
+        "manifestSha256": "ccdfdc066437e2166542e35a9bc6109792eeac6a4df5041c0ae2c527818f9f31"
+      },
+      "checkpointAfterEveryCommand": [
+        {
+          "atUnixMs": 1791340306703,
+          "changedPathBytesHex": [],
+          "commandKey": "binding-control",
+          "digestSha256": "b5b066cf462f12540417fc927b74755329d4d4e958698c7dd8c29d487ffa9909",
+          "fileCount": 38083,
+          "stable": true
+        }
+      ],
+      "excluded": {
+        "evidenceOutputPathBytesHex": null,
+        "evidenceOutputRelativePath": null,
+        "policy": "This invocation's fresh --evidence subtree and exact real OS fd stdout/stderr files of this process and its ancestors are excluded. No ancestor sink directory is excluded. The set is fixed before binding; other tracked and non-ignored untracked paths stay bound.",
+        "runOutputFiles": []
+      },
+      "finalChangedPathBytesHex": [],
+      "headAtEndError": null,
+      "schema": "lingxi-candidate-source-binding-v1",
+      "stable": true,
+      "testedShaAtEnd": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b"
+    }
+  }
+]

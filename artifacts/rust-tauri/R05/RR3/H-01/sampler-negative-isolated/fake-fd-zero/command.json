@@ -1,0 +1,27 @@
+{
+  "command": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-01/sampler-negative-isolated/r05_t08_resources",
+    "f27_sampler_controls_detect_growth_release_and_failure",
+    "--exact",
+    "--nocapture"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-01/sampler-negative-isolated",
+  "startedAt": "2026-10-07T02:27:57.161807+00:00",
+  "endedAt": "2026-10-07T02:27:57.677549+00:00",
+  "exitCode": 101,
+  "expectedExitCode": 101,
+  "targetNamed": true,
+  "mode": "fd",
+  "equipmentSource": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r05_t08_resources-f66968a3ba499b0b",
+  "sourceHash": "9aa07b6514177d42637b1eb935e0086a1f86abcd47c5c03b130d1320ba7104d1",
+  "copyHash": "9aa07b6514177d42637b1eb935e0086a1f86abcd47c5c03b130d1320ba7104d1",
+  "stdoutHash": "47ec7055a5b23e1384cf8001ee229191bbcdb5de883363fb8fb2736003b699d3",
+  "cleanup": {
+    "processGroup": 45728,
+    "membersBefore": [
+      "45729 45728 sleep"
+    ],
+    "membersAfter": []
+  },
+  "status": "PASS"
+}

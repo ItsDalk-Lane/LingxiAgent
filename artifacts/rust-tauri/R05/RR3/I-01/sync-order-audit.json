@@ -1,0 +1,41 @@
+[
+  {
+    "case": "sync-production-normal",
+    "beforeAtUnixMs": 1791340446589,
+    "waitEndUTC": "2026-10-07T02:34:07.732806+00:00",
+    "bindingCompletedBeforeObservedSignal": true,
+    "runner": "PASS",
+    "overall": "PASS",
+    "stable": true,
+    "commandsAllPass": true,
+    "changedPaths": [],
+    "resultSha256": "7f7bc780546a9862927de13244355a38f2eebe2c3d6f9e183da2390112ca0611"
+  },
+  {
+    "case": "sync-production-midbyte",
+    "beforeAtUnixMs": 1791340448910,
+    "waitEndUTC": "2026-10-07T02:34:09.263374+00:00",
+    "bindingCompletedBeforeObservedSignal": true,
+    "runner": "PASS",
+    "overall": "FAIL",
+    "stable": false,
+    "commandsAllPass": true,
+    "changedPaths": [
+      "rust/crates/lingxi-kernel/src/lib.rs"
+    ],
+    "resultSha256": "1c0acd4b5535d2b0cf0665215050bf3e944fc7ac8ae20685c2f31f73322ee087",
+    "appendStartUTC": "2026-10-07T02:34:09.264026+00:00"
+  },
+  {
+    "case": "sync-production-restored",
+    "beforeAtUnixMs": 1791340450532,
+    "waitEndUTC": "2026-10-07T02:34:10.892371+00:00",
+    "bindingCompletedBeforeObservedSignal": true,
+    "runner": "PASS",
+    "overall": "PASS",
+    "stable": true,
+    "commandsAllPass": true,
+    "changedPaths": [],
+    "resultSha256": "61e0dbce0fb016a27fab8e9dc7cf2ed78b8b12493878574d38e03da145b57847"
+  }
+]

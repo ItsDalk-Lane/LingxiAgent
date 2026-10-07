@@ -1,0 +1,17 @@
+{
+  "utc": "2026-10-07T04:22:52.184490+00:00",
+  "query": [
+    "ps",
+    "-Ao",
+    "pid=,ppid=,command="
+  ],
+  "exitCode": 0,
+  "matchingRuntimeProcesses": [],
+  "scope": "本任务已知旧G观察器/negative隔离copy/legacy临时路径；新G审查者仍须自行核实际所有写者",
+  "authorsStopped": [
+    "rr3_j_impl_02",
+    "rr3_j_review_02",
+    "rr3_delivery_prep_02",
+    "rr3_doc_input_boundary_01"
+  ]
+}

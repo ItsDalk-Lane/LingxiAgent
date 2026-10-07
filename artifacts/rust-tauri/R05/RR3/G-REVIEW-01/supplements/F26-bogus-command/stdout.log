@@ -1,0 +1,22 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy.hTXzzN/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.80s
+     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 1 test
+test stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once ... FAILED
+
+failures:
+
+---- stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once stdout ----
+
+thread 'stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once' (21438823) panicked at crates/xtask/src/stage_map.rs:3392:17:
+registry entry R05-T08-C13 binds to command "bogus_gate" which the R05 map does not register
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    stage_map::map_tests::r05_stage_cid_table_owns_every_pinned_test_exactly_once
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`

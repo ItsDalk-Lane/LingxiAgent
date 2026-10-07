@@ -1,0 +1,113 @@
+{
+ "purpose": "DELIVERY-FINAL-02 自身新证据独立收据（避免循环自哈希）：枚举快照内仅 delivery_final_02.py 已入 classification.json；其余产物为枚举后新增，本收据递增登记",
+ "utc": "2026-10-07T23:39:04.166550+00:00",
+ "snapshotPolicy": "enumeration-untracked.nul 为权威快照；下表产物除 delivery_final_02.py 外均不在该快照内，作为 INCLUDE_EVIDENCE 候选交 DELIVERY-REVIEW-01 审定后由 root 精确暂存",
+ "outputs": [
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/REPORT.md",
+   "bytes": 13874,
+   "sha256": "b6bf677c7bc80a9f39ccbc968366e4b067f6f0ab2bd23f22940c664e3b7a95a2"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/classification.json",
+   "bytes": 24497130,
+   "sha256": "e91dfebff4c262e7aa594b31a6b7810c70d876db9e07ba42c7264c64901db853"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/commands.jsonl",
+   "bytes": 1905,
+   "sha256": "24efac04f24c9d18f3f1901c5edffec3bbf672b1c3acb3a0433654f8acc95930"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/crlf-no-filters-boundary.json",
+   "bytes": 136977,
+   "sha256": "091b21002d2b42202832a79e2d3c32668a7d1ab2f8aa4e03200347a5193e678f"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/delivery_final_02.py",
+   "bytes": 23673,
+   "sha256": "98260cf937551a43f197dbf5e9a238ff3b18737422d88a771c745caf1c63b8ad"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/enumeration-modified-tracked.nul",
+   "bytes": 1250,
+   "sha256": "0384e4830569e31202b07f63342e862bbdd97999ed57752611a6c26ce1e535ad"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/enumeration-staged.nul",
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/enumeration-untracked.nul",
+   "bytes": 3866006,
+   "sha256": "a7c8be7f26a1fd7a7f34ff08cea357f714909816e34c15ff170ed9e01d2163a4"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/git-initial-state.json",
+   "bytes": 447,
+   "sha256": "cc8c603c74f2965ee5682564e3cd53f2cd83a92c2ea0983807da70b48e6d7bd5"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/include-paths.nul",
+   "bytes": 3116702,
+   "sha256": "4418cbd961137d4360197cbd78a949d594191bf552134fa5941be4651fa8b3d6"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/include-paths.txt",
+   "bytes": 5041287,
+   "sha256": "c83bc479dfb1b8c196bea47eaafc0fc3348c7561ecf34781b99245b3551c2b99"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/local-paths.nul",
+   "bytes": 750554,
+   "sha256": "21c0d026cc14f065ec8197d3b29314abd893d4a748abba830aa85c61394a153e"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/local-paths.txt",
+   "bytes": 1140900,
+   "sha256": "a93b907273450f22a795e25d43841f85a58bf142531b502cad2de0ceb1bf3773"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/reference-boundary-index.json",
+   "bytes": 44789,
+   "sha256": "82674ecef03db97a7e77cbad96bd3f833976a8775f8d7c2cda65e61588ba92ad"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/space-estimate.json",
+   "bytes": 933,
+   "sha256": "579c88d9f60f16b371d2fa56a5d11a6b87d260e77239a4e9982ae516ab2a3f7e"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/summary.json",
+   "bytes": 1901,
+   "sha256": "f7a00088fa0eaba03a76f018ea46bf503ec18877e977e6e2a61f33c5a1878341"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/unknown-items.json",
+   "bytes": 73,
+   "sha256": "31f53464da92106ca167a33ff4d71239823750428ae2ba8239e4ae654073b6df"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/unknown-paths.nul",
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/unknown-paths.txt",
+   "bytes": 144,
+   "sha256": "416f0ae3b19057bc361c3f97b4fccc16690e3df754afa709bc07888757856fd7"
+  }
+ ],
+ "closingStabilityCheck": {
+  "utc": "2026-10-07T23:39:04.166550+00:00",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "stagedCount": 0,
+  "indexSha256": "3016f7ae9d18d93951f05a77adb68946cab99a92d0a122294d4c5cf096407d47",
+  "diffHeadSha256": "a38e5d7affb3594504bc73ef2a63978b47dea1efcd48550829a2278d861953d8",
+  "headEqualsStart": true,
+  "stagedStillZero": true,
+  "indexShaEqualsStart": true,
+  "diffShaEqualsStart": true
+ }
+}

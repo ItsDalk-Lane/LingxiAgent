@@ -1,0 +1,23 @@
+Executable=/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0
+Identifier=r00_management_leaves-294787929158efb0
+Format=Mach-O thin (arm64)
+CodeDirectory v=20400 size=445215 flags=0x20002(adhoc,linker-signed) hashes=13909+0 location=embedded
+VersionPlatform=1
+VersionMin=720896
+VersionSDK=1769472
+Hash type=sha256 size=32
+CandidateCDHash sha256=d9676388f524872f1269c13f61f413458c0e9e52
+CandidateCDHashFull sha256=d9676388f524872f1269c13f61f413458c0e9e5246adbc3b7ccb9da04054687d
+Hash choices=sha256
+CMSDigest=d9676388f524872f1269c13f61f413458c0e9e5246adbc3b7ccb9da04054687d
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=18457440
+Executable Segment flags=0x1
+Page size=4096
+CDHash=d9676388f524872f1269c13f61f413458c0e9e52
+Signature=adhoc
+Info.plist=not bound
+TeamIdentifier=not set
+Sealed Resources=none
+Internal requirements=none

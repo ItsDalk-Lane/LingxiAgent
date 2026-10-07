@@ -1,0 +1,267 @@
+{
+  "A01": [
+    {
+      "level": "warn",
+      "count": 17,
+      "failed": 0,
+      "sources": [
+        {
+          "source": "cli",
+          "checks": {
+            "originalBytesPreserved": true,
+            "fallbackPreserved": true,
+            "selectedSourceDiagnostic": true,
+            "correctEpochDiagnostic": true,
+            "noReady": true,
+            "noStorageOrToken": true
+          },
+          "actualExitContract": 2,
+          "exitEvidence": "unchanged production shell obtains real wait status then requires equality to 2; exact case green",
+          "leafCases": [
+            {
+              "case": "a01-newer-data-epoch-refused",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            },
+            {
+              "case": "a01-newer-data-epoch-explicit-error",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            },
+            {
+              "case": "a01-newer-data-epoch-no-root-switch",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            }
+          ]
+        },
+        {
+          "source": "env",
+          "checks": {
+            "originalBytesPreserved": true,
+            "fallbackPreserved": true,
+            "selectedSourceDiagnostic": true,
+            "correctEpochDiagnostic": true,
+            "noReady": true,
+            "noStorageOrToken": true
+          },
+          "actualExitContract": 2,
+          "exitEvidence": "unchanged production shell obtains real wait status then requires equality to 2; exact case green",
+          "leafCases": [
+            {
+              "case": "a01-newer-env-data-epoch-refused",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            },
+            {
+              "case": "a01-newer-env-data-epoch-explicit-error",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            },
+            {
+              "case": "a01-newer-env-data-epoch-no-root-switch",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            }
+          ]
+        },
+        {
+          "source": "config-file",
+          "checks": {
+            "originalBytesPreserved": true,
+            "fallbackPreserved": true,
+            "selectedSourceDiagnostic": true,
+            "correctEpochDiagnostic": true,
+            "noReady": true,
+            "noStorageOrToken": true
+          },
+          "actualExitContract": 2,
+          "exitEvidence": "unchanged production shell obtains real wait status then requires equality to 2; exact case green",
+          "leafCases": [
+            {
+              "case": "a01-newer-config-data-epoch-refused",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            },
+            {
+              "case": "a01-newer-config-data-epoch-explicit-error",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            },
+            {
+              "case": "a01-newer-config-data-epoch-no-root-switch",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            }
+          ]
+        }
+      ],
+      "health": {
+        "status": "ok",
+        "serverKind": "lingxi-service",
+        "serverVersion": "0.0.0",
+        "wireProtocolMin": 1,
+        "wireProtocolMax": 1,
+        "dataEpoch": 1
+      }
+    },
+    {
+      "level": "info",
+      "count": 17,
+      "failed": 0,
+      "sources": [
+        {
+          "source": "cli",
+          "checks": {
+            "originalBytesPreserved": true,
+            "fallbackPreserved": true,
+            "selectedSourceDiagnostic": true,
+            "correctEpochDiagnostic": true,
+            "noReady": true,
+            "noStorageOrToken": true
+          },
+          "actualExitContract": 2,
+          "exitEvidence": "unchanged production shell obtains real wait status then requires equality to 2; exact case green",
+          "leafCases": [
+            {
+              "case": "a01-newer-data-epoch-refused",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            },
+            {
+              "case": "a01-newer-data-epoch-explicit-error",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            },
+            {
+              "case": "a01-newer-data-epoch-no-root-switch",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            }
+          ]
+        },
+        {
+          "source": "env",
+          "checks": {
+            "originalBytesPreserved": true,
+            "fallbackPreserved": true,
+            "selectedSourceDiagnostic": true,
+            "correctEpochDiagnostic": true,
+            "noReady": true,
+            "noStorageOrToken": true
+          },
+          "actualExitContract": 2,
+          "exitEvidence": "unchanged production shell obtains real wait status then requires equality to 2; exact case green",
+          "leafCases": [
+            {
+              "case": "a01-newer-env-data-epoch-refused",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            },
+            {
+              "case": "a01-newer-env-data-epoch-explicit-error",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            },
+            {
+              "case": "a01-newer-env-data-epoch-no-root-switch",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            }
+          ]
+        },
+        {
+          "source": "config-file",
+          "checks": {
+            "originalBytesPreserved": true,
+            "fallbackPreserved": true,
+            "selectedSourceDiagnostic": true,
+            "correctEpochDiagnostic": true,
+            "noReady": true,
+            "noStorageOrToken": true
+          },
+          "actualExitContract": 2,
+          "exitEvidence": "unchanged production shell obtains real wait status then requires equality to 2; exact case green",
+          "leafCases": [
+            {
+              "case": "a01-newer-config-data-epoch-refused",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            },
+            {
+              "case": "a01-newer-config-data-epoch-explicit-error",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            },
+            {
+              "case": "a01-newer-config-data-epoch-no-root-switch",
+              "expect": 1,
+              "actual": 1,
+              "ok": true
+            }
+          ]
+        }
+      ],
+      "health": {
+        "status": "ok",
+        "serverKind": "lingxi-service",
+        "serverVersion": "0.0.0",
+        "wireProtocolMin": 1,
+        "wireProtocolMax": 1,
+        "dataEpoch": 1
+      }
+    }
+  ],
+  "A13": {
+    "scriptSHA256": "59876a68d3b3c1a68a889bb4e4739e2710918f23861b822f5bad3eb34d9fb792",
+    "secretKinds": 6,
+    "actualReads": 246,
+    "targetFiles": 41,
+    "unreadable": 0,
+    "occurrences": 0,
+    "requestId": "req-2165e7a3c9b0713747bf2405caaf2bcf",
+    "requestIdLength": 36,
+    "bareAssignmentLength": 47,
+    "runId": "run_000001a1146477a3_000001",
+    "retainedSourceBoundFiles": [
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a13-final/A13/redaction-scan/service-logs/service-000001.log",
+        "sha256": "5376551b5d687017d5f49668516be4e2ced694227063ee55d9e88128c34d379f",
+        "bytes": 3392
+      },
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a13-final/A13/redaction-scan/service-logs/service-000002.log",
+        "sha256": "6b2a49df809008adaed447f643ab8c3d01607e4c353d89b07758911ab94b55da",
+        "bytes": 3735
+      },
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a13-final/A13/redaction-scan/service-logs/service-000003.log",
+        "sha256": "10884b0c7811fc79f5999f72677adffbfc16f2152c09e1a3d3f1277bf9eebc86",
+        "bytes": 157
+      }
+    ],
+    "inventoryVerified": true,
+    "p3ActualStatusCounts": {
+      "409": 7,
+      "503": 1
+    },
+    "boundary": "all six secrets were scanned in actual unmodified shell while local token/home existed; no claim of re-reading destroyed token after cleanup"
+  }
+}

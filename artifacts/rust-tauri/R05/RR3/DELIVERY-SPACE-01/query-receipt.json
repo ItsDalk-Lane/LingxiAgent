@@ -1,0 +1,95 @@
+{
+  "queries": [
+    {
+      "argv": [
+        "git",
+        "--version"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-10-07T04:52:17.403953+00:00",
+      "ended_utc": "2026-10-07T04:52:17.410900+00:00",
+      "exit_code": 0,
+      "stdout": "git version 2.53.0\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-object-format",
+        "HEAD"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-10-07T04:52:17.410915+00:00",
+      "ended_utc": "2026-10-07T04:52:17.417161+00:00",
+      "exit_code": 0,
+      "stdout": "sha1\nb3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "symbolic-ref",
+        "--short",
+        "HEAD"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-10-07T04:52:17.417178+00:00",
+      "ended_utc": "2026-10-07T04:52:17.423054+00:00",
+      "exit_code": 0,
+      "stdout": "codex/rust-tauri-migration\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "config",
+        "--show-origin",
+        "--get-regexp",
+        "^(core\\.(compression|loosecompression|bigfilethreshold|hookspath|autocrlf|eol|attributesfile)|pack\\.|gc\\.|maintenance\\.|index\\.|filter\\.|http\\.postbuffer)"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-10-07T04:52:17.423078+00:00",
+      "ended_utc": "2026-10-07T04:52:17.428831+00:00",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "count-objects",
+        "-v"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-10-07T04:52:17.428853+00:00",
+      "ended_utc": "2026-10-07T04:52:17.445376+00:00",
+      "exit_code": 0,
+      "stdout": "count: 2049\nsize: 40360\nin-pack: 118494\npacks: 19\nsize-pack: 3608385\nprune-packable: 0\ngarbage: 1\nsize-garbage: 88\n",
+      "stderr": "warning: garbage found: .git/objects/a0/tmp_obj_fJd8y2\n"
+    }
+  ],
+  "estimator_execution": {
+    "argv": [
+      "python3",
+      "/private/tmp/rr3-delivery-space-20261007/estimate.py"
+    ],
+    "observed_exit_code": 0,
+    "note": "最终完整执行exit0，摘要记录实际起止；其git helper均检查返回值非0即抛错；hash-object未使用-w。",
+    "embedded_read_only_commands": [
+      "git check-attr -z --stdin filter text eol working-tree-encoding",
+      "git hash-object --stdin-paths",
+      "git cat-file --batch-check=%(objectname) %(objecttype) %(objectsize) %(objectsize:disk)",
+      "git ls-files --stage -z"
+    ]
+  },
+  "normalization_execution": {
+    "argv": [
+      "python3",
+      "/private/tmp/rr3-delivery-space-20261007/normalization.py"
+    ],
+    "observed_exit_code": 0,
+    "note": "真实执行exit0；163条filtered SHA1逐项与hash-object结果相同；raw存在性用batch-check。"
+  },
+  "get_regexp_exit1_means": "所选范围无配置覆盖；不是读取失败"
+}

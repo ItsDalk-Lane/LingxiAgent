@@ -1,0 +1,64 @@
+status_lines=
+tracked_lines=75
+untracked_lines=0
+== sha256: status all ==
+00b4b1469bfe97a37cb6a0c973afcf66fd5fb74cd63691cb38334dbf3f2f4a06  /tmp/f51r-status.txt
+== sha256: git diff HEAD ==
+8c23d0d944b66d76f1c65e6a8883d7782a7509d434b10bc13dda2ab5bc393361  -
+== sha256: git ls-files --cached -s ==
+3016f7ae9d18d93951f05a77adb68946cab99a92d0a122294d4c5cf096407d47  -
+== diffstat vs HEAD ==
+ 25 files changed, 8878 insertions(+), 370 deletions(-)
+== tracked set vs F51 baseline (expect identical) ==
+TRACKED-SET-IDENTICAL
+== untracked lines (now) ==
+?? artifacts/rust-tauri/R05/RR3/
+?? docs/rust-tauri/R05/repair-current/RR3_A_R2_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_CF46_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_DELIVERY_FINAL_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_DELIVERY_FINAL_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_DELIVERY_PREP_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_DELIVERY_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_D_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_E_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_E_R2_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_E_R2_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_E_R3_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_E_R3_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_E_R4_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_F51_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_F51_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_FINAL_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_G_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_G_INTERRUPTION_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_G_R2_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_G_R3_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md
+?? docs/rust-tauri/R05/repair-current/RR3_H_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_H_R2_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_H_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json
+?? docs/rust-tauri/R05/repair-current/RR3_I_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_I_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_J_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_J_R2_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_J_R2_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_J_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md
+?? docs/rust-tauri/R05/repair-current/RR3_R02_TRIAGE_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_STORAGE_BRIEF.md
+?? docs/rust-tauri/R05/repair-current/RR3_STORAGE_R2_BRIEF.md
+?? rust/crates/lingxi-service/tests/support/
+?? scripts/rust-tauri/prepare_git_copy.py
+?? scripts/rust-tauri/prepare_git_copy_selfcheck.py
+?? scripts/rust-tauri/r02_run_output_regression.py
+?? scripts/rust-tauri/r02_t01_log_level_regression.py
+?? scripts/rust-tauri/r05_t08_mutate_pin.py
+?? scripts/rust-tauri/r05_t08_negative_gate_selfcheck.py
+?? scripts/rust-tauri/r05_t08_node_selfcheck.py
+?? scripts/rust-tauri/r05_t08_prepare_node.py
+?? scripts/rust-tauri/r05_t08_restore_selfcheck.py
+?? scripts/rust-tauri/run_output_sinks.py

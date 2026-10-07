@@ -1,0 +1,708 @@
+{
+  "mode": "history",
+  "checks": [
+    {
+      "name": "before原文hash docs/rust-tauri/R05/R05_REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "before原文hash docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "before原文hash docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "before原文hash docs/rust-tauri/R05/R05_HANDOFF.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "before原文hash docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "before原文hash docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "before原文hash docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "before原文hash docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "before原文hash docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "before原文hash docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "before原文hash docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "before原文hash docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "before原文hash docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "before原文hash docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "权威未改 docs/rust-tauri/R05/r05_stage_cids.tsv",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "权威未改 docs/rust-tauri/R05/r05_leaf_case_map.tsv",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "权威未改 docs/rust-tauri/R05/r05_required_cids.tsv",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "权威未改 docs/rust-tauri/R05/r05_stage_pins.tsv",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "权威未改 docs/rust-tauri/R05/R05_SCOPE_MATRIX.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "历史Markdown逐行保留 docs/rust-tauri/R05/R05_REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "历史Markdown逐行保留 docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "历史Markdown逐行保留 docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "旧JSON字段差异已逐项取证 docs/rust-tauri/R05/R05_HANDOFF.json",
+      "pass": true,
+      "detail": {
+        "count": 6,
+        "evidence": "R05_HANDOFF-historical-diff.json"
+      }
+    },
+    {
+      "name": "旧JSON字段差异已逐项取证 docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "大型账本旧字段无改 docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "旧JSON字段差异已逐项取证 docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "大型账本旧字段无改 docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "旧JSON字段差异已逐项取证 docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "大型账本旧字段无改 docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "历史Markdown逐行保留 docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "旧JSON字段差异已逐项取证 docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "大型账本旧字段无改 docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "旧JSON字段差异已逐项取证 docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "历史Markdown逐行保留 docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "旧JSON字段差异已逐项取证 docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "pass": true,
+      "detail": {
+        "count": 38,
+        "evidence": "ORCHESTRATOR_PROGRESS-historical-diff.json"
+      }
+    },
+    {
+      "name": "INTERFACE_EVOLUTION字节原样",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R00",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R01",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R02",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R03",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R04",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R06",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R07",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R08",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R09",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R10",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R11",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R00-T01",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R00-T02",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R00-T03",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R00-T04",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R00-T05",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R00-T06",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R00-T07",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R00-T08",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R01-T01",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R01-T02",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R01-T03",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R01-T04",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R01-T05",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R01-T06",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R01-T07",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R01-T08",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R02-T01",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R02-T02",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R02-T03",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R02-T04",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R02-T05",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R02-T06",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R02-T07",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R02-T08",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R03-T01",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R03-T02",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R03-T03",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R03-T04",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R03-T05",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R03-T06",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R03-T07",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R03-T08",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R04-T01",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R04-T02",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R04-T03",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R04-T04",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R04-T05",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R04-T06",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R04-T07",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R04-T08",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R06-T01",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R06-T02",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R06-T03",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R06-T04",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R06-T05",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R06-T06",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R06-T07",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R06-T08",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R07-T01",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R07-T02",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R07-T03",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R07-T04",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R07-T05",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R07-T06",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R07-T07",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R07-T08",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R07-T09",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R07-T10",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R07-T11",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R07-T12",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R08-T01",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R08-T02",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R08-T03",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R08-T04",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R08-T05",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R08-T06",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R08-T07",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R08-T08",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R09-T01",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R09-T02",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R09-T03",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R09-T04",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R09-T05",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R09-T06",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R09-T07",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R09-T08",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R10-T01",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R10-T02",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R10-T03",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R10-T04",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R10-T05",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R10-T06",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R10-T07",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R10-T08",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R11-T01",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R11-T02",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R11-T03",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R11-T04",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R11-T05",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R11-T06",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R11-T07",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ORCH非R05保留 R11-T08",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "passed": 139,
+  "failed": 0
+}

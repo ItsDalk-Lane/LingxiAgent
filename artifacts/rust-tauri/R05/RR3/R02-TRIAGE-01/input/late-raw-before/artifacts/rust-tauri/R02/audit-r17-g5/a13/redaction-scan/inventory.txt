@@ -1,0 +1,61 @@
+evidence files:
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/build.log
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/inventory.txt
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p1-execute-ok.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p1-execute-ok.headers
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p1-execute-request.json
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p1-issue-credential.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p1-issue-credential.headers
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p1-issue-request.json
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p1-me-ok.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p1-me-ok.headers
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p1-ticket-request.json
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p1-ticket.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p1-ticket.headers
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p2-me-bad-bearer.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p2-me-bad-bearer.headers
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p2-me-no-auth.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p2-me-no-auth.headers
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p2-session-cross.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p2-session-cross.headers
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p2-session-missing.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p2-session-missing.headers
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p2-ws-bad-query.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p2-ws-bad-query.headers
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p2-ws-transcript.txt
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p3-burst-1.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p3-burst-2.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p3-burst-3.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p3-burst-4.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p3-burst-5.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p3-burst-6.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p3-burst-7.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p3-burst-8.body
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p3-execute-request.json
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p3-lock.log
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p3-status-codes.txt
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/retention-manifest.txt
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000001.log
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000002.log
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000003.log
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-p1.addr
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-p1.err
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-p1.out
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-p3.addr
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-p3.err
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-p3.out
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-p4.err
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-p4.out
+artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/summary.txt
+retained rotating log files (content sha256):
+82cbba6e9687250aec1aa20e7596ffd69043dfbe39b64a603a1cf0585d9634d8  artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/retention-manifest.txt
+d96d2a17d21da3472297b8e3e7f05c1416bc236a88346f6cf891d0cf06c57eb6  artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000001.log
+2fea1d2428d154253a187049b8a305b97abbb73da4db4b26234d128ab4b092a1  artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000002.log
+fe2ce7dd6a102803297b998d7044725cde97d4d1180bd4235170cbfb1be6ebcb  artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/service-logs/service-000003.log
+rotated log files in home (at inventory time):
+total 32
+drwx------@ 5 study_superior  staff   160 Sep 28 14:36 .
+drwx------@ 9 study_superior  staff   288 Sep 28 14:36 ..
+-rw-------@ 1 study_superior  staff  3651 Sep 28 14:35 service-000001.log
+-rw-------@ 1 study_superior  staff  4410 Sep 28 14:36 service-000002.log
+-rw-------@ 1 study_superior  staff   201 Sep 28 14:36 service-000003.log

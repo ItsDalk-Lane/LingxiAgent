@@ -1,0 +1,8 @@
+rr3_e_impl_01 已完成，状态 **SELF_CHECKED；独立 E 验收 PENDING**。
+
+- 更新了 13 份授权文档；保留历史 FAIL、待验状态及原有许可边界。
+- 文档自检命令全部退出 0；423 项核对范围内输入前后相同。未运行正式门禁。
+- **NOT_ACCEPTED / R06_READY=false**；A2、C/F46 待独立复验，D BLOCKED，G 默认16及 FINAL 尚未跑，无最终 SHA。
+- 已停止全部文件写入，未改生产源码、权威表、总控 RR3 台账或 dispatch。
+
+交新独立 E 验收：[实施报告](artifacts/rust-tauri/R05/RR3/E-01/REPORT.md) · [真实检查回执](artifacts/rust-tauri/R05/RR3/E-01/commands-03.json)。

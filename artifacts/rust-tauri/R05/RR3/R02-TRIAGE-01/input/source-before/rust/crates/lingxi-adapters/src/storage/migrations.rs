@@ -1,0 +1,973 @@
+//! Versioned migrations of the new run/message database (R02-T04 step 1).
+//!
+//! Framework contract:
+//! - Migrations are an ordered, compile-time-fixed list; each carries a
+//!   `version`, a `name` and its exact SQL text. The **fingerprint** is
+//!   `sha256(sql)` and is written into an on-disk receipt
+//!   (`schema_migrations`) inside the SAME transaction that applies the SQL.
+//! - Opening the database verifies receipts against the compiled-in set:
+//!   a gap, an unknown version, a renamed migration or a fingerprint
+//!   mismatch is a loud [`StorageError::SchemaTampered`] — never a silent
+//!   replay (acceptance R02-A08 negative case).
+//! - The applied version is recorded BOTH in the receipts table and in
+//!   `PRAGMA user_version`; a disagreement between the two is tampering.
+//! - A database whose version is NEWER than this build is rejected with
+//!   [`StorageError::DatabaseTooNew`] — no downgrade, no replay.
+//! - Migration SQL deliberately avoids `IF NOT EXISTS`: an accidental
+//!   replay against an already-migrated database must FAIL loudly, not
+//!   silently succeed as a no-op.
+
+use rusqlite::Connection;
+use sha2::{Digest, Sha256};
+
+use lingxi_kernel::ports::StorageError;
+
+/// One compiled-in migration.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Migration {
+    pub version: u64,
+    pub name: &'static str,
+    pub sql: &'static str,
+}
+
+/// sha256 hex fingerprint of a migration's SQL text.
+pub fn fingerprint_sql(sql: &str) -> String {
+    let digest = Sha256::digest(sql.as_bytes());
+    let mut hex = String::with_capacity(digest.len() * 2);
+    for byte in digest {
+        hex.push_str(&format!("{byte:02x}"));
+    }
+    hex
+}
+
+/// Initial schema of the run/message database (version 1).
+///
+/// Ownership mapping (OWNERSHIP_TARGET.json; one owner per table, the
+/// physical writer is always the single rust-service process):
+/// - `sessions`, `runs`, `run_attempts`, `key_events`, `messages`:
+///   run/session authority facts (`kernel.run-supervisor` /
+///   `kernel.session` own the semantics; rows are only written through the
+///   [`crate::storage::RunDatabase`] port implementation).
+/// - `invocations`: tool-invocation receipts (`kernel.tool-gateway`
+///   semantics; populated from R04).
+/// - `schema_migrations`: migration receipts owned by the storage adapter.
+///
+/// `key_events.seq` is assigned per `stream_id` by the single writer inside
+/// the committing transaction (UNIQUE constraint is the mechanical backstop).
+pub const V1_NAME: &str = "initial_run_message_schema";
+pub const V1_SQL: &str = r#"
+CREATE TABLE sessions (
+    session_id         TEXT PRIMARY KEY,
+    agent_id           TEXT NOT NULL,
+    owner_user_id      TEXT NOT NULL,
+    title              TEXT NOT NULL,
+    created_at_unix_ms INTEGER NOT NULL
+);
+
+CREATE TABLE runs (
+    run_id             TEXT PRIMARY KEY,
+    session_id         TEXT NOT NULL REFERENCES sessions(session_id),
+    owner_kind         TEXT NOT NULL,
+    owner_subject      TEXT NOT NULL,
+    principal_id       TEXT NOT NULL,
+    attempt_count      INTEGER NOT NULL DEFAULT 0,
+    status             TEXT NOT NULL,
+    terminal_reason    TEXT,
+    generation         INTEGER NOT NULL,
+    created_at_unix_ms INTEGER NOT NULL,
+    updated_at_unix_ms INTEGER NOT NULL,
+    last_event_seq     INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX idx_runs_session ON runs(session_id);
+
+CREATE TABLE run_attempts (
+    run_id             TEXT NOT NULL REFERENCES runs(run_id),
+    attempt            TEXT NOT NULL,
+    generation         INTEGER NOT NULL,
+    started_at_unix_ms INTEGER NOT NULL,
+    PRIMARY KEY (run_id, attempt)
+);
+
+CREATE TABLE invocations (
+    invocation_id      TEXT PRIMARY KEY,
+    run_id             TEXT NOT NULL REFERENCES runs(run_id),
+    attempt            TEXT NOT NULL,
+    target             TEXT NOT NULL,
+    args_digest        TEXT NOT NULL,
+    status             TEXT NOT NULL,
+    started_at_unix_ms INTEGER NOT NULL,
+    completed_at_unix_ms INTEGER
+);
+
+CREATE TABLE messages (
+    message_id         TEXT PRIMARY KEY,
+    session_id         TEXT NOT NULL REFERENCES sessions(session_id),
+    run_id             TEXT NOT NULL REFERENCES runs(run_id),
+    role               TEXT NOT NULL,
+    content_json       TEXT NOT NULL,
+    model_call_id      TEXT,
+    committed_at_unix_ms INTEGER NOT NULL,
+    seq                INTEGER NOT NULL
+);
+CREATE INDEX idx_messages_session ON messages(session_id, seq);
+
+CREATE TABLE key_events (
+    event_id           TEXT PRIMARY KEY,
+    stream_id          TEXT NOT NULL,
+    seq                INTEGER NOT NULL,
+    session_id         TEXT NOT NULL,
+    run_id             TEXT,
+    attempt            TEXT,
+    event_type         TEXT NOT NULL,
+    payload_json       TEXT NOT NULL,
+    committed_at_unix_ms INTEGER NOT NULL,
+    UNIQUE (stream_id, seq)
+);
+CREATE INDEX idx_key_events_run ON key_events(run_id);
+CREATE INDEX idx_key_events_session ON key_events(session_id, seq);
+"#;
+
+/// R03-T04 fence audit table (version 2): the audit-only trace of refused
+/// LATE results. Rows are written when `record_run_events` refuses a stale
+/// delivery (terminal run / superseded attempt / never-opened attempt) and
+/// when the run driver fences an in-flight result
+/// (`record_stale_result`). The table deliberately has NO foreign keys to
+/// `runs`/`run_attempts`: an audited claim may name a run that never
+/// existed — the audit proves WHAT ARRIVED, not that the claim was
+/// legitimate.
+pub const V2_NAME: &str = "stale_result_audit";
+pub const V2_SQL: &str = r#"
+CREATE TABLE stale_result_audit (
+    audit_id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id               TEXT NOT NULL,
+    session_id           TEXT NOT NULL,
+    attempt              TEXT,
+    generation           INTEGER NOT NULL,
+    owner_kind           TEXT NOT NULL,
+    owner_subject        TEXT NOT NULL,
+    reason               TEXT NOT NULL,
+    refused_event_types  TEXT NOT NULL,
+    recorded_at_unix_ms  INTEGER NOT NULL
+);
+CREATE INDEX idx_stale_result_audit_run ON stale_result_audit(run_id);
+"#;
+
+/// R03-T05 side-effect invocation receipts (version 3): the
+/// InvocationJournal. One row per tool invocation (journal_id = the tool
+/// call id the run driver minted), carrying the full receipt binding
+/// (owner facts, run/attempt/generation, target, args digest, idempotency
+/// key) and the receipt lifecycle `phase`
+/// prepared→authorized→started→succeeded/failed/unknown.
+///
+/// Write-order contract (enforced by the driver, witnessed by the row):
+/// the intent phases are durable BEFORE the external execution; the
+/// receipt columns (`receipt_outcome`/`receipt_detail`/`dedup_id`/
+/// `dispatched`) land AFTER it. No cross-system atomicity is claimed.
+///
+/// The FK to `runs` is deliberate here (unlike the T04 audit table): the
+/// journal is written by the live driver of a real run, never as a record
+/// of an untrusted claim. The unique partial index on `idempotency_key`
+/// mechanically prevents two invocations from ever presenting the same
+/// key.
+pub const V3_NAME: &str = "invocation_journal";
+pub const V3_SQL: &str = r#"
+CREATE TABLE invocation_journal (
+    journal_id           TEXT PRIMARY KEY,
+    session_id           TEXT NOT NULL,
+    run_id               TEXT NOT NULL REFERENCES runs(run_id),
+    attempt              TEXT NOT NULL,
+    generation           INTEGER NOT NULL,
+    owner_kind           TEXT NOT NULL,
+    owner_subject        TEXT NOT NULL,
+    target               TEXT NOT NULL,
+    args_digest          TEXT NOT NULL,
+    args_summary         TEXT,
+    idempotency_key      TEXT,
+    phase                TEXT NOT NULL,
+    receipt_outcome      TEXT,
+    receipt_detail       TEXT,
+    dedup_id             TEXT,
+    dispatched           INTEGER,
+    prepared_at_unix_ms  INTEGER NOT NULL,
+    updated_at_unix_ms   INTEGER NOT NULL
+);
+CREATE INDEX idx_invocation_journal_run ON invocation_journal(run_id);
+CREATE UNIQUE INDEX idx_invocation_journal_idem
+    ON invocation_journal(idempotency_key)
+    WHERE idempotency_key IS NOT NULL;
+"#;
+
+/// R03-T06 run lineage (version 4): the four-part identity that ties every
+/// run to what caused it — `parent_run_id` (the run whose delegation tool
+/// call dispatched this child; NULL for user submissions), `origin` (the
+/// entry-surface vocabulary: user / subagent / cron / heartbeat / bridge
+/// — the R07 Bridge/cron integrations reuse THIS table, no second
+/// scheduler), `source_message_id` (the message that sourced the run —
+/// for a child, the parent's model call that emitted the delegation
+/// request) and `cause_id` (the precise causal anchor — for a child, the
+/// parent's tool call id; for a user submission, the explicit requestId).
+///
+/// Lineage is IMMUTABLE once recorded (enforced by the writer: identical
+/// re-record = idempotent replay, different lineage = loud Conflict). The
+/// FK to `runs` is deliberate, same as the T05 journal: lineage rows are
+/// written by the live driver of a real run.
+pub const V4_NAME: &str = "run_lineage";
+pub const V4_SQL: &str = r#"
+CREATE TABLE run_lineage (
+    run_id               TEXT PRIMARY KEY REFERENCES runs(run_id),
+    parent_run_id        TEXT,
+    origin               TEXT NOT NULL,
+    source_message_id    TEXT,
+    cause_id             TEXT,
+    recorded_at_unix_ms  INTEGER NOT NULL
+);
+CREATE INDEX idx_run_lineage_parent ON run_lineage(parent_run_id)
+    WHERE parent_run_id IS NOT NULL;
+"#;
+
+/// R05-T07 usage ledger (version 5): ONE row per model call — the
+/// per-request correlation (session/run/attempt + host-minted call id),
+/// the route that served it (provider/model/protocol), the purpose and
+/// causal parentage (origin/parent run/cause ref) and the normalized
+/// usage fact with its provenance decomposed into columns
+/// (`usage_state` + `missing_fields`/`estimate_basis`/`invalid_detail`).
+///
+/// Deliberately NO foreign keys: the ledger is an accounting fact table
+/// — rows for worker-callback/auxiliary/operation calls exist without a
+/// run row of their own, and an accounting row must survive even when it
+/// names a parent the runs table never admitted (the audit-first stance
+/// of the T04 stale table, applied to accounting). `model_call_id` is
+/// the host-minted call identity — PRIMARY KEY makes re-recording the
+/// identical row an idempotent replay and a different row under the same
+/// id a loud conflict (a call's accounting is never rewritten).
+///
+/// Token columns are NULLABLE on purpose: NULL means "not reported"
+/// (unknown — never zero). `transport_attempts >= 1` counts the physical
+/// provider requests of the logical call (a 401-refresh resend is a
+/// second billable request, not an invisible one). `cost_basis` NULL =
+/// cost unknown: no price source is configured and none is invented.
+pub const V5_NAME: &str = "model_call_usage_ledger";
+pub const V5_SQL: &str = r#"
+CREATE TABLE model_call_usage (
+    model_call_id       TEXT PRIMARY KEY,
+    session_id          TEXT,
+    run_id              TEXT,
+    attempt             TEXT,
+    purpose             TEXT NOT NULL,
+    origin              TEXT NOT NULL,
+    parent_run_id       TEXT,
+    cause_ref           TEXT,
+    provider            TEXT NOT NULL,
+    model               TEXT NOT NULL,
+    protocol            TEXT NOT NULL,
+    usage_state         TEXT NOT NULL,
+    input_tokens        INTEGER,
+    output_tokens       INTEGER,
+    cache_read_tokens   INTEGER,
+    cache_write_tokens  INTEGER,
+    reasoning_tokens    INTEGER,
+    missing_fields      TEXT,
+    estimate_basis      TEXT,
+    invalid_detail      TEXT,
+    transport_attempts  INTEGER NOT NULL,
+    cost_basis          TEXT,
+    recorded_at_unix_ms INTEGER NOT NULL
+);
+CREATE INDEX idx_model_call_usage_session ON model_call_usage(session_id);
+CREATE INDEX idx_model_call_usage_run ON model_call_usage(run_id);
+"#;
+
+/// R05 RR1 F21 usage-ledger extension (version 6): the per-physical-attempt
+/// and causal-join columns the T07 taskbook's query/export contract needs —
+/// the call's settlement `outcome` (succeeded/failed/cancelled/unknown),
+/// the start/settle timestamps (`started_at_unix_ms`/`settled_at_unix_ms`
+/// — 耗时 is their difference, both stored so a reader can show either),
+/// the child→parent-tool JOIN key (`parent_tool_call_id`) and the parent
+/// model row's batch listing (`emitted_tool_calls`) that closes the second
+/// hop (child callback → parent tool → parent MODEL call, all inside the
+/// ledger — never inferred from timing).
+///
+/// `outcome` defaults to `'unknown'` because SQLite ALTER cannot add a
+/// non-constant NOT NULL column; rows written by older builds honestly
+/// hold the unknown settlement.
+pub const V6_NAME: &str = "model_call_usage_rr1_f21";
+pub const V6_SQL: &str = r#"
+ALTER TABLE model_call_usage ADD COLUMN outcome TEXT NOT NULL DEFAULT 'unknown';
+ALTER TABLE model_call_usage ADD COLUMN started_at_unix_ms INTEGER;
+ALTER TABLE model_call_usage ADD COLUMN settled_at_unix_ms INTEGER;
+ALTER TABLE model_call_usage ADD COLUMN parent_tool_call_id TEXT;
+ALTER TABLE model_call_usage ADD COLUMN emitted_tool_calls TEXT;
+CREATE INDEX idx_model_call_usage_recorded_at ON model_call_usage(recorded_at_unix_ms);
+CREATE INDEX idx_model_call_usage_purpose ON model_call_usage(purpose);
+CREATE INDEX idx_model_call_usage_parent_tool ON model_call_usage(parent_tool_call_id)
+    WHERE parent_tool_call_id IS NOT NULL;
+"#;
+
+/// R05 RR1 F38 usage-ledger `transport_attempts` nullability (version 7):
+/// the column becomes NULLABLE so a row written for a call whose future
+/// was DROPPED before settlement (a cancellation fence dropping an
+/// in-flight model call / worker callback) can state "attempts UNKNOWN"
+/// honestly. SQLite cannot `ALTER` a column's NOT NULL constraint away, so
+/// the migration REBUILDS the table: every pre-existing row keeps its
+/// value verbatim (all historical rows carry an observed count —
+/// `Some(n)` semantics; none is rewritten, none is dropped), the indexes
+/// are recreated identically (they vanish with the old table).
+///
+/// Column semantics after v7: NULL = attempts unknown after a drop
+/// (never 0, never 1 — never a fabricated count); 0 = not-sent; ≥1 the
+/// observed physical request count.
+pub const V7_NAME: &str = "model_call_usage_rr1_f38_attempts_nullable";
+pub const V7_SQL: &str = r#"
+CREATE TABLE model_call_usage_v7 (
+    model_call_id       TEXT PRIMARY KEY,
+    session_id          TEXT,
+    run_id              TEXT,
+    attempt             TEXT,
+    purpose             TEXT NOT NULL,
+    origin              TEXT NOT NULL,
+    parent_run_id       TEXT,
+    cause_ref           TEXT,
+    provider            TEXT NOT NULL,
+    model               TEXT NOT NULL,
+    protocol            TEXT NOT NULL,
+    usage_state         TEXT NOT NULL,
+    input_tokens        INTEGER,
+    output_tokens       INTEGER,
+    cache_read_tokens   INTEGER,
+    cache_write_tokens  INTEGER,
+    reasoning_tokens    INTEGER,
+    missing_fields      TEXT,
+    estimate_basis      TEXT,
+    invalid_detail      TEXT,
+    transport_attempts  INTEGER,
+    cost_basis          TEXT,
+    recorded_at_unix_ms INTEGER NOT NULL,
+    outcome             TEXT NOT NULL DEFAULT 'unknown',
+    started_at_unix_ms  INTEGER,
+    settled_at_unix_ms  INTEGER,
+    parent_tool_call_id TEXT,
+    emitted_tool_calls  TEXT
+);
+INSERT INTO model_call_usage_v7
+    (model_call_id, session_id, run_id, attempt, purpose, origin,
+     parent_run_id, cause_ref, parent_tool_call_id, provider, model,
+     protocol, usage_state, input_tokens, output_tokens, cache_read_tokens,
+     cache_write_tokens, reasoning_tokens, missing_fields, estimate_basis,
+     invalid_detail, transport_attempts, cost_basis, recorded_at_unix_ms,
+     outcome, started_at_unix_ms, settled_at_unix_ms, emitted_tool_calls)
+SELECT model_call_id, session_id, run_id, attempt, purpose, origin,
+       parent_run_id, cause_ref, parent_tool_call_id, provider, model,
+       protocol, usage_state, input_tokens, output_tokens, cache_read_tokens,
+       cache_write_tokens, reasoning_tokens, missing_fields, estimate_basis,
+       invalid_detail, transport_attempts, cost_basis, recorded_at_unix_ms,
+       outcome, started_at_unix_ms, settled_at_unix_ms, emitted_tool_calls
+FROM model_call_usage;
+DROP TABLE model_call_usage;
+ALTER TABLE model_call_usage_v7 RENAME TO model_call_usage;
+CREATE INDEX idx_model_call_usage_session ON model_call_usage(session_id);
+CREATE INDEX idx_model_call_usage_run ON model_call_usage(run_id);
+CREATE INDEX idx_model_call_usage_recorded_at ON model_call_usage(recorded_at_unix_ms);
+CREATE INDEX idx_model_call_usage_purpose ON model_call_usage(purpose);
+CREATE INDEX idx_model_call_usage_parent_tool ON model_call_usage(parent_tool_call_id)
+    WHERE parent_tool_call_id IS NOT NULL;
+"#;
+
+/// The full ordered migration list. Appending a migration is a deliberate,
+/// reviewed act; editing an existing entry changes its fingerprint and is
+/// rejected on every already-migrated database.
+pub const MIGRATIONS: &[Migration] = &[
+    Migration {
+        version: 1,
+        name: V1_NAME,
+        sql: V1_SQL,
+    },
+    Migration {
+        version: 2,
+        name: V2_NAME,
+        sql: V2_SQL,
+    },
+    Migration {
+        version: 3,
+        name: V3_NAME,
+        sql: V3_SQL,
+    },
+    Migration {
+        version: 4,
+        name: V4_NAME,
+        sql: V4_SQL,
+    },
+    Migration {
+        version: 5,
+        name: V5_NAME,
+        sql: V5_SQL,
+    },
+    Migration {
+        version: 6,
+        name: V6_NAME,
+        sql: V6_SQL,
+    },
+    Migration {
+        version: 7,
+        name: V7_NAME,
+        sql: V7_SQL,
+    },
+];
+
+/// Highest schema version this build understands.
+pub fn supported_version() -> u64 {
+    MIGRATIONS.last().map(|m| m.version).unwrap_or(0)
+}
+
+/// Result of an open-time migration pass.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MigrationOutcome {
+    /// Versions applied by THIS pass (empty when already up to date).
+    pub applied: Vec<u64>,
+    /// Schema version the database is at now.
+    pub current_version: u64,
+    /// Highest version this build supports.
+    pub supported_version: u64,
+}
+
+fn user_version(conn: &Connection) -> Result<u64, StorageError> {
+    let v: i64 = conn
+        .query_row("PRAGMA user_version", [], |row| row.get(0))
+        .map_err(map_rusqlite)?;
+    u64::try_from(v).map_err(|_| StorageError::Corrupted {
+        detail: format!("negative PRAGMA user_version {v}"),
+    })
+}
+
+fn set_user_version(conn: &Connection, version: u64) -> Result<(), StorageError> {
+    // Same signed-32-bit sqlite3Atoi consumer as busy_timeout /
+    // wal_autocheckpoint (sqlite3.c PragTyp_HEADER_VALUE, OP_SetCookie p3) —
+    // an out-of-range value would not error, it would store 0. Migration
+    // versions are internal constants far below this bound, but the cast
+    // stays checked so this pragma can never silently write 0 either
+    // (R02 stage-repair R4 / R4-F01 same-root-cause sweep).
+    let version_i32 = i32::try_from(version).map_err(|_| StorageError::Internal {
+        detail: format!(
+            "migration version {version} exceeds the PRAGMA user_version range (signed 32-bit)"
+        ),
+    })?;
+    conn.pragma_update(None, "user_version", version_i32)
+        .map_err(map_rusqlite)
+}
+
+fn table_exists(conn: &Connection, name: &str) -> Result<bool, StorageError> {
+    let n: i64 = conn
+        .query_row(
+            "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=?1",
+            [name],
+            |row| row.get(0),
+        )
+        .map_err(map_rusqlite)?;
+    Ok(n > 0)
+}
+
+/// Bootstraps the receipts table itself (the one piece of DDL that cannot
+/// live inside a receipted transaction). Loudly refuses when the database
+/// is not empty but has no receipts table: that is a tampered or foreign
+/// database, not a fresh one.
+fn ensure_receipts_table(conn: &Connection) -> Result<(), StorageError> {
+    if table_exists(conn, "schema_migrations")? {
+        return Ok(());
+    }
+    let n: i64 = conn
+        .query_row(
+            "SELECT COUNT(*) FROM sqlite_master WHERE type='table' \
+             AND name NOT LIKE 'sqlite_%'",
+            [],
+            |row| row.get(0),
+        )
+        .map_err(map_rusqlite)?;
+    if n > 0 {
+        return Err(StorageError::SchemaTampered {
+            detail: format!(
+                "database has {n} non-system table(s) but no schema_migrations \
+                 receipts; refusing to adopt an unregistered schema"
+            ),
+        });
+    }
+    conn.execute(
+        "CREATE TABLE schema_migrations (
+            version            INTEGER PRIMARY KEY,
+            name               TEXT NOT NULL,
+            fingerprint        TEXT NOT NULL,
+            applied_at_unix_ms INTEGER NOT NULL,
+            applied_by         TEXT NOT NULL
+        )",
+        [],
+    )
+    .map_err(map_rusqlite)?;
+    Ok(())
+}
+
+/// On-disk receipt row.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Receipt {
+    pub version: u64,
+    pub name: String,
+    pub fingerprint: String,
+    pub applied_at_unix_ms: i64,
+    pub applied_by: String,
+}
+
+fn read_receipts(conn: &Connection) -> Result<Vec<Receipt>, StorageError> {
+    let mut stmt = conn
+        .prepare(
+            "SELECT version, name, fingerprint, applied_at_unix_ms, applied_by \
+             FROM schema_migrations ORDER BY version",
+        )
+        .map_err(map_rusqlite)?;
+    let rows = stmt
+        .query_map([], |row| {
+            Ok(Receipt {
+                version: row.get::<_, i64>(0)? as u64,
+                name: row.get(1)?,
+                fingerprint: row.get(2)?,
+                applied_at_unix_ms: row.get(3)?,
+                applied_by: row.get(4)?,
+            })
+        })
+        .map_err(map_rusqlite)?;
+    let mut out = Vec::new();
+    for row in rows {
+        out.push(row.map_err(map_rusqlite)?);
+    }
+    Ok(out)
+}
+
+/// Verifies the receipts against the compiled-in migration list: contiguous
+/// from 1, known versions/names, matching fingerprints, and in agreement
+/// with `PRAGMA user_version`.
+pub fn verify_receipts(conn: &Connection) -> Result<Vec<Receipt>, StorageError> {
+    let receipts = read_receipts(conn)?;
+    let pragma = user_version(conn)?;
+    let max_receipt = receipts.last().map(|r| r.version).unwrap_or(0);
+    if pragma != max_receipt {
+        return Err(StorageError::SchemaTampered {
+            detail: format!(
+                "PRAGMA user_version ({pragma}) disagrees with the newest \
+                 migration receipt ({max_receipt}); version bookkeeping was \
+                 tampered with"
+            ),
+        });
+    }
+    // An EMPTY receipts table over a database that already holds non-system
+    // tables is a wiped bookkeeping trail, not a fresh database: replaying
+    // migrations over existing tables is forbidden (loud, classified).
+    if receipts.is_empty() {
+        let n: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM sqlite_master WHERE type='table' \
+                 AND name NOT LIKE 'sqlite_%' AND name != 'schema_migrations'",
+                [],
+                |row| row.get(0),
+            )
+            .map_err(map_rusqlite)?;
+        if n > 0 {
+            return Err(StorageError::SchemaTampered {
+                detail: format!(
+                    "schema_migrations is empty but the database holds {n} \
+                     non-system table(s); receipts were wiped - refusing to \
+                     replay migrations over existing tables"
+                ),
+            });
+        }
+        return Ok(receipts);
+    }
+    for (index, receipt) in receipts.iter().enumerate() {
+        let expected_version = (index as u64) + 1;
+        if receipt.version != expected_version {
+            return Err(StorageError::SchemaTampered {
+                detail: format!(
+                    "migration receipts must be contiguous from 1; position \
+                     {index} holds version {}",
+                    receipt.version
+                ),
+            });
+        }
+        let Some(expected) = MIGRATIONS.iter().find(|m| m.version == receipt.version) else {
+            return Err(StorageError::DatabaseTooNew {
+                found_version: receipt.version,
+                supported_version: supported_version(),
+            });
+        };
+        if receipt.name != expected.name {
+            return Err(StorageError::SchemaTampered {
+                detail: format!(
+                    "migration {expected_version} recorded as {:?} but this \
+                     build expects {:?}",
+                    receipt.name, expected.name
+                ),
+            });
+        }
+        let expected_fp = fingerprint_sql(expected.sql);
+        if receipt.fingerprint != expected_fp {
+            return Err(StorageError::SchemaTampered {
+                detail: format!(
+                    "migration {expected_version} ({}) fingerprint mismatch: \
+                     on-disk {}, compiled-in {}; the SQL text drifted or was \
+                     tampered with",
+                    receipt.name, receipt.fingerprint, expected_fp
+                ),
+            });
+        }
+    }
+    Ok(receipts)
+}
+
+/// Runs the open-time migration pass: verify receipts, reject newer
+/// databases, apply pending migrations one transaction each.
+pub fn apply_all(
+    conn: &Connection,
+    applied_by: &str,
+    now_unix_ms: i64,
+) -> Result<MigrationOutcome, StorageError> {
+    ensure_receipts_table(conn)?;
+    let receipts = verify_receipts(conn)?;
+    let current = receipts.last().map(|r| r.version).unwrap_or(0);
+    let supported = supported_version();
+    if current > supported {
+        return Err(StorageError::DatabaseTooNew {
+            found_version: current,
+            supported_version: supported,
+        });
+    }
+    let mut applied = Vec::new();
+    for migration in MIGRATIONS.iter().filter(|m| m.version > current) {
+        let fp = fingerprint_sql(migration.sql);
+        conn.execute_batch("BEGIN IMMEDIATE")
+            .map_err(map_rusqlite)?;
+        let txn_result = (|| -> Result<(), StorageError> {
+            conn.execute_batch(migration.sql).map_err(map_rusqlite)?;
+            conn.execute(
+                "INSERT INTO schema_migrations \
+                 (version, name, fingerprint, applied_at_unix_ms, applied_by) \
+                 VALUES (?1, ?2, ?3, ?4, ?5)",
+                rusqlite::params![
+                    migration.version as i64,
+                    migration.name,
+                    fp,
+                    now_unix_ms,
+                    applied_by
+                ],
+            )
+            .map_err(map_rusqlite)?;
+            set_user_version(conn, migration.version)?;
+            Ok(())
+        })();
+        match txn_result {
+            Ok(()) => {
+                conn.execute_batch("COMMIT").map_err(map_rusqlite)?;
+                applied.push(migration.version);
+            }
+            Err(err) => {
+                // Roll back loudly; a rollback failure is itself surfaced
+                // (never masked by the original error).
+                if let Err(rollback_err) = conn.execute_batch("ROLLBACK") {
+                    return Err(StorageError::Internal {
+                        detail: format!(
+                            "migration {} failed ({err}) AND rollback failed \
+                             ({rollback_err})",
+                            migration.version
+                        ),
+                    });
+                }
+                return Err(err);
+            }
+        }
+    }
+    Ok(MigrationOutcome {
+        applied,
+        current_version: supported_version(),
+        supported_version: supported,
+    })
+}
+
+/// Maps a rusqlite error onto the kernel storage error vocabulary, keying
+/// on SQLite's numeric primary codes (the stable wire between SQLite
+/// versions and rusqlite enum surface):
+/// 5/6 busy+locked, 13 disk full, 8/14 readonly/cant-open (real IO faults),
+/// 10 io_err, 11 corrupt, 26 not-a-database (a corrupted or foreign file —
+/// R02-T06 A12: the open must refuse loudly, never create or overwrite),
+/// 18/too-many-files... anything else internal.
+pub fn map_rusqlite(err: rusqlite::Error) -> StorageError {
+    if let rusqlite::Error::SqliteFailure(ffi_err, message) = &err {
+        let primary = ffi_err.extended_code & 0xff;
+        let detail = message.clone().unwrap_or_else(|| err.to_string());
+        return match primary {
+            5 | 6 => StorageError::Busy { timeout_ms: 0 },
+            13 => StorageError::DiskFull { detail },
+            8 | 14 => StorageError::Io { detail },
+            10 => StorageError::Io { detail },
+            11 | 26 => StorageError::Corrupted { detail },
+            _ => StorageError::Internal { detail },
+        };
+    }
+    StorageError::Internal {
+        detail: err.to_string(),
+    }
+}
+
+/// Maps busy with the configured timeout for accurate reporting.
+pub fn map_rusqlite_busy(err: rusqlite::Error, timeout_ms: u64) -> StorageError {
+    match map_rusqlite(err) {
+        StorageError::Busy { .. } => StorageError::Busy { timeout_ms },
+        other => other,
+    }
+}
+
+/// Full-file integrity verification of an opened database (R02-T06 step 3:
+/// "恢复时校验 schema/epoch/完整性"). Runs `PRAGMA integrity_check` and
+/// requires every output row to be `ok`; any other verdict (or an error
+/// while running it) is a loud [`StorageError::Corrupted`] — the caller
+/// (the startup path) must refuse, never rebuild, truncate or recreate.
+///
+/// Called by [`crate::storage::RunDatabase::open`] AFTER the receipt
+/// verification, so a database that is structurally intact but whose
+/// schema bookkeeping was tampered with is still rejected.
+pub fn verify_integrity(conn: &Connection) -> Result<(), StorageError> {
+    let mut stmt = conn
+        .prepare("PRAGMA integrity_check")
+        .map_err(map_rusqlite)?;
+    let mut rows = stmt.query([]).map_err(map_rusqlite)?;
+    let mut verdicts = 0usize;
+    while let Some(row) = rows.next().map_err(map_rusqlite)? {
+        let line: String = row.get(0).map_err(map_rusqlite)?;
+        if line != "ok" {
+            return Err(StorageError::Corrupted {
+                detail: format!("integrity_check reported: {line}"),
+            });
+        }
+        verdicts += 1;
+    }
+    if verdicts == 0 {
+        return Err(StorageError::Corrupted {
+            detail: "integrity_check returned no verdict row".to_string(),
+        });
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn in_memory() -> Connection {
+        Connection::open_in_memory().expect("open in-memory db")
+    }
+
+    fn hex_len_ok(fp: &str) -> bool {
+        fp.len() == 64 && fp.chars().all(|c| c.is_ascii_hexdigit())
+    }
+
+    #[test]
+    fn fingerprints_are_stable_sha256_hex() {
+        let fp = fingerprint_sql(V1_SQL);
+        assert!(hex_len_ok(&fp), "fingerprint shape: {fp}");
+        // Deterministic: same SQL, same fingerprint.
+        assert_eq!(fp, fingerprint_sql(V1_SQL));
+        // Sensitive: any edit changes it.
+        let mut edited = V1_SQL.to_string();
+        edited.push('\n');
+        assert_ne!(fp, fingerprint_sql(&edited));
+    }
+
+    #[test]
+    fn migrations_are_contiguous_from_one() {
+        for (index, m) in MIGRATIONS.iter().enumerate() {
+            assert_eq!(m.version, index as u64 + 1);
+            assert!(!m.name.is_empty());
+            // Every migration carries real DDL. An ADDITIVE migration may
+            // legitimately be ALTER-based (R05 RR1 F21's v6 appends usage
+            // ledger columns — SQLite cannot add non-constant NOT NULL
+            // columns to an existing table by table rebuild either); the
+            // guard still refuses DDL-free "migration" entries.
+            assert!(
+                m.sql.contains("CREATE TABLE") || m.sql.contains("ALTER TABLE"),
+                "migration {} carries no DDL",
+                m.version
+            );
+        }
+    }
+
+    #[test]
+    fn migration_sql_avoids_if_not_exists() {
+        // Accidental replays must fail loudly, never no-op.
+        for m in MIGRATIONS {
+            assert!(
+                !m.sql.to_ascii_lowercase().contains("if not exists"),
+                "migration {} uses IF NOT EXISTS",
+                m.version
+            );
+        }
+    }
+
+    #[test]
+    fn apply_then_verify_is_idempotent() {
+        let conn = in_memory();
+        let out = apply_all(&conn, "test", 1_000).unwrap();
+        let expected: Vec<u64> = (1..=supported_version()).collect();
+        assert_eq!(out.applied, expected);
+        assert_eq!(out.current_version, supported_version());
+        // Re-run: nothing applied, no error.
+        let again = apply_all(&conn, "test", 2_000).unwrap();
+        assert!(again.applied.is_empty());
+        assert_eq!(again.current_version, supported_version());
+        assert!(verify_receipts(&conn).is_ok());
+    }
+
+    #[test]
+    fn tampered_version_row_is_rejected() {
+        let conn = in_memory();
+        apply_all(&conn, "test", 1_000).unwrap();
+        // Direct tampering with the receipt version (down to 0).
+        conn.execute(
+            "UPDATE schema_migrations SET version = 0 WHERE version = 1",
+            [],
+        )
+        .unwrap();
+        match apply_all(&conn, "test", 2_000) {
+            Err(StorageError::SchemaTampered { detail }) => {
+                // Either check fires: the pragma/receipt disagreement (the
+                // row moved to 0 while user_version stayed 1) or the
+                // contiguity check. Both are loud tamper rejections.
+                assert!(
+                    detail.contains("contiguous") || detail.contains("disagrees"),
+                    "detail: {detail}"
+                )
+            }
+            other => panic!("expected SchemaTampered, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn tampered_user_version_is_rejected() {
+        let conn = in_memory();
+        apply_all(&conn, "test", 1_000).unwrap();
+        conn.pragma_update(None, "user_version", 0).unwrap();
+        match apply_all(&conn, "test", 2_000) {
+            Err(StorageError::SchemaTampered { detail }) => {
+                assert!(detail.contains("disagrees"), "detail: {detail}")
+            }
+            other => panic!("expected SchemaTampered, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn tampered_fingerprint_is_rejected() {
+        let conn = in_memory();
+        apply_all(&conn, "test", 1_000).unwrap();
+        conn.execute(
+            "UPDATE schema_migrations SET fingerprint = 'deadbeef' WHERE version = 1",
+            [],
+        )
+        .unwrap();
+        match apply_all(&conn, "test", 2_000) {
+            Err(StorageError::SchemaTampered { detail }) => {
+                assert!(detail.contains("fingerprint mismatch"), "detail: {detail}")
+            }
+            other => panic!("expected SchemaTampered, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn foreign_tables_without_receipts_are_rejected() {
+        let conn = in_memory();
+        conn.execute("CREATE TABLE stranger (x INTEGER)", [])
+            .unwrap();
+        match apply_all(&conn, "test", 1_000) {
+            Err(StorageError::SchemaTampered { detail }) => {
+                assert!(detail.contains("refusing to adopt"), "detail: {detail}")
+            }
+            other => panic!("expected SchemaTampered, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn newer_database_is_rejected_not_downgraded() {
+        let conn = in_memory();
+        apply_all(&conn, "test", 1_000).unwrap();
+        // Simulate a database from a newer build: one version beyond what
+        // this build carries.
+        let future = supported_version() + 1;
+        conn.execute(
+            "INSERT INTO schema_migrations \
+             (version, name, fingerprint, applied_at_unix_ms, applied_by) \
+             VALUES (?1, 'future', 'fp', 1, 'future-build')",
+            [i64::try_from(future).unwrap()],
+        )
+        .unwrap();
+        conn.pragma_update(None, "user_version", i64::try_from(future).unwrap())
+            .unwrap();
+        match apply_all(&conn, "test", 2_000) {
+            Err(StorageError::DatabaseTooNew {
+                found_version,
+                supported_version,
+            }) => {
+                assert_eq!(found_version, future);
+                assert_eq!(supported_version, super::supported_version());
+            }
+            other => panic!("expected DatabaseTooNew, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn not_a_database_maps_to_corrupted() {
+        // R02-T06 A12: a garbage/foreign file must be classified Corrupted
+        // (refuse loudly), never Internal-with-retry semantics.
+        use rusqlite::ffi::Error as FfiError;
+        let mk = rusqlite::Error::SqliteFailure(
+            FfiError::new(26),
+            Some("file is not a database".to_string()),
+        );
+        assert!(matches!(map_rusqlite(mk), StorageError::Corrupted { .. }));
+    }
+
+    #[test]
+    fn integrity_check_passes_a_healthy_db_and_flags_a_broken_one() {
+        let conn = in_memory();
+        apply_all(&conn, "test", 1_000).unwrap();
+        verify_integrity(&conn).expect("healthy db passes integrity_check");
+    }
+
+    #[test]
+    fn sqlite_error_mapping_by_primary_code() {
+        use rusqlite::ffi::Error as FfiError;
+        let mk = |code: i32| {
+            rusqlite::Error::SqliteFailure(FfiError::new(code), Some("synthetic".to_string()))
+        };
+        assert!(matches!(
+            map_rusqlite(mk(13)),
+            StorageError::DiskFull { .. }
+        ));
+        assert!(matches!(
+            map_rusqlite(mk(266)), // SQLITE_IOERR_READ (extended, primary 10)
+            StorageError::Io { .. }
+        ));
+        assert!(matches!(
+            map_rusqlite(mk(261)), // SQLITE_BUSY_RECOVERY (extended, primary 5)
+            StorageError::Busy { .. }
+        ));
+        assert!(matches!(
+            map_rusqlite(mk(5)),
+            StorageError::Busy { timeout_ms: 0 }
+        ));
+        assert!(matches!(
+            map_rusqlite_busy(mk(5), 7_000),
+            StorageError::Busy { timeout_ms: 7_000 }
+        ));
+        assert!(matches!(map_rusqlite(mk(8)), StorageError::Io { .. }));
+        assert!(matches!(map_rusqlite(mk(10)), StorageError::Io { .. }));
+        assert!(matches!(
+            map_rusqlite(mk(11)),
+            StorageError::Corrupted { .. }
+        ));
+        assert!(matches!(
+            map_rusqlite(rusqlite::Error::InvalidParameterCount(1, 2)),
+            StorageError::Internal { .. }
+        ));
+    }
+}

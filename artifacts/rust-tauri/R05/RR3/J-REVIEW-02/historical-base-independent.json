@@ -1,0 +1,22 @@
+{
+  "startedUtc": "2026-10-07T04:17:08.735973+00:00",
+  "base": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16.TOOW5g/repo-base",
+  "candidate": "/Users/study_superior/r05t08-work/j-review02-gvphliks",
+  "baseCommit": "201584f2917a7fd96d6ea603bdeddbd420082cfe",
+  "entries": 8880,
+  "bytes": 1562337119,
+  "methods": {
+    "cow": 8795,
+    "ordinary": 0,
+    "git-blob": 85,
+    "git-link": 0
+  },
+  "manifestMatchesRealHistoricalTree": true,
+  "physicalBaseAvailable": true,
+  "physicalFilesVerified": 8880,
+  "exactHead": true,
+  "indexClean": true,
+  "worktreeDiffEmpty": true,
+  "residueZero": true,
+  "finishedUtc": "2026-10-07T04:17:11.240446+00:00"
+}

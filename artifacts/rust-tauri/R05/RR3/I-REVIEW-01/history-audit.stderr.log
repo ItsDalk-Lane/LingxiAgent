@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/history_audit.py", line 33, in <module>
+    assert not diff,diff
+           ^^^^^^^^
+AssertionError: ['dispatch/events.jsonl', 'dispatch/request.json', 'dispatch/stderr.log']

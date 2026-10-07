@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "startedUtc": "2026-10-07T03:43:34.290323+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/copy",
+      "startedUtc": "2026-10-07T03:43:42.532463+00:00",
+      "finishedUtc": "2026-10-07T03:43:42.811617+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "receipt": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-01/node-preparation/result.json",
+  "receiptSha256": "1f31391b5db9458c275b5d6d8a54e0e48d518ee9b062571803dafec202e32427",
+  "checkedFiles": 64760,
+  "finishedUtc": "2026-10-07T03:43:42.864534+00:00"
+}

@@ -1,0 +1,909 @@
+{
+  "started_utc": "2026-10-07T04:48:52.919182+00:00",
+  "ended_utc": "2026-10-07T04:49:03.812908+00:00",
+  "repository": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "git_version": "git version 2.53.0",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "branch": "codex/rust-tauri-migration",
+  "object_format": "sha1",
+  "zlib_runtime": "1.2.12",
+  "before_fs": {
+    "bsize": 1048576,
+    "frsize": 4096,
+    "available": 247099392
+  },
+  "after_fs": {
+    "bsize": 1048576,
+    "frsize": 4096,
+    "available": 246673408
+  },
+  "inputs": {
+    "merged-paths.json": {
+      "size": 15579440,
+      "mtime_ns": 1791345476088198670,
+      "sha256": "959c1138d18b0a1479bd735a286e6501538e28d7ab017ba835af8540f8855df0"
+    },
+    "include-paths.txt": {
+      "size": 1415475,
+      "mtime_ns": 1791345476138053901,
+      "sha256": "80ea2d86d68ae7bbe5f6980eb79fe2b98564fe4aea6809309fde98abfd9af112"
+    }
+  },
+  "old_include_count": 13828,
+  "old_include_bytes": 572265729,
+  "measured_paths": {
+    "objects": 13784,
+    "logical": 567200413,
+    "compressed_level1": 120375222,
+    "compressed_level6": 107913306,
+    "level1_4k_blocks": 170835968,
+    "level6_4k_blocks": 157896704,
+    "max_blob": 18232835,
+    "max_z1": 12207397
+  },
+  "unique_blobs": {
+    "objects": 4802,
+    "logical": 322502929,
+    "compressed_level1": 75784881,
+    "compressed_level6": 69154946,
+    "level1_4k_blocks": 91848704,
+    "level6_4k_blocks": 85250048,
+    "max_blob": 18232835,
+    "max_z1": 12207397
+  },
+  "existing_blobs": {
+    "objects": 595,
+    "logical": 35623618,
+    "compressed_level1": 6815787,
+    "compressed_level6": 5962870,
+    "level1_4k_blocks": 8708096,
+    "level6_4k_blocks": 7880704,
+    "max_blob": 17700371,
+    "max_z1": 2607342
+  },
+  "missing_blobs": {
+    "objects": 4207,
+    "logical": 286879311,
+    "compressed_level1": 68969094,
+    "compressed_level6": 63192076,
+    "level1_4k_blocks": 83140608,
+    "level6_4k_blocks": 77369344,
+    "max_blob": 18232835,
+    "max_z1": 12207397
+  },
+  "duplicate_path_count": 8982,
+  "old_content_sha_checked": 276,
+  "old_metadata_only_count": 13508,
+  "raw_sha256_and_git_sha1_digest": "e3daf09900a14e8a10e53d2dbb366341bc662c42370ee7211dac84fdc7ee5274",
+  "git_sha256_digest": "28f185a968e46929e1c580d4cd842a7468acf1ecda964713e7288f1809403d0c",
+  "normalized_paths": [
+    "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial-with-times/spacing-crlf-other-rows/before.tsv",
+    "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial-with-times/spacing-crlf-other-rows/input.tsv",
+    "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial/spacing-crlf-other-rows/before.tsv",
+    "artifacts/rust-tauri/R05/RR3/B-REVIEW-01/adversarial/spacing-crlf-other-rows/input.tsv",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-a/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n16-binding-drift/run-b/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/supplements/binding-restored-real-R02/evidence/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-final/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-green/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-green/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-green/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-green/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-green/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-green/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-green/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-green/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/a13-green/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/baseline-a13/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/baseline-a13/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/baseline-a13/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/baseline-a13/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/baseline-a13/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/baseline-a13/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/baseline-a13/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/baseline-a13/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/baseline-a13/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-boundary-red/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-boundary-red/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-boundary-red/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-boundary-red/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-boundary-red/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-boundary-red/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-boundary-red/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-boundary-red/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-boundary-red/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-restored-green/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-restored-green/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-restored-green/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-restored-green/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-restored-green/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-restored-green/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-restored-green/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-restored-green/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/H-01/commands/f48-restored-green/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a13-final/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a13-final/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a13-final/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a13-final/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a13-final/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a13-final/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a13-final/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a13-final/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/a13-final/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-boundary-red/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-boundary-red/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-boundary-red/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-boundary-red/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-boundary-red/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-boundary-red/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-boundary-red/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-boundary-red/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-boundary-red/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green-2/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green-2/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green-2/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green-2/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green-2/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green-2/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green-2/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green-2/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green-2/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/f48-restored-green/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/I-01/b41-final/spacing-crlf-other-rows/before.tsv",
+    "artifacts/rust-tauri/R05/RR3/I-01/b41-final/spacing-crlf-other-rows/input.tsv",
+    "artifacts/rust-tauri/R05/RR3/I-01/b41-new/spacing-crlf-other-rows/before.tsv",
+    "artifacts/rust-tauri/R05/RR3/I-01/b41-new/spacing-crlf-other-rows/input.tsv",
+    "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/b41-independent/spacing-crlf-other-rows/before.tsv",
+    "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/b41-independent/spacing-crlf-other-rows/input.tsv",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n06-midgate-mutation/evidence/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-a/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/history-before/artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/n16-binding-drift/run-b/A13/redaction-scan/p2-ws-bad-query.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-execute-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-issue-credential.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-me-ok.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p1-ticket.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-bad-bearer.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-me-no-auth.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-cross.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-session-missing.headers",
+    "artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01/input/raw-before/artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A13/redaction-scan/p2-ws-bad-query.headers"
+  ],
+  "attributes": [
+    {
+      "name": "eol",
+      "value": "lf",
+      "count": 13784
+    },
+    {
+      "name": "filter",
+      "value": "unspecified",
+      "count": 13784
+    },
+    {
+      "name": "text",
+      "value": "auto",
+      "count": 13781
+    },
+    {
+      "name": "text",
+      "value": "unset",
+      "count": 3
+    },
+    {
+      "name": "working-tree-encoding",
+      "value": "unspecified",
+      "count": 13784
+    }
+  ],
+  "skipped": [
+    {
+      "path": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 252562
+    },
+    {
+      "path": "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 20505
+    },
+    {
+      "path": "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 67257
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 4053957
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 12005
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_HANDOFF.json",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 59052
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 24115
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 27259
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 11297
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 38128
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_REPORT.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 24828
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 92362
+    },
+    {
+      "path": "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 6992
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_A_R2_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 2414
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 7538
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_CF46_REVIEW_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 3093
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_DELIVERY_PREP_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 2195
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_D_REVIEW_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 3185
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_E_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 4037
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_E_R2_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 2502
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_E_R2_REVIEW_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 2483
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 3974
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_E_R3_REVIEW_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 1438
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_F46_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 2610
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_FINAL_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 5826
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_G_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 3115
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_G_INTERRUPTION_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 1935
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_G_R2_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 6225
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 8257
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_H_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 4503
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_H_R2_REVIEW_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 5474
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_H_REVIEW_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 4617
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 16724
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_I_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 3967
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_I_REVIEW_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 3068
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_J_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 4205
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_J_REVIEW_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 3102
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 14013
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_R02_TRIAGE_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 2533
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_REVIEW_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 3911
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_STORAGE_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 1769
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_STORAGE_R2_BRIEF.md",
+      "reason": "current_document_owner_active_or_coordinator",
+      "old_bytes": 1911
+    },
+    {
+      "path": "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+      "reason": "old_metadata_changed_not_source_drift_judgment",
+      "old_bytes": 207621,
+      "current_bytes": 207199
+    },
+    {
+      "path": "scripts/rust-tauri/r05_t08_negative_gate.sh",
+      "reason": "old_metadata_changed_not_source_drift_judgment",
+      "old_bytes": 35957,
+      "current_bytes": 36137
+    }
+  ],
+  "index": {
+    "before": {
+      "size": 6139139,
+      "mtime_ns": 1791313335094042749,
+      "sha256": "e65fd8f9353224483a9b94cc32bca37dde0505f363692af58539d270df9dfc9d"
+    },
+    "after": {
+      "size": 6139139,
+      "mtime_ns": 1791313335094042749,
+      "sha256": "e65fd8f9353224483a9b94cc32bca37dde0505f363692af58539d270df9dfc9d"
+    },
+    "version": 2,
+    "existing_entries": 38066,
+    "model_entries": 51840,
+    "added_entries": 13774,
+    "v2_entry_bytes_model": 8294432
+  },
+  "tree_upper_model": {
+    "all_directories": 7109,
+    "uncompressed": 3033070,
+    "synthetic_zero_subtree_oid_zlib_level1_not_upper": 1814813,
+    "synthetic_round4k_not_upper": 29241344,
+    "compressBound_upper": 3125609,
+    "compressBound_round4k_upper": 29585408
+  },
+  "missing_oid_directories": 256,
+  "missing_oid_new_directories": 0,
+  "new_unclassified_directory_stats": {
+    "DELIVERY-PREP-01": {
+      "buckets": {
+        "(root files)": {
+          "regular_files": 48,
+          "bytes": 56140716,
+          "blocks": 56238080,
+          "round4k_upper": 56287232,
+          "zlib_compressBound_upper": 56161520
+        }
+      },
+      "pruned_no_size_claim": []
+    },
+    "DELIVERY-PREP-02": {
+      "buckets": {
+        "(root files)": {
+          "regular_files": 36,
+          "bytes": 41498063,
+          "blocks": 41570304,
+          "round4k_upper": 41603072,
+          "zlib_compressBound_upper": 41513480
+        }
+      },
+      "pruned_no_size_claim": []
+    },
+    "DOC-INPUT-BOUNDARY-01": {
+      "buckets": {
+        "(root files)": {
+          "regular_files": 14,
+          "bytes": 1077936,
+          "blocks": 1110016,
+          "round4k_upper": 1110016,
+          "zlib_compressBound_upper": 1079333
+        }
+      },
+      "pruned_no_size_claim": []
+    },
+    "J-02": {
+      "buckets": {
+        "(root files)": {
+          "regular_files": 75,
+          "bytes": 8762401,
+          "blocks": 8912896,
+          "round4k_upper": 8990720,
+          "zlib_compressBound_upper": 8770818
+        },
+        "a-fd": {
+          "regular_files": 120,
+          "bytes": 110432,
+          "blocks": 376832,
+          "round4k_upper": 544768,
+          "zlib_compressBound_upper": 119686
+        },
+        "actual-final-01": {
+          "regular_files": 248,
+          "bytes": 56825226,
+          "blocks": 56938496,
+          "round4k_upper": 57823232,
+          "zlib_compressBound_upper": 56861654
+        },
+        "actual-final-02": {
+          "regular_files": 248,
+          "bytes": 56825226,
+          "blocks": 56938496,
+          "round4k_upper": 57823232,
+          "zlib_compressBound_upper": 56861654
+        },
+        "full-default-01": {
+          "regular_files": 239,
+          "bytes": 55775899,
+          "blocks": 55865344,
+          "round4k_upper": 56745984,
+          "zlib_compressBound_upper": 55811318
+        },
+        "i-restore": {
+          "regular_files": 87,
+          "bytes": 1339253,
+          "blocks": 1449984,
+          "round4k_upper": 1650688,
+          "zlib_compressBound_upper": 1346341
+        },
+        "legacy-directed-01": {
+          "regular_files": 9,
+          "bytes": 369588,
+          "blocks": 385024,
+          "round4k_upper": 397312,
+          "zlib_compressBound_upper": 370390
+        },
+        "legacy-directed-02": {
+          "regular_files": 262,
+          "bytes": 9324578,
+          "blocks": 9691136,
+          "round4k_upper": 10321920,
+          "zlib_compressBound_upper": 9347570
+        },
+        "node-final-verify": {
+          "regular_files": 3,
+          "bytes": 998,
+          "blocks": 4096,
+          "round4k_upper": 12288,
+          "zlib_compressBound_upper": 1229
+        },
+        "node-final-verify-02": {
+          "regular_files": 3,
+          "bytes": 998,
+          "blocks": 4096,
+          "round4k_upper": 12288,
+          "zlib_compressBound_upper": 1229
+        },
+        "selfcheck-01": {
+          "regular_files": 615,
+          "bytes": 325831,
+          "blocks": 1171456,
+          "round4k_upper": 2748416,
+          "zlib_compressBound_upper": 373253
+        },
+        "selfcheck-02": {
+          "regular_files": 697,
+          "bytes": 368199,
+          "blocks": 1323008,
+          "round4k_upper": 3117056,
+          "zlib_compressBound_upper": 421945
+        },
+        "selfcheck-03": {
+          "regular_files": 697,
+          "bytes": 368626,
+          "blocks": 1323008,
+          "round4k_upper": 3117056,
+          "zlib_compressBound_upper": 422372
+        }
+      },
+      "pruned_no_size_claim": [
+        "i-restore/copy"
+      ]
+    },
+    "J-REVIEW-01": {
+      "buckets": {
+        "(root files)": {
+          "regular_files": 92,
+          "bytes": 24413289,
+          "blocks": 24547328,
+          "round4k_upper": 24711168,
+          "zlib_compressBound_upper": 24427790
+        },
+        "AUTH": {
+          "regular_files": 29,
+          "bytes": 46207,
+          "blocks": 126976,
+          "round4k_upper": 143360,
+          "zlib_compressBound_upper": 48446
+        },
+        "CLIENT": {
+          "regular_files": 17,
+          "bytes": 14510,
+          "blocks": 65536,
+          "round4k_upper": 73728,
+          "zlib_compressBound_upper": 15820
+        },
+        "CLI_RUST_MIN": {
+          "regular_files": 20,
+          "bytes": 224804,
+          "blocks": 266240,
+          "round4k_upper": 294912,
+          "zlib_compressBound_upper": 226411
+        },
+        "LEGACY_DIRECTED": {
+          "regular_files": 8,
+          "bytes": 366105,
+          "blocks": 376832,
+          "round4k_upper": 389120,
+          "zlib_compressBound_upper": 366829
+        },
+        "full-content-red": {
+          "regular_files": 1,
+          "bytes": 258,
+          "blocks": 4096,
+          "round4k_upper": 4096,
+          "zlib_compressBound_upper": 335
+        },
+        "full-content-restored": {
+          "regular_files": 3,
+          "bytes": 1011,
+          "blocks": 4096,
+          "round4k_upper": 12288,
+          "zlib_compressBound_upper": 1242
+        },
+        "full-shared-objects-red": {
+          "regular_files": 3,
+          "bytes": 1430271,
+          "blocks": 1437696,
+          "round4k_upper": 1437696,
+          "zlib_compressBound_upper": 1430937
+        },
+        "full-shared-objects-restored": {
+          "regular_files": 3,
+          "bytes": 1011,
+          "blocks": 4096,
+          "round4k_upper": 12288,
+          "zlib_compressBound_upper": 1242
+        },
+        "full-verify": {
+          "regular_files": 3,
+          "bytes": 1011,
+          "blocks": 4096,
+          "round4k_upper": 12288,
+          "zlib_compressBound_upper": 1242
+        },
+        "i-preservation": {
+          "regular_files": 87,
+          "bytes": 1342601,
+          "blocks": 1454080,
+          "round4k_upper": 1654784,
+          "zlib_compressBound_upper": 1349691
+        },
+        "node-preparation": {
+          "regular_files": 22,
+          "bytes": 10696060,
+          "blocks": 10735616,
+          "round4k_upper": 10784768,
+          "zlib_compressBound_upper": 10701017
+        },
+        "selfcheck": {
+          "regular_files": 12,
+          "bytes": 432613,
+          "blocks": 438272,
+          "round4k_upper": 475136,
+          "zlib_compressBound_upper": 433667
+        },
+        "selfcheck-outside": {
+          "regular_files": 296,
+          "bytes": 2266418,
+          "blocks": 2691072,
+          "round4k_upper": 3399680,
+          "zlib_compressBound_upper": 2289873
+        }
+      },
+      "pruned_no_size_claim": [
+        "i-preservation/copy",
+        "copy"
+      ]
+    },
+    "J-REVIEW-02": {
+      "buckets": {
+        "(root files)": {
+          "regular_files": 91,
+          "bytes": 17368572,
+          "blocks": 17555456,
+          "round4k_upper": 17666048,
+          "zlib_compressBound_upper": 17380847
+        },
+        "CLIENT": {
+          "regular_files": 17,
+          "bytes": 14471,
+          "blocks": 65536,
+          "round4k_upper": 73728,
+          "zlib_compressBound_upper": 15781
+        },
+        "default-prefix": {
+          "regular_files": 239,
+          "bytes": 55775440,
+          "blocks": 55865344,
+          "round4k_upper": 56745984,
+          "zlib_compressBound_upper": 55810859
+        },
+        "fd-old-red": {
+          "regular_files": 58,
+          "bytes": 47982,
+          "blocks": 159744,
+          "round4k_upper": 278528,
+          "zlib_compressBound_upper": 52460
+        },
+        "fd-restored": {
+          "regular_files": 120,
+          "bytes": 111440,
+          "blocks": 380928,
+          "round4k_upper": 548864,
+          "zlib_compressBound_upper": 120696
+        },
+        "fd-selfcheck": {
+          "regular_files": 120,
+          "bytes": 111512,
+          "blocks": 380928,
+          "round4k_upper": 548864,
+          "zlib_compressBound_upper": 120768
+        },
+        "git-selfcheck": {
+          "regular_files": 697,
+          "bytes": 371226,
+          "blocks": 1323008,
+          "round4k_upper": 3117056,
+          "zlib_compressBound_upper": 424972
+        },
+        "i-restore": {
+          "regular_files": 87,
+          "bytes": 1341198,
+          "blocks": 1454080,
+          "round4k_upper": 1654784,
+          "zlib_compressBound_upper": 1348288
+        },
+        "legacy-directed": {
+          "regular_files": 262,
+          "bytes": 9324907,
+          "blocks": 9691136,
+          "round4k_upper": 10321920,
+          "zlib_compressBound_upper": 9347899
+        },
+        "node-content-red": {
+          "regular_files": 1,
+          "bytes": 258,
+          "blocks": 4096,
+          "round4k_upper": 4096,
+          "zlib_compressBound_upper": 335
+        },
+        "node-content-restored": {
+          "regular_files": 3,
+          "bytes": 987,
+          "blocks": 4096,
+          "round4k_upper": 12288,
+          "zlib_compressBound_upper": 1218
+        },
+        "node-final-verify": {
+          "regular_files": 3,
+          "bytes": 987,
+          "blocks": 4096,
+          "round4k_upper": 12288,
+          "zlib_compressBound_upper": 1218
+        },
+        "node-shared-object-red": {
+          "regular_files": 3,
+          "bytes": 1431241,
+          "blocks": 1437696,
+          "round4k_upper": 1437696,
+          "zlib_compressBound_upper": 1431907
+        },
+        "node-shared-object-restored": {
+          "regular_files": 3,
+          "bytes": 987,
+          "blocks": 4096,
+          "round4k_upper": 12288,
+          "zlib_compressBound_upper": 1218
+        }
+      },
+      "pruned_no_size_claim": [
+        "i-restore/copy"
+      ]
+    },
+    "G-REVIEW-02": {
+      "buckets": {
+        "(root files)": {
+          "regular_files": 6,
+          "bytes": 85797,
+          "blocks": 102400,
+          "round4k_upper": 102400,
+          "zlib_compressBound_upper": 86281
+        },
+        "default16-01": {
+          "regular_files": 265,
+          "bytes": 57200443,
+          "blocks": 57352192,
+          "round4k_upper": 58232832,
+          "zlib_compressBound_upper": 57238280
+        },
+        "metadata": {
+          "regular_files": 28,
+          "bytes": 5476186,
+          "blocks": 5545984,
+          "round4k_upper": 5545984,
+          "zlib_compressBound_upper": 5479994
+        }
+      },
+      "pruned_no_size_claim": []
+    },
+    "STORAGE-03": {
+      "buckets": {
+        "(root files)": {
+          "regular_files": 24,
+          "bytes": 427873,
+          "blocks": 483328,
+          "round4k_upper": 483328,
+          "zlib_compressBound_upper": 429834
+        }
+      },
+      "pruned_no_size_claim": []
+    }
+  },
+  "e03_and_future_outputs": "UNKNOWN; active current documents not read/frozen; E03/Ereview03/final inventory not sized",
+  "warning": "PREP02旧列表及本容量模型均不是最终授权stage列表；既有元数据相等不等于旧字节逐项有历史SHA证明。"
+}

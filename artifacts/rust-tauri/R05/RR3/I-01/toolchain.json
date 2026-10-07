@@ -1,0 +1,74 @@
+[
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/rustc",
+      "--version"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:34:32.812090+00:00",
+    "endUTC": "2026-10-07T02:34:32.852094+00:00",
+    "exitCode": 0,
+    "stdout": "rustc 1.98.1 (48a229cea 2026-09-01)\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "--version"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:34:32.852121+00:00",
+    "endUTC": "2026-10-07T02:34:32.876012+00:00",
+    "exitCode": 0,
+    "stdout": "cargo 1.98.1 (797e8a9bc 2026-08-05)\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "node",
+      "--version"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:34:32.876035+00:00",
+    "endUTC": "2026-10-07T02:34:32.891896+00:00",
+    "exitCode": 0,
+    "stdout": "v24.16.0\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "npm",
+      "--version"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:34:32.891916+00:00",
+    "endUTC": "2026-10-07T02:34:32.958077+00:00",
+    "exitCode": 0,
+    "stdout": "11.13.0\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "uname",
+      "-sm"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:34:32.958102+00:00",
+    "endUTC": "2026-10-07T02:34:32.961678+00:00",
+    "exitCode": 0,
+    "stdout": "Darwin arm64\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "bash",
+      "--version"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startUTC": "2026-10-07T02:34:32.961696+00:00",
+    "endUTC": "2026-10-07T02:34:32.965273+00:00",
+    "exitCode": 0,
+    "stdout": "GNU bash, version 3.2.57(1)-release (arm64-apple-darwin26)\nCopyright (C) 2007 Free Software Foundation, Inc.\n",
+    "stderr": ""
+  }
+]

@@ -1,0 +1,51 @@
+{
+  "files": {
+    "scripts/rust-tauri/r05_t08_negative_gate.sh": {
+      "expected": "026a1bca836ff070ad5994d3753fdfe06dcfcda3a04def81ec86471148b46b9d",
+      "actual": "7ca614a77b2e4f0613ed82c3df171776dbb5f5866c77c54a07c10e16bcd931b6",
+      "equal": false
+    },
+    "scripts/rust-tauri/r05_t08_prepare_node.py": {
+      "expected": "51abc64c8be5e90b1af7e35a475f3ea9e37cbb37033b9c256b5093333fd8c082",
+      "actual": "51abc64c8be5e90b1af7e35a475f3ea9e37cbb37033b9c256b5093333fd8c082",
+      "equal": true
+    },
+    "scripts/rust-tauri/r05_t08_node_selfcheck.py": {
+      "expected": "0429d60f3a32370377bd9c6864f5c81e2329d1f41ee2a3caab35db545f120614",
+      "actual": "0429d60f3a32370377bd9c6864f5c81e2329d1f41ee2a3caab35db545f120614",
+      "equal": true
+    },
+    "scripts/rust-tauri/r05_t08_restore_selfcheck.py": {
+      "expected": "0cd24624bf7d6079e3cf7b4e6cf693222026db8261ffc60691bdc77fde0f57a4",
+      "actual": "0cd24624bf7d6079e3cf7b4e6cf693222026db8261ffc60691bdc77fde0f57a4",
+      "equal": true
+    },
+    "scripts/rust-tauri/r05_t08_mutate_pin.py": {
+      "expected": "7785b41ebadfdc6d6415ee1d337ea48621e25d1bbb1ed1c16456004545279609",
+      "actual": "7785b41ebadfdc6d6415ee1d337ea48621e25d1bbb1ed1c16456004545279609",
+      "equal": true
+    },
+    "package.json": {
+      "expected": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+      "actual": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+      "equal": true
+    },
+    "package-lock.json": {
+      "expected": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+      "actual": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+      "equal": true
+    },
+    ".npmrc": {
+      "expected": "ce00fe5025692993005d3a5350ff13f8a568d604158041df74f1d229a2dfb607",
+      "actual": "ce00fe5025692993005d3a5350ff13f8a568d604158041df74f1d229a2dfb607",
+      "equal": true
+    }
+  },
+  "nodeCallByteEqual": true,
+  "nodeCallSha256": "8608c7c2a9906b32aac492384f7ba43a9ddb2f76bdfadd9fc91d387d5d813702",
+  "dependencyManifestEqual": true,
+  "oldDependencyManifest": "a7194de703eabe3832f360f856d613e1ee1e4df7191250726c115ee6bb289408",
+  "newDependencyManifest": "a7194de703eabe3832f360f856d613e1ee1e4df7191250726c115ee6bb289408",
+  "toolRecordsEqual": true,
+  "note": "\u53ea\u590d\u7528\u672a\u53d8Node\u52a9\u624b\u7684\u8d1f\u63a7\u8bed\u4e49\uff1b\u9ed8\u8ba4\u51c6\u5907\u4e0e\u5b8c\u6574\u65b0\u4f9d\u8d56\u5df2\u53e6\u8dd1\uff0c\u65e7\u9ed8\u8ba4/legacy\u5931\u8d25\u4e0d\u51b2\u9500"
+}

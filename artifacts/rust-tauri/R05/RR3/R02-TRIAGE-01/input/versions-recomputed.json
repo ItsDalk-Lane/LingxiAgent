@@ -1,0 +1,384 @@
+{
+  "authority": {
+    "status": "ok",
+    "serverKind": "lingxi-service",
+    "serverVersion": "0.0.0",
+    "wireProtocolMin": 1,
+    "wireProtocolMax": 1,
+    "dataEpoch": 1
+  },
+  "snapshots": {
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s4-migrations-round1.json": {
+      "supportedVersion": 7,
+      "userVersion": 7,
+      "compiledIn": [
+        {
+          "fingerprint": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",
+          "name": "initial_run_message_schema",
+          "version": 1
+        },
+        {
+          "fingerprint": "64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",
+          "name": "stale_result_audit",
+          "version": 2
+        },
+        {
+          "fingerprint": "3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",
+          "name": "invocation_journal",
+          "version": 3
+        },
+        {
+          "fingerprint": "371d415462b7e8d698693f50a7b9c9f493fbb4e653ee30e5d3e8930f77e161b5",
+          "name": "run_lineage",
+          "version": 4
+        },
+        {
+          "fingerprint": "16dce1c9d5106b74ef00df7348591f5fad11bf8a7bc0244effba804dfde7606d",
+          "name": "model_call_usage_ledger",
+          "version": 5
+        },
+        {
+          "fingerprint": "cd875eae835e6a5ecdee8480b7c7c223eea5a180eaf8ee3c2b43416a7deadb86",
+          "name": "model_call_usage_rr1_f21",
+          "version": 6
+        },
+        {
+          "fingerprint": "b3189ef9c77630918436df07291bccd8f5a6a55f21109153ff73841cef58e3fb",
+          "name": "model_call_usage_rr1_f38_attempts_nullable",
+          "version": 7
+        }
+      ],
+      "receipts": [
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",
+          "name": "initial_run_message_schema",
+          "version": 1
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",
+          "name": "stale_result_audit",
+          "version": 2
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",
+          "name": "invocation_journal",
+          "version": 3
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "371d415462b7e8d698693f50a7b9c9f493fbb4e653ee30e5d3e8930f77e161b5",
+          "name": "run_lineage",
+          "version": 4
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "16dce1c9d5106b74ef00df7348591f5fad11bf8a7bc0244effba804dfde7606d",
+          "name": "model_call_usage_ledger",
+          "version": 5
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "cd875eae835e6a5ecdee8480b7c7c223eea5a180eaf8ee3c2b43416a7deadb86",
+          "name": "model_call_usage_rr1_f21",
+          "version": 6
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "b3189ef9c77630918436df07291bccd8f5a6a55f21109153ff73841cef58e3fb",
+          "name": "model_call_usage_rr1_f38_attempts_nullable",
+          "version": 7
+        }
+      ],
+      "sha256": "dd51ba6d008c91db937a4588138a90bb0a14b7d2eb519b02c2945bc10b20765d"
+    },
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s4-migrations-round2.json": {
+      "supportedVersion": 7,
+      "userVersion": 7,
+      "compiledIn": [
+        {
+          "fingerprint": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",
+          "name": "initial_run_message_schema",
+          "version": 1
+        },
+        {
+          "fingerprint": "64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",
+          "name": "stale_result_audit",
+          "version": 2
+        },
+        {
+          "fingerprint": "3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",
+          "name": "invocation_journal",
+          "version": 3
+        },
+        {
+          "fingerprint": "371d415462b7e8d698693f50a7b9c9f493fbb4e653ee30e5d3e8930f77e161b5",
+          "name": "run_lineage",
+          "version": 4
+        },
+        {
+          "fingerprint": "16dce1c9d5106b74ef00df7348591f5fad11bf8a7bc0244effba804dfde7606d",
+          "name": "model_call_usage_ledger",
+          "version": 5
+        },
+        {
+          "fingerprint": "cd875eae835e6a5ecdee8480b7c7c223eea5a180eaf8ee3c2b43416a7deadb86",
+          "name": "model_call_usage_rr1_f21",
+          "version": 6
+        },
+        {
+          "fingerprint": "b3189ef9c77630918436df07291bccd8f5a6a55f21109153ff73841cef58e3fb",
+          "name": "model_call_usage_rr1_f38_attempts_nullable",
+          "version": 7
+        }
+      ],
+      "receipts": [
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",
+          "name": "initial_run_message_schema",
+          "version": 1
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",
+          "name": "stale_result_audit",
+          "version": 2
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",
+          "name": "invocation_journal",
+          "version": 3
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "371d415462b7e8d698693f50a7b9c9f493fbb4e653ee30e5d3e8930f77e161b5",
+          "name": "run_lineage",
+          "version": 4
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "16dce1c9d5106b74ef00df7348591f5fad11bf8a7bc0244effba804dfde7606d",
+          "name": "model_call_usage_ledger",
+          "version": 5
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "cd875eae835e6a5ecdee8480b7c7c223eea5a180eaf8ee3c2b43416a7deadb86",
+          "name": "model_call_usage_rr1_f21",
+          "version": 6
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "b3189ef9c77630918436df07291bccd8f5a6a55f21109153ff73841cef58e3fb",
+          "name": "model_call_usage_rr1_f38_attempts_nullable",
+          "version": 7
+        }
+      ],
+      "sha256": "dd51ba6d008c91db937a4588138a90bb0a14b7d2eb519b02c2945bc10b20765d"
+    },
+    "artifacts/rust-tauri/R05/RR3/G-REVIEW-01/default16-01/n06-midgate-mutation/evidence/A07_A08/s4-migrations-round3.json": {
+      "supportedVersion": 7,
+      "userVersion": 7,
+      "compiledIn": [
+        {
+          "fingerprint": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",
+          "name": "initial_run_message_schema",
+          "version": 1
+        },
+        {
+          "fingerprint": "64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",
+          "name": "stale_result_audit",
+          "version": 2
+        },
+        {
+          "fingerprint": "3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",
+          "name": "invocation_journal",
+          "version": 3
+        },
+        {
+          "fingerprint": "371d415462b7e8d698693f50a7b9c9f493fbb4e653ee30e5d3e8930f77e161b5",
+          "name": "run_lineage",
+          "version": 4
+        },
+        {
+          "fingerprint": "16dce1c9d5106b74ef00df7348591f5fad11bf8a7bc0244effba804dfde7606d",
+          "name": "model_call_usage_ledger",
+          "version": 5
+        },
+        {
+          "fingerprint": "cd875eae835e6a5ecdee8480b7c7c223eea5a180eaf8ee3c2b43416a7deadb86",
+          "name": "model_call_usage_rr1_f21",
+          "version": 6
+        },
+        {
+          "fingerprint": "b3189ef9c77630918436df07291bccd8f5a6a55f21109153ff73841cef58e3fb",
+          "name": "model_call_usage_rr1_f38_attempts_nullable",
+          "version": 7
+        }
+      ],
+      "receipts": [
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",
+          "name": "initial_run_message_schema",
+          "version": 1
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",
+          "name": "stale_result_audit",
+          "version": 2
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",
+          "name": "invocation_journal",
+          "version": 3
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "371d415462b7e8d698693f50a7b9c9f493fbb4e653ee30e5d3e8930f77e161b5",
+          "name": "run_lineage",
+          "version": 4
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "16dce1c9d5106b74ef00df7348591f5fad11bf8a7bc0244effba804dfde7606d",
+          "name": "model_call_usage_ledger",
+          "version": 5
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "cd875eae835e6a5ecdee8480b7c7c223eea5a180eaf8ee3c2b43416a7deadb86",
+          "name": "model_call_usage_rr1_f21",
+          "version": 6
+        },
+        {
+          "appliedAtUnixMs": 1791337835942,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "b3189ef9c77630918436df07291bccd8f5a6a55f21109153ff73841cef58e3fb",
+          "name": "model_call_usage_rr1_f38_attempts_nullable",
+          "version": 7
+        }
+      ],
+      "sha256": "dd51ba6d008c91db937a4588138a90bb0a14b7d2eb519b02c2945bc10b20765d"
+    },
+    "artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A07_A08/s4-migrations-round1.json": {
+      "supportedVersion": 7,
+      "userVersion": 7,
+      "compiledIn": [
+        {
+          "fingerprint": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",
+          "name": "initial_run_message_schema",
+          "version": 1
+        },
+        {
+          "fingerprint": "64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",
+          "name": "stale_result_audit",
+          "version": 2
+        },
+        {
+          "fingerprint": "3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",
+          "name": "invocation_journal",
+          "version": 3
+        },
+        {
+          "fingerprint": "371d415462b7e8d698693f50a7b9c9f493fbb4e653ee30e5d3e8930f77e161b5",
+          "name": "run_lineage",
+          "version": 4
+        },
+        {
+          "fingerprint": "16dce1c9d5106b74ef00df7348591f5fad11bf8a7bc0244effba804dfde7606d",
+          "name": "model_call_usage_ledger",
+          "version": 5
+        },
+        {
+          "fingerprint": "cd875eae835e6a5ecdee8480b7c7c223eea5a180eaf8ee3c2b43416a7deadb86",
+          "name": "model_call_usage_rr1_f21",
+          "version": 6
+        },
+        {
+          "fingerprint": "b3189ef9c77630918436df07291bccd8f5a6a55f21109153ff73841cef58e3fb",
+          "name": "model_call_usage_rr1_f38_attempts_nullable",
+          "version": 7
+        }
+      ],
+      "receipts": [
+        {
+          "appliedAtUnixMs": 1791311382474,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",
+          "name": "initial_run_message_schema",
+          "version": 1
+        },
+        {
+          "appliedAtUnixMs": 1791311382474,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",
+          "name": "stale_result_audit",
+          "version": 2
+        },
+        {
+          "appliedAtUnixMs": 1791311382474,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",
+          "name": "invocation_journal",
+          "version": 3
+        },
+        {
+          "appliedAtUnixMs": 1791311382474,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "371d415462b7e8d698693f50a7b9c9f493fbb4e653ee30e5d3e8930f77e161b5",
+          "name": "run_lineage",
+          "version": 4
+        },
+        {
+          "appliedAtUnixMs": 1791311382474,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "16dce1c9d5106b74ef00df7348591f5fad11bf8a7bc0244effba804dfde7606d",
+          "name": "model_call_usage_ledger",
+          "version": 5
+        },
+        {
+          "appliedAtUnixMs": 1791311382474,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "cd875eae835e6a5ecdee8480b7c7c223eea5a180eaf8ee3c2b43416a7deadb86",
+          "name": "model_call_usage_rr1_f21",
+          "version": 6
+        },
+        {
+          "appliedAtUnixMs": 1791311382474,
+          "appliedBy": "lingxi-adapters 0.0.0",
+          "fingerprint": "b3189ef9c77630918436df07291bccd8f5a6a55f21109153ff73841cef58e3fb",
+          "name": "model_call_usage_rr1_f38_attempts_nullable",
+          "version": 7
+        }
+      ],
+      "sha256": "fc75ba8d86322698e73a9edd50e2d0b7e9e00e622d907ecebc457e257dee72cd"
+    }
+  }
+}

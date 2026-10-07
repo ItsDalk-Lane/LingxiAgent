@@ -1,0 +1,27 @@
+{
+  "status": "FAIL",
+  "startedUtc": "2026-10-07T04:18:15.272689+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/Users/study_superior/r05t08-work/j-review02-gvphliks",
+      "startedUtc": "2026-10-07T04:18:22.771753+00:00",
+      "finishedUtc": "2026-10-07T04:18:22.867639+00:00",
+      "exitCode": 10,
+      "stdoutSha256": "5d6a62b5165b18ccb13f8af24c973cdb6585d5ef93d61f7b81e926e434187399",
+      "stderrSha256": "4dae4921c5f2c5ffa4e404200bda32bd54d7ba166650b1a8b3fbdc6b00f59d6a"
+    }
+  ],
+  "cacheExclusions": [
+    ".cache",
+    ".vite",
+    ".vite-temp"
+  ],
+  "error": "command failed (10): ['git', 'fsck', '--connectivity-only', '--no-dangling']; see /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-REVIEW-02/node-shared-object-red/command-00.stderr.log",
+  "finishedUtc": "2026-10-07T04:18:22.872220+00:00"
+}

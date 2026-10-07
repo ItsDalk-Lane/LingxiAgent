@@ -1,0 +1,13 @@
+{
+  "atUtc": "2026-10-07T04:07:40.738318+00:00",
+  "status": "SELF_CHECKED",
+  "sources": {
+    "scripts/rust-tauri/prepare_git_copy.py": "37f4246a11f54826f2a31a772c1db0b5e3422c0261ea56c9872c3a3b75c9cb24",
+    "scripts/rust-tauri/prepare_git_copy_selfcheck.py": "5dc5e9486c9cf18b2c856082b611d2c64f5433cc4e0dafa5c0635e7fa527fc6f",
+    "scripts/rust-tauri/r05_t08_negative_gate.sh": "7ca614a77b2e4f0613ed82c3df171776dbb5f5866c77c54a07c10e16bcd931b6",
+    "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh": "171eaa1f7f24635d736afe1abf6f5dc8a8d563f1f21c52655fa8ddc37995cde4"
+  },
+  "nodeHelperSha256": "51abc64c8be5e90b1af7e35a475f3ea9e37cbb37033b9c256b5093333fd8c082",
+  "syntax": "shell syntax toolchain.json exit0; final Python AST parse PASS",
+  "R06_READY": false
+}

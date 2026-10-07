@@ -1,0 +1,24 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/r05_t06_rr1_media_resource.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r05-t08/debug/deps/r05_t06_rr1_media_resource-a8eec76cae06e894)
+
+running 17 tests
+test rr1_f17_attachment_read_uses_the_authorized_canonical_path ... ok
+test rr1_f17_leaf_symlink_to_outside_is_refused_by_real_target ... ok
+test rr1_f17_legal_attachment_reads_still_work ... ok
+test rr1_f17_attachment_size_caps_refuse_loudly ... ok
+test rr1_f17_special_file_is_refused_not_read_unbounded ... ok
+test rr1_f18_cross_kind_task_id_is_refused ... ok
+test rr1_f18_duplicate_provider_task_id_is_disambiguated ... ok
+test rr1_f18_legacy_fallback_uses_the_distinct_host_tracker_id ... ok
+test rr1_f18_f19_dashscope_image_task_still_completes_via_registered_product ... ok
+test rr1_f18_old_task_survives_reload_without_retargeting ... ok
+test rr1_f18_video_poll_sends_the_provider_job_id ... ok
+test rr1_f19_cancel_after_completion_keeps_the_delivered_fact ... ok
+test rr1_f19_cancel_during_inflight_poll_fences_download_and_completion ... ok
+test rr1_f19_concurrent_polls_deliver_once ... ok
+test rr1_f37_parent_dir_swapped_to_inside_symlink_reads_the_real_target ... ok
+test rr1_f37_parent_dir_swapped_to_outside_symlink_is_refused_by_real_target ... ok
+test rr1_f19_cancel_during_download_leaves_no_registered_product ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+

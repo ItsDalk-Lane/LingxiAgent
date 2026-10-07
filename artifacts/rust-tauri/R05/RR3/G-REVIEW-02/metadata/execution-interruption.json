@@ -1,0 +1,36 @@
+{
+  "at": "2026-10-07T04:33:01.293290+00:00",
+  "defaultCommand": {
+    "argv": [
+      "bash",
+      "scripts/rust-tauri/r05_t08_negative_gate.sh",
+      "artifacts/rust-tauri/R05/RR3/G-REVIEW-02/default16-01"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "start": "2026-10-07T04:24:34.372421+00:00",
+    "environment": {
+      "CARGO_INCREMENTAL": "0",
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "R02_LEGACY_REGRESSION_MODE": null
+    },
+    "removedInheritedLegacyMode": null
+  },
+  "defaultExitRaw": null,
+  "defaultExitInferred": 1,
+  "inference": "Final console line comes from fail() which calls exit 1; this is not a persisted child wait status.",
+  "recorderToolSession": 19082,
+  "recorderToolExit": 1,
+  "recorderError": "OSError: [Errno 28] No space left on device while saving command.json after p.wait(); source-after and post-default therefore were not written by the original recorder.",
+  "observerToolSession": 37844,
+  "observerPid": 11853,
+  "observerStop": "Sent SIGTERM only after default/cargo/rustc were absent; tool exit 143.",
+  "defaultConsoleSha256": "812bf514f3fbcf6a952e04e83256f5eb1081fb20fe5949e889295d4a870aeda6",
+  "consoleLastWriteUtc": "2026-10-07T04:28:34.544201+00:00",
+  "notes": [
+    "N02 printed exit=1 in console, but exit-code.txt failed to write.",
+    "All original logs remain as written; no failed output overwritten.",
+    "N03-N16, final reset, node final verify and result aggregation did not execute.",
+    "copy-initial-comparison.json was taken during N02 after N01, despite its filename; it is not a pristine baseline.",
+    "Two post-abort metadata writes and a here-doc creation failed ENOSPC before narrowly authorized one-file cache cleanup."
+  ]
+}

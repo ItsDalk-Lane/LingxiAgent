@@ -1,0 +1,38 @@
+[
+  {
+    "argv": [
+      "bash",
+      "/Users/study_superior/r05t08-work/j02-default-zr71fcjm/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-02/legacy-directed-02"
+    ],
+    "cwd": "/Users/study_superior/r05t08-work/j02-default-zr71fcjm",
+    "startedUtc": "2026-10-07T04:03:30.588822+00:00",
+    "freeBefore": 1639542784,
+    "name": "legacy-directed-final",
+    "exitCode": 0,
+    "finishedUtc": "2026-10-07T04:05:40.607457+00:00",
+    "freeAfter": 1612210176,
+    "stdoutSha256": "815d15ff34c3f4c5620b27ae18bfdd8db3a2089a37030472e9fb5fa166567dc0",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r05_t08_prepare_node.py",
+      "--verify",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-02/actual-final-02/full-default-01/node-preparation/result.json",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/J-02/node-final-verify-02"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "startedUtc": "2026-10-07T04:05:40.607958+00:00",
+    "freeBefore": 1612181504,
+    "name": "node-final-verify-02",
+    "exitCode": 0,
+    "finishedUtc": "2026-10-07T04:06:04.767641+00:00",
+    "freeAfter": 1611710464,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

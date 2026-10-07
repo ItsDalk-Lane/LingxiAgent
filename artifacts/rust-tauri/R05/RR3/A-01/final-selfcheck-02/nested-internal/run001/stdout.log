@@ -1,0 +1,27 @@
+
+running 1 test
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-71135-1791333069287917000/artifacts/rust-tauri/R05/run001/verify-R05/bounded-control-0
+本层真实 stdout 在 checkpoint 前增长：0/bounded-control-0
+xtask: verify-stage RX [bounded-control-0] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-71135-1791333069287917000/artifacts/rust-tauri/R05/run001/verify-R05/bounded-control-1
+本层真实 stdout 在 checkpoint 前增长：0/bounded-control-1
+xtask: verify-stage RX [bounded-control-1] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-71135-1791333069287917000/artifacts/rust-tauri/R05/run001/verify-R05/bounded-control-2
+本层真实 stdout 在 checkpoint 前增长：0/bounded-control-2
+xtask: verify-stage RX [bounded-control-2] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-71135-1791333069287917000/artifacts/rust-tauri/R05/run001/verify-R05/bounded-control-3
+本层真实 stdout 在 checkpoint 前增长：0/bounded-control-3
+xtask: verify-stage RX [bounded-control-3] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-71135-1791333069287917000/artifacts/rust-tauri/R05/run001/verify-R05/bounded-control-4
+本层真实 stdout 在 checkpoint 前增长：0/bounded-control-4
+xtask: verify-stage RX [bounded-control-4] PASS
+xtask: verify-stage RX [sh -c printf control] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-71135-1791333069287917000/artifacts/rust-tauri/R05/run001/verify-R05/bounded-control-5
+本层真实 stdout 在 checkpoint 前增长：0/bounded-control-5
+xtask: verify-stage RX [bounded-control-5] PASS
+xtask: verify-stage RX [env LINGXI_NESTED_LEVEL=1 LINGXI_NESTED_EVIDENCE=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-71135-1791333069287917000/artifacts/rust-tauri/R05/run001/verify-R05/R04_REGRESSION /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/xtask-ad766de8ea03e62c --exact verify::runner_tests::rr3_nested_process_probe --nocapture] > /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-xtask-test-rr3-nested-71135-1791333069287917000/artifacts/rust-tauri/R05/run001/verify-R05/r04_regression_gate
+本层真实 stdout 在 checkpoint 前增长：0/r04_regression_gate
+xtask: verify-stage RX [r04_regression_gate] PASS
+test verify::runner_tests::rr3_nested_process_probe ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 10.58s
+

@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0",
+  "task_id": "R02-T04",
+  "stage_id": "R02",
+  "generated_by": "ZCode:R02-T04 (EXECUTOR-R02-T04, 2026-09-26); fingerprints = sha256 over the migration SQL text, cross-checked against the on-disk receipt produced by lingxi-storage-inspect in artifacts/rust-tauri/R02/T04/s4-migrations-round1.json; V2/V3/V4 fingerprints registered by ZCode:EXECUTOR-R03-T08-E01 (2026-09-29), independently recomputed on disk via lingxi-storage-inspect over a fresh service-created runs.db (userVersion=4, receipts==compiledIn), matching the T04/T05/T06 report prefixes; V1 kept byte-for-byte; V6/V7 registered by ZCode:RR2-WP-A (2026-10-06, F41 repair, branch codex/rust-tauri-migration @ ad5ec4e98): fingerprints taken verbatim from the lingxi-storage-inspect `migrations` output over a fresh service-created runs.db built from this candidate (userVersion=7; receipts and compiledIn agree exactly on version/name/fingerprint; V1–V5 receipts reproduced the previously registered values byte-for-byte), evidence artifacts/rust-tauri/R05/RR2/A-R2/fingerprint-extraction/.",
+  "deterministic": "no timestamps/randomness; identical migration SQL produces identical fingerprints",
+  "new_persistence_points": [
+    {
+      "store_id": "rust-runs-db",
+      "kind": "sqlite-database",
+      "path_pattern": "{LINGXI_HOME}/lingxi-service/data/runs.db (+-wal/-shm siblings)",
+      "created_by_task": "R02-T04",
+      "owner": "adapters.storage (module lingxi-adapters; port contract in lingxi-kernel::ports::StoragePort)",
+      "writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+      "tables": {
+        "sessions": "kernel.session",
+        "runs": "kernel.run-supervisor",
+        "run_attempts": "kernel.run-supervisor",
+        "invocations": "kernel.tool-gateway (rows arrive R04; schema present)",
+        "messages": "kernel.session (normalized messages; rows arrive R05+; schema present)",
+        "key_events": "kernel.run-supervisor / kernel.session (key events for recovery; consumed by R02-T05)",
+        "schema_migrations": "adapters.storage (migration receipts)",
+        "stale_result_audit": "kernel.run-supervisor (R03-T04 fence audit; audit-only, never key_events/status)",
+        "invocation_journal": "kernel.tool-gateway semantics via R03-T05 InvocationJournal (prepared→authorized→started→succeeded/failed/unknown receipts)",
+        "run_lineage": "kernel.run-supervisor (R03-T06 RunLineage: parentRunId/origin/sourceMessageId/causeId)",
+        "model_call_usage": "kernel.usage ledger via R05-T07 (per-model-call usage rows; owner-scoped queries)"
+      },
+      "pragmas": {
+        "journal_mode": "WAL (verified at open; refusal if not negotiated)",
+        "busy_timeout_ms": 5000,
+        "wal_autocheckpoint_pages": 1000,
+        "foreign_keys": "ON",
+        "synchronous": "FULL"
+      },
+      "migrations": [
+        {
+          "version": 1,
+          "name": "initial_run_message_schema",
+          "fingerprint_sha256": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8"
+        },
+        {
+          "version": 2,
+          "name": "stale_result_audit",
+          "fingerprint_sha256": "64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",
+          "registered_by_task": "R03-T04 (late-result fence audit table; registered by R03-T08 per the T04-R1-F1/T05/T06 deferred item)"
+        },
+        {
+          "version": 3,
+          "name": "invocation_journal",
+          "fingerprint_sha256": "3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",
+          "registered_by_task": "R03-T05 (side-effect invocation journal; registered by R03-T08 per the same deferred item)"
+        },
+        {
+          "version": 4,
+          "name": "run_lineage",
+          "fingerprint_sha256": "371d415462b7e8d698693f50a7b9c9f493fbb4e653ee30e5d3e8930f77e161b5",
+          "registered_by_task": "R03-T06 (run lineage four-part identity; registered by R03-T08 per the same deferred item)"
+        },
+        {
+          "version": 5,
+          "name": "model_call_usage_ledger",
+          "fingerprint_sha256": "16dce1c9d5106b74ef00df7348591f5fad11bf8a7bc0244effba804dfde7606d",
+          "registered_by": "R05-T07 (model_call_usage table; fingerprint recomputed from V5_SQL with the registry's own sha256-of-SQL method, verified by reproducing v4's registered fingerprint)"
+        },
+        {
+          "version": 6,
+          "name": "model_call_usage_rr1_f21",
+          "fingerprint_sha256": "cd875eae835e6a5ecdee8480b7c7c223eea5a180eaf8ee3c2b43416a7deadb86",
+          "registered_by": "R05 RR1 F21 (usage-ledger extension: outcome/started_at_unix_ms/settled_at_unix_ms/parent_tool_call_id/emitted_tool_calls via V6_SQL ALTERs + three indexes; migration fn V6_NAME/V6_SQL in rust/crates/lingxi-adapters/src/storage/migrations.rs; registered by RR2 WP-A per the first-round v5 precedent)"
+        },
+        {
+          "version": 7,
+          "name": "model_call_usage_rr1_f38_attempts_nullable",
+          "fingerprint_sha256": "b3189ef9c77630918436df07291bccd8f5a6a55f21109153ff73841cef58e3fb",
+          "registered_by": "R05 RR1 F38 (transport_attempts NULLABLE: table rebuild preserving every pre-existing row verbatim, indexes recreated identically; NULL = attempts unknown after a drop, never 0; migration fn V7_NAME/V7_SQL in rust/crates/lingxi-adapters/src/storage/migrations.rs; registered by RR2 WP-A per the first-round v5 precedent)"
+        }
+      ],
+      "cutover_strategy": "switch-to-new-authority (new isolated database under the new rust data root; no incumbent store is written by this task)",
+      "notes": "Bounded single-writer work queue (capacity 64) fronts all SQLite access; QueueFull is explicit backpressure; terminal status + key events commit in one BEGIN IMMEDIATE transaction; event publication happens only after commit returns Ok."
+    }
+  ],
+  "incumbent_stores_untouched": {
+    "authority": "docs/rust-tauri/R01/DATA_COMPATIBILITY_MATRIX.json (69 stores, per-store strategy)",
+    "summary": "35 preserve-format + 13 regenerable + 11 switch-to-new-authority + 6 shell-local + 4 epoch-mechanism",
+    "statement": "R02-T04 does not merge, migrate or rewrite ANY incumbent store. The 11 switch-to-new-authority stores remain the old JSONL/SQLite formats until the R08 cutover drills (read-only import + receipts + verification + switch per ADR-004). The other 58 stores keep their formats and owners.",
+    "rust_readers_writers_in_this_task": "none (no preserve-format store is read or written by R02-T04 code)"
+  }
+}

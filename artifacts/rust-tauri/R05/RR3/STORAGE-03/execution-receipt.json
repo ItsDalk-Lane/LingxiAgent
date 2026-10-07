@@ -1,0 +1,349 @@
+{
+  "beforeAt": "2026-10-07T04:40:57.292062+00:00",
+  "freeBefore": 127086592,
+  "finalCandidatesSha256": "67f49103de14fc46735e66eec486366d4e9afc818ead65595e351079a0c2a8ee",
+  "plannedCount": 33,
+  "plannedLogicalBytes": 136063856,
+  "actions": [
+    {
+      "at": "2026-10-07T04:40:57.293566+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/request_dedup-50d0725df0b8106f.request_dedup.6340a5725faa9ccc-cgu.0.rcgu.o",
+      "sha256": "6ad969445184054ce1c6089ae68a20173dd4c10814118e641e6c69c3467e19b3",
+      "bytes": 718464,
+      "inode": 278612483,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.294451+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/request_dedup-50d0725df0b8106f.request_dedup.6340a5725faa9ccc-cgu.1.rcgu.o",
+      "sha256": "acf19950d446b9973e2c5131e37c8fec3faef42718cb40792ccecb7cbff7ee34",
+      "bytes": 1054288,
+      "inode": 278612508,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.295020+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/request_dedup-50d0725df0b8106f.request_dedup.6340a5725faa9ccc-cgu.7.rcgu.o",
+      "sha256": "d773a7177cb1b7efb26bea200b85b65bd1ef789108eab3daaaca2857d7fc8d85",
+      "bytes": 297768,
+      "inode": 278612497,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.296427+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/recovery_startup_scan-6b7021db87572cee.recovery_startup_scan.f7fe99839e20dcd6-cgu.0.rcgu.o",
+      "sha256": "16de747732c973af6f97da21924527d593881888c62eef0ef986af2c637690f9",
+      "bytes": 621928,
+      "inode": 278612482,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.306593+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/recovery_startup_scan-6b7021db87572cee.recovery_startup_scan.f7fe99839e20dcd6-cgu.1.rcgu.o",
+      "sha256": "02cafc95b68e974d7516091260c527929fc5ccd24cc255c3a25b7134802db733",
+      "bytes": 1056504,
+      "inode": 278612509,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.307181+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/recovery_startup_scan-6b7021db87572cee.recovery_startup_scan.f7fe99839e20dcd6-cgu.7.rcgu.o",
+      "sha256": "802afee370e24e7a8da7af6006baef9c16dd6e147b6dc4f4f2ad1eb7bd16332e",
+      "bytes": 299152,
+      "inode": 278612494,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.308711+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r04_t01_tool_catalog-836df67508d997e6.r04_t01_tool_catalog.20252bd0826c88b2-cgu.00.rcgu.o",
+      "sha256": "527ea5c0f38cc4c25ee62099cc86c0f1bdfc675bb838c44c454b92a953c21ecc",
+      "bytes": 973552,
+      "inode": 278612516,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.309804+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t08_production_tools-a75678f8fef0bf0b.r05_t08_production_tools.c8f077771e8ab9fd-cgu.00.rcgu.o",
+      "sha256": "c4430c062d20ac974703695f7e62b290033e8f6e8e9823d58ed065eb62a86163",
+      "bytes": 678520,
+      "inode": 278612476,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.310893+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t08_production_tools-a75678f8fef0bf0b.r05_t08_production_tools.c8f077771e8ab9fd-cgu.01.rcgu.o",
+      "sha256": "46b59b86fd6cbae958b9651ad1c06969fcf47d80a1b41d2ae7b556f5bbacb167",
+      "bytes": 805912,
+      "inode": 278612507,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.311638+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t08_production_tools-a75678f8fef0bf0b.r05_t08_production_tools.c8f077771e8ab9fd-cgu.02.rcgu.o",
+      "sha256": "5be0c36f5bb4bd62584ee0ed2dc60c45d4dbd674e08e60a982e71964cbc7c7b7",
+      "bytes": 547024,
+      "inode": 278612529,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.312475+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t08_production_tools-a75678f8fef0bf0b.r05_t08_production_tools.c8f077771e8ab9fd-cgu.14.rcgu.o",
+      "sha256": "bd725e4410ee21f24a0bbc41d9525a80fc1a69a876605c1cfff63aa39c2641d4",
+      "bytes": 500696,
+      "inode": 278612515,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.312970+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t08_production_tools-a75678f8fef0bf0b.r05_t08_production_tools.c8f077771e8ab9fd-cgu.15.rcgu.o",
+      "sha256": "b028227c757bfb2e1816aa1052bc2357a7df4127bdc064ef2748f9e4e5114a36",
+      "bytes": 250264,
+      "inode": 278612502,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.315281+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/cancel_link_inheritance-53f0f2d4dbfb53d5.cancel_link_inheritance.a253037f91009efd-cgu.00.rcgu.o",
+      "sha256": "7f5d10665582a46f28610d8eaed5b066d818f8385d4ca69ec4f3ad38e5c93c2a",
+      "bytes": 1373144,
+      "inode": 278612503,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.316235+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/cancel_link_inheritance-53f0f2d4dbfb53d5.cancel_link_inheritance.a253037f91009efd-cgu.15.rcgu.o",
+      "sha256": "330d58240168b16e0a108f89c9fa8b578b0fe4e42bd821400c10fc000d80b1c8",
+      "bytes": 956344,
+      "inode": 278612518,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.322025+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/shutdown_coordinator-716f7661f2cbf41a.shutdown_coordinator.e1ffded70f5a5e4e-cgu.00.rcgu.o",
+      "sha256": "128539ee661a40478ed91389f8ba979be1d40b4c151e9db3f5163390d2588a35",
+      "bytes": 1300376,
+      "inode": 278612510,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.323028+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/shutdown_coordinator-716f7661f2cbf41a.shutdown_coordinator.e1ffded70f5a5e4e-cgu.15.rcgu.o",
+      "sha256": "dd494f57eaede14fd2e2a23629df3d0975f45518077936b89eb8c2b34584e865",
+      "bytes": 421920,
+      "inode": 278612530,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.324979+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/session_serialization-32010a796f6f7fe2.session_serialization.4f55b2b6e89beab6-cgu.00.rcgu.o",
+      "sha256": "48ec6e83a0b4337e7ee7b498cb07796b3524afd7b1794d079cdcb1b8a8dc6d0b",
+      "bytes": 1089000,
+      "inode": 278612520,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.327609+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t07_persistence-964c555ebff6502e.r05_t07_persistence.ce9d849ec12d399d-cgu.00.rcgu.o",
+      "sha256": "9979e35a83e083865433dc328e5f4a035399d4960352ce45103ddb1464da2d54",
+      "bytes": 1267456,
+      "inode": 278612504,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.329261+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t07_persistence-964c555ebff6502e.r05_t07_persistence.ce9d849ec12d399d-cgu.01.rcgu.o",
+      "sha256": "910e2bbf3af8901a578a43d86af34c61b3a1eeaa9e16609f962343c80a1d37b6",
+      "bytes": 985392,
+      "inode": 278612531,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.330049+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t07_persistence-964c555ebff6502e.r05_t07_persistence.ce9d849ec12d399d-cgu.15.rcgu.o",
+      "sha256": "8a01685a6b5e242ce59d20d9d639f3a9e468fe9712280ef029146b16872517f7",
+      "bytes": 478320,
+      "inode": 278612514,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.367214+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.00.rcgu.o",
+      "sha256": "1134fd664117d068b2b4d0380916e879f676b6af20edd2864ddfef05b3c64605",
+      "bytes": 15151824,
+      "inode": 278612314,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.384810+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.01.rcgu.o",
+      "sha256": "9977f2b04a9008abb3a83bab417f36181d897603e1d22c3260216f258e97f172",
+      "bytes": 9738880,
+      "inode": 278612324,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.391586+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.02.rcgu.o",
+      "sha256": "1271c10b99f79f8d5c7ff067c8c5e29ef690a1734b8dc2efcd708dfbee61caaa",
+      "bytes": 5320472,
+      "inode": 278612359,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.409034+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.03.rcgu.o",
+      "sha256": "9a516ec1413ccacf30440572d2c4e41cda5feb728431b033e4eb019b3019a7c3",
+      "bytes": 5101864,
+      "inode": 278612400,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.418072+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.04.rcgu.o",
+      "sha256": "1475a76bf4aae13a4762b05104eb13796440300e79ec1c542bc6a8e1af5486b7",
+      "bytes": 5332056,
+      "inode": 278612414,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.437986+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.05.rcgu.o",
+      "sha256": "8cde3502697f66592b20a9d7f89c0ce101f316b39a19c969c25891131cea3153",
+      "bytes": 9244344,
+      "inode": 278612425,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.455718+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.06.rcgu.o",
+      "sha256": "532fb2de4d8cc56fa216b9d6b80e56f1562564b86a420bae7494a0919f67a940",
+      "bytes": 9776656,
+      "inode": 278612427,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.485525+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.09.rcgu.o",
+      "sha256": "34e9537f499758ff9f8b0d0a970ad282a220804d449c4568eac6cc6b93b845b0",
+      "bytes": 15082224,
+      "inode": 278612429,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.497465+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.10.rcgu.o",
+      "sha256": "037f9c820c8896f075b7ff76c2bb8204944e3351be41d425e1a7c18d82766629",
+      "bytes": 5413704,
+      "inode": 278612426,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.509279+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.11.rcgu.o",
+      "sha256": "295e3119d463330e04aeb19c4fece2c0570dc9544a196ddb1b86b84e229e7299",
+      "bytes": 7590240,
+      "inode": 278612417,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.530000+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.12.rcgu.o",
+      "sha256": "9192be85dcab13ac179b84d2232a9c307bb14d84bb6a925a457b21b5d670f19a",
+      "bytes": 11918352,
+      "inode": 278612406,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.539918+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.14.rcgu.o",
+      "sha256": "b55435423038b61b277c4812332f216e61f58a4797766da86127ed2cc114c3ba",
+      "bytes": 5298472,
+      "inode": 278612336,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    },
+    {
+      "at": "2026-10-07T04:40:57.564038+00:00",
+      "path": "/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_service-db0defd20b34f871.lingxi_service.8ad4f4b7b374d885-cgu.15.rcgu.o",
+      "sha256": "8fb7bae3aa6838bea8d2a5d18e6f6aa4a8a56a75fb2fd7cd324660424e38a61c",
+      "bytes": 15418744,
+      "inode": 278612315,
+      "operation": "unlink",
+      "result": "success",
+      "existsAfter": false
+    }
+  ],
+  "exit": 0,
+  "afterUnlinkAt": "2026-10-07T04:40:57.564247+00:00",
+  "freeAfterUnlink": 265191424,
+  "finalAt": "2026-10-07T04:40:57.955756+00:00",
+  "freeAfterVerification": 265158656,
+  "observedImmediateFreeDelta": 138104832,
+  "deletedCount": 33,
+  "deletedLogicalBytes": 136063856,
+  "preservedCount": 1450,
+  "preservedChanges": []
+}

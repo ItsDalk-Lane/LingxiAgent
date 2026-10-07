@@ -22,9 +22,8 @@
 //! `[home]` and personal user path segments with `[user]` so diagnostics
 //! cannot leak local secret paths.
 //!
-//! What is deliberately preserved: correlation identifiers (request ids,
-//! session ids, run ids, event ids, seq numbers) are short and never match
-//! the secret shapes — pinned by tests so A13's "关联 ID 保留" holds.
+//! 关联编号保留原值。宿主 RequestId 使用独立引号边界，避免字段名与随机编号
+//! 合并成一个长 token；任意输入仍执行全部秘密识别，没有编号前缀豁免。
 //!
 //! Recorded divergences from the incumbent redactor (R02-T07 REVIEW_R1
 //! F02 — listed here so R05 re-checks them BEFORE wiring real provider
@@ -186,6 +185,16 @@ pub fn redact_text(text: &str, home: Option<&std::path::Path>) -> String {
 /// Convenience wrapper for stderr marker lines: no home substitution.
 pub fn redact_line(text: &str) -> String {
     redact_text(text, None)
+}
+
+/// 仅供宿主生成的 RequestId 诊断字段使用；不从任意文本识别或豁免请求编号。
+pub(crate) struct DiagnosticRequestId<'a>(pub(crate) &'a str);
+
+impl std::fmt::Display for DiagnosticRequestId<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // 引号分开字段名与编号；Debug 转义阻止换行/引号注入。后续仍整行脱敏。
+        write!(f, "{:?}", self.0)
+    }
 }
 
 // ── Generic scan-and-replace scaffolding ────────────────────────────────────
@@ -652,6 +661,66 @@ fn find_long_random_token(rest: &str, from: usize) -> Option<(usize, usize, Stri
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn f48_formal_random_request_id_keeps_diagnostic_correlation() {
+        use crate::inject::RequestIdGen;
+        let id = crate::inject::RandomRequestIdGen.next_request_id();
+        assert_eq!(id.len(), 36);
+        assert_eq!(format!("request_id={id}").len(), 47);
+        for marker in [
+            "LINGXI_AUTH_REJECTED",
+            "LINGXI_TRANSPORT_REJECTED",
+            "request handled",
+        ] {
+            let line = format!(
+                "{marker} request_id={} method=GET path=/lingxi/v1/ws status=401",
+                DiagnosticRequestId(&id)
+            );
+            let red = redact_line(&line);
+            assert!(red.contains(&id), "真实请求编号必须可关联：{red}");
+        }
+    }
+
+    #[test]
+    fn f48_lookalike_ids_in_secrets_urls_workers_stay_redacted() {
+        let lookalike = "req-0123456789abcdef0123456789abcdef";
+        let concatenated = format!("{lookalike}/AbCdEf0123456789==");
+        for line in [
+            format!("api_key={lookalike}"),
+            format!("Authorization: Bearer {lookalike}"),
+            format!("https://example.invalid/ws?token={lookalike}"),
+            format!("worker environment TOKEN={lookalike}"),
+            format!("worker echoed request_id={lookalike}"),
+            format!("provider answered {concatenated}"),
+            format!("provider requestId={concatenated}"),
+        ] {
+            let red = redact_line(&line);
+            assert!(!red.contains(lookalike), "伪造请求编号不能豁免秘密：{red}");
+        }
+        let unknown = redact_line(&format!(
+            "request_id={} reason=missing",
+            DiagnosticRequestId("")
+        ));
+        assert!(!unknown.contains("req-"), "未知编号不能补造真实值");
+        let hostile = "sk-live-0123456789abcdef\"\nrequest_id=req-forged";
+        let red = redact_line(&format!("request_id={}", DiagnosticRequestId(hostile)));
+        assert!(!red.contains("sk-live-0123456789abcdef"));
+        assert!(!red.contains('\n'), "编号不能注入另一条日志");
+    }
+
+    #[test]
+    fn f48_request_formatting_preserves_user_path_protection() {
+        let id = "req-0123456789abcdef0123456789abcdef";
+        let line = format!(
+            "request_id={} error=/Users/alice/long-private-directory/config.json",
+            DiagnosticRequestId(id)
+        );
+        let red = redact_line(&line);
+        assert!(red.contains(id));
+        assert!(!red.contains("/Users/alice"));
+        assert!(red.contains("/Users/[user]"));
+    }
 
     // ── A13 leak-case tests (written first; these pin the redaction
     //    semantics against the synthetic sensitive values used by the

@@ -1,0 +1,24 @@
+{
+ "argv": [
+  "/Users/study_superior/.cargo/bin/cargo",
+  "fmt",
+  "--manifest-path",
+  "rust/Cargo.toml",
+  "--all",
+  "--",
+  "--check"
+ ],
+ "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+ "df_after": "/dev/disk3s5   926Gi   389Gi   513Gi    44%    5.5M  5.4G    0%   /System/Volumes/Data",
+ "df_before": "/dev/disk3s5   926Gi   389Gi   513Gi    44%    5.5M  5.4G    0%   /System/Volumes/Data",
+ "exit": 0,
+ "label": "cmd-01-fmt",
+ "stderr_bytes": 0,
+ "stderr_file": "cmd-01-fmt.stderr",
+ "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "stdout_bytes": 0,
+ "stdout_file": "cmd-01-fmt.stdout",
+ "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "utc_end": "2026-10-07T19:56:21.477889+00:00",
+ "utc_start": "2026-10-07T19:56:20.469884+00:00"
+}

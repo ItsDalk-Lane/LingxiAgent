@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-07T00:25:53.749260+00:00",
+  "cleanup": [
+    {
+      "pid": 38630,
+      "action": "already gone or identity differs; no signal",
+      "psExit": 1,
+      "observedCommand": ""
+    }
+  ]
+}

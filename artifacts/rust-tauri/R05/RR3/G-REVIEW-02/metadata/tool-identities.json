@@ -1,0 +1,47 @@
+{
+  "at": "2026-10-07T04:36:27.348504+00:00",
+  "files": [
+    {
+      "path": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo",
+      "realpath": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo",
+      "sha256": "6e17e865f3a20dd55a1d212f849f58b77124179f0de7c52973096d84ba34118d",
+      "bytes": 31960040
+    },
+    {
+      "path": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc",
+      "realpath": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc",
+      "sha256": "766eda9d8f53afd6fc7f27b3cd2e444dd22afacb5afa710a5625fc8e45b8c941",
+      "bytes": 412504
+    },
+    {
+      "path": "/bin/bash",
+      "realpath": "/bin/bash",
+      "sha256": "d59c6f2312e551e9c46497329d435b6ec74fbc46e9155b84170f377127ed004e",
+      "bytes": 1961872
+    },
+    {
+      "path": "/usr/bin/python3",
+      "realpath": "/usr/bin/python3",
+      "sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+      "bytes": 200560
+    },
+    {
+      "path": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "realpath": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+      "sha256": "1192b994fbb50303c9df2cc97c9d63797d454c7f57f20ca682877c9e770429aa",
+      "bytes": 135696
+    },
+    {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust-toolchain.toml",
+      "realpath": "/Users/study_superior/Desktop/Code/LingxiAgent/rust-toolchain.toml",
+      "sha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "bytes": 772
+    },
+    {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.lock",
+      "realpath": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.lock",
+      "sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "bytes": 77319
+    }
+  ]
+}

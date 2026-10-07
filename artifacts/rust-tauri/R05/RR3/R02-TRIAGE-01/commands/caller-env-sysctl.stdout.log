@@ -1,0 +1,22 @@
+[
+  {
+    "pid": 85741,
+    "utc": "2026-10-07T02:03:30.156244+00:00",
+    "sysctlExit": -1,
+    "errno": 22,
+    "observable": false,
+    "selector": "CTL_KERN/KERN_PROCARGS2/PID",
+    "boundary": "其他环境值只在内存用于定位分隔符，不保存"
+  },
+  {
+    "pid": 90799,
+    "utc": "2026-10-07T02:03:30.156485+00:00",
+    "sysctlExit": 0,
+    "errno": 0,
+    "observable": true,
+    "selector": "CTL_KERN/KERN_PROCARGS2/PID",
+    "boundary": "其他环境值只在内存用于定位分隔符，不保存",
+    "RUST_LOG": [],
+    "argc": 3
+  }
+]

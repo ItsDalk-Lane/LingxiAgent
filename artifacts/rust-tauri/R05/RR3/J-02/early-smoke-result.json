@@ -1,0 +1,360 @@
+{
+  "status": "PASS",
+  "startedUtc": "2026-10-07T03:52:26.662667+00:00",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/source",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/source",
+      "startedUtc": "2026-10-07T03:52:26.663130+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.670226+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "378818a576a13e2fea0b2f368f086bf24ccfcb0ce98c83ee5cf2d203c0dc93a6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0000.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/source",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/source",
+      "startedUtc": "2026-10-07T03:52:26.670447+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.677093+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ada709e99148f2cae58002195b0d5eb9f543ee30c540d5d23d2c7a2ea1e8cdcd",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0001.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/source",
+        "rev-parse",
+        "--verify",
+        "HEAD^{commit}"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/source",
+      "startedUtc": "2026-10-07T03:52:26.677358+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.683965+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ada709e99148f2cae58002195b0d5eb9f543ee30c540d5d23d2c7a2ea1e8cdcd",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0002.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/source",
+        "rev-parse",
+        "--show-object-format"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/source",
+      "startedUtc": "2026-10-07T03:52:26.684116+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.690689+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "335277ee77cfc8d51d6602e4137232cf6041aac2bc663777e384b90d5ae74d51",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0003.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/source",
+        "ls-tree",
+        "-rlz",
+        "98265bf48a213c9b101568fab93a680368295511"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/source",
+      "startedUtc": "2026-10-07T03:52:26.690857+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.697491+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "1949d9b4cb92ea8265ce47bbb93e7c70bed31654832537251c624b07d2b65a7b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0004.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/source",
+        "clone",
+        "--shared",
+        "--no-checkout",
+        "--quiet",
+        "--branch",
+        "codex/rust-tauri-migration",
+        "/private/tmp/j02-first-r5rtbm0f/source",
+        "/private/tmp/j02-first-r5rtbm0f/copy"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/source",
+      "startedUtc": "2026-10-07T03:52:26.697774+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.722361+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0005.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/copy",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/copy",
+      "startedUtc": "2026-10-07T03:52:26.722555+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.729993+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ada709e99148f2cae58002195b0d5eb9f543ee30c540d5d23d2c7a2ea1e8cdcd",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0006.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/copy",
+        "read-tree",
+        "98265bf48a213c9b101568fab93a680368295511"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/copy",
+      "startedUtc": "2026-10-07T03:52:26.730157+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.737230+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0007.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/copy",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/copy",
+      "startedUtc": "2026-10-07T03:52:26.737408+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.773793+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0008.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/copy",
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/copy",
+      "startedUtc": "2026-10-07T03:52:26.773955+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.780374+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "739d016ad398c5d86e4f6056fd9159cdf4f1973749fa5781a39dd10b5d7bccbf",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0009.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/copy",
+        "cat-file",
+        "blob",
+        "94f3610c08588440112ed977376f26a8fba169b0"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/copy",
+      "startedUtc": "2026-10-07T03:52:26.780614+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.787384+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "0682c5f2076f099c34cfdd15a9e063849ed437a49677e6fcc5b4198c76575be5",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/copy/hello"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/source",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/source",
+      "startedUtc": "2026-10-07T03:52:26.787675+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.794110+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "378818a576a13e2fea0b2f368f086bf24ccfcb0ce98c83ee5cf2d203c0dc93a6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0011.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/source",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/source",
+      "startedUtc": "2026-10-07T03:52:26.794299+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.800629+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "ada709e99148f2cae58002195b0d5eb9f543ee30c540d5d23d2c7a2ea1e8cdcd",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0012.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/copy",
+        "ls-tree",
+        "-rlz",
+        "HEAD"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/copy",
+      "startedUtc": "2026-10-07T03:52:26.800882+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.807689+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "1949d9b4cb92ea8265ce47bbb93e7c70bed31654832537251c624b07d2b65a7b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0013.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/copy",
+        "write-tree"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/copy",
+      "startedUtc": "2026-10-07T03:52:26.807864+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.814670+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "739d016ad398c5d86e4f6056fd9159cdf4f1973749fa5781a39dd10b5d7bccbf",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0014.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/copy",
+        "diff",
+        "--exit-code",
+        "98265bf48a213c9b101568fab93a680368295511",
+        "--"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/copy",
+      "startedUtc": "2026-10-07T03:52:26.814824+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.822101+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0015.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/copy",
+        "status",
+        "--porcelain=v1",
+        "-z",
+        "--untracked-files=all"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/copy",
+      "startedUtc": "2026-10-07T03:52:26.822252+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.829065+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0016.stdout"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/j02-first-r5rtbm0f/copy",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling"
+      ],
+      "cwd": "/private/tmp/j02-first-r5rtbm0f/copy",
+      "startedUtc": "2026-10-07T03:52:26.829214+00:00",
+      "finishedUtc": "2026-10-07T03:52:26.863338+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputFile": "/private/tmp/j02-first-r5rtbm0f/evidence/git-0017.stdout"
+    }
+  ],
+  "platform": "darwin",
+  "argv": [
+    "scripts/rust-tauri/prepare_git_copy.py",
+    "--source",
+    "/private/tmp/j02-first-r5rtbm0f/source",
+    "--copy",
+    "/private/tmp/j02-first-r5rtbm0f/copy",
+    "--branch",
+    "codex/rust-tauri-migration",
+    "--evidence",
+    "/private/tmp/j02-first-r5rtbm0f/evidence"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "spaceNote": "\u5b9e\u9645\u6587\u4ef6\u7cfb\u7edf\u53ef\u7528\u7a7a\u95f4\u622a\u70b9\uff0c\u4e0d\u80fd\u89e3\u91ca\u4e3a\u6b64\u526f\u672c\u72ec\u5360\u7269\u7406\u5757",
+  "source": "/private/tmp/j02-first-r5rtbm0f/source",
+  "copy": "/private/tmp/j02-first-r5rtbm0f/copy",
+  "requestedRevision": "HEAD",
+  "sourceBefore": {
+    "head": "98265bf48a213c9b101568fab93a680368295511",
+    "headFileSha256": "a5514e446d5aa78abd1b01492bf577b9b369799dd4461fd9e7da0ae3c87814e4",
+    "indexSha256": "cf8feb91c2ba147df6543d0694685252c01ad790fda13021f88563873848acb1"
+  },
+  "freeBytesBefore": 1952731136,
+  "helperSha256": "ce3c7f4ff93c8e29105b970b8ac663828506bafca61a5dc8297f4c35be6b7fe2",
+  "commit": "98265bf48a213c9b101568fab93a680368295511",
+  "tree": "4d517f9dfd79db6f9e2a551e072a5feb1a5d19f4",
+  "objectFormat": "sha1",
+  "sourceAfter": {
+    "head": "98265bf48a213c9b101568fab93a680368295511",
+    "headFileSha256": "a5514e446d5aa78abd1b01492bf577b9b369799dd4461fd9e7da0ae3c87814e4",
+    "indexSha256": "cf8feb91c2ba147df6543d0694685252c01ad790fda13021f88563873848acb1"
+  },
+  "tracked-files.json": {
+    "sha256": "a40a2ce00f4d95fc7d59d85f01e932155a6492f64edca0c35e23d44cd67b3cdb",
+    "count": 1
+  },
+  "source-files.json": {
+    "sha256": "be3721546aaf501cdea2442c43b6df2068c21543be93ecda1f0976067d3b5f93",
+    "count": 1
+  },
+  "trackedCount": 1,
+  "trackedBytes": 8,
+  "methods": {
+    "cow": 0,
+    "ordinary": 0,
+    "git-blob": 1,
+    "git-link": 0
+  },
+  "copyIndexSha256": "5b268859da135971482fad83918ac2b0f98acc8be932fdc2ef537ec8027f5718",
+  "freeBytesAfter": 1952538624,
+  "finishedUtc": "2026-10-07T03:52:26.863906+00:00"
+}

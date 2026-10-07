@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+    "--home",
+    "/tmp/h48.otemorzo",
+    "--bind",
+    "127.0.0.1:0"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "UTC_start": "2026-10-07T02:26:41.994942+00:00",
+  "UTC_end": "2026-10-07T02:26:42.125202+00:00",
+  "exit": 0,
+  "pid": 41920,
+  "reaped": true,
+  "binarySHA256": "096fd810e2c187ac6d4031a61ccabe596175c48a3f61988b00567da2911b194a",
+  "logs": {
+    "service-000001.log": "4b9d5fc86c7937028c25be79883356c9441e1fec2e4aa404f7fe494e70f626d3"
+  }
+}

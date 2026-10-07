@@ -1,0 +1,9 @@
+{
+  "historicalDiscovery": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/A-REVIEW-02/discover-old.py",
+  "oldSha256": "4bce16b2e31044ac6519dbdd8a3598d96233325ad2f6e0d44c57ea4f676a0ed0",
+  "isolatedSha256": "4bce16b2e31044ac6519dbdd8a3598d96233325ad2f6e0d44c57ea4f676a0ed0",
+  "oldCounterexampleReached": true,
+  "oldBeforeAfterEqual": true,
+  "restoredExit": 0,
+  "boundary": "真实OS父child fd和原binder；只替换独立指定旧发现器，不手造FILE"
+}

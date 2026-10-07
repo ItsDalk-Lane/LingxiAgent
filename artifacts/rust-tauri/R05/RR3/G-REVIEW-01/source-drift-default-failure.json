@@ -1,0 +1,129 @@
+{
+  "utc": "2026-10-07T02:31:13.599554+00:00",
+  "changes": [
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "before": "44e7eef0684e96275db9af6f4a60911464963e7a6bb7f258682df28f33f21756",
+      "current": "dc580e37ae016100d750e4c498d8ad697123f05e17c343998993e75ce0170abe",
+      "executionInput": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/redaction.rs",
+      "before": "9d749fc88d7c653399db7908b4fddd1bcca3264362c9da3a6a7ba49318c6a1ed",
+      "current": "5b192ab43df13d6add0705a9f1eb2ead45da1131f012c3afb61dd9f90ac10b7a",
+      "executionInput": true
+    },
+    {
+      "path": "scripts/rust-tauri/r02_t01_service_smoke.sh",
+      "before": "14516af32a59d2f590018be232c601817dfeadb3e4355fa860fd90b1cc34bd79",
+      "current": "76f3e9fd143842b4f9ef7577bf3c857ddaee29e02ec849b9b93d2cc14afede1c",
+      "executionInput": true
+    },
+    {
+      "path": "scripts/rust-tauri/r05_t08_negative_gate.sh",
+      "before": "4853e129e2d0cf7dbd6c93c8c158186fad23e6f231a03ff64f140cca61e0042f",
+      "current": "a69110b81298705a9161652d28402a5e5a585f945fdfd214ccf071132ecb67dd",
+      "executionInput": true
+    },
+    {
+      "path": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "before": "f308cf1a2d4d4f1550355ee732ae85fa162555d647ee372c6947c04bd7510cc2",
+      "current": "be5ee9671acc3cfcc458cd1ec2dd384ca6a7f31a9a1ab9ee5b21effad156694c",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "before": "83df50d0e43cf6642b515baf9609fcb68b6b85d6fe8524ac9aa56de230bd5f70",
+      "current": "08dd8c15aafb420668b2569a43084f038d1a0ddcec438f9e9e022f4f03648abc",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "before": "f278ccdb11db0e2914a332cbf3aec1c10b36d7fb281b9266ffb6160b44d0ff7b",
+      "current": "ba1942aa792f8f2629ad504218f6079fd118c960cd9e2cb87bfe29f7b1d08e89",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "before": "9e37fa10c9e6ea4449d4ec02ab4c576bf432e32f413b65f997ec6208a97f1aa4",
+      "current": "7eecc3908d9672d3d6b2588463c1f1ebbdd9a5451f62f58b98b45bb9f2844c43",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "before": "510bcef0d8d9562cf194d3a22356a4b59b741abfdd0ebc37a9922c0559711418",
+      "current": "f8eef564b4dc2981ab53cd68e1c1cfb7018cf8f159f23985fbf5d69ffa97a972",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+      "before": "a7d9beac3a23c494d9734f8ead5372202e228dca90ca304ea94c98cf6004bc86",
+      "current": "2e36bfa19d2efab9c16080461a1bfb252df1566cba497ced6b9c2099d0949b17",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "before": "7d1fa6f234b40279cc98cfa1ee35bf2c0c5b15baa290738e5c1d5ab6ca1acc9c",
+      "current": "3def9a60679edb5de237a1b164adb08951ae3d3920abdd32f338f58a11c1c22d",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "before": "fb309a94c34d00b590e37c2586fd52716cd33a6131fb079d8d0319fe2569cb5d",
+      "current": "472a278c59f1897ace517db9650a920041998da43feeceff3dc8d990ffee407a",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_HANDOFF.json",
+      "before": "b141de12c4f9a662f0745165855b414bfd6205ff558d710958f3b02a6c2e1f58",
+      "current": "87ea87b09f37bd073a6ed85df4dec6769e18cf41326c2541d20588ae834517c0",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "before": "956573d45bc2c590a244803778e1e496b26049ededc6b2050c4781e454135991",
+      "current": "ef28cb6a1f9d200381d94781a7ad5d594f349f95089ab7deb3f70bfd4984faca",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "before": "56e27bef584a9aa65ff2ab6508199001590c323e72eefa965665eedd114df464",
+      "current": "a4e362636b909d4a5a7646f932c58408d149623cb041cde812f7d300f36f4f7d",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_REPORT.md",
+      "before": "4570371eb036ff6d6d37dd40d1fba24ded33ab7c678cb429f2eff69f492f3693",
+      "current": "e1e73289c4e9abb0be2a3e094c60274225028082506adbb5f802966d711895dc",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "before": "4a0e0a56893f7e52a08318f6873f4df194f5098e092314306f73102bed275ee2",
+      "current": "1b5d6f3cfdb4ce089f21003cb40ecc44547e31c93837be7f43cc19b43cf91e26",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json",
+      "before": "8aa8f61e6c717ee2c44485a516d177e3ca9566c66415c441a0b1adcf3f5c247c",
+      "current": "8877ce93d32f34b5d8908f92677276d4a371fbb6c4dc9d93a51a7673c553a914",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md",
+      "before": "0be22b9b26dc7eea267b5c9ea845949841cbc7570e20c01c7a00eaf043c22097",
+      "current": "188d6e7b8af12e06407cbc0d32789836d0aa83a209fd086506250d0dabc075fd",
+      "executionInput": false
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+      "before": "386b8f75bb2a0b32df903bb2449e2d21bd04cb80150e73abe36c2fa231be04c1",
+      "current": "62a838daaf3f46888bf11d63a953848de0ce45e3effa855cb654dbf19a31eb17",
+      "executionInput": false
+    }
+  ],
+  "defaultExit": 2,
+  "actualCaseRows": 15,
+  "N16reuseExecuted": false,
+  "boundary": "默认入口运行时主树被其他主体修改；本审查未写主树执行输入，不能把混合运行算16/16"
+}

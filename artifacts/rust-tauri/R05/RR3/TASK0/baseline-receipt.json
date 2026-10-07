@@ -1,0 +1,284 @@
+{
+  "schema": "rr3-task0-v1",
+  "baselineHead": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "exitCode": 0,
+      "stdout": "?? docs/rust-tauri/R05/repair-current/RR3_BRIEF.md\n?? docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md\n?? docs/rust-tauri/R05/repair-current/RR3_ISSUE_MATRIX.json\n?? docs/rust-tauri/R05/repair-current/RR3_PROGRESS.md\n",
+      "stderr": "",
+      "at": "2026-10-07T08:15:22.710698+08:00"
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "--show-current"
+      ],
+      "exitCode": 0,
+      "stdout": "codex/rust-tauri-migration\n",
+      "stderr": "",
+      "at": "2026-10-07T08:15:22.717333+08:00"
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0,
+      "stdout": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b\n",
+      "stderr": "",
+      "at": "2026-10-07T08:15:22.723044+08:00"
+    },
+    {
+      "command": [
+        "git",
+        "ls-remote",
+        "origin",
+        "refs/heads/codex/rust-tauri-migration"
+      ],
+      "exitCode": 0,
+      "stdout": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b\trefs/heads/codex/rust-tauri-migration\n",
+      "stderr": "",
+      "at": "2026-10-07T08:15:24.214543+08:00"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/rustc",
+        "--version"
+      ],
+      "exitCode": 0,
+      "stdout": "rustc 1.98.1 (48a229cea 2026-09-01)\n",
+      "stderr": "",
+      "at": "2026-10-07T08:15:24.251292+08:00"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "--version"
+      ],
+      "exitCode": 0,
+      "stdout": "cargo 1.98.1 (797e8a9bc 2026-08-05)\n",
+      "stderr": "",
+      "at": "2026-10-07T08:15:24.273691+08:00"
+    },
+    {
+      "command": [
+        "node",
+        "--version"
+      ],
+      "exitCode": 0,
+      "stdout": "v24.16.0\n",
+      "stderr": "",
+      "at": "2026-10-07T08:15:24.288014+08:00"
+    },
+    {
+      "command": [
+        "npm",
+        "--version"
+      ],
+      "exitCode": 0,
+      "stdout": "11.13.0\n",
+      "stderr": "",
+      "at": "2026-10-07T08:15:24.367230+08:00"
+    },
+    {
+      "command": [
+        "uname",
+        "-sm"
+      ],
+      "exitCode": 0,
+      "stdout": "Darwin arm64\n",
+      "stderr": "",
+      "at": "2026-10-07T08:15:24.370738+08:00"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "rust-toolchain.toml",
+      "sha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "bytes": 772
+    },
+    {
+      "path": "rust/Cargo.lock",
+      "sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "bytes": 77319
+    },
+    {
+      "path": "rust/Cargo.toml",
+      "sha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+      "bytes": 3231
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+      "bytes": 657207
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "3f98359bc0c6ab7038aec8326419a03cdbf0de6f3f185555d051ad3e489b531b",
+      "bytes": 5637
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_BLOCKERS.md",
+      "sha256": "de950b466ac930d201f61bbb464a66a49a7b69afd79295931a7d753a637ae563",
+      "bytes": 10307
+    },
+    {
+      "path": "docs/rust-tauri/R05/CREDENTIAL_FLOW_MATRIX.json",
+      "sha256": "9b19e6e81364acd88a735a1010c1c2e34e475f4c812272dcf4ef1c62e7b0a25f",
+      "bytes": 9587
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_t05_generate_compat_goldens.mjs",
+      "sha256": "80f9cdc8cd2a4a3630668683ac8f958eff96c334bfa38be61f0418892c29d4d8",
+      "bytes": 22436
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_t04_codemod_delta_sink.py",
+      "sha256": "b4dcbc86a1d313702ec3e1c8d2a8908e62dc527dcf20a7d13ba72671c78ed95f",
+      "bytes": 3712
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_stage_cids.tsv",
+      "sha256": "ffffbe56313a1d5e50e7b216499cd851b1efc988da811a57d4fe0b07cc0be556",
+      "bytes": 37255
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_t01_extract_provider_matrix.mjs",
+      "sha256": "9376dfb9862fd93b31d4fe9d0331eb8ebe70747fef80ef4e58290bb130bc615c",
+      "bytes": 9876
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "sha256": "11afe718db1c1c251fe915f77b378fe54450ed76a01966939b8df83b2bc5102b",
+      "bytes": 3177
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_leaf_case_map.tsv",
+      "sha256": "a4f5866d11a833a7bbcd7224e898baaaa047a485cf4b2c66c515af25348db64f",
+      "bytes": 8755
+    },
+    {
+      "path": "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+      "sha256": "c219180aab39823c647f8758028fe91150bd2e5e76d735b3dd9000ab99ec7b37",
+      "bytes": 18986
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "sha256": "c1fd4b03b677d033ddc6a19df1cae2e41be7ea46d3dfd3f4424b7bb2aea0801a",
+      "bytes": 7256
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+      "sha256": "14f3e7bbbeef2058426b01c1e721b4bc83acb7d288ab16cd3e28fe2730898b54",
+      "bytes": 67889
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_required_cids.tsv",
+      "sha256": "1a046aa162d62bc1fdefdd286a6211d37c15852a2683073df9c629d26190676c",
+      "bytes": 3125
+    },
+    {
+      "path": "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+      "sha256": "027afa74e452e5839885ccd6d1412301b7ffcc19812fffaaea9ffd9bdd3f35c4",
+      "bytes": 4911
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_t01_build_scope_matrix.py",
+      "sha256": "5bb22b63b018b41ee11f20426545834680c3e86397c093a98e121ac489783048",
+      "bytes": 15821
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "sha256": "c6b5da4a74938e66b6962b733a46a1d9ef8401cab36dc816ccbdb2de553bec99",
+      "bytes": 66677
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md",
+      "sha256": "0cfd02db2ab41fd1b876b694d705410dd90564265d56917413e98d28508a61f2",
+      "bytes": 9930
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_BASELINE.json",
+      "sha256": "dd0f3e0cf070dea03a3128e2a9be576bb032c44b0597129056947de2d425aa0b",
+      "bytes": 5866
+    },
+    {
+      "path": "docs/rust-tauri/R05/PROVIDER_SUPPORT_MATRIX.json",
+      "sha256": "c1ddf6301578f0d3ab493a120b95c9edcc9b7c6f304da28c6a7df16b09053d86",
+      "bytes": 44631
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_t01_build_callsite_matrix.py",
+      "sha256": "a62dabe310b4ace1e9439646464a11f9a654b02cba703abd347e2b0b587d86b6",
+      "bytes": 19820
+    },
+    {
+      "path": "docs/rust-tauri/R05/PROTOCOL_WIRE_MATRIX.json",
+      "sha256": "1407f4bcfae76a3ddef5a174f8b394dc5abf1ed992f4f8ddae39803e1c5fb59c",
+      "bytes": 89848
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_t01_codemod_next_turn.py",
+      "sha256": "6b728f4c396d92dadd88e830637a7112a7309ab78c3bd4e5589cf40b1d58f4e9",
+      "bytes": 4571
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_HANDOFF.json",
+      "sha256": "41eb3ad1a91a577511402736b80b38cc5529b937ca6574bbc074acc7d01376b1",
+      "bytes": 13651
+    },
+    {
+      "path": "docs/rust-tauri/R05/r05_stage_pins.tsv",
+      "sha256": "fdacb2c2401ccd0a276abc7ab945cad57ec307f08e24516bac9227e76031e6e5",
+      "bytes": 10498
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "sha256": "6fc4c7096145a3bfa3d6f318b32721ad520f064162d34f007080a41a524c73d1",
+      "bytes": 4030337
+    },
+    {
+      "path": "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "sha256": "2c431b2bf9fa6ad83ca010f4392cc262844eca2e2366a6e6aa204e14b280f108",
+      "bytes": 43637
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_REPORT.md",
+      "sha256": "a13ca7342991da5725a721e93fa8dade0437b600a06e64814206254872a23907",
+      "bytes": 14794
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_INDEPENDENT_REVIEW.md",
+      "sha256": "edaefa5b5a1d0f5afaa3c75760c264269fecadaa54acb2915793052e99557d2c",
+      "bytes": 22932
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_SCOPE_MATRIX.json",
+      "sha256": "222e8e7e54030578c0ce4697d33a98b59ec3ca5cc210642bdc83bdb3b7a72110",
+      "bytes": 117184
+    },
+    {
+      "path": "docs/rust-tauri/R05/MODEL_CALLSITE_MATRIX.json",
+      "sha256": "ec39ebf839be3fbc3a0311e7164b4e6b996239240c0fa73d08e123366b7776bf",
+      "bytes": 42263
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR1_MASTER_PROMPT_2026-10-04.md",
+      "sha256": "7fc077f1b370660f582d964977685d5a619fa988befd26f8a4915f409529f2bc",
+      "bytes": 70892
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR2_MASTER_PROMPT_2026-10-06.md",
+      "sha256": "35802f225728954cccedd12ef0453090948afd18db9cb0f8f31cc9d896e92545",
+      "bytes": 8316
+    }
+  ],
+  "note": "git status includes only RR3 coordination documents created after clean baseline check; binary identity later belongs to D/FINAL receipts"
+}

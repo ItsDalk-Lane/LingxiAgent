@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-07T04:42:13.486172+00:00",
+  "checkedExistingPaths": 40,
+  "identityFields": [
+    "bytes",
+    "inode",
+    "device",
+    "mode",
+    "mtimeNs",
+    "nlink"
+  ],
+  "differences": [],
+  "contentHashesAlreadyVerified": "protected-after-execution.json"
+}

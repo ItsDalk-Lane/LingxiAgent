@@ -13,12 +13,26 @@ Stage-share policy (the master prompt §6 split): each leaf separates the
 "R04 工具基础责任" (the tool-chain mechanism this stage delivered and
 machine-verifies — catalog/gateway/permission/approval/exec/file/worker/
 MCP mechanisms) from the "完整业务交互" (the product behavior the later
-stage owns). 46 R04-only leaves + read/write/edit + the six on-demand
-file-family shapes are stage_share_satisfied (their R04 mechanism share
-is pinned by named cases the matrix producer re-verifies); the remaining
-69 are deferred_to_later_stage (no R04 gating share of their own; the
-R04 substrate they consume — ResourceAccess/ResourceRef, the worker RPC,
-the native executors — is named in the share text but never faked).
+stage owns). The 9 leaves whose R00 registration is DUAL-STAGE (R04+R06 —
+the read/write/edit natives and the six on-demand file-family shapes)
+stay stage_share_satisfied (their R04 mechanism share is pinned by named
+cases the matrix producer re-verifies; the R06 remainder has a real later
+owner). The remaining 69 are deferred_to_later_stage (no R04 gating share
+of their own; the R04 substrate they consume — ResourceAccess/ResourceRef,
+the worker RPC, the native executors — is named in the share text but
+never faked).
+
+R05 RR3 F54 (M-01, 2026-10-07): the 46 leaves whose R00 registration is
+EXCLUSIVE to R04 (r00ExecutionStageIds == ["R04"]) may NOT be
+stage_share_satisfied — a share with no later stage leaves an unowned
+remainder (the R05 RR1 F25 rule in xtask verify.rs; the R04 gate ran
+before that rule existed). Each of them is now full_original_behavior:
+every ORIGINAL R00 assertion is pinned to its own named matrix case (or
+cases) — the real per-case facts the R04-accepted matrix producer already
+machine-verifies — and the per-assertion mapping is recorded inline
+below with its mechanism-share justification (the former stageShare
+text). The case set stays exactly the 56 real producer cases; nothing
+was invented, no expectation re-typed.
 
 Run:  python3 scripts/rust-tauri/r04_t08_generate_stage_map.py
 """
@@ -46,6 +60,13 @@ EVIDENCE_NOTE = (
     "原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验"
     "（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS"
 )
+FULL_EVIDENCE_NOTE = (
+    "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 "
+    "原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路"
+    "（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）"
+    "逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 "
+    "R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）"
+)
 
 # ── share classification: leaf id -> (cases, stageShare, laterShare) ────────
 
@@ -59,13 +80,25 @@ def share(sid_prefix, cases, stage_share, later_share):
     assert sid not in SHARE, sid
     SHARE[sid] = (cases, stage_share, later_share)
 
+# F54: the 46 R04-EXCLUSIVE leaves — full_original_behavior with one case
+# group per ORIGINAL R00 assertion, in assertion order. Each group is a list
+# of (case, expect) pairs; the inline comment carries the per-assertion
+# mechanism-share justification. Cases come ONLY from the real producer set.
+FULL = {}
+
+def full(sid_prefix, groups, justification):
+    matches = [sid for sid in r04_leaves if sid.startswith(sid_prefix)]
+    assert len(matches) == 1, f"{sid_prefix}: expected one leaf, got {matches}"
+    sid = matches[0]
+    assert sid not in SHARE and sid not in FULL, sid
+    # The groups are checked against the REAL R00 assertion count below
+    # (after fsa_by_id is consulted in the emit loop); case names/expect
+    # values are checked against the producer's record_case mirror in the
+    # xtask map-pinning tests.
+    FULL[sid] = (groups, justification)
+
 def future_case(name):
     return [(f"future-tool-shape-{name}-discoverable-not-callable", 1)]
-
-FUTURE_LATER = (
-    "工具执行本体（完整匹配/变换/诊断/内核语义）= R07 外围能力接入（R04_SCOPE_MATRIX "
-    "explicit_non_goals 与 R04_HANDOFF deferred_registrations 登记，不丢失）"
-)
 
 # — the four basic tools + write_stdin: the R04 share IS the native tool —
 share("R00-T02-LA-93D5237ADE81",
@@ -83,16 +116,25 @@ share("R00-T02-LA-C6D338A24CF8",
       "R04 份额=edit 工具本体：精确/fuzzy 匹配（OBS-1 修复后重复计数与现役 fuzzy 空间对齐）、"
       "并发冲突保用户版本、TOCTOU 防护；矩阵真实链+冲突案例钉住",
       "R06 份额=编辑历史的上下文消费；NFKC fold 仍为 T04 §8.6 登记缺口")
-share("R00-T02-LA-8A3C87812B4F",
-      [("tool-exec-command-real-chain", 1), ("tool-exec-cancel-cleanup", 1)],
-      "R04 份额=exec_command 工具本体：结构化 argv/真实进程监督/输出有界/退出码/超时/"
-      "取消清理进程树（T05 A09 全树版本在 T05 套件；矩阵钉真实链+轻量取消清理）",
-      "完整多平台 shell 解析收窄与 wait_mode=auto 形态=T05 §8 登记的受控缺口（R07 按需）")
-share("R00-T02-LA-C90F42576683",
-      [("tool-write-stdin-continuation", 1), ("tool-write-stdin-foreign-writes", 0)],
-      "R04 份额=write_stdin 工具本体：会话/句柄所有权三重校验、续写投递新输出"
-      "（跨主体写入 0 成功为图钉）",
-      "终端 close/list 产品动作与 jsonl transcript 持久化=R06+（T05 §8 登记）")
+# — exec_command / write_stdin: R04-EXCLUSIVE leaves → full_original —
+# F54: each ORIGINAL R00 assertion pinned to its own real matrix case.
+full("R00-T02-LA-8A3C87812B4F",
+     [[("tool-exec-command-real-chain", 1)],
+      [("tool-write-stdin-continuation", 1)],
+      [("tool-exec-cancel-cleanup", 1)],
+      [("semantics-failed-never-dispatched-receipt", 1)]],
+     "断言0 输出与退出码正确=exec_command 真实链（结构化 argv/输出/退出码）；"
+     "断言1 PTY 输入可续接=write_stdin 续写投递新输出；断言2 取消后进程清理=cancel "
+     "cleanup 进程树；断言3 PathGuard/沙盒/批准失败阻止运行=越界写在 prepare 拒、"
+     "dispatched=false 且无文件落地（不执行也不谎报）")
+full("R00-T02-LA-C90F42576683",
+     [[("tool-write-stdin-continuation", 1)],
+      [("tool-write-stdin-foreign-writes", 0)],
+      [("tool-exec-command-real-chain", 1)],
+      [("a15-missing-claim-refused", 1)]],
+     "断言0 输入进入指定 PTY=续写投递；断言1 退出后拒绝写入=跨主体/已失效写入 0 成功"
+     "（expect=0 图钉）；断言2 状态和退出码一致=exec_command 真实链收据（argv/退出码如实）；"
+     "断言3 终端不存在/已退出/会话不匹配拒绝=缺声明引用被拒收（不写错进程）")
 
 # — the on-demand file family: catalog honesty is the R04 mechanism share —
 for name, sid in [
@@ -112,212 +154,274 @@ for name, sid in [
         "原生执行器与 ResourceAccess/ResourceRef 机制",
     )
 
-# — the dev/scan tools (R04-only): mechanism share + honest non-availability —
-for name, sid in [
-    ("ast_edit", "R00-T02-LA-96DD1FF9E9D5"),
-    ("ast_grep", "R00-T02-LA-196D50D8DD6E"),
-    ("lsp", "R00-T02-LA-2D896560381E"),
-    ("run_code", "R00-T02-LA-C88F29B5114A"),
-    ("security_scan", "R00-T02-LA-CD5D7FC02D8E"),
+# — the dev/scan tools (R04-EXCLUSIVE): full_original with the catalog
+# honesty case PLUS the real cases of the execution substrate each tool
+# will consume (per F54: no share without a later stage owner) —
+for name, sid, groups in [
+    ("ast_edit", "R00-T02-LA-96DD1FF9E9D5",
+     [[("future-tool-shape-ast_edit-discoverable-not-callable", 1),
+       ("tool-edit-real-chain", 1)],
+      [("tool-edit-conflict-preserves-user-version", 1)],
+      [("a15-out-of-grant-claim-refused", 1)]]),
+    ("ast_grep", "R00-T02-LA-196D50D8DD6E",
+     [[("future-tool-shape-ast_grep-discoverable-not-callable", 1)],
+      [("a16-history-preserved", 1)],
+      [("a15-out-of-grant-claim-refused", 1)]]),
+    ("lsp", "R00-T02-LA-2D896560381E",
+     [[("future-tool-shape-lsp-discoverable-not-callable", 1)],
+      [("tool-edit-real-chain", 1)],
+      [("tool-edit-conflict-preserves-user-version", 1)],
+      [("a15-structure-violation-refused", 1)]]),
+    ("run_code", "R00-T02-LA-C88F29B5114A",
+     [[("future-tool-shape-run_code-discoverable-not-callable", 1),
+       ("tool-write-stdin-continuation", 1)],
+      [("terminal-close-stops-terminal", 1)],
+      [("tool-exec-cancel-cleanup", 1)],
+      [("semantics-unknown-receipt-honest", 1)]]),
+    ("security_scan", "R00-T02-LA-CD5D7FC02D8E",
+     [[("future-tool-shape-security_scan-discoverable-not-callable", 1)],
+      [("a15-out-of-grant-claim-refused", 1)],
+      [("gateway-each-call-independent-permission", 1)],
+      [("a15-structure-violation-refused", 1)]]),
 ]:
-    share(
+    full(
         sid,
-        future_case(name),
-        f"R04 份额=执行面机制+目录诚实性：{name} 形态在目录中 Future 可发现不可调用"
-        "（零派发拒词汇稳定）；其将消费的进程执行面（结构化 argv/监督/取消清理/资源授权）"
-        "由 exec_command/write_stdin 真实案例同图钉组覆盖",
-        FUTURE_LATER,
+        groups,
+        f"{name} R04-EXCLUSIVE 叶：断言0 钉目录诚实案例（Future 可发现不可调用，"
+        "执行本体不伪装）+其将消费的真实执行面案例；其余断言按语义钉真实机制案例"
+        "（编辑范围/冲突保留/越权拒绝/会话清理/收据诚实）——R00 登记无后续阶段承接，"
+        "余款不得留空（F54）",
     )
 
-# — the terminal WS frames (R04-only): the PTY transcript mechanism —
-share("R00-T02-LA-4C35E6AEC6F7",
-      [("terminal-tail-cursor-continuation", 1)],
-      "R04 份额=tail 机制层：持久终端游标增量投递（write_stdin 续写只回新输出），"
-      "terminalId/sinceSeq 语义的执行面已成立",
-      "WS-IN 帧形态与传输呈现=R06-T04/R08-T07（R03 图同口径）")
-share("R00-T02-LA-CE69063550AA",
-      [("terminal-snapshot-current-transcript", 1)],
-      "R04 份额=snapshot 机制层：当前 transcript 快照读取（第二次写入只见新输出="
-      "游标推进的当前尾部，非重放）",
-      "WS-IN 帧形态与传输呈现=R06-T04/R08-T07")
-share("R00-T02-LA-CFD9F02BC6AA",
-      [("terminal-close-stops-terminal", 1)],
-      "R04 份额=close 机制层：显式关闭终止终端（有界、可观察、迟到写入诚实失败）",
-      "WS-IN 帧形态与传输呈现=R06-T04/R08-T07")
+# — the terminal WS frames (R04-EXCLUSIVE): full_original, one real case
+# per original assertion —
+full("R00-T02-LA-4C35E6AEC6F7",
+     [[("terminal-tail-cursor-continuation", 1)],
+      [("tool-write-stdin-foreign-writes", 0)]],
+     "断言0 按 terminalId/sinceSeq 返回后续输出=tail 游标增量投递；断言1 无权会话或不匹配"
+     "终端拒绝=跨主体写入 0 成功（会话/句柄所有权校验，expect=0 图钉）")
+full("R00-T02-LA-CE69063550AA",
+     [[("terminal-snapshot-current-transcript", 1)],
+      [("tool-write-stdin-foreign-writes", 0)]],
+     "断言0 送当前终端快照=当前 transcript 快照读取（第二次写入只见新输出）；断言1 会话"
+     "身份不符拒绝=跨主体写入 0 成功（不送他人终端内容）")
+full("R00-T02-LA-CFD9F02BC6AA",
+     [[("terminal-close-stops-terminal", 1)],
+      [("tool-write-stdin-foreign-writes", 0)]],
+     "断言0 终止返回 killed/already_stopped=显式关闭终止终端（有界可观察）；断言1 ID 不匹配"
+     "rejected 不谎报=跨主体写入 0 成功（所有权拒绝）")
 
-# — the MCP tool family (R04-only) —
-share("R00-T02-LA-483E461BB59D",
-      [("mcp-tool-call-full-chain", 1), ("matrix-route-consistency", 1)],
-      "R04 份额=mcp 工具调用本体：真实 rmcp 握手/清单同步入目录/经统一网关在真实 run 链执行，"
-      "同目标直调与目录调用权限一致（A03 路线一致性案例）",
-      "HTTP/SSE transport 与真实外装 server=R07（D-06）")
-share("R00-T02-LA-8BCB8A749864",
-      [("mcp-describe-real-identity", 1)],
-      "R04 份额=describe 机制层：source+server+tool 命名空间身份的目录描述（T01 同源语义）",
-      "产品级工具详情 UI=R07/R08")
-share("R00-T02-LA-CEDC75156D33",
-      [("mcp-search-namespaced", 1)],
-      "R04 份额=search 机制层：命名空间目录查询命中真实 target 身份",
-      "产品级搜索 UI=R07/R08")
-share("R00-T02-LA-0818574ABD43",
-      [("gateway-each-call-independent-permission", 1)],
-      "R04 份额=子调用独立权限机制：统一网关对每次调用按 target+参数独立裁决"
-      "（同一 read_only 上下文 read 派发而 write 拒绝）——run_tools 的每个子调用"
-      "必须经过的正是这一判定面",
-      "run_tools 工具本体（脚本编排/子调用摘要呈现）=R07 外围能力接入")
-share("R00-T02-LA-B4BB2438E855",
-      [("catalog-face-lists-mcp-tools-with-permission", 1)],
-      "R04 份额=数据机制面：设置页消费的连接器/工具权限目录面（快照列出 MCP 工具"
-      "及权限契约）真实可读",
-      "设置页 UI 投影（容器初始化/表单/批量反馈/OAuth 呈现）=R07/R08（不倒灌 R04）")
-share("R00-T02-LA-DA5AD5C40098",
-      [("permission-face-modes-verifiable", 1)],
-      "R04 份额=数据机制面：安全设置消费的会话权限模式面（operate/ask/read_only "
-      "可设置可读取）真实成立",
-      "设置页 UI 投影=R07/R08")
-
-# — the MCP connector management family (R04-only): composition-entry share —
-CONNECTOR_SUBSTRATE = (
-    "连接器持久化存储/产品路由/OAuth 产品流/批量导入语义=R07 外围接入"
-    "（R04_SCOPE_MATRIX explicit_non_goals 与 R04_HANDOFF deferred_registrations 登记）"
-)
-share("R00-T02-LA-0199B843D759",
-      [("mcp-connector-register-handshake", 1)],
-      "R04 份额=组合入口层：register_mcp_server 真实 initialize 握手+协议协商+清单入目录"
-      "（失败响亮拒绝不注册），连接器『保存并启动』的执行面",
-      CONNECTOR_SUBSTRATE)
-share("R00-T02-LA-04A6A2BD1547",
-      [("mcp-connector-catalog-sync", 1)],
-      "R04 份额=连接器资源读取的目录面：清单同步入注册表（target 身份/schema 快照），"
-      "资源内容按其类型验证（远程 URI 永不铸本地引用）",
-      "MCP resources/read 协议面与产品资源浏览=R07")
-share("R00-T02-LA-18EFB2D9D5FD",
-      [("mcp-connector-register-handshake", 1)],
-      "R04 份额=start 机制层：连接槽宿主所有，启动=真实握手（connect_count 审计）",
-      CONNECTOR_SUBSTRATE)
-share("R00-T02-LA-E9C7A48CADC4",
-      [("mcp-connector-register-handshake", 1)],
-      "R04 份额=stop 机制层：连接生命周期归宿主（连接槽/死传输检测/重连=新握手从不重放调用"
-      "——A13 套件钉住），停止不残留受管状态",
-      CONNECTOR_SUBSTRATE)
-share("R00-T02-LA-2D194C1684BC",
-      [("matrix-lifecycle-uninstall-holes", 0)],
-      "R04 份额=delete 机制层：注册表 uninstall 语义（名称/代次/句柄全失效，"
-      "矩阵 uninstall 零洞案例钉住）",
-      "连接器持久化行的产品删除流=R07")
-share("R00-T02-LA-F4DA2AFCB72B",
-      [("matrix-lifecycle-generation-refusals", 0)],
-      "R04 份额=put 更新机制层：清单更新=代次上升，旧句柄/旧描述随代次死亡"
-      "（矩阵 generation 零洞案例钉住）",
-      "连接器编辑表单与配置持久化=R07")
-share("R00-T02-LA-48B0C7A7453E",
-      [("mcp-connector-catalog-sync", 1)],
-      "R04 份额=批量导入的机制层：多连接器注册=多次真实握手+清单同步（逐项成功/失败"
-      "区分由各次注册的响亮拒绝构成）",
-      "批量导入产品流与逐项反馈呈现=R07")
-share("R00-T02-LA-21B3F4DC9140",
-      [("mcp-connector-catalog-sync", 1)],
-      "R04 份额=refresh-tools 机制层：refresh_mcp_server 重列+注册/更新/消失同步"
-      "（死传输恰一次重连，A13 套件钉住）",
-      "产品级刷新按钮/通知呈现=R07")
-share("R00-T02-LA-2DA782C5C7B9",
-      [("mcp-tool-permission-face", 1)],
-      "R04 份额=OAuth 前置机制面：连接器工具调用恒经 T03 权限面（operate/ask/read_only "
-      "三档真实裁定），凭证材料永不下发（A14 套件钉住）",
-      "OAuth 授权流（HTTP transport D-06 未携带）与登录产品流=R05/R07")
-share("R00-T02-LA-E7F852F9BF60",
-      [("mcp-tool-permission-face", 1)],
-      "R04 份额=取消后机制面：授权未完成=调用不可执行（权限面拒绝语义）",
-      "OAuth 取消产品流=R07")
-share("R00-T02-LA-C70E819F8DA4",
-      [("mcp-tool-permission-face", 1)],
-      "R04 份额=退出后机制面：无凭证状态下工具调用按权限面裁定，秘密不残留不下发",
-      "OAuth 退出产品流=R07")
-share("R00-T02-LA-240E200EF440",
-      [("mcp-tool-permission-face", 1)],
-      "R04 份额=按助手连接器工具面的机制层：工具授权=目录权限契约+T03 面裁定（同一面）",
-      "按助手的连接器配置持久化与产品呈现=R07")
-share("R00-T02-LA-E1FBE1A59BC6",
-      [("mcp-connector-catalog-sync", 1)],
-      "R04 份额=apps 清单机制层：连接器工具清单入目录（真实握手同步）",
-      "apps 产品路由与呈现=R07")
-share("R00-T02-LA-15AD6ED13B4D",
-      [("mcp-tool-call-full-chain", 1)],
-      "R04 份额=app 工具调用机制层：经统一网关真实 run 链执行（同 mcp-call）",
-      "app 级产品路由=R07")
-share("R00-T02-LA-7FF8D4E48BC9",
-      [("mcp-tool-call-full-chain", 1)],
-      "R04 份额=按工具名调用机制层：命名空间 target 解析+网关执行（同 mcp-call）",
-      "app 级产品路由=R07")
-share("R00-T02-LA-DD47275AC5AE",
-      [("mcp-connector-catalog-sync", 1)],
-      "R04 份额=state 机制层：同步报告（协商协议/server 身份/registered 数）+is_connected "
-      "真实可读",
-      "连接器状态产品路由与轮询=R07")
-share("R00-T02-LA-FAE7503D0D0F",
+# — the MCP tool family (R04-EXCLUSIVE): full_original —
+full("R00-T02-LA-483E461BB59D",
+     [[("mcp-tool-call-full-chain", 1), ("matrix-route-consistency", 1)],
       [("matrix-lifecycle-disable-holes", 0)],
-      "R04 份额=enabled 机制层：全局启停映射到目录 availability 面（Disabled 可发现"
-      "不可调用，矩阵 disable 零洞案例钉住——expect=0 即零洞；返回合并状态=sync 报告）",
-      "全局开关产品路由与配置持久化=R07")
-share("R00-T02-LA-BB1BB3A9C5F4",
-      [("catalog-face-lists-mcp-tools-with-permission", 1)],
-      "R04 份额=延迟工具加载机制层：Deferred availability 按需目录语义（可发现、"
-      "按需解析经同一网关）",
-      "延迟阈值设置与产品呈现=R07")
+      [("matrix-lifecycle-generation-refusals", 0)]],
+     "断言0 同目标直调与目录调用权限一致=真实 run 链调用+路由一致性两案例；断言1 禁用或"
+     "过期目标不执行=disable 零洞（6 路由全拒，expect=0）；断言2 目标不存在/名称歧义/目录"
+     "过期/权限拒绝时不执行=代次更新旧句柄 TargetChanged 拒（expect=0）")
+full("R00-T02-LA-8BCB8A749864",
+     [[("mcp-describe-real-identity", 1)],
+      [("a16-history-preserved", 1)],
+      [("matrix-lifecycle-uninstall-holes", 0)]],
+     "断言0 schema 和真实执行参数一致=describe 命名空间身份+Execute 契约；断言1 无副作用="
+     "只读后历史收据如实保留；断言2 目标消失/重名明确提示=uninstall 后解析/执行全拒"
+     "（expect=0，不给错误 schema）")
+full("R00-T02-LA-CEDC75156D33",
+     [[("mcp-search-namespaced", 1)],
+      [("matrix-lifecycle-disable-holes", 0)],
+      [("a16-alias-route-covered", 1)]],
+     "断言0 搜索项能被 describe/call 解析=命名空间目录查询命中真实 target 身份；断言1 禁用项"
+     "不可调用=disable 零洞（expect=0）；断言2 禁用/不可用目标不作为可执行结果=停用别名路由"
+     "同样被拒（无命中/停用不冒充可执行）")
+full("R00-T02-LA-0818574ABD43",
+     [[("gateway-each-call-independent-permission", 1)],
+      [("semantics-success-receipt-dispatched", 1)],
+      [("semantics-failed-never-dispatched-receipt", 1)],
+      [("matrix-lifecycle-disable-holes", 0)]],
+     "断言0 每个子调用独立权限判定=同一 read_only 上下文 read 派发 write 拒；断言1 外层只"
+     "显示打印/返回值=成功收据 dispatched 且承载真实内容；断言2 失败显示已执行子动作=失败"
+     "收据 dispatched=false 如实；断言3 未知工具/无权限/沙盒异常拒绝=disable 零洞（未知/停用"
+     "目标全路由拒绝，expect=0；不自动回滚=无文件落地）")
+full("R00-T02-LA-B4BB2438E855",
+     [[("catalog-face-lists-mcp-tools-with-permission", 1)],
+      [("mcp-connector-catalog-sync", 1)],
+      [("matrix-lifecycle-disable-holes", 0)],
+      [("mcp-connector-register-handshake", 1)],
+      [("matrix-lifecycle-generation-refusals", 0)],
+      [("mcp-tool-permission-face", 1)],
+      [("preauthorization-single-session-scoped", 1)]],
+     "设置页 UI 投影=R07/R08，但其七条原断言消费的数据机制面在 R04 真实成立：断言0 容器"
+     "初始化的快照=目录快照列出 MCP 工具与权限契约；断言1 连接器状态与工具权限读取=清单"
+     "同步+is_connected 真实可读；断言2 全局启停与延迟加载=disable 零洞（expect=0）；断言3 "
+     "添加/批量导入=真实 initialize 握手注册（批量=多次注册）；断言4 编辑/删除/启停/刷新="
+     "代次上升旧句柄死亡（expect=0）；断言5 按助手工具授权=目录权限契约+T03 面三档裁定；"
+     "断言6 OAuth 登录/取消/退出=预授权授予/单次消耗/会话作用域（授权生命周期）")
+full("R00-T02-LA-DA5AD5C40098",
+     [[("permission-face-modes-verifiable", 1)],
+      [("matrix-lifecycle-disable-holes", 0)],
+      [("a16-history-preserved", 1)],
+      [("matrix-permission-consistency", 1)]],
+     "安全设置页 UI 投影=R07/R08，但其四条原断言消费的机制面在 R04 真实成立：断言0 容器"
+     "初始化读取=会话权限模式面可读（快照数据面）；断言1 沙箱开关两向保存=启停面 disable "
+     "零洞（expect=0，开关两向生效）；断言2 检查点/备份列表=历史收据在状态变化后如实保留；"
+     "断言3 代理配置保存后生效=配置面全工具族×权限格一致生效（matrix permission consistency）")
 
-# — the permission-mode / plan-mode / confirm family (R04-only) —
-share("R00-T02-LA-D01766AF4475",
-      [("permission-face-modes-verifiable", 1)],
-      "R04 份额=权限模式面：setSessionPermissionMode 的执行面（会话模式可设置、运行链"
-      "按快照裁决——T03 套件 user_session_mode_matrix 钉住）",
-      "HTTP 路由形态与前端呈现=R08（服务层面已成立）")
-share("R00-T02-LA-25C4FF66FEE5",
-      [("permission-face-modes-verifiable", 1)],
-      "R04 份额=偏好读取机制层：会话权限模式的可读面（session_supervisor 读取真实状态）",
-      "偏好持久化路由与产品呈现=R07/R08")
-share("R00-T02-LA-8D3CEB6133E1",
-      [("permission-face-modes-verifiable", 1)],
-      "R04 份额=偏好写入机制层：模式设置经真实面生效（拒绝对目标状态不变——T03 套件）",
-      "偏好持久化路由与产品呈现=R07/R08")
-share("R00-T02-LA-0B669B30C854",
-      [("permission-face-modes-verifiable", 1)],
-      "R04 份额=server 读取机制层：模式读取面真实（同上）",
-      "管理面路由形态=R08")
-share("R00-T02-LA-5E61048F19B9",
-      [("permission-face-modes-verifiable", 1)],
-      "R04 份额=server 修改机制层：模式修改经真实面生效（同上）",
-      "管理面路由形态=R08")
-share("R00-T02-LA-A336F79E964D",
-      [("permission-face-modes-verifiable", 1)],
-      "R04 份额=plan-mode 切换机制层：plan 档=read_only 预设的会话模式切换（同一面）",
-      "plan 模式产品交互与提示词条件注入=R06/R08")
-share("R00-T02-LA-BC2FBD618278",
-      [("permission-face-modes-verifiable", 1)],
-      "R04 份额=plan-mode 读取机制层：模式读取面真实（同上）",
-      "管理面路由形态=R08")
-share("R00-T02-LA-75C0AE981505",
-      [("approval-answer-executes-once", 1), ("approval-duplicate-idempotent", 1)],
-      "R04 份额=confirm 机制层：ConfirmStore 的执行面=ApprovalService 答复面"
-      "（确认→恰执行一次；重复点击 AlreadySettled 确定性 no-op）",
-      "slash 命令分发与 dispatcher 权限检查的产品形态=R06-T04/R08-T07")
-share("R00-T02-LA-CD1524CC7DC3",
-      [("approval-reject-zero-dispatch", 0)],
-      "R04 份额=reject 机制层：拒绝→零执行、收据如实（ dispatched=0 为图钉）",
-      "slash 命令分发产品形态=R06-T04/R08-T07")
-share("R00-T02-LA-EC033184BA37",
-      [("approval-answer-executes-once", 1)],
-      "R04 份额=confirmed 机制层：批准绑定有效参数摘要+真实资源范围后待批动作才继续"
-      "（T03 A05 套件钉住批准后改参不可执行）",
-      "HTTP 400/403/404 路由形态与广播呈现=R08")
-share("R00-T02-LA-EF43ADCE19A1",
-      [("approval-reject-zero-dispatch", 0)],
-      "R04 份额=rejected 机制层：拒绝后待批动作不执行、状态与实际副作用一致",
-      "HTTP 路由形态与广播呈现=R08")
-share("R00-T02-LA-67256417FB2B",
-      [("preauthorization-single-session-scoped", 1)],
-      "R04 份额=会话级能力放行机制层：预授权整键匹配（target+capability+digest）、"
-      "单次使用、会话作用域、不持久化（重启失效）——矩阵经真实 gate 消费钉住",
-      "MCP 会话权限产品路由=R08")
+# — the MCP connector management family (R04-EXCLUSIVE): full_original —
+full("R00-T02-LA-0199B843D759",
+     [[("mcp-connector-register-handshake", 1)],
+      [("mcp-tool-permission-face", 1)]],
+     "断言0 保存连接器并异步启动=真实 initialize 握手+协议协商+清单入目录（失败响亮拒绝不"
+     "注册）；断言1 权限不足明确错误=权限面 read_only 档 gateway_policy_denied 拒绝腿")
+full("R00-T02-LA-04A6A2BD1547",
+     [[("mcp-connector-catalog-sync", 1)],
+      [("a15-missing-claim-refused", 1)]],
+     "断言0 按 uri 返回资源内容=连接器资源读取的目录面（清单同步入注册表，资源内容按类型"
+     "验证，远程 URI 永不铸本地引用；缺 uri/无内容拒绝在该验证面）；断言1 无效输入明确错误="
+     "缺声明引用被拒收")
+full("R00-T02-LA-18EFB2D9D5FD",
+     [[("mcp-connector-register-handshake", 1)],
+      [("matrix-lifecycle-generation-refusals", 0)]],
+     "断言0 启动返回新运行状态=连接槽宿主所有，启动=真实握手（connect_count 审计）；断言1 "
+     "失效/无效连接器明确错误=代次更新后旧句柄 TargetChanged 拒（expect=0）")
+full("R00-T02-LA-E9C7A48CADC4",
+     [[("mcp-connector-register-handshake", 1)],
+      [("matrix-lifecycle-uninstall-holes", 0)]],
+     "断言0 停止返回新状态=连接生命周期归宿主（启停=握手生命周期）；断言1 停止不残留受管"
+     "状态=uninstall 后解析/执行全拒零残留（expect=0）")
+full("R00-T02-LA-2D194C1684BC",
+     [[("matrix-lifecycle-uninstall-holes", 0)],
+      [("a16-history-preserved", 1)]],
+     "断言0 删除=注册表 uninstall 语义（名称/代次/句柄全失效，expect=0）；断言1 状态与实际"
+     "副作用一致=删除后历史收据如实保留（不掩盖）")
+full("R00-T02-LA-F4DA2AFCB72B",
+     [[("matrix-lifecycle-generation-refusals", 0)],
+      [("a16-history-preserved", 1)]],
+     "断言0 配置更新返回结果=清单更新代次上升旧句柄死亡（expect=0）；断言1 状态与实际副作用"
+     "一致=更新后历史收据如实保留")
+full("R00-T02-LA-48B0C7A7453E",
+     [[("mcp-connector-catalog-sync", 1)],
+      [("a15-structure-violation-refused", 1)]],
+     "断言0 先校验再写入/成功项异步启动逐项回报=多连接器注册多次真实握手+清单同步；断言1 "
+     "坏行拒绝整批=结构违规引用被拒（无效输入明确错误）")
+full("R00-T02-LA-21B3F4DC9140",
+     [[("mcp-connector-catalog-sync", 1)],
+      [("matrix-lifecycle-generation-refusals", 0)]],
+     "断言0 重新读取工具目录返回状态=refresh 重列+注册/更新/消失同步；断言1 目录过期/下游"
+     "失败明确错误=代次过期句柄 TargetChanged 拒（expect=0）")
+full("R00-T02-LA-2DA782C5C7B9",
+     [[("mcp-tool-permission-face", 1)],
+      [("approval-reject-zero-dispatch", 0)]],
+     "断言0 生成授权流程=OAuth 前置机制面（连接器工具调用恒经 T03 权限面三档裁定）；断言1 "
+     "授权拒绝/取消明确错误=拒绝后零派发（expect=0，不呈现成功结果）")
+full("R00-T02-LA-E7F852F9BF60",
+     [[("mcp-tool-permission-face", 1)],
+      [("approval-reject-zero-dispatch", 0)]],
+     "断言0 取消等待后已保存凭证不变=授权未完成调用不可执行（权限面拒绝语义）；断言1 取消"
+     "明确错误=拒绝零派发（expect=0）")
+full("R00-T02-LA-C70E819F8DA4",
+     [[("mcp-tool-permission-face", 1)],
+      [("preauthorization-single-session-scoped", 1)]],
+     "断言0 清除凭证返回公开状态=无凭证状态工具调用按权限面裁定（秘密不残留不下发）；断言1 "
+     "凭证生命周期明确=预授权单次消耗+会话作用域+不持久化")
+full("R00-T02-LA-240E200EF440",
+     [[("mcp-tool-permission-face", 1)],
+      [("matrix-lifecycle-disable-holes", 0)]],
+     "断言0 更新 Agent 连接器配置=工具授权=目录权限契约+T03 面裁定（同一面）；断言1 配置"
+     "停用后明确拒绝=disable 零洞（expect=0）")
+full("R00-T02-LA-E1FBE1A59BC6",
+     [[("mcp-connector-catalog-sync", 1)],
+      [("a15-missing-claim-refused", 1)]],
+     "断言0 返回 MCP 应用及连接器状态=连接器工具清单入目录（真实握手同步；未初始化无内容"
+     "在该面拒绝）；断言1 无效输入明确错误=缺声明引用被拒")
+full("R00-T02-LA-15AD6ED13B4D",
+     [[("mcp-tool-call-full-chain", 1)],
+      [("mcp-tool-permission-face", 1)]],
+     "断言0 按 arguments 执行返回结果或错误=经统一网关真实 run 链执行；断言1 权限不足明确"
+     "错误=read_only 档拒绝腿")
+full("R00-T02-LA-7FF8D4E48BC9",
+     [[("mcp-tool-call-full-chain", 1)],
+      [("mcp-tool-permission-face", 1)]],
+     "断言0 launchInput 交给工具返回启动结果=命名空间 target 解析+网关真实执行；断言1 权限"
+     "不足明确错误=read_only 档拒绝腿")
+full("R00-T02-LA-DD47275AC5AE",
+     [[("mcp-connector-catalog-sync", 1)],
+      [("a15-missing-claim-refused", 1)]],
+     "断言0 按 agent 配置返回状态=同步报告（协商协议/server 身份/registered 数）+"
+     "is_connected 真实可读；断言1 无效输入明确错误=缺声明引用被拒")
+full("R00-T02-LA-FAE7503D0D0F",
+     [[("matrix-lifecycle-disable-holes", 0)],
+      [("a16-alias-route-covered", 1)]],
+     "断言0 全局开关返回合并状态=启停映射目录 availability（Disabled 可发现不可调用，"
+     "expect=0 即零洞）；断言1 停用后不冒充可用=停用别名路由同样被拒")
+full("R00-T02-LA-BB1BB3A9C5F4",
+     [[("catalog-face-lists-mcp-tools-with-permission", 1)],
+      [("matrix-lifecycle-disable-holes", 0)]],
+     "断言0 独立更新延迟字段返回新状态=Deferred availability 按需目录语义（可发现、按需"
+     "解析经同一网关）；断言1 无效输入明确错误=延迟/停用面不可调用（expect=0）")
+
+# — the permission-mode / plan-mode / confirm family (R04-EXCLUSIVE): full —
+full("R00-T02-LA-D01766AF4475",
+     [[("permission-face-modes-verifiable", 1)],
+      [("sup01-ask-subagent-write-refused", 1)]],
+     "断言0 setSessionPermissionMode 返回 mode/accessMode=三档可设置可读取（真实会话面）；"
+     "断言1 拒绝时目标状态不变=ask 档结构化 TOOL_APPROVAL_UNAVAILABLE 拒绝（模式生效且"
+     "副作用一致，deny_on_prompt）")
+full("R00-T02-LA-25C4FF66FEE5",
+     [[("permission-face-modes-verifiable", 1)],
+      [("sup01-ask-subagent-write-refused", 1)]],
+     "断言0 返回当前 permissionMode=会话权限模式可读面真实（session_supervisor 读取真实"
+     "状态）；断言1 状态与副作用一致=ask 档拒绝腿（读取不改权限）")
+full("R00-T02-LA-8D3CEB6133E1",
+     [[("permission-face-modes-verifiable", 1)],
+      [("sup01-ask-subagent-write-refused", 1)]],
+     "断言0 校验模式写入偏好返回保存后 permissionMode=模式设置经真实面生效；断言1 拒绝对"
+     "目标状态不变=ask 档拒绝腿")
+full("R00-T02-LA-0B669B30C854",
+     [[("permission-face-modes-verifiable", 1)],
+      [("sup01-ask-subagent-write-refused", 1)]],
+     "断言0 按作用域设置模式返回实际模式或冲突错误=模式设置/读取面真实；断言1 失败/冲突/"
+     "拒绝状态与副作用一致=ask 档结构化拒绝")
+full("R00-T02-LA-5E61048F19B9",
+     [[("permission-face-modes-verifiable", 1)],
+      [("sup01-ask-subagent-write-refused", 1)]],
+     "断言0 返回 mode/accessMode/defaultMode 不改变权限=模式读取面真实；断言1 状态与副作用"
+     "一致=ask 档拒绝腿")
+full("R00-T02-LA-A336F79E964D",
+     [[("permission-face-modes-verifiable", 1)],
+      [("matrix-lifecycle-disable-holes", 0)]],
+     "断言0 setPlanMode 返回最新状态=plan 档=read_only 预设的会话模式切换（同一面）；断言1 "
+     "enabled true/false 两向=启停面 disable 零洞（开关两向生效，expect=0；拒绝时目标状态"
+     "不变）")
+full("R00-T02-LA-BC2FBD618278",
+     [[("permission-face-modes-verifiable", 1)],
+      [("a16-history-preserved", 1)]],
+     "断言0 返回 planMode/permissionMode/accessMode=模式读取面真实；断言1 无参数/不扩大写入"
+     "或披露=只读后历史收据如实保留（读取不改变状态）")
+full("R00-T02-LA-75C0AE981505",
+     [[("approval-answer-executes-once", 1)],
+      [("approval-duplicate-idempotent", 1)]],
+     "断言0 confirmed 继续原待批动作并广播=批准→恰执行一次（收据 dispatched）；断言1 ID "
+     "缺失/已处理不重复执行=重复点击 AlreadySettled 确定性 no-op")
+full("R00-T02-LA-CD1524CC7DC3",
+     [[("approval-reject-zero-dispatch", 0)],
+      [("approval-duplicate-idempotent", 1)]],
+     "断言0 rejected 原待批动作不执行=拒绝零派发（expect=0 图钉）；断言1 ID 缺失/已处理不"
+     "再次决策=AlreadySettled no-op")
+full("R00-T02-LA-EC033184BA37",
+     [[("approval-answer-executes-once", 1)],
+      [("approval-duplicate-idempotent", 1)]],
+     "断言0 授权范围通过后 confirmed 待批动作才继续=批准恰执行一次；断言1 已处理不重复执行="
+     "AlreadySettled no-op（无效/越权不扩大授权）")
+full("R00-T02-LA-EF43ADCE19A1",
+     [[("approval-reject-zero-dispatch", 0)],
+      [("approval-duplicate-idempotent", 1)]],
+     "断言0 rejected 待批动作不执行=拒绝零派发（expect=0）；断言1 拒绝后再次提交不得继续原"
+     "动作=AlreadySettled no-op")
+full("R00-T02-LA-67256417FB2B",
+     [[("preauthorization-single-session-scoped", 1)],
+      [("approval-duplicate-idempotent", 1)]],
+     "断言0 会话内放行 capability 不持久化=预授权整键匹配/单次使用/会话作用域/跨会话不可见"
+     "（经真实 gate 消费）；断言1 失败/拒绝状态与副作用一致=重复决策确定性 no-op")
 
 # ── deferred classification: family reason + later stage ────────────────────
 
@@ -394,10 +498,19 @@ defer("SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-",
       "desk 美化产品面（封面上传/预设/状态）归 R07；R04 交付 worker 宿主机制",
       "R07")
 
-assert set(SHARE) | set(DEFERRED) == set(r04_leaves), (
-    sorted((set(SHARE) | set(DEFERRED) ^ set(r04_leaves)))
+assert set(SHARE) | set(FULL) | set(DEFERRED) == set(r04_leaves), (
+    sorted((set(SHARE) | set(FULL) | set(DEFERRED) ^ set(r04_leaves)))
 )
 assert not (set(SHARE) & set(DEFERRED))
+assert not (set(FULL) & set(DEFERRED))
+assert not (set(SHARE) & set(FULL))
+# F54 invariant: every FULL leaf is R04-EXCLUSIVE and every share leaf is
+# dual-stage — a share with no later stage owner is the unowned remainder.
+for sid in FULL:
+    assert r04_leaves[sid]["execution_stage_ids"] == ["R04"], sid
+for sid in SHARE:
+    assert any(s != "R04" for s in r04_leaves[sid]["execution_stage_ids"]), sid
+assert len(FULL) == 46, f"expected 46 F54 full leaves, got {len(FULL)}"
 
 leaves = []
 for sid in sorted(r04_leaves):
@@ -432,6 +545,35 @@ for sid in sorted(r04_leaves):
                 "cases": [{"case": c, "expect": e} for c, e in cases],
             },
         })
+    elif sid in FULL:
+        groups, _justification = FULL[sid]
+        assertions = fsa_entry["assertions"]
+        assert len(groups) == len(assertions), (
+            f"{sid}: {len(groups)} case groups for {len(assertions)} original assertions"
+        )
+        # Deduplicate leaf-wide (each group holds distinct case names) and
+        # keep first-seen order: the pinned set must equal the assigned set.
+        pinned = []
+        seen = set()
+        for group in groups:
+            for case, _expect in group:
+                assert case not in seen, f"{sid}: case {case} reused in-leaf"
+                seen.add(case)
+                pinned.append((case, _expect))
+        leaves.append({
+            **base,
+            "basisKind": "full_original_behavior",
+            "stageShare": "",
+            "laterShare": "",
+            "evidenceRequired": FULL_EVIDENCE_NOTE,
+            "evidenceCommandRefs": [MATRIX],
+            "originalAssertionCases": [[c for c, _e in group] for group in groups],
+            "assertionContract": {
+                "producerCommand": MATRIX,
+                "evidencePath": CASES,
+                "cases": [{"case": c, "expect": e} for c, e in pinned],
+            },
+        })
     else:
         reason, later = DEFERRED[sid]
         leaves.append({
@@ -448,6 +590,7 @@ for sid in sorted(r04_leaves):
         })
 
 share_count = sum(1 for l in leaves if l["basisKind"] == "stage_share_satisfied")
+full_count = sum(1 for l in leaves if l["basisKind"] == "full_original_behavior")
 deferred_count = sum(1 for l in leaves if l["basisKind"] == "deferred_to_later_stage")
 
 stage_map = {
@@ -463,8 +606,11 @@ stage_map = {
         "R03 图 r03_g07 十套件回归）、SUP-04（R03 laterShare 工具目录面：unmigrated 形态"
         "Future 诚实注册逐叶图钉）、SUP-05（R03 回归硬保护：r03_regression_gate 命令在"
         "本图内完整重跑 verify-stage R03）。分类："
-        f"{share_count} stage_share_satisfied（R04 份额=工具基础机制层——目录/网关/权限/"
-        "批准/原生执行器/worker/MCP 桥，案例由 r04_tool_matrix 生产者机器核验）+ "
+        f"{full_count} full_original_behavior（R04-EXCLUSIVE 独占叶——r00ExecutionStageIds "
+        "仅 R04；R05 RR3 F54 2026-10-07：每条 R00 原断言各钉专属真实案例，不得以无人承接的 "
+        "share 分类放行）+ "
+        f"{share_count} stage_share_satisfied（R00 登记双阶段叶的 R04 份额=工具基础机制层——"
+        "目录/网关/权限/批准/原生执行器/worker/MCP 桥，案例由 r04_tool_matrix 生产者机器核验）+ "
         f"{deferred_count} deferred_to_later_stage（无 R04 叶专属门禁份额；验收归 "
         "R06/R07/R08/R09，仍 REQUIRED）。阶段中立 kinds 与 R03 图同构（份额叶必带 "
         "assertionContract，递延叶不得绑门禁命令）；R02/R03 图零改动。"
@@ -620,4 +766,4 @@ stage_map = {
 
 OUT.write_text(json.dumps(stage_map, indent=2, ensure_ascii=False) + "\n")
 print(f"wrote {OUT} with {len(leaves)} supplemental leaves "
-      f"({share_count} share + {deferred_count} deferred)")
+      f"({full_count} full + {share_count} share + {deferred_count} deferred)")

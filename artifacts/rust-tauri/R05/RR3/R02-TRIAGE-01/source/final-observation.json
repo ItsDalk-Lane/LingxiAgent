@@ -1,0 +1,49 @@
+{
+  "time": "2026-10-07T02:14:51.654782+00:00",
+  "files": {
+    "rust/crates/lingxi-service/src/main.rs": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/main.rs",
+      "sha256": "9ea695ee5b2eef4163db16df4b584b363df6a375ca334f02c9160886ed1b5f5b",
+      "bytes": 45662,
+      "mtime_ns": 1791211366684075102
+    },
+    "rust/crates/lingxi-service/src/logging.rs": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/logging.rs",
+      "sha256": "495608195d8c7702707b710781a4fb1be836ad6cf5904fef8558d2c1337ca301",
+      "bytes": 22354,
+      "mtime_ns": 1791333538955322877
+    },
+    "rust/crates/lingxi-service/src/redaction.rs": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/redaction.rs",
+      "sha256": "9d749fc88d7c653399db7908b4fddd1bcca3264362c9da3a6a7ba49318c6a1ed",
+      "bytes": 38972,
+      "mtime_ns": 1790946694771320000
+    },
+    "scripts/rust-tauri/r02_t01_service_smoke.sh": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t01_service_smoke.sh",
+      "sha256": "14516af32a59d2f590018be232c601817dfeadb3e4355fa860fd90b1cc34bd79",
+      "bytes": 21818,
+      "mtime_ns": 1790603296214189916
+    },
+    "scripts/rust-tauri/r02_t07_redaction_scan.sh": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t07_redaction_scan.sh",
+      "sha256": "59876a68d3b3c1a68a889bb4e4739e2710918f23861b822f5bad3eb34d9fb792",
+      "bytes": 35836,
+      "mtime_ns": 1790603296216636554
+    },
+    "rust/Cargo.lock": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.lock",
+      "sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+      "bytes": 77319,
+      "mtime_ns": 1790981895131101025
+    },
+    "rust-toolchain.toml": {
+      "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust-toolchain.toml",
+      "sha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+      "bytes": 772,
+      "mtime_ns": 1790297092542644250
+    }
+  },
+  "gitHEAD": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "writesLimitedTo": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/R02-TRIAGE-01"
+}

@@ -1,0 +1,1919 @@
+{
+  "at": "2026-10-07T04:52:31.932307+00:00",
+  "status": "FAIL",
+  "kind": "AUTHOR_DOCUMENT_SELF_CHECK_NOT_INDEPENDENT_REVIEW",
+  "assertions": 378,
+  "failed": [
+    {
+      "name": "worker kind actual dispatch",
+      "passed": false,
+      "detail": null
+    },
+    {
+      "name": "local markdown links R05_REPORT.md",
+      "passed": false,
+      "detail": [
+        "../../../artifacts/rust-tauri/R05/RR3/E-03/REPORT.md"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "same current docs/rust-tauri/R05/R05_HANDOFF.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "strict JSON docs/rust-tauri/R05/R05_HANDOFF.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "same current docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "strict JSON docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "same current docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "strict JSON docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "same current docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "strict JSON docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "same current docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "strict JSON docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "same current docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "strict JSON docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "same current docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "strict JSON docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "nested duplicate keys refused",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R05 false/accepted empty",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all closed packages consume actual reports",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "E03 only selfcheck and historical E2 closed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "G02 exact incomplete boundary",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "FINAL actual absent",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "old D object not current",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "I01-I11 boundary exact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Git genuinely not performed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "four platform axes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/schemaVersion",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/artifactKind",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/stage_id",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/baseline",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/interfaces",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/consumer_guidance_r06",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/deferred_registrations",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/stage_gate_registration",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/rr1_repair_round",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/rr2_repair_round",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/protocol_version",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/data_epoch",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/storage_schema_version",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/dependency_locks",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/accepted_tasks",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/accepted_tasks_semantics",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_HANDOFF.json/historical_generated_metadata",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "E02 current retained docs/rust-tauri/R05/R05_HANDOFF.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "earlier current history retained docs/rust-tauri/R05/R05_HANDOFF.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/PROGRESS_LEDGER.json/schemaVersion",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/PROGRESS_LEDGER.json/artifactKind",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/PROGRESS_LEDGER.json/stage_id",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/PROGRESS_LEDGER.json/baseline",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/PROGRESS_LEDGER.json/tasks",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/PROGRESS_LEDGER.json/gates_terminal_state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/PROGRESS_LEDGER.json/environment_items",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/PROGRESS_LEDGER.json/followup_obligations_for_t03_plus",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/PROGRESS_LEDGER.json/rr1_repair_round",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/PROGRESS_LEDGER.json/rr2_repair_round",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "E02 current retained docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "earlier current history retained docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json/schemaVersion",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json/artifactKind",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json/stage_id",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json/baseline",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json/note",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json/acceptances",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json/rr2_repair_round",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "E02 current retained docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "earlier current history retained docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_TEST_MAP.json/schemaVersion",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_TEST_MAP.json/artifactKind",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_TEST_MAP.json/stage_id",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_TEST_MAP.json/structure",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_TEST_MAP.json/aIndex",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_TEST_MAP.json/entries",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_TEST_MAP.json/oldProductUntouchedDiff",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_TEST_MAP.json/ledgerNameCorrections",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_TEST_MAP.json/aIndexNote",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_TEST_MAP.json/registryNote",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_TEST_MAP.json/rr3_I10_mapping_history",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "E02 current retained docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "earlier current history retained docs/rust-tauri/R05/R05_TEST_MAP.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/schemaVersion",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/artifactKind",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/stage_id",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/honestyRule",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/preregisteredThresholds",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/measured",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/notClaimed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json/rr3_resource_selfcheck",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "E02 current retained docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "earlier current history retained docs/rust-tauri/R05/R05_PERFORMANCE_RESULTS.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/schemaVersion",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/artifactKind",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/stage_id",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/policy",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/status",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/statusVocabulary",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/whatIsBlocked",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/whatIsNotBlocked",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/deferredObligation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical field docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json/platformVerification",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "E02 current retained docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "earlier current history retained docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "large ledger original byte prefix PROGRESS_LEDGER.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "large ledger original byte prefix R05_ACCEPTANCE_LEDGER.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "large ledger original byte prefix R05_TEST_MAP.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "other stages untouched",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all tasks untouched",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "other orchestration roots untouched",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "consumer contract only two current evidence refs changed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unneeded interface unchanged WORKER_MODEL_BOUNDARY.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unneeded interface unchanged R05_INTERFACE_EVOLUTION.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "historical Markdown line order R05_REPORT.md",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "historical Markdown line order R05_INDEPENDENT_REVIEW.md",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "historical Markdown line order R05_BLOCKERS.md",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "historical Markdown line order R05_NEGATIVE_GATE_REPORT.md",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "historical Markdown line order MODEL_USAGE_SEMANTICS.md",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "current banner R05_REPORT.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "current banner R05_INDEPENDENT_REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "current banner R05_BLOCKERS.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "current banner R05_NEGATIVE_GATE_REPORT.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "actual complete field order ModelRouteRequest",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "actual complete field order RunContext",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "actual complete field order ModelTurnInput",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "actual complete field order AuxiliaryRequest",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "actual complete field order EmbeddingRequest",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "actual complete field order OperationCallContext",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "actual complete field order ModelUsageQuery",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "exchange fields AssistantTurn",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "exchange fields ToolResult",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "worker six actual fields",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "worker kind actual dispatch",
+      "passed": false,
+      "detail": null
+    },
+    {
+      "name": "storage schema7",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "wire event epoch axes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "operation context actual embed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "operation context actual rerank",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "real normal embedding sample",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unknown output preserved",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "callback trace real wiring",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "mandatory consumer keys",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all lifecycle descriptions",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "raw exact SHA",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all original counts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "original distribution",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "original thresholds",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "service ranges rssKiB",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree ranges rssKiB",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "owner ranges rssKiB",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "service ranges fds",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree ranges fds",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "owner ranges fds",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65713",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65713",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65713",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65713",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65713",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65713",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65713",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65713",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65713",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65713",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65713",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65713",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65713",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 68787",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 75921",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "tree sums PID 65305",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "15 live workers",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "15 released workers",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "45 owner steady zero",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all 115 log limits",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "steady tmp clear",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "budget restart separate",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "cleanup preserved",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "real sampler control sequence",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "ordinary actual receipt artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/ordinary-cancel-recovery/command.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "ordinary actual receipt artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/late-result-next-run/command.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "resource actual command",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "actual runtime binary",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/TASK0/historical-layer-audit.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/verify-stage-result.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR2/FINAL-01/STAGE_REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/A-02/REPORT.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/A-REVIEW-01/REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/B-REVIEW-01/REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/C-01/REPORT.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/C-01/I-MAPPING.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-subagent-01/command.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/C-01/ordinary-cancel-late-result-01/command.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/F46-01/REPORT.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/F46-01/resources-01/command.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/F46-01/resources-01/f27-resource-series.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/F46-01/resources-01/runtime-binding.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/result.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/D-01/REPORT.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/D-01/PREPARED-ALLOW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/summary.txt",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/r02_legacy_regression/stdout.log",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-binding-exclusions.txt",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/e0-run-output-sinks.txt",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/A-REVIEW-02/REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/A-REVIEW-02/manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/MANIFEST.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/RESULT.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/command.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/f27-resource-series.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/RESOURCE_ANALYSIS.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/resources-01/runtime-binding.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/result.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-subagent/command.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/ordinary-late/command.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/D-REVIEW-01/REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/D-REVIEW-01/evidence-manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/D-REVIEW-01/PREPARED-ALLOW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/D-REVIEW-01/prepared-object.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/D-REVIEW-01/r00-formal-01.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/E-REVIEW-01/REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/E-REVIEW-01/manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/E-02/manifest-consumption.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/E-02/REPORT.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/E-02/raw-audit.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/E-02/source-audit.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/E-02/g-observation-final.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/E-02/d-object-readback.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/E-02/E01-manifest-consumption.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/I-REVIEW-01/REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/ordinary-cancel-recovery/command.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/G-REVIEW-02/STOPPED.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/H-REVIEW-02/FINAL_SOURCE_BINDING.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/DELIVERY-PREP-02/REFRESH_RULES.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/command.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/DOC-INPUT-BOUNDARY-01/REPORT.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/G-REVIEW-02/I-MAPPING.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/H-REVIEW-02/sampler-negative-final/result.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/STORAGE-03/REPORT.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/J-REVIEW-02/REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/late-result-next-run/command.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/G-REVIEW-02/REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/E-REVIEW-02/REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/f27-resource-series.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/DELIVERY-PREP-02/REPORT.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/H-REVIEW-02/REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/STORAGE-03/execution-receipt.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/H-REVIEW-02/RESOURCE_ANALYSIS-resources-final.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "artifact hash artifacts/rust-tauri/R05/RR3/H-REVIEW-02/commands/resources-final/runtime-binding.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "dependency lock rust/Cargo.lock",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "dependency lock rust-toolchain.toml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "dependency lock package-lock.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "original authority unchanged artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/Lingxi_R05_完整执行与验收提示词_2026-10-02.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "original authority unchanged artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/01_通用执行约束.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "original authority unchanged artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/02_目标架构与强制契约.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "original authority unchanged artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R05_模型协议、凭证、流式处理与最小完整闭环.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "original authority unchanged artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/04_阶段依赖与接口交接.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "original authority unchanged artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/06_风险、技术决策与退出条件.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "original authority unchanged artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R06_上下文、会话语义、记忆与知识库.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "original authority unchanged artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/05_验收与性能协议.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "original authority unchanged artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/03_功能与所有权矩阵.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "storage formal archive every file",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "current explicit anchor R05_REPORT.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "local markdown links R05_REPORT.md",
+      "passed": false,
+      "detail": [
+        "../../../artifacts/rust-tauri/R05/RR3/E-03/REPORT.md"
+      ]
+    },
+    {
+      "name": "current explicit anchor R05_INDEPENDENT_REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "current explicit anchor R05_INDEPENDENT_REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "current explicit anchor R05_INDEPENDENT_REVIEW.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "local markdown links R05_INDEPENDENT_REVIEW.md",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "current explicit anchor R05_BLOCKERS.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "current explicit anchor R05_BLOCKERS.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "current explicit anchor R05_BLOCKERS.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "local markdown links R05_BLOCKERS.md",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "current explicit anchor R05_NEGATIVE_GATE_REPORT.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "current explicit anchor R05_NEGATIVE_GATE_REPORT.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "local markdown links R05_NEGATIVE_GATE_REPORT.md",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "current explicit anchor MODEL_USAGE_SEMANTICS.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "current explicit anchor MODEL_USAGE_SEMANTICS.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "local markdown links MODEL_USAGE_SEMANTICS.md",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "local markdown links WORKER_MODEL_BOUNDARY.md",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "semantic paths and each byte mode equal",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "semantic digest same",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "H375 current equals tested actual input",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "semantic_count": 9369,
+  "semantic_digest": "dee0f52b7bdd7d4e243f7bf77810128008a107b9ab9b6536427cc8c9aa5616d9",
+  "documents_changed": 12,
+  "g_inventory_changes": 17,
+  "whole_candidate_equal": false
+}

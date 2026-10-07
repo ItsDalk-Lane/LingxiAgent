@@ -1,0 +1,722 @@
+[
+  {
+    "label": "a01-both-levels",
+    "classification": "EXECUTED",
+    "record": "commands/a01-both-levels/command.json",
+    "recordSha256": "c07c09c15700736110f5032a12d7e44b2c6574f88b9b0af761a2d33878d69eff",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-01/commands/a01-both-levels/levels/warn/a01-leaf-cases.json",
+        "actual": 17,
+        "failed": 0
+      },
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-01/commands/a01-both-levels/levels/info/a01-leaf-cases.json",
+        "actual": 17,
+        "failed": 0
+      }
+    ],
+    "nonTestCounts": null
+  },
+  {
+    "label": "a01-final-both-levels",
+    "classification": "EXECUTED",
+    "record": "commands/a01-final-both-levels/command.json",
+    "recordSha256": "cf1b395c17c95bda66c0ec7e67a86b318d25e18e0824e13932b01985a4e04b07",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-01/commands/a01-final-both-levels/levels/warn/a01-leaf-cases.json",
+        "actual": 17,
+        "failed": 0
+      },
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-01/commands/a01-final-both-levels/levels/info/a01-leaf-cases.json",
+        "actual": 17,
+        "failed": 0
+      }
+    ],
+    "nonTestCounts": null
+  },
+  {
+    "label": "a13-final",
+    "classification": "EXECUTED",
+    "record": "commands/a13-final/command.json",
+    "recordSha256": "c21acf997467d426bede2b30f10db62943b35b0bc4a33a9d2a639b580f39e1eb",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "a13-green",
+    "classification": "EXECUTED",
+    "record": "commands/a13-green/command.json",
+    "recordSha256": "9b5b3106efa39ba6757b50266a5eb64bf06468f7c1072e4d7dabdfa092c60973",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "all-root-evidence-read",
+    "classification": "EXECUTED",
+    "record": "commands/all-root-evidence-read/command.json",
+    "recordSha256": "19ba3f5452db60af1ba204d9fae0079db657239052333630f1bc289c15971963",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "baseline-a01-warn",
+    "classification": "TARGET_RED",
+    "record": "commands/baseline-a01-warn/command.json",
+    "recordSha256": "0fec43848ca949a01ef74cd91f54b87d7354e8745c3a7437c6553d910441eddd",
+    "exit": 1,
+    "RustActualCounts": [],
+    "leafCases": [
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-01/commands/baseline-a01-warn/A01/a01-leaf-cases.json",
+        "actual": 11,
+        "failed": 1
+      }
+    ],
+    "nonTestCounts": null
+  },
+  {
+    "label": "baseline-a13",
+    "classification": "TARGET_RED",
+    "record": "commands/baseline-a13/command.json",
+    "recordSha256": "fcff885a74015e7ef5e89f94cb9ed918a1b301e31603ab441aea3e5c6679e7ab",
+    "exit": 1,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "clippy-service",
+    "classification": "EXECUTED",
+    "record": "commands/clippy-service/command.json",
+    "recordSha256": "db78ef970ef4b0c8d98f6619f7830695344a9c83fb179b33a9bee3d9dc895ace",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "diagnostic-consumers",
+    "classification": "EXECUTED",
+    "record": "commands/diagnostic-consumers/command.json",
+    "recordSha256": "56eee77ffb2f7c41d1c317b9dc510ea2681a4028da8c48606a557fd8b0f0e361",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "environment",
+    "classification": "EXECUTED",
+    "record": "commands/environment/command.json",
+    "recordSha256": "be81eab8a44d2655e4d60e6cb1b6b888d5575b2aabbf841d2b842fdfd57d8d11",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "f46-old-driver",
+    "classification": "EXECUTED",
+    "record": "commands/f46-old-driver/command.json",
+    "recordSha256": "b0ea156af465b5e4217ad77ec823725fd66b8a924162daf8130b184433a0fc52",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "f46-old-prune-red",
+    "classification": "EXECUTED",
+    "record": "commands/f46-old-prune-red/command.json",
+    "recordSha256": "f8082a9ab4e100f07006dad2a1c5d1450f0b604a6247ec9412c589c7bd79f1bc",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "f46-old-six-command",
+    "classification": "TARGET_RED",
+    "record": "commands/f46-old-six-command/command.json",
+    "recordSha256": "72eb0c17f2778fc9d8933d1e22ac59e29ca3feb87eab24abcc664090d32ba17f",
+    "exit": 1,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "f46-restore-driver",
+    "classification": "EXECUTED",
+    "record": "commands/f46-restore-driver/command.json",
+    "recordSha256": "c4a6dbbf6e2314bb8d9b3f11e4f52b909a8d616a8c93717dcaead65170dc5e2d",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "f46-restored-green",
+    "classification": "EXECUTED",
+    "record": "commands/f46-restored-green/command.json",
+    "recordSha256": "af43d3bcf5d26cce0a569d9147886863db9452d6acf5f5bc3a55ece5ed5a6c2c",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "f46-restored-six-command",
+    "classification": "EXECUTED",
+    "record": "commands/f46-restored-six-command/command.json",
+    "recordSha256": "a53d3079cabb4a2c7fcd73c36e9013d2faf61cad00624d27afb24cdae06a48c7",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "f47-guard-driver",
+    "classification": "TARGET_RED",
+    "record": "commands/f47-guard-driver/command.json",
+    "recordSha256": "4c53bf990e9ad1729537ec864804559955003caf8b983949ab5a1dedc624f99f",
+    "exit": 1,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "f47-guard-red",
+    "classification": "TARGET_RED",
+    "record": "commands/f47-guard-red/command.json",
+    "recordSha256": "4d510d215d2fae163c1a307e290102f2bfe700b35e8bb1b502ba47d66d3016a6",
+    "exit": 1,
+    "RustActualCounts": [],
+    "leafCases": [
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-01/commands/f47-guard-red/A01/a01-leaf-cases.json",
+        "actual": 11,
+        "failed": 1
+      }
+    ],
+    "nonTestCounts": null
+  },
+  {
+    "label": "f47-restore-2-driver",
+    "classification": "EXECUTED",
+    "record": "commands/f47-restore-2-driver/command.json",
+    "recordSha256": "29e8dd25d53ec731533db00c65c96f6f7801d90cc5829f69ea5ed2599eb24397",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "f47-restore-driver",
+    "classification": "INVALID_PREPARATION_RETAINED",
+    "record": "commands/f47-restore-driver/command.json",
+    "recordSha256": "f8aacf697a7e69cf616b4614eff5831dceb4bcb78097eadb0163e13d8e873cf5",
+    "exit": 1,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "f47-restored-green",
+    "classification": "INVALID_PREPARATION_RETAINED",
+    "record": "commands/f47-restored-green/command.json",
+    "recordSha256": "ff495bdbae53c368c20f5f2ede988effde33d12190dc2c4b0c1a33c02d596595",
+    "exit": 1,
+    "RustActualCounts": [],
+    "leafCases": [
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-01/commands/f47-restored-green/A01/a01-leaf-cases.json",
+        "actual": 9,
+        "failed": 1
+      }
+    ],
+    "nonTestCounts": null
+  },
+  {
+    "label": "f47-restored-green-2",
+    "classification": "EXECUTED",
+    "record": "commands/f47-restored-green-2/command.json",
+    "recordSha256": "2c7313b78a0f3123678ad78c7ac95a712f837bc5860e89b4015fc8c220fc5648",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-01/commands/f47-restored-green-2/A01/a01-leaf-cases.json",
+        "actual": 17,
+        "failed": 0
+      }
+    ],
+    "nonTestCounts": null
+  },
+  {
+    "label": "f47-root-driver",
+    "classification": "TARGET_RED",
+    "record": "commands/f47-root-driver/command.json",
+    "recordSha256": "1b9a8d180737e64135f42be2cd4b20e77aff016ad58b806b8addc1eaca49b133",
+    "exit": 1,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "f47-root-red",
+    "classification": "TARGET_RED",
+    "record": "commands/f47-root-red/command.json",
+    "recordSha256": "9504537643522ae672d45088234d0d87c00aed5acbc0788b832971ba186bfb44",
+    "exit": 1,
+    "RustActualCounts": [],
+    "leafCases": [
+      {
+        "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR3/H-01/commands/f47-root-red/A01/a01-leaf-cases.json",
+        "actual": 9,
+        "failed": 1
+      }
+    ],
+    "nonTestCounts": null
+  },
+  {
+    "label": "f48-boundary-red",
+    "classification": "TARGET_RED",
+    "record": "commands/f48-boundary-red/command.json",
+    "recordSha256": "d61b9e3c8897f057c8385ffdae04eacebf26d263c2ee373be3be527b87f36538",
+    "exit": 1,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "f48-red-driver",
+    "classification": "TARGET_RED",
+    "record": "commands/f48-red-driver/command.json",
+    "recordSha256": "fdd916ede96d4415b0ed2c26b4488bb6422e2ee5f2c01ec762bc6757f1b3bbda",
+    "exit": 1,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "f48-restore-driver",
+    "classification": "EXECUTED",
+    "record": "commands/f48-restore-driver/command.json",
+    "recordSha256": "58e13ea51adad2226cca097a28d5596e0a0dd41e6793ae5bb72a7fa0925ce2f0",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "f48-restored-green",
+    "classification": "EXECUTED",
+    "record": "commands/f48-restored-green/command.json",
+    "recordSha256": "3183bd5312e68ec793fde6bfea7531542a721a6bc2e83bd45af9216af8bd066b",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "final-diff-check",
+    "classification": "EXECUTED",
+    "record": "commands/final-diff-check/command.json",
+    "recordSha256": "9324bebe04c0b13d6b5dff1a3f9a9c99b5eecb87f9eaff519168aebec8917c24",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "final-root-build",
+    "classification": "INVALID_PREPARATION_RETAINED",
+    "record": "commands/final-root-build/command.json",
+    "recordSha256": "c1d706ecf90d25161f6a706d48bed24ace59c0ca05c4ed5bfd25e3e7765fef93",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "final-root-build-2",
+    "classification": "EXECUTED",
+    "record": "commands/final-root-build-2/command.json",
+    "recordSha256": "a68015281a38f87fe3bed98aacb39cb2967d25c8d707ddaa980b5e0c76ecb2ec",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "final-source-diff",
+    "classification": "EXECUTED",
+    "record": "commands/final-source-diff/command.json",
+    "recordSha256": "5377b24f8fdfa28cd5a3942aa5fa9caa5ff7cf3330f95d6901385d0e57db1787",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "fmt-check",
+    "classification": "EXECUTED",
+    "record": "commands/fmt-check/command.json",
+    "recordSha256": "adacaea40e4d5e5cfbf68737b7fe75fc6c5ca001d8c2e5fe5a89f2f6b2716bda",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "force-root-owned-input-mtime",
+    "classification": "EXECUTED",
+    "record": "commands/force-root-owned-input-mtime/command.json",
+    "recordSha256": "bbb82395a0d0decbb8a3adc90b6714501374c840a56cc8b607da28db494965db",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "format-edited",
+    "classification": "EXECUTED",
+    "record": "commands/format-edited/command.json",
+    "recordSha256": "8ac43f7526af3bff6780771c329c2cb566a539af16d544bdf5eadff060334a35",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "inspect-diff",
+    "classification": "EXECUTED",
+    "record": "commands/inspect-diff/command.json",
+    "recordSha256": "d30d684e4fe9070ff77bc5debc9054046468a9454c2c8bd6b851f766bb25e430",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "limits-and-readonly-inputs",
+    "classification": "EXECUTED",
+    "record": "commands/limits-and-readonly-inputs/command.json",
+    "recordSha256": "f67d963df3ff33a1a131b8a10d468aeae9257b5cdb9c7412265aaeb5c7c6decc",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "live-correlation",
+    "classification": "EXECUTED",
+    "record": "commands/live-correlation/command.json",
+    "recordSha256": "c66815801fc50bd435bec964e9b64d7b3dd814a7b7987a2b1cc0919b145bf9b2",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "live-correlation-final-command",
+    "classification": "EXECUTED",
+    "record": "commands/live-correlation-final-command/command.json",
+    "recordSha256": "2ea75d0e14643ba9c3168c96d202158f567ff447f3d90ebfb61781c2257a9af0",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "logging-final",
+    "classification": "EXECUTED",
+    "record": "commands/logging-final/command.json",
+    "recordSha256": "a1c314d5572a812feac20855214ef13d795da8cd0cc3e899e3d76d476a340e24",
+    "exit": 0,
+    "RustActualCounts": [
+      {
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 352
+      }
+    ],
+    "leafCases": [],
+    "nonTestCounts": null
+  },
+  {
+    "label": "node-version",
+    "classification": "EXECUTED",
+    "record": "commands/node-version/command.json",
+    "recordSha256": "ba3199a7853bdee305320b9d59ef07cb46301b9fb1c59000d022d4d2363dce79",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "npm-version",
+    "classification": "EXECUTED",
+    "record": "commands/npm-version/command.json",
+    "recordSha256": "d253e1fed4c1ae9d5c45252a11be695bd6d10d7affe646c032ff0941bbb35178",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "platform",
+    "classification": "EXECUTED",
+    "record": "commands/platform/command.json",
+    "recordSha256": "ab9cfb9c5eca5a3c6114f827bf0768d902b73396305bf6dda8fd32e1b9b8d4e7",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "prepare-isolated",
+    "classification": "EXECUTED",
+    "record": "commands/prepare-isolated/command.json",
+    "recordSha256": "6d5d99eb4b0d9be4937a81f5ba39de70a63049db2766f1584c8dec5523a3ecd0",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "python-and-shell-syntax",
+    "classification": "EXECUTED",
+    "record": "commands/python-and-shell-syntax/command.json",
+    "recordSha256": "02c345d8f6d295420e2cc7c21c4dc93cc6843286410d1608fd0ea2eb3a92f710",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "read-originals",
+    "classification": "EXECUTED",
+    "record": "commands/read-originals/command.json",
+    "recordSha256": "57b78de71b969a2ae853d48abae2671a630a443e5128d0e887876c22ad621b36",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "redaction-final",
+    "classification": "EXECUTED",
+    "record": "commands/redaction-final/command.json",
+    "recordSha256": "866fa52849432900611b55a8be6a3c7b0645e3da12516ebcc208a6562679e666",
+    "exit": 0,
+    "RustActualCounts": [
+      {
+        "passed": 25,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 336
+      }
+    ],
+    "leafCases": [],
+    "nonTestCounts": null
+  },
+  {
+    "label": "redaction-green",
+    "classification": "EXECUTED",
+    "record": "commands/redaction-green/command.json",
+    "recordSha256": "053855e33d9d36b9ea9cd47c6f7e4cad8e83bbdf2c1ef0a830d6c527612acf2a",
+    "exit": 0,
+    "RustActualCounts": [
+      {
+        "passed": 25,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 336
+      }
+    ],
+    "leafCases": [],
+    "nonTestCounts": null
+  },
+  {
+    "label": "regression-old-red",
+    "classification": "TARGET_RED",
+    "record": "commands/regression-old-red/command.json",
+    "recordSha256": "d62e4e0f4921bdb9fec19613a66a6239ce28d6f36c9e02cfaf69c29f3d70edd3",
+    "exit": 101,
+    "RustActualCounts": [
+      {
+        "passed": 0,
+        "failed": 3,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 358
+      }
+    ],
+    "leafCases": [],
+    "nonTestCounts": null
+  },
+  {
+    "label": "resource-analysis",
+    "classification": "EXECUTED",
+    "record": "commands/resource-analysis/command.json",
+    "recordSha256": "d77d32e5d260688584735d2855f4a4b7ce61b5807b54ecf0af826b1549de6dbd",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "resource-analysis-strict",
+    "classification": "EXECUTED",
+    "record": "commands/resource-analysis-strict/command.json",
+    "recordSha256": "6c5e2ea8ce411244f3262f252a20354b8360ffb99d8db60704530c49bf37c1af",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "resource-final-analysis",
+    "classification": "EXECUTED",
+    "record": "commands/resource-final-analysis/command.json",
+    "recordSha256": "6536a75a9672a51b882e40c022f5b9b21d648afdeebaf677b68c3f346a1237f5",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "resources-final",
+    "classification": "EXECUTED",
+    "record": "commands/resources-final/command.json",
+    "recordSha256": "0d2c85a8f4b87f96e893e0e8aa6c6266c7e33951f142c40ab3d1718c748ebc71",
+    "exit": 0,
+    "RustActualCounts": [
+      {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      }
+    ],
+    "leafCases": [],
+    "nonTestCounts": null
+  },
+  {
+    "label": "resources-green",
+    "classification": "EXECUTED",
+    "record": "commands/resources-green/command.json",
+    "recordSha256": "0673d16e5b93b47d0bae0bc9d094f0f8a064d9c705473874a981e2f0ed1ecb9b",
+    "exit": 0,
+    "RustActualCounts": [
+      {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      }
+    ],
+    "leafCases": [],
+    "nonTestCounts": null
+  },
+  {
+    "label": "runtime-binding",
+    "classification": "EXECUTED",
+    "record": "commands/runtime-binding/command.json",
+    "recordSha256": "5fe02dcb54f3afd634af7342af817df0dc159747eb3fb40303673b34edd891b0",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "runtime-final-binding",
+    "classification": "EXECUTED",
+    "record": "commands/runtime-final-binding/command.json",
+    "recordSha256": "813cf36d4e42e4e70ba45de87eecb3c5fb8eeec3267937e165b2c976b5ee71e4",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "sampler-negative-final-command",
+    "classification": "EXECUTED",
+    "record": "commands/sampler-negative-final-command/command.json",
+    "recordSha256": "99ff0148ba6f91786757eb5f5f020908345724f41cb31e63220e52aefc38a52c",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "sampler-negative-new-binary",
+    "classification": "EXECUTED",
+    "record": "commands/sampler-negative-new-binary/command.json",
+    "recordSha256": "7f3f02c5c6c5b3a60486274b9de248a7a015b1f5c8cb0a31038eb3bb299c8cbe",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "source-context",
+    "classification": "EXECUTED",
+    "record": "commands/source-context/command.json",
+    "recordSha256": "db92a432f387151ed2977b85c6e050d4954d02ad0bbb0ba97f15a80ac453e7c2",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "toolchain-rustc",
+    "classification": "EXECUTED",
+    "record": "commands/toolchain-rustc/command.json",
+    "recordSha256": "028360d19fdbdfb175fccc222a247d0907248daa10491ffcdd8b46f72672306a",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；原始输出保留，未把无测试/工具exit0当测试绿"
+  },
+  {
+    "label": "final-evidence-verification",
+    "classification": "EVIDENCE_VERIFICATION",
+    "record": "commands/final-evidence-verification/command.json",
+    "recordSha256": "519e71d41cdb7a44b3a02fe205098d817df0092046a23b8b0dd9d5b9cc9abe5b",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；证据核验不算Rust测试"
+  },
+  {
+    "label": "final-manifest",
+    "classification": "EVIDENCE_VERIFICATION",
+    "record": "commands/final-manifest/command.json",
+    "recordSha256": "2c2418bc78dd2199244b8c2a4e021af8f0c595afd545d119b2f61b8de922ebb0",
+    "exit": 0,
+    "RustActualCounts": [],
+    "leafCases": [],
+    "nonTestCounts": "不适用；证据核验不算Rust测试"
+  }
+]

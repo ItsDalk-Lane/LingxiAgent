@@ -1,0 +1,7 @@
+
+running 1 test
+F27 sampler controls: {"deadProcessTree":"UNKNOWN","emptyAndWrongIdentity":"UNKNOWN","fdBaseline":3,"fdReleased":"UNKNOWN (dead/reaped PID)","fdRetained":6,"filesReleased":[],"filesRetained":[{"bytes":17,"path":"held-0.tmp"},{"bytes":17,"path":"held-1.tmp"},{"bytes":17,"path":"held-2.tmp"}],"liveProcessTree":{"establishedTcpCount":0,"fds":3,"processes":[{"establishedTcp":[],"fds":3,"pid":45538,"rssKiB":1488}],"rootPid":45538,"rssKiB":1488},"tcpReleased":0,"tcpRetained":2}
+test f27_sampler_controls_detect_growth_release_and_failure ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.98s
+

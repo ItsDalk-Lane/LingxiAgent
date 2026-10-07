@@ -1,0 +1,16 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r05_t05_timeouts.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r05-t08/debug/deps/r05_t05_timeouts-fb063e2c714df376)
+
+running 9 tests
+test a_retry_that_cannot_fit_the_call_budget_is_vetoed_not_slept_into ... ok
+test a_retry_after_a_confirmed_tool_effect_never_re_executes_it ... ok
+test cancellation_during_backoff_settles_now_not_after_the_delay ... ok
+test an_idle_stream_is_cut_at_the_injected_bound_and_settles_honestly ... ok
+test computed_backoff_doubles_from_the_base_to_the_cap ... ok
+test computed_backoff_applies_without_a_hint ... ok
+test retry_after_hint_overrides_the_computed_backoff ... ok
+test the_default_attempt_budget_is_the_preregistered_three ... ok
+test the_backoff_sleep_holds_no_model_call_permit ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.87s
+

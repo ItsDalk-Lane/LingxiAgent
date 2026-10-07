@@ -1,0 +1,23 @@
+{
+  "startUTC": "2026-10-07T03:37:06.005319+00:00",
+  "endUTC": "2026-10-07T03:37:51.468680+00:00",
+  "scope": "本报告数据一致性核对；不是产品测试或完整源码验证",
+  "checks": {
+    "uniquePaths": true,
+    "categoryCountsSum": true,
+    "noUnresolvedSelectedReferences": true,
+    "allRecordedGitCommandsExit0": true,
+    "noContentClaimMismatch": true,
+    "allIncludePathsExcludeLocalReview": true,
+    "finishExit0": true,
+    "indexStillEmpty": true
+  },
+  "gitIndexReadCommand": [
+    "git",
+    "diff",
+    "--cached",
+    "--quiet"
+  ],
+  "gitIndexReadExitCode": 0,
+  "exitCode": 0
+}

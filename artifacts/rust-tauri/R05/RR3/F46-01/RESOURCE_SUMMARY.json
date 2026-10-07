@@ -1,0 +1,170 @@
+{
+  "status": "SELF_CHECKED",
+  "independentReview": "PENDING",
+  "checks": {
+    "160OriginalRounds": true,
+    "54BinaryPoints": true,
+    "61OwnerPoints": true,
+    "liveWorker15": true,
+    "releasedWorker15": true,
+    "owner15Peaks": true,
+    "owner45Steady": true,
+    "allSampledLogsWithin3": true,
+    "finalRestartLogs3": true,
+    "allKnownParticipantPidsGone": true,
+    "realCleanup": true
+  },
+  "rawSha256": "bcc0620794f4384196d74b7844098c063a96947147be48897a1076b9d6a50b7b",
+  "binarySha256": "b180d47abeeecef4e6d677b9501fde0828cd4061f74276d8e5e2a2a9afb33d81",
+  "workerSha256": "0b9e45e0c4e6530bbf02959f7d7f23704e7a9d9c82cd590dabbd899ae55cc794",
+  "equipmentSha256": "323456600dc961ee6e4d20b60cf7cf9964526bfcd4153090c7b4e89c0bf2e3a1",
+  "load": {
+    "cancelCycles": 60,
+    "cancelDanglingActive": 60,
+    "cancelSettled": 0,
+    "errorCycles": 60,
+    "errorRuns": 60,
+    "longResponseCycles": 10,
+    "okCycles": 15,
+    "sessions": [
+      "sess_local_alpha",
+      "sess_local_beta"
+    ],
+    "workerCycles": 15
+  },
+  "binaryPointPhases": {
+    "baseline": 1,
+    "cancel-live": 6,
+    "cancel": 6,
+    "error": 6,
+    "ok": 3,
+    "worker-live": 15,
+    "worker-released": 15,
+    "worker-final": 1,
+    "post-restart": 1
+  },
+  "ownerPhases": {
+    "baseline": 1,
+    "worker-and-queued-live": 15,
+    "released-steady": 45
+  },
+  "range": {
+    "serviceRssKiB": [
+      27328,
+      36656
+    ],
+    "serviceFds": [
+      15,
+      19
+    ],
+    "serviceTreeRssKiB": [
+      27328,
+      39232
+    ],
+    "serviceTreeFds": [
+      15,
+      22
+    ],
+    "sampledLogCounts": [
+      1,
+      2,
+      3
+    ]
+  },
+  "finalRestartLogs": [
+    {
+      "bytes": 65358,
+      "path": "lingxi-service/logs/service-000003.log"
+    },
+    {
+      "bytes": 33642,
+      "path": "lingxi-service/logs/service-000004.log"
+    },
+    {
+      "bytes": 0,
+      "path": "lingxi-service/logs/service-000005.log"
+    }
+  ],
+  "ownerPeak": {
+    "activeSessionRuns": 2,
+    "backgroundIds": [],
+    "liveRunIds": [
+      "run_000001a0dcba6c00_0000a5",
+      "run_000001a0dcba6c00_0000a4"
+    ],
+    "modelPermits": 1,
+    "modelWaiters": 1,
+    "toolPermits": 1,
+    "toolWaiters": 0
+  },
+  "ownerSteady": {
+    "activeSessionRuns": 0,
+    "backgroundIds": [],
+    "liveRunIds": [],
+    "modelPermits": 0,
+    "modelWaiters": 0,
+    "toolPermits": 0,
+    "toolWaiters": 0
+  },
+  "cleanup": {
+    "configRemoved": true,
+    "equipmentStubStopped": true,
+    "homeRemoved": true,
+    "lastServiceExit": 0,
+    "lastServicePid": 13882,
+    "serviceStopped": true,
+    "workspaceRemoved": true
+  },
+  "pidReadback": {
+    "capturedAt": "2026-10-07T00:47:26.691458+00:00",
+    "command": [
+      "ps",
+      "-axo",
+      "pid=,ppid=,comm="
+    ],
+    "exitCode": 0,
+    "knownPids": [
+      8841,
+      9175,
+      9502,
+      9832,
+      10158,
+      10487,
+      10815,
+      11142,
+      11467,
+      11792,
+      12117,
+      12442,
+      12767,
+      13095,
+      13421,
+      13882,
+      14069,
+      14398,
+      14723,
+      15048,
+      15375,
+      15700,
+      16025,
+      16350,
+      16675,
+      17000,
+      17326,
+      17660,
+      17998,
+      18323,
+      18654,
+      81588,
+      81853,
+      95828
+    ],
+    "stillPresent": []
+  },
+  "boundaries": [
+    "binary160 load separated from in-process production-owner integration",
+    "cancel phase budget drop leaves60running before recovery; no claim ordinary cancellation settled them",
+    "macOS arm64 debug only; no release performance benefit/no R10 long-run/no other-platform or paid-provider acceptance",
+    "expanded runtime inputs capture during/post run supplements five-file pre/post binding, not full repository candidate freeze"
+  ]
+}

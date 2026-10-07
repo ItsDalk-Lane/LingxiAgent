@@ -1,0 +1,21 @@
+{
+ "assert_clean": true,
+ "clean": true,
+ "counts": {
+  "ancestor_not_dir": 0,
+  "ancestor_symlink": 0,
+  "directory_entry": 0,
+  "final_symlink": 0,
+  "irregular": 0,
+  "missing": 0,
+  "regular_file": 69140
+ },
+ "distinct_ancestor_dirs_lstat_cached": 8551,
+ "elapsed_seconds": 0.586,
+ "finished_utc": "2026-10-07T13:11:29.782523+00:00",
+ "offenders": [],
+ "repo_root": "/Users/study_superior/Desktop/Code/LingxiAgent",
+ "started_utc": "2026-10-07T13:11:29.196543+00:00",
+ "tool": "F52-REVIEW-01 review_classify.py (independent method: final-component lstat + ancestor dir cache)",
+ "total_entries": 69140
+}

@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "python3",
+    "artifacts/rust-tauri/R05/RR3/H-01/sampler_negative_probe.py",
+    "sampler-negative-final"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "UTC_start": "2026-10-07T02:43:04.023445+00:00",
+  "UTC_end": "2026-10-07T02:43:08.685977+00:00",
+  "exit": 0,
+  "counts": [],
+  "leafCounts": [],
+  "inputEqual": true,
+  "inputBeforeDigest": "d44d6f5509b454afc2e8e1d46632efd6855ed781a74b15eae2447f0d8717e296",
+  "inputAfterDigest": "d44d6f5509b454afc2e8e1d46632efd6855ed781a74b15eae2447f0d8717e296",
+  "environment": {
+    "PATH": "/Users/study_superior/.cargo/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.codex/tmp/arg0/codex-arg09KvvCE:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.codex/tmp/arg0/codex-arg0uQYuTZ:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/study_superior/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS",
+    "CARGO_TARGET_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target",
+    "CARGO_NET_OFFLINE": "true",
+    "TMPDIR": "/tmp",
+    "RUST_LOG": "warn"
+  },
+  "stdoutSHA256": "4b0de6d3def9e3189a5c19fd94f6b08a4f3e71c5ab2edb8f948d9453005762d7",
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "binary": {
+    "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service",
+    "sha256": "3c2c30954478adc179b6b1073d70405a9025722463a132be6ee36c8727ea4865"
+  },
+  "boundary": "正式Cargo和真实服务入口；仅本包隔离变异明确单列；无供应商外发",
+  "head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b"
+}

@@ -1,0 +1,13 @@
+PASS O1 OK: 736 features, exactly one assignment each
+PASS O3/O6 OK: every feature owner exists and is an authority kind
+PASS O2 OK: 69 stores, exactly one owner each
+PASS O8 OK: authoritative stores owned by authority kinds, written by rust-service only
+PASS O4/O5 OK: 11 critical facts, single authority-kind owner each
+PASS O7 OK: counts coherent
+PASS B1 OK: 48 service source files scanned; protected executor symbols (dispatch_executor, execute_prepared) appear only in their reasoned whitelists
+PASS O7-drift OK: OWNERSHIP_TARGET_UP_TO_DATE features=736 stores=69
+FAIL [D1] cargo metadata failed: error: cyclic package dependency: package `lingxi-adapters v0.0.0 (/Users/study_superior/r05t08-work/negcopy.IYrM8z/rust/crates/lingxi-adapters)` depends on itself. Cycle:
+package `lingxi-adapters v0.0.0 (/Users/study_superior/r05t08-work/negcopy.IYrM8z/rust/crates/lingxi-adapters)`
+    ... which satisfies path dependency `lingxi-adapters` (locked to 0.0.0) of package `lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy.IYrM8z/rust/crates/lingxi-service)`
+    ... which satisfies pat
+RESULT: FAIL (1 violation(s))
