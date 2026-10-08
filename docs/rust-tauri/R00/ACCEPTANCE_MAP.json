@@ -4,16 +4,16 @@
  "artifact_kind": "EXECUTABLE_ACCEPTANCE_LEDGER",
  "ledger_self_status": "READY_FOR_REVIEW",
  "ledger_self_status_note": "执行者只标 READY_FOR_REVIEW；ACCEPTED 由独立验收决定（01 通用约束 §6）",
- "generated_at": "2026-09-24T07:01:59.064633+00:00",
+ "generated_at": "2026-10-08T04:36:35.517681+00:00",
  "generator": "docs/rust-tauri/R00/r00_t07_build_map.py",
  "basis": {
-  "head": "8b153b1031bbb01204375b08e9caaa891397d7a5",
+  "head": "def860a74abd174a2297a7adfbc8799d400aabea",
   "branch": "codex/rust-tauri-migration",
   "validated_repo_head": "4401afae2ee48df1512b8a8c9a1262be0efbe64f",
   "input_sha256": {
    "acceptance-catalog.json": "17c040690f529b9fd757606eeb3bb6f5bc0d21bd0d1e82272db6793a2338125e",
    "task-catalog.json": "32ef3502f1a9223bf7f5c509c43973aa96f3983ec86d3ad3c19b8c9acfef1959",
-   "FEATURE_STAGE_ACCEPTANCE.json": "699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9",
+   "FEATURE_STAGE_ACCEPTANCE.json": "462d528b17aba8b8bc9ae10912feda7778adfef92de7c3282d311dc5e7c1bac3",
    "ENTRYPOINT_COVERAGE.json": "76fe6e2b9aaae914aaff21be6f731ba8d537b944ced6412ebca4f547c8313000",
    "FEATURE_INVENTORY.json": "48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039",
    "ENTRYPOINTS.json": "f69e658f8b35b5a486a764872e27c82b599c84ef49404903f5b72f4b0b84d669",
@@ -16136,7 +16136,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16157,7 +16159,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16178,7 +16182,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16199,7 +16205,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16220,7 +16228,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16262,7 +16272,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16283,7 +16295,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16304,7 +16318,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16325,7 +16341,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16346,7 +16364,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16367,7 +16387,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16388,7 +16410,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16409,7 +16433,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16430,7 +16456,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T03"
@@ -16450,7 +16478,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16471,7 +16501,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16492,7 +16524,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -16513,7 +16547,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T02",
@@ -18343,7 +18379,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T03",
@@ -18750,7 +18788,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T03",
@@ -19407,7 +19447,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T03",
@@ -19428,7 +19470,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T03",
@@ -19471,7 +19515,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T03",
@@ -19492,7 +19538,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T03",
@@ -19513,7 +19561,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T03",
@@ -21924,7 +21974,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T03",
@@ -22053,7 +22105,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T03",
@@ -22189,7 +22243,8 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07"
    ],
    "task_ids": [
     "R04-T05"
@@ -22209,7 +22264,8 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07"
    ],
    "task_ids": [
     "R04-T05"
@@ -22744,7 +22800,8 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07"
    ],
    "task_ids": [
     "R04-T05"
@@ -22976,7 +23033,8 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07"
    ],
    "task_ids": [
     "R04-T05"
@@ -22996,7 +23054,8 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07"
    ],
    "task_ids": [
     "R04-T01",
@@ -23037,7 +23096,8 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07"
    ],
    "task_ids": [
     "R04-T03",
@@ -23916,7 +23976,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T01",
@@ -24002,7 +24064,9 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R07",
+    "R08"
    ],
    "task_ids": [
     "R04-T03",
@@ -24367,7 +24431,8 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R08"
    ],
    "task_ids": [
     "R04-T05"
@@ -24387,7 +24452,8 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R08"
    ],
    "task_ids": [
     "R04-T05"
@@ -24407,7 +24473,8 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R08"
    ],
    "task_ids": [
     "R04-T05"
@@ -24427,7 +24494,8 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R08"
    ],
    "task_ids": [
     "R04-T03"
@@ -24447,7 +24515,8 @@
    "kind": "supplemental",
    "stage_id": "R00",
    "execution_stage_ids": [
-    "R04"
+    "R04",
+    "R08"
    ],
    "task_ids": [
     "R04-T03"
@@ -58318,7 +58387,7 @@
     {
      "path": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
      "role": "feature->stage/task/acceptance + 736 supplemental scenarios",
-     "sha256": "699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9"
+     "sha256": "462d528b17aba8b8bc9ae10912feda7778adfef92de7c3282d311dc5e7c1bac3"
     },
     {
      "path": "docs/rust-tauri/R00/R00-T02_REPORT.md",
@@ -58875,7 +58944,7 @@
    "tested_sha": "4401afae2ee48df1512b8a8c9a1262be0efbe64f",
    "committed_in": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
    "timestamp_basis": "T07 自测机器时间戳（SELFTEST_SUMMARY.json 记录）；committed_in 由 R00-T08 补绑 T07 交付提交 e0b7be610（原 null 仅提交前合法，当前 HEAD 重建暴露后按事实修正；tested_sha 仍由构建器回填自测验证树 4401afae2）",
-   "working_tree_digest": "7c921da6be5f0806a94e927a1bcb883ff76bfefe01e0767823f206104614ca4b",
+   "working_tree_digest": "ddf53e797797e997cffa645dcf05863f157ff5f0b89447383e2d70c0aa2426bb",
    "working_tree_digest_scope": "由生成器在构建时填入（校验器/账本/输入文件当前哈希）",
    "platform": "macOS 27.0 darwin arm64",
    "toolchain": {
@@ -58924,7 +58993,7 @@
     "docs/rust-tauri/R00/r00_t07_validate_ledger.py": "665f39a0b42a6043d7060cce2f497bcf9fd90833c2662da825d0f7ae1c18eace",
     "docs/rust-tauri/R00/r00_t07_selftest.py": "33a4244f23ba419296b9accf5c90e0ffbab51b82ec993b14fc4d5174f804e789",
     "docs/rust-tauri/R00/R00-T07_RESULTS.json": "bc0bfb3b7119cb64c9114271c7fa689c4d00cc365254c4ff67dd1ae0686790b3",
-    "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json": "699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9",
+    "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json": "462d528b17aba8b8bc9ae10912feda7778adfef92de7c3282d311dc5e7c1bac3",
     "docs/rust-tauri/R00/ENTRYPOINT_COVERAGE.json": "76fe6e2b9aaae914aaff21be6f731ba8d537b944ced6412ebca4f547c8313000",
     "docs/rust-tauri/R00/FEATURE_INVENTORY.json": "48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039",
     "docs/rust-tauri/R00/ENTRYPOINTS.json": "f69e658f8b35b5a486a764872e27c82b599c84ef49404903f5b72f4b0b84d669"
@@ -58938,7 +59007,7 @@
    "tested_sha": "4401afae2ee48df1512b8a8c9a1262be0efbe64f",
    "committed_in": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
    "timestamp_basis": "T07 自测机器时间戳（SELFTEST_SUMMARY.json 记录）；committed_in 由 R00-T08 补绑 T07 交付提交 e0b7be610（原 null 仅提交前合法，当前 HEAD 重建暴露后按事实修正；tested_sha 仍由构建器回填自测验证树 4401afae2）",
-   "working_tree_digest": "7c921da6be5f0806a94e927a1bcb883ff76bfefe01e0767823f206104614ca4b",
+   "working_tree_digest": "ddf53e797797e997cffa645dcf05863f157ff5f0b89447383e2d70c0aa2426bb",
    "working_tree_digest_scope": "由生成器在构建时填入",
    "platform": "macOS 27.0 darwin arm64",
    "toolchain": {
@@ -58987,7 +59056,7 @@
     "docs/rust-tauri/R00/r00_t07_validate_ledger.py": "665f39a0b42a6043d7060cce2f497bcf9fd90833c2662da825d0f7ae1c18eace",
     "docs/rust-tauri/R00/r00_t07_selftest.py": "33a4244f23ba419296b9accf5c90e0ffbab51b82ec993b14fc4d5174f804e789",
     "docs/rust-tauri/R00/R00-T07_RESULTS.json": "bc0bfb3b7119cb64c9114271c7fa689c4d00cc365254c4ff67dd1ae0686790b3",
-    "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json": "699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9",
+    "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json": "462d528b17aba8b8bc9ae10912feda7778adfef92de7c3282d311dc5e7c1bac3",
     "docs/rust-tauri/R00/ENTRYPOINT_COVERAGE.json": "76fe6e2b9aaae914aaff21be6f731ba8d537b944ced6412ebca4f547c8313000",
     "docs/rust-tauri/R00/FEATURE_INVENTORY.json": "48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039",
     "docs/rust-tauri/R00/ENTRYPOINTS.json": "f69e658f8b35b5a486a764872e27c82b599c84ef49404903f5b72f4b0b84d669"
@@ -59002,7 +59071,7 @@
    "committed_in": "8b153b1031bbb01204375b08e9caaa891397d7a5",
    "timestamp_utc": "2026-09-24T04:37:00+00:00",
    "timestamp_basis": "T08 执行会话机器时间（两次复现与校验日志内均有运行时间窗）；committed_in 由阶段修复 STAGE-REPAIR-R00-R1 补绑 T08 交付提交 8b153b103（原 null 为 T08 提交前合法待提交态；tested_sha 保留 T08 执行时点 HEAD e0b7be610，未伪称在提交后运行）",
-   "working_tree_digest": "538c57419a44a60274f4224c2fe683515f845f47210df674522b683e49605b9d",
+   "working_tree_digest": "f4679574e0b25d5ba8c2d6d651bf31b1edd4f5c8acf32bd35107a911a36e5500",
    "working_tree_digest_scope": "以 r00_t08_a15_verify_repro.py 与 .sync-audit/verified-source-sha.txt 逐文件哈希为内容基准",
    "platform": "macOS 27.0 darwin arm64",
    "toolchain": {
@@ -59054,7 +59123,7 @@
    ],
    "source_digests": {
     "docs/rust-tauri/R00/r00_t08_a15_verify_repro.py": "0fcf1086083adbd1f3046f8bf867055e3757fcc72af5431e703959441413174b",
-    ".sync-audit/verified-source-sha.txt": "b2d8dc46821888fcf79bd04ffe3b017439463581a37ddf9cf25c8d31e44d33da"
+    ".sync-audit/verified-source-sha.txt": "bf3893f89b1f9d7739419feb77f981f646384e95f55c87f9078820dd4798e50b"
    }
   },
   {

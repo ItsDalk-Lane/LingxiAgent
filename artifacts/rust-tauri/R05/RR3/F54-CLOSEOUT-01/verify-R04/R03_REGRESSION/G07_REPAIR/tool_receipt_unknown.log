@@ -1,0 +1,13 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/tool_receipt_unknown.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/tool_receipt_unknown-a2405017d3a05be9)
+
+running 6 tests
+test f04_c01_adv_panic_before_side_effect_is_still_unknown ... ok
+test f04_c01_panic_after_side_effect_journals_unknown_not_confirmed_failure ... ok
+test f04_c03_trusted_negatives_survive_alongside_the_unknown ... ok
+test f04_c02_dispatched_no_result_variants_classify_consistently_unknown ... ok
+test f04_c04_adv_control_verified_idempotent_recovery_uses_only_the_original_key ... ok
+test f04_c04_recovery_and_repeat_recovery_do_not_redo_unknown ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+

@@ -1,0 +1,9 @@
+R04.json 叶分类计数: {'deferred_to_later_stage': 69, 'stage_share_satisfied': 49, 'full_original_behavior': 6}
+full 叶: ['R00-T02-LA-15AD6ED13B4D', 'R00-T02-LA-483E461BB59D', 'R00-T02-LA-8A3C87812B4F', 'R00-T02-LA-8BCB8A749864', 'R00-T02-LA-C90F42576683', 'R00-T02-LA-CEDC75156D33']
+share 叶阶段分布: {('R04', 'R07', 'R08'): 29, ('R04', 'R07'): 6, ('R04', 'R06'): 9, ('R04', 'R08'): 5}
+R04+R06(既有 9 叶) share 数: 9
+FSA 变更 40 叶 ⊆ 图 share 叶: True
+40 修订叶全部在图中为 share: True
+图 deferred 数: 69
+图 r00Assertions ↔ HEAD FSA assertions 不一致数: 0
+图 r00ExecutionStageIds ↔ 当前 FSA 不一致数: 0

@@ -833,10 +833,35 @@ async fn matrix_tools_x_permission_x_entry_consistency() {
             .as_ref()
             .is_some_and(|r| r.outcome == lingxi_kernel::ports::ReceiptOutcome::Succeeded)
         && text_of(&direct).contains("granted-content");
+    // F54 收口：路由一致性补 MCP 目标腿——同一连接器工具经直调网关与目录
+    // run 链两路授权并执行一致（mcp_call 断言0「同目标直调与目录调用权限
+    // 一致」的字面证明面，此前该案例只在 read 目标上比较两路）。
+    let mcp_direct = gateway_call(
+        &h,
+        &h.ctx("route-mcp"),
+        CallerSurface::UserRun,
+        user_mode(SessionPermissionMode::Operate),
+        mcp_target.as_str(),
+        json!({}),
+    )
+    .await
+    .expect("mcp direct route executes");
+    let mcp_direct_ok = matches!(mcp_direct.outcome, ToolOutcome::Success { .. });
+    let mcp_run = run_chain(
+        &h,
+        vec![tool_turn(mcp_target.as_str(), json!({}))],
+        "route axis: run-chain mcp",
+    )
+    .await;
+    let mcp_journal = journal_of(&h, &mcp_run.run_id).await;
+    let mcp_chain_ok = mcp_journal.len() == 1
+        && mcp_journal[0].receipt.as_ref().is_some_and(|r| {
+            r.outcome == lingxi_kernel::ports::ReceiptOutcome::Succeeded && r.dispatched
+        });
     record_case(
         "matrix-route-consistency",
         1,
-        i64::from(direct_ok && chain_ok),
+        i64::from(direct_ok && chain_ok && mcp_direct_ok && mcp_chain_ok),
     );
 }
 
@@ -2203,6 +2228,40 @@ async fn mcp_mechanism_face_share_cases() {
             r.outcome == lingxi_kernel::ports::ReceiptOutcome::Succeeded && r.dispatched
         });
     record_case("mcp-tool-call-full-chain", 1, i64::from(call_ok));
+
+    // F54 收口补充案例 1：describe 是只读路径——描述前后目录代次不变
+    // （"描述无副作用"由代次守恒证明，不是由历史收据旁证）。
+    let gen_before = h.registry.snapshot().catalog_generation;
+    let _desc = h.registry.describe_full(&target).expect("describe");
+    let gen_after = h.registry.snapshot().catalog_generation;
+    record_case(
+        "mcp-describe-no-side-effect",
+        1,
+        i64::from(gen_before == gen_after),
+    );
+
+    // F54 收口补充案例 2：搜索诚实——无命中返回空；停用的连接器工具仍列出
+    // 但标 Disabled（不冒充可执行）。
+    let miss_empty = h.registry.search("f54-no-such-mcp-tool").is_empty();
+    h.registry
+        .set_availability(
+            &target,
+            Availability::Disabled {
+                reason: "F54 search honesty case".to_string(),
+            },
+        )
+        .expect("disable");
+    let after_disable = h.registry.search("env_report");
+    let disabled_honest = !after_disable.is_empty()
+        && after_disable.iter().all(|listing| {
+            listing.target_id == target
+                && matches!(listing.availability, Availability::Disabled { .. })
+        });
+    record_case(
+        "mcp-search-honest-availability",
+        1,
+        i64::from(miss_empty && disabled_honest),
+    );
 }
 
 // ── the approval-face share cases ──────────────────────────────────────────

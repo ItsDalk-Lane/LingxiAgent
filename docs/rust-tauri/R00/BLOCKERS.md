@@ -1,6 +1,6 @@
 # R00 阻塞登记（BLOCKERS.md）
 
-生成：`docs/rust-tauri/R00/r00_t07_build_map.py`｜基准 HEAD `8b153b1031bbb01204375b08e9caaa891397d7a5`｜配套账本 `ACCEPTANCE_MAP.json`。
+生成：`docs/rust-tauri/R00/r00_t07_build_map.py`｜基准 HEAD `def860a74abd174a2297a7adfbc8799d400aabea`｜配套账本 `ACCEPTANCE_MAP.json`。
 状态语义遵循 01 通用约束 §6：BLOCKED 表示已到执行时点但缺凭证/平台/授权；
 未来阶段场景保持 NOT_STARTED/SPECIFIED_NOT_EXECUTED，其外部依赖在此预登记（anticipated），
 到对应阶段仍缺条件时转为 active BLOCKED，不预写 FAIL、不伪造 PASS。

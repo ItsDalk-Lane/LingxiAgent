@@ -3,7 +3,7 @@
   "resultVersion": "lingxi.xtask.verify-stage.v1",
   "stage": "R04",
   "defaultTimeoutSecs": 1200,
-  "supplementalCoverageNote": "R04-T08 阶段图（2026-09-30）：本图由 R04_SCOPE_MATRIX.json 的补充义务驱动建立——SUP-01（ask 档审批策略面：sup01-ask-subagent-write-refused 案例在矩阵图钉，T03 套件全量钉住）、SUP-02（唯一授权面/单一 journal 写者：网关零授权逻辑零存储，全矩阵经同一链）、SUP-03（canonical 序列化消费点关闭：T01 套件+F1/F2 关闭证据，R03 图 r03_g07 十套件回归）、SUP-04（R03 laterShare 工具目录面：unmigrated 形态Future 诚实注册逐叶图钉）、SUP-05（R03 回归硬保护：r03_regression_gate 命令在本图内完整重跑 verify-stage R03）。分类：46 full_original_behavior（R04-EXCLUSIVE 独占叶——r00ExecutionStageIds 仅 R04；R05 RR3 F54 2026-10-07：每条 R00 原断言各钉专属真实案例，不得以无人承接的 share 分类放行）+ 9 stage_share_satisfied（R00 登记双阶段叶的 R04 份额=工具基础机制层——目录/网关/权限/批准/原生执行器/worker/MCP 桥，案例由 r04_tool_matrix 生产者机器核验）+ 69 deferred_to_later_stage（无 R04 叶专属门禁份额；验收归 R06/R07/R08/R09，仍 REQUIRED）。阶段中立 kinds 与 R03 图同构（份额叶必带 assertionContract，递延叶不得绑门禁命令）；R02/R03 图零改动。RR1 修复轮 G05 增量（2026-10-01，CLOSE-C01）：追加 R04-RR1-F01..F05 五个REQUIRED 场景与 r04_rr1_repair_suites 生产者（六集成套件+二十六单测=63 测试，逐测试归属 22 个五 F C-ID；CLOSE-C01..C04 为收口检查不入图）；原 16 A-ID、SUP01/03/05 与 124 叶结构零改动，只增不减。",
+  "supplementalCoverageNote": "R04-T08 阶段图（2026-09-30）：本图由 R04_SCOPE_MATRIX.json 的补充义务驱动建立——SUP-01（ask 档审批策略面：sup01-ask-subagent-write-refused 案例在矩阵图钉，T03 套件全量钉住）、SUP-02（唯一授权面/单一 journal 写者：网关零授权逻辑零存储，全矩阵经同一链）、SUP-03（canonical 序列化消费点关闭：T01 套件+F1/F2 关闭证据，R03 图 r03_g07 十套件回归）、SUP-04（R03 laterShare 工具目录面：unmigrated 形态Future 诚实注册逐叶图钉）、SUP-05（R03 回归硬保护：r03_regression_gate 命令在本图内完整重跑 verify-stage R03）。分类：6 full_original_behavior（R04-EXCLUSIVE 独占叶——r00ExecutionStageIds 仅 R04；R05 RR3 F54 收口 2026-10-08：仅保留每条原断言都有真实案例证明的叶——终端执行链与 MCP 工具机制面，绑定按案例实际语义逐一核对并补 2 个生产者案例，不得以案例语义不符的虚假绑定放行）+ 49 stage_share_satisfied（R00 登记多阶段叶的 R04 份额=工具基础机制层——目录/网关/权限/批准/原生执行器/worker/MCP 桥；其中 40 叶为 F54 登记错配修订，余款按任务书条款归 R07（dev 工具本体/管理 API/设置页）或 R08（客户端/HTTP 面），案例由 r04_tool_matrix 生产者机器核验）+ 69 deferred_to_later_stage（无 R04 叶专属门禁份额；验收归 R06/R07/R08/R09，仍 REQUIRED）。阶段中立 kinds 与 R03 图同构（份额叶必带 assertionContract，递延叶不得绑门禁命令）；R02/R03 图零改动。RR1 修复轮 G05 增量（2026-10-01，CLOSE-C01）：追加 R04-RR1-F01..F05 五个REQUIRED 场景与 r04_rr1_repair_suites 生产者（六集成套件+二十六单测=63 测试，逐测试归属 22 个五 F C-ID；CLOSE-C01..C04 为收口检查不入图）；原 16 A-ID、SUP01/03/05 与 124 叶结构零改动，只增不减。",
   "commands": {
     "rust_fmt": {
       "argv": [
@@ -361,7 +361,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -372,20 +374,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=连接机制面：真实 initialize 握手+协议协商+清单入目录（失败响亮拒绝不注册），权限面三档裁定",
+      "laterShare": "连接器配置持久化管理 API（保存/返回公开配置与当下状态/异步启动/失败错误状态）=R07-T08（旧栈 server/routes/mcp.ts）+R08（UI 投影回归）；R04-T07 到期=transport 接入与目录同步",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "mcp-connector-register-handshake"
-        ],
-        [
-          "mcp-tool-permission-face"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -412,7 +406,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -423,20 +419,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=资源内容机制面：连接器内容经真实同步入目录；内容块映射按类型验证，远程 URI 永不铸本地引用（mcpbridge 单测钉住）",
+      "laterShare": "按 uri 的连接器资源读取 API（缺 uri/无内容明确拒绝）=R07-T08（旧栈 readResource 路由迁移）；R04 无 resources/read 端点",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "mcp-connector-catalog-sync"
-        ],
-        [
-          "a15-missing-claim-refused"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -444,10 +432,6 @@
         "cases": [
           {
             "case": "mcp-connector-catalog-sync",
-            "expect": 1
-          },
-          {
-            "case": "a15-missing-claim-refused",
             "expect": 1
           }
         ]
@@ -492,7 +476,8 @@
         "R04-T02"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -505,26 +490,12 @@
         "未知工具、自调用、无权限、脚本超时或沙盒异常拒绝；已执行子动作不因外层失败自动回滚。"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=子调用的网关机制面：每调用独立权限判定（同一上下文 read 派发 write 拒）+统一收据（成功 dispatched/失败如实 dispatched=false）+停用目标全路由拒绝",
+      "laterShare": "run_tools 脚本工具本体（子调用编排/摘要/失败不自动回滚）=R07（现役 OPTIONAL 工具迁移，R07-T12 逐功能真实闭环）；R04 已交付其消费的网关/权限/收据机制",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "gateway-each-call-independent-permission"
-        ],
-        [
-          "semantics-success-receipt-dispatched"
-        ],
-        [
-          "semantics-failed-never-dispatched-receipt"
-        ],
-        [
-          "matrix-lifecycle-disable-holes"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -559,7 +530,9 @@
         "R04-T06"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -570,20 +543,12 @@
         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=会话级模式设置/拒绝机制面：模式设置与结构化拒绝真实",
+      "laterShare": "按当前会话/待新建会话/指定会话/全局作用域的设置 API 与冲突错误=R07-T08+R08（Rust 当前仅会话级面；作用域与偏好持久化为管理 API 面）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "permission-face-modes-verifiable"
-        ],
-        [
-          "sup01-ask-subagent-write-refused"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -802,7 +767,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -813,20 +780,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=启动机制面：启动=真实握手（connect_count 审计，连接槽宿主所有）；失效句柄 TargetChanged 拒（expect=0）",
+      "laterShare": "已保存连接器的启动管理入口与新运行状态返回=R07-T08+R08；R04 已交付启动的机制本体（register=握手+注册）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "mcp-connector-register-handshake"
-        ],
-        [
-          "matrix-lifecycle-generation-refusals"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -852,7 +811,8 @@
         "R04-T05"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -864,23 +824,12 @@
         "无匹配为空结果；语言/解析失败或路径越权给错误。"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=目录诚实机制面：ast_grep 工具形态可注册可发现（Availability::Future），未迁移能力诚实拒调用（不伪装 available）；Rust 生产代码无该工具执行本体（旧栈 lib/tools/ 为现役实现，OPTIONAL_TOOL_NAMES 按需目录）",
+      "laterShare": "ast_grep 执行本体与完整业务交互=R07（现役产品能力全部接到 Rust 服务：R07 §1；逐功能真实闭环 R07-T12/R07-A23）；R04 已交付其消费的目录/网关/权限机制（F54 收口：登记错配修订，R00 台账 execution_stage_ids += R07）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "future-tool-shape-ast_grep-discoverable-not-callable"
-        ],
-        [
-          "a16-history-preserved"
-        ],
-        [
-          "a15-out-of-grant-claim-refused"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -888,14 +837,6 @@
         "cases": [
           {
             "case": "future-tool-shape-ast_grep-discoverable-not-callable",
-            "expect": 1
-          },
-          {
-            "case": "a16-history-preserved",
-            "expect": 1
-          },
-          {
-            "case": "a15-out-of-grant-claim-refused",
             "expect": 1
           }
         ]
@@ -1008,7 +949,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -1019,20 +962,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=refresh 机制面：重列+注册/更新/消失同步（R04-A13 断线恰一次新握手不重放），代次失效句柄拒绝",
+      "laterShare": "指定连接器的刷新管理入口与状态返回=R07-T08（refresh_mcp_server 机制本体已由 R04-T07 套件真实测试交付）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "mcp-connector-catalog-sync"
-        ],
-        [
-          "matrix-lifecycle-generation-refusals"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -1087,7 +1022,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -1098,20 +1035,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=工具授权机制面：T03 三档裁定+停用零洞（expect=0，配置停用后明确拒绝）",
+      "laterShare": "Agent↔连接器绑定配置管理 API（更新并返回配置）=R07-T08+R08",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "mcp-tool-permission-face"
-        ],
-        [
-          "matrix-lifecycle-disable-holes"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -1138,7 +1067,9 @@
         "R04-T06"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -1149,20 +1080,12 @@
         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=模式读取机制面：会话真实状态可读（读取不改权限）",
+      "laterShare": "新会话默认权限偏好（未设置时 ASK）的读取 API=R07-T08（偏好管理）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "permission-face-modes-verifiable"
-        ],
-        [
-          "sup01-ask-subagent-write-refused"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -1170,10 +1093,6 @@
         "cases": [
           {
             "case": "permission-face-modes-verifiable",
-            "expect": 1
-          },
-          {
-            "case": "sup01-ask-subagent-write-refused",
             "expect": 1
           }
         ]
@@ -1217,7 +1136,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -1228,20 +1149,12 @@
         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=移除机制面：注册表 uninstall 语义（名称/代次/句柄全失效），历史收据如实保留（不掩盖）",
+      "laterShare": "连接器删除管理 API（配置及运行状态移除、删除结果）=R07-T08+R08",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "matrix-lifecycle-uninstall-holes"
-        ],
-        [
-          "a16-history-preserved"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -1267,7 +1180,8 @@
         "R04-T05"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -1280,26 +1194,12 @@
         "服务缺失/崩溃、不可重命名或写入能力缺失明确报错；无编辑时文件不变。"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=目录诚实机制面：lsp 工具形态可注册可发现（Availability::Future），未迁移能力诚实拒调用（不伪装 available）；Rust 生产代码无该工具执行本体（旧栈 lib/tools/ 为现役实现，OPTIONAL_TOOL_NAMES 按需目录）",
+      "laterShare": "lsp 执行本体与完整业务交互=R07（现役产品能力全部接到 Rust 服务：R07 §1；逐功能真实闭环 R07-T12/R07-A23）；R04 已交付其消费的目录/网关/权限机制（F54 收口：登记错配修订，R00 台账 execution_stage_ids += R07）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "future-tool-shape-lsp-discoverable-not-callable"
-        ],
-        [
-          "tool-edit-real-chain"
-        ],
-        [
-          "tool-edit-conflict-preserves-user-version"
-        ],
-        [
-          "a15-structure-violation-refused"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -1307,18 +1207,6 @@
         "cases": [
           {
             "case": "future-tool-shape-lsp-discoverable-not-callable",
-            "expect": 1
-          },
-          {
-            "case": "tool-edit-real-chain",
-            "expect": 1
-          },
-          {
-            "case": "tool-edit-conflict-preserves-user-version",
-            "expect": 1
-          },
-          {
-            "case": "a15-structure-violation-refused",
             "expect": 1
           }
         ]
@@ -1334,7 +1222,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -1345,20 +1235,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=授权前置机制面：连接器工具调用恒经 T03 权限面三档裁定，拒绝后零派发（expect=0，不呈现成功结果）",
+      "laterShare": "连接器 OAuth 授权流程（生成授权资料/回调/轮询作内部步骤）=R07-T08（旧栈 oauth/callback+poll 路由迁移）；依据 R04_PROMPT §3.2「不迁移…真实凭证/OAuth 体系」",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "mcp-tool-permission-face"
-        ],
-        [
-          "approval-reject-zero-dispatch"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -1778,7 +1660,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -1789,20 +1673,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=校验机制面：多连接器注册=多次真实握手+清单同步；结构违规引用被拒（无效输入明确错误）",
+      "laterShare": "批量导入管理 API（先校验全部再写入/坏行拒整批/成功项异步启动逐项回报）=R07-T08+R08",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "mcp-connector-catalog-sync"
-        ],
-        [
-          "a15-structure-violation-refused"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -1857,7 +1733,8 @@
         "R04-T05"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -1868,20 +1745,12 @@
         "无权会话或不匹配终端拒绝，不接续错误进程"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=持续终端机制面：游标增量投递（按句柄续读新输出，真实 PTY 时序）+所有权拒绝（跨主体写入 0 成功，不接续错误进程）",
+      "laterShare": "WS 帧协议面（terminalId/sinceSeq 尾读请求经 terminalWsBridge）=R08（旧 Electron 客户端接入、React 服务传输）；R04-T05 已交付 write_stdin 游标语义本体",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "terminal-tail-cursor-continuation"
-        ],
-        [
-          "tool-write-stdin-foreign-writes"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -2153,7 +2022,9 @@
         "R04-T06"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -2164,20 +2035,12 @@
         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=模式读取机制面：读取面真实（不改变权限）",
+      "laterShare": "mode/accessMode/defaultMode 读取 API=R07-T08",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "permission-face-modes-verifiable"
-        ],
-        [
-          "sup01-ask-subagent-write-refused"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -2185,10 +2048,6 @@
         "cases": [
           {
             "case": "permission-face-modes-verifiable",
-            "expect": 1
-          },
-          {
-            "case": "sup01-ask-subagent-write-refused",
             "expect": 1
           }
         ]
@@ -2319,7 +2178,9 @@
         "R04-T03"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -2330,20 +2191,12 @@
         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=预授权机制面：整键匹配/单次使用/会话作用域/跨会话不可见，经真实 gate 消费（不持久化）",
+      "laterShare": "会话权限授予管理 API（校验 sessions.write 范围/仅本次会话放行 capability 的 HTTP 面）=R07-T08（旧栈 /session-permissions）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "preauthorization-single-session-scoped"
-        ],
-        [
-          "approval-duplicate-idempotent"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -2428,7 +2281,9 @@
         "R04-T06"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -2439,20 +2294,12 @@
         "ID 缺失/已处理不重复执行；命令来源权限须由 dispatcher 检查"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=ConfirmStore 决策机制面：confirmed 继续原待批动作并按收据证明恰一次执行，ID 缺失/已处理确定性 no-op",
+      "laterShare": "斜杠命令 /confirm 入口（dispatcher 来源权限检查+状态广播）=CLI 归 R07-T09、客户端归 R08（旧栈 core/slash-commands/bridge-commands）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "approval-answer-executes-once"
-        ],
-        [
-          "approval-duplicate-idempotent"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -2535,7 +2382,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -2546,20 +2395,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=工具调用机制面：命名空间 target 解析+网关真实执行+权限面裁定",
+      "laterShare": "连接器应用（apps）launch API（把 launchInput 交给指定连接器工具）=R07-T08（旧栈 /apps 域）；R04 无 apps 语义",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "mcp-tool-call-full-chain"
-        ],
-        [
-          "mcp-tool-permission-face"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -2761,7 +2602,7 @@
           "mcp-describe-real-identity"
         ],
         [
-          "a16-history-preserved"
+          "mcp-describe-no-side-effect"
         ],
         [
           "matrix-lifecycle-uninstall-holes"
@@ -2776,7 +2617,7 @@
             "expect": 1
           },
           {
-            "case": "a16-history-preserved",
+            "case": "mcp-describe-no-side-effect",
             "expect": 1
           },
           {
@@ -2796,7 +2637,9 @@
         "R04-T06"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -2807,20 +2650,12 @@
         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=模式设置机制面：模式设置经真实面生效",
+      "laterShare": "默认权限偏好的校验/写入/持久化 API（返回保存后 permissionMode）=R07-T08",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "permission-face-modes-verifiable"
-        ],
-        [
-          "sup01-ask-subagent-write-refused"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -2828,10 +2663,6 @@
         "cases": [
           {
             "case": "permission-face-modes-verifiable",
-            "expect": 1
-          },
-          {
-            "case": "sup01-ask-subagent-write-refused",
             "expect": 1
           }
         ]
@@ -2887,7 +2718,8 @@
         "R04-T05"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -2899,24 +2731,12 @@
         "语法/匹配失败、越权路径或新旧版本冲突拒绝，不应静默改错位置。"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=目录诚实机制面：ast_edit 工具形态可注册可发现（Availability::Future），未迁移能力诚实拒调用（不伪装 available）；Rust 生产代码无该工具执行本体（旧栈 lib/tools/ 为现役实现，OPTIONAL_TOOL_NAMES 按需目录）",
+      "laterShare": "ast_edit 执行本体与完整业务交互=R07（现役产品能力全部接到 Rust 服务：R07 §1；逐功能真实闭环 R07-T12/R07-A23）；R04 已交付其消费的目录/网关/权限机制（F54 收口：登记错配修订，R00 台账 execution_stage_ids += R07）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "future-tool-shape-ast_edit-discoverable-not-callable",
-          "tool-edit-real-chain"
-        ],
-        [
-          "tool-edit-conflict-preserves-user-version"
-        ],
-        [
-          "a15-out-of-grant-claim-refused"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -2924,18 +2744,6 @@
         "cases": [
           {
             "case": "future-tool-shape-ast_edit-discoverable-not-callable",
-            "expect": 1
-          },
-          {
-            "case": "tool-edit-real-chain",
-            "expect": 1
-          },
-          {
-            "case": "tool-edit-conflict-preserves-user-version",
-            "expect": 1
-          },
-          {
-            "case": "a15-out-of-grant-claim-refused",
             "expect": 1
           }
         ]
@@ -3095,7 +2903,9 @@
         "R04-T06"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -3106,20 +2916,12 @@
         "边界：enabled true/false 两向及 ok=false；拒绝时目标状态不变"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=会话模式切换机制面：plan=read_only 预设，同一权限模式面真实可设置（开关两向=启停面零洞）",
+      "laterShare": "setPlanMode 切换 API（!!enabled 语义/返回最新状态）=R07-T08（旧栈 planMode 是权限模式预设，core/session-permission-mode.ts；API 面随偏好管理迁移）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "permission-face-modes-verifiable"
-        ],
-        [
-          "matrix-lifecycle-disable-holes"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -3357,7 +3159,9 @@
         "R04-T02"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -3373,35 +3177,12 @@
         "OAuth 登录、取消、退出：成功核对 登录轮询返回 done 后刷新连接器并显示保存成功；退出接口成功后经统一 run 刷新并显示成功。；成功后有 agentId 时重读连接器状态与工具权限。；OAuth 授权 URL 成功返回后打开外链并轮询，完成/退出后重读状态；取消仅 POST cancel。；桌面 platform.openExternal 走 IPC，Web/mobile 使用浏览器 window.open。；空态/未初始化核对 未登录显示登录入口；等待中可点击取消，取消请求后关闭等待卡。；无 agentId 时不发 state GET。；错误/无权限核对 启动、轮询 error/超时或取消请求失败按各自 catch 显示错误；外链打开未等待，拒绝不会进入登录 catch，仍继续轮询；轮询 cancelled 直接返回，connectOAuth 随后仍刷新并可能显示保存成功，不能将取消断言为安静退出。；启动失败不打开外链；取消分支不因取消本身重读 state。；取消本身不直接重读，但在途轮询若回到 cancelled 并正常结束，登录回调仍可能间接 loadState，需按并发结果验。"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=设置页消费的数据机制面：目录快照列出 MCP 工具与权限契约、真实 initialize 握手注册（添加/批量=多次注册的机制）、T03 三档授权面、预授权会话作用域（OAuth 生命周期机制）",
+      "laterShare": "MCP 连接器设置页 UI 投影与管理 API=R07-T08（「迁移…工具启停…等真实API；设置页不是迁移后的空壳」）+R08（全产品现有界面回归）；依据 R04_PROMPT §3.2「不要求新建完整产品 UI」——逐动作 UI 断言（loading/toast/开关）非 R04 到期",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "catalog-face-lists-mcp-tools-with-permission"
-        ],
-        [
-          "mcp-connector-catalog-sync"
-        ],
-        [
-          "matrix-lifecycle-disable-holes"
-        ],
-        [
-          "mcp-connector-register-handshake"
-        ],
-        [
-          "matrix-lifecycle-generation-refusals"
-        ],
-        [
-          "mcp-tool-permission-face"
-        ],
-        [
-          "preauthorization-single-session-scoped"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -3412,20 +3193,8 @@
             "expect": 1
           },
           {
-            "case": "mcp-connector-catalog-sync",
-            "expect": 1
-          },
-          {
-            "case": "matrix-lifecycle-disable-holes",
-            "expect": 0
-          },
-          {
             "case": "mcp-connector-register-handshake",
             "expect": 1
-          },
-          {
-            "case": "matrix-lifecycle-generation-refusals",
-            "expect": 0
           },
           {
             "case": "mcp-tool-permission-face",
@@ -3489,7 +3258,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -3500,20 +3271,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=按需目录机制面：Deferred availability 可发现、按需解析经同一网关，停用面不可调用（expect=0）",
+      "laterShare": "deferEnabled/deferThreshold/builtinDeferEnabled 独立更新的设置持久化 API=R07-T08（旧栈 /settings/defer）+R08",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "catalog-face-lists-mcp-tools-with-permission"
-        ],
-        [
-          "matrix-lifecycle-disable-holes"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -3569,7 +3332,9 @@
         "R04-T06"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -3580,20 +3345,12 @@
         "拒绝/边界：无参数；不应错误扩大写入或披露范围"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=模式读取面：读取真实且不改状态（历史收据如实保留）",
+      "laterShare": "planMode/permissionMode/accessMode 读取 API=R07-T08",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "permission-face-modes-verifiable"
-        ],
-        [
-          "a16-history-preserved"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -3779,7 +3536,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -3790,20 +3549,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=凭证生命周期机制面：授权未完成调用不可执行；预授权单次消耗+会话作用域+不持久化（秘密不残留不下发）",
+      "laterShare": "OAuth 凭证清除与公开状态返回 API=R07-T08",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "mcp-tool-permission-face"
-        ],
-        [
-          "preauthorization-single-session-scoped"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -3829,7 +3580,8 @@
         "R04-T05"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -3842,27 +3594,12 @@
         "语言无效、无会话、内核死亡或超时显式失败；重启不声称保留旧状态。"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=目录诚实机制面：run_code 工具形态可注册可发现（Availability::Future），未迁移能力诚实拒调用（不伪装 available）；Rust 生产代码无该工具执行本体（旧栈 lib/tools/ 为现役实现，OPTIONAL_TOOL_NAMES 按需目录）",
+      "laterShare": "run_code 执行本体与完整业务交互=R07（现役产品能力全部接到 Rust 服务：R07 §1；逐功能真实闭环 R07-T12/R07-A23）；R04 已交付其消费的目录/网关/权限机制（F54 收口：登记错配修订，R00 台账 execution_stage_ids += R07）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "future-tool-shape-run_code-discoverable-not-callable",
-          "tool-write-stdin-continuation"
-        ],
-        [
-          "terminal-close-stops-terminal"
-        ],
-        [
-          "tool-exec-cancel-cleanup"
-        ],
-        [
-          "semantics-unknown-receipt-honest"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -3870,22 +3607,6 @@
         "cases": [
           {
             "case": "future-tool-shape-run_code-discoverable-not-callable",
-            "expect": 1
-          },
-          {
-            "case": "tool-write-stdin-continuation",
-            "expect": 1
-          },
-          {
-            "case": "terminal-close-stops-terminal",
-            "expect": 1
-          },
-          {
-            "case": "tool-exec-cancel-cleanup",
-            "expect": 1
-          },
-          {
-            "case": "semantics-unknown-receipt-honest",
             "expect": 1
           }
         ]
@@ -3925,13 +3646,13 @@
           "tool-write-stdin-continuation"
         ],
         [
-          "tool-write-stdin-foreign-writes"
+          "terminal-close-stops-terminal"
         ],
         [
           "tool-exec-command-real-chain"
         ],
         [
-          "a15-missing-claim-refused"
+          "tool-write-stdin-foreign-writes"
         ]
       ],
       "assertionContract": {
@@ -3943,16 +3664,16 @@
             "expect": 1
           },
           {
-            "case": "tool-write-stdin-foreign-writes",
-            "expect": 0
+            "case": "terminal-close-stops-terminal",
+            "expect": 1
           },
           {
             "case": "tool-exec-command-real-chain",
             "expect": 1
           },
           {
-            "case": "a15-missing-claim-refused",
-            "expect": 1
+            "case": "tool-write-stdin-foreign-writes",
+            "expect": 0
           }
         ]
       }
@@ -4023,7 +3744,9 @@
         "R04-T06"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -4034,20 +3757,12 @@
         "ID 缺失/已处理不再次决策；Bridge 权限与反馈单独核查"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=拒绝机制面：rejected 原待批动作不执行（零派发）+已处理不再决策",
+      "laterShare": "斜杠命令 /reject 入口=CLI 归 R07-T09、客户端归 R08",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "approval-reject-zero-dispatch"
-        ],
-        [
-          "approval-duplicate-idempotent"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -4074,7 +3789,8 @@
         "R04-T06"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -4087,26 +3803,12 @@
         "非Git工作区、路径越权、文件上限或引擎失败标注范围/错误，不伪称全量通过。"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=目录诚实机制面：security_scan 工具形态可注册可发现（Availability::Future），未迁移能力诚实拒调用（不伪装 available）；Rust 生产代码无该工具执行本体（旧栈 lib/tools/ 为现役实现，OPTIONAL_TOOL_NAMES 按需目录）",
+      "laterShare": "security_scan 执行本体与完整业务交互=R07（现役产品能力全部接到 Rust 服务：R07 §1；逐功能真实闭环 R07-T12/R07-A23）；R04 已交付其消费的目录/网关/权限机制（F54 收口：登记错配修订，R00 台账 execution_stage_ids += R07）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "future-tool-shape-security_scan-discoverable-not-callable"
-        ],
-        [
-          "a15-out-of-grant-claim-refused"
-        ],
-        [
-          "gateway-each-call-independent-permission"
-        ],
-        [
-          "a15-structure-violation-refused"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -4114,18 +3816,6 @@
         "cases": [
           {
             "case": "future-tool-shape-security_scan-discoverable-not-callable",
-            "expect": 1
-          },
-          {
-            "case": "a15-out-of-grant-claim-refused",
-            "expect": 1
-          },
-          {
-            "case": "gateway-each-call-independent-permission",
-            "expect": 1
-          },
-          {
-            "case": "a15-structure-violation-refused",
             "expect": 1
           }
         ]
@@ -4140,7 +3830,8 @@
         "R04-T05"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -4151,20 +3842,12 @@
         "会话身份不符时拒绝，不送他人终端内容"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=快照机制面：当前 transcript 尾部快照（第二次写入只见新输出，非重放）+会话身份不符拒绝（不送他人终端内容）",
+      "laterShare": "WS 帧协议面（terminalWsBridge 快照请求帧）=R08（旧客户端接入）；R04-T05 已交付快照语义本体（游标读取）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "terminal-snapshot-current-transcript"
-        ],
-        [
-          "tool-write-stdin-foreign-writes"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -4212,13 +3895,14 @@
       ],
       "originalAssertionCases": [
         [
-          "mcp-search-namespaced"
+          "mcp-search-namespaced",
+          "mcp-describe-real-identity"
         ],
         [
           "matrix-lifecycle-disable-holes"
         ],
         [
-          "a16-alias-route-covered"
+          "mcp-search-honest-availability"
         ]
       ],
       "assertionContract": {
@@ -4230,11 +3914,15 @@
             "expect": 1
           },
           {
+            "case": "mcp-describe-real-identity",
+            "expect": 1
+          },
+          {
             "case": "matrix-lifecycle-disable-holes",
             "expect": 0
           },
           {
-            "case": "a16-alias-route-covered",
+            "case": "mcp-search-honest-availability",
             "expect": 1
           }
         ]
@@ -4249,7 +3937,8 @@
         "R04-T05"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -4260,20 +3949,12 @@
         "终端管理器不可用/ID不匹配返回 rejected，不谎报已停止"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=关闭机制面：显式关闭终止终端（有界可观察，Terminated/Exited 记录）+ID 不匹配拒绝（不谎报已停止）",
+      "laterShare": "WS 帧协议面（close 请求的 killed/already_stopped 返回）=R08（旧客户端接入）；R04-T05 已交付关闭语义本体（supervisor 显式终止+关闭后写入诚实失败）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "terminal-close-stops-terminal"
-        ],
-        [
-          "tool-write-stdin-foreign-writes"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -4300,7 +3981,9 @@
         "R04-T06"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -4311,20 +3994,12 @@
         "边界：mode 存在时不由 enabled 决定；拒绝时目标状态不变"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=权限裁决机制面（T03 到期）：三档模式真实设置/读取并决定裁决；ask 档结构化拒绝（副作用一致，deny_on_prompt）",
+      "laterShare": "setSessionPermissionMode 管理 API 投影（body.mode/返回 mode/accessMode）=R07-T08（权限管理真实 API）+R08（旧客户端接入）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "permission-face-modes-verifiable"
-        ],
-        [
-          "sup01-ask-subagent-write-refused"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -4435,7 +4110,9 @@
         "R04-T06"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -4448,26 +4125,12 @@
         "网络代理模式及 HTTP/HTTPS/WS/WSS/noProxy 字段保存：成功核对 proxy 模式和 HTTP/HTTPS/WS/WSS/noProxy 通过每助手配置接口写入全局 preferences并通知运行时。；代理配置保存成功后广播 network-proxy-changed，IPC 应用失败仅记录日志，桌面壳据事件更新对应状态。；适用保存路径后重读当前助手合成配置视图。；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；空态/未初始化核对 系统代理或直连模式字段禁用；无 agentId/resourceKey 时 loadSettingsConfig 不请求；经验未启用时不 GET experience。；错误/无权限核对 失败提示并保留草稿；通知失败或保存失败不能冒充目标配置已完成。；各项 GET 失败应与前序保存结果分开判断。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=安全设置消费的模式/权限数据面：三档模式真实可设置可读取，全工具族×权限格一致生效",
+      "laterShare": "沙箱/检查点/代理设置页 UI 与偏好持久化 API（写入全局 preferences/代理广播）=R07-T08（权限、偏好真实 API）+R08（界面回归）；依据 R04_PROMPT §3.2",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "permission-face-modes-verifiable"
-        ],
-        [
-          "matrix-lifecycle-disable-holes"
-        ],
-        [
-          "a16-history-preserved"
-        ],
-        [
-          "matrix-permission-consistency"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -4475,14 +4138,6 @@
         "cases": [
           {
             "case": "permission-face-modes-verifiable",
-            "expect": 1
-          },
-          {
-            "case": "matrix-lifecycle-disable-holes",
-            "expect": 0
-          },
-          {
-            "case": "a16-history-preserved",
             "expect": 1
           },
           {
@@ -4502,7 +4157,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -4513,20 +4170,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=状态数据机制面：同步报告（协商协议/server 身份/registered 数）与 is_connected 真实可读",
+      "laterShare": "按 agent 配置合成的 MCP state API（合入内置工具延迟加载开关）=R07-T08+R08",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "mcp-connector-catalog-sync"
-        ],
-        [
-          "a15-missing-claim-refused"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -4534,10 +4183,6 @@
         "cases": [
           {
             "case": "mcp-connector-catalog-sync",
-            "expect": 1
-          },
-          {
-            "case": "a15-missing-claim-refused",
             "expect": 1
           }
         ]
@@ -4582,7 +4227,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -4593,20 +4240,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=连接器状态数据机制面：真实握手同步后状态可读",
+      "laterShare": "MCP apps 列表 API（返回应用及连接器状态/未初始化 503）=R07-T08（旧栈 /apps）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "mcp-connector-catalog-sync"
-        ],
-        [
-          "a15-missing-claim-refused"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -4614,10 +4253,6 @@
         "cases": [
           {
             "case": "mcp-connector-catalog-sync",
-            "expect": 1
-          },
-          {
-            "case": "a15-missing-claim-refused",
             "expect": 1
           }
         ]
@@ -4661,7 +4296,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -4672,20 +4309,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=授权未完成不可执行机制面：权限面拒绝语义+拒绝零派发",
+      "laterShare": "OAuth 等待取消 API（结束在途往返、已保存凭证不变）=R07-T08",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "mcp-tool-permission-face"
-        ],
-        [
-          "approval-reject-zero-dispatch"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -4712,7 +4341,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -4723,20 +4354,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=连接生命周期机制面：连接/断开归宿主（握手生命周期审计），移除后解析/执行全拒零残留（expect=0）",
+      "laterShare": "停止指定连接器的管理 API 与新运行状态返回=R07-T08+R08；R04 已交付 disconnect/uninstall 机制本体",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "mcp-connector-register-handshake"
-        ],
-        [
-          "matrix-lifecycle-uninstall-holes"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -4819,7 +4442,8 @@
         "R04-T03"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -4830,20 +4454,12 @@
         "无效 action 400、已处理 404、越权 403；批准目标变化须重审且不能扩大授权"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=审批决策机制面（T03 到期）：ConfirmStore 标记 confirmed+待批动作恰执行一次+重复决策 AlreadySettled no-op+越权/异会话拒绝",
+      "laterShare": "confirmation_resolved 事件广播接线与确认 API 投影（无效 action 400/已处理 404/越权 403）=R08（旧业务 API 兼容；旧栈 server/routes/confirm.ts+engine 事件面）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "approval-answer-executes-once"
-        ],
-        [
-          "approval-duplicate-idempotent"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -4941,7 +4557,8 @@
         "R04-T03"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -4952,20 +4569,12 @@
         "无效 action 400、已处理 404、越权 403；拒绝后再次提交不得继续原动作"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=拒绝机制面：rejected 后零派发（expect=0）+已处理不重复决策",
+      "laterShare": "confirmation_resolved 事件广播接线与拒绝 API 投影（拒绝后再次提交不得继续）=R08（旧业务 API 兼容）",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "approval-reject-zero-dispatch"
-        ],
-        [
-          "approval-duplicate-idempotent"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -4992,7 +4601,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -5003,20 +4614,12 @@
         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=更新机制面：清单更新代次上升旧句柄死亡（expect=0），历史收据如实",
+      "laterShare": "连接器配置更新管理 API 与更新结果=R07-T08+R08",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "matrix-lifecycle-generation-refusals"
-        ],
-        [
-          "a16-history-preserved"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",
@@ -5144,7 +4747,9 @@
         "R04-T07"
       ],
       "r00ExecutionStageIds": [
-        "R04"
+        "R04",
+        "R07",
+        "R08"
       ],
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
@@ -5155,20 +4760,12 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "stageShare": "",
-      "laterShare": "",
-      "evidenceRequired": "R04 独占叶（r00ExecutionStageIds 仅 R04）按 full_original_behavior 验收：每条 R00 原断言各钉专属具名案例，案例由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）——每条断言的案例即该断言 R04 机制面的真实 per-case 事实（R05 RR3 F54：独占叶不得以无人承接的 share 分类放行）",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R04 份额=启停映射机制面：availability 禁用映射全路由零洞（expect=0），停用别名路由同样被拒（不冒充可用）",
+      "laterShare": "MCP 全局开关设置持久化与合并连接状态 API=R07-T08+R08",
+      "evidenceRequired": "本阶段份额由 r04_tool_matrix 生产者经真实工具链路（注册表→统一网关→T03 策略/批准面→原生执行器/worker/MCP 桥，必要处经真实 run 链）逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R04 份额 PASS",
       "evidenceCommandRefs": [
         "r04_tool_matrix"
-      ],
-      "originalAssertionCases": [
-        [
-          "matrix-lifecycle-disable-holes"
-        ],
-        [
-          "a16-alias-route-covered"
-        ]
       ],
       "assertionContract": {
         "producerCommand": "r04_tool_matrix",

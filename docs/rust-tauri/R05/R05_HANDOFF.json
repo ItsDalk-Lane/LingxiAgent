@@ -435,7 +435,19 @@
         "mustFix": [],
         "impl_ref": "artifacts/rust-tauri/R05/RR3/M-01/REPORT.md",
         "review_ref": "artifacts/rust-tauri/R05/RR3/M-REVIEW-01/REVIEW.md",
-        "note": "R04 46 独占叶改 full_original_behavior（119 专属案例组逐条钉住，全部来自 r04_tool_matrix 真实 56 案例集）；改动白名单 stage_maps/R04.json、r04_t08_generate_stage_map.py、stage_map.rs 仅镜像测试；FINAL-04 R04 层叶表 0 FAIL（55=46 full+9 share，69 deferred 合法承接）验证生效。"
+        "note": "R04 46 独占叶改 full_original_behavior（119 专属案例组逐条钉住，全部来自 r04_tool_matrix 真实 56 案例集）；改动白名单 stage_maps/R04.json、r04_t08_generate_stage_map.py、stage_map.rs 仅镜像测试；FINAL-04 R04 层叶表 0 FAIL（55=46 full+9 share，69 deferred 合法承接）验证生效。",
+        "semantic_resurvey": {
+          "trigger": "F54 语义修复总控批次（用户指令）：M-01 的 46 full 中约 40 叶存在虚假完整声明——机制面案例（目录占位/握手/代次/权限格/终端回显）被当作产品语义断言的完整证明；审查复核确认后按共同根因集中修复",
+          "impl_ref": "artifacts/rust-tauri/R05/RR3/F54-CLOSEOUT-01/F54_FIX_REPORT.md",
+          "audit_ref": "artifacts/rust-tauri/R05/RR3/F54-CLOSEOUT-01/F54_SEMANTIC_AUDIT.json（46 叶逐断言七问）",
+          "review_ref": "artifacts/rust-tauri/R05/RR3/F54-REVIEW-01/REVIEW.md（REVIEWER-F54-R1 全新独立审，PASS 无阻断，5 项 OBSERVATION）",
+          "category_split": "A=2（证据本就正确）、B=1（write_stdin 换绑）、C=3（补真实生产入口证明：MCP 路由双路比较/describe 代次守恒/search 诚实可用性）、D=40（权威分期后续：R07-T08/T09/T12 与 R08-T01/T02/T07 承接，laterShare 逐叶载明条款）",
+          "r00_revision": "40 叶 execution_stage_ids 修订走 r00_t07_build_map.py 生成链（R04→R04+R07/R04+R08 多阶段化）；程序化证明仅阶段字段变化、原始断言零删改、46 叶之外零变化；审查者逐叶条款级比对抽查 30 D 叶+6 full 叶全有任务书依据，SCOPE_DECISION_REQUIRED=0",
+          "new_leaf_split": "6 full + 49 share + 69 deferred = 124（M-01 为 46/9/69）；verify.rs 校验器语义零改动",
+          "gate": "verify-stage R04（F54-CLOSEOUT-01/verify-R04）overall=PASS，testedSha=def860a74+真实工作树，绑定 stable，8 命令 exit0，叶表 55/0/69，24 场景 PASS，58 案例全 ok（含 2 新案例）",
+          "negative_checks": "F54-CLOSEOUT-01/F54_NEGATIVE_CHECKS.md 7 项（不可调用标 full/回显冒充变量共享/握手冒充资源读取/删断言/臆造阶段/无承接延期均被拒+正对照），审查者独立复跑 3 项命中",
+          "historical_note": "M-01/M-REVIEW-01 记录保留不删；其 46 full 分类被本轮有据推翻，历史 FAIL/结论原样存档"
+        }
       }
     },
     "historical_layers": [
@@ -755,7 +767,7 @@
       "env_item": "R05-ENV-R00 保留『按二进制实例偶发』观察属性：历史 9f748902… 曾被拦，43d95970…/cf9bce2f…/d57ea731… 连续放行；不能写成永久解除",
       "system_modifications": "零（全程无系统/防火墙/权限修改）"
     },
-    "f42_f54_closure": "F42（A-REVIEW-02）、F45（B-REVIEW-01）、F27-RR3/F46（C-F46-REVIEW-01+H-REVIEW-02）、F28-RR3（E-REVIEW-02/04）、F47/F48（H-REVIEW-02）、F49（I-REVIEW-01）、F50（J-REVIEW-02）、F51（F51-REVIEW-01）、F52（F52-REVIEW-01）、F53（L-REVIEW-01）、F54（M-REVIEW-01）全部独立 CLOSED；R05-ENV-R00 为观察属性非缺口。各独立审指针见 RR3_ISSUE_MATRIX。"
+    "f42_f54_closure": "F42（A-REVIEW-02）、F45（B-REVIEW-01）、F27-RR3/F46（C-F46-REVIEW-01+H-REVIEW-02）、F28-RR3（E-REVIEW-02/04）、F47/F48（H-REVIEW-02）、F49（I-REVIEW-01）、F50（J-REVIEW-02）、F51（F51-REVIEW-01）、F52（F52-REVIEW-01）、F53（L-REVIEW-01）、F54（M-REVIEW-01，后经语义修复轮 F54-CLOSEOUT-01 推翻重分类并以 F54-REVIEW-01 重新独立 CLOSED）全部独立 CLOSED；R05-ENV-R00 为观察属性非缺口。各独立审指针见 RR3_ISSUE_MATRIX。"
   },
   "source_sha": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
   "source_sha_semantics": "E03只读观察HEAD；G02/H02均为此HEAD加各自记录的dirty输入。不是纯HEAD测试或后续交付SHA。RR3/FINAL-04终审testedSha=本HEAD+RR3未提交真实工作树（worktreeDirty=true）；E-04回填未改HEAD、零Git写，文档增量按E-04收据单列，不冒充该tested候选全树相等。",

@@ -1,0 +1,20 @@
+AM scenarios 数: HEAD 952  工作树 952  ID一致: True
+AM 场景非阶段字段差异数: 0
+AM 阶段修订后分布: {('R04', 'R07', 'R08'): 29, ('R04', 'R07'): 6, ('R04', 'R08'): 5}
+AM 总追加阶段 ID 数: 69 (与 69 新路径核对)
+AM 段 schema_version: 一致
+AM 段 task_id: 一致
+AM 段 artifact_kind: 一致
+AM 段 ledger_self_status: 一致
+AM 段 ledger_self_status_note: 一致
+AM 段 generator: 一致
+AM 段 counts: 一致
+AM 段 spec_digests: 一致
+AM 段 spec_digests_note: 一致
+AM 段 tasks: 一致
+AM 段 features_index: 一致
+AM 段 entrypoint_index: 一致
+AM 段 surfaces: 一致
+AM 段 tests: 一致
+AM 段 blockers: 一致
+AM 段 validation_rules_doc: 一致

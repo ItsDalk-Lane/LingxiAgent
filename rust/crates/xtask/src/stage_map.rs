@@ -2119,9 +2119,11 @@ mod map_tests {
     /// loads via STAGE_MAPS).
     const R04_PRODUCTION: &str = include_str!("stage_maps/R04.json");
 
-    /// The 56 case names the matrix producer records (the exact set the
-    /// share leaves' assertion contracts may pin — a map pinning anything
-    /// else, or the producer losing a case, is a named gap).
+    /// The 58 case names the matrix producer records (the exact set the
+    /// leaves' assertion contracts may pin — a map pinning anything
+    /// else, or the producer losing a case, is a named gap). F54 closeout
+    /// added mcp-describe-no-side-effect / mcp-search-honest-availability
+    /// and extended matrix-route-consistency with an MCP-target leg.
     const R04_MATRIX_CASES: &[&str] = &[
         "a15-directory-claim-refused",
         "a15-gateway-audit-directory-ref-failed",
@@ -2157,7 +2159,9 @@ mod map_tests {
         "matrix-tool-family-count",
         "mcp-connector-catalog-sync",
         "mcp-connector-register-handshake",
+        "mcp-describe-no-side-effect",
         "mcp-describe-real-identity",
+        "mcp-search-honest-availability",
         "mcp-search-namespaced",
         "mcp-tool-call-full-chain",
         "mcp-tool-permission-face",
@@ -2205,17 +2209,18 @@ mod map_tests {
         "sup01-ask-subagent-write-refused",
     ];
 
-    /// The 124 R00 leaves bound to R04 split 46 full / 9 share / 69
-    /// deferred. R05 RR3 F54 (M-01): the 46 R04-EXCLUSIVE leaves
-    /// (r00ExecutionStageIds == ["R04"]) are full_original_behavior — a
-    /// share with no later stage would leave an unowned remainder (the
-    /// R05 RR1 F25 rule). The 9 share leaves are the DUAL-STAGE natives
-    /// (read/write/edit) + six file-family shapes whose R06 remainder has
-    /// a real later owner. The generator script
+    /// The 124 R00 leaves bound to R04 split 6 full / 49 share / 69
+    /// deferred. R05 RR3 F54 closeout (F54-CLOSEOUT-01): full stays ONLY
+    /// for the leaves whose every original assertion is proven by its
+    /// pinned case's actual semantics (the exec/write_stdin terminals and
+    /// the MCP tool mechanism face); the other 40 former-full leaves are
+    /// stage_share_satisfied with the R00 ledger revised (execution_stage_ids
+    /// += R07/R08) so every share has a real later-stage owner (the F25
+    /// rule). The generator script
     /// `scripts/rust-tauri/r04_t08_generate_stage_map.py` holds the table;
     /// these numbers pin it — a re-classification that silently drops
     /// coverage turns this red until the map and the decision agree.
-    const R04_LEAF_COUNTS: (usize, usize, usize) = (46, 9, 69);
+    const R04_LEAF_COUNTS: (usize, usize, usize) = (6, 49, 69);
 
     fn parse_production_r04() -> StageMap {
         parse_stage_map(R04_PRODUCTION)
@@ -2495,7 +2500,9 @@ mod map_tests {
             ("matrix-tool-family-count", 7),
             ("mcp-connector-catalog-sync", 1),
             ("mcp-connector-register-handshake", 1),
+            ("mcp-describe-no-side-effect", 1),
             ("mcp-describe-real-identity", 1),
+            ("mcp-search-honest-availability", 1),
             ("mcp-search-namespaced", 1),
             ("mcp-tool-call-full-chain", 1),
             ("mcp-tool-permission-face", 1),

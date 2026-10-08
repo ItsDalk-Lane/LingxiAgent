@@ -1,0 +1,25 @@
+仅 HEAD 有的路径: 0  仅工作树有的路径: 69
+值不同的路径数: 10
+  其他:results: 7
+  生成元数据: 3
+其他差异: /results/14/source_digests/.sync-audit/verified-source-sha.txt
+   HEAD: 'b2d8dc46821888fcf79bd04ffe3b017439463581a37ddf9cf25c8d31e44d33da'
+   CUR : 'bf3893f89b1f9d7739419feb77f981f646384e95f55c87f9078820dd4798e50b'
+其他差异: /results/14/working_tree_digest
+   HEAD: '538c57419a44a60274f4224c2fe683515f845f47210df674522b683e49605b9d'
+   CUR : 'f4679574e0b25d5ba8c2d6d651bf31b1edd4f5c8acf32bd35107a911a36e5500'
+其他差异: /results/13/source_digests/docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json
+   HEAD: '699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9'
+   CUR : '462d528b17aba8b8bc9ae10912feda7778adfef92de7c3282d311dc5e7c1bac3'
+其他差异: /results/13/working_tree_digest
+   HEAD: '7c921da6be5f0806a94e927a1bcb883ff76bfefe01e0767823f206104614ca4b'
+   CUR : 'ddf53e797797e997cffa645dcf05863f157ff5f0b89447383e2d70c0aa2426bb'
+其他差异: /results/12/working_tree_digest
+   HEAD: '7c921da6be5f0806a94e927a1bcb883ff76bfefe01e0767823f206104614ca4b'
+   CUR : 'ddf53e797797e997cffa645dcf05863f157ff5f0b89447383e2d70c0aa2426bb'
+其他差异: /results/12/source_digests/docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json
+   HEAD: '699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9'
+   CUR : '462d528b17aba8b8bc9ae10912feda7778adfef92de7c3282d311dc5e7c1bac3'
+其他差异: /results/2/evidence/2/sha256
+   HEAD: '699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9'
+   CUR : '462d528b17aba8b8bc9ae10912feda7778adfef92de7c3282d311dc5e7c1bac3'

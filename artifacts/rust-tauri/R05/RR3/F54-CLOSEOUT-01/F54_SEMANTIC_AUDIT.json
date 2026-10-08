@@ -1,0 +1,2178 @@
+{
+  "schema": "lingxi.f54-semantic-audit.v1",
+  "generated_at": "2026-10-08",
+  "task": "R05 RR3 F54 收口：R04 46 个 R00 独占叶逐断言语义审计与修复",
+  "method": "56 矩阵案例全量亲读（r04_t08_tool_matrix.rs）+Rust 生产实现面核实（mcpbridge/management/sessions/approval_service/config/toolcatalog）+R04/R07 任务书与 R04_ORCHESTRATOR_PROMPT 条款核实；重点核查：工具可发现≠可调用、终端回显≠变量共享、连接器握手≠指定 URI 资源内容读取、配置代次变化≠持久化正确",
+  "category_legend": {
+    "A": "完整实现且证据正确（不动）",
+    "B": "完整实现但证据绑错（换绑到语义相符的既有案例）",
+    "C": "R04 到期但证明面不足（补最小生产者案例/案例腿）",
+    "D": "权威分期明确允许后续完成（R00 登记修订+stage_share_satisfied+laterShare 义务文本；余款归 R07/R08）"
+  },
+  "category_counts": {
+    "A": 2,
+    "B": 1,
+    "C": 3,
+    "D": 40
+  },
+  "total": 46,
+  "scope_decision_required": [],
+  "leaves": [
+    {
+      "leaf_id": "R00-T02-LA-0199B843D759",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-MCP-0199B8",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "保存一个连接器并异步启动，返回公开配置与当下状态；启动失败留在连接器错误状态",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“添加 MCP 连接器”后核对：保存一个连接器并异步启动，返回公开配置与当下状态；启动失败留在连接器错误状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-connector-register-handshake",
+          "expect": 1,
+          "semantics": "注册=真实 initialize 握手+协议协商（connect_count 审计；失败响亮拒绝不注册）"
+        },
+        {
+          "case": "mcp-tool-permission-face",
+          "expect": 1,
+          "semantics": "MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "mcp-connector-register-handshake=注册=真实 initialize 握手+协议协商（connect_count 审计；失败响亮拒绝不注册）；mcp-tool-permission-face=MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（连接器保存与异步启动 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "连接器保存与异步启动：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-04A6A2BD1547",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-RESOURCES-04A6A2",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "按 uri 返回连接器资源内容；缺 uri 或无内容拒绝",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“读取连接器资源”后核对：按 uri 返回连接器资源内容；缺 uri 或无内容拒绝",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-connector-catalog-sync",
+          "expect": 1,
+          "semantics": "清单同步（协商协议/server 身份/registered 数，is_connected 真实可读）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "mcp-connector-catalog-sync=清单同步（协商协议/server 身份/registered 数，is_connected 真实可读）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（按 uri 的连接器资源读取 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "按 uri 的连接器资源读取：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-0818574ABD43",
+      "feature_id": "F-D03-TOOL-TOOL-RUN-TOOLS-081857",
+      "r00_task_ids": [
+        "R04-T01",
+        "R04-T02"
+      ],
+      "r00_then": "脚本返回日志/结果与子调用摘要；每个子调用经原目标权限检查，子结果默认不直接进对话。",
+      "r00_acceptance_assertions": [
+        "每个子调用独立权限判定",
+        "外层只显示打印/返回值",
+        "失败显示已执行子动作",
+        "未知工具、自调用、无权限、脚本超时或沙盒异常拒绝；已执行子动作不因外层失败自动回滚。"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界=统一工具网关+四基础工具+目录机制；dev/批量工具执行本体不在 R04 边界（§3.2「后续业务工具尚未迁移时，不假装其已可执行」）",
+      "actual_implementation": "Rust 生产代码无该工具执行本体（仅 Availability::Future 目录注册机制）；其消费的网关/权限/目录机制面真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "gateway-each-call-independent-permission",
+          "expect": 1,
+          "semantics": "同一上下文逐子调用独立权限判定（read 派发、write 拒）"
+        },
+        {
+          "case": "semantics-success-receipt-dispatched",
+          "expect": 1,
+          "semantics": "成功收据 dispatched 且承载真实内容"
+        },
+        {
+          "case": "semantics-failed-never-dispatched-receipt",
+          "expect": 1,
+          "semantics": "失败路径收据如实 dispatched=false（不谎报已执行）"
+        },
+        {
+          "case": "matrix-lifecycle-disable-holes",
+          "expect": 0,
+          "semantics": "停用后 6 条路由零洞（fresh/cached/alias/cached-alias/run-chain/pinned 全拒；expect=0）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "gateway-each-call-independent-permission=同一上下文逐子调用独立权限判定（read 派发、write 拒）；semantics-success-receipt-dispatched=成功收据 dispatched 且承载真实内容；semantics-failed-never-dispatched-receipt=失败路径收据如实 dispatched=false（不谎报已执行）；matrix-lifecycle-disable-holes=停用后 6 条路由零洞（fresh/cached/alias/cached-alias/run-chain/pinned 全拒；expect=0）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：钉住的目录诚实案例证明的是「可发现不可调用」，不证明执行本体存在",
+      "category": "D-D-R07",
+      "required_fix": "R00 登记修订（run_tools execution_stage_ids += R07）+重分类 stage_share_satisfied（份额=机制面，余款由 R07 承接）",
+      "deferred_obligation": "run_tools 脚本工具本体（子调用编排/摘要/失败不自动回滚）=R07",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（§1/T12/A23）"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-0B669B30C854",
+      "feature_id": "F-D04-ROUTE_BEHAVIOR-BEHAVIOR-SERVER-INDEX-API-SESSION-PERMISSION-MOD-0B669B",
+      "r00_task_ids": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "r00_then": "按当前会话、待新建会话、指定会话或全局作用域设置模式，返回实际模式或冲突错误",
+      "r00_acceptance_assertions": [
+        "执行“切换指定作用域的会话权限模式”后核对：按当前会话、待新建会话、指定会话或全局作用域设置模式，返回实际模式或冲突错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "permission-face-modes-verifiable",
+          "expect": 1,
+          "semantics": "三档权限模式真实可设置可读取"
+        },
+        {
+          "case": "sup01-ask-subagent-write-refused",
+          "expect": 1,
+          "semantics": "ask 档子代理写类结构化拒绝（TOOL_APPROVAL_UNAVAILABLE，副作用一致）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "permission-face-modes-verifiable=三档权限模式真实可设置可读取；sup01-ask-subagent-write-refused=ask 档子代理写类结构化拒绝（TOOL_APPROVAL_UNAVAILABLE，副作用一致）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（按作用域（当前/待新建/指定/全局）的权限设置 API 与冲突错误 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "按作用域（当前/待新建/指定/全局）的权限设置 API 与冲突错误：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-15AD6ED13B4D",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-APP-TOOLS-TOOL-15AD6E",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "按 arguments 执行指定连接器工具并返回结果或错误",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“调用连接器应用工具”后核对：按 arguments 执行指定连接器工具并返回结果或错误",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04"
+      ],
+      "r04_taskbook_obligation": "R04-T01/T02/T07：mcp_call 按 arguments 经统一网关执行指定连接器工具，返回结果或错误；权限不足明确错误",
+      "actual_implementation": "mcpbridge+统一网关真实实现：命名空间 target 解析、真实 run 链执行（收据 dispatched）、read_only 档 gateway_policy_denied 拒绝腿",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-tool-call-full-chain",
+          "expect": 1,
+          "semantics": "MCP 命名空间目标经统一网关真实 run 链执行，成功收据 dispatched"
+        },
+        {
+          "case": "mcp-tool-permission-face",
+          "expect": 1,
+          "semantics": "MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）"
+        }
+      ],
+      "original_assertion_case_groups": [
+        [
+          "mcp-tool-call-full-chain"
+        ],
+        [
+          "mcp-tool-permission-face"
+        ]
+      ],
+      "current_case_semantics": "mcp-tool-call-full-chain=MCP 命名空间目标经统一网关真实 run 链执行，成功收据 dispatched；mcp-tool-permission-face=MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）",
+      "evidence_mismatch": "无——两条断言与所钉案例语义一一对应",
+      "category": "A",
+      "required_fix": "无（审计通过）",
+      "deferred_obligation": "无——R04 独占且逐断言证明",
+      "evidence_paths": [
+        "artifacts/rust-tauri/R05/RR3/F54-CLOSEOUT-01/verify-R04/R04_MATRIX/leaf-cases.json",
+        "rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs （mcp-tool-call-full-chain/mcp-tool-permission-face）",
+        "rust/crates/xtask/src/stage_maps/R04.json"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-18EFB2D9D5FD",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-START-18EFB2",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "启动指定连接器，返回新运行状态或错误",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“启动连接器”后核对：启动指定连接器，返回新运行状态或错误",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-connector-register-handshake",
+          "expect": 1,
+          "semantics": "注册=真实 initialize 握手+协议协商（connect_count 审计；失败响亮拒绝不注册）"
+        },
+        {
+          "case": "matrix-lifecycle-generation-refusals",
+          "expect": 0,
+          "semantics": "代次更新后旧句柄 TargetChanged 拒（expect=0）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "mcp-connector-register-handshake=注册=真实 initialize 握手+协议协商（connect_count 审计；失败响亮拒绝不注册）；matrix-lifecycle-generation-refusals=代次更新后旧句柄 TargetChanged 拒（expect=0）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（已保存连接器启动管理 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "已保存连接器启动管理：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-196D50D8DD6E",
+      "feature_id": "F-D13-TOOL-TOOL-AST-GREP-196D50",
+      "r00_task_ids": [
+        "R04-T05"
+      ],
+      "r00_then": "返回匹配位置与代码片段，工作区不变。",
+      "r00_acceptance_assertions": [
+        "命中结构而非同文字符串",
+        "无匹配不写文件",
+        "无匹配为空结果；语言/解析失败或路径越权给错误。"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界=统一工具网关+四基础工具+目录机制；dev/批量工具执行本体不在 R04 边界（§3.2「后续业务工具尚未迁移时，不假装其已可执行」）",
+      "actual_implementation": "Rust 生产代码无该工具执行本体（仅 Availability::Future 目录注册机制）；其消费的网关/权限/目录机制面真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "future-tool-shape-ast_grep-discoverable-not-callable",
+          "expect": 1,
+          "semantics": "ast_grep 形态可注册可发现（Availability::Future），调用被诚实拒绝（不伪装可用）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "future-tool-shape-ast_grep-discoverable-not-callable=ast_grep 形态可注册可发现（Availability::Future），调用被诚实拒绝（不伪装可用）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：钉住的目录诚实案例证明的是「可发现不可调用」，不证明执行本体存在",
+      "category": "D-D-R07",
+      "required_fix": "R00 登记修订（ast_grep execution_stage_ids += R07）+重分类 stage_share_satisfied（份额=机制面，余款由 R07 承接）",
+      "deferred_obligation": "执行本体与完整业务交互=R07",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（§1/T12/A23）"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-21B3F4DC9140",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-REFRESH-TOOLS-21B3F4",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "重新读取指定连接器工具目录并返回状态",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“刷新连接器工具”后核对：重新读取指定连接器工具目录并返回状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-connector-catalog-sync",
+          "expect": 1,
+          "semantics": "清单同步（协商协议/server 身份/registered 数，is_connected 真实可读）"
+        },
+        {
+          "case": "matrix-lifecycle-generation-refusals",
+          "expect": 0,
+          "semantics": "代次更新后旧句柄 TargetChanged 拒（expect=0）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "mcp-connector-catalog-sync=清单同步（协商协议/server 身份/registered 数，is_connected 真实可读）；matrix-lifecycle-generation-refusals=代次更新后旧句柄 TargetChanged 拒（expect=0）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（连接器刷新管理入口 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "连接器刷新管理入口：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-240E200EF440",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-AGENTS-AGENTID-CONNECTORS-ID-240E20",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "更新该 Agent 对连接器的配置并返回配置",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“设置指定 Agent 的连接器”后核对：更新该 Agent 对连接器的配置并返回配置",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-tool-permission-face",
+          "expect": 1,
+          "semantics": "MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）"
+        },
+        {
+          "case": "matrix-lifecycle-disable-holes",
+          "expect": 0,
+          "semantics": "停用后 6 条路由零洞（fresh/cached/alias/cached-alias/run-chain/pinned 全拒；expect=0）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "mcp-tool-permission-face=MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）；matrix-lifecycle-disable-holes=停用后 6 条路由零洞（fresh/cached/alias/cached-alias/run-chain/pinned 全拒；expect=0）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（Agent↔连接器绑定配置管理 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "Agent↔连接器绑定配置管理：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-25C4FF66FEE5",
+      "feature_id": "F-D04-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-SESSION-PERMISS-25C4FF",
+      "r00_task_ids": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "r00_then": "返回当前 permissionMode，未设置时为 ASK",
+      "r00_acceptance_assertions": [
+        "执行“查看新会话默认权限”后核对：返回当前 permissionMode，未设置时为 ASK",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "permission-face-modes-verifiable",
+          "expect": 1,
+          "semantics": "三档权限模式真实可设置可读取"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "permission-face-modes-verifiable=三档权限模式真实可设置可读取",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（新会话默认权限偏好读取 API 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "新会话默认权限偏好读取 API：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-2D194C1684BC",
+      "feature_id": "F-D03-ROUTE_BEHAVIOR-BEHAVIOR-MCP-CONNECTORS-ID-DELETE-2D194C",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "连接器配置及运行状态移除，返回删除结果或错误",
+      "r00_acceptance_assertions": [
+        "执行“删除 MCP 连接器”后核对：连接器配置及运行状态移除，返回删除结果或错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "matrix-lifecycle-uninstall-holes",
+          "expect": 0,
+          "semantics": "移除后解析/执行全拒零残留（expect=0）"
+        },
+        {
+          "case": "a16-history-preserved",
+          "expect": 1,
+          "semantics": "状态变化后历史收据如实保留（不掩盖）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "matrix-lifecycle-uninstall-holes=移除后解析/执行全拒零残留（expect=0）；a16-history-preserved=状态变化后历史收据如实保留（不掩盖）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（连接器删除管理 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "连接器删除管理：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-2D896560381E",
+      "feature_id": "F-D13-TOOL-TOOL-LSP-2D8965",
+      "r00_task_ids": [
+        "R04-T05"
+      ],
+      "r00_then": "只读动作返回诊断/位置/悬浮信息；rename经prepare校验后对相关文件应用编辑。",
+      "r00_acceptance_assertions": [
+        "位置与源码一致",
+        "rename仅改返回编辑范围",
+        "不可写时只预览不落盘",
+        "服务缺失/崩溃、不可重命名或写入能力缺失明确报错；无编辑时文件不变。"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界=统一工具网关+四基础工具+目录机制；dev/批量工具执行本体不在 R04 边界（§3.2「后续业务工具尚未迁移时，不假装其已可执行」）",
+      "actual_implementation": "Rust 生产代码无该工具执行本体（仅 Availability::Future 目录注册机制）；其消费的网关/权限/目录机制面真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "future-tool-shape-lsp-discoverable-not-callable",
+          "expect": 1,
+          "semantics": "lsp 形态可注册可发现（Availability::Future），调用被诚实拒绝（不伪装可用）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "future-tool-shape-lsp-discoverable-not-callable=lsp 形态可注册可发现（Availability::Future），调用被诚实拒绝（不伪装可用）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：钉住的目录诚实案例证明的是「可发现不可调用」，不证明执行本体存在",
+      "category": "D-D-R07",
+      "required_fix": "R00 登记修订（lsp execution_stage_ids += R07）+重分类 stage_share_satisfied（份额=机制面，余款由 R07 承接）",
+      "deferred_obligation": "执行本体与完整业务交互=R07",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（§1/T12/A23）"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-2DA782C5C7B9",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-OAUTH-START-OA-2DA782",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "生成授权流程并返回浏览器所需资料，后续回调及轮询作内部步骤",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“启动连接器 OAuth 登录”后核对：生成授权流程并返回浏览器所需资料，后续回调及轮询作内部步骤",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-tool-permission-face",
+          "expect": 1,
+          "semantics": "MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）"
+        },
+        {
+          "case": "approval-reject-zero-dispatch",
+          "expect": 0,
+          "semantics": "拒绝后零派发（expect=0 图钉）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "mcp-tool-permission-face=MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）；approval-reject-zero-dispatch=拒绝后零派发（expect=0 图钉）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（连接器 OAuth 授权流程 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "连接器 OAuth 授权流程：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-483E461BB59D",
+      "feature_id": "F-D03-TOOL-TOOL-MCP-CALL-483E46",
+      "r00_task_ids": [
+        "R04-T01",
+        "R04-T02"
+      ],
+      "r00_then": "按真实目标身份解析、验证参数、重新检查可用性和权限后执行，返回目标原结果。",
+      "r00_acceptance_assertions": [
+        "同目标直调与目录调用权限一致",
+        "禁用或过期目标不执行",
+        "目标不存在/名称歧义/目录过期/权限拒绝时不执行目标。"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04"
+      ],
+      "r04_taskbook_obligation": "R04-T01/T02/T07：MCP 工具经统一网关执行；同目标不同入口权限一致",
+      "actual_implementation": "mcpbridge+统一网关真实实现：命名空间 target 解析、真实 run 链执行、T03 权限面、生命周期代次失效",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-tool-call-full-chain",
+          "expect": 1,
+          "semantics": "MCP 命名空间目标经统一网关真实 run 链执行，成功收据 dispatched"
+        },
+        {
+          "case": "matrix-route-consistency",
+          "expect": 1,
+          "semantics": "同一目标经直调网关与目录 run 链两路授权并执行一致（read 腿+F54 新增 MCP 腿）"
+        },
+        {
+          "case": "matrix-lifecycle-disable-holes",
+          "expect": 0,
+          "semantics": "停用后 6 条路由零洞（fresh/cached/alias/cached-alias/run-chain/pinned 全拒；expect=0）"
+        },
+        {
+          "case": "matrix-lifecycle-generation-refusals",
+          "expect": 0,
+          "semantics": "代次更新后旧句柄 TargetChanged 拒（expect=0）"
+        }
+      ],
+      "original_assertion_case_groups": [
+        [
+          "mcp-tool-call-full-chain",
+          "matrix-route-consistency"
+        ],
+        [
+          "matrix-lifecycle-disable-holes"
+        ],
+        [
+          "matrix-lifecycle-generation-refusals"
+        ]
+      ],
+      "current_case_semantics": "mcp-tool-call-full-chain=MCP 命名空间目标经统一网关真实 run 链执行，成功收据 dispatched；matrix-route-consistency=同一目标经直调网关与目录 run 链两路授权并执行一致（read 腿+F54 新增 MCP 腿）；matrix-lifecycle-disable-holes=停用后 6 条路由零洞（fresh/cached/alias/cached-alias/run-chain/pinned 全拒；expect=0）；matrix-lifecycle-generation-refusals=代次更新后旧句柄 TargetChanged 拒（expect=0）",
+      "evidence_mismatch": "M-01 断言0「同目标直调与目录调用权限一致」钉 matrix-route-consistency，但该案例只在 read 目标上比较两路——MCP 目标无两路比较，属跨工具族挪用证据",
+      "category": "C",
+      "required_fix": "扩展 matrix-route-consistency 增加 MCP 目标腿（直调网关+run 链两路授权执行一致），绑定保持 full-chain+route-consistency，钉住成立且字面对应",
+      "deferred_obligation": "无——R04 独占且逐断言证明",
+      "evidence_paths": [
+        "artifacts/rust-tauri/R05/RR3/F54-CLOSEOUT-01/verify-R04/R04_MATRIX/leaf-cases.json",
+        "rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs （mcp-tool-call-full-chain/matrix-route-consistency——后者含 F54 新增 MCP 目标腿）",
+        "rust/crates/xtask/src/stage_maps/R04.json"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-48B0C7A7453E",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-BULK-48B0C7",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "先校验全部输入再写入；坏行拒绝整批，成功项异步启动并逐项回报",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“批量导入连接器”后核对：先校验全部输入再写入；坏行拒绝整批，成功项异步启动并逐项回报",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-connector-catalog-sync",
+          "expect": 1,
+          "semantics": "清单同步（协商协议/server 身份/registered 数，is_connected 真实可读）"
+        },
+        {
+          "case": "a15-structure-violation-refused",
+          "expect": 1,
+          "semantics": "结构违规引用被拒（无效输入明确错误）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "mcp-connector-catalog-sync=清单同步（协商协议/server 身份/registered 数，is_connected 真实可读）；a15-structure-violation-refused=结构违规引用被拒（无效输入明确错误）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（连接器批量导入管理 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "连接器批量导入管理：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-4C35E6AEC6F7",
+      "feature_id": "F-D13-WS_IN-WS-IN-TERMINAL-TAIL-REQUEST-4C35E6",
+      "r00_task_ids": [
+        "R04-T05"
+      ],
+      "r00_then": "按 terminalId/sinceSeq 返回后续输出",
+      "r00_acceptance_assertions": [
+        "按 terminalId/sinceSeq 返回后续输出",
+        "无权会话或不匹配终端拒绝，不接续错误进程"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1=终端机制本体（T05）/ConfirmStore 决策（T03）；WS 帧协议与事件广播是客户端接入面，不在 R04 机制边界",
+      "actual_implementation": "机制本体真实（T03/T05 套件+矩阵钉住）；Rust 无 terminalWsBridge/无 confirmation_resolved 事件广播",
+      "current_pinned_cases": [
+        {
+          "case": "terminal-tail-cursor-continuation",
+          "expect": 1,
+          "semantics": "尾读按游标续读新输出（第二次读取只见增量，非重放）"
+        },
+        {
+          "case": "tool-write-stdin-foreign-writes",
+          "expect": 0,
+          "semantics": "跨主体/异会话写入 0 成功（所有权拒绝，不接错进程；expect=0 图钉）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "terminal-tail-cursor-continuation=尾读按游标续读新输出（第二次读取只见增量，非重放）；tool-write-stdin-foreign-writes=跨主体/异会话写入 0 成功（所有权拒绝，不接错进程；expect=0 图钉）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制案例不证明 WS 帧协议/事件广播存在",
+      "category": "D-D-R08",
+      "required_fix": "R00 登记修订（终端 WS 尾读 叶 execution_stage_ids += R08）+重分类 stage_share_satisfied（份额=机制面，余款由 R08 承接）",
+      "deferred_obligation": "WS 帧协议面（terminalId/sinceSeq 经 terminalWsBridge）=R08 旧 Electron 客户端接入+React 服务传输",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R04-T05_DISPATCH_E01.md",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-5E61048F19B9",
+      "feature_id": "F-D04-ROUTE_BEHAVIOR-BEHAVIOR-SERVER-INDEX-API-SESSION-PERMISSION-MOD-5E6104",
+      "r00_task_ids": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "r00_then": "返回 mode、accessMode 与 defaultMode，不改变权限",
+      "r00_acceptance_assertions": [
+        "执行“查看当前会话权限模式”后核对：返回 mode、accessMode 与 defaultMode，不改变权限",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "permission-face-modes-verifiable",
+          "expect": 1,
+          "semantics": "三档权限模式真实可设置可读取"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "permission-face-modes-verifiable=三档权限模式真实可设置可读取",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（mode/accessMode/defaultMode 读取 API 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "mode/accessMode/defaultMode 读取 API：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-67256417FB2B",
+      "feature_id": "F-D03-ROUTE_BEHAVIOR-BEHAVIOR-MCP-SESSION-PERMISSIONS-POST-672564",
+      "r00_task_ids": [
+        "R04-T03"
+      ],
+      "r00_then": "校验会话与 sessions.write 范围后，仅在本次会话内放行指定 capability；不持久化",
+      "r00_acceptance_assertions": [
+        "执行“批准当前会话的一次 MCP 工具能力”后核对：校验会话与 sessions.write 范围后，仅在本次会话内放行指定 capability；不持久化",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "preauthorization-single-session-scoped",
+          "expect": 1,
+          "semantics": "预授权整键匹配/单次消耗/会话作用域/跨会话不可见且不持久化"
+        },
+        {
+          "case": "approval-duplicate-idempotent",
+          "expect": 1,
+          "semantics": "重复决策 AlreadySettled 确定性 no-op"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "preauthorization-single-session-scoped=预授权整键匹配/单次消耗/会话作用域/跨会话不可见且不持久化；approval-duplicate-idempotent=重复决策 AlreadySettled 确定性 no-op",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（会话权限授予管理 API（sessions.write 范围校验） 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "会话权限授予管理 API（sessions.write 范围校验）：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-75C0AE981505",
+      "feature_id": "F-D04-SLASH_COMMAND-SLASH-COMMAND-CONFIRM-75C0AE",
+      "r00_task_ids": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "r00_then": "ConfirmStore 将待处理请求标为 confirmed，继续原待批动作并广播状态",
+      "r00_acceptance_assertions": [
+        "ConfirmStore 将待处理请求标为 confirmed，继续原待批动作并广播状态",
+        "ID 缺失/已处理不重复执行；命令来源权限须由 dispatcher 检查"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "approval-answer-executes-once",
+          "expect": 1,
+          "semantics": "批准后待批动作恰执行一次（收据证明）"
+        },
+        {
+          "case": "approval-duplicate-idempotent",
+          "expect": 1,
+          "semantics": "重复决策 AlreadySettled 确定性 no-op"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "approval-answer-executes-once=批准后待批动作恰执行一次（收据证明）；approval-duplicate-idempotent=重复决策 AlreadySettled 确定性 no-op",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（斜杠命令 /confirm 入口（CLI=R07-T09，客户端=R08） 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "斜杠命令 /confirm 入口（CLI=R07-T09，客户端=R08）：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-7FF8D4E48BC9",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-APPS-TOOLNAME--7FF8D4",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "把 launchInput 交给指定连接器工具，返回启动结果或错误",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“启动连接器应用”后核对：把 launchInput 交给指定连接器工具，返回启动结果或错误",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-tool-call-full-chain",
+          "expect": 1,
+          "semantics": "MCP 命名空间目标经统一网关真实 run 链执行，成功收据 dispatched"
+        },
+        {
+          "case": "mcp-tool-permission-face",
+          "expect": 1,
+          "semantics": "MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "mcp-tool-call-full-chain=MCP 命名空间目标经统一网关真实 run 链执行，成功收据 dispatched；mcp-tool-permission-face=MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（连接器应用 launch API 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "连接器应用 launch API：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-8A3C87812B4F",
+      "feature_id": "F-D13-TOOL-TOOL-EXEC-COMMAND-8A3C87",
+      "r00_task_ids": [
+        "R04-T05"
+      ],
+      "r00_then": "返回输出、退出码/终端ID；持续命令可由write_stdin续写，取消清理进程。",
+      "r00_acceptance_assertions": [
+        "输出与退出码正确",
+        "PTY输入可续接",
+        "取消后进程清理",
+        "PathGuard/沙盒/批准失败阻止运行；取消后不留下孙进程。"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04"
+      ],
+      "r04_taskbook_obligation": "R04-T04/T05：exec_command 真实执行、write_stdin 续写、取消清理、越界拒绝（原生执行器+网关+沙盒）",
+      "actual_implementation": "Rust 原生执行器真实实现：exec_command 结构化 argv/输出/退出码；write_stdin 游标续写；cancel 进程树清理；PathGuard/沙盒/批准拒绝面（T04/T05 套件+矩阵）",
+      "current_pinned_cases": [
+        {
+          "case": "tool-exec-command-real-chain",
+          "expect": 1,
+          "semantics": "真实进程执行：结构化 argv、真实 stdout/stderr 与退出码如实收据"
+        },
+        {
+          "case": "tool-write-stdin-continuation",
+          "expect": 1,
+          "semantics": "write_stdin 按句柄续写 PTY，续读只投递新输出（游标时序，真实 PTY）"
+        },
+        {
+          "case": "tool-exec-cancel-cleanup",
+          "expect": 1,
+          "semantics": "cancel 后进程树被清理（真实子进程回收，不残留）"
+        },
+        {
+          "case": "semantics-failed-never-dispatched-receipt",
+          "expect": 1,
+          "semantics": "失败路径收据如实 dispatched=false（不谎报已执行）"
+        }
+      ],
+      "original_assertion_case_groups": [
+        [
+          "tool-exec-command-real-chain"
+        ],
+        [
+          "tool-write-stdin-continuation"
+        ],
+        [
+          "tool-exec-cancel-cleanup"
+        ],
+        [
+          "semantics-failed-never-dispatched-receipt"
+        ]
+      ],
+      "current_case_semantics": "tool-exec-command-real-chain=真实进程执行：结构化 argv、真实 stdout/stderr 与退出码如实收据；tool-write-stdin-continuation=write_stdin 按句柄续写 PTY，续读只投递新输出（游标时序，真实 PTY）；tool-exec-cancel-cleanup=cancel 后进程树被清理（真实子进程回收，不残留）；semantics-failed-never-dispatched-receipt=失败路径收据如实 dispatched=false（不谎报已执行）",
+      "evidence_mismatch": "无——四条断言与所钉案例语义一一对应",
+      "category": "A",
+      "required_fix": "无（审计通过；justification 文本微调以逐断言对应）",
+      "deferred_obligation": "无——R04 独占且逐断言证明",
+      "evidence_paths": [
+        "artifacts/rust-tauri/R05/RR3/F54-CLOSEOUT-01/verify-R04/R04_MATRIX/leaf-cases.json",
+        "rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs （tool-exec-command-real-chain/tool-write-stdin-continuation/tool-exec-cancel-cleanup/semantics-failed-never-dispatched-receipt）",
+        "rust/crates/xtask/src/stage_maps/R04.json"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-8BCB8A749864",
+      "feature_id": "F-D03-TOOL-TOOL-MCP-DESCRIBE-TOOL-8BCB8A",
+      "r00_task_ids": [
+        "R04-T01",
+        "R04-T02"
+      ],
+      "r00_then": "返回目标真实schema、必填项和约束，不执行工具。",
+      "r00_acceptance_assertions": [
+        "schema和真实执行参数一致",
+        "无副作用",
+        "目标消失/重名时明确提示，不给错误schema。"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04"
+      ],
+      "r04_taskbook_obligation": "R04-T02/T07：describe 返回真实 schema；描述不执行不产生副作用",
+      "actual_implementation": "registry.describe_full 真实实现（listing+verbatim schema，与执行同一 from_effective_arguments 校验源）",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-describe-real-identity",
+          "expect": 1,
+          "semantics": "describe 返回真实命名空间身份+Execute 权限契约（与执行同一 schema 源）"
+        },
+        {
+          "case": "mcp-describe-no-side-effect",
+          "expect": 1,
+          "semantics": "describe 前后目录代次不变（F54 新增生产者案例，只读路径的代次守恒证明）"
+        },
+        {
+          "case": "matrix-lifecycle-uninstall-holes",
+          "expect": 0,
+          "semantics": "移除后解析/执行全拒零残留（expect=0）"
+        }
+      ],
+      "original_assertion_case_groups": [
+        [
+          "mcp-describe-real-identity"
+        ],
+        [
+          "mcp-describe-no-side-effect"
+        ],
+        [
+          "matrix-lifecycle-uninstall-holes"
+        ]
+      ],
+      "current_case_semantics": "mcp-describe-real-identity=describe 返回真实命名空间身份+Execute 权限契约（与执行同一 schema 源）；mcp-describe-no-side-effect=describe 前后目录代次不变（F54 新增生产者案例，只读路径的代次守恒证明）；matrix-lifecycle-uninstall-holes=移除后解析/执行全拒零残留（expect=0）",
+      "evidence_mismatch": "M-01 断言1「无副作用」钉 a16-history-preserved（历史收据保留≠描述无副作用）——工具可发现≠可调用同类错位",
+      "category": "C",
+      "required_fix": "新增生产者案例 mcp-describe-no-side-effect：describe 前后目录代次不变（只读路径的代次守恒证明），断言1 换钉新案例",
+      "deferred_obligation": "无——R04 独占且逐断言证明",
+      "evidence_paths": [
+        "artifacts/rust-tauri/R05/RR3/F54-CLOSEOUT-01/verify-R04/R04_MATRIX/leaf-cases.json",
+        "rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs （mcp-describe-real-identity/mcp-describe-no-side-effect/matrix-lifecycle-uninstall-holes）",
+        "rust/crates/xtask/src/stage_maps/R04.json"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-8D3CEB6133E1",
+      "feature_id": "F-D04-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-SESSION-PERMISS-8D3CEB",
+      "r00_task_ids": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "r00_then": "校验模式并写入偏好，返回保存后的 permissionMode 或错误",
+      "r00_acceptance_assertions": [
+        "执行“设置新会话默认权限”后核对：校验模式并写入偏好，返回保存后的 permissionMode 或错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "permission-face-modes-verifiable",
+          "expect": 1,
+          "semantics": "三档权限模式真实可设置可读取"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "permission-face-modes-verifiable=三档权限模式真实可设置可读取",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（默认权限偏好校验/写入/持久化 API 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "默认权限偏好校验/写入/持久化 API：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-96DD1FF9E9D5",
+      "feature_id": "F-D13-TOOL-TOOL-AST-EDIT-96DD1F",
+      "r00_task_ids": [
+        "R04-T05"
+      ],
+      "r00_then": "匹配节点被替换，文件内容和会话文件记录反映修改。",
+      "r00_acceptance_assertions": [
+        "修改目标节点且其他内容不变",
+        "冲突时原文件保留",
+        "语法/匹配失败、越权路径或新旧版本冲突拒绝，不应静默改错位置。"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界=统一工具网关+四基础工具+目录机制；dev/批量工具执行本体不在 R04 边界（§3.2「后续业务工具尚未迁移时，不假装其已可执行」）",
+      "actual_implementation": "Rust 生产代码无该工具执行本体（仅 Availability::Future 目录注册机制）；其消费的网关/权限/目录机制面真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "future-tool-shape-ast_edit-discoverable-not-callable",
+          "expect": 1,
+          "semantics": "ast_edit 形态可注册可发现（Availability::Future），调用被诚实拒绝（不伪装可用）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "future-tool-shape-ast_edit-discoverable-not-callable=ast_edit 形态可注册可发现（Availability::Future），调用被诚实拒绝（不伪装可用）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：钉住的目录诚实案例证明的是「可发现不可调用」，不证明执行本体存在",
+      "category": "D-D-R07",
+      "required_fix": "R00 登记修订（ast_edit execution_stage_ids += R07）+重分类 stage_share_satisfied（份额=机制面，余款由 R07 承接）",
+      "deferred_obligation": "执行本体与完整业务交互=R07（现役 OPTIONAL 工具迁移+R07-T12 逐功能真实闭环）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（§1/T12/A23）"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-A336F79E964D",
+      "feature_id": "F-D04-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PLAN-MODE-TOGGLE-A336F7",
+      "r00_task_ids": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "r00_then": "无 mode 时由 !!enabled 调 setPlanMode，返回最新状态",
+      "r00_acceptance_assertions": [
+        "成功：切换规划模式后，无 mode 时由 !!enabled 调 setPlanMode，返回最新状态",
+        "边界：enabled true/false 两向及 ok=false；拒绝时目标状态不变"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "permission-face-modes-verifiable",
+          "expect": 1,
+          "semantics": "三档权限模式真实可设置可读取"
+        },
+        {
+          "case": "matrix-lifecycle-disable-holes",
+          "expect": 0,
+          "semantics": "停用后 6 条路由零洞（fresh/cached/alias/cached-alias/run-chain/pinned 全拒；expect=0）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "permission-face-modes-verifiable=三档权限模式真实可设置可读取；matrix-lifecycle-disable-holes=停用后 6 条路由零洞（fresh/cached/alias/cached-alias/run-chain/pinned 全拒；expect=0）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（setPlanMode 切换 API（!!enabled 语义） 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "setPlanMode 切换 API（!!enabled 语义）：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-B4BB2438E855",
+      "feature_id": "F-D03-UI-UI-SETTINGS-MCP-B4BB24",
+      "r00_task_ids": [
+        "R04-T01",
+        "R04-T02"
+      ],
+      "r00_then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "r00_acceptance_assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "自动读取连接器状态与工具权限：成功核对 连接器列表、状态、工具与权限显示；空态/未初始化核对 无连接器显示添加入口；错误/无权限核对 连接器或权限读取失败仅 console.error，保留旧状态，无专门错误态或 toast。",
+        "全局启停与延迟工具加载：成功核对 总开关及延迟阈值保存；成功后有 agentId 时重读连接器状态与工具权限。；空态/未初始化核对 无连接器时仍可切总开关；无 agentId 时不发 state GET。；错误/无权限核对 失败恢复旧配置",
+        "添加连接器、批量导入：成功核对 新连接器出现，批量结果逐项反馈；成功后有 agentId 时重读连接器状态与工具权限。；空态/未初始化核对 空表单不可提交；无 agentId 时不发 state GET。；错误/无权限核对 批量可部分成功，不能用全成功 toast",
+        "编辑/删除连接器与启动/停止/刷新工具：成功核对 连接状态和目录更新；成功后有 agentId 时重读连接器状态与工具权限。；空态/未初始化核对 删除需确认；停用不清凭据；无 agentId 时不发 state GET。；错误/无权限核对 失败显示错误且保留连接器",
+        "按助手启停连接器、设置工具权限/置顶：成功核对 当前助手允许工具和排序更新；成功后有 agentId 时重读连接器状态与工具权限。；空态/未初始化核对 无工具显示空目录；无 agentId 时不发 state GET。；错误/无权限核对 保存失败不伪造授权",
+        "OAuth 登录、取消、退出：成功核对 登录轮询返回 done 后刷新连接器并显示保存成功；退出接口成功后经统一 run 刷新并显示成功。；成功后有 agentId 时重读连接器状态与工具权限。；OAuth 授权 URL 成功返回后打开外链并轮询，完成/退出后重读状态；取消仅 POST cancel。；桌面 platform.openExternal 走 IPC，Web/mobile 使用浏览器 window.open。；空态/未初始化核对 未登录显示登录入口；等待中可点击取消，取消请求后关闭等待卡。；无 agentId 时不发 state GET。；错误/无权限核对 启动、轮询 error/超时或取消请求失败按各自 catch 显示错误；外链打开未等待，拒绝不会进入登录 catch，仍继续轮询；轮询 cancelled 直接返回，connectOAuth 随后仍刷新并可能显示保存成功，不能将取消断言为安静退出。；启动失败不打开外链；取消分支不因取消本身重读 state。；取消本身不直接重读，但在途轮询若回到 cancelled 并正常结束，登录回调仍可能间接 loadState，需按并发结果验。"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust 无设置页 UI/无管理 API；其消费的数据机制面真实（目录快照/握手/权限面/预授权，矩阵钉住）",
+      "current_pinned_cases": [
+        {
+          "case": "catalog-face-lists-mcp-tools-with-permission",
+          "expect": 1,
+          "semantics": "目录快照列出 MCP 工具及其权限契约（设置面消费的数据机制）"
+        },
+        {
+          "case": "mcp-connector-register-handshake",
+          "expect": 1,
+          "semantics": "注册=真实 initialize 握手+协议协商（connect_count 审计；失败响亮拒绝不注册）"
+        },
+        {
+          "case": "mcp-tool-permission-face",
+          "expect": 1,
+          "semantics": "MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）"
+        },
+        {
+          "case": "preauthorization-single-session-scoped",
+          "expect": 1,
+          "semantics": "预授权整键匹配/单次消耗/会话作用域/跨会话不可见且不持久化"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "catalog-face-lists-mcp-tools-with-permission=目录快照列出 MCP 工具及其权限契约（设置面消费的数据机制）；mcp-connector-register-handshake=注册=真实 initialize 握手+协议协商（connect_count 审计；失败响亮拒绝不注册）；mcp-tool-permission-face=MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）；preauthorization-single-session-scoped=预授权整键匹配/单次消耗/会话作用域/跨会话不可见且不持久化",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（MCP 连接器设置页 UI 投影与管理 API 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "MCP 连接器设置页 UI 投影与管理 API：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-BB1BB3A9C5F4",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-SETTINGS-DEFER-MCP-BB1BB3",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "独立更新 deferEnabled、deferThreshold、builtinDeferEnabled 中实际提供的字段，返回新状态",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“设置 MCP 工具延迟加载”后核对：独立更新 deferEnabled、deferThreshold、builtinDeferEnabled 中实际提供的字段，返回新状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "catalog-face-lists-mcp-tools-with-permission",
+          "expect": 1,
+          "semantics": "目录快照列出 MCP 工具及其权限契约（设置面消费的数据机制）"
+        },
+        {
+          "case": "matrix-lifecycle-disable-holes",
+          "expect": 0,
+          "semantics": "停用后 6 条路由零洞（fresh/cached/alias/cached-alias/run-chain/pinned 全拒；expect=0）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "catalog-face-lists-mcp-tools-with-permission=目录快照列出 MCP 工具及其权限契约（设置面消费的数据机制）；matrix-lifecycle-disable-holes=停用后 6 条路由零洞（fresh/cached/alias/cached-alias/run-chain/pinned 全拒；expect=0）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（延迟加载设置持久化 API（deferEnabled/threshold/builtinDefer） 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "延迟加载设置持久化 API（deferEnabled/threshold/builtinDefer）：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-BC2FBD618278",
+      "feature_id": "F-D04-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-INDEX-API-PLAN-MODE-READ-BC2FBD",
+      "r00_task_ids": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "r00_then": "返回 planMode、permissionMode、accessMode",
+      "r00_acceptance_assertions": [
+        "成功：执行“查看规划/权限模式”后，返回 planMode、permissionMode、accessMode",
+        "拒绝/边界：无参数；不应错误扩大写入或披露范围"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "permission-face-modes-verifiable",
+          "expect": 1,
+          "semantics": "三档权限模式真实可设置可读取"
+        },
+        {
+          "case": "a16-history-preserved",
+          "expect": 1,
+          "semantics": "状态变化后历史收据如实保留（不掩盖）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "permission-face-modes-verifiable=三档权限模式真实可设置可读取；a16-history-preserved=状态变化后历史收据如实保留（不掩盖）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（planMode/permissionMode/accessMode 读取 API 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "planMode/permissionMode/accessMode 读取 API：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-C70E819F8DA4",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-OAUTH-LOGOUT-O-C70E81",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "清除连接器 OAuth 凭证并返回公开状态",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“退出连接器 OAuth”后核对：清除连接器 OAuth 凭证并返回公开状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-tool-permission-face",
+          "expect": 1,
+          "semantics": "MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）"
+        },
+        {
+          "case": "preauthorization-single-session-scoped",
+          "expect": 1,
+          "semantics": "预授权整键匹配/单次消耗/会话作用域/跨会话不可见且不持久化"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "mcp-tool-permission-face=MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）；preauthorization-single-session-scoped=预授权整键匹配/单次消耗/会话作用域/跨会话不可见且不持久化",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（OAuth 凭证清除与公开状态 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "OAuth 凭证清除与公开状态：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-C88F29B5114A",
+      "feature_id": "F-D13-TOOL-TOOL-RUN-CODE-C88F29",
+      "r00_task_ids": [
+        "R04-T05"
+      ],
+      "r00_then": "run返回输出并保留同会话变量；restart清空内核状态；status如实报启动状态。",
+      "r00_acceptance_assertions": [
+        "两次调用可共享变量",
+        "重启后旧变量消失",
+        "取消清理内核",
+        "语言无效、无会话、内核死亡或超时显式失败；重启不声称保留旧状态。"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界=统一工具网关+四基础工具+目录机制；dev/批量工具执行本体不在 R04 边界（§3.2「后续业务工具尚未迁移时，不假装其已可执行」）",
+      "actual_implementation": "Rust 生产代码无该工具执行本体（仅 Availability::Future 目录注册机制）；其消费的网关/权限/目录机制面真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "future-tool-shape-run_code-discoverable-not-callable",
+          "expect": 1,
+          "semantics": "run_code 形态可注册可发现（Availability::Future），调用被诚实拒绝（不伪装可用）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "future-tool-shape-run_code-discoverable-not-callable=run_code 形态可注册可发现（Availability::Future），调用被诚实拒绝（不伪装可用）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：钉住的目录诚实案例证明的是「可发现不可调用」，不证明执行本体存在",
+      "category": "D-D-R07",
+      "required_fix": "R00 登记修订（run_code execution_stage_ids += R07）+重分类 stage_share_satisfied（份额=机制面，余款由 R07 承接）",
+      "deferred_obligation": "执行本体与完整业务交互=R07",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（§1/T12/A23）"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-C90F42576683",
+      "feature_id": "F-D13-TOOL-TOOL-WRITE-STDIN-C90F42",
+      "r00_task_ids": [
+        "R04-T05"
+      ],
+      "r00_then": "交互命令收到输入，输出和会话状态更新；关闭可回收会话。",
+      "r00_acceptance_assertions": [
+        "输入进入指定PTY",
+        "退出后拒绝写入",
+        "状态和退出码一致",
+        "终端不存在、已退出或会话不匹配时拒绝，不写错进程。"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04"
+      ],
+      "r04_taskbook_obligation": "R04-T05：PTY 输入投递、退出后诚实失败、状态退出码一致、跨主体拒绝",
+      "actual_implementation": "write_stdin/exec_command 机制本体真实（同 8A3C 叶；T05 套件）",
+      "current_pinned_cases": [
+        {
+          "case": "tool-write-stdin-continuation",
+          "expect": 1,
+          "semantics": "write_stdin 按句柄续写 PTY，续读只投递新输出（游标时序，真实 PTY）"
+        },
+        {
+          "case": "terminal-close-stops-terminal",
+          "expect": 1,
+          "semantics": "显式关闭终止终端（Terminated/Exited 有界可观察）；关闭后写入诚实失败"
+        },
+        {
+          "case": "tool-exec-command-real-chain",
+          "expect": 1,
+          "semantics": "真实进程执行：结构化 argv、真实 stdout/stderr 与退出码如实收据"
+        },
+        {
+          "case": "tool-write-stdin-foreign-writes",
+          "expect": 0,
+          "semantics": "跨主体/异会话写入 0 成功（所有权拒绝，不接错进程；expect=0 图钉）"
+        }
+      ],
+      "original_assertion_case_groups": [
+        [
+          "tool-write-stdin-continuation"
+        ],
+        [
+          "terminal-close-stops-terminal"
+        ],
+        [
+          "tool-exec-command-real-chain"
+        ],
+        [
+          "tool-write-stdin-foreign-writes"
+        ]
+      ],
+      "current_case_semantics": "tool-write-stdin-continuation=write_stdin 按句柄续写 PTY，续读只投递新输出（游标时序，真实 PTY）；terminal-close-stops-terminal=显式关闭终止终端（Terminated/Exited 有界可观察）；关闭后写入诚实失败；tool-exec-command-real-chain=真实进程执行：结构化 argv、真实 stdout/stderr 与退出码如实收据；tool-write-stdin-foreign-writes=跨主体/异会话写入 0 成功（所有权拒绝，不接错进程；expect=0 图钉）",
+      "evidence_mismatch": "M-01 断言1「退出后拒绝写入」错钉 a15-missing-claim-refused（worker 产物缺失拒绝，与终端无关）；断言3「会话不匹配拒绝」错钉 foreign-writes 的断言1 位置语义错位——退出后拒绝与跨会话拒绝两案例互换",
+      "category": "B",
+      "required_fix": "换绑：断言1→terminal-close-stops-terminal（显式关闭后 late write 诚实失败）；断言3→tool-write-stdin-foreign-writes(expect=0)；断言0/2 绑定不变",
+      "deferred_obligation": "无——R04 独占且逐断言证明",
+      "evidence_paths": [
+        "artifacts/rust-tauri/R05/RR3/F54-CLOSEOUT-01/verify-R04/R04_MATRIX/leaf-cases.json",
+        "rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs （tool-write-stdin-continuation/terminal-close-stops-terminal/tool-exec-command-real-chain/tool-write-stdin-foreign-writes）",
+        "rust/crates/xtask/src/stage_maps/R04.json"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-CD1524CC7DC3",
+      "feature_id": "F-D04-SLASH_COMMAND-SLASH-COMMAND-REJECT-CD1524",
+      "r00_task_ids": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "r00_then": "ConfirmStore 标为 rejected，回复已取消并广播；原待批动作不执行",
+      "r00_acceptance_assertions": [
+        "ConfirmStore 标为 rejected，回复已取消并广播；原待批动作不执行",
+        "ID 缺失/已处理不再次决策；Bridge 权限与反馈单独核查"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "approval-reject-zero-dispatch",
+          "expect": 0,
+          "semantics": "拒绝后零派发（expect=0 图钉）"
+        },
+        {
+          "case": "approval-duplicate-idempotent",
+          "expect": 1,
+          "semantics": "重复决策 AlreadySettled 确定性 no-op"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "approval-reject-zero-dispatch=拒绝后零派发（expect=0 图钉）；approval-duplicate-idempotent=重复决策 AlreadySettled 确定性 no-op",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（斜杠命令 /reject 入口（CLI=R07-T09，客户端=R08） 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "斜杠命令 /reject 入口（CLI=R07-T09，客户端=R08）：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-CD5D7FC02D8E",
+      "feature_id": "F-D04-TOOL-TOOL-SECURITY-SCAN-CD5D7F",
+      "r00_task_ids": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "r00_then": "返回文件数、引擎结果和发现计数，写安全审计记录但不改业务文件。",
+      "r00_acceptance_assertions": [
+        "发现与实际文件对应",
+        "范围不足明确",
+        "无越权读取",
+        "非Git工作区、路径越权、文件上限或引擎失败标注范围/错误，不伪称全量通过。"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界=统一工具网关+四基础工具+目录机制；dev/批量工具执行本体不在 R04 边界（§3.2「后续业务工具尚未迁移时，不假装其已可执行」）",
+      "actual_implementation": "Rust 生产代码无该工具执行本体（仅 Availability::Future 目录注册机制）；其消费的网关/权限/目录机制面真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "future-tool-shape-security_scan-discoverable-not-callable",
+          "expect": 1,
+          "semantics": "security_scan 形态可注册可发现（Availability::Future），调用被诚实拒绝（不伪装可用）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "future-tool-shape-security_scan-discoverable-not-callable=security_scan 形态可注册可发现（Availability::Future），调用被诚实拒绝（不伪装可用）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：钉住的目录诚实案例证明的是「可发现不可调用」，不证明执行本体存在",
+      "category": "D-D-R07",
+      "required_fix": "R00 登记修订（security_scan execution_stage_ids += R07）+重分类 stage_share_satisfied（份额=机制面，余款由 R07 承接）",
+      "deferred_obligation": "执行本体与完整业务交互=R07",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（§1/T12/A23）"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-CE69063550AA",
+      "feature_id": "F-D13-WS_IN-WS-IN-TERMINAL-SNAPSHOT-REQUEST-CE6906",
+      "r00_task_ids": [
+        "R04-T05"
+      ],
+      "r00_then": "通过 terminalWsBridge 送当前终端快照",
+      "r00_acceptance_assertions": [
+        "通过 terminalWsBridge 送当前终端快照",
+        "会话身份不符时拒绝，不送他人终端内容"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1=终端机制本体（T05）/ConfirmStore 决策（T03）；WS 帧协议与事件广播是客户端接入面，不在 R04 机制边界",
+      "actual_implementation": "机制本体真实（T03/T05 套件+矩阵钉住）；Rust 无 terminalWsBridge/无 confirmation_resolved 事件广播",
+      "current_pinned_cases": [
+        {
+          "case": "terminal-snapshot-current-transcript",
+          "expect": 1,
+          "semantics": "快照返回当前 transcript 尾部（真实 PTY 内容）"
+        },
+        {
+          "case": "tool-write-stdin-foreign-writes",
+          "expect": 0,
+          "semantics": "跨主体/异会话写入 0 成功（所有权拒绝，不接错进程；expect=0 图钉）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "terminal-snapshot-current-transcript=快照返回当前 transcript 尾部（真实 PTY 内容）；tool-write-stdin-foreign-writes=跨主体/异会话写入 0 成功（所有权拒绝，不接错进程；expect=0 图钉）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制案例不证明 WS 帧协议/事件广播存在",
+      "category": "D-D-R08",
+      "required_fix": "R00 登记修订（终端 WS 快照 叶 execution_stage_ids += R08）+重分类 stage_share_satisfied（份额=机制面，余款由 R08 承接）",
+      "deferred_obligation": "WS 帧协议面（快照请求帧）=R08",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R04-T05_DISPATCH_E01.md",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-CEDC75156D33",
+      "feature_id": "F-D03-TOOL-TOOL-MCP-SEARCH-TOOLS-CEDC75",
+      "r00_task_ids": [
+        "R04-T01",
+        "R04-T02"
+      ],
+      "r00_then": "返回匹配工具名称、来源、描述与参数摘要，不执行工具。",
+      "r00_acceptance_assertions": [
+        "搜索项能被describe/call解析",
+        "禁用项不可调用",
+        "禁用或不可用目标不应被提供为可执行结果；无命中为空。"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04"
+      ],
+      "r04_taskbook_obligation": "R04-T02/T07：搜索返回可被 describe/call 解析的真实项；禁用/无命中诚实",
+      "actual_implementation": "registry.search 真实实现（local_name/display_name/alias 匹配；停用项保留于目录并携带 Disabled availability）",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-search-namespaced",
+          "expect": 1,
+          "semantics": "命名空间搜索命中真实 target 身份"
+        },
+        {
+          "case": "mcp-describe-real-identity",
+          "expect": 1,
+          "semantics": "describe 返回真实命名空间身份+Execute 权限契约（与执行同一 schema 源）"
+        },
+        {
+          "case": "matrix-lifecycle-disable-holes",
+          "expect": 0,
+          "semantics": "停用后 6 条路由零洞（fresh/cached/alias/cached-alias/run-chain/pinned 全拒；expect=0）"
+        },
+        {
+          "case": "mcp-search-honest-availability",
+          "expect": 1,
+          "semantics": "无命中返回空；停用项仍列出但标 Disabled 不冒充可执行（F54 新增生产者案例）"
+        }
+      ],
+      "original_assertion_case_groups": [
+        [
+          "mcp-search-namespaced",
+          "mcp-describe-real-identity"
+        ],
+        [
+          "matrix-lifecycle-disable-holes"
+        ],
+        [
+          "mcp-search-honest-availability"
+        ]
+      ],
+      "current_case_semantics": "mcp-search-namespaced=命名空间搜索命中真实 target 身份；mcp-describe-real-identity=describe 返回真实命名空间身份+Execute 权限契约（与执行同一 schema 源）；matrix-lifecycle-disable-holes=停用后 6 条路由零洞（fresh/cached/alias/cached-alias/run-chain/pinned 全拒；expect=0）；mcp-search-honest-availability=无命中返回空；停用项仍列出但标 Disabled 不冒充可执行（F54 新增生产者案例）",
+      "evidence_mismatch": "M-01 断言2「禁用或不可用目标不应被提供为可执行结果；无命中为空」钉 a16-alias-route-covered（别名路由拒绝≠搜索诚实：不证明无命中为空、不证明停用项标注）",
+      "category": "C",
+      "required_fix": "新增生产者案例 mcp-search-honest-availability：无命中返回空+停用项仍列出但标 Disabled，断言2 换钉新案例；断言0 补钉 mcp-describe-real-identity（搜索命中身份可被 describe 解析的闭环）；断言1 绑定不变",
+      "deferred_obligation": "无——R04 独占且逐断言证明",
+      "evidence_paths": [
+        "artifacts/rust-tauri/R05/RR3/F54-CLOSEOUT-01/verify-R04/R04_MATRIX/leaf-cases.json",
+        "rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs （mcp-search-namespaced/mcp-describe-real-identity/matrix-lifecycle-disable-holes/mcp-search-honest-availability）",
+        "rust/crates/xtask/src/stage_maps/R04.json"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-CFD9F02BC6AA",
+      "feature_id": "F-D13-WS_IN-WS-IN-TERMINAL-CLOSE-REQUEST-CFD9F0",
+      "r00_task_ids": [
+        "R04-T05"
+      ],
+      "r00_then": "终止指定 terminalId 并返回 killed 或 already_stopped",
+      "r00_acceptance_assertions": [
+        "终止指定 terminalId 并返回 killed 或 already_stopped",
+        "终端管理器不可用/ID不匹配返回 rejected，不谎报已停止"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1=终端机制本体（T05）/ConfirmStore 决策（T03）；WS 帧协议与事件广播是客户端接入面，不在 R04 机制边界",
+      "actual_implementation": "机制本体真实（T03/T05 套件+矩阵钉住）；Rust 无 terminalWsBridge/无 confirmation_resolved 事件广播",
+      "current_pinned_cases": [
+        {
+          "case": "terminal-close-stops-terminal",
+          "expect": 1,
+          "semantics": "显式关闭终止终端（Terminated/Exited 有界可观察）；关闭后写入诚实失败"
+        },
+        {
+          "case": "tool-write-stdin-foreign-writes",
+          "expect": 0,
+          "semantics": "跨主体/异会话写入 0 成功（所有权拒绝，不接错进程；expect=0 图钉）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "terminal-close-stops-terminal=显式关闭终止终端（Terminated/Exited 有界可观察）；关闭后写入诚实失败；tool-write-stdin-foreign-writes=跨主体/异会话写入 0 成功（所有权拒绝，不接错进程；expect=0 图钉）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制案例不证明 WS 帧协议/事件广播存在",
+      "category": "D-D-R08",
+      "required_fix": "R00 登记修订（终端 WS 关闭 叶 execution_stage_ids += R08）+重分类 stage_share_satisfied（份额=机制面，余款由 R08 承接）",
+      "deferred_obligation": "WS 帧协议面（close 的 killed/already_stopped 返回）=R08",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R04-T05_DISPATCH_E01.md",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-D01766AF4475",
+      "feature_id": "F-D04-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PERMISSION-MODE-SET-D01766",
+      "r00_task_ids": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "r00_then": "body.mode 调 setSessionPermissionMode，返回 mode/accessMode",
+      "r00_acceptance_assertions": [
+        "成功：设置会话权限模式后，body.mode 调 setSessionPermissionMode，返回 mode/accessMode",
+        "边界：mode 存在时不由 enabled 决定；拒绝时目标状态不变"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "permission-face-modes-verifiable",
+          "expect": 1,
+          "semantics": "三档权限模式真实可设置可读取"
+        },
+        {
+          "case": "sup01-ask-subagent-write-refused",
+          "expect": 1,
+          "semantics": "ask 档子代理写类结构化拒绝（TOOL_APPROVAL_UNAVAILABLE，副作用一致）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "permission-face-modes-verifiable=三档权限模式真实可设置可读取；sup01-ask-subagent-write-refused=ask 档子代理写类结构化拒绝（TOOL_APPROVAL_UNAVAILABLE，副作用一致）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（setSessionPermissionMode 管理 API 投影 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "setSessionPermissionMode 管理 API 投影：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-DA5AD5C40098",
+      "feature_id": "F-D04-UI-UI-SETTINGS-SECURITY-DA5AD5",
+      "r00_task_ids": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "r00_then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "r00_acceptance_assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "沙箱及沙箱网络开关：成功核对 两个开关通过每助手配置接口写入全局 preferences；适用保存路径后重读当前助手合成配置视图。；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；空态/未初始化核对 sandbox 状态尚未初始化时为 undefined/loading；只有显式 false 时显示关闭警告，不把未加载当关闭。；无 agentId/resourceKey 时 loadSettingsConfig 不请求；经验未启用时不 GET experience。；错误/无权限核对 保存失败恢复开关；各项 GET 失败应与前序保存结果分开判断。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。",
+        "检查点保留策略、展开备份列表：成功核对 保留天数与检查点列表显示；适用保存路径后重读当前助手合成配置视图。；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；空态/未初始化核对 无检查点显示空列表；无 agentId/resourceKey 时 loadSettingsConfig 不请求；经验未启用时不 GET experience。；错误/无权限核对 检查点列表 GET 失败直接设为空数组且无警告；页面可能呈假空态，不能要求显示读取错误。；各项 GET 失败应与前序保存结果分开判断。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。",
+        "网络代理模式及 HTTP/HTTPS/WS/WSS/noProxy 字段保存：成功核对 proxy 模式和 HTTP/HTTPS/WS/WSS/noProxy 通过每助手配置接口写入全局 preferences并通知运行时。；代理配置保存成功后广播 network-proxy-changed，IPC 应用失败仅记录日志，桌面壳据事件更新对应状态。；适用保存路径后重读当前助手合成配置视图。；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；空态/未初始化核对 系统代理或直连模式字段禁用；无 agentId/resourceKey 时 loadSettingsConfig 不请求；经验未启用时不 GET experience。；错误/无权限核对 失败提示并保留草稿；通知失败或保存失败不能冒充目标配置已完成。；各项 GET 失败应与前序保存结果分开判断。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust 无设置页 UI/无沙箱/代理偏好持久化 API；权限模式面真实",
+      "current_pinned_cases": [
+        {
+          "case": "permission-face-modes-verifiable",
+          "expect": 1,
+          "semantics": "三档权限模式真实可设置可读取"
+        },
+        {
+          "case": "matrix-permission-consistency",
+          "expect": 1,
+          "semantics": "全工具族×权限格×入口裁决一致（含 MCP 族）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "permission-face-modes-verifiable=三档权限模式真实可设置可读取；matrix-permission-consistency=全工具族×权限格×入口裁决一致（含 MCP 族）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（沙箱/检查点/代理设置页 UI 与偏好持久化 API 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "沙箱/检查点/代理设置页 UI 与偏好持久化 API：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-DD47275AC5AE",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-STATE-MCP-DD4727",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "按 agent 配置返回连接器状态并合入内置工具延迟加载开关",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“查看 MCP 连接状态”后核对：按 agent 配置返回连接器状态并合入内置工具延迟加载开关",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-connector-catalog-sync",
+          "expect": 1,
+          "semantics": "清单同步（协商协议/server 身份/registered 数，is_connected 真实可读）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "mcp-connector-catalog-sync=清单同步（协商协议/server 身份/registered 数，is_connected 真实可读）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（按 agent 配置合成的 MCP state API 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "按 agent 配置合成的 MCP state API：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-E1FBE1A59BC6",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-APPS-MCP-E1FBE1",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "返回 MCP 应用及连接器状态；未初始化返回 503",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“查看 MCP 应用列表”后核对：返回 MCP 应用及连接器状态；未初始化返回 503",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-connector-catalog-sync",
+          "expect": 1,
+          "semantics": "清单同步（协商协议/server 身份/registered 数，is_connected 真实可读）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "mcp-connector-catalog-sync=清单同步（协商协议/server 身份/registered 数，is_connected 真实可读）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（MCP apps 列表 API 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "MCP apps 列表 API：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-E7F852F9BF60",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-OAUTH-CANCEL-O-E7F852",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "结束尚在等待的浏览器往返，已保存凭证不变",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“取消连接器 OAuth 等待”后核对：结束尚在等待的浏览器往返，已保存凭证不变",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-tool-permission-face",
+          "expect": 1,
+          "semantics": "MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）"
+        },
+        {
+          "case": "approval-reject-zero-dispatch",
+          "expect": 0,
+          "semantics": "拒绝后零派发（expect=0 图钉）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "mcp-tool-permission-face=MCP 目标三档权限面真实裁定（operate 允/ask 需批/read_only 拒）；approval-reject-zero-dispatch=拒绝后零派发（expect=0 图钉）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（OAuth 等待取消 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "OAuth 等待取消：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-E9C7A48CADC4",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-STOP-E9C7A4",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "停止指定连接器，返回新运行状态或错误",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“停止连接器”后核对：停止指定连接器，返回新运行状态或错误",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "mcp-connector-register-handshake",
+          "expect": 1,
+          "semantics": "注册=真实 initialize 握手+协议协商（connect_count 审计；失败响亮拒绝不注册）"
+        },
+        {
+          "case": "matrix-lifecycle-uninstall-holes",
+          "expect": 0,
+          "semantics": "移除后解析/执行全拒零残留（expect=0）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "mcp-connector-register-handshake=注册=真实 initialize 握手+协议协商（connect_count 审计；失败响亮拒绝不注册）；matrix-lifecycle-uninstall-holes=移除后解析/执行全拒零残留（expect=0）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（连接器停止管理 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "连接器停止管理：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-EC033184BA37",
+      "feature_id": "F-D04-BODY_EFFECT-CONFIRM-CONFIRMED-A083F1",
+      "r00_task_ids": [
+        "R04-T03"
+      ],
+      "r00_then": "授权范围通过后 ConfirmStore 标记 confirmed，广播 confirmation_resolved，待批动作才继续",
+      "r00_acceptance_assertions": [
+        "授权范围通过后 ConfirmStore 标记 confirmed，广播 confirmation_resolved，待批动作才继续",
+        "无效 action 400、已处理 404、越权 403；批准目标变化须重审且不能扩大授权"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1=终端机制本体（T05）/ConfirmStore 决策（T03）；WS 帧协议与事件广播是客户端接入面，不在 R04 机制边界",
+      "actual_implementation": "机制本体真实（T03/T05 套件+矩阵钉住）；Rust 无 terminalWsBridge/无 confirmation_resolved 事件广播",
+      "current_pinned_cases": [
+        {
+          "case": "approval-answer-executes-once",
+          "expect": 1,
+          "semantics": "批准后待批动作恰执行一次（收据证明）"
+        },
+        {
+          "case": "approval-duplicate-idempotent",
+          "expect": 1,
+          "semantics": "重复决策 AlreadySettled 确定性 no-op"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "approval-answer-executes-once=批准后待批动作恰执行一次（收据证明）；approval-duplicate-idempotent=重复决策 AlreadySettled 确定性 no-op",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制案例不证明 WS 帧协议/事件广播存在",
+      "category": "D-D-R08",
+      "required_fix": "R00 登记修订（confirm 批准 叶 execution_stage_ids += R08）+重分类 stage_share_satisfied（份额=机制面，余款由 R08 承接）",
+      "deferred_obligation": "confirmation_resolved 事件广播接线与确认 API 投影（无效 400/已处理 404/越权 403）=R08 旧业务 API 兼容",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R04-T05_DISPATCH_E01.md",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-EF43ADCE19A1",
+      "feature_id": "F-D04-BODY_EFFECT-CONFIRM-REJECTED-F97BFB",
+      "r00_task_ids": [
+        "R04-T03"
+      ],
+      "r00_then": "授权范围通过后 ConfirmStore 标记 rejected，广播 confirmation_resolved，待批动作不执行",
+      "r00_acceptance_assertions": [
+        "授权范围通过后 ConfirmStore 标记 rejected，广播 confirmation_resolved，待批动作不执行",
+        "无效 action 400、已处理 404、越权 403；拒绝后再次提交不得继续原动作"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1=终端机制本体（T05）/ConfirmStore 决策（T03）；WS 帧协议与事件广播是客户端接入面，不在 R04 机制边界",
+      "actual_implementation": "机制本体真实（T03/T05 套件+矩阵钉住）；Rust 无 terminalWsBridge/无 confirmation_resolved 事件广播",
+      "current_pinned_cases": [
+        {
+          "case": "approval-reject-zero-dispatch",
+          "expect": 0,
+          "semantics": "拒绝后零派发（expect=0 图钉）"
+        },
+        {
+          "case": "approval-duplicate-idempotent",
+          "expect": 1,
+          "semantics": "重复决策 AlreadySettled 确定性 no-op"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "approval-reject-zero-dispatch=拒绝后零派发（expect=0 图钉）；approval-duplicate-idempotent=重复决策 AlreadySettled 确定性 no-op",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制案例不证明 WS 帧协议/事件广播存在",
+      "category": "D-D-R08",
+      "required_fix": "R00 登记修订（confirm 拒绝 叶 execution_stage_ids += R08）+重分类 stage_share_satisfied（份额=机制面，余款由 R08 承接）",
+      "deferred_obligation": "confirmation_resolved 事件广播接线与拒绝 API 投影=R08",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R04-T05_DISPATCH_E01.md",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-F4DA2AFCB72B",
+      "feature_id": "F-D03-ROUTE_BEHAVIOR-BEHAVIOR-MCP-CONNECTORS-ID-PUT-F4DA2A",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "连接器配置更新，返回更新结果或错误",
+      "r00_acceptance_assertions": [
+        "执行“修改 MCP 连接器”后核对：连接器配置更新，返回更新结果或错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "matrix-lifecycle-generation-refusals",
+          "expect": 0,
+          "semantics": "代次更新后旧句柄 TargetChanged 拒（expect=0）"
+        },
+        {
+          "case": "a16-history-preserved",
+          "expect": 1,
+          "semantics": "状态变化后历史收据如实保留（不掩盖）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "matrix-lifecycle-generation-refusals=代次更新后旧句柄 TargetChanged 拒（expect=0）；a16-history-preserved=状态变化后历史收据如实保留（不掩盖）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（连接器配置更新管理 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "连接器配置更新管理：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    },
+    {
+      "leaf_id": "R00-T02-LA-FAE7503D0D0F",
+      "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-ENABLED-MCP-FAE750",
+      "r00_task_ids": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "r00_then": "enabled true 启用、其他值停用，返回合并后的连接状态",
+      "r00_acceptance_assertions": [
+        "给定目标与相应权限，执行“开关 MCP 全局连接”后核对：enabled true 启用、其他值停用，返回合并后的连接状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00_execution_stage_ids_after_fix": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "r04_taskbook_obligation": "R04 任务书 §3.1 交付边界不含连接器管理 API/设置页 UI/权限偏好持久化/plan mode/斜杠入口（R04_PROMPT §3.2「不要求新建完整产品 UI」「不迁移…OAuth 体系」；§六区分本阶段工具基础责任与后续完整业务交互）；管理 API=R07-T08（「设置页不是迁移后的空壳」），客户端/HTTP 面回归=R08",
+      "actual_implementation": "Rust management.rs/sessions 无该管理 API 或 UI 面；其消费的机制面（目录/网关/权限/批准/握手）真实并由矩阵钉住",
+      "current_pinned_cases": [
+        {
+          "case": "matrix-lifecycle-disable-holes",
+          "expect": 0,
+          "semantics": "停用后 6 条路由零洞（fresh/cached/alias/cached-alias/run-chain/pinned 全拒；expect=0）"
+        },
+        {
+          "case": "a16-alias-route-covered",
+          "expect": 1,
+          "semantics": "停用别名路由同样被拒（不冒充可用）"
+        }
+      ],
+      "original_assertion_case_groups": null,
+      "current_case_semantics": "matrix-lifecycle-disable-holes=停用后 6 条路由零洞（fresh/cached/alias/cached-alias/run-chain/pinned 全拒；expect=0）；a16-alias-route-covered=停用别名路由同样被拒（不冒充可用）",
+      "evidence_mismatch": "M-01 将其分类 full_original_behavior 属虚假完整：机制面案例（握手/权限/批准）不证明管理 API/产品 UI/事件广播存在",
+      "category": "D-D-R07R08",
+      "required_fix": "R00 登记修订（MCP 全局开关设置持久化与合并状态 API 叶 execution_stage_ids += R07/R08）+重分类 stage_share_satisfied（份额=机制面，余款按任务书条款归 R07-T08/R08）",
+      "deferred_obligation": "MCP 全局开关设置持久化与合并状态 API：管理 API=R07-T08、客户端/HTTP 面与界面回归=R08（逐叶 share 文本已载入 R04 图 laterShare）",
+      "evidence_paths": [
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        "docs/rust-tauri/R04/dispatches/R04_ORCHESTRATOR_PROMPT_2026-09-30.md §3.2/§六",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07（T08/T09）",
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md"
+      ]
+    }
+  ]
+}

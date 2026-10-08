@@ -1,0 +1,64 @@
+====================================================================================================
+R00-T02-LA-15AD6ED13B4D | 按 arguments 执行指定连接器工具并返回结果或错误
+  断言0: 给定目标与相应权限，执行“调用连接器应用工具”后核对：按 arguments 执行指定连接器工具并返回结果或错误
+  断言1: 输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果
+  producerCommand: r04_tool_matrix
+  钉住: {'case': 'mcp-tool-call-full-chain', 'expect': 1}
+  钉住: {'case': 'mcp-tool-permission-face', 'expect': 1}
+  stageShare: 
+====================================================================================================
+R00-T02-LA-483E461BB59D | 按真实目标身份解析、验证参数、重新检查可用性和权限后执行，返回目标原结果。
+  断言0: 同目标直调与目录调用权限一致
+  断言1: 禁用或过期目标不执行
+  断言2: 目标不存在/名称歧义/目录过期/权限拒绝时不执行目标。
+  producerCommand: r04_tool_matrix
+  钉住: {'case': 'mcp-tool-call-full-chain', 'expect': 1}
+  钉住: {'case': 'matrix-route-consistency', 'expect': 1}
+  钉住: {'case': 'matrix-lifecycle-disable-holes', 'expect': 0}
+  钉住: {'case': 'matrix-lifecycle-generation-refusals', 'expect': 0}
+  stageShare: 
+====================================================================================================
+R00-T02-LA-8A3C87812B4F | 返回输出、退出码/终端ID；持续命令可由write_stdin续写，取消清理进程。
+  断言0: 输出与退出码正确
+  断言1: PTY输入可续接
+  断言2: 取消后进程清理
+  断言3: PathGuard/沙盒/批准失败阻止运行；取消后不留下孙进程。
+  producerCommand: r04_tool_matrix
+  钉住: {'case': 'tool-exec-command-real-chain', 'expect': 1}
+  钉住: {'case': 'tool-write-stdin-continuation', 'expect': 1}
+  钉住: {'case': 'tool-exec-cancel-cleanup', 'expect': 1}
+  钉住: {'case': 'semantics-failed-never-dispatched-receipt', 'expect': 1}
+  stageShare: 
+====================================================================================================
+R00-T02-LA-8BCB8A749864 | 返回目标真实schema、必填项和约束，不执行工具。
+  断言0: schema和真实执行参数一致
+  断言1: 无副作用
+  断言2: 目标消失/重名时明确提示，不给错误schema。
+  producerCommand: r04_tool_matrix
+  钉住: {'case': 'mcp-describe-real-identity', 'expect': 1}
+  钉住: {'case': 'mcp-describe-no-side-effect', 'expect': 1}
+  钉住: {'case': 'matrix-lifecycle-uninstall-holes', 'expect': 0}
+  stageShare: 
+====================================================================================================
+R00-T02-LA-C90F42576683 | 交互命令收到输入，输出和会话状态更新；关闭可回收会话。
+  断言0: 输入进入指定PTY
+  断言1: 退出后拒绝写入
+  断言2: 状态和退出码一致
+  断言3: 终端不存在、已退出或会话不匹配时拒绝，不写错进程。
+  producerCommand: r04_tool_matrix
+  钉住: {'case': 'tool-write-stdin-continuation', 'expect': 1}
+  钉住: {'case': 'terminal-close-stops-terminal', 'expect': 1}
+  钉住: {'case': 'tool-exec-command-real-chain', 'expect': 1}
+  钉住: {'case': 'tool-write-stdin-foreign-writes', 'expect': 0}
+  stageShare: 
+====================================================================================================
+R00-T02-LA-CEDC75156D33 | 返回匹配工具名称、来源、描述与参数摘要，不执行工具。
+  断言0: 搜索项能被describe/call解析
+  断言1: 禁用项不可调用
+  断言2: 禁用或不可用目标不应被提供为可执行结果；无命中为空。
+  producerCommand: r04_tool_matrix
+  钉住: {'case': 'mcp-search-namespaced', 'expect': 1}
+  钉住: {'case': 'mcp-describe-real-identity', 'expect': 1}
+  钉住: {'case': 'matrix-lifecycle-disable-holes', 'expect': 0}
+  钉住: {'case': 'mcp-search-honest-availability', 'expect': 1}
+  stageShare: 

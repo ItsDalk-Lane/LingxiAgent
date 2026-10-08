@@ -261,7 +261,15 @@
       "evidenceDir": "artifacts/rust-tauri/R05/RR3/M-01/",
       "successCriterion": "R04叶表0 FAIL（standalone verify-stage R04新证据目录亲跑）；改回旧分类必须重现FAIL；fmt/clippy绿",
       "nextCommand": "FINAL-04 换全新阶段审查者",
-      "independentReview": "rr3_m_review_01 fresh native / PASS no mustFix / artifacts/rust-tauri/R05/RR3/M-REVIEW-01/REVIEW.md（含审查者独立standalone verify-stage R04 overall=PASS复现）"
+      "independentReview": "rr3_m_review_01 fresh native / PASS no mustFix / artifacts/rust-tauri/R05/RR3/M-REVIEW-01/REVIEW.md（含审查者独立standalone verify-stage R04 overall=PASS复现）",
+      "semantic_resurvey": {
+        "date_utc": "2026-10-08",
+        "why": "语义修复批次（用户总控指令）：M-01 将 46 独占叶全标 full_original_behavior，其中约 40 叶为虚假完整声明（机制面案例冒充产品语义断言），审查确认后按共同根因集中修复",
+        "impl_ref": "artifacts/rust-tauri/R05/RR3/F54-CLOSEOUT-01/（F54_SEMANTIC_AUDIT.json + F54_FIX_REPORT.md + F54_NEGATIVE_CHECKS.md）",
+        "review_ref": "artifacts/rust-tauri/R05/RR3/F54-REVIEW-01/REVIEW.md（REVIEWER-F54-R1 全新独立审 PASS 无阻断）",
+        "outcome": "新分类 6 full + 49 share + 69 deferred；R00 登记 40 叶多阶段化（R07/R08 承接，逐叶条款依据，SCOPE_DECISION_REQUIRED=0）；verify-stage R04 overall=PASS（55/0/69）；校验器语义零改动",
+        "note": "M-01/M-REVIEW-01 历史记录保留不删；本行 history 反映真实演进"
+      }
     }
   ],
   "preservedRepairs": [

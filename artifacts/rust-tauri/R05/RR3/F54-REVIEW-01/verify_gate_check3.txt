@@ -1,0 +1,15 @@
+before digest: e955b1a9fe7c2e051f13f89481412107e680a2c55fcb0b6e6fd0787dfb05cbed
+after  digest: e955b1a9fe7c2e051f13f89481412107e680a2c55fcb0b6e6fd0787dfb05cbed
+before==after digest: True
+before fileCount: 67287  after fileCount: 67287
+excluded keys: ['evidenceOutputPathBytesHex', 'evidenceOutputRelativePath', 'policy', 'runOutputFiles']
+
+=== 8 命令 key 与 argv[0:3] ===
+- key=rust_test_workspace: exit=0 status=PASS argv0..2=['cargo', 'test', '--manifest-path']
+- key=r04_tool_matrix: exit=0 status=PASS argv0..2=['bash', 'scripts/rust-tauri/r04_t08_matrix.sh', '{EVIDENCE}/R04_MATRIX']
+- key=rust_fmt: exit=0 status=PASS argv0..2=['cargo', 'fmt', '--manifest-path']
+- key=rust_clippy: exit=0 status=PASS argv0..2=['cargo', 'clippy', '--manifest-path']
+- key=check_contracts: exit=0 status=PASS argv0..2=['bash', 'scripts/rust-tauri/r01-t02-check-generated.sh']
+- key=check_boundaries: exit=0 status=PASS argv0..2=['python3', '-B', 'docs/rust-tauri/R01/r01_t01_check_ownership.py']
+- key=r03_regression_gate: exit=0 status=PASS argv0..2=['cargo', 'run', '--manifest-path']
+- key=r04_rr1_repair_suites: exit=0 status=PASS argv0..2=['bash', 'scripts/rust-tauri/r04_rr1_g05_repair_suites.sh', '{EVIDENCE}/R04_RR1_REPAIR']
