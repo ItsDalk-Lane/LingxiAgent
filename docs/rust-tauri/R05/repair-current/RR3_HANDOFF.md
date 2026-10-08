@@ -73,3 +73,8 @@ E03完整报告已读全并停写，包级独立审待新E-REVIEW-03；不是阶
 - STORAGE-03外置/private/tmp/rr3-storage03-20261007与仓内归档BRIEF/REPORT SHA256一致（835eca73…/c9c03a0b…），集成项完成。
 - 空间恢复不改E03截点事实：E03文档写的265MB阻断在当时为真；当前真实状态=空间已解除但G03/FINAL尚未运行，阶段仍NOT_ACCEPTED/R06_READY=false，由E-REVIEW-04按此口径审。
 - 执行序（静默纪律）：E-REVIEW-04 → G03（默认16+fullR02+E5，冻结窗口root只读）→ FINAL(RR3/FINAL-01) → E04回填+E-REVIEW-05 → DELIVERY-FINAL-02+DELIVERY-REVIEW-01 → 总控精确Git+最终报告（含D用户防火墙操作说明）。
+
+## 2026-10-08 RR3 最终收口回执（总控）
+- 主提交 d1786a34f3d3d37a399dc3a5d20f41799eaf99a4（29,180 文件；include 29,158+交付审查轮+台账），fast-forward 推送 origin/codex/rust-tauri-migration 成功（b3ac0e6ae..d1786a34f），远端读回同 SHA。163 条 CRLF 原证以 --no-filters raw blob 归档（0 失误）。生产输入相等：FINAL-04 冻结 33 项 vs 提交逐一相等（ok=33/mismatch=0）。
+- 独立回执：artifacts/rust-tauri/R05/RR3/GIT-RECEIPT-01/receipt.json。封印未推进（理由与下一步在回执 seal 节）。Mimosa push 前 scanner_e2big 如实记录。
+- R05 最终状态：FINAL-04 独立终审 PASS；六元组 offline_gate=PASS / independent_review=PASS / live=BLOCKED_NOT_AUTHORIZED（原许可最迟R10）/ platform=macOS arm64真实+Linux继承未复验+Windows未验证 / stage_readiness=ACCEPTED_OFFLINE_SCOPE_WITH_REGISTERED_LIVE_DEFERRALS / R06_READY=true。RR3 收口完成，停止在 R05；R06 按 R05_HANDOFF.json 的 r06_inputs 消费。

@@ -371,7 +371,7 @@
     "storageCloseout": "STORAGE-03：33自产失败对象136063856 bytes精确回收；1450保护项相等，剩余约265MB，37残片及所有binary/rlib/旧cache/证据保留。"
   },
   "deliveryPreparation": {
-    "status": "REVIEWED_READY_FOR_CONTROLLER_GIT",
+    "status": "DELIVERED",
     "classification": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/",
     "independentReview": "rr3_delivery_review_01 fresh native / PASS no mustFix / artifacts/rust-tauri/R05/RR3/DELIVERY-REVIEW-01/REVIEW.md",
     "include": {
@@ -406,5 +406,15 @@
     },
     "r00": "two relinks (cf9bce2f, d57ea731/CDHash 364514be) all LAN assertions passed, ALF allowed both, no user action evidenced",
     "remaining": "E04 backfill + E-REVIEW-05 + DELIVERY-FINAL-02 + DELIVERY-REVIEW-01 + controller git closeout"
+  },
+  "gitDelivery": {
+    "mainCommit": "d1786a34f3d3d37a399dc3a5d20f41799eaf99a4",
+    "filesChanged": 29180,
+    "push": "b3ac0e6ae..d1786a34f fast-forward exit0，远端读回同SHA",
+    "crlfRawBlobs": 163,
+    "productionInputEquality": "33/33 ok vs FINAL-04 frozen",
+    "receipt": "artifacts/rust-tauri/R05/RR3/GIT-RECEIPT-01/receipt.json",
+    "seal": "NOT_ADVANCED（理由见回执）",
+    "docsReceiptCommit": "本回执所在第二提交"
   }
 }

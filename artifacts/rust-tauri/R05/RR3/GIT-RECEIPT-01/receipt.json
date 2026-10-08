@@ -1,0 +1,44 @@
+{
+  "recorded_at": "2026-10-08T00:05:48.794080+00:00",
+  "performed_by": "RR3 master controller (root)",
+  "authority": "既有有效授权沿 RR2_HANDOFF 回执模式（e8c0672e5/b3ac0e6ae 同支线精确提交推送）",
+  "tested_head": "b3ac0e6aeae8d7d530a6ab8657a5fa9ce4849f0b",
+  "tested_candidate_shape": "HEAD b3ac0e6ae + 未提交 RR3 工作树（FINAL-04 testedSha 口径，见 FINAL-04/STAGE_REVIEW.md §二）",
+  "tested_dirty_input_manifest": "artifacts/rust-tauri/R05/RR3/FINAL-04/command-records/frozen-inputs.json + frozen-inputs-postcheck.json",
+  "e03_document_manifest": "artifacts/rust-tauri/R05/RR3/E-04/MANIFEST.json",
+  "delivery_classification": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/（include 29,158 / localOnly 5,912 / unknown 0）",
+  "delivery_independent_review": "artifacts/rust-tauri/R05/RR3/DELIVERY-REVIEW-01/REVIEW.md（PASS 无 mustFix）",
+  "exact_staged_paths": {
+    "planned": "artifacts/rust-tauri/R05/RR3/GIT-RECEIPT-01/staged-paths-planned.txt",
+    "actual": "artifacts/rust-tauri/R05/RR3/GIT-RECEIPT-01/staged-paths-actual.txt",
+    "count": 29180,
+    "composition": "DELIVERY-FINAL-02 include 29,158 + DELIVERY-FINAL-02 自身 21 + DELIVERY-REVIEW-01 2 + 台账（进度/矩阵）",
+    "overlap_with_localOnly": 0,
+    "crlf_no_filters": "163 条按 crlf-no-filters-boundary.json 以 git hash-object -w --no-filters + git update-index --cacheinfo 100664,<sha>,<path> 归档；index blob SHA1 与期望逐一相等（mismatches=0）；未来 checkout 会按 .gitattributes 改写工作树副本，blob 保持原始字节"
+  },
+  "local_only_originals_index": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/local-paths.nul（5,912）+ F51-01/RELOCATION-RECEIPT.json + F52-01/RELOCATION-RECEIPT-F52.json（外置 LingxiAgent-RR3-localonly-fixtures/ 57 项）+ DELIVERY-SPACE-01（134,457,480B rlib 等）",
+  "secret_and_reference_review": "DELIVERY-REVIEW-01 include 安全核验（票据/token/.git/node_modules/.env/密钥模式 0 命中）；注意：Mimosa 钩子在 git push 前因 diff 体量（scanner_e2big）未产出完整项目级扫描结论，按兼容策略放行——不宣称项目级安全结论，如需可另跑完整审计",
+  "commit": {
+    "command": "git -c gc.auto=0 commit -m 'fix(rust-tauri): R05 RR3 closeout — F42-F54 closed, FINAL-04 stage review PASS, R06_READY=true'",
+    "exit": 0,
+    "sha": "d1786a34f3d3d37a399dc3a5d20f41799eaf99a4",
+    "files_changed": 29180,
+    "utc": "2026-10-08（本地时区执行）"
+  },
+  "push": {
+    "command": "git push origin codex/rust-tauri-migration",
+    "exit": 0,
+    "result": "b3ac0e6ae..d1786a34f  codex/rust-tauri-migration -> codex/rust-tauri-migration（fast-forward，无强推）",
+    "remote_ref_readback": "git ls-remote origin codex/rust-tauri-migration → d1786a34f3d3d37a399dc3a5d20f41799eaf99a4"
+  },
+  "production_input_equality": {
+    "claim": "已交付提交 d1786a34f 中 FINAL-04 冻结的 33 项生产输入（rust/crates、scripts、lock/toolchain、R05 四 TSV、R01 检查脚本）与终审被测版本逐字节相等",
+    "verification": "git show d1786a34f:<path> 逐一 SHA256+bytes 对比 frozen-inputs-postcheck.json：ok=33 mismatch=0",
+    "note": " Receipt 本身与其后的纯文档回填属新的候选字节，不伪称 FINAL-04 testedSha 覆盖它们；FINAL-04 testedSha 仍为 b3ac0e6ae+当刻工作树"
+  },
+  "seal": {
+    "decision": "NOT_ADVANCED_THIS_ROUND",
+    "verified_source_sha_still": "ab4f228155dd4246734e6c4c45d7288072361f3c（2026-09-26 R01）",
+    "reason": "自旧封印点以来 desktop/(40)/cli/(5)/tests/(15)/build/(3) 等 npm 侧生产代码已变化，本轮 R05 Rust 证据链不含 npm 全量验证；如实推进=虚报坐标。按 AGENTS.md『需要提交才能完成的封印留待相应授权步骤』，封印推进留给已授权的 desktop 链验证轮；npm 侧 post-verification-audit-seal 测试自 R02 提交起处于旧坐标失败状态为本轮如实记录的已知限制"
+  }
+}
