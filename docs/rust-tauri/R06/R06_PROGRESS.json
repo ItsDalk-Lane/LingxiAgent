@@ -1,0 +1,81 @@
+{
+  "schema": "lingxi.r06.orchestrator-progress.v1",
+  "stage_id": "R06",
+  "stage_name": "上下文、会话语义、记忆与知识库",
+  "created_at": "2026-10-08",
+  "orchestrator": "R06 阶段专用总控（本轮会话）",
+  "authority_scope": "仅 R06 阶段自动推进；R06 完成后停止，不进入 R07",
+
+  "stage_base": {
+    "base_sha": "c9cca6020e0990016ee0d14af406766370849a7a",
+    "branch": "codex/rust-tauri-migration",
+    "remote": "origin",
+    "remote_head_at_freeze": "c9cca6020e0990016ee0d14af406766370849a7a",
+    "worktree_status": "clean（git status --porcelain 空输出）",
+    "user_uncommitted_changes": "无"
+  },
+
+  "toolchain_freeze": {
+    "cargo": "1.98.1 (797e8a9bc 2026-08-05)",
+    "rustc": "1.98.1 (48a229cea 2026-09-01)",
+    "arch": "arm64 (macOS, Darwin 27.0.0)",
+    "rust_toolchain_toml": "channel=1.98.1, components=[rustfmt, clippy]",
+    "cargo_lock_sha256": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3",
+    "package_lock_sha256": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+    "disk_free_at_freeze": "500Gi available (/System/Volumes/Data)"
+  },
+
+  "taskbook_freeze": {
+    "dir": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23",
+    "key_spec_files_sha256_vs_MANIFEST": "13/13 OK（00/01/02/03/04/05/06/R06/90/91/stage-index/task-catalog/acceptance-catalog）",
+    "validate_bundle_py": "DOCUMENT_SPEC_INVALID——仅因包内缺《完整阅读版.html/.md》两个派生文件且存在 .DS_Store/.mimosa 运行残留；R06 执行依赖的全部规格文件逐项校验一致，不构成就绪阻断",
+    "r06_tasks": ["R06-T01","R06-T02","R06-T03","R06-T04","R06-T05","R06-T06","R06-T07","R06-T08"],
+    "r06_acceptances_all_required": ["R06-A01","R06-A02","R06-A03","R06-A04","R06-A05","R06-A06","R06-A07","R06-A08","R06-A09","R06-A10","R06-A11","R06-A12","R06-A13","R06-A14","R06-A15","R06-A16"]
+  },
+
+  "r05_admission_verification": {
+    "local_head_eq_remote": true,
+    "r05_delivery_commit_in_ancestry": "d1786a34f3d3d37a399dc3a5d20f41799eaf99a4 = YES",
+    "f54_resurvey_committed": "c9cca6020（F54 semantic resurvey, gate PASS）",
+    "production_drift_since_r05_delivery": "d1786a34f..HEAD 仅触及 rust/crates/xtask（stage_map/R04.json 阶段图工具）、lingxi-service/tests/r04_t08_tool_matrix.rs（测试）、scripts/rust-tauri/r04_t08_generate_stage_map.py（生成器）与文档台账；ModelGateway/CredentialService/协议适配/流式/Usage 等 R05 验收生产代码零变化",
+    "final04_six_tuple": {
+      "offline_gate": "PASS",
+      "independent_review": "PASS",
+      "live_verification": "BLOCKED_NOT_AUTHORIZED（RR-BLK-CREDENTIALS，最迟 R10）",
+      "platform": "macOS arm64 实测 / Linux 继承未复验 / Windows 未验证",
+      "stage_readiness": "ACCEPTED_OFFLINE_SCOPE_WITH_REGISTERED_LIVE_DEFERRALS",
+      "R06_READY": true
+    },
+    "cross_check_sources": [
+      "artifacts/rust-tauri/R05/RR3/FINAL-04/STAGE_REVIEW.md",
+      "artifacts/rust-tauri/R05/RR3/E-REVIEW-05/REVIEW.md（PASS 无 mustFix）",
+      "artifacts/rust-tauri/R05/RR3/F54-REVIEW-01/REVIEW.md（PASS 无阻断）",
+      "artifacts/rust-tauri/R05/RR3/F54-CLOSEOUT-01/F54_R06_READINESS.md（九条件全满足）",
+      "artifacts/rust-tauri/R05/RR3/GIT-RECEIPT-01/receipt.json（d1786a34f 推送读回确认）",
+      "docs/rust-tauri/R05/R05_HANDOFF.json（rr3_current.R06_READY=true，git_delivery=PERFORMED_BY_CONTROLLER）"
+    ],
+    "stale_fields_noted": "ORCHESTRATOR_PROGRESS.json current_head_note 与 R05_HANDOFF baseline/rr2_repair_round 段保留 RR3 提交前旧状态（R06_READY=false 历史值）；以 rr3_current + FINAL-04 + GIT-RECEIPT + F54-CLOSEOUT 为准",
+    "r06_handoff_items_from_r05": [
+      "可消费接口：ModelGateway/CredentialService 的 chat/embedding/辅助槽稳定入口；统一规范化事件流 streaming_norm；usage 台账 v7；r05_t08_closed_loop 五方一致/反作弊 nonce 验收骨架",
+      "R05 范围声明：R06 全量历史压缩/知识检索/人格编译器属 R06 新建（R05 只交付最小会话交换层）",
+      "F54 后续义务（R06 不冒称）：D 类 40 叶→R07/R08；OBS-3 连接器 /api/mcp/* 兼容核对→R07-T08/R08；live 延期→R10",
+      "33 项 R05 冻结生产输入身份：artifacts/rust-tauri/R05/RR3/FINAL-04/command-records/frozen-inputs-postcheck.json"
+    ]
+  },
+
+  "r00_leaf_map": "docs/rust-tauri/R06/R06_LEAF_MAP.json（T01:31 / T03:74 / T04:89 / T05:57 / T06:101 / T07:24；T02/T08 为横切任务无直接叶子）",
+
+  "task_chain": [
+    {"task_id": "R06-T01", "name": "上下文编译器与短提示词", "depends_on": [], "acceptance_ids": ["R06-A01","R06-A02"], "deliverables": ["ContextCompiler","ContextArtifact","提示词差异报告"], "status": "IN_REVIEW", "executor_report": "docs/rust-tauri/R06/R06-T01_REPORT.md（STATUS: READY_FOR_INDEPENDENT_REVIEW，候选摘要 6dc9f4c2…）", "executor_flags_for_reviewer": ["执行者自报工具链实测 1.93.0 与冻结 1.98.1 矛盾，疑似使用 Homebrew 工具链，审查者必须核实全部测试实际运行的 rustc 版本", "执行者修改了 R05 测试 r05_t01_binary_wiring.rs/r05_t08_closed_loop.rs（声称位置断言+1 语义零改动），须重点核查是否削弱既有断言"], "review_state": "R1_LAUNCHED", "commit_sha": null, "push_state": null},
+    {"task_id": "R06-T02", "name": "token预算、压缩与长会话", "depends_on": ["R06-T01"], "acceptance_ids": ["R06-A03","R06-A04"], "deliverables": ["ContextBudgeter","CompactionService","长会话夹具"], "status": "NOT_STARTED", "review_state": null, "commit_sha": null, "push_state": null},
+    {"task_id": "R06-T03", "name": "会话树、重试、fork与回退", "depends_on": ["R06-T02"], "acceptance_ids": ["R06-A05","R06-A06"], "deliverables": ["SessionService","树/分支索引","回退检查"], "status": "NOT_STARTED", "review_state": null, "commit_sha": null, "push_state": null},
+    {"task_id": "R06-T04", "name": "统一消息历史、重连与导出", "depends_on": ["R06-T03"], "acceptance_ids": ["R06-A07","R06-A08"], "deliverables": ["CanonicalMessageStore","统一历史投影","分页/导出接口"], "status": "NOT_STARTED", "review_state": null, "commit_sha": null, "push_state": null},
+    {"task_id": "R06-T05", "name": "会话文件、资源与产物身份", "depends_on": ["R06-T04"], "acceptance_ids": ["R06-A09","R06-A10"], "deliverables": ["ResourceService","SessionFile迁移适配","文件引用检查器"], "status": "NOT_STARTED", "review_state": null, "commit_sha": null, "push_state": null},
+    {"task_id": "R06-T06", "name": "人格、记忆与技能系统", "depends_on": ["R06-T05"], "acceptance_ids": ["R06-A11","R06-A12"], "deliverables": ["MemoryService","SkillService","PI_REPLACEMENT_MATRIX更新"], "status": "NOT_STARTED", "review_state": null, "commit_sha": null, "push_state": null},
+    {"task_id": "R06-T07", "name": "现役知识库迁移", "depends_on": ["R06-T06"], "acceptance_ids": ["R06-A13","R06-A14"], "deliverables": ["KnowledgeService","索引兼容矩阵","引用与迁移测试"], "status": "NOT_STARTED", "review_state": null, "commit_sha": null, "push_state": null},
+    {"task_id": "R06-T08", "name": "工具行为评测与上下文交接", "depends_on": ["R06-T07"], "acceptance_ids": ["R06-A15","R06-A16"], "deliverables": ["R06_REPORT.md","R06_HANDOFF.json","BEHAVIOR_EVAL.json"], "status": "NOT_STARTED", "review_state": null, "commit_sha": null, "push_state": null}
+  ],
+
+  "stage_review": {"state": "NOT_STARTED", "rounds": []},
+  "final": {"status": "IN_PROGRESS"}
+}

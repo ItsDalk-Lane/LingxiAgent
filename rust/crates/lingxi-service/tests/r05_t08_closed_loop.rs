@@ -939,16 +939,20 @@ async fn c01_read_edit_read_final_restart_five_way_chain() {
             .expect("messages")
             .clone()
     };
-    assert_eq!(messages_of(0).len(), 1, "first turn: user only");
+    // R06-T01: every turn now leads with the compiled system context
+    // (messages[0] = role "system", the frozen artifact's render); the
+    // positional indices below shifted by exactly one.
+    assert_eq!(messages_of(0).len(), 2, "first turn: system + user");
+    assert_eq!(messages_of(0)[0]["role"], "system");
     assert_eq!(
         messages_of(1).len(),
-        3,
-        "user + assistant(tool) + tool result"
+        4,
+        "system + user + assistant(tool) + tool result"
     );
-    assert_eq!(messages_of(1)[2]["role"], "tool");
-    assert_eq!(messages_of(1)[2]["tool_call_id"], "call_t08_read");
+    assert_eq!(messages_of(1)[3]["role"], "tool");
+    assert_eq!(messages_of(1)[3]["tool_call_id"], "call_t08_read");
     assert_eq!(
-        messages_of(1)[2]["content"],
+        messages_of(1)[3]["content"],
         v1,
         "the runtime nonce rode the wire"
     );
@@ -958,25 +962,25 @@ async fn c01_read_edit_read_final_restart_five_way_chain() {
     let v2 = format!("{v1}{EDIT_MARKER}\n");
     assert_eq!(
         messages_of(2).len(),
-        5,
-        "user, asst(read), tool(read), asst(edit), tool(receipt)"
+        6,
+        "system, user, asst(read), tool(read), asst(edit), tool(receipt)"
     );
-    assert_eq!(messages_of(2)[4]["role"], "tool");
-    assert_eq!(messages_of(2)[4]["tool_call_id"], "call_t08_edit");
+    assert_eq!(messages_of(2)[5]["role"], "tool");
+    assert_eq!(messages_of(2)[5]["tool_call_id"], "call_t08_edit");
     assert!(
-        messages_of(2)[4]["content"]
+        messages_of(2)[5]["content"]
             .as_str()
             .is_some_and(|c| c.contains("Successfully replaced")),
         "the edit receipt rode the wire: {}",
-        messages_of(2)[4]["content"]
+        messages_of(2)[5]["content"]
     );
     assert_eq!(
         messages_of(3).len(),
-        7,
-        "…, asst(read2), tool(read2 result)"
+        8,
+        "system, …, asst(read2), tool(read2 result)"
     );
-    assert_eq!(messages_of(3)[6]["tool_call_id"], "call_t08_read2");
-    assert_eq!(messages_of(3)[6]["content"], v2);
+    assert_eq!(messages_of(3)[7]["tool_call_id"], "call_t08_read2");
+    assert_eq!(messages_of(3)[7]["content"], v2);
 
     // (2) FILE: the real edit landed on disk.
     assert_eq!(
@@ -1145,8 +1149,10 @@ async fn c02_two_full_chain_runs_different_runtime_nonces() {
             .collect();
         assert_eq!(this_round.len(), 4, "round {round}: four provider turns");
         let messages = this_round[1].2["messages"].as_array().expect("messages");
+        // R06-T01: messages[0] is the compiled system context; the read's
+        // tool result now sits at index 3.
         assert_eq!(
-            messages[2]["content"], v1,
+            messages[3]["content"], v1,
             "round {round}: the FRESH nonce rode the next request verbatim"
         );
         let db = open_runs_db(&h.home);

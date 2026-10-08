@@ -1,0 +1,39 @@
+{
+  "task": "R06-T01 上下文编译器与短提示词",
+  "base_sha": "c9cca6020e0990016ee0d14af406766370849a7a",
+  "goal": "发给模型的文本与观测详情来自同一份构建结果（同源）。",
+  "requirements": [
+    {
+      "id": "R06-A01",
+      "text": "观测和实际请求同源：除明示脱敏外一致，无另一套重建 prompt。",
+      "production_entry": "RunSupervisor::drive_run 在存在 provider 时经 ContextCompilerPort 编译/取会话级缓存 artifact，system_prompt = Some(artifact.render())；观测读面 = GET /lingxi/v1/sessions/{id}/context-observation（同一 Arc<CompiledContext> 的段级摘要，不落第二份文本）。",
+      "owner": "rust/crates/lingxi-kernel/src/context.rs（编译与渲染）+ rust/crates/lingxi-service/src/context_compiler.rs（材料源/注册表/digest 装饰）",
+      "positive_tests": [
+        "service: r06_t01_context_compiler::sent_request_is_byte_identical_to_observed_artifact",
+        "service: r06_t01_context_compiler::binary closed-loop leg（真实二进制 + loopback stub 捕获请求 ↔ 观测端点 digest 对照）"
+      ],
+      "negative_tests": [
+        "service: 观测摘要对 digest-only 段不含正文（TOP_SECRET 标记扫描）",
+        "kernel: provenance_view_carries_no_digest_only_content"
+      ],
+      "evidence": "artifacts/rust-tauri/R06/T01/（命令记录 + 请求/段 digest 对照 JSON）"
+    },
+    {
+      "id": "R06-A02",
+      "text": "提示词长度不暗增：不超过冻结预算；新增冗余段使测试失败；证据=token 与段来源对照。",
+      "production_entry": "ContextCompiler::compile 的闭合段注册表 + 每段冻结 token 预算 + 总量上限；超预算 = 响亮编译错误（run 失败，不静默截断）。",
+      "owner": "rust/crates/lingxi-kernel/src/context.rs（SEGMENT_SPECS 冻结表）",
+      "positive_tests": [
+        "kernel: golden_preamble_zh/en_byte_equal（与 tests/fixtures/system-prompt-golden-*.txt 逐字节一致）",
+        "kernel: per_segment_tokens_match_incumbent_measurement（对照 artifacts 中的现役测量）",
+        "kernel: static_prefix_stable_under_dynamic_drift"
+      ],
+      "negative_tests": [
+        "kernel: budget_exceeded_is_a_loud_error（材料超段预算 → BudgetExceeded）",
+        "kernel: segment_registry_is_frozen（注册表条目/顺序锁；新增段即红）"
+      ],
+      "evidence": "artifacts/rust-tauri/R06/T01/incumbent-budget-measurement.raw.txt（现役真实装配链实测）+ 冻结预算表（报告 §预算冻结）"
+    }
+  ],
+  "leaf_mapping_policy": "31 个 R00 叶子全部为 D06（助手管理/设置 UI/MOOD）。T01 的真实实现份额 = 人格/记忆/用户档案材料的『读取与装配通道』（resolvePersonaSource 回落链、tenets/memory.md/user.md/appearance-summary 读取、模板填充、段裁剪）；写面与 UI/管理面归后续阶段。逐条映射见最终报告。"
+}

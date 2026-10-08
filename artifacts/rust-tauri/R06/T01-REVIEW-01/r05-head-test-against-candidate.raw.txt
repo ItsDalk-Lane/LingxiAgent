@@ -1,0 +1,27 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.08s
+     Running tests/r05_t01_binary_wiring.rs (target/debug/deps/r05_t01_binary_wiring-730df06181d11c2d)
+
+running 2 tests
+test c02_real_binary_full_chain_through_authenticated_endpoint ... FAILED
+test c03_real_binary_without_plane_settles_unconfigured ... ok
+
+failures:
+
+---- c02_real_binary_full_chain_through_authenticated_endpoint stdout ----
+
+thread 'c02_real_binary_full_chain_through_authenticated_endpoint' (29415918) panicked at crates/lingxi-service/tests/r05_t01_binary_wiring.rs:575:5:
+assertion `left == right` failed: user + assistant(tool_calls) + tool result
+  left: 4
+ right: 3
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    c02_real_binary_full_chain_through_authenticated_endpoint
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.77s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t01_binary_wiring`
+
+[exited with code 0]

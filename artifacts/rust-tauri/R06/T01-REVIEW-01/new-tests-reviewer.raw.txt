@@ -1,0 +1,9 @@
+=== kernel r06_t01 ===
+     Running tests/r06_t01_context_compiler.rs (target/debug/deps/r06_t01_context_compiler-35eece0ae250b162)
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+=== service r06_t01 ===
+     Running tests/r06_t01_context_compiler.rs (target/debug/deps/r06_t01_context_compiler-9536adadd11372c9)
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+=== service r06_t01_closed_loop ===
+     Running tests/r06_t01_closed_loop.rs (target/debug/deps/r06_t01_closed_loop-59e13d2a96a7c740)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.98s

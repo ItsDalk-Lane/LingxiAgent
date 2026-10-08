@@ -1,0 +1,6 @@
+test probe_all_materials_missing_is_loud_via_yuan ... ok
+test probe_template_markers_in_user_materials_are_not_substituted ... ok
+test probe_fake_system_instructions_stay_in_data_segments ... ok
+test probe_determinism_same_input_same_output ... ok
+test probe_budget_boundary_exact_fit_and_one_over ... ok
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s

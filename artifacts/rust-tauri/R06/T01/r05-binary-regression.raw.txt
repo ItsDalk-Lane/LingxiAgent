@@ -1,0 +1,43 @@
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.00s
+
+     Running tests/r05_t08_closed_loop.rs (target/debug/deps/r05_t08_closed_loop-2c7f50a66792a8b3)
+
+running 11 tests
+test c04_request_id_replay_and_conflict ... ok
+test c03_allowed_and_denied_file_sentinels ... ok
+test c09_live_stream_and_history_projection_agree ... ok
+test rr1_f13_normalized_final_survives_restart_on_the_real_binary ... ok
+test c08_two_sessions_shared_callid_isolated ... ok
+test c02_two_full_chain_runs_different_runtime_nonces ... ok
+test c01_read_edit_read_final_restart_five_way_chain ... ok
+test c05_restart_reads_history_zero_reexecution ... ok
+test c07_crash_midstream_honest_terminal ... ok
+test c06_crash_after_tool_effect_no_blind_redo ... ok
+test c12_repeated_cycles_stay_bounded ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.14s
+
+     Running tests/r05_t08_production_tools.rs (target/debug/deps/r05_t08_production_tools-9efa56e66607a30c)
+
+running 6 tests
+test f24_production_wire_declares_the_four_tools ... ok
+test f24_exec_command_workdir_outside_the_workspace_is_refused ... ok
+test f24_exec_command_runs_a_real_subprocess_end_to_end ... ok
+test f24_worker_child_environment_carries_no_credential_material ... ok
+test f24_worker_nested_chain_under_global_permit_one ... ok
+test f24_sigterm_with_parked_callback_reaps_the_worker_child ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.66s
+
+     Running tests/r05_t08_resources.rs (target/debug/deps/r05_t08_resources-c7e49db06b980228)
+
+running 2 tests
+test f27_sampler_controls_detect_growth_release_and_failure ... ok
+test f27_sustained_cancel_error_worker_load_stays_bounded has been running for over 60 seconds
+test f27_sustained_cancel_error_worker_load_stays_bounded ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 334.25s
+
+CARGO_EXIT=0
+
+[exited with code 0]

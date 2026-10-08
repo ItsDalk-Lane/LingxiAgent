@@ -572,16 +572,19 @@ async fn c02_real_binary_full_chain_through_authenticated_endpoint() {
         assert_eq!(body["model"], "stub-model-bin");
     }
     let messages = requests[1].2["messages"].as_array().expect("messages");
+    // R06-T01: every turn now leads with the compiled system context
+    // (messages[0] = role "system"); the positional indices shifted by one.
+    assert_eq!(messages[0]["role"], "system");
     assert_eq!(
         messages.len(),
-        3,
-        "user + assistant(tool_calls) + tool result"
+        4,
+        "system + user + assistant(tool_calls) + tool result"
     );
-    assert_eq!(messages[1]["tool_calls"][0]["id"], "call_bin_1");
-    assert_eq!(messages[2]["role"], "tool");
-    assert_eq!(messages[2]["tool_call_id"], "call_bin_1");
+    assert_eq!(messages[2]["tool_calls"][0]["id"], "call_bin_1");
+    assert_eq!(messages[3]["role"], "tool");
+    assert_eq!(messages[3]["tool_call_id"], "call_bin_1");
     assert_eq!(
-        messages[2]["content"], FILE_BODY,
+        messages[3]["content"], FILE_BODY,
         "REAL file content rode the wire"
     );
 

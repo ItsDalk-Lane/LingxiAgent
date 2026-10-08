@@ -1,0 +1,23 @@
+=== cmd: cargo test -p lingxi-kernel --test r06_t01_context_compiler ===
+test empty_wrapper_bands_are_omitted_but_cwd_stays ... ok
+test per_segment_tokens_match_incumbent_measurement ... ok
+test roster_format_matches_incumbent ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+=== cmd: cargo test -p lingxi-service --test r06_t01_context_compiler ===
+test sent_system_prompt_is_byte_identical_to_observed_artifact ... ok
+test session_freeze_spans_runs_and_turns ... ok
+test subagent_run_sends_trimmed_context_and_observation_prefers_main ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+
+=== cmd: cargo test -p lingxi-service --test r06_t01_closed_loop ===
+
+running 1 test
+test sent_wire_system_bytes_match_the_observation_digests ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.76s
+

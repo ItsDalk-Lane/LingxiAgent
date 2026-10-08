@@ -38,6 +38,7 @@
 //! | POST /lingxi/v1/ws-ticket                  | scope `chat`        |
 //! | GET  /lingxi/v1/sessions                   | scope `chat`        |
 //! | GET  /lingxi/v1/sessions/{id}              | scope `chat` + owner check in handler |
+//! | GET  /lingxi/v1/sessions/{id}/context-observation | scope `chat` + owner check in handler |
 //! | POST /lingxi/v1/sessions/{id}/execute      | scope `chat` + owner check in handler |
 //! | POST /lingxi/v1/devices/credentials        | local_only          |
 //! | GET  /lingxi/v1/ws                         | scope `chat` (WS upgrade) |
@@ -565,6 +566,13 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         // as the session read it projects; ownership is re-checked per
         // request against the session the stream belongs to).
         if let Some(id) = rest.strip_suffix("/events") {
+            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        // R06-T01: the context-observation read face — same scope and the
+        // same per-request owner re-check as the session read it observes.
+        if let Some(id) = rest.strip_suffix("/context-observation") {
             if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
                 return RoutePolicy::Scope("chat");
             }

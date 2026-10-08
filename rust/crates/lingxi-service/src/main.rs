@@ -499,6 +499,35 @@ async fn main() -> ExitCode {
         deps.model_plane_source = Some(source);
     }
 
+    // ---- context compiler (R06-T01) ----
+    // The session-scoped context compiler: materials come from the SAME
+    // canonical data root (agents/, user/) and the resolved product dir
+    // (yuan/identity/agents templates); the strict-config workspace feeds
+    // the <cwd> wrapper segment. The environment is read HERE at the
+    // composition root only (DEP-08). With no provider configured the
+    // compile point is never reached (the no-provider early return
+    // precedes it), so this wiring changes nothing of that shape.
+    {
+        let product_dir = lingxi_service::context_compiler::resolve_product_dir(
+            std::env::var("LINGXI_PRODUCT_DIR").ok().as_deref(),
+            &std::env::current_exe().unwrap_or_else(|_| std::path::PathBuf::from(".")),
+            &layout.home,
+        );
+        let host = lingxi_service::context_compiler::probe_host_facts(
+            deps.workspace_root.as_deref(),
+            &layout.home,
+        );
+        deps.context_compiler = Some(std::sync::Arc::new(
+            lingxi_service::context_compiler::ContextCompilerService::new(std::sync::Arc::new(
+                lingxi_service::context_compiler::FileContextMaterialSource::from_home(
+                    &layout.home,
+                    product_dir,
+                    host,
+                ),
+            )),
+        ));
+    }
+
     // ---- single-writer lock + instance identity (steps 3–4) ----
     let (guard, stale) = match acquire(&layout) {
         Ok(acquired) => acquired,

@@ -28,6 +28,7 @@ pub mod auth;
 pub mod background;
 pub mod cancel;
 pub mod config;
+pub mod context_compiler;
 pub mod credentials;
 pub mod dedup;
 pub mod epoch;
@@ -482,6 +483,11 @@ pub struct ServiceState {
     /// present exactly when the production model chain was wired; the
     /// management reload surface publishes new policy generations on it.
     network_plane: Option<Arc<lingxi_adapters::models::network::NetworkPlane>>,
+    /// The session-scoped context compiler (R06-T01): present exactly when
+    /// the composition root wired it — the run supervisor's system text
+    /// AND the context-observation endpoint both read from it (one build
+    /// result, R06-A01).
+    context_compiler: Option<Arc<context_compiler::ContextCompilerService>>,
 }
 
 impl std::fmt::Debug for ServiceState {
@@ -657,6 +663,11 @@ pub struct ServiceDeps {
     /// the real chain — or alongside an injected `turn_provider` — is a
     /// loud startup error, never a silently skipped or test-owned plane.
     pub worker_tool_registration: Option<config::WorkerToolRegistration>,
+    /// The session-scoped context compiler (R06-T01): the SINGLE source of
+    /// every driven run's system text and of the context-observation
+    /// endpoint (one build result — R06-A01). `None` keeps the pre-R06
+    /// shape exactly (`system_prompt: None`, observation endpoint 404s).
+    pub context_compiler: Option<std::sync::Arc<context_compiler::ContextCompilerService>>,
 }
 
 /// The formal tool plane's shared handles (R05 RR1 F24): what the real
@@ -703,6 +714,7 @@ impl Default for ServiceDeps {
             workspace_root: None,
             worker_model: None,
             worker_tool_registration: None,
+            context_compiler: None,
         }
     }
 }
@@ -764,6 +776,10 @@ impl std::fmt::Debug for ServiceDeps {
                     .worker_tool_registration
                     .as_ref()
                     .map(|w| w.local_name.as_str()),
+            )
+            .field(
+                "context_compiler",
+                &self.context_compiler.as_ref().map(|_| "bound"),
             )
             .finish()
     }
@@ -1240,6 +1256,11 @@ impl ServiceState {
             Some(timeout) => runs.with_stream_idle_timeout(timeout),
             None => runs,
         };
+        // R06-T01: the session-scoped context compiler — when wired, EVERY
+        // driven run's system text is its artifact's render and the
+        // observation endpoint serves the SAME artifact (R06-A01); `None`
+        // keeps the pre-R06 shape exactly.
+        let runs = runs.with_context_compiler(deps.context_compiler.clone());
         let runs = Arc::new(runs);
         subagent_runtime.bind_supervisor(Arc::downgrade(&runs));
         // R05-T06: the worker model-callback port. An injected port always
@@ -1586,6 +1607,7 @@ impl ServiceState {
             worker_model,
             operations: operations_entry,
             network_plane: deps.network_plane.clone(),
+            context_compiler: deps.context_compiler.clone(),
         })
     }
 
@@ -1664,6 +1686,13 @@ impl ServiceState {
     /// reload surface publishes new policy generations on it.
     pub fn network_plane(&self) -> Option<&Arc<lingxi_adapters::models::network::NetworkPlane>> {
         self.network_plane.as_ref()
+    }
+
+    /// The session-scoped context compiler (R06-T01) — the observation
+    /// endpoint reads the SAME frozen artifacts the run supervisor sends
+    /// from (one build result, R06-A01).
+    pub fn context_compiler(&self) -> Option<&Arc<context_compiler::ContextCompilerService>> {
+        self.context_compiler.as_ref()
     }
 
     /// The managed-task shutdown handle (R02-T06): the binary subscribes
@@ -2881,6 +2910,36 @@ async fn get_session(
     }
 }
 
+/// `GET /lingxi/v1/sessions/{id}/context-observation` — the R06-T01
+/// observation read face. The served view is built from the SAME frozen
+/// artifact whose render the run supervisor sends as every turn's system
+/// text (R06-A01: one build result, no second prompt reconstruction).
+/// Digest-only segments carry per-segment sha256 over the SENT bytes and
+/// never their content. A session whose run never reached a model call has
+/// no compiled artifact — 404, observation never builds one on demand.
+async fn session_context_observation(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+) -> Response {
+    match state.sessions.get_for(&principal, &session_id).await {
+        Ok(sessions::SessionAccess::Ok(_facts)) => {
+            let observation = state
+                .context_compiler()
+                .and_then(|compiler| compiler.observation_for_session(&session_id));
+            match observation {
+                Some(view) => (StatusCode::OK, Json(view)).into_response(),
+                None => EndpointError::not_found().into_response(),
+            }
+        }
+        Ok(sessions::SessionAccess::NotFound) => EndpointError::not_found().into_response(),
+        Ok(sessions::SessionAccess::Forbidden) => {
+            EndpointError::forbidden("cross_principal_access").into_response()
+        }
+        Err(err) => EndpointError::storage(&err).into_response(),
+    }
+}
+
 /// `GET /lingxi/v1/sessions/{id}/events` — snapshot / cursor continuation
 /// page of the session's event stream (R02-T05). Transport DTO reusing the
 /// protocol `Page` semantics (`items`/`nextCursor`/`snapshotSeq` pin the
@@ -3937,6 +3996,10 @@ pub fn build_router(state: ServiceState) -> Router {
         .route(
             "/lingxi/v1/sessions/{session_id}/events",
             get(session_events_page),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/context-observation",
+            get(session_context_observation),
         )
         .route("/lingxi/v1/ws-ticket", post(ws_ticket))
         .route(

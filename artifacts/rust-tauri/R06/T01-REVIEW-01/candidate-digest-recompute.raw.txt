@@ -1,0 +1,11 @@
+=== 声明值（报告头部）: 6dc9f4c2050faa501bd6360b863f8e81224e3e1e9a750894ffdfdfde9273b183
+=== 复核重算（含审查证据文件之前的树状态已不可复现；以下为当前树）===
+4f6c57fa862cb86eb40257e732385e10a4fc9852e1411ee0fb79bc49fecead76  -
+=== 根因证据：候选集中 mtime 晚于报告写入（18:21:45）的文件 ===
+19:29:04 artifacts/rust-tauri/R06/T01-REVIEW-01/candidate-digest-recompute.raw.txt
+19:28:33 artifacts/rust-tauri/R06/T01-REVIEW-01/new-tests-reviewer.raw.txt
+19:27:50 artifacts/rust-tauri/R06/T01-REVIEW-01/fmt-clippy-reviewer.raw.txt
+19:27:33 rust/crates/lingxi-service/src/runs.rs
+=== 排除全部审查证据文件后的稳定重算 ===
+9a6e05413465c1fea52c09f2f750db52edf222a0e21f0954a85089f6723baeec  ≠  6dc9f4c2050faa501bd6360b863f8e81224e3e1e9a750894ffdfdfde9273b183（声明值）
+两次独立重算（含/不含审查证据目录）均不符；唯一报告后改动 = docs/rust-tauri/R06/R06_PROGRESS.json（mtime 18:23:56 > 报告 18:21:45）

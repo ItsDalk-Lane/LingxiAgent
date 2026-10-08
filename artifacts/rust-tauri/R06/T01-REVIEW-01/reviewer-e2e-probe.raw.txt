@@ -1,0 +1,16 @@
+PASS no-credential-401 status=401
+PASS wrong-verb-rejected status=405
+PASS execute-accepted status=200 body={'runId': 'run_000001a11b2ce32f_000001', 'runCount': 1}
+PASS provider-called captured=1
+PASS wire-messages0-system 
+PASS wire-carries-materials 
+PASS owner-observation-200 status=200
+PASS renderSha256-matches-wire 
+PASS per-segment-digests-and-disclosure 
+PASS observation-no-secret 
+PASS issue-foreign-credential status=201 body={'credentialId': 'cred_1cf27ecff109c488d5838f88e0fdccf8', 'deviceId': 'device_98bb31da4e98d866d457f9088646d6e8', 'secret': 'hana_dev_aRxIj2r13FdqW0C6iZnmXvwQOJe9QQ-WKjdt2BdU3Hg', 'scopes': ['chat'], 'expiresAtUnixMs': None}
+PASS cross-principal-403 status=403 body={'code': 'forbidden', 'details': {'causeId': 'authz.cross_principal_access', 'reason': 'cross_principal_access', 'requestId': 'req-d70c10b571bfcc7d6056b7f989cdbeaf'}, 'message': 'not allowed for this principal', 'retryable': False}
+PASS unknown-session-404 status=404
+PASS head-allowed status=200
+PASS graceful-shutdown rc=0
+SUMMARY: ALL-PASS

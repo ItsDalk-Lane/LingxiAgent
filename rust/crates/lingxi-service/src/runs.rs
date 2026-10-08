@@ -583,6 +583,13 @@ pub struct RunSupervisor {
     /// R05-T05: the per-call wall-clock tuning (total budget across all
     /// attempts of one logical call + the retry backoff shape).
     model_call_tuning: ModelCallTuning,
+    /// R06-T01: the session-scoped context compiler. When `Some`, the
+    /// system text of EVERY turn's [`ModelTurnInput`] is the render of the
+    /// session's frozen [`crate::context_compiler::CompiledContext`] — the
+    /// SAME artifact the observation endpoint serves (one build result,
+    /// no second prompt reconstruction). `None` (the no-compiler test
+    /// wiring) keeps the pre-R06 shape exactly (`system_prompt: None`).
+    context_compiler: Option<Arc<crate::context_compiler::ContextCompilerService>>,
 }
 
 impl std::fmt::Debug for RunSupervisor {
@@ -603,6 +610,10 @@ impl std::fmt::Debug for RunSupervisor {
                 &self.tool_gateway.as_ref().map(|_| "injected"),
             )
             .field("model_call_tuning", &self.model_call_tuning)
+            .field(
+                "context_compiler",
+                &self.context_compiler.as_ref().map(|_| "bound"),
+            )
             .finish()
     }
 }
@@ -631,6 +642,7 @@ impl RunSupervisor {
             tool_gateway: None,
             stream_idle_timeout: Duration::from_millis(DEFAULT_STREAM_IDLE_TIMEOUT_MS),
             model_call_tuning: ModelCallTuning::default(),
+            context_compiler: None,
         }
     }
 
@@ -668,6 +680,7 @@ impl RunSupervisor {
             tool_gateway: None,
             stream_idle_timeout: Duration::from_millis(DEFAULT_STREAM_IDLE_TIMEOUT_MS),
             model_call_tuning: ModelCallTuning::default(),
+            context_compiler: None,
         })
     }
 
@@ -700,6 +713,18 @@ impl RunSupervisor {
         tuning.validate()?;
         self.model_call_tuning = tuning;
         Ok(self)
+    }
+
+    /// R06-T01: binds the session-scoped context compiler (builder-style;
+    /// the composition root calls this after [`Self::new`]). Binding it
+    /// makes its compiled artifact the ONLY system-prompt source of every
+    /// driven run of this supervisor (no dual prompt path).
+    pub fn with_context_compiler(
+        mut self,
+        compiler: Option<Arc<crate::context_compiler::ContextCompilerService>>,
+    ) -> Self {
+        self.context_compiler = compiler;
+        self
     }
 
     pub fn limits(&self) -> &RunDriveLimits {
@@ -1036,6 +1061,45 @@ impl RunSupervisor {
             return Ok(finish);
         };
 
+        // R06-T01 (R06-A01 同源): compile the session's frozen context
+        // artifact ONCE per (session, subagent shape) — after the provider
+        // check, so the no-provider path stays byte-identical to the pre-R06
+        // shape; before the first model call, so EVERY turn of this run
+        // sends the SAME render the observation endpoint serves. A compile
+        // failure is a LOUD non-retryable run failure (the adjudicated
+        // finalize mirrors the no-provider early return above), never a
+        // silently degraded prompt.
+        let system_prompt = match self.context_compiler.as_ref() {
+            Some(compiler) => {
+                let for_subagent = matches!(authorization.grant, RunGrant::Subagent { .. });
+                match compiler.compiled_for_run(session_id, agent_id, for_subagent, now_ms) {
+                    Ok(compiled) => Some(compiled.render().to_string()),
+                    Err(failure) => {
+                        let finish = RunFinish::Failed {
+                            cause: FailureCause::ProviderFailed {
+                                code: format!("context_compile: {failure}"),
+                                retryable: false,
+                            },
+                        };
+                        let finish = self
+                            .adjudicated_finalize(
+                                port,
+                                events,
+                                &ctx,
+                                &entry,
+                                RunStatus::Running,
+                                finish,
+                                now_ms,
+                            )
+                            .await?;
+                        guard.disarm();
+                        return Ok(finish);
+                    }
+                }
+            }
+            None => None,
+        };
+
         let mut turn: u32 = 0;
         let mut tool_call_seq: u32 = 0;
         let mut saw_tool_failure = false;
@@ -1172,12 +1236,15 @@ impl RunSupervisor {
             }
             // The typed per-turn exchange (R05-T01): submission + complete
             // prior exchange of this run + the send-time tool snapshot.
-            // R05-T03: `system_prompt` stays None — the persona/system
-            // layer is a later stage; every adapter omits the family system
-            // slot on None (codex uses its documented default instruction).
+            // R06-T01: `system_prompt` is the render of the session's frozen
+            // context artifact when the compiler is wired (one build result
+            // for the sent text AND the observation — R06-A01); without a
+            // compiler wired it stays None (the pre-R06 test wiring — every
+            // adapter omits the family system slot on None, codex uses its
+            // documented default instruction).
             let turn_input = ModelTurnInput {
                 submission,
-                system_prompt: None,
+                system_prompt: system_prompt.clone(),
                 turn,
                 prior: exchange.clone(),
                 tools: tool_snapshot,

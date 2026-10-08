@@ -18,6 +18,7 @@
 
 use lingxi_protocol::{AttemptId, NormalizedMessage, RunId, RunStatus, SessionId, ToolCallId};
 
+pub mod context;
 pub mod invocation;
 pub mod model_exchange;
 pub mod ports;
