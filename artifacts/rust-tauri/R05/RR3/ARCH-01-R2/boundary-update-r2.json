@@ -1,0 +1,45 @@
+{
+  "utc": "2026-10-08T02:29:43.044Z",
+  "task": "RR3 ARCH-01-R2 嵌套 .gitignore 显形的 439 旧快照残留收尾（R 集 DELETE）引用边界增量——沿 ARCH-01/boundary-update.json 既有格式，不改原文件与 baseIndex",
+  "baseIndex": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/reference-boundary-index.json",
+  "head": "b4b0094d37d4de2b1914d8c8de5e89cdf79312a6",
+  "arch01r2Deleted": {
+    "status": "historically_removed",
+    "receipt": "artifacts/rust-tauri/R05/RR3/ARCH-01-R2/mini-cleanup-receipt.json",
+    "entries": 439,
+    "bytes": 69088347,
+    "byCategory": {
+      "R01_era_snapshot_residual": 439
+    },
+    "scope": "仅 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot/ 下未跟踪旧快照文件（ARCH-01/boundary-update.json notes 所登记 439 范围外余量的获批后续）",
+    "shaVerifiedBeforeDelete": true,
+    "localOnly": true,
+    "remoteOriginalAvailable": false,
+    "mtimeRange": {
+      "min": "2026-09-12T02:39:02.519Z",
+      "max": "2026-09-15T02:20:22.049Z"
+    },
+    "deleted": {
+      "receipt_items": 439,
+      "deleted": 439,
+      "missing": 0,
+      "sizeMismatch": 0,
+      "empty_dirs_removed": 149,
+      "parent_dir_removed": 0,
+      "at": "2026-10-08T02:28:40.639Z"
+    },
+    "pointerNote": "逐项 path/bytes/删除前 SHA256/UTC 全量登记于 mini-cleanup-receipt.json（439 条），本增量不重复展开"
+  },
+  "rootGitignoreHiddenUntouched": {
+    "status": "preserved_out_of_scope",
+    "note": "被根 .gitignore 隐藏的 .mimosa/__pycache__/reviews 等忽略文件不属本任务，未触碰；snapshot/ 下仅余此类忽略内容目录"
+  },
+  "mainTreeResidual": {
+    "rSetPathsGone": true,
+    "verifiedBy": "delete-r2-result.json（439/439 deleted，missing=0）+ 删除后逐路径 lexists 全 False"
+  },
+  "notes": [
+    "本文件只追加增量，不修改 ARCH-01/boundary-update.json、baseIndex 及任何既有产物。",
+    "Git 全程只读：未 add/commit/stash，tracked 集与 HEAD 零变化（见 REPORT.md tracked-baseline 复核）。"
+  ]
+}

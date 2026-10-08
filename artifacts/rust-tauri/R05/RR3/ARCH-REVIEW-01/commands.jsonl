@@ -1,0 +1,22 @@
+{"seq": 0, "recorded_utc": "2026-10-08T02:51:21Z", "note": "审查者命令日志（只读审查）。各条按真实执行顺序编号；未逐条计时，recorded_utc 为写本日志时刻。除标注外 exit=0。对账/复核脚本经 python3 stdin heredoc 执行（不落盘临时文件），以脚本摘要登记。"}
+{"seq": 1, "phase": "开工", "cmd": "git status --porcelain; git branch --show-current; git rev-parse HEAD", "purpose": "开工状态基线", "exit": 0}
+{"seq": 2, "phase": "输入", "cmd": "读 RR3_ARCH_REVIEW_BRIEF.md / RR3_ARCH01_BRIEF.md / RR3_ARCH01_R2_BRIEF.md / ARCH-01/REPORT.md / ARCH-01-R2/REPORT.md 全文", "purpose": "任务书与被审报告", "exit": 0}
+{"seq": 3, "phase": "输入", "cmd": "ls ARCH-01/ ARCH-01-R2/ DELIVERY-FINAL-02/; find LingxiAgent-RR3-localonly-evidence -type f | wc -l（=61）", "purpose": "产物与外置证据盘点", "exit": 0}
+{"seq": 4, "phase": "输入", "cmd": "python3: 解析 classification.json(35,070行)/cleanup-receipt/relocation-receipt/mini-cleanup-receipt 结构", "purpose": "输入结构确认", "exit": 0}
+{"seq": 5, "phase": "项1", "cmd": "python3: classification LOCAL_* 5,912 集合 × local-paths.nul × include-paths.nul × cleanup-receipt(5,851) × relocation-receipt(61) 行集/类别/字节逐一对账", "purpose": "处置集完整性", "exit": 0}
+{"seq": 6, "phase": "项3", "cmd": "python3: cleanup-receipt 5,851 条字段完整/64hex/UTC 可解析/无重复 + SHA×classification 双源交叉（0 不等）+ reloc 61 三方 SHA 全等 + mini 439 字段/hex/重复/前缀", "purpose": "回执内部一致性", "exit": 0}
+{"seq": 7, "phase": "项3", "cmd": "python3: 定位 51 条缺字段标记 → 全为 bytes=0 零字节文件（SHA=空输入哈希，与分类相等）", "purpose": "假阴性排除", "exit": 0}
+{"seq": 8, "phase": "项2", "cmd": "python3: 外置目录 61 文件集合==回执 new_absolute_path 集合; 磁盘 size×61; 抽样 15 项（含最大两件）实读 SHA256 全等", "purpose": "迁出字节级复核", "exit": 0}
+{"seq": 9, "phase": "项2", "cmd": "python3: 回执内 .rlib 检索=0; classification 检索 liblingxi_service.rlib → LOCAL_BUILD_CACHE(134,457,480B); cleanup-receipt 该条 SHA=ef146b51…==分类; 主树 lexists=False", "purpose": "最大 rlib 去向判定与双源复核", "exit": 1}
+{"seq": 10, "phase": "项2", "cmd": "python3: 39×RELOCATED-ARCH01.json 逐个解析 marker/receipt/written_utc + children 61/61 逐路径精确覆盖 + new_absolute_path isfile 全通过", "purpose": "标记在位与指向正确", "exit": 0}
+{"seq": 11, "phase": "项2", "cmd": "find LingxiAgent-RR3-localonly-fixtures -type f | wc -l（110,072）; python3: fixtures 全树最新 mtime=2026-10-07T11:55:40Z（早于 ARCH-01 窗口）", "purpose": "F51/F52 零触碰 mtime 证据", "exit": 0}
+{"seq": 12, "phase": "项2", "cmd": "python3: import F51 digest_tree 复算抽样 4 条目 tree_digest（3 全等; J-REVIEW-01_copy=fee8e52b… 与 F51 报告§七留档事后值一致）+ F52 全量（SHA f9dc56ed…/255B + 符号链接目标）", "purpose": "F51/F52 字节级复核", "exit": 0}
+{"seq": 13, "phase": "项4", "cmd": "python3: boundary-update.json/boundary-update-r2.json 结构与声明值（5851/61/439）+ reference-boundary-index.json 指针式先例比对 + 61 新位置 isfile 全通过", "purpose": "边界更新完备", "exit": 0}
+{"seq": 14, "phase": "项5", "cmd": "git --no-optional-locks ls-files -s | shasum -a 256（=64d610a9…08c30）; git --no-optional-locks diff HEAD | shasum -a 256（=e3b0c442…空）; rev-parse HEAD（=b4b0094d3…）; diff --cached --name-only | wc -l（0）; diff --name-only | wc -l（0）; git show HEAD:.gitignore | cmp - .gitignore（逐字节同）; git --no-optional-locks stash list | wc -l（1,既有）", "purpose": "tracked 指纹/HEAD/.gitignore 亲核", "exit": 0}
+{"seq": 15, "phase": "项5", "cmd": "git -c core.quotepath=off --no-optional-locks status --porcelain -uall（62 条）+ python3 逐条归类: ARCH-01×12 + R2×8 + 标记×39 + brief×3（含总控追加 RR3_ARCH_REVIEW_BRIEF）, 其他=0", "purpose": "余量构成对账", "exit": 0}
+{"seq": 16, "phase": "项6", "cmd": "python3: LOCAL_ONLY 抽 10 + LOCAL_RUNTIME_STATE 抽 5（seed 20261008）路径语义核对; LOCAL_* 前缀外=0; 凭证式路径名扫描（LO 13 / RS 24 命中逐条检视）", "purpose": "分类判断抽查", "exit": 0}
+{"seq": 17, "phase": "项6", "cmd": "python3 + git --no-optional-locks ls-files -z（67,220）: deleted∩tracked=0, relocated∩tracked=0; RS 136 构成（home-state96/epoch5/lock6/local-token7/p1-body17/模拟home5）", "purpose": "无 tracked 内容被删 + RS 构成", "exit": 0}
+{"seq": 18, "phase": "项6", "cmd": "python3 + git --no-optional-locks show HEAD:<路径>: 13 个凭证名 LOCAL_ONLY 中 11 个与 HEAD tracked 原件 SHA256 字节等价（2 个为 old-independent-copy 源码副本）; git --no-optional-locks grep p1-issue-credential HEAD（11+ tracked 文件留档发现）", "purpose": "快照无凭证强验", "exit": 0}
+{"seq": 19, "phase": "项6", "cmd": "python3: 解析 ARCH-01/commands.jsonl 195 条 git 调用 → 195/195 带 --no-optional-locks, 子命令仅 diff/ls-files/rev-parse/status, 写动词 0; ARCH-01-R2 日志只读; relocate/delete-exceptions 均空", "purpose": "Git 只读红线复核", "exit": 0}
+{"seq": 20, "phase": "项7", "cmd": "python3（内存副本）: 基线 0 问题; 篡改①SHA ②删条目 ③bytes ④totals.bytes ⑤mini计数 → 5/5 检出", "purpose": "方法自控", "exit": 0}
+{"seq": 21, "phase": "交付", "cmd": "写 ARCH-REVIEW-01/REVIEW.md + ARCH-REVIEW-01/commands.jsonl（本文件）", "purpose": "交付", "exit": 0}

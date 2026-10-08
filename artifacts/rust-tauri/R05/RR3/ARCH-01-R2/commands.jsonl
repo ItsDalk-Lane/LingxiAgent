@@ -1,0 +1,11 @@
+{"step":"env","cmd":"echo $HOME; whoami; git rev-parse --show-toplevel; git branch --show-current","note":"HOME=/Users/study_superior 正确；分支 codex/rust-tauri-migration"}
+{"step":"baseline","cmd":"git ls-files -s | shasum -a 256","out":"64d610a91beedf0f0a8f1f9536de9ea6a4da94c978c334b5a39ac176b1508c30","note":"tracked 基线（存 tracked-baseline.sha256）；status -uno=0；stash=1（既有，未动）"}
+{"step":"enumerate","cmd":"git -c core.quotepath=off ls-files --others --exclude-standard -z","out":"492+2(自生产物)=494","note":"ls-files 无 -uall 开关；--others 本就逐文件展开无目录折叠，与 status -uall 计数一致"}
+{"step":"derive-R","cmd":"grep -v 排除 ARCH-01/、ARCH-01-R2/、RELOCATED-ARCH01.json、两个 brief","out":"R=439","note":"对账：12(ARCH-01)+2(ARCH-01-R2)+39(标记)+2(brief)+439(R)=494"}
+{"step":"R-class-check","cmd":"按前缀统计 + grep -cv + mtime","out":"439/439 位于 artifacts/rust-tauri/R05/RR3/A-REVIEW-01/snapshot/；mtime 2026-09-12(269)/09-13(69)/09-15(101)","note":"0 例外；与 ARCH-01 报告的 R01 时代窗口吻合；find 确认嵌套 .gitignore 已不存在"}
+{"step":"ignored-audit","cmd":"git ls-files --others --ignored --exclude-standard --directory","note":"snapshot 下被根规则隐藏的 .mimosa/__pycache__/reviews 等一概不碰（brief 第8行红线）"}
+{"step":"receipt","cmd":"node sha256+stat 全量登记","out":"mini-cleanup-receipt.json 439 条 / 69,088,347 字节 / mtime 2026-09-12T02:39:02Z~2026-09-15T02:20:22Z","note":"先登记后删除"}
+{"step":"delete","cmd":"node 自 receipt 回读→前缀+数量双校验→unlink→自底向上 rmdir 空目录","out":"deleted=439 missing=0 sizeMismatch=0 empty_dirs_removed=149","note":"delete-r2-result.json"}
+{"step":"post-delete","cmd":"逐 R 路径 lexists + git ls-files --others --exclude-standard 重数","out":"0 残留；未跟踪 494→58（=53 原余量+5 个 ARCH-01-R2 产物）；snapshot 下仅余被忽略内容目录"}
+{"step":"boundary-r2","cmd":"node 写 boundary-update-r2.json","out":"R 集 historically_removed → mini-cleanup-receipt.json；不改 ARCH-01 既有产物与 baseIndex"}
+{"step":"final-verify","cmd":"git status --porcelain -uall / tracked 基线复核 / HEAD / stash","out":"余量 59=12+6+39+2；tracked 哈希=基线（零变化）；HEAD b4b0094d37d4 未动；stash=1 未动","note":"新增产物后总数为 61"}

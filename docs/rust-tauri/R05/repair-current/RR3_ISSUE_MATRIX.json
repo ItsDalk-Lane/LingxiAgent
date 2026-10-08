@@ -416,5 +416,26 @@
     "receipt": "artifacts/rust-tauri/R05/RR3/GIT-RECEIPT-01/receipt.json",
     "seal": "NOT_ADVANCED（理由见回执）",
     "docsReceiptCommit": "本回执所在第二提交"
+  },
+  "localOnlyArchive": {
+    "status": "DONE_REVIEWED",
+    "review": "artifacts/rust-tauri/R05/RR3/ARCH-REVIEW-01/REVIEW.md PASS 7/7 no mustFix",
+    "deleted": {
+      "count": 6290,
+      "bytes": 838297176,
+      "receipts": [
+        "ARCH-01/cleanup-receipt.json",
+        "ARCH-01-R2/mini-cleanup-receipt.json"
+      ],
+      "boundary": "historically_removed"
+    },
+    "relocated": {
+      "count": 61,
+      "bytes": 448967152,
+      "destination": "../LingxiAgent-RR3-localonly-evidence/",
+      "receipt": "ARCH-01/relocation-receipt.json"
+    },
+    "rlibDisclosure": "134MB rlib classified LOCAL_BUILD_CACHE, deleted per category rule, SHA ef146b51 dual-source verified; substance-rebuildable from committed source+locked toolchain, not byte-identical",
+    "residual": "root-.gitignore-hidden files (.mimosa×88, pycache×2, reviews×10) untouched, invisible in status"
   }
 }

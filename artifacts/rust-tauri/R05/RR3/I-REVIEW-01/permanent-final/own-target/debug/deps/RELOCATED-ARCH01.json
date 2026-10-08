@@ -1,0 +1,18 @@
+{
+ "marker": "RELOCATED-ARCH01",
+ "receipt": "artifacts/rust-tauri/R05/RR3/ARCH-01/relocation-receipt.json",
+ "relocated_children": [
+  {
+   "name": "xtask-4e4cec2af9d831e0",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/deps/xtask-4e4cec2af9d831e0",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/deps/xtask-4e4cec2af9d831e0"
+  },
+  {
+   "name": "xtask-ad766de8ea03e62c",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/deps/xtask-ad766de8ea03e62c",
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/deps/xtask-ad766de8ea03e62c"
+  }
+ ],
+ "task": "RR3 ARCH-01: localOnly LOCAL_BINARY originals relocated out of the main tree",
+ "written_utc": "2026-10-08T02:11:34.947914Z"
+}

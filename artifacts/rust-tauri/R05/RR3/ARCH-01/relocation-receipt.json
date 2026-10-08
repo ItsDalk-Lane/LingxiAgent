@@ -1,0 +1,561 @@
+{
+ "task": "RR3 ARCH-01: 61 LOCAL_BINARY relocated out of main tree (user-approved delete+relocate closeout)",
+ "destination_root": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence",
+ "entries": [
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/build/lingxi-service",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/isolated/build/lingxi-service",
+   "sha256_before": "7d9190d27d1b6a019abfbe97049d6855a3f225494124fee43ef8988e032ae78b",
+   "sha256_after": "7d9190d27d1b6a019abfbe97049d6855a3f225494124fee43ef8988e032ae78b",
+   "sha256_classified": "7d9190d27d1b6a019abfbe97049d6855a3f225494124fee43ef8988e032ae78b",
+   "bytes": 59478432,
+   "moved_utc": "2026-10-08T02:11:34.619785Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/r05_t08_resources",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/C-F46-REVIEW-01/sampler-negative-isolated/r05_t08_resources",
+   "sha256_before": "323456600dc961ee6e4d20b60cf7cf9964526bfcd4153090c7b4e89c0bf2e3a1",
+   "sha256_after": "323456600dc961ee6e4d20b60cf7cf9964526bfcd4153090c7b4e89c0bf2e3a1",
+   "sha256_classified": "323456600dc961ee6e4d20b60cf7cf9964526bfcd4153090c7b4e89c0bf2e3a1",
+   "bytes": 47691408,
+   "moved_utc": "2026-10-08T02:11:34.645312Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/D-01/lan_probe",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/D-01/lan_probe",
+   "sha256_before": "86d4f4f5fec48a66dfd38278331578e6764bf9edc2592e4315334294ab7b6b65",
+   "sha256_after": "86d4f4f5fec48a66dfd38278331578e6764bf9edc2592e4315334294ab7b6b65",
+   "sha256_classified": "86d4f4f5fec48a66dfd38278331578e6764bf9edc2592e4315334294ab7b6b65",
+   "bytes": 34632,
+   "moved_utc": "2026-10-08T02:11:34.664966Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/D-REVIEW-01/lan_probe",
+   "sha256_before": "bae663f002198af37ca27b1c6886dd377aabf17f5eb026dfc3fae0e7193bfe2b",
+   "sha256_after": "bae663f002198af37ca27b1c6886dd377aabf17f5eb026dfc3fae0e7193bfe2b",
+   "sha256_classified": "bae663f002198af37ca27b1c6886dd377aabf17f5eb026dfc3fae0e7193bfe2b",
+   "bytes": 34600,
+   "moved_utc": "2026-10-08T02:11:34.665228Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/r05_t08_resources",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/F46-01/sampler-negative-isolated/r05_t08_resources",
+   "sha256_before": "323456600dc961ee6e4d20b60cf7cf9964526bfcd4153090c7b4e89c0bf2e3a1",
+   "sha256_after": "323456600dc961ee6e4d20b60cf7cf9964526bfcd4153090c7b4e89c0bf2e3a1",
+   "sha256_classified": "323456600dc961ee6e4d20b60cf7cf9964526bfcd4153090c7b4e89c0bf2e3a1",
+   "bytes": 47691408,
+   "moved_utc": "2026-10-08T02:11:34.665462Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/H-01/sampler-negative-final/r05_t08_resources",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/H-01/sampler-negative-final/r05_t08_resources",
+   "sha256_before": "50e8fbdf2cb63adeb6614635ff4a9ca8bde421c678f26c09e72b9ecff996c397",
+   "sha256_after": "50e8fbdf2cb63adeb6614635ff4a9ca8bde421c678f26c09e72b9ecff996c397",
+   "sha256_classified": "50e8fbdf2cb63adeb6614635ff4a9ca8bde421c678f26c09e72b9ecff996c397",
+   "bytes": 47691744,
+   "moved_utc": "2026-10-08T02:11:34.685388Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/H-01/sampler-negative-isolated/r05_t08_resources",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/H-01/sampler-negative-isolated/r05_t08_resources",
+   "sha256_before": "9aa07b6514177d42637b1eb935e0086a1f86abcd47c5c03b130d1320ba7104d1",
+   "sha256_after": "9aa07b6514177d42637b1eb935e0086a1f86abcd47c5c03b130d1320ba7104d1",
+   "sha256_classified": "9aa07b6514177d42637b1eb935e0086a1f86abcd47c5c03b130d1320ba7104d1",
+   "bytes": 47691744,
+   "moved_utc": "2026-10-08T02:11:34.705477Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/sampler-negative-final/r05_t08_resources",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/sampler-negative-final/r05_t08_resources",
+   "sha256_before": "07fa503e4fde47534ed06f6bde443a849ac8697b2091e94ccd8a67589d51d18c",
+   "sha256_after": "07fa503e4fde47534ed06f6bde443a849ac8697b2091e94ccd8a67589d51d18c",
+   "sha256_classified": "07fa503e4fde47534ed06f6bde443a849ac8697b2091e94ccd8a67589d51d18c",
+   "bytes": 47691744,
+   "moved_utc": "2026-10-08T02:11:34.725100Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/H-REVIEW-02/verified-binaries/lingxi-service",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/H-REVIEW-02/verified-binaries/lingxi-service",
+   "sha256_before": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e",
+   "sha256_after": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e",
+   "sha256_classified": "7fa13a3bc7ad8d8fde1d55d33242f0eca8b17913172daf8fe513d899c224cd7e",
+   "bytes": 62352400,
+   "moved_utc": "2026-10-08T02:11:34.745377Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/libc-26ddd0231c356665/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/libc-26ddd0231c356665/build-script-build",
+   "sha256_before": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_after": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_classified": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "bytes": 649552,
+   "moved_utc": "2026-10-08T02:11:34.771286Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/libc-26ddd0231c356665/build_script_build-26ddd0231c356665",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/libc-26ddd0231c356665/build_script_build-26ddd0231c356665",
+   "sha256_before": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_after": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_classified": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "bytes": 649552,
+   "moved_utc": "2026-10-08T02:11:34.771867Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/serde_core-900cf3aa05175b3d/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/serde_core-900cf3aa05175b3d/build-script-build",
+   "sha256_before": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_after": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_classified": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "bytes": 601232,
+   "moved_utc": "2026-10-08T02:11:34.772326Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/serde_core-900cf3aa05175b3d/build_script_build-900cf3aa05175b3d",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/serde_core-900cf3aa05175b3d/build_script_build-900cf3aa05175b3d",
+   "sha256_before": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_after": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_classified": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "bytes": 601232,
+   "moved_utc": "2026-10-08T02:11:34.772682Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/serde_json-5be08a238166421e/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/serde_json-5be08a238166421e/build-script-build",
+   "sha256_before": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_after": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_classified": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "bytes": 471584,
+   "moved_utc": "2026-10-08T02:11:34.773149Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/serde_json-5be08a238166421e/build_script_build-5be08a238166421e",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/serde_json-5be08a238166421e/build_script_build-5be08a238166421e",
+   "sha256_before": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_after": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_classified": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "bytes": 471584,
+   "moved_utc": "2026-10-08T02:11:34.773534Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/zmij-6b209463fc12b1fd/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/zmij-6b209463fc12b1fd/build-script-build",
+   "sha256_before": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_after": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_classified": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "bytes": 574496,
+   "moved_utc": "2026-10-08T02:11:34.773873Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/zmij-6b209463fc12b1fd/build_script_build-6b209463fc12b1fd",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/build/zmij-6b209463fc12b1fd/build_script_build-6b209463fc12b1fd",
+   "sha256_before": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_after": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_classified": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "bytes": 574496,
+   "moved_utc": "2026-10-08T02:11:34.774226Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/deps/xtask-4e4cec2af9d831e0",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/deps/xtask-4e4cec2af9d831e0",
+   "sha256_before": "d8451083b8cf1b228101bb47128dbb278fc7f92ebf5c1dc60a0ba20fb9cc2b71",
+   "sha256_after": "d8451083b8cf1b228101bb47128dbb278fc7f92ebf5c1dc60a0ba20fb9cc2b71",
+   "sha256_classified": "d8451083b8cf1b228101bb47128dbb278fc7f92ebf5c1dc60a0ba20fb9cc2b71",
+   "bytes": 4746440,
+   "moved_utc": "2026-10-08T02:11:34.774625Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/xtask",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-02/own-target/debug/xtask",
+   "sha256_before": "d8451083b8cf1b228101bb47128dbb278fc7f92ebf5c1dc60a0ba20fb9cc2b71",
+   "sha256_after": "d8451083b8cf1b228101bb47128dbb278fc7f92ebf5c1dc60a0ba20fb9cc2b71",
+   "sha256_classified": "d8451083b8cf1b228101bb47128dbb278fc7f92ebf5c1dc60a0ba20fb9cc2b71",
+   "bytes": 4746440,
+   "moved_utc": "2026-10-08T02:11:34.776768Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/libc-26ddd0231c356665/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/libc-26ddd0231c356665/build-script-build",
+   "sha256_before": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_after": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_classified": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "bytes": 649552,
+   "moved_utc": "2026-10-08T02:11:34.779346Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/libc-26ddd0231c356665/build_script_build-26ddd0231c356665",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/libc-26ddd0231c356665/build_script_build-26ddd0231c356665",
+   "sha256_before": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_after": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_classified": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "bytes": 649552,
+   "moved_utc": "2026-10-08T02:11:34.779849Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/serde_core-900cf3aa05175b3d/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/serde_core-900cf3aa05175b3d/build-script-build",
+   "sha256_before": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_after": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_classified": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "bytes": 601232,
+   "moved_utc": "2026-10-08T02:11:34.780345Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/serde_core-900cf3aa05175b3d/build_script_build-900cf3aa05175b3d",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/serde_core-900cf3aa05175b3d/build_script_build-900cf3aa05175b3d",
+   "sha256_before": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_after": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_classified": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "bytes": 601232,
+   "moved_utc": "2026-10-08T02:11:34.780755Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/serde_json-5be08a238166421e/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/serde_json-5be08a238166421e/build-script-build",
+   "sha256_before": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_after": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_classified": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "bytes": 471584,
+   "moved_utc": "2026-10-08T02:11:34.781213Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/serde_json-5be08a238166421e/build_script_build-5be08a238166421e",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/serde_json-5be08a238166421e/build_script_build-5be08a238166421e",
+   "sha256_before": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_after": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_classified": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "bytes": 471584,
+   "moved_utc": "2026-10-08T02:11:34.781601Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/zmij-6b209463fc12b1fd/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/zmij-6b209463fc12b1fd/build-script-build",
+   "sha256_before": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_after": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_classified": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "bytes": 574496,
+   "moved_utc": "2026-10-08T02:11:34.782013Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/zmij-6b209463fc12b1fd/build_script_build-6b209463fc12b1fd",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/build/zmij-6b209463fc12b1fd/build_script_build-6b209463fc12b1fd",
+   "sha256_before": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_after": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_classified": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "bytes": 574496,
+   "moved_utc": "2026-10-08T02:11:34.782450Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/deps/xtask-4e4cec2af9d831e0",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/deps/xtask-4e4cec2af9d831e0",
+   "sha256_before": "353af794814604ec8b71efe57da098a36e7b8d1491c381587cf57573d0daa3a7",
+   "sha256_after": "353af794814604ec8b71efe57da098a36e7b8d1491c381587cf57573d0daa3a7",
+   "sha256_classified": "353af794814604ec8b71efe57da098a36e7b8d1491c381587cf57573d0daa3a7",
+   "bytes": 4746440,
+   "moved_utc": "2026-10-08T02:11:34.782854Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/xtask",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-03/own-target/debug/xtask",
+   "sha256_before": "353af794814604ec8b71efe57da098a36e7b8d1491c381587cf57573d0daa3a7",
+   "sha256_after": "353af794814604ec8b71efe57da098a36e7b8d1491c381587cf57573d0daa3a7",
+   "sha256_classified": "353af794814604ec8b71efe57da098a36e7b8d1491c381587cf57573d0daa3a7",
+   "bytes": 4746440,
+   "moved_utc": "2026-10-08T02:11:34.785154Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/libc-26ddd0231c356665/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/libc-26ddd0231c356665/build-script-build",
+   "sha256_before": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_after": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_classified": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "bytes": 649552,
+   "moved_utc": "2026-10-08T02:11:34.787603Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/libc-26ddd0231c356665/build_script_build-26ddd0231c356665",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/libc-26ddd0231c356665/build_script_build-26ddd0231c356665",
+   "sha256_before": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_after": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_classified": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "bytes": 649552,
+   "moved_utc": "2026-10-08T02:11:34.788043Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/serde_core-900cf3aa05175b3d/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/serde_core-900cf3aa05175b3d/build-script-build",
+   "sha256_before": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_after": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_classified": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "bytes": 601232,
+   "moved_utc": "2026-10-08T02:11:34.788500Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/serde_core-900cf3aa05175b3d/build_script_build-900cf3aa05175b3d",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/serde_core-900cf3aa05175b3d/build_script_build-900cf3aa05175b3d",
+   "sha256_before": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_after": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_classified": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "bytes": 601232,
+   "moved_utc": "2026-10-08T02:11:34.788903Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/serde_json-5be08a238166421e/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/serde_json-5be08a238166421e/build-script-build",
+   "sha256_before": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_after": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_classified": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "bytes": 471584,
+   "moved_utc": "2026-10-08T02:11:34.789372Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/serde_json-5be08a238166421e/build_script_build-5be08a238166421e",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/serde_json-5be08a238166421e/build_script_build-5be08a238166421e",
+   "sha256_before": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_after": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_classified": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "bytes": 471584,
+   "moved_utc": "2026-10-08T02:11:34.789729Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/zmij-6b209463fc12b1fd/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/zmij-6b209463fc12b1fd/build-script-build",
+   "sha256_before": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_after": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_classified": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "bytes": 574496,
+   "moved_utc": "2026-10-08T02:11:34.790096Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/zmij-6b209463fc12b1fd/build_script_build-6b209463fc12b1fd",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/build/zmij-6b209463fc12b1fd/build_script_build-6b209463fc12b1fd",
+   "sha256_before": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_after": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_classified": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "bytes": 574496,
+   "moved_utc": "2026-10-08T02:11:34.790473Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/deps/xtask-4e4cec2af9d831e0",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/deps/xtask-4e4cec2af9d831e0",
+   "sha256_before": "fd0e1316276de5cc73f1ee9aeae48a033a4b70dba1075d755c71d81338b823e2",
+   "sha256_after": "fd0e1316276de5cc73f1ee9aeae48a033a4b70dba1075d755c71d81338b823e2",
+   "sha256_classified": "fd0e1316276de5cc73f1ee9aeae48a033a4b70dba1075d755c71d81338b823e2",
+   "bytes": 4746440,
+   "moved_utc": "2026-10-08T02:11:34.790884Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/deps/xtask-ad766de8ea03e62c",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/deps/xtask-ad766de8ea03e62c",
+   "sha256_before": "80392f8c4ee7714f254b74035679a72b5ec1176f2ea5c799712e60d074bb7569",
+   "sha256_after": "80392f8c4ee7714f254b74035679a72b5ec1176f2ea5c799712e60d074bb7569",
+   "sha256_classified": "80392f8c4ee7714f254b74035679a72b5ec1176f2ea5c799712e60d074bb7569",
+   "bytes": 9080872,
+   "moved_utc": "2026-10-08T02:11:34.793061Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/xtask",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-04/own-target/debug/xtask",
+   "sha256_before": "fd0e1316276de5cc73f1ee9aeae48a033a4b70dba1075d755c71d81338b823e2",
+   "sha256_after": "fd0e1316276de5cc73f1ee9aeae48a033a4b70dba1075d755c71d81338b823e2",
+   "sha256_classified": "fd0e1316276de5cc73f1ee9aeae48a033a4b70dba1075d755c71d81338b823e2",
+   "bytes": 4746440,
+   "moved_utc": "2026-10-08T02:11:34.797090Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/libc-26ddd0231c356665/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/libc-26ddd0231c356665/build-script-build",
+   "sha256_before": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_after": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_classified": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "bytes": 649552,
+   "moved_utc": "2026-10-08T02:11:34.799543Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/libc-26ddd0231c356665/build_script_build-26ddd0231c356665",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/libc-26ddd0231c356665/build_script_build-26ddd0231c356665",
+   "sha256_before": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_after": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_classified": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "bytes": 649552,
+   "moved_utc": "2026-10-08T02:11:34.799986Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/serde_core-900cf3aa05175b3d/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/serde_core-900cf3aa05175b3d/build-script-build",
+   "sha256_before": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_after": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_classified": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "bytes": 601232,
+   "moved_utc": "2026-10-08T02:11:34.800457Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/serde_core-900cf3aa05175b3d/build_script_build-900cf3aa05175b3d",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/serde_core-900cf3aa05175b3d/build_script_build-900cf3aa05175b3d",
+   "sha256_before": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_after": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_classified": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "bytes": 601232,
+   "moved_utc": "2026-10-08T02:11:34.800854Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/serde_json-5be08a238166421e/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/serde_json-5be08a238166421e/build-script-build",
+   "sha256_before": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_after": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_classified": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "bytes": 471584,
+   "moved_utc": "2026-10-08T02:11:34.801278Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/serde_json-5be08a238166421e/build_script_build-5be08a238166421e",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/serde_json-5be08a238166421e/build_script_build-5be08a238166421e",
+   "sha256_before": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_after": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_classified": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "bytes": 471584,
+   "moved_utc": "2026-10-08T02:11:34.801631Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/zmij-6b209463fc12b1fd/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/zmij-6b209463fc12b1fd/build-script-build",
+   "sha256_before": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_after": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_classified": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "bytes": 574496,
+   "moved_utc": "2026-10-08T02:11:34.802033Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/zmij-6b209463fc12b1fd/build_script_build-6b209463fc12b1fd",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/build/zmij-6b209463fc12b1fd/build_script_build-6b209463fc12b1fd",
+   "sha256_before": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_after": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_classified": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "bytes": 574496,
+   "moved_utc": "2026-10-08T02:11:34.802437Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/deps/xtask-4e4cec2af9d831e0",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/deps/xtask-4e4cec2af9d831e0",
+   "sha256_before": "f2249fb33ea50f6c896fc74dc02ecf0da35916b9676f253d7cc10559d7552a44",
+   "sha256_after": "f2249fb33ea50f6c896fc74dc02ecf0da35916b9676f253d7cc10559d7552a44",
+   "sha256_classified": "f2249fb33ea50f6c896fc74dc02ecf0da35916b9676f253d7cc10559d7552a44",
+   "bytes": 4747608,
+   "moved_utc": "2026-10-08T02:11:34.802838Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/xtask",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-01/selfcheck-final/own-target/debug/xtask",
+   "sha256_before": "f2249fb33ea50f6c896fc74dc02ecf0da35916b9676f253d7cc10559d7552a44",
+   "sha256_after": "f2249fb33ea50f6c896fc74dc02ecf0da35916b9676f253d7cc10559d7552a44",
+   "sha256_classified": "f2249fb33ea50f6c896fc74dc02ecf0da35916b9676f253d7cc10559d7552a44",
+   "bytes": 4747608,
+   "moved_utc": "2026-10-08T02:11:34.805034Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/libc-26ddd0231c356665/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/libc-26ddd0231c356665/build-script-build",
+   "sha256_before": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_after": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_classified": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "bytes": 649552,
+   "moved_utc": "2026-10-08T02:11:34.807299Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/libc-26ddd0231c356665/build_script_build-26ddd0231c356665",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/libc-26ddd0231c356665/build_script_build-26ddd0231c356665",
+   "sha256_before": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_after": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "sha256_classified": "19b7dd518568b396bb6721c64dcf59c622a63f8b0ccd0dde591971a42a73d44c",
+   "bytes": 649552,
+   "moved_utc": "2026-10-08T02:11:34.807739Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/serde_core-900cf3aa05175b3d/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/serde_core-900cf3aa05175b3d/build-script-build",
+   "sha256_before": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_after": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_classified": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "bytes": 601232,
+   "moved_utc": "2026-10-08T02:11:34.808169Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/serde_core-900cf3aa05175b3d/build_script_build-900cf3aa05175b3d",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/serde_core-900cf3aa05175b3d/build_script_build-900cf3aa05175b3d",
+   "sha256_before": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_after": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "sha256_classified": "91dcd3229ce79d632476571d5317e187bb411394ef96235baf4383b5c031b4fe",
+   "bytes": 601232,
+   "moved_utc": "2026-10-08T02:11:34.808552Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/serde_json-5be08a238166421e/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/serde_json-5be08a238166421e/build-script-build",
+   "sha256_before": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_after": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_classified": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "bytes": 471584,
+   "moved_utc": "2026-10-08T02:11:34.808988Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/serde_json-5be08a238166421e/build_script_build-5be08a238166421e",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/serde_json-5be08a238166421e/build_script_build-5be08a238166421e",
+   "sha256_before": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_after": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "sha256_classified": "921f2c168ec02080d700298a57f20fb41a8889b7004f79a33cbb82e027b87fda",
+   "bytes": 471584,
+   "moved_utc": "2026-10-08T02:11:34.809286Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/zmij-6b209463fc12b1fd/build-script-build",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/zmij-6b209463fc12b1fd/build-script-build",
+   "sha256_before": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_after": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_classified": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "bytes": 574496,
+   "moved_utc": "2026-10-08T02:11:34.809667Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/zmij-6b209463fc12b1fd/build_script_build-6b209463fc12b1fd",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/build/zmij-6b209463fc12b1fd/build_script_build-6b209463fc12b1fd",
+   "sha256_before": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_after": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "sha256_classified": "cfbf1206729be404d13bdc399a259497e6f2a0bd3a00f5b56b120896cd08c71f",
+   "bytes": 574496,
+   "moved_utc": "2026-10-08T02:11:34.810057Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/deps/xtask-4e4cec2af9d831e0",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/deps/xtask-4e4cec2af9d831e0",
+   "sha256_before": "47adbebcec2fdc1c05c4ca25db8fb80e5119be3541015706be646d7c5a254e05",
+   "sha256_after": "47adbebcec2fdc1c05c4ca25db8fb80e5119be3541015706be646d7c5a254e05",
+   "sha256_classified": "47adbebcec2fdc1c05c4ca25db8fb80e5119be3541015706be646d7c5a254e05",
+   "bytes": 4750232,
+   "moved_utc": "2026-10-08T02:11:34.810486Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/deps/xtask-ad766de8ea03e62c",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/deps/xtask-ad766de8ea03e62c",
+   "sha256_before": "751afe48cb7e4a7dde76c614dc348413078beec0f8d107afc1888aed6ce1d63f",
+   "sha256_after": "751afe48cb7e4a7dde76c614dc348413078beec0f8d107afc1888aed6ce1d63f",
+   "sha256_classified": "751afe48cb7e4a7dde76c614dc348413078beec0f8d107afc1888aed6ce1d63f",
+   "bytes": 9085208,
+   "moved_utc": "2026-10-08T02:11:34.812654Z"
+  },
+  {
+   "old_relative_path": "artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/xtask",
+   "new_absolute_path": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence/artifacts/rust-tauri/R05/RR3/I-REVIEW-01/permanent-final/own-target/debug/xtask",
+   "sha256_before": "47adbebcec2fdc1c05c4ca25db8fb80e5119be3541015706be646d7c5a254e05",
+   "sha256_after": "47adbebcec2fdc1c05c4ca25db8fb80e5119be3541015706be646d7c5a254e05",
+   "sha256_classified": "47adbebcec2fdc1c05c4ca25db8fb80e5119be3541015706be646d7c5a254e05",
+   "bytes": 4750232,
+   "moved_utc": "2026-10-08T02:11:34.816729Z"
+  }
+ ],
+ "utc": "2026-10-08T02:11:34.818855Z",
+ "totals": {
+  "entries": 61,
+  "bytes": 448967152,
+  "all_sha_equal": true
+ }
+}

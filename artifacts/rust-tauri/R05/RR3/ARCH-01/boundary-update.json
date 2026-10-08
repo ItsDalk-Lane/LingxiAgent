@@ -1,0 +1,46 @@
+{
+ "utc": "2026-10-08T02:20:50.623436Z",
+ "task": "RR3 ARCH-01 localOnly 收尾（DELETE 5,851 + RELOCATE 61）引用边界增量——沿 DELIVERY-FINAL-02/reference-boundary-index.json 既有格式，不改原文件",
+ "baseIndex": "artifacts/rust-tauri/R05/RR3/DELIVERY-FINAL-02/reference-boundary-index.json",
+ "head": "b4b0094d37d4de2b1914d8c8de5e89cdf79312a6",
+ "arch01Deleted": {
+  "status": "historically_removed",
+  "receipt": "artifacts/rust-tauri/R05/RR3/ARCH-01/cleanup-receipt.json",
+  "entries": 5851,
+  "bytes": 769208829,
+  "byCategory": {
+   "LOCAL_ONLY": 1074,
+   "LOCAL_BUILD_CACHE": 3442,
+   "LOCAL_ISOLATED_SOURCE": 1199,
+   "LOCAL_RUNTIME_STATE": 136
+  },
+  "shaVerifiedBeforeDelete": true,
+  "localOnly": true,
+  "remoteOriginalAvailable": false,
+  "pointerNote": "逐项 path/category/bytes/删除前 SHA256/UTC 全量登记于 cleanup-receipt.json（5,851 条），本增量不重复展开（沿 prep02LocalOriginalsPointer 先例）"
+ },
+ "arch01Relocated": {
+  "status": "RELOCATED_EXTERNAL_LOCALONLY",
+  "receipt": "artifacts/rust-tauri/R05/RR3/ARCH-01/relocation-receipt.json",
+  "destinationRoot": "/Users/study_superior/Desktop/Code/LingxiAgent-RR3-localonly-evidence",
+  "entries": 61,
+  "bytes": 448967152,
+  "allShaEqual": true,
+  "markers": {
+   "count": 39,
+   "format": "RELOCATED-ARCH01（沿 F51 RELOCATED-F51 格式：被迁子路径/新位置/指向回执/UTC），逐父目录清单见 checkpoint.json phases.markers.written"
+  },
+  "localOnly": true,
+  "remoteOriginalAvailable": false,
+  "pointerNote": "逐项 old→new/SHA 前后/UTC 全量登记于 relocation-receipt.json（61 条），本增量不重复展开"
+ },
+ "mainTreeResidual": {
+  "originalLocalOnlyPaths": 5912,
+  "goneFromMainTree": true,
+  "verifiedBy": "ARCH-01/final-verification.json（precheck 5,912 路径 lexists 全 False）"
+ },
+ "notes": [
+  "F51 外置 LingxiAgent-RR3-localonly-fixtures/（57 项）与 DELIVERY-SPACE-01 超限登记面维持原状；本轮 ARCH-01 另建 LingxiAgent-RR3-localonly-evidence/ 承接 61 个 LOCAL_BINARY 原件（镜像相对路径布局）。",
+  "主树余量中存在 539 个范围外文件（439 个 A-REVIEW-01/snapshot 旧证据 + 100 个被根 .gitignore 隐藏的 .mimosa/pycache/reviews），均不在 classification 35,070 全集、不属本轮 5,912 处置对象，按红线保留未触碰；成因与清单见 ARCH-01/final-verification.json remainder_expanded。"
+ ]
+}
