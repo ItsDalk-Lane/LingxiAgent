@@ -54,7 +54,9 @@ pub mod runs;
 pub mod sandbox;
 mod security_audit;
 pub mod serve;
+pub mod session_admin;
 pub mod session_supervisor;
+pub mod session_tree;
 pub mod sessions;
 pub mod shutdown;
 mod static_web;
@@ -442,6 +444,18 @@ pub struct ServiceState {
     /// Run lifecycle supervisor (R03-T01): drives every execute through
     /// the real queued→running→…→single-finalize chain.
     runs: Arc<runs::RunSupervisor>,
+    /// R06-T03: the session tree service (fork / retry / rewind /
+    /// checkpoints / branch index) over the same storage + events.
+    session_tree: Arc<session_tree::SessionService>,
+    /// R06-T03: the session admin service (create / rename / pin / archive /
+    /// restore / delete / cleanup / search / memory toggle).
+    session_admin: Arc<session_admin::SessionAdminService>,
+    /// R06-T03: the workspace file-rollback preference (incumbent
+    /// `getRollbackFileChanges`, `core/preferences-manager.ts:322-324`).
+    /// Default OFF, mirroring the incumbent; a rewind/retry that requests
+    /// file restore while this is off is refused 403 `file_rollback_disabled`,
+    /// never silently degraded to a no-restore rewind.
+    rollback_file_changes: Arc<std::sync::atomic::AtomicBool>,
     /// Subagent runtime (R03-T06): child-run dispatch/reply/close through
     /// the same run supervisor.
     subagents: Arc<subagents::SubagentRuntime>,
@@ -1325,6 +1339,12 @@ impl ServiceState {
         // observation endpoint serves the SAME artifact (R06-A01); `None`
         // keeps the pre-R06 shape exactly.
         let runs = runs.with_context_compiler(deps.context_compiler.clone());
+        // R06-T03: the user-message recorder — when wired, every USER-origin
+        // run's input lands in the session message tree (the write path of
+        // fork/rewind); `None` keeps the pre-T03 shape exactly.
+        let runs = runs.with_user_message_recorder(Some(Arc::new(
+            session_tree::DbUserMessageRecorder::new(Arc::clone(&storage)),
+        )));
         let runs = Arc::new(runs);
         subagent_runtime.bind_supervisor(Arc::downgrade(&runs));
         // R05-T06: the worker model-callback port. An injected port always
@@ -1637,8 +1657,16 @@ impl ServiceState {
                 deps.ws_ticket_ttl_ms,
                 deps.ws_max_tickets,
             )),
-            storage,
+            storage: Arc::clone(&storage),
             sessions: session_arc,
+            session_tree: Arc::new(session_tree::SessionService::new(
+                Arc::clone(&storage),
+                Arc::clone(&events),
+            )),
+            session_admin: Arc::new(session_admin::SessionAdminService::new(Arc::clone(
+                &storage,
+            ))),
+            rollback_file_changes: Arc::new(std::sync::atomic::AtomicBool::new(false)),
             events: Arc::clone(&events),
             rate: Arc::new(limits::RateLimiter::new(deps.rate_window_ms, deps.rate_max)),
             ws_conns: Arc::new(limits::WsConnectionCounter::new(deps.ws_max_connections)),
@@ -1697,6 +1725,30 @@ impl ServiceState {
 
     pub fn sessions(&self) -> &sessions::SessionStore {
         &self.sessions
+    }
+
+    /// R06-T03: the session tree service (fork / retry / rewind / checkpoints).
+    pub fn session_tree(&self) -> &Arc<session_tree::SessionService> {
+        &self.session_tree
+    }
+
+    /// R06-T03: the session admin service (rename/pin/archive/restore/
+    /// delete/cleanup/search/memory).
+    pub fn session_admin(&self) -> &Arc<session_admin::SessionAdminService> {
+        &self.session_admin
+    }
+
+    /// R06-T03: whether workspace file rollback is enabled (incumbent
+    /// `getRollbackFileChanges`; default off).
+    pub fn rollback_file_changes_enabled(&self) -> bool {
+        self.rollback_file_changes
+            .load(std::sync::atomic::Ordering::Relaxed)
+    }
+
+    /// Test/evidence seam: toggle the rollback preference.
+    pub fn set_rollback_file_changes(&self, enabled: bool) {
+        self.rollback_file_changes
+            .store(enabled, std::sync::atomic::Ordering::Relaxed);
     }
 
     /// The injected event subscription service (R02-T05: snapshot/cursor
@@ -1888,6 +1940,14 @@ impl EndpointError {
     /// Sets the structured cause identifier (`details.causeId`).
     pub fn with_cause(mut self, cause_id: impl Into<String>) -> Self {
         self.cause_id = cause_id.into();
+        self
+    }
+
+    /// Attaches one extra structured detail value (R06-T03: childCount of the
+    /// archive 409, mirroring the incumbent `child_sessions_present` payload).
+    fn with_detail_value(mut self, key: &str, value: serde_json::Value) -> Self {
+        let details = self.error.details.get_or_insert_with(serde_json::Map::new);
+        details.insert(key.to_string(), value);
         self
     }
 
@@ -2939,6 +2999,1016 @@ async fn list_sessions(
     (StatusCode::OK, Json(Body { sessions })).into_response()
 }
 
+// ---------------------------------------------------------------- R06-T03
+// session tree: fork / retry / rewind / checkpoint / branch history.
+// 现役锚点：sessions.ts:1768 fork、:1558 retry、session-turn-actions.ts:189 rewind。
+// 错误映射：Busy→409 session_busy、ForkDepthLimit→409、ForkTargetInvalid→400、
+// CheckpointConflict→409、SessionExists→409 session_exists、
+// FileRollbackDisabled→403、NotFound→404、Forbidden→403、Storage→存储映射。
+// （REPAIR-R1：文件冲突不再整批 409——rewind 逐文件三档判定并如实入收据。）
+
+fn session_tree_error_response(err: session_tree::SessionTreeError) -> Response {
+    use session_tree::SessionTreeError as E;
+    match err {
+        E::Busy => EndpointError::session_busy().into_response(),
+        E::ForkDepthLimit => EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            "session fork depth limit reached",
+        )
+        .with_reason("session_fork_depth_limit")
+        .with_cause("session.fork_depth_limit")
+        .into_response(),
+        E::ForkTargetInvalid => EndpointError::invalid_message("fork target not on branch")
+            .with_reason("session_fork_target_invalid")
+            .into_response(),
+        E::InvalidTarget { detail } => {
+            EndpointError::invalid_message(format!("invalid retry/rewind target: {detail}"))
+                .with_reason("session_turn_target_invalid")
+                .into_response()
+        }
+        E::CheckpointConflict { name } => EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            format!("checkpoint {name} already exists"),
+        )
+        .with_reason("checkpoint_conflict")
+        .with_cause("session.checkpoint_conflict")
+        .into_response(),
+        E::SessionExists { session_id } => EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            format!("session {session_id} already exists"),
+        )
+        .with_reason("session_exists")
+        .with_cause("session.exists")
+        .into_response(),
+        E::FileRollbackDisabled => {
+            EndpointError::forbidden("file_rollback_disabled").into_response()
+        }
+        E::FileNotAuthorized { file_path } => EndpointError::forbidden(&format!(
+            "checkpoint file not under session authorized folders: {file_path}"
+        ))
+        .into_response(),
+        E::NotFound => EndpointError::not_found().into_response(),
+        E::Forbidden => EndpointError::forbidden("session_forbidden").into_response(),
+        E::Storage(err) => EndpointError::storage(&err).into_response(),
+    }
+}
+
+/// R06-T03 写操作的统一前置闸：归属（现役 can_access）+ 生命周期（现役
+/// assertManifestLifecycle "active"）。归档/已删会话拒绝树写操作；
+/// 读取面（branch/checkpoints 列表）不走此闸。
+/// 返回 Ok(()) 放行；Err(Response) 是已构造好的响亮失败响应。
+/// Err 直接携带 axum Response 供 handler 原样 return（19 处调用点），
+/// 拒绝路径非热路径，不做 Box 瘦身。
+#[allow(clippy::result_large_err)]
+async fn gate_session_tree_write(
+    state: &ServiceState,
+    principal: &Principal,
+    session_id: &str,
+) -> Result<(), Response> {
+    match state.sessions.get_for(principal, session_id).await {
+        Ok(sessions::SessionAccess::Ok(_)) => {}
+        Ok(sessions::SessionAccess::NotFound) => {
+            return Err(EndpointError::not_found().into_response());
+        }
+        Ok(sessions::SessionAccess::Forbidden) => {
+            return Err(EndpointError::forbidden("cross_principal_access").into_response());
+        }
+        Err(err) => return Err(EndpointError::storage(&err).into_response()),
+    }
+    let row =
+        match lingxi_adapters::storage::session_tree::get_session_row(state.storage(), session_id)
+            .await
+        {
+            Ok(Some(row)) => row,
+            Ok(None) => return Err(EndpointError::not_found().into_response()),
+            Err(err) => return Err(EndpointError::storage(&err).into_response()),
+        };
+    if row.lifecycle != "active" {
+        return Err(EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            format!(
+                "session lifecycle is {}, tree writes require active",
+                row.lifecycle
+            ),
+        )
+        .with_reason("session_not_active")
+        .with_cause("session.not_active")
+        .into_response());
+    }
+    Ok(())
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct ForkRequestBody {
+    new_session_id: String,
+    boundary_message_id: String,
+}
+
+/// `POST /lingxi/v1/sessions/{id}/fork` — 从指定消息分叉会话（R06-A05）。
+async fn fork_session_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+    body: Result<Json<ForkRequestBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    if let Err(resp) = gate_session_tree_write(&state, &principal, &session_id).await {
+        return resp;
+    }
+    let busy = state.sessions.session_supervisor().is_busy(&session_id);
+    match state
+        .session_tree
+        .fork_session(
+            &principal,
+            &session_id,
+            &req.new_session_id,
+            &req.boundary_message_id,
+            busy,
+            state.clock.now_unix_ms(),
+        )
+        .await
+    {
+        Ok(view) => (StatusCode::OK, Json(view)).into_response(),
+        Err(err) => session_tree_error_response(err),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct RetryRequestBody {
+    /// 目标消息（user=该回合；assistant=其前方最近 user 回合）。
+    /// 缺省 = 最近 user 回合（现役 latestUserOnly 兼容形态）。
+    /// 重置点只由服务端从当前分支解析——客户端传 new_head 的旧口径已废止。
+    #[serde(default)]
+    target_message_id: Option<String>,
+    /// 文件回退（现役 sessions.ts:1584-1607 契约）：缺省/none = 不回退；
+    /// workspace = 随 retry 内容级回滚工作区文件（需偏好开启，未开 403
+    /// file_rollback_disabled）；其他值响亮 400 invalid_file_rollback。
+    #[serde(default)]
+    file_rollback: Option<String>,
+}
+
+/// `POST /lingxi/v1/sessions/{id}/turns/retry` — 服务端解析重置点 →
+/// 分支头回移 + reset 标记；回合输入随响应返回，客户端经 execute 提交为
+/// 全新 run（D6 两段式；旧结果永不覆盖）。fileRollback=workspace 时在分支
+/// 重置前对工作区做内容级回滚（与 rewind 同一机制），报告随响应返回。
+async fn retry_turn_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+    body: Result<Json<RetryRequestBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    // 现役契约（sessions.ts:1584-1597）：fileRollback 只接受 none/workspace；
+    // 其他值 → 400 invalid_file_rollback，绝不静默降级成 none。
+    let file_rollback = match req.file_rollback.as_deref() {
+        None | Some("none") => session_tree::FileRollbackMode::None,
+        Some("workspace") => session_tree::FileRollbackMode::Workspace,
+        Some(_) => {
+            return EndpointError::invalid_message("invalid fileRollback")
+                .with_reason("invalid_file_rollback")
+                .into_response();
+        }
+    };
+    if let Err(resp) = gate_session_tree_write(&state, &principal, &session_id).await {
+        return resp;
+    }
+    let busy = state.sessions.session_supervisor().is_busy(&session_id);
+    let rollback_enabled = state.rollback_file_changes_enabled();
+    match state
+        .session_tree
+        .retry_turn(
+            &session_id,
+            req.target_message_id.as_deref(),
+            file_rollback,
+            rollback_enabled,
+            busy,
+            state.clock.now_unix_ms(),
+        )
+        .await
+    {
+        Ok(outcome) => (StatusCode::OK, Json(outcome)).into_response(),
+        Err(err) => session_tree_error_response(err),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct RewindRequestBody {
+    checkpoint: String,
+    #[serde(default)]
+    restore_files: bool,
+}
+
+/// `POST /lingxi/v1/sessions/{id}/rewind` — 回退到具名检查点（R06-A06）。
+/// 重置点由服务端从检查点目标消息解析；restoreFiles 时内容级回滚：
+/// 逐文件三档判定（restored/conflicted/skipped/failed），冲突文件保留
+/// 用户修改、分支照常回移、收据如实标注（REPAIR-R1 FINDING-05 裁决语义）。
+async fn rewind_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+    body: Result<Json<RewindRequestBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    if let Err(resp) = gate_session_tree_write(&state, &principal, &session_id).await {
+        return resp;
+    }
+    let busy = state.sessions.session_supervisor().is_busy(&session_id);
+    // 回退偏好闸（现役 getRollbackFileChanges）：restoreFiles 且偏好未开 → 403。
+    let rollback_enabled = state.rollback_file_changes_enabled();
+    match state
+        .session_tree
+        .rewind_to_checkpoint(
+            &session_id,
+            session_tree::RewindRequest {
+                checkpoint_name: &req.checkpoint,
+                restore_files: req.restore_files,
+                file_rollback_enabled: rollback_enabled,
+                busy,
+                now_unix_ms: state.clock.now_unix_ms(),
+            },
+        )
+        .await
+    {
+        Ok(receipt) => (StatusCode::OK, Json(receipt)).into_response(),
+        Err(err) => session_tree_error_response(err),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct RewindPreviewRequestBody {
+    checkpoint: String,
+    #[serde(default)]
+    restore_files: bool,
+}
+
+/// `POST /lingxi/v1/sessions/{id}/rewind/preview` — 只读预览：分支重置点 +
+/// 逐文件判定；不写状态、不发布事件（ROLLBACK-PREVIE 叶）。
+async fn rewind_preview_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+    body: Result<Json<RewindPreviewRequestBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    // 预览是读操作：归属闸，但不闸生命周期（归档会话也允许预览其检查点）。
+    match state.sessions.get_for(&principal, &session_id).await {
+        Ok(sessions::SessionAccess::Ok(_)) => {}
+        Ok(sessions::SessionAccess::NotFound) => {
+            return EndpointError::not_found().into_response();
+        }
+        Ok(sessions::SessionAccess::Forbidden) => {
+            return EndpointError::forbidden("cross_principal_access").into_response();
+        }
+        Err(err) => return EndpointError::storage(&err).into_response(),
+    }
+    let rollback_enabled = state.rollback_file_changes_enabled();
+    match state
+        .session_tree
+        .preview_rewind(
+            &session_id,
+            &req.checkpoint,
+            req.restore_files,
+            rollback_enabled,
+        )
+        .await
+    {
+        Ok(preview) => (StatusCode::OK, Json(preview)).into_response(),
+        Err(err) => session_tree_error_response(err),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct CreateCheckpointBody {
+    name: String,
+    target_message_id: String,
+    /// 需要记录版本的文件（rewind 冲突检测基线）；逐条须在会话授权目录下。
+    #[serde(default)]
+    file_paths: Vec<String>,
+}
+
+/// `POST /lingxi/v1/sessions/{id}/checkpoints` — 创建具名检查点
+/// （latest 覆盖/其余重名 409/上限 200；文件版本经授权目录闸）。
+async fn create_checkpoint_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+    body: Result<Json<CreateCheckpointBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    if req.name.trim().is_empty() {
+        return EndpointError::invalid_message("checkpoint name must be non-empty").into_response();
+    }
+    if let Err(resp) = gate_session_tree_write(&state, &principal, &session_id).await {
+        return resp;
+    }
+    match state
+        .session_tree
+        .create_checkpoint(
+            &session_id,
+            req.name.trim(),
+            &req.target_message_id,
+            &req.file_paths,
+            state.clock.now_unix_ms(),
+        )
+        .await
+    {
+        Ok(row) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "checkpointId": row.checkpoint_id,
+                "sessionId": row.session_id,
+                "name": row.name,
+                "targetMessageId": row.target_message_id,
+                "messageCount": row.message_count,
+                "createdAtUnixMs": row.created_at_unix_ms,
+            })),
+        )
+            .into_response(),
+        Err(err) => session_tree_error_response(err),
+    }
+}
+
+/// `GET /lingxi/v1/sessions/{id}/checkpoints` — 列出具名检查点。
+async fn list_checkpoints_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+) -> Response {
+    match state.sessions.get_for(&principal, &session_id).await {
+        Ok(sessions::SessionAccess::Ok(_)) => {}
+        Ok(sessions::SessionAccess::NotFound) => {
+            return EndpointError::not_found().into_response();
+        }
+        Ok(sessions::SessionAccess::Forbidden) => {
+            return EndpointError::forbidden("cross_principal_access").into_response();
+        }
+        Err(err) => return EndpointError::storage(&err).into_response(),
+    }
+    match state.session_tree.list_checkpoints(&session_id).await {
+        Ok(rows) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "checkpoints": rows.iter().map(|r| serde_json::json!({
+                    "checkpointId": r.checkpoint_id,
+                    "name": r.name,
+                    "targetMessageId": r.target_message_id,
+                    "messageCount": r.message_count,
+                    "createdAtUnixMs": r.created_at_unix_ms,
+                })).collect::<Vec<_>>(),
+            })),
+        )
+            .into_response(),
+        Err(err) => session_tree_error_response(err),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct DeleteCheckpointBody {
+    name: String,
+}
+
+/// `POST /lingxi/v1/sessions/{id}/checkpoints/delete` — 删除具名检查点
+/// （不存在 → 404；现役检查点删除走 tool 面，本路由是其 REST 面）。
+async fn delete_checkpoint_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+    body: Result<Json<DeleteCheckpointBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    if let Err(resp) = gate_session_tree_write(&state, &principal, &session_id).await {
+        return resp;
+    }
+    match state
+        .session_tree
+        .delete_checkpoint(&session_id, &req.name)
+        .await
+    {
+        Ok(true) => (StatusCode::OK, Json(serde_json::json!({ "ok": true }))).into_response(),
+        Ok(false) => EndpointError::not_found().into_response(),
+        Err(err) => session_tree_error_response(err),
+    }
+}
+
+// ------------------------------------------------------- R06-T03 会话管理面
+// 现役锚点（sessions.ts）：rename:2493 / cleanup:2517 / archived:2555 /
+// archive:2569 / restore:2813 / archived-delete:2882 / pin:1014 /
+// pin-order:1052 / search:857 / find:922 / memory GET:1103 PATCH:1135。
+// 归属闸：会话级操作经 get_for；列表级操作按主体 owner 过滤
+// （本地主人视野 = 全部，设备主体 = 本人）。
+
+fn session_admin_error_response(err: session_admin::SessionAdminError) -> Response {
+    use session_admin::SessionAdminError as E;
+    match err {
+        E::NotFound => EndpointError::not_found().into_response(),
+        E::WrongLifecycle { detail } => {
+            EndpointError::new(StatusCode::CONFLICT, ErrorCode::Conflict, detail)
+                .with_reason("session_lifecycle_conflict")
+                .into_response()
+        }
+        E::SessionExists { session_id } => EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            format!("session {session_id} already exists"),
+        )
+        .with_reason("session_exists")
+        .with_cause("session.exists")
+        .into_response(),
+        E::ChildrenPresent { child_count } => EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            "child sessions present",
+        )
+        .with_reason("child_sessions_present")
+        .with_detail_value("childCount", serde_json::json!(child_count))
+        .into_response(),
+        E::InvalidRequest { detail } => EndpointError::invalid_message(detail).into_response(),
+        E::Busy => EndpointError::session_busy().into_response(),
+        E::Storage(err) => EndpointError::storage(&err).into_response(),
+    }
+}
+
+/// 列表级操作的主体过滤：本地主人 = None（全部）；设备主体 = 本人 user id。
+fn owner_filter(principal: &Principal) -> Option<&str> {
+    if principal.is_local_owner() {
+        None
+    } else {
+        principal.user_id.as_deref()
+    }
+}
+
+/// 会话级管理操作的归属闸（不做生命周期闸——各操作生命周期语义不同：
+/// archive 要 active、restore/delete 要 archived，由服务层结局区分）。
+/// Err(Response) 同 gate_session_tree_write：handler 原样 return。
+#[allow(clippy::result_large_err)]
+async fn gate_session_owned(
+    state: &ServiceState,
+    principal: &Principal,
+    session_id: &str,
+) -> Result<(), Response> {
+    match state.sessions.get_for(principal, session_id).await {
+        Ok(sessions::SessionAccess::Ok(_)) => Ok(()),
+        Ok(sessions::SessionAccess::NotFound) => Err(EndpointError::not_found().into_response()),
+        Ok(sessions::SessionAccess::Forbidden) => {
+            Err(EndpointError::forbidden("cross_principal_access").into_response())
+        }
+        Err(err) => Err(EndpointError::storage(&err).into_response()),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct CreateSessionBody {
+    session_id: String,
+    agent_id: String,
+    title: String,
+    #[serde(default)]
+    permission_mode: Option<String>,
+    #[serde(default)]
+    authorized_folders: Vec<String>,
+    #[serde(default = "default_true")]
+    memory_enabled: bool,
+}
+
+fn default_true() -> bool {
+    true
+}
+
+/// `POST /lingxi/v1/sessions` — 创建顶层会话（谱系深度 0；授权目录须为
+/// 现存目录，否则响亮 400；fork 不走这里）。
+async fn create_session_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    body: Result<Json<CreateSessionBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    if req.session_id.trim().is_empty() || req.title.trim().is_empty() {
+        return EndpointError::invalid_message("sessionId and title must be non-empty")
+            .into_response();
+    }
+    let owner = principal
+        .user_id
+        .clone()
+        .unwrap_or_else(|| crate::auth::LOCAL_OWNER_USER_ID.to_string());
+    match state
+        .session_admin
+        .create_session(
+            req.session_id.trim(),
+            req.agent_id.trim(),
+            &owner,
+            req.title.trim(),
+            req.permission_mode.as_deref(),
+            &req.authorized_folders,
+            req.memory_enabled,
+            state.clock.now_unix_ms(),
+        )
+        .await
+    {
+        Ok(()) => (
+            StatusCode::CREATED,
+            Json(serde_json::json!({
+                "sessionId": req.session_id.trim(),
+                "ownerUserId": owner,
+            })),
+        )
+            .into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct RenameSessionBody {
+    session_id: String,
+    title: String,
+}
+
+/// `POST /lingxi/v1/sessions/rename` — 改名（现役 sessions.ts:2493）。
+async fn rename_session_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    body: Result<Json<RenameSessionBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    if let Err(resp) = gate_session_owned(&state, &principal, &req.session_id).await {
+        return resp;
+    }
+    match state
+        .session_admin
+        .rename_session(&req.session_id, &req.title)
+        .await
+    {
+        Ok(()) => (StatusCode::OK, Json(serde_json::json!({ "ok": true }))).into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct PinSessionBody {
+    session_id: String,
+    pinned: bool,
+}
+
+/// `POST /lingxi/v1/sessions/pin` — 置顶/取消置顶（现役 :1014）。
+async fn pin_session_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    body: Result<Json<PinSessionBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    if let Err(resp) = gate_session_owned(&state, &principal, &req.session_id).await {
+        return resp;
+    }
+    match state
+        .session_admin
+        .set_pinned(&req.session_id, req.pinned, state.clock.now_unix_ms())
+        .await
+    {
+        Ok(view) => (StatusCode::OK, Json(view)).into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct PinOrderBody {
+    session_ids: Vec<String>,
+}
+
+/// `POST /lingxi/v1/sessions/pin-order` — 置顶区整体重编号
+/// （现役 :1052；重复 id 响亮 400；每个 id 独立归属校验——一次请求跨多个
+/// 会话，授权不只看第一个）。
+async fn pin_order_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    body: Result<Json<PinOrderBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    if req.session_ids.is_empty() {
+        return EndpointError::invalid_message("sessionIds must be non-empty").into_response();
+    }
+    for id in &req.session_ids {
+        if let Err(resp) = gate_session_owned(&state, &principal, id).await {
+            return resp;
+        }
+    }
+    match state
+        .session_admin
+        .set_pin_order(&req.session_ids, state.clock.now_unix_ms())
+        .await
+    {
+        Ok(()) => (StatusCode::OK, Json(serde_json::json!({ "ok": true }))).into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct ArchiveSessionBody {
+    session_id: String,
+    /// 子对话处置：archive_children / detach_children；缺省且有子对话 → 409。
+    #[serde(default)]
+    child_mode: Option<String>,
+}
+
+/// `POST /lingxi/v1/sessions/archive` — 归档（现役 :2569；子对话策略
+/// 与流式跳过语义同现役）。
+async fn archive_session_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    body: Result<Json<ArchiveSessionBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    if let Err(resp) = gate_session_owned(&state, &principal, &req.session_id).await {
+        return resp;
+    }
+    let child_mode = match req.child_mode.as_deref() {
+        None => None,
+        Some("archive_children") => {
+            Some(lingxi_adapters::storage::session_admin::ChildMode::ArchiveChildren)
+        }
+        Some("detach_children") => {
+            Some(lingxi_adapters::storage::session_admin::ChildMode::DetachChildren)
+        }
+        Some(other) => {
+            return EndpointError::invalid_message(format!(
+                "unknown childMode {other} (archive_children|detach_children)"
+            ))
+            .into_response();
+        }
+    };
+    let supervisor = state.sessions.session_supervisor();
+    let target_busy = supervisor.is_busy(&req.session_id);
+    let is_busy = |id: &str| supervisor.is_busy(id);
+    match state
+        .session_admin
+        .archive_session(
+            &req.session_id,
+            child_mode,
+            target_busy,
+            &is_busy,
+            state.clock.now_unix_ms(),
+        )
+        .await
+    {
+        Ok(view) => (StatusCode::OK, Json(view)).into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct SessionIdBody {
+    session_id: String,
+}
+
+/// `POST /lingxi/v1/sessions/restore` — 恢复归档会话（现役 :2813；仅归档态）。
+async fn restore_session_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    body: Result<Json<SessionIdBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    if let Err(resp) = gate_session_owned(&state, &principal, &req.session_id).await {
+        return resp;
+    }
+    match state
+        .session_admin
+        .restore_session(&req.session_id, state.clock.now_unix_ms())
+        .await
+    {
+        Ok(()) => (StatusCode::OK, Json(serde_json::json!({ "ok": true }))).into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+/// `POST /lingxi/v1/sessions/archived/delete` — 永久删除已归档会话
+/// （现役 :2882；仅归档态；FK 依赖序清全部派生数据）。
+async fn delete_archived_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    body: Result<Json<SessionIdBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    if let Err(resp) = gate_session_owned(&state, &principal, &req.session_id).await {
+        return resp;
+    }
+    let busy = state.sessions.session_supervisor().is_busy(&req.session_id);
+    match state
+        .session_admin
+        .delete_archived_session(&req.session_id, busy)
+        .await
+    {
+        Ok(()) => (StatusCode::OK, Json(serde_json::json!({ "ok": true }))).into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct CleanupBody {
+    #[serde(default = "default_max_age_days")]
+    max_age_days: u64,
+}
+
+/// 现役 cleanup 默认窗口（sessions.ts:2519 `maxAgeDays = 90`）。
+fn default_max_age_days() -> u64 {
+    90
+}
+
+/// `POST /lingxi/v1/sessions/cleanup` — 清理过期归档（现役 :2517）。
+async fn cleanup_archived_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    body: Result<Json<CleanupBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    let supervisor = state.sessions.session_supervisor();
+    let is_busy = |id: &str| supervisor.is_busy(id);
+    match state
+        .session_admin
+        .cleanup_archived(
+            owner_filter(&principal),
+            req.max_age_days,
+            state.clock.now_unix_ms(),
+            &is_busy,
+        )
+        .await
+    {
+        Ok(view) => (StatusCode::OK, Json(view)).into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+/// `GET /lingxi/v1/sessions/archived` — 列出已归档会话（现役 :2555）。
+async fn list_archived_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+) -> Response {
+    match state
+        .session_admin
+        .list_archived(owner_filter(&principal))
+        .await
+    {
+        Ok(rows) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "sessions": rows.iter().map(|r| serde_json::json!({
+                    "sessionId": r.session_id,
+                    "agentId": r.agent_id,
+                    "title": r.title,
+                    "lifecycle": r.lifecycle,
+                    "createdAtUnixMs": r.created_at_unix_ms,
+                    "archivedAtUnixMs": r.archived_at_unix_ms,
+                })).collect::<Vec<_>>(),
+            })),
+        )
+            .into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+/// `GET /lingxi/v1/sessions/search?q=&phase=&limit=` — 会话搜索
+/// （现役 :857；query 上限 512；phase=title|content）。
+async fn search_sessions_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    axum::extract::RawQuery(query): axum::extract::RawQuery,
+) -> Response {
+    let pairs = ws::parse_query_pairs(query.as_deref().unwrap_or(""));
+    let mut q = String::new();
+    let mut phase = String::from("title");
+    let mut limit = 50usize;
+    for (key, value) in pairs {
+        match key.as_str() {
+            "q" => q = value,
+            "phase" => phase = value,
+            "limit" => match value.parse::<usize>() {
+                Ok(n) => limit = n,
+                Err(_) => {
+                    return EndpointError::invalid_message("limit must be a number")
+                        .into_response();
+                }
+            },
+            _ => {
+                return EndpointError::invalid_message(format!("unknown query key {key}"))
+                    .into_response();
+            }
+        }
+    }
+    match state
+        .session_admin
+        .search(owner_filter(&principal), &q, &phase, limit)
+        .await
+    {
+        Ok(hits) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "query": q,
+                "phase": phase,
+                "results": hits.iter().map(|h| serde_json::json!({
+                    "sessionId": h.session_id,
+                    "title": h.title,
+                    "snippet": h.snippet,
+                    "matchKind": h.match_kind,
+                    "createdAtUnixMs": h.created_at_unix_ms,
+                    "lastActivityUnixMs": h.last_activity_unix_ms,
+                })).collect::<Vec<_>>(),
+            })),
+        )
+            .into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+/// `GET /lingxi/v1/sessions/find?sessionId=` — 按 id 定位会话
+/// （现役 :922 manifest 定位；本实现返回会话行全列投影）。
+async fn find_session_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    axum::extract::RawQuery(query): axum::extract::RawQuery,
+) -> Response {
+    let pairs = ws::parse_query_pairs(query.as_deref().unwrap_or(""));
+    let mut session_id: Option<String> = None;
+    for (key, value) in pairs {
+        match key.as_str() {
+            "sessionId" => session_id = Some(value),
+            _ => {
+                return EndpointError::invalid_message(format!("unknown query key {key}"))
+                    .into_response();
+            }
+        }
+    }
+    let Some(session_id) = session_id else {
+        return EndpointError::invalid_message("missing query key sessionId").into_response();
+    };
+    if let Err(resp) = gate_session_owned(&state, &principal, &session_id).await {
+        return resp;
+    }
+    match state.session_admin.get_session_row(&session_id).await {
+        Ok(Some(row)) => (StatusCode::OK, Json(session_row_json(&row))).into_response(),
+        Ok(None) => EndpointError::not_found().into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+/// 会话行全列投影的 JSON 形状（find/get 扩展共用）。
+fn session_row_json(
+    row: &lingxi_adapters::storage::session_tree::SessionTreeRow,
+) -> serde_json::Value {
+    serde_json::json!({
+        "sessionId": row.session_id,
+        "agentId": row.agent_id,
+        "ownerUserId": row.owner_user_id,
+        "title": row.title,
+        "createdAtUnixMs": row.created_at_unix_ms,
+        "parentSessionId": row.parent_session_id,
+        "forkPointMessageId": row.fork_point_message_id,
+        "lineageDepth": row.lineage_depth,
+        "lifecycle": row.lifecycle,
+        "pinnedAtUnixMs": row.pinned_at_unix_ms,
+        "pinOrder": row.pin_order,
+        "memoryEnabled": row.memory_enabled,
+        "authorizedFolders": row.authorized_folders,
+        "permissionMode": row.permission_mode,
+        "archivedAtUnixMs": row.archived_at_unix_ms,
+        "lastActivityUnixMs": row.last_activity_unix_ms,
+    })
+}
+
+/// `GET /lingxi/v1/sessions/{id}/memory` — 记忆开关读取（现役 :1103）。
+async fn get_memory_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+) -> Response {
+    if let Err(resp) = gate_session_owned(&state, &principal, &session_id).await {
+        return resp;
+    }
+    match state.session_admin.get_memory_enabled(&session_id).await {
+        Ok(enabled) => (
+            StatusCode::OK,
+            Json(serde_json::json!({ "ok": true, "memoryEnabled": enabled })),
+        )
+            .into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct MemoryPatchBody {
+    memory_enabled: bool,
+}
+
+/// `PATCH /lingxi/v1/sessions/{id}/memory` — 记忆开关写入（现役 :1135）。
+async fn patch_memory_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+    body: Result<Json<MemoryPatchBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    if let Err(resp) = gate_session_owned(&state, &principal, &session_id).await {
+        return resp;
+    }
+    match state
+        .session_admin
+        .set_memory_enabled(&session_id, req.memory_enabled)
+        .await
+    {
+        Ok(enabled) => (
+            StatusCode::OK,
+            Json(serde_json::json!({ "ok": true, "memoryEnabled": enabled })),
+        )
+            .into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+/// `GET /lingxi/v1/sessions/{id}/branch` — 当前分支历史投影（含 reset 标记）。
+async fn branch_history_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+) -> Response {
+    // 归属闸（现役 can_access）：跨主体 → 403，不存在 → 404。
+    match state.sessions.get_for(&principal, &session_id).await {
+        Ok(sessions::SessionAccess::Ok(_)) => {}
+        Ok(sessions::SessionAccess::NotFound) => {
+            return EndpointError::not_found().into_response();
+        }
+        Ok(sessions::SessionAccess::Forbidden) => {
+            return EndpointError::forbidden("cross_principal_access").into_response();
+        }
+        Err(err) => return EndpointError::storage(&err).into_response(),
+    }
+    match state.session_tree.branch_history(&session_id).await {
+        Ok(msgs) => (
+            StatusCode::OK,
+            Json(serde_json::json!({ "messages": msgs })),
+        )
+            .into_response(),
+        Err(err) => session_tree_error_response(err),
+    }
+}
+
 async fn get_session(
     axum::Extension(principal): axum::Extension<Principal>,
     State(state): State<ServiceState>,
@@ -3186,6 +4256,28 @@ async fn execute_session(
         input: &request.input,
         request_id: validated_request_id.as_deref(),
     };
+    // R06-T03 生命周期闸（现役 assertManifestLifecycle "active"）：归档会话
+    // 拒绝执行。归档语义 = 不再接受新轮次；不闸归属（归属在 admit 链上
+    // 已有 404/403 区分），此处只查 lifecycle，存在性由 admit 链负责。
+    match lingxi_adapters::storage::session_tree::get_session_row(state.storage(), &session_id)
+        .await
+    {
+        Ok(Some(row)) if row.lifecycle != "active" => {
+            return EndpointError::new(
+                StatusCode::CONFLICT,
+                ErrorCode::Conflict,
+                format!(
+                    "session lifecycle is {}, execute requires active",
+                    row.lifecycle
+                ),
+            )
+            .with_reason("session_not_active")
+            .with_cause("session.not_active")
+            .into_response();
+        }
+        Ok(_) => {}
+        Err(err) => return EndpointError::storage(&err).into_response(),
+    }
     match state
         .sessions
         .execute_submission_for(
@@ -4051,7 +5143,24 @@ pub fn build_router(state: ServiceState) -> Router {
     Router::new()
         .route("/lingxi/v1/health", get(health))
         .route("/lingxi/v1/me", get(me))
-        .route("/lingxi/v1/sessions", get(list_sessions))
+        .route(
+            "/lingxi/v1/sessions",
+            get(list_sessions).post(create_session_route),
+        )
+        // R06-T03 管理面静态路由（axum 静态段优先于 {session_id} 参数段）。
+        .route("/lingxi/v1/sessions/rename", post(rename_session_route))
+        .route("/lingxi/v1/sessions/pin", post(pin_session_route))
+        .route("/lingxi/v1/sessions/pin-order", post(pin_order_route))
+        .route("/lingxi/v1/sessions/archive", post(archive_session_route))
+        .route("/lingxi/v1/sessions/restore", post(restore_session_route))
+        .route("/lingxi/v1/sessions/archived", get(list_archived_route))
+        .route(
+            "/lingxi/v1/sessions/archived/delete",
+            post(delete_archived_route),
+        )
+        .route("/lingxi/v1/sessions/cleanup", post(cleanup_archived_route))
+        .route("/lingxi/v1/sessions/search", get(search_sessions_route))
+        .route("/lingxi/v1/sessions/find", get(find_session_route))
         .route("/lingxi/v1/sessions/{session_id}", get(get_session))
         .route(
             "/lingxi/v1/sessions/{session_id}/execute",
@@ -4064,6 +5173,38 @@ pub fn build_router(state: ServiceState) -> Router {
         .route(
             "/lingxi/v1/sessions/{session_id}/context-observation",
             get(session_context_observation),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/fork",
+            post(fork_session_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/turns/retry",
+            post(retry_turn_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/rewind",
+            post(rewind_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/rewind/preview",
+            post(rewind_preview_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/checkpoints",
+            get(list_checkpoints_route).post(create_checkpoint_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/checkpoints/delete",
+            post(delete_checkpoint_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/memory",
+            get(get_memory_route).patch(patch_memory_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/branch",
+            get(branch_history_route),
         )
         .route("/lingxi/v1/ws-ticket", post(ws_ticket))
         .route(

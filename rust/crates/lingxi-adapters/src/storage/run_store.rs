@@ -19,6 +19,8 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use rusqlite::OptionalExtension;
+
 use lingxi_kernel::ports::{
     CommittedOutcome, InvocationJournalEntry, InvocationPhase, InvocationReceipt, KeyEvent,
     LateResultReason, ReceiptOutcome, RunOutcome, RunRecord, StaleResultFact, StorageError,
@@ -231,6 +233,13 @@ impl RunDatabase {
         self.queue.options()
     }
 
+    /// R06-T03: crate-internal access to the bounded single-writer queue so
+    /// sibling storage modules (session_tree) submit work through the SAME
+    /// serialization point as every other mutation — never a second writer.
+    pub(crate) fn queue(&self) -> &Arc<DbQueue> {
+        &self.queue
+    }
+
     /// Evidence helper for the R02-A11 harness: canonical logical dump of
     /// the fact rows (sorted, read through the single-writer queue).
     /// Compares the LOGICAL content of source vs restored databases —
@@ -395,6 +404,8 @@ impl RunDatabase {
     }
 
     /// 最近会话排前；服务层继续按身份过滤，CLI 读取前 20 项。
+    /// REPAIR-R1 FINDING-03：主列表只含 active（归档语义 = 从日常工作面
+    /// 消失，对照现役归档文件移出活跃目录；归档会话走 list_archived_sessions）。
     pub async fn list_sessions(&self) -> Result<Vec<SessionRow>, StorageError> {
         self.queue
             .submit(move |conn| {
@@ -402,6 +413,7 @@ impl RunDatabase {
                     .prepare(
                         "SELECT session_id, agent_id, owner_user_id, title, \
                          created_at_unix_ms FROM sessions \
+                         WHERE lifecycle = 'active' \
                          ORDER BY created_at_unix_ms DESC, session_id DESC",
                     )
                     .map_err(migrations::map_rusqlite)?;
@@ -1202,7 +1214,7 @@ fn check_journal_owner(
 }
 
 /// BEGIN IMMEDIATE + f + COMMIT/ROLLBACK with busy-error decoration.
-fn with_write_txn<T>(
+pub(crate) fn with_write_txn<T>(
     conn: &rusqlite::Connection,
     busy_timeout_ms: u64,
     f: impl FnOnce(&rusqlite::Connection) -> Result<T, StorageError>,
@@ -1543,21 +1555,71 @@ impl StoragePort for RunDatabase {
                             )
                             .map_err(migrations::map_rusqlite)?;
                         let content_json = canon::canonical_string(message);
+                        // R06-T03: the final message is a node of the session
+                        // message TREE — its parent is the current branch head
+                        // (session_branch_heads; fallback: the session's
+                        // max-seq message for pre-v8 rows that predate branch
+                        // heads) and it ADVANCES the branch head, so the
+                        // branch projection / fork copies see the assistant
+                        // reply, not just the user input. Without this the
+                        // chain would break at every final message (parent
+                        // NULL) and fork would copy user-only histories.
+                        let final_message_id = format!("{run_id}-final");
+                        let recorded_head: Option<String> = conn
+                            .query_row(
+                                "SELECT head_message_id FROM session_branch_heads \
+                                 WHERE session_id = ?1",
+                                [&session_id],
+                                |row| row.get::<_, Option<String>>(0),
+                            )
+                            .optional()
+                            .map_err(migrations::map_rusqlite)?
+                            .flatten();
+                        let parent_message_id: Option<String> = match recorded_head {
+                            Some(head) => Some(head),
+                            None => conn
+                                .query_row(
+                                    "SELECT message_id FROM messages WHERE session_id = ?1 \
+                                     ORDER BY seq DESC LIMIT 1",
+                                    [&session_id],
+                                    |row| row.get(0),
+                                )
+                                .optional()
+                                .map_err(migrations::map_rusqlite)?,
+                        };
                         conn.execute(
                             "INSERT INTO messages \
                              (message_id, session_id, run_id, role, content_json, \
-                              model_call_id, committed_at_unix_ms, seq) \
-                             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+                              model_call_id, committed_at_unix_ms, seq, parent_message_id) \
+                             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
                             rusqlite::params![
-                                format!("{run_id}-final"),
+                                final_message_id,
                                 session_id,
                                 run_id,
                                 message.role,
                                 content_json,
                                 message.model_call_id.as_ref().map(|id| id.to_string()),
                                 now_unix_ms as i64,
-                                message_seq
+                                message_seq,
+                                parent_message_id,
                             ],
+                        )
+                        .map_err(migrations::map_rusqlite)?;
+                        // R06-T03: the branch head advances to the final
+                        // message in the SAME transaction (the head never
+                        // points at a superseded position after a terminal
+                        // commit).
+                        conn.execute(
+                            "INSERT INTO session_branch_heads \
+                             (session_id, head_message_id, observed_tail_message_id, revision, \
+                              head_resolution, updated_at_unix_ms) \
+                             VALUES (?1, ?2, ?2, 0, 'persisted_head', ?3) \
+                             ON CONFLICT(session_id) DO UPDATE SET \
+                               head_message_id = excluded.head_message_id, \
+                               revision = session_branch_heads.revision + 1, \
+                               head_resolution = 'persisted_head', \
+                               updated_at_unix_ms = excluded.updated_at_unix_ms",
+                            rusqlite::params![session_id, final_message_id, now_unix_ms as i64],
                         )
                         .map_err(migrations::map_rusqlite)?;
                         let event = KeyEvent {

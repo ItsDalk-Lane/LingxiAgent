@@ -1,0 +1,18 @@
+# R06-T03 候选摘要（digest）
+
+date: 2026-10-09T05:5xZ
+script: scripts/rust-tauri/r06_candidate_digest.sh（口径固化脚本，本文件被其规则 (a)/(b) 排除在口径外）
+base: 4920c59e38ddf69c8b846fb1aea896fca70d939d
+
+CANDIDATE_DIGEST = c65faae948709fa21938e5abb6b073f32c2d4fe831f18cf262bd47dcbabf9f60
+
+计算时点：全部交付文件写完之后（报告 docs/rust-tauri/R06/R06-T03_REPORT.md 在口径内、
+正文不含本值）。复现性：连续两次运行脚本输出一致（两次 exit 均为 0）。
+
+── REPAIR-R1 重算（2026-10-09，修复定稿后）──
+
+CANDIDATE_DIGEST = 19f82d330edd4b3b51539742e43dcd7fd74b676af4074135fed9b67a3e9ac8e3
+
+口径：同一脚本 scripts/rust-tauri/r06_candidate_digest.sh（连续两次运行输出一致，exit 均 0）。
+相对初版值 c65faae9…9f60 的变化来源：REPAIR-R1 全部生产/测试/文档改动
+（修复矩阵 09_repair_r1_fix_matrix.md 逐项可查；本载体与 artifacts/ 证据目录按口径规则排除）。

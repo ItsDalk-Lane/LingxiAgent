@@ -37,9 +37,20 @@
 //! | GET  /lingxi/v1/me                         | authenticated       |
 //! | POST /lingxi/v1/ws-ticket                  | scope `chat`        |
 //! | GET  /lingxi/v1/sessions                   | scope `chat`        |
+//! | POST /lingxi/v1/sessions                   | scope `chat` (R06-T03 create) |
 //! | GET  /lingxi/v1/sessions/{id}              | scope `chat` + owner check in handler |
 //! | GET  /lingxi/v1/sessions/{id}/context-observation | scope `chat` + owner check in handler |
 //! | POST /lingxi/v1/sessions/{id}/execute      | scope `chat` + owner check in handler |
+//! | POST /lingxi/v1/sessions/{id}/fork         | scope `chat` + owner check (R06-T03) |
+//! | POST /lingxi/v1/sessions/{id}/turns/retry  | scope `chat` + owner check (R06-T03) |
+//! | POST /lingxi/v1/sessions/{id}/rewind[ /preview] | scope `chat` + owner check (R06-T03) |
+//! | GET  /lingxi/v1/sessions/{id}/branch       | scope `chat` + owner check (R06-T03) |
+//! | GET|POST /lingxi/v1/sessions/{id}/checkpoints[ /delete] | scope `chat` + owner check (R06-T03) |
+//! | GET|PATCH /lingxi/v1/sessions/{id}/memory  | scope `chat` + owner check (R06-T03) |
+//! | POST /lingxi/v1/sessions/{rename,pin,pin-order,archive,restore,cleanup} | scope `chat` (R06-T03) |
+//! | GET  /lingxi/v1/sessions/archived          | scope `chat` (R06-T03) |
+//! | POST /lingxi/v1/sessions/archived/delete   | scope `chat` (R06-T03) |
+//! | GET  /lingxi/v1/sessions/{search,find}     | scope `chat` (R06-T03) |
 //! | POST /lingxi/v1/devices/credentials        | local_only          |
 //! | GET  /lingxi/v1/ws                         | scope `chat` (WS upgrade) |
 //! | anything else under (or outside) /lingxi/  | local_only (fail-closed default) |
@@ -550,10 +561,23 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
             RoutePolicy::LocalOnly
         };
     }
-    if p == "/lingxi/v1/sessions" && (m == "GET" || m == "HEAD") {
+    if p == "/lingxi/v1/sessions" && (m == "GET" || m == "HEAD" || m == "POST") {
         return RoutePolicy::Scope("chat");
     }
     if let Some(rest) = p.strip_prefix("/lingxi/v1/sessions/") {
+        // R06-T03 管理面静态名（先静态后参数，与 axum 静态优先同口径；
+        // 误把静态名当会话 id 也只会落到同一 scope，区别只在归属校验）。
+        if m == "POST"
+            && matches!(
+                rest,
+                "rename" | "pin" | "pin-order" | "archive" | "restore" | "cleanup"
+            )
+        {
+            return RoutePolicy::Scope("chat");
+        }
+        if rest == "archived/delete" && m == "POST" {
+            return RoutePolicy::Scope("chat");
+        }
         if !rest.is_empty() && !rest.contains('/') && (m == "GET" || m == "HEAD") {
             return RoutePolicy::Scope("chat");
         }
@@ -573,6 +597,50 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         // R06-T01: the context-observation read face — same scope and the
         // same per-request owner re-check as the session read it observes.
         if let Some(id) = rest.strip_suffix("/context-observation") {
+            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        // R06-T03: the session tree faces — fork / retry / rewind (write,
+        // sessions.write-shaped; fail-closed scope `chat` + owner re-check)
+        // and the branch-history read (read, same as the session read).
+        if let Some(id) = rest.strip_suffix("/fork") {
+            if !id.is_empty() && !id.contains('/') && m == "POST" {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        if let Some(id) = rest.strip_suffix("/turns/retry") {
+            if !id.is_empty() && !id.contains('/') && m == "POST" {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        if let Some(id) = rest.strip_suffix("/rewind/preview") {
+            if !id.is_empty() && !id.contains('/') && m == "POST" {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        if let Some(id) = rest.strip_suffix("/rewind") {
+            if !id.is_empty() && !id.contains('/') && m == "POST" {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        // R06-T03: 具名检查点（创建/列举/删除）与记忆开关（读/写）。
+        if let Some(id) = rest.strip_suffix("/checkpoints/delete") {
+            if !id.is_empty() && !id.contains('/') && m == "POST" {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        if let Some(id) = rest.strip_suffix("/checkpoints") {
+            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD" || m == "POST") {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        if let Some(id) = rest.strip_suffix("/memory") {
+            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD" || m == "PATCH") {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        if let Some(id) = rest.strip_suffix("/branch") {
             if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
                 return RoutePolicy::Scope("chat");
             }

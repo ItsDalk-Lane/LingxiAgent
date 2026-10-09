@@ -1,0 +1,19 @@
+# R06-T03 GREEN 证据 03：cargo fmt
+date: 2026-10-09T05:23:59Z
+cargo: /Users/study_superior/.cargo/bin/cargo — cargo 1.98.1 (797e8a9bc 2026-08-05)
+rustc: rustc 1.98.1 (48a229cea 2026-09-01)
+
+## 阶段 1：初次检查（T03 新文件尚未格式化，如实记录）
+$ cargo fmt --all -- --check
+退出码：非 0（rustfmt diff 输出，全部落在 T03 触碰的 8 个文件：
+  crates/lingxi-adapters/src/storage/session_admin.rs
+  crates/lingxi-adapters/src/storage/session_tree.rs
+  crates/lingxi-adapters/tests/session_tree_r06t03.rs
+  crates/lingxi-kernel/src/session_tree.rs
+  crates/lingxi-service/src/{auth,lib,session_admin,session_tree}.rs
+  crates/lingxi-service/tests/r06_t03_session_tree.rs）
+处置：cargo fmt --all（只格式化，无逻辑改动），随后复检。
+
+## 阶段 2：格式化后复检
+$ cargo fmt --all -- --check
+FMT_RECHECK_EXIT=0  (0 = 全 workspace 无 diff)

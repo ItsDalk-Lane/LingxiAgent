@@ -1,0 +1,7 @@
+MIGRATED_VERSION=8
+MESSAGE_ROWS=2
+ROW=m_old_1|sess_old|run_old|user|{"text":"hello"}|NULL|111|1|NULL|NULL|message
+ROW=m_old_2|sess_old|run_old|assistant|{"text":"world"}|mc-9|222|2|NULL|NULL|message
+LIFECYCLE_DEFAULT=active FOLDERS_DEFAULT=[]
+REBUILT_INDEXES=2
+PROBE2_OK

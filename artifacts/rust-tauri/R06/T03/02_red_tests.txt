@@ -1,0 +1,9 @@
+=== command: cargo test --locked -p lingxi-adapters --test session_tree_r06t03 (RED)
+=== cwd: /Users/study_superior/Desktop/Code/LingxiAgent/rust
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+error[E0433]: cannot find `session_tree` in `storage`
+  --> crates/lingxi-adapters/tests/session_tree_r06t03.rs:48:31
+   |
+48 |     lingxi_adapters::storage::session_tree::seed_session(
+   |                               ^^^^^^^^^^^^ could not find `session_tree` in `storage`
+=== exit_code: 101（REPAIR-R1 FINDING-09 回填，2026-10-09 UTC：原采集漏记退出码；上方载荷为 E0433 编译失败，cargo 编译失败确定性退出 101——属有据推断而非当次实测，特此标注，不冒充原始记录）

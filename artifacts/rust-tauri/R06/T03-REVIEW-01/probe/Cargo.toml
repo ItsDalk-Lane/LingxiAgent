@@ -1,0 +1,11 @@
+[package]
+name = "r06t03-review-probe"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+lingxi-adapters = { path = "../../../../../rust/crates/lingxi-adapters" }
+lingxi-kernel = { path = "../../../../../rust/crates/lingxi-kernel" }
+tokio = { version = "1", features = ["full"] }
+
+[workspace]

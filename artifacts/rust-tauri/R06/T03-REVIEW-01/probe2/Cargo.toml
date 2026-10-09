@@ -1,0 +1,11 @@
+[package]
+name = "r06t03-review-probe2"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+lingxi-adapters = { path = "../../../../../rust/crates/lingxi-adapters" }
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+tokio = { version = "1", features = ["full"] }
+
+[workspace]

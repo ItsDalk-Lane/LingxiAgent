@@ -16,6 +16,8 @@ pub mod backup;
 pub mod migrations;
 pub mod queue;
 pub mod run_store;
+pub mod session_admin;
+pub mod session_tree;
 #[cfg(windows)]
 pub mod windows_acl;
 

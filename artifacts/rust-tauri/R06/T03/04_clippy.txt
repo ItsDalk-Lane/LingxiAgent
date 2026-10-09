@@ -1,0 +1,18 @@
+# R06-T03 GREEN 证据 04：cargo clippy
+date: 2026-10-09T05:24:21Z
+cargo: /Users/study_superior/.cargo/bin/cargo — cargo 1.98.1 (797e8a9bc 2026-08-05)
+rustc: rustc 1.98.1 (48a229cea 2026-09-01)
+
+## 阶段 1：初次运行（如实记录失败）
+$ cargo clippy --locked --workspace --all-targets -- -D warnings
+结果：2 个 clippy::result_large_err 错误（exit 101）：
+  crates/lingxi-service/src/lib.rs:3069 gate_session_tree_write -> Result<(), Response>
+  crates/lingxi-service/src/lib.rs:3443 gate_session_owned -> Result<(), Response>
+处置：两函数 Err 直接携带已构造的 axum Response 供 19 处 handler 原样
+  return；Box 化需同步改全部调用点，拒绝路径非热路径。按最小修改准则加
+  #[allow(clippy::result_large_err)] 并注明理由。无逻辑改动。
+
+## 阶段 2：复检（完整输出尾部 + 真实退出码）
+$ cargo clippy --locked --workspace --all-targets -- -D warnings 2>&1 | tail -6
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.29s
+CLIPPY_EXIT=0  (0 = 零警告通过，-D warnings 生效)

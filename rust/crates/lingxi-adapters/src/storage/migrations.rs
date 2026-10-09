@@ -372,6 +372,112 @@ CREATE INDEX idx_model_call_usage_parent_tool ON model_call_usage(parent_tool_ca
     WHERE parent_tool_call_id IS NOT NULL;
 "#;
 
+/// R06-T03 session tree / fork / retry / rewind (version 8): the relational
+/// form of the incumbent append-only JSONL session tree — lineage
+/// (parent_session_id/fork_point/lineage_depth), lifecycle (active/archived/
+/// deleted), pinning, per-session branch heads, named checkpoints, file
+/// versions for rewind conflict detection, and file-level checkpoints.
+///
+/// Semantics anchors (incumbent, surveyed end-to-end):
+/// - lineage depth cap `MAX_FORK_LINEAGE_DEPTH = 2`
+///   (`server/routes/sessions.ts:1738`);
+/// - fork copies root→boundary KEEPING message ids, only re-linking parents
+///   (`pi-coding-agent/dist/core/session-manager.js:1113 createBranchedSession`)
+///   — hence `messages` PRIMARY KEY becomes (session_id, message_id): a forked
+///   copy shares the id with its source, unique only within a session;
+/// - branch heads: one row per session (the incumbent session_branch_heads
+///   table, `core/session-branch-head.ts`);
+/// - named checkpoints: `latest` overwrites, other names conflict, cap 200
+///   (`core/session-checkpoints.ts:14-16`);
+/// - file versions: rewind conflict detection record (A06 hardening — the
+///   incumbent has NO external-modification detection, report deviation D1).
+///
+/// The `messages` rebuild follows the v7 precedent: SQLite cannot alter a
+/// PRIMARY KEY, so the table is rebuilt, every existing row is copied
+/// verbatim (parent_message_id NULL, branch_id NULL, entry_type 'message'),
+/// and the indexes are recreated identically.
+pub const V8_NAME: &str = "r06_t03_session_tree";
+pub const V8_SQL: &str = r#"
+ALTER TABLE sessions ADD COLUMN parent_session_id TEXT;
+ALTER TABLE sessions ADD COLUMN fork_point_message_id TEXT;
+ALTER TABLE sessions ADD COLUMN lineage_depth INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE sessions ADD COLUMN lifecycle TEXT NOT NULL DEFAULT 'active';
+ALTER TABLE sessions ADD COLUMN pinned_at_unix_ms INTEGER;
+ALTER TABLE sessions ADD COLUMN pin_order INTEGER;
+ALTER TABLE sessions ADD COLUMN memory_enabled INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE sessions ADD COLUMN authorized_folders_json TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE sessions ADD COLUMN permission_mode TEXT;
+ALTER TABLE sessions ADD COLUMN archived_at_unix_ms INTEGER;
+ALTER TABLE sessions ADD COLUMN last_activity_unix_ms INTEGER;
+
+CREATE TABLE session_branch_heads (
+    session_id                TEXT PRIMARY KEY REFERENCES sessions(session_id),
+    head_message_id           TEXT,
+    observed_tail_message_id  TEXT,
+    revision                  INTEGER NOT NULL DEFAULT 0,
+    head_resolution           TEXT NOT NULL DEFAULT 'legacy_tail',
+    updated_at_unix_ms        INTEGER NOT NULL
+);
+
+CREATE TABLE checkpoints (
+    checkpoint_id        TEXT PRIMARY KEY,
+    session_id           TEXT NOT NULL REFERENCES sessions(session_id),
+    name                 TEXT NOT NULL,
+    kind                 TEXT NOT NULL,
+    target_message_id    TEXT,
+    turn_input_message_id TEXT,
+    message_count        INTEGER NOT NULL DEFAULT 0,
+    created_at_unix_ms   INTEGER NOT NULL
+);
+CREATE INDEX idx_checkpoints_session ON checkpoints(session_id);
+
+CREATE TABLE checkpoint_file_versions (
+    checkpoint_id        TEXT NOT NULL REFERENCES checkpoints(checkpoint_id),
+    file_path            TEXT NOT NULL,
+    sha256               TEXT NOT NULL,
+    size_bytes           INTEGER NOT NULL,
+    recorded_at_unix_ms  INTEGER NOT NULL,
+    PRIMARY KEY (checkpoint_id, file_path)
+);
+
+CREATE TABLE file_checkpoints (
+    checkpoint_id        TEXT NOT NULL REFERENCES checkpoints(checkpoint_id),
+    session_id           TEXT,
+    file_path            TEXT NOT NULL,
+    content              BLOB NOT NULL,
+    encoding             TEXT NOT NULL,
+    reason               TEXT NOT NULL,
+    created_at_unix_ms   INTEGER NOT NULL,
+    PRIMARY KEY (checkpoint_id, file_path)
+);
+CREATE INDEX idx_file_checkpoints_session ON file_checkpoints(session_id);
+
+CREATE TABLE messages_v8 (
+    message_id         TEXT NOT NULL,
+    session_id         TEXT NOT NULL REFERENCES sessions(session_id),
+    run_id             TEXT REFERENCES runs(run_id),
+    role               TEXT NOT NULL,
+    content_json       TEXT NOT NULL,
+    model_call_id      TEXT,
+    committed_at_unix_ms INTEGER NOT NULL,
+    seq                INTEGER NOT NULL,
+    parent_message_id  TEXT,
+    branch_id          TEXT,
+    entry_type         TEXT NOT NULL DEFAULT 'message',
+    PRIMARY KEY (session_id, message_id)
+);
+INSERT INTO messages_v8
+    (message_id, session_id, run_id, role, content_json, model_call_id,
+     committed_at_unix_ms, seq, parent_message_id, branch_id, entry_type)
+SELECT message_id, session_id, run_id, role, content_json, model_call_id,
+       committed_at_unix_ms, seq, NULL, NULL, 'message'
+FROM messages;
+DROP TABLE messages;
+ALTER TABLE messages_v8 RENAME TO messages;
+CREATE INDEX idx_messages_session ON messages(session_id, seq);
+CREATE INDEX idx_messages_parent ON messages(session_id, parent_message_id);
+"#;
+
 /// The full ordered migration list. Appending a migration is a deliberate,
 /// reviewed act; editing an existing entry changes its fingerprint and is
 /// rejected on every already-migrated database.
@@ -410,6 +516,11 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 7,
         name: V7_NAME,
         sql: V7_SQL,
+    },
+    Migration {
+        version: 8,
+        name: V8_NAME,
+        sql: V8_SQL,
     },
 ];
 

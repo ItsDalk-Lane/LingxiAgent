@@ -24,6 +24,7 @@ pub mod invocation;
 pub mod model_exchange;
 pub mod ports;
 pub mod recovery;
+pub mod session_tree;
 pub mod subagent;
 pub mod toolcatalog;
 pub mod usage;

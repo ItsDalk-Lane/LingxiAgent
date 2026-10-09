@@ -1,0 +1,31 @@
+# R06-T03 GREEN 证据 06：workspace 全量回归
+
+date: 2026-10-09T05:4xZ（GREEN 阶段，fmt/clippy 收敛后）
+cargo: /Users/study_superior/.cargo/bin/cargo — cargo 1.98.1 (797e8a9bc 2026-08-05)
+rustc: rustc 1.98.1 (48a229cea 2026-09-01)
+
+## 命令与退出码（真实记录）
+
+$ cargo test --locked --workspace
+
+编译：3 个 crate（lingxi-kernel / lingxi-adapters / lingxi-service），无 error[、无 warning 行。
+结果行统计（grep 'test result' 逐套件汇总）：
+  套件数（test result: ok 行数）：124
+  失败行（failed 且非 "0 failed"）：0
+  合计通过：1643 passed / 0 failed
+WORKSPACE_EXIT=0
+
+说明：完整命令输出经 grep 过滤（'test result|error|failures|Compiling|Finished'）后
+逐套件核对；后台任务原始输出行 131 记录 WORKSPACE_EXIT=0。
+含 R06-T03 全部目标套件（kernel session_tree 9、adapters session_tree_r06t03 12、
+service r06_t03_session_tree 10）与全部既有套件（含 R06-T01/T02 及更早阶段的
+lib/集成/契约测试），无回归。
+
+## 既有套件保护声明
+
+本 Task 改动文件之外的行为无回归：1643/1643 全绿覆盖了
+- lingxi-service lib 361 项（既有路由/鉴权/run 生命周期）
+- lingxi-adapters 119 项 lib + 各集成套件（既有 run_store/migrations 等）
+- lingxi-kernel 96 项 lib + R06-T01 20 项 + R06-T02 44 项
+其中 run_store.rs 的 final 消息 parent 链接修复属本 Task 范围（链断裂修复，
+T03 消息链依赖），其既有套件同批全绿。

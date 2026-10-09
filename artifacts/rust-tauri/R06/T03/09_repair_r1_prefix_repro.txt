@@ -1,0 +1,63 @@
+# R06-T03 REPAIR-R1 证据 09-a：修复前逐项复现（prefix repro）
+
+date: 2026-10-09（REPAIR-R1 启动日，修复前）
+cargo: /Users/study_superior/.cargo/bin/cargo — cargo 1.98.1 (797e8a9bc 2026-08-05)
+base: 4920c59e38ddf69c8b846fb1aea896fca70d939d + 工作区候选（修复前状态）
+
+## 第一节：FINDING-01 本体（R1 probe1 原样复跑）
+
+$ cd artifacts/rust-tauri/R06/T03-REVIEW-01/probe && cargo run
+
+A: overwrite ok, checkpoint_id=s:latest（同 id? true）
+A: record_file_version on overwritten latest = ERR: Internal { detail: "UNIQUE constraint failed: checkpoint_file_versions.checkpoint_id, checkpoint_file_versions.file_path" }
+B: record new file f2 = true
+B: file versions after overwrite with f2 only: ["/tmp/f1", "/tmp/f2"]
+B: 残留旧文件 f1? true
+PROBE1_EXIT=0
+
+→ FINDING-01 修复前状态确认：latest 覆盖后同文件再记录 = UNIQUE 500；不同文件 = 旧版本残留。
+
+## 第二节：REPAIR 复现探针（本任务新建，修复前运行）
+
+探针源码：artifacts/rust-tauri/R06/T03/repair_probe/{Cargo.toml,src/main.rs}
+（独立 workspace 探针工程，与 R1 probe 同形；只调公开存储 API。）
+
+$ cd artifacts/rust-tauri/R06/T03/repair_probe && /Users/study_superior/.cargo/bin/cargo run
+EXIT=0（探针自身跑完；各行是各 finding 的修复前实测结局）
+
+P1 FINDING-03: archived session still in main list? true
+   → 归档会话仍出现在 list_sessions 主列表（run_store.rs:407 SQL 无 WHERE lifecycle）。
+P2 FINDING-06: ghost-run message insert = OK（无外键拦截）
+   → run_id="run-does-not-exist"（无对应 runs 行）插入成功：v8 messages 重建丢了 FK。
+P3 FINDING-08: archived_children=2（真实翻转=1：仅 c1f；c2f 已归档）
+   → 混合子树计数虚增：已归档后代 c2f 未翻转仍计入。
+P4 OBS: fork duplicate id = ERR: Internal { detail: "UNIQUE constraint failed: sessions.session_id" }
+   → fork new_session_id 撞库 → StorageError::Internal → 生产链 HTTP 500（应为响亮 409）。
+P5 F01-EXT: eviction with file versions = ERR: upsert #200 (c200) failed: Internal { detail: "FOREIGN KEY constraint failed" }
+   → FINDING-01 同根因扩展（修复代理自查发现）：201 窗口裁减 DELETE FROM checkpoints
+     不删子行，被裁检查点若带文件版本 → FK 失败，整个第 201 次 upsert 确定性 500。
+     （R1 未标此行号；同根因=「检查点行的删除/覆盖不清子行」。）
+P6 F05/07: checkpoint s-evict:c0 的文件版本行数=1（仅存 sha256+size；file_checkpoints 内容表无写路径——rewind 无内容可恢复）
+   → FINDING-05/07 存储层佐证：内容表零写入路径，rewind 结构性无内容可写回。
+
+## 第三节：服务层行为级 finding 的复现方式
+
+FINDING-02/04/05 服务层行为的修复前证据映射（如实声明：本修复未对服务层做
+RED-first 复跑——repair 启动时服务层修复与测试编写同分支推进，新测试直接以
+修复后代码验证 GREEN；以下为修复前状态的静态事实与既有复现记录，不冒充
+当次实测运行）：
+
+- F-02（retry fileRollback 非法值→400）：修复前 `RetryRequestBody` 带
+  `deny_unknown_fields` 且无 fileRollback 字段——任何携带 fileRollback 的
+  请求体在反序列化边界即 400（静态事实）；R1 评审 REVIEW.md 复现记录同此
+  （400 但 reason 非 invalid_file_rollback，且 workspace 语义整体缺席）。
+- F-04（fork 字段失真）：修复前 fork 复制 SELECT 列裁剪（model_call_id
+  不入选、committed_at_unix_ms 改写为 fork 时刻）为代码静态事实；
+  R1 评审 REVIEW.md 附对照。
+- F-05（内容级恢复缺席）：第二节 P6 实测——内容表零写入路径，rewind
+  结构性无内容可写回；修复前 rewind 语义=整批 409（初版套件
+  rewind_refuses_on_external_modification_and_preserves_branch 全绿即其
+  证据，该测试随语义裁决重写为
+  rewind_restores_content_with_per_file_verdicts_and_branch_rewinds）。
+- 修复后 GREEN 证据：09_repair_r1_targeted_tests.txt（三套件逐名 +
+  退出码）。

@@ -13,3 +13,7 @@ lingxi-protocol = { path = "../lingxi-protocol" }
 # Same locked version as lingxi-protocol/lingxi-service (no new package
 # version enters the lock).
 serde_json = "1.0.151"
+# R06-T03: file-version conflict detection hashes (sha256 over file bytes).
+# Same locked version as lingxi-protocol/lingxi-adapters (no new package
+# version enters the lock).
+sha2 = "0.11.0"

@@ -1,0 +1,8 @@
+# REPAIR-R1 09：rustfmt 一致性（门禁 REQUIRED）
+# 命令：cargo fmt --all -- --check（工作目录 rust/）
+# 采集时间（UTC）：2026-10-09T08:23:32Z
+# 过程：首次 --check 发现 REPAIR-R1 新增代码 3 处格式差 → cargo fmt --all 归一化
+#      （仅触碰本任务改动的 3 个文件）→ 以下为重放最终结果。
+
+$ cargo fmt --all -- --check
+EXIT=0

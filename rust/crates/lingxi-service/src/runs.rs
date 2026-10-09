@@ -53,8 +53,8 @@ use lingxi_kernel::ports::{
     TurnDeltaSinkClosed, TurnProviderPort,
 };
 use lingxi_kernel::subagent::{
-    authorize_child_tool, authorize_child_tool_with_registry_id, RunLineage, ToolAccessTier,
-    ToolAuthorization,
+    authorize_child_tool, authorize_child_tool_with_registry_id, RunLineage, RunOrigin,
+    ToolAccessTier, ToolAuthorization,
 };
 use lingxi_kernel::{
     attempt_id, model_call_id, tool_call_id, FailureCause, NoFinalCause, QuotaResource, RunFinish,
@@ -600,6 +600,28 @@ pub struct RunSupervisor {
     /// semantics) with a loud ledger row + warn. `None` (test wiring)
     /// keeps the pre-R06-T02 shape exactly.
     compaction: Option<Arc<crate::compaction::CompactionService>>,
+    /// R06-T03: the user-message persistence hook. When `Some`, a
+    /// `RunOrigin::User` run's input is persisted as a message-tree row
+    /// (parent = current branch head) right after the durable run-start
+    /// commit — the write path of the session tree the fork/rewind/
+    /// projection surfaces read. A failure is adjudicated like any other
+    /// run failure (the run finalizes Failed; nothing pretends the input
+    /// landed). `None` keeps the pre-T03 shape exactly (no user-message row).
+    user_message_recorder: Option<Arc<dyn UserMessageRecorder>>,
+}
+
+/// R06-T03: persists a user-origin run's input into the session message tree.
+/// Implemented by the service layer over the storage single-writer queue; a
+/// trait object (not a concrete adapter) keeps `lingxi-service`'s run driver
+/// decoupled from the storage module's shape.
+pub trait UserMessageRecorder: Send + Sync {
+    fn record_user_message<'a>(
+        &'a self,
+        session_id: &'a str,
+        run_id: &'a str,
+        input: &'a str,
+        now_unix_ms: u64,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), StorageError>> + Send + 'a>>;
 }
 
 impl std::fmt::Debug for RunSupervisor {
@@ -655,6 +677,7 @@ impl RunSupervisor {
             model_call_tuning: ModelCallTuning::default(),
             context_compiler: None,
             compaction: None,
+            user_message_recorder: None,
         }
     }
 
@@ -694,7 +717,19 @@ impl RunSupervisor {
             model_call_tuning: ModelCallTuning::default(),
             context_compiler: None,
             compaction: None,
+            user_message_recorder: None,
         })
+    }
+
+    /// R06-T03: binds the user-message recorder (builder-style; the
+    /// composition root calls this after [`Self::new`]). `None` keeps the
+    /// pre-T03 shape exactly (no user-message row written).
+    pub fn with_user_message_recorder(
+        mut self,
+        recorder: Option<Arc<dyn UserMessageRecorder>>,
+    ) -> Self {
+        self.user_message_recorder = recorder;
+        self
     }
 
     /// R04-T02: binds the unified tool invocation gateway (builder-style;
@@ -1063,6 +1098,21 @@ impl RunSupervisor {
         port.record_run_lineage(&ctx, authorization.lineage.clone(), now_ms)
             .await
             .map_err(DriveError::Storage)?;
+        // R06-T03: a USER-origin run's input is persisted into the session
+        // message tree right after the durable run-start commit (parent =
+        // the session's current branch head) — the write path of the tree
+        // that fork copies and rewind rewinds. Only RunOrigin::User; child/
+        // cron/heartbeat/bridge runs never mint user-message rows. A failure
+        // surfaces as DriveError (the caller finalizes the run Failed; the
+        // input is never pretended to have landed).
+        if authorization.lineage.origin == RunOrigin::User {
+            if let Some(recorder) = &self.user_message_recorder {
+                recorder
+                    .record_user_message(session_id, run_id.as_str(), input, now_ms)
+                    .await
+                    .map_err(DriveError::Storage)?;
+            }
+        }
 
         // 2) Model turns. No provider configured: explicit no-content
         //    completion (never a fake reply). The early close goes through

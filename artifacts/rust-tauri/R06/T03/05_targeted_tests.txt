@@ -1,0 +1,68 @@
+# R06-T03 GREEN 证据 05：目标测试套件（逐条对照现役语义）
+
+date: 2026-10-09T05:2xZ（GREEN 阶段）
+cargo: /Users/study_superior/.cargo/bin/cargo — cargo 1.98.1 (797e8a9bc 2026-08-05)
+rustc: rustc 1.98.1 (48a229cea 2026-09-01)
+（rust-toolchain.toml 仓库根 channel = "1.98.1"，经 rustup shim 生效；homebrew 1.93.0 未使用）
+
+## 套件 A：kernel 纯逻辑（重试点解析/检查点规划/fork 深度/路径闸/sha256）
+
+$ cargo test --locked -p lingxi-kernel session_tree
+
+running 9 tests
+test session_tree::tests::fork_depth_allows_two_layers_and_rejects_third ... ok
+test session_tree::tests::checkpoint_latest_overwrites_others_conflict ... ok
+test session_tree::tests::file_restore_conflict_detection ... ok
+test session_tree::tests::path_within_folders_is_component_aware ... ok
+test session_tree::tests::retry_reset_point_loud_failures ... ok
+test session_tree::tests::retry_reset_point_resolves_user_assistant_and_latest_user ... ok
+test session_tree::tests::fork_retained_is_root_to_boundary_inclusive ... ok
+test session_tree::tests::checkpoint_eviction_drops_oldest_non_latest ... ok
+test session_tree::tests::sha256_hex_is_64_lower_hex ... ok
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 87 filtered out
+T03_KERNEL_EXIT=0
+
+## 套件 B：adapters 存储层（schema v8 真实 SQLite；fork/reset/检查点/管理面）
+
+$ cargo test --locked -p lingxi-adapters --test session_tree_r06t03
+
+running 12 tests
+test branch_reset_moves_head_and_appends_marker_without_deleting_history ... ok
+test branch_reset_to_null_head_leaves_only_the_marker ... ok
+test delete_checkpoint_removes_file_versions_first ... ok
+test fork_does_not_widen_authorizations ... ok
+test admin_rename_pin_order_and_memory_roundtrip ... ok
+test fork_rejects_depth_beyond_two ... ok
+test admin_search_title_content_owner_and_like_escape ... ok
+test admin_archive_restore_delete_lifecycle_gates ... ok
+test fork_copies_shared_history_with_stable_ids_and_independent_writes ... ok
+test rewind_detects_external_modification_and_refuses_to_overwrite ... ok
+test named_checkpoint_latest_overwrites_others_conflict ... ok
+test checkpoint_window_evicts_oldest_non_latest_at_201 ... ok
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured
+T03_ADAPTERS_EXIT=0
+
+## 套件 C：service 生产链（真实 TCP + HTTP/1.1 + 设备凭证 + scripted provider）
+
+$ cargo test --locked -p lingxi-service --test r06_t03_session_tree
+
+running 10 tests
+test checkpoint_file_paths_outside_authorized_folders_are_403 ... ok
+test busy_session_refuses_fork_retry_rewind_409 ... ok
+test fork_beyond_depth_two_is_refused_409 ... ok
+test retry_target_resolution_matches_incumbent ... ok
+test checkpoint_crud_matches_incumbent_shape ... ok
+test rewind_refuses_on_external_modification_and_preserves_branch ... ok
+test retry_resets_branch_and_new_run_never_overwrites_old ... ok
+test fork_copies_history_with_stable_ids_and_writes_stay_independent ... ok
+test management_surface_rename_pin_memory_archive_restore_delete_cleanup ... ok
+test cross_principal_tree_access_is_403 ... ok
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; finished in 8.61s
+T03_SERVICE_EXIT=0
+
+## 汇总
+
+kernel 9/9 + adapters 12/12 + service 10/10 = 31/31 全绿，三个真实退出码均 0。
+现役对照锚点见各测试注释与 01_design.md；无自洽测试——每条断言锚定
+server/routes/sessions.ts / core/session-turn-actions.ts / core/session-checkpoints.ts /
+core/workspace-snapshots.ts / pi-coding-agent session-manager.js 的已勘察行号。

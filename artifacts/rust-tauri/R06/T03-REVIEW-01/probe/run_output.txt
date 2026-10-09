@@ -1,0 +1,5 @@
+A: overwrite ok, checkpoint_id=s:latest（同 id? true）
+A: record_file_version on overwritten latest = ERR: Internal { detail: "UNIQUE constraint failed: checkpoint_file_versions.checkpoint_id, checkpoint_file_versions.file_path" }
+B: record new file f2 = true
+B: file versions after overwrite with f2 only: ["/tmp/f1", "/tmp/f2"]
+B: 残留旧文件 f1? true
