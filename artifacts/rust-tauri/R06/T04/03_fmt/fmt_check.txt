@@ -1,0 +1,607 @@
+$ /Users/study_superior/.cargo/bin/cargo fmt --all -- --check
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/canonical_message_store.rs:68:
+     message_id: &str,
+ ) -> Result<Option<MessageRow>, StorageError> {
+     conn.query_row(
+-        &format!(
+-            "SELECT {MESSAGE_COLS} FROM messages WHERE session_id=?1 AND message_id=?2"
+-        ),
++        &format!("SELECT {MESSAGE_COLS} FROM messages WHERE session_id=?1 AND message_id=?2"),
+         rusqlite::params![session_id, message_id],
+         |r| {
+             Ok(MessageRow {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/canonical_message_store.rs:300:
+                     .map_err(map_err)?;
+                 for row in rows {
+                     let (seq, run_id, event_id, payload_json) = row.map_err(map_err)?;
+-                    let payload: EventPayload = serde_json::from_str(&payload_json).map_err(
+-                        |err| StorageError::Corrupted {
+-                            detail: format!(
+-                                "key_events payload for {event_id} is not valid JSON: {err}"
+-                            ),
+-                        },
+-                    )?;
++                    let payload: EventPayload =
++                        serde_json::from_str(&payload_json).map_err(|err| {
++                            StorageError::Corrupted {
++                                detail: format!(
++                                    "key_events payload for {event_id} is not valid JSON: {err}"
++                                ),
++                            }
++                        })?;
+                     out.push(StoredEventRow {
+                         seq: seq as u64,
+                         run_id,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/canonical_message_store.rs:135:
+     let mut before: Option<HistoryCursor> = None;
+     let mut pages = 0usize;
+     loop {
+-        let page = block_on(cms::read_branch_page(&db, "s", before.clone(), limit))
+-            .expect("read page");
++        let page =
++            block_on(cms::read_branch_page(&db, "s", before.clone(), limit)).expect("read page");
+         pages += 1;
+         assert!(
+             !page.messages.is_empty() || !page.has_more,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/canonical_message_store.rs:174:
+         .flatten()
+         .cloned()
+         .collect();
+-    assert_eq!(collected, expected, "连续页面拼接必须覆盖完整链（分页语义无丢无重）");
++    assert_eq!(
++        collected, expected,
++        "连续页面拼接必须覆盖完整链（分页语义无丢无重）"
++    );
+     let unique: std::collections::HashSet<&String> = collected.iter().collect();
+     assert_eq!(unique.len(), collected.len(), "不重");
+ }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/canonical_message_store.rs:194:
+     let mut total_queries = 0u64;
+     let mut per_page_rows = Vec::new();
+     loop {
+-        let page = block_on(cms::read_branch_page(&db, "s", before.clone(), limit))
+-            .expect("read page");
++        let page =
++            block_on(cms::read_branch_page(&db, "s", before.clone(), limit)).expect("read page");
+         total_rows += page.stats.rows_examined;
+         total_queries += page.stats.queries;
+         per_page_rows.push(page.stats.rows_examined);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/canonical_message_store.rs:253:
+     block_on(write_legacy_rows(&db, "legacy", 7));
+
+     let page = block_on(cms::read_branch_page(&db, "legacy", None, 200)).expect("read");
+-    let got: Vec<&str> = page.messages.iter().map(|m| m.message_id.as_str()).collect();
++    let got: Vec<&str> = page
++        .messages
++        .iter()
++        .map(|m| m.message_id.as_str())
++        .collect();
+     // 每个 legacy run 的 final 消息 id 是 `{run}-final`（真实提交路径）。
+     let expected: Vec<String> = (1..=7).map(|i| format!("legacy_run_{i}-final")).collect();
+     assert_eq!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/canonical_message_store.rs:271:
+     let (db, _dir) = temp_db("mixed-regions");
+     seed(&db, "s");
+     block_on(write_legacy_rows(&db, "s", 3)); // legacy_run_{1..3}-final（parent NULL）
+-    // T03+ 链接段：n1→legacy_run_3-final, n2→n1（append_message 顺手推进
+-    // branch head）。
++                                              // T03+ 链接段：n1→legacy_run_3-final, n2→n1（append_message 顺手推进
++                                              // branch head）。
+     append(&db, "s", "n1", Some("legacy_run_3-final"), "user", 10);
+     append(&db, "s", "n2", Some("n1"), "assistant", 11);
+
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/canonical_message_store.rs:279:
+     let page = block_on(cms::read_branch_page(&db, "s", None, 200)).expect("read");
+-    let got: Vec<&str> = page.messages.iter().map(|m| m.message_id.as_str()).collect();
++    let got: Vec<&str> = page
++        .messages
++        .iter()
++        .map(|m| m.message_id.as_str())
++        .collect();
+     assert_eq!(
+         got,
+-        vec!["legacy_run_1-final", "legacy_run_2-final", "legacy_run_3-final", "n1", "n2"]
++        vec![
++            "legacy_run_1-final",
++            "legacy_run_2-final",
++            "legacy_run_3-final",
++            "n1",
++            "n2"
++        ]
+     );
+ }
+
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/canonical_message_store.rs:333:
+     let err = block_on(cms::read_branch_page(&db, "b", Some(missing), 50))
+         .expect_err("不存在的游标消息必须失败");
+     assert!(
+-        matches!(err, lingxi_kernel::ports::StorageError::InvalidRequest { .. }),
++        matches!(
++            err,
++            lingxi_kernel::ports::StorageError::InvalidRequest { .. }
++        ),
+         "got {err:?}"
+     );
+     // 合法游标：b 会话 m3 → 读到 m1..m2。
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/canonical_message_store.rs:340:
+     let ok = block_on(cms::read_branch_page(&db, "b", Some(foreign), 50)).expect("read");
+     let got: Vec<&str> = ok.messages.iter().map(|m| m.message_id.as_str()).collect();
+-    assert_eq!(got, vec!["m1"], "before=m2 语义：严格更老的消息（不含 m2 自身）");
++    assert_eq!(
++        got,
++        vec!["m1"],
++        "before=m2 语义：严格更老的消息（不含 m2 自身）"
++    );
+     let _ = ok;
+ }
+
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/canonical_message_store.rs:352:
+     // 每 run 的持久事件 = record_run_started 的 `{run}-start`（queued→
+     // running，run_store.rs:1398-1416）+ 提交路径 staging 的 3 条
+     // key_events（2 工具 + 1 终态）= 4 条。
+-    let events =
+-        block_on(cms::read_branch_events(&db, "s", &["ra".to_string()])).expect("events");
++    let events = block_on(cms::read_branch_events(&db, "s", &["ra".to_string()])).expect("events");
+     let seqs: Vec<u64> = events.iter().map(|e| e.seq).collect();
+     assert_eq!(events.len(), 4, "ra 的 4 条事件（start + 2 工具 + 1 终态）");
+     assert!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/canonical_message_store.rs:380:
+     block_on(seed_lineage(&db));
+
+     let edges = block_on(cms::read_lineage_children(&db, &["p".to_string()])).expect("lineage");
+-    let children: std::collections::HashSet<&str> =
+-        edges.iter().map(|(_, c)| c.as_str()).collect();
++    let children: std::collections::HashSet<&str> = edges.iter().map(|(_, c)| c.as_str()).collect();
+     assert!(
+         children.contains("c1") && children.contains("g1"),
+         "传递闭包必须含子与孙: {edges:?}"
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/canonical_message_store.rs:395:
+ /// 把 parent 全置 NULL 并删除 branch_heads 行——即 pre-T03 库迁到 v8 后
+ /// 的冻结数据形态（迁移 SQL 原样语义：parent 置空、无头行）。
+ async fn write_legacy_rows(db: &RunDatabase, session: &str, n: usize) {
+-    use lingxi_protocol::{EventId, EventPayload, KnownEventPayload, RunStateChangedPayload, RunStatus};
++    use lingxi_protocol::{
++        EventId, EventPayload, KnownEventPayload, RunStateChangedPayload, RunStatus,
++    };
+     // 每个 legacy「run」= 1 条 final 消息（pre-T03 只有 final 落 messages）。
+     // 经真实 run 提交路径写事件与 run 行，再直改 parent 为 NULL 拟态迁移。
+     for i in 1..=n {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/canonical_message_store.rs:408:
+             generation: 1,
+         };
+         use lingxi_kernel::ports::StoragePort;
+-        db.record_run_started(&ctx, 1_000 + i as u64).await.expect("start");
++        db.record_run_started(&ctx, 1_000 + i as u64)
++            .await
++            .expect("start");
+         let outcome = lingxi_kernel::ports::RunOutcome {
+             status: RunStatus::Completed,
+             reason: Some("completed".to_string()),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/canonical_message_store.rs:501:
+             key_events,
+             final_message: None,
+         };
+-        db.commit_run_outcome(&ctx, outcome, 1_001).await.expect("commit");
++        db.commit_run_outcome(&ctx, outcome, 1_001)
++            .await
++            .expect("commit");
+     }
+ }
+
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol/src/history.rs:77:
+
+ /// 统一历史项。`kind` 为判别字段（snake_case）。
+ #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+-#[serde(tag = "kind", rename_all = "snake_case", rename_all_fields = "camelCase")]
++#[serde(
++    tag = "kind",
++    rename_all = "snake_case",
++    rename_all_fields = "camelCase"
++)]
+ pub enum HistoryItem {
+     /// 用户消息（回合输入锚点）。
+     UserMessage {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol/src/history.rs:196:
+         let raw = base64::engine::general_purpose::URL_SAFE_NO_PAD
+             .decode(cursor.as_str().as_bytes())
+             .map_err(|_| "cursor is not valid base64url".to_string())?;
+-        let text =
+-            String::from_utf8(raw).map_err(|_| "cursor bytes are not UTF-8".to_string())?;
+-        let value: serde_json::Value = serde_json::from_str(&text)
+-            .map_err(|err| format!("cursor body is not JSON: {err}"))?;
++        let text = String::from_utf8(raw).map_err(|_| "cursor bytes are not UTF-8".to_string())?;
++        let value: serde_json::Value =
++            serde_json::from_str(&text).map_err(|err| format!("cursor body is not JSON: {err}"))?;
+         #[derive(serde::Deserialize)]
+         #[serde(deny_unknown_fields)]
+         struct Body {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/history.rs:284:
+     // 跨页 user 锚探测：分支上存在 `user:{run}` 的 run（决定 final 锚是否
+     // 携带 run 组项——每 run 恰好出现一次）。
+     let user_keys: Vec<String> = all_runs.iter().map(|run| format!("user:{run}")).collect();
+-    let user_anchors_on_branch: HashSet<String> = cms::read_existing_message_ids(
+-        db,
+-        session_id,
+-        &user_keys,
+-    )
+-    .await?
+-    .into_iter()
+-    .filter_map(|id| id.strip_prefix("user:").map(str::to_string))
+-    .collect();
++    let user_anchors_on_branch: HashSet<String> =
++        cms::read_existing_message_ids(db, session_id, &user_keys)
++            .await?
++            .into_iter()
++            .filter_map(|id| id.strip_prefix("user:").map(str::to_string))
++            .collect();
+     Ok(project_history(&ProjectionInput {
+         messages,
+         events: &events,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/history.rs:320:
+
+ fn set_etag(response: &mut Response, etag: &str) {
+     if let Ok(value) = HeaderValue::from_str(etag) {
+-        response.headers_mut().insert(axum::http::header::ETAG, value);
++        response
++            .headers_mut()
++            .insert(axum::http::header::ETAG, value);
+     }
+ }
+
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/history.rs:352:
+ /// 现役 storage 映射（响亮 5xx，绝不静默降级）。
+ fn storage_error_response(err: &StorageError) -> Response {
+     match err {
+-        StorageError::InvalidRequest { detail } => {
+-            EndpointError::invalid_message(detail.clone())
+-                .with_cause("history.invalid_cursor")
+-                .into_response()
+-        }
++        StorageError::InvalidRequest { detail } => EndpointError::invalid_message(detail.clone())
++            .with_cause("history.invalid_cursor")
++            .into_response(),
+         other => EndpointError::storage(other).into_response(),
+     }
+ }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/history_projection.rs:31:
+
+ use lingxi_adapters::storage::canonical_message_store::StoredEventRow;
+ use lingxi_adapters::storage::session_tree::MessageRow;
+-use lingxi_protocol::history::{
+-    HistoryItem, HistoryToolStatus, RunAssociation,
+-};
++use lingxi_protocol::history::{HistoryItem, HistoryToolStatus, RunAssociation};
+ use lingxi_protocol::{EventPayload, KnownEventPayload, NormalizedMessage, RunStatus};
+
+ /// 投影输入（全部为持久事实的只读视图）。
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/history_projection.rs:654:
+ /// deny_unknown_fields）；剥离后仍不合形状 → LegacyRaw。
+ fn parse_normalized_message(
+     content_json: &str,
+-) -> Result<(NormalizedMessage, serde_json::Map<String, serde_json::Value>), (serde_json::Value, String)>
+-{
++) -> Result<
++    (
++        NormalizedMessage,
++        serde_json::Map<String, serde_json::Value>,
++    ),
++    (serde_json::Value, String),
++> {
+     let value: serde_json::Value = serde_json::from_str(content_json).map_err(|err| {
+         (
+             serde_json::Value::String(content_json.to_string()),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/history_projection.rs:677:
+             legacy_fields.insert(key, value);
+         }
+     }
+-    let normalized: NormalizedMessage =
+-        serde_json::from_value(serde_json::Value::Object(map)).map_err(|err| {
++    let normalized: NormalizedMessage = serde_json::from_value(serde_json::Value::Object(map))
++        .map_err(|err| {
+             (
+                 serde_json::Value::String(content_json.to_string()),
+                 format!("message body is not a normalized message: {err}"),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/history_projection.rs:723:
+         }
+     }
+
+-    fn segment_events(run: &str, segment: &str, kind: SegmentKind, base: u64, text: &str) -> Vec<StoredEventRow> {
++    fn segment_events(
++        run: &str,
++        segment: &str,
++        kind: SegmentKind,
++        base: u64,
++        text: &str,
++    ) -> Vec<StoredEventRow> {
+         vec![
+             event(
+                 base,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/history_projection.rs:843:
+     fn terminal_honesty_with_and_without_final() {
+         let messages = vec![
+             msg("user:r1", None, None, "user", r#"{"text":"q"}"#, 1),
+-            msg("r1-final", Some("user:r1"), Some("r1"), "assistant", r#"{"role":"assistant","content":[{"type":"text","text":"a"}]}"#, 2),
+-            msg("user:r2", Some("r1-final"), None, "user", r#"{"text":"q2"}"#, 3),
++            msg(
++                "r1-final",
++                Some("user:r1"),
++                Some("r1"),
++                "assistant",
++                r#"{"role":"assistant","content":[{"type":"text","text":"a"}]}"#,
++                2,
++            ),
++            msg(
++                "user:r2",
++                Some("r1-final"),
++                None,
++                "user",
++                r#"{"text":"q2"}"#,
++                3,
++            ),
+         ];
+         let mut events = segment_events("r1", "s1", SegmentKind::Text, 10, "正文");
+         events.push(event(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/history_projection.rs:958:
+                 _ => None,
+             })
+             .expect("r2 的工具卡");
+-        assert_eq!(tool, (HistoryToolStatus::Failed, true), "started+completed 配对");
++        assert_eq!(
++            tool,
++            (HistoryToolStatus::Failed, true),
++            "started+completed 配对"
++        );
+     }
+
+     /// 锚定：user 锚缺失（子代理 run）且无 final → lineage 并入父组。
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:203:
+         &layout,
+         ServiceDeps {
+             turn_provider: Some(provider as Arc<dyn TurnProviderPort>),
+-            tool_executor: with_tool
+-                .then(|| Arc::new(EchoTool) as Arc<dyn ToolExecutorPort>),
++            tool_executor: with_tool.then(|| Arc::new(EchoTool) as Arc<dyn ToolExecutorPort>),
+             ..ServiceDeps::default()
+         },
+     )
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:257:
+     }
+
+     async fn post(&self, path: &str, body: &str) -> (u16, String) {
+-        http(&self.addr, "POST", path, &[("Authorization", &self.bearer())], Some(body))
+-            .await
+-            .into_status_body()
++        http(
++            &self.addr,
++            "POST",
++            path,
++            &[("Authorization", &self.bearer())],
++            Some(body),
++        )
++        .await
++        .into_status_body()
+     }
+
+     async fn get(&self, path: &str) -> (u16, String) {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:266:
+-        http(&self.addr, "GET", path, &[("Authorization", &self.bearer())], None)
+-            .await
+-            .into_status_body()
++        http(
++            &self.addr,
++            "GET",
++            path,
++            &[("Authorization", &self.bearer())],
++            None,
++        )
++        .await
++        .into_status_body()
+     }
+
+     /// 带响应头的 GET（ETag 条件请求断言用）。
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:272:
+     async fn get_full(&self, path: &str, extra: &[(&str, &str)]) -> HttpResponse {
+-        let mut headers: Vec<(String, String)> =
+-            vec![("Authorization".to_string(), self.bearer())];
++        let mut headers: Vec<(String, String)> = vec![("Authorization".to_string(), self.bearer())];
+         for (name, value) in extra {
+             headers.push(((*name).to_string(), (*value).to_string()));
+         }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:278:
+-        let refs: Vec<(&str, &str)> =
+-            headers.iter().map(|(n, v)| (n.as_str(), v.as_str())).collect();
++        let refs: Vec<(&str, &str)> = headers
++            .iter()
++            .map(|(n, v)| (n.as_str(), v.as_str()))
++            .collect();
+         http(&self.addr, "GET", path, &refs, None).await
+     }
+
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:312:
+     }
+
+     /// 执行一轮并等待 run 终态；返回 (run_id, 终态 status, terminal_reason)。
+-    async fn execute_wait(&self, session_id: &str, input: &str) -> (String, String, Option<String>) {
++    async fn execute_wait(
++        &self,
++        session_id: &str,
++        input: &str,
++    ) -> (String, String, Option<String>) {
+         let (status, body) = self
+             .post(
+                 &format!("/lingxi/v1/sessions/{session_id}/execute"),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:591:
+         let ty = value["payload"]["type"].as_str().unwrap_or("").to_string();
+         if ty == "run_state_changed" {
+             let to = value["payload"]["to"].as_str().unwrap_or("");
+-            if matches!(to, "completed" | "failed" | "cancelled" | "interrupted_needs_attention")
+-            {
++            if matches!(
++                to,
++                "completed" | "failed" | "cancelled" | "interrupted_needs_attention"
++            ) {
+                 saw_terminal = true;
+             }
+         }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:621:
+         match payload["type"].as_str().unwrap_or("") {
+             "assistant_segment_start" => out.push((
+                 "segment".to_string(),
+-                payload["segmentId"].as_str().expect("segmentId").to_string(),
++                payload["segmentId"]
++                    .as_str()
++                    .expect("segmentId")
++                    .to_string(),
+             )),
+             "tool_call_started" => out.push((
+                 "tool".to_string(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:636:
+             )),
+             "run_state_changed" if !has_final => {
+                 let to = payload["to"].as_str().unwrap_or("");
+-                if matches!(to, "completed" | "failed" | "cancelled" | "interrupted_needs_attention")
+-                {
++                if matches!(
++                    to,
++                    "completed" | "failed" | "cancelled" | "interrupted_needs_attention"
++                ) {
+                     out.push((
+                         "terminal".to_string(),
+                         e["runId"].as_str().expect("runId").to_string(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:762:
+     // 阶段构成：2 段（文本过程/思考——同一 turn 的正文段在 think 前后
+     // 续写同一段）+ 1 工具 + 1 final。
+     assert_eq!(
+-        live_stages
+-            .iter()
+-            .filter(|(k, _)| k == "segment")
+-            .count(),
++        live_stages.iter().filter(|(k, _)| k == "segment").count(),
+         2,
+         "文本过程+思考两段: {live_stages:?}"
+     );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:774:
+     let realtime_text = serde_json::to_string(&realtime).unwrap();
+     let history_text = serde_json::to_string(&history["items"]).unwrap();
+     for (mode, blob) in [("realtime", &realtime_text), ("history", &history_text)] {
+-        for forbidden in ["<mood", "</mood>", "<think", "</think>", "happy", "calm", "proud"] {
++        for forbidden in [
++            "<mood", "</mood>", "<think", "</think>", "happy", "calm", "proud",
++        ] {
+             assert!(
+                 !blob.contains(forbidden),
+                 "{mode} 不得混入 MOOD/思考标记或 MOOD 内容 {forbidden:?}"
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:784:
+     // 独立思考仍在——以「推理段/推理块」身份，而不是混进正文。
+     let reasoning_segment = items
+         .iter()
+-        .find(|i| {
+-            i["kind"] == "assistant_segment" && i["segmentKind"] == "reasoning"
+-        })
++        .find(|i| i["kind"] == "assistant_segment" && i["segmentKind"] == "reasoning")
+         .expect("思考必须以推理段存在");
+     assert!(
+-        reasoning_segment["text"].as_str().unwrap().contains("内部推理A"),
++        reasoning_segment["text"]
++            .as_str()
++            .unwrap()
++            .contains("内部推理A"),
+         "推理段承载思考内容: {reasoning_segment}"
+     );
+     let final_item = items
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:850:
+     );
+     assert_eq!(hist_tool["status"], "success");
+     assert_eq!(
+-        hist_tool["result"]["content"],
+-        live_completed["payload"]["result"]["content"],
++        hist_tool["result"]["content"], live_completed["payload"]["result"]["content"],
+         "工具结果历史==实时"
+     );
+
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:863:
+     assert_eq!(items[user_pos]["text"], "读取 a.txt 并总结");
+     let first_run_pos = items
+         .iter()
+-        .position(|i| matches!(i["kind"].as_str(), Some("assistant_segment" | "tool_call" | "final_message")))
++        .position(|i| {
++            matches!(
++                i["kind"].as_str(),
++                Some("assistant_segment" | "tool_call" | "final_message")
++            )
++        })
+         .expect("run items");
+     assert!(user_pos < first_run_pos, "user 锚在 run 组之前");
+
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:889:
+     let (run_id, status, reason) = server.execute_wait("s", "计数").await;
+     assert_eq!(status, "completed");
+     assert!(
+-        reason.as_deref().unwrap_or("").starts_with("completed.no_final."),
++        reason
++            .as_deref()
++            .unwrap_or("")
++            .starts_with("completed.no_final."),
+         "无 final 必须显式 no_final 终态: {reason:?}"
+     );
+
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:962:
+     let parsed: serde_json::Value = serde_json::from_str(&clamped.body).unwrap();
+     assert_eq!(parsed["page"]["limit"], 200, "limit 超上限钳 200");
+     for bad in ["limit=abc", "limit=0", "limit=-3", "limit=1&limit=2"] {
+-        let (status, body) = server.get(&format!("/lingxi/v1/sessions/s/history?{bad}")).await;
++        let (status, body) = server
++            .get(&format!("/lingxi/v1/sessions/s/history?{bad}"))
++            .await;
+         assert_eq!(status, 400, "非法分页参数 {bad} 必须 400: {body}");
+     }
+
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:978:
+     server.execute_wait("s", "q1").await;
+
+     for bad in ["before=!!!", "before=AAAA", "before="] {
+-        let (status, body) = server.get(&format!("/lingxi/v1/sessions/s/history?{bad}")).await;
++        let (status, body) = server
++            .get(&format!("/lingxi/v1/sessions/s/history?{bad}"))
++            .await;
+         assert_eq!(status, 400, "畸形游标 {bad} 必须响亮 400: {body}");
+     }
+
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t04_history.rs:997:
+         None,
+     )
+     .await;
+-    assert_eq!(foreign.status, 403, "跨主体读历史必须 403: {}", foreign.body);
++    assert_eq!(
++        foreign.status, 403,
++        "跨主体读历史必须 403: {}",
++        foreign.body
++    );
+     let foreign_export = http(
+         &server.addr,
+         "GET",
+EXIT=1
+
+# 首次 --check 失败（EXIT=1，格式差异如上）；执行 cargo fmt --all 应用格式化后复检：
+$ /Users/study_superior/.cargo/bin/cargo fmt --all
+FMT_APPLY_EXIT=0
+$ /Users/study_superior/.cargo/bin/cargo fmt --all -- --check
+EXIT=0
+
+# clippy 修复后再复检 fmt：
+$ /Users/study_superior/.cargo/bin/cargo fmt --all -- --check
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/history.rs:233:
+ ) -> Option<Response> {
+     match state.sessions.get_for(principal, session_id).await {
+         Ok(sessions::SessionAccess::Ok(_)) => None,
+-        Ok(sessions::SessionAccess::NotFound) => {
+-            Some(EndpointError::not_found().into_response())
+-        }
++        Ok(sessions::SessionAccess::NotFound) => Some(EndpointError::not_found().into_response()),
+         Ok(sessions::SessionAccess::Forbidden) => {
+             Some(EndpointError::forbidden("cross_principal_access").into_response())
+         }
+EXIT=1
+$ /Users/study_superior/.cargo/bin/cargo fmt --all && 复检
+FMT_APPLY_EXIT=0
+EXIT=0

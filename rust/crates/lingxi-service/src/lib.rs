@@ -36,6 +36,8 @@ pub mod epoch;
 pub mod events;
 pub mod exectools;
 pub mod filetools;
+pub mod history;
+pub mod history_projection;
 pub mod inject;
 pub mod instance;
 pub mod invocations;
@@ -5205,6 +5207,15 @@ pub fn build_router(state: ServiceState) -> Router {
         .route(
             "/lingxi/v1/sessions/{session_id}/branch",
             get(branch_history_route),
+        )
+        // R06-T04 统一历史读面：分页投影与全量导出（同一投影函数）。
+        .route(
+            "/lingxi/v1/sessions/{session_id}/history",
+            get(history::session_history_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/export",
+            get(history::session_export_route),
         )
         .route("/lingxi/v1/ws-ticket", post(ws_ticket))
         .route(

@@ -1,0 +1,25 @@
+$ /Users/study_superior/.cargo/bin/cargo test --locked -p lingxi-protocol history
+running 2 tests
+test history::tests::seq_fields_are_decimal_strings_on_the_wire ... ok
+test history::tests::cursor_roundtrip_and_strict_decode ... ok
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 23 filtered out; finished in 0.00s
+running 0 tests
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+running 0 tests
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+running 0 tests
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+EXIT=0
+
+$ /Users/study_superior/.cargo/bin/cargo test --locked -p lingxi-adapters --test canonical_message_store
+running 8 tests
+test cursor_must_reference_a_message_of_this_session ... ok
+test lineage_children_resolve_transitively_without_cycles ... ok
+test root_reset_marker_stops_the_walk ... ok
+test branch_events_scoped_to_page_runs_and_ordered ... ok
+test mixed_linked_and_legacy_regions_walk_through ... ok
+test legacy_parentless_history_walks_full_seq_order ... ok
+test a08_consecutive_pages_cover_full_branch_without_loss_or_duplication ... ok
+test a08_page_walk_examines_only_window_rows ... ok
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+EXIT=0

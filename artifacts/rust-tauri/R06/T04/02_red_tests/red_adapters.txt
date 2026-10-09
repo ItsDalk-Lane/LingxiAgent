@@ -1,0 +1,19 @@
+$ /Users/study_superior/.cargo/bin/cargo test --locked -p lingxi-adapters --test canonical_message_store
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+error[E0432]: unresolved import `lingxi_adapters::storage::canonical_message_store`
+  --> crates/lingxi-adapters/tests/canonical_message_store.rs:19:32
+   |
+19 | use lingxi_adapters::storage::{canonical_message_store as cms, RunDatabase, StoreOptions};
+   |                                -----------------------^^^^^^^
+   |                                |
+   |                                no `canonical_message_store` in `storage`
+
+error[E0432]: unresolved import `lingxi_protocol::history`
+  --> crates/lingxi-adapters/tests/canonical_message_store.rs:20:22
+   |
+20 | use lingxi_protocol::history::HistoryCursor;
+   |                      ^^^^^^^ could not find `history` in `lingxi_protocol`
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `lingxi-adapters` (test "canonical_message_store") due to 2 previous errors
+EXIT=101

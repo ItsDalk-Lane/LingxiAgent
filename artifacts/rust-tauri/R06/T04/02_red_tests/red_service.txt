@@ -1,0 +1,98 @@
+$ /Users/study_superior/.cargo/bin/cargo test --locked -p lingxi-service --test r06_t04_history
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0716]: temporary value dropped while borrowed
+   --> crates/lingxi-service/tests/r06_t04_history.rs:706:10
+    |
+706 |         &serde_json::json!({ "input": "读取 a.txt 并总结" }).to_string(),
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ creates a temporary value which is freed while still in use
+707 |     );
+    |      - temporary value is freed at the end of this statement
+708 |     let (status, body) = exec.await;
+    |                          ---- borrow later used here
+    |
+help: consider using a `let` binding to create a longer lived value
+    |
+704 ~     let binding = serde_json::json!({ "input": "读取 a.txt 并总结" }).to_string();
+705 ~     let exec = server.post(
+706 |         "/lingxi/v1/sessions/s/execute",
+707 ~         &binding,
+    |
+
+For more information about this error, try `rustc --explain E0716`.
+error: could not compile `lingxi-service` (test "r06_t04_history") due to 1 previous error
+EXIT=101
+$ /Users/study_superior/.cargo/bin/cargo test --locked -p lingxi-service --test r06_t04_history  (rerun after test-side borrow fix)
+error: could not find `Cargo.toml` in `/Users/study_superior/Desktop/Code/LingxiAgent` or any parent directory
+EXIT=101
+--- (上一条为目录误跑：agent 沙箱每次调用重置 cwd，漏了 cd rust；以下为有效 RED 运行)
+$ cd rust && /Users/study_superior/.cargo/bin/cargo test --locked -p lingxi-service --test r06_t04_history
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.92s
+     Running tests/r06_t04_history.rs (target/debug/deps/r06_t04_history-5baa86acc1a7a2ad)
+
+running 6 tests
+test history_cursor_validation_and_owner_isolation ... FAILED
+test history_etag_conditional_get_and_limit_clamp ... FAILED
+test forked_copy_marks_run_association_unknown ... FAILED
+test tool_only_run_projects_terminal_honestly ... FAILED
+test export_equals_paged_concat ... FAILED
+test a07_realtime_reopen_reconnect_export_agree ... FAILED
+
+failures:
+
+---- history_cursor_validation_and_owner_isolation stdout ----
+
+thread 'history_cursor_validation_and_owner_isolation' (32868427) panicked at crates/lingxi-service/tests/r06_t04_history.rs:982:9:
+assertion `left == right` failed: 畸形游标 before=!!! 必须响亮 400:
+  left: 404
+ right: 400
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- history_etag_conditional_get_and_limit_clamp stdout ----
+
+thread 'history_etag_conditional_get_and_limit_clamp' (32868428) panicked at crates/lingxi-service/tests/r06_t04_history.rs:938:5:
+assertion `left == right` failed: history:
+  left: 404
+ right: 200
+
+---- forked_copy_marks_run_association_unknown stdout ----
+
+thread 'forked_copy_marks_run_association_unknown' (32868426) panicked at crates/lingxi-service/tests/r06_t04_history.rs:336:9:
+assertion `left == right` failed: history src:
+  left: 404
+ right: 200
+
+---- tool_only_run_projects_terminal_honestly stdout ----
+
+thread 'tool_only_run_projects_terminal_honestly' (32868429) panicked at crates/lingxi-service/tests/r06_t04_history.rs:336:9:
+assertion `left == right` failed: history s:
+  left: 404
+ right: 200
+
+---- export_equals_paged_concat stdout ----
+
+thread 'export_equals_paged_concat' (32868425) panicked at crates/lingxi-service/tests/r06_t04_history.rs:1039:9:
+assertion `left == right` failed: page 1:
+  left: 404
+ right: 200
+
+---- a07_realtime_reopen_reconnect_export_agree stdout ----
+
+thread 'a07_realtime_reopen_reconnect_export_agree' (32868424) panicked at crates/lingxi-service/tests/r06_t04_history.rs:336:9:
+assertion `left == right` failed: history s:
+  left: 404
+ right: 200
+
+
+failures:
+    a07_realtime_reopen_reconnect_export_agree
+    export_equals_paged_concat
+    forked_copy_marks_run_association_unknown
+    history_cursor_validation_and_owner_isolation
+    history_etag_conditional_get_and_limit_clamp
+    tool_only_run_projects_terminal_honestly
+
+test result: FAILED. 0 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_t04_history`
+EXIT=101

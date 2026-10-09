@@ -13,6 +13,7 @@
 //!   restores (R02-T06; never a plain copy of the active main file).
 
 pub mod backup;
+pub mod canonical_message_store;
 pub mod migrations;
 pub mod queue;
 pub mod run_store;

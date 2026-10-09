@@ -645,6 +645,18 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
                 return RoutePolicy::Scope("chat");
             }
         }
+        // R06-T04: 统一历史读面（分页 /history 与全量 /export）——与会话读
+        // 同 scope，归属按请求重检（gate 在 handler 内先于一切实体读取）。
+        if let Some(id) = rest.strip_suffix("/history") {
+            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        if let Some(id) = rest.strip_suffix("/export") {
+            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
+                return RoutePolicy::Scope("chat");
+            }
+        }
         // Known session subtree, wrong verb/shape: local only (fail closed).
         return RoutePolicy::LocalOnly;
     }
@@ -2544,6 +2556,23 @@ mod tests {
         assert_eq!(
             classify_route("POST", "/lingxi/v1/sessions/s1/execute"),
             Scope("chat")
+        );
+        // R06-T04 统一历史读面：GET/HEAD 走 chat scope，其余动词 fail-closed。
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/sessions/s1/history"),
+            Scope("chat")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/sessions/s1/export"),
+            Scope("chat")
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/sessions/s1/history"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/sessions/s1/history/extra"),
+            LocalOnly
         );
         assert_eq!(
             classify_route("DELETE", "/lingxi/v1/sessions/s1"),

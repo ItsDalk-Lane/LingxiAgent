@@ -1,0 +1,27 @@
+$ /Users/study_superior/.cargo/bin/cargo test --locked -p lingxi-service --lib history_projection
+running 5 tests
+test history_projection::tests::unparseable_row_becomes_legacy_raw ... ok
+test history_projection::tests::fork_copy_run_association_is_unknown ... ok
+test history_projection::tests::legacy_final_content_resplit_and_unknown_fields_kept ... ok
+test history_projection::tests::terminal_honesty_with_and_without_final ... ok
+test history_projection::tests::orphan_child_merges_into_parent_group ... ok
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 361 filtered out; finished in 0.01s
+EXIT=0
+
+$ /Users/study_superior/.cargo/bin/cargo test --locked -p lingxi-service --test r06_t04_history
+running 6 tests
+test forked_copy_marks_run_association_unknown ... ok
+test tool_only_run_projects_terminal_honestly ... ok
+test a07_realtime_reopen_reconnect_export_agree ... ok
+test history_etag_conditional_get_and_limit_clamp ... ok
+test export_equals_paged_concat ... ok
+test history_cursor_validation_and_owner_isolation ... ok
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.86s
+EXIT=0
+
+# auth 路由表（新增 /history /export 断言所在套件）
+$ /Users/study_superior/.cargo/bin/cargo test --locked -p lingxi-service --lib auth::
+running 19 tests
+test auth::tests::route_policy_table ... ok
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 347 filtered out; finished in 7.92s
+EXIT=0
