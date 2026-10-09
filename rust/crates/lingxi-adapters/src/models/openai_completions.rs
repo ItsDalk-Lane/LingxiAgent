@@ -548,6 +548,29 @@ pub fn render_chat_request(
                     content: render_tool_outcome_text(outcome),
                 });
             }
+            // R06-T02: 压缩摘要是普通 user 角色历史（现役 convertToLlm 的
+            // 包装），绝不获得系统指令优先级；mid-run 时再补一条 notice
+            // user 消息（现役 MIDRUN_COMPACTION_NOTICE，逐字）。
+            ExchangeItem::CompactionSummary {
+                summary, mid_run, ..
+            } => {
+                messages.push(RequestMessage::User {
+                    content: lingxi_kernel::compaction::render_summary_message_text(summary),
+                });
+                if *mid_run {
+                    messages.push(RequestMessage::User {
+                        content: lingxi_kernel::compaction::MIDRUN_COMPACTION_NOTICE.to_string(),
+                    });
+                }
+            }
+            // R06-T02: 请求作用域的压缩指令（仅出现在摘要调用自身的
+            // prior 末尾；永不进入 run 的 live exchange——kernel planner
+            // 对携带它的交换响亮拒绝）。
+            ExchangeItem::CompactionInstruction { text } => {
+                messages.push(RequestMessage::User {
+                    content: text.clone(),
+                });
+            }
         }
     }
     let tools = input

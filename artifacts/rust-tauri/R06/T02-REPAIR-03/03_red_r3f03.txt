@@ -1,0 +1,4 @@
+$ cargo test --locked -p lingxi-service --test r06_t02_compaction report_deviation_register (旧 stray 逻辑 + 篡改自证 → 应红)
+thread 'report_deviation_register_matches_test_references' (31124250) panicked at crates/lingxi-service/tests/r06_t02_compaction.rs:2375:5:
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.08s
+CARGO_EXIT=101

@@ -101,6 +101,14 @@ fn describe_prior(input: &ModelTurnInput) -> Vec<String> {
                 };
                 format!("tool_result:{tool_call_id}:{detail}")
             }
+            // R06-T02: new exchange variants (never produced by this
+            // suite's drivers; arms exist for exhaustiveness only).
+            lingxi_kernel::model_exchange::ExchangeItem::CompactionSummary { .. } => {
+                "compaction_summary".to_string()
+            }
+            lingxi_kernel::model_exchange::ExchangeItem::CompactionInstruction { .. } => {
+                "compaction_instruction".to_string()
+            }
         })
         .collect()
 }

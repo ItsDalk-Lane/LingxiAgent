@@ -436,6 +436,38 @@ pub(crate) fn render_input_items(
                     "output": render_tool_outcome_text(outcome),
                 }));
             }
+            // R06-T02: 压缩摘要是普通 user 角色历史（现役 convertToLlm
+            // 包装），绝不获得系统指令优先级；mid-run 时再补一条 notice。
+            ExchangeItem::CompactionSummary {
+                summary, mid_run, ..
+            } => {
+                items.push(serde_json::json!({
+                    "type": "message",
+                    "role": "user",
+                    "content": [{
+                        "type": "input_text",
+                        "text": lingxi_kernel::compaction::render_summary_message_text(summary),
+                    }],
+                }));
+                if *mid_run {
+                    items.push(serde_json::json!({
+                        "type": "message",
+                        "role": "user",
+                        "content": [{
+                            "type": "input_text",
+                            "text": lingxi_kernel::compaction::MIDRUN_COMPACTION_NOTICE,
+                        }],
+                    }));
+                }
+            }
+            // R06-T02: 请求作用域的压缩指令（仅摘要调用自身的 prior 末尾）。
+            ExchangeItem::CompactionInstruction { text } => {
+                items.push(serde_json::json!({
+                    "type": "message",
+                    "role": "user",
+                    "content": [{"type": "input_text", "text": text}],
+                }));
+            }
         }
     }
     Ok(items)

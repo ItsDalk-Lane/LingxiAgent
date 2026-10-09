@@ -56,6 +56,7 @@ fn view_of(model: &Value) -> (ModelView<'static>, RouteCompatHints) {
         reasoning: model.get("reasoning").and_then(Value::as_bool),
         max_tokens: model.get("maxTokens").and_then(Value::as_u64),
         context_window: model.get("contextWindow").and_then(Value::as_u64),
+        output_cap_required: compat.get("outputCapRequired").and_then(Value::as_bool),
         quirks: model
             .get("quirks")
             .and_then(Value::as_array)

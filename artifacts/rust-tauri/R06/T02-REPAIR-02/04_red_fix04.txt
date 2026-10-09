@@ -1,0 +1,4 @@
+$ cargo test -p lingxi-service --test r06_t02_compaction --locked repair_flow_accepts（FIX-04 临时回退 sanitized.text → 红）
+thread 'repair_flow_accepts_a_fixed_summary' (30758526) panicked at crates/lingxi-service/tests/r06_t02_compaction.rs:727:5:
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.12s
+EXIT=101

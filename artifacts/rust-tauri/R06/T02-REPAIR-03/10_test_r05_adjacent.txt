@@ -1,0 +1,37 @@
+=== rustc 版本 ===
+rustc 1.98.1 (48a229cea 2026-09-01)
+=== service r05_t01_binary_wiring ===
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.98s
+
+EXIT_r05_t01=0
+=== service r05_t05_timeouts ===
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.81s
+
+EXIT_r05_t05_timeouts_service=0
+=== adapters r05_t05_timeouts ===
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+
+EXIT_r05_t05_timeouts_adapters=0
+=== adapters r05_t05_compat ===
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+EXIT_r05_t05_compat=0
+=== service r05_t08_closed_loop ===
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.54s
+
+EXIT_r05_t08_closed_loop=0
+=== service r05_t08_production_tools ===
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.05s
+
+EXIT_r05_t08_production_tools=0
+=== service r05_t08_resources ===
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 333.20s
+
+EXIT_r05_t08_resources=0

@@ -593,6 +593,31 @@ pub fn render_generate_request(
                     }));
                 }
             }
+            // R06-T02: 压缩摘要是普通 user 角色历史（现役 convertToLlm
+            // 包装），绝不获得系统指令优先级；mid-run 时再补一条 notice。
+            ExchangeItem::CompactionSummary {
+                summary, mid_run, ..
+            } => {
+                contents.push(serde_json::json!({
+                    "role": "user",
+                    "parts": [{
+                        "text": lingxi_kernel::compaction::render_summary_message_text(summary),
+                    }],
+                }));
+                if *mid_run {
+                    contents.push(serde_json::json!({
+                        "role": "user",
+                        "parts": [{"text": lingxi_kernel::compaction::MIDRUN_COMPACTION_NOTICE}],
+                    }));
+                }
+            }
+            // R06-T02: 请求作用域的压缩指令（仅摘要调用自身的 prior 末尾）。
+            ExchangeItem::CompactionInstruction { text } => {
+                contents.push(serde_json::json!({
+                    "role": "user",
+                    "parts": [{"text": text}],
+                }));
+            }
         }
     }
     let declarations: Vec<serde_json::Value> = input

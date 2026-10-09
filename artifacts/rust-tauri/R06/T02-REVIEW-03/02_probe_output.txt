@@ -1,0 +1,28 @@
+$ /Users/study_superior/.cargo/bin/cargo run（probe 项目，依赖 path 指向 rust/crates）
+rustc 1.98.1 (48a229cea 2026-09-01)
+REVIEWER-R06-T02-R3 对抗探针
+── A. fit 检查退化面
+   A OK：window=0/1/MAX 退化臂与 85% 精确边界、cap 公式地板全部符合
+── B1. kernel 对 [摘要, 保留区≥keep_recent] 仍会给出切点
+   B1 OK：plan=Some(cut=1, summarized=177)——kernel 层无护栏，护栏纯属 service 职责
+── B2. service 护栏三态（summarize 窗口=1000 强制 fit 失败）
+   B2(i) OK：旧区仅摘要 → NotTriggered（同文标记不互替）
+   B2(ii)(iii) OK：HardTruncated → 再进 NotTriggered（闭环不循环）
+── C. placeholder 恢复后 enrichment 仍追加
+   C OK：恢复×enrichment 组合成立，placeholder 意图不污染清单，台账 2 行
+── D1. outputCapRequired 配置注入三态
+   D1(i) OK：outputCapRequired=true → max_tokens=4096 上线
+   D1(ii) OK：outputCapRequired=false → 族清单兜底，线上仍无 cap 键
+── D2. summarize 路由窗口未声明 → 永远硬截断（R3-F-01 复证一）
+   D2 OK：窗口未声明 → HardTruncated、0 调用、0 台账（现役同配置走正常摘要——分叉）
+── D3. summarize 槽缺失 → Failed（R3-F-01 复证二）
+   D3 OK：槽缺失 → Failed(the summarize slot has no resolvable route (no model route c…)、0 调用、原交换不动
+── E. compact_now 两轮 fileOps 续传
+   E OK：两轮手动压缩 fileOps 续传成立（播种 ∪ 新增）
+── F1. 交叉锁鉴别力：删中间条目+引用残留 是否被捕获
+   F1 CONFIRMED GAP：『删中间条目、代码引用残留』逃逸检测——交叉锁只有 『条目→至少一次引用』与『引用 ≤ max』两方向，无『引用 ∈ 条目集合』方向
+── F2. 族矩阵独立重算 × 现役 OUTPUT_CAP_CAPABILITIES 五档对照
+   F2 OK：六档逐档一致；大小写敏感度差异记录为 informational
+ALL PROBES DONE
+PROBE_EXIT=0（输出经管道，真实退出码以直通重跑为准）
+DIRECT_EXIT=0

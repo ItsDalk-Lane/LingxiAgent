@@ -328,6 +328,12 @@ impl WorkerModelPort for GatewayWorkerModel {
                         images: Vec::new(),
                         max_output_tokens: Some(request.max_output_tokens),
                         deadline_unix_ms: request.deadline_unix_ms,
+                        // R06-T02: worker callbacks carry no session system
+                        // prompt, no live history and no tool snapshot —
+                        // only the compaction slot uses those fields.
+                        system_prompt: None,
+                        prior: Vec::new(),
+                        tools: None,
                     },
                 )
                 .await;

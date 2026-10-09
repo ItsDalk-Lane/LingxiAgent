@@ -1,0 +1,12 @@
+=== command: /Users/study_superior/.cargo/bin/cargo test --locked -p lingxi-service --test r06_t02_closed_loop
+=== cwd: /Users/study_superior/Desktop/Code/LingxiAgent/rust
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r06_t02_closed_loop.rs (target/debug/deps/r06_t02_closed_loop-d8af07afeb12e457)
+
+running 2 tests
+test a04_summary_provider_failure_keeps_the_original_history ... ok
+test a03_mid_run_compaction_lands_on_the_real_binary ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.21s
+
+=== exit_code: 0

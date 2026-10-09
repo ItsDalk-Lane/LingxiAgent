@@ -1,0 +1,6 @@
+$ cargo test -p lingxi-kernel --test r06_t02_compaction --locked => EXIT=0
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+$ cargo test -p lingxi-service --test r06_t02_compaction --locked => EXIT=0
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.71s
+$ cargo test -p lingxi-service --test r06_t02_closed_loop --locked => EXIT=0
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.27s

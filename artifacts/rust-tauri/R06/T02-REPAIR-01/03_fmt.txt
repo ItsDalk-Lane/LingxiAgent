@@ -1,0 +1,3 @@
+=== command: cd rust && cargo fmt --all -- --check
+=== （首轮 fmt --check 报 3 处排版差异；cargo fmt --all 应用后复检）
+=== fmt apply 后复检 exit_code: 0

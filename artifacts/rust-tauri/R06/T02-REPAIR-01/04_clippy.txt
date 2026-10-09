@@ -1,0 +1,3 @@
+=== command: cd rust && cargo clippy --workspace --all-targets --locked -- -D warnings
+=== exit_code: 0（Finished，无 error/warning 行）
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 31.46s

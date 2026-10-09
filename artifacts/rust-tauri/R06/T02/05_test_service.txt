@@ -1,0 +1,24 @@
+=== command: /Users/study_superior/.cargo/bin/cargo test --locked -p lingxi-service --test r06_t02_compaction
+=== cwd: /Users/study_superior/Desktop/Code/LingxiAgent/rust
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running tests/r06_t02_compaction.rs (target/debug/deps/r06_t02_compaction-fb52e0256b30352d)
+
+running 14 tests
+test below_threshold_never_calls_the_model ... ok
+test without_compaction_service_the_drive_shape_is_unchanged ... ok
+test undeclared_window_never_triggers ... ok
+test repair_exhaustion_is_a_loud_failure ... ok
+test unknown_usage_never_triggers_the_service ... ok
+test unprovable_pairs_fail_without_a_model_call ... ok
+test trigger_fires_and_compacts_through_the_real_chain ... ok
+test cancellation_during_the_summary_call_accounts_cancelled ... ok
+test capability_gate_refuses_a_toolsless_summarize_route ... ok
+test manual_compaction_skips_the_threshold_and_compacts ... ok
+test repair_flow_accepts_a_fixed_summary ... ok
+test provider_failure_keeps_the_original_exchange_and_accounts_it ... ok
+test driven_run_survives_a_failed_compaction ... ok
+test driven_run_compacts_mid_run_and_continues_with_the_summary ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.64s
+
+=== exit_code: 0

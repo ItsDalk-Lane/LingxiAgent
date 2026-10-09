@@ -1,0 +1,3 @@
+$ { git diff; git ls-files --others --exclude-standard | sort | grep -v 报告自身 | grep -v T02-REVIEW-01/ | grep -v T02-REVIEW-02/ | grep -v T02-ROOTCAUSE-01/ | grep -v T02-REPAIR-01/ | grep -v /probe/target/ | xargs shasum -a 256; } | shasum -a 256
+CANDIDATE_DIGEST=3cabcb4647fe1d53d68f330ee0df6ed85b8602a0aa564d066c963f00dbac5023
+计算时点：全部文件写完之后、证据归档完成之后（本文件自身在口径内，故 digest 随本文件落盘而成立——报告自身被排除）。

@@ -1,0 +1,61 @@
+=== rustc 版本 ===
+rustc 1.98.1 (48a229cea 2026-09-01)
+=== 命令 ===
+cd rust && cargo test --locked -p lingxi-service --test r06_t02_compaction
+
+running 26 tests
+test report_deviation_register_matches_test_references ... FAILED
+test unprovable_pairs_fail_without_a_model_call ... ok
+test without_compaction_service_the_drive_shape_is_unchanged ... ok
+test repair_flow_accepts_a_fixed_summary ... ok
+test capability_gate_refuses_a_toolsless_summarize_route ... ok
+test missing_summarize_slot_falls_back_to_the_chat_route ... ok
+test below_threshold_never_calls_the_model ... ok
+test manual_compaction_skips_the_threshold_and_compacts ... ok
+test trigger_fires_and_compacts_through_the_real_chain ... ok
+test file_ops_sections_ride_the_compacted_summary ... ok
+test hard_truncate_no_progress_guard_skips_when_only_summaries_remain ... ok
+test undeclared_summarize_window_falls_back_to_the_chat_window_not_hard_truncation ... ok
+test placeholder_recovery_answers_a_single_tool_intent_and_compacts ... ok
+test multiple_tool_calls_in_one_turn_fail_loudly ... ok
+test repair_exhaustion_is_a_loud_failure ... ok
+test cancellation_during_the_summary_call_accounts_cancelled ... ok
+test unresolvable_summarize_slot_and_chat_route_fail_loudly ... ok
+test undeclared_window_never_triggers ... ok
+test provider_failure_keeps_the_original_exchange_and_accounts_it ... ok
+test over_window_summary_request_hard_truncates_without_a_model_call ... ok
+test unknown_usage_never_triggers_the_service ... ok
+test second_tool_intent_after_recovery_fails_loudly ... ok
+test required_cap_family_backfills_min_of_declared_caps_on_the_wire ... ok
+test driven_run_survives_a_failed_compaction ... ok
+test driven_run_compacts_mid_run_and_continues_with_the_summary ... ok
+test failed_turn_usage_never_triggers_compaction ... ok
+
+failures:
+
+---- report_deviation_register_matches_test_references stdout ----
+
+thread 'report_deviation_register_matches_test_references' (31144461) panicked at crates/lingxi-service/tests/r06_t02_compaction.rs:2378:5:
+register lock violated:
+code references unknown §十 entries: [17]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    report_deviation_register_matches_test_references
+
+test result: FAILED. 25 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.68s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_t02_compaction`
+CARGO_EXIT=101
+
+=== 附注（修复者）===
+- 三个 R3-F-01 新回归测试全部转绿：
+  missing_summarize_slot_falls_back_to_the_chat_route ... ok
+  undeclared_summarize_window_falls_back_to_the_chat_window_not_hard_truncation ... ok
+  unresolvable_summarize_slot_and_chat_route_fail_loudly ... ok
+  其余 22 个既有测试全绿（R3-F-01 实现未造成任何回归）。
+- 唯一红 = report_deviation_register_matches_test_references：
+  强化后的交叉锁（R3-F-03）正确抓到真实仓库状态——新代码注释引用了
+  §十#17，而报告 §十 当时只有 16 条（引用∉条目集合即红，正是 R3-F-03
+  要求的鉴别力）。报告 §十#17 落盘后该测试自然转绿（见 06/07 号证据）。

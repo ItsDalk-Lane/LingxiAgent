@@ -1,0 +1,16 @@
+$ cargo test --locked -p lingxi-service --test r06_t02_compaction <name> (修复前→应红; 退出码经 pipestatus[1] 取 cargo 本人)
+== missing_summarize_slot_falls_back_to_the_chat_route ==
+thread 'missing_summarize_slot_falls_back_to_the_chat_route' (31120804) panicked at crates/lingxi-service/tests/r06_t02_compaction.rs:2011:9:
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.06s
+error: test failed, to rerun pass `-p lingxi-service --test r06_t02_compaction`
+CARGO_EXIT=101
+== undeclared_summarize_window_falls_back_to_the_chat_window_not_hard_truncation ==
+thread 'undeclared_summarize_window_falls_back_to_the_chat_window_not_hard_truncation' (31120838) panicked at crates/lingxi-service/tests/r06_t02_compaction.rs:2070:9:
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.06s
+error: test failed, to rerun pass `-p lingxi-service --test r06_t02_compaction`
+CARGO_EXIT=101
+== unresolvable_summarize_slot_and_chat_route_fail_loudly ==
+thread 'unresolvable_summarize_slot_and_chat_route_fail_loudly' (31120867) panicked at crates/lingxi-service/tests/r06_t02_compaction.rs:2132:5:
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.06s
+error: test failed, to rerun pass `-p lingxi-service --test r06_t02_compaction`
+CARGO_EXIT=101

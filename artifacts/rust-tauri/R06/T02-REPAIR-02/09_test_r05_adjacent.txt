@@ -1,0 +1,24 @@
+$ cargo test --locked -p lingxi-service --test r05_t01_binary_wiring
+EXIT=0
+
+$ cargo test --locked -p lingxi-service --test r05_t05_timeouts
+EXIT=0
+
+$ cargo test --locked -p lingxi-adapters --test r05_t05_timeouts
+EXIT=0
+
+$ cargo test --locked -p lingxi-adapters --test r05_t05_compat
+EXIT=0
+
+$ cargo test --locked -p lingxi-service --test r05_t08_closed_loop
+EXIT=0
+
+$ cargo test --locked -p lingxi-service --test r05_t08_production_tools
+EXIT=0
+
+$ cargo test --locked -p lingxi-service --test r05_t08_resources
+EXIT=0
+
+$ cargo test --locked -p lingxi-service --test cancellation_tree  （全量首轮单点失败后的单独重跑）
+EXIT=0
+

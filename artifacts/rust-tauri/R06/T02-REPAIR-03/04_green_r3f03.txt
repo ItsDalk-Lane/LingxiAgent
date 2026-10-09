@@ -1,0 +1,9 @@
+$ cargo test --locked -p lingxi-service --test r06_t02_compaction report_deviation_register (修复 stray=∉条目集合 → 应绿)
+thread 'report_deviation_register_matches_test_references' (31125958) panicked at crates/lingxi-service/tests/r06_t02_compaction.rs:2378:5:
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.08s
+CARGO_EXIT=101
+
+== 附注：本轮“应绿”运行实际红在真实检查臂 ==
+强化后的双向锁先抓到真实仓库状态：代码面（三个新测试注释）已引用 §十#17，
+而报告 §十 尚只有 16 条 → "code references unknown §十 entries: [17]"。
+这正是修复后的预期鉴别力（新增条目必须先落报告）。报告 §十#17 落盘后本测试转绿。

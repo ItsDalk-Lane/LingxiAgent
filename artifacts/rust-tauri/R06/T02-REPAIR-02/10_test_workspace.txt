@@ -1,0 +1,5 @@
+$ cargo test --workspace --locked（首轮，2026-10-09 04:0x 起跑）
+结果：EXIT=101——R03 既有目标 cancellation_tree::r03_a06_cancel_parent_spares_unrelated_background 单点失败（45 个目标 ok / 941 passed / 1 failed）；该目标单独重跑 8/8 绿（见 09_test_r05_adjacent.txt 末节），判定为时序/环境压力（与 R1 轮 r04_rr1_f05_spill_failure 同型），非本任务改动面。
+
+$ cargo test --workspace --locked（全量重跑）
+结果：EXIT=0——122 个 test target 全部 ok，1609 passed / 0 failed / 0 ignored。

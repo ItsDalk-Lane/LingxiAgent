@@ -1,0 +1,4 @@
+=== command: cd rust && cargo test --locked -p lingxi-adapters --test r06_t02_compaction_render
+=== exit_code: 0
+running 11 tests
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

@@ -1,0 +1,16 @@
+=== rustc 版本 ===
+rustc 1.98.1 (48a229cea 2026-09-01)
+=== cargo test -p lingxi-service --locked --test r05_t01_binary_wiring ===
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.90s
+=== cargo test -p lingxi-service --locked --test r05_t05_timeouts ===
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.80s
+=== cargo test -p lingxi-adapters --locked --test r05_t05_timeouts ===
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s
+=== cargo test -p lingxi-adapters --locked --test r05_t05_compat ===
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+=== cargo test -p lingxi-service --locked --test r05_t08_closed_loop ===
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.51s
+=== cargo test -p lingxi-service --locked --test r05_t08_production_tools ===
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.30s
+=== cargo test -p lingxi-service --locked --test r05_t08_resources ===
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 334.13s

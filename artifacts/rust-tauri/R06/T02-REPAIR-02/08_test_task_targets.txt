@@ -1,0 +1,12 @@
+$ cargo test --locked -p lingxi-kernel --test r06_t02_compaction
+EXIT=0
+
+$ cargo test --locked -p lingxi-adapters --test r06_t02_compaction_render
+EXIT=0
+
+$ cargo test --locked -p lingxi-service --test r06_t02_compaction
+EXIT=0
+
+$ cargo test --locked -p lingxi-service --test r06_t02_closed_loop
+EXIT=0
+

@@ -590,6 +590,16 @@ pub struct RunSupervisor {
     /// no second prompt reconstruction). `None` (the no-compiler test
     /// wiring) keeps the pre-R06 shape exactly (`system_prompt: None`).
     context_compiler: Option<Arc<crate::context_compiler::ContextCompilerService>>,
+    /// R06-T02: the mid-run compaction service. When `Some`, every turn
+    /// boundary runs the incumbent trigger evaluation (real usage + tail
+    /// estimate against the chat route's declared window; FORCE 80% /
+    /// reserve line) and, on FIRE, compacts the live exchange through the
+    /// Summarize auxiliary slot (cache-preserving request shape). A
+    /// compaction failure NEVER interrupts the run — the original
+    /// exchange continues (the incumbent "compaction never throws"
+    /// semantics) with a loud ledger row + warn. `None` (test wiring)
+    /// keeps the pre-R06-T02 shape exactly.
+    compaction: Option<Arc<crate::compaction::CompactionService>>,
 }
 
 impl std::fmt::Debug for RunSupervisor {
@@ -614,6 +624,7 @@ impl std::fmt::Debug for RunSupervisor {
                 "context_compiler",
                 &self.context_compiler.as_ref().map(|_| "bound"),
             )
+            .field("compaction", &self.compaction.as_ref().map(|_| "bound"))
             .finish()
     }
 }
@@ -643,6 +654,7 @@ impl RunSupervisor {
             stream_idle_timeout: Duration::from_millis(DEFAULT_STREAM_IDLE_TIMEOUT_MS),
             model_call_tuning: ModelCallTuning::default(),
             context_compiler: None,
+            compaction: None,
         }
     }
 
@@ -681,6 +693,7 @@ impl RunSupervisor {
             stream_idle_timeout: Duration::from_millis(DEFAULT_STREAM_IDLE_TIMEOUT_MS),
             model_call_tuning: ModelCallTuning::default(),
             context_compiler: None,
+            compaction: None,
         })
     }
 
@@ -724,6 +737,19 @@ impl RunSupervisor {
         compiler: Option<Arc<crate::context_compiler::ContextCompilerService>>,
     ) -> Self {
         self.context_compiler = compiler;
+        self
+    }
+
+    /// R06-T02: binds the mid-run compaction service (builder-style; the
+    /// composition root calls this after [`Self::new`]). Binding it makes
+    /// every driven run's turn boundary run the incumbent trigger
+    /// evaluation; `None` keeps the pre-R06-T02 shape exactly (no
+    /// compaction check at all).
+    pub fn with_compaction(
+        mut self,
+        compaction: Option<Arc<crate::compaction::CompactionService>>,
+    ) -> Self {
+        self.compaction = compaction;
         self
     }
 
@@ -1114,6 +1140,16 @@ impl RunSupervisor {
         // never a re-executed write); only the failed model call itself
         // leaves no assistant turn behind.
         let mut exchange: Vec<ExchangeItem> = Vec::new();
+        // R06-T02: the mid-run compaction trigger state (the incumbent
+        // `session-compaction-runtime` facts). `last_turn_usage` = the last
+        // RESOLVED model call's real usage (the trigger's primary signal —
+        // never an estimate; `None` after a successful compaction mirrors
+        // the incumbent retrigger guard). `tail_from` = the exchange index
+        // right after the last assistant turn — the tool results beyond it
+        // are the tail that entered the context AFTER that usage fact.
+        let mut last_turn_usage: Option<lingxi_kernel::usage::ModelCallUsage> = None;
+        let mut tail_from: usize = 0;
+        let mut compaction_seq: u32 = 0;
         // R05-T07: the run's ledger context — parentage is a creation fact
         // from the authorization's lineage, captured ONCE (never guessed
         // from wall-clock proximity).
@@ -1223,6 +1259,98 @@ impl RunSupervisor {
                 }
                 None => lingxi_kernel::model_exchange::ToolDeclarationSnapshot::empty(),
             };
+            // R06-T02: the mid-run compaction check at the turn boundary
+            // (the incumbent `compactIfNeeded` position: after the tool
+            // snapshot exists — the compaction request carries it — and
+            // before the call budget opens). Trigger = the incumbent
+            // FORCE/reserve lines on the REAL last-call usage plus the
+            // tail estimate; a successful compaction REPLACES the live
+            // exchange with [summary item] + retained suffix (the summary
+            // rides as ordinary user-role history, never as a system
+            // instruction) and resets the retrigger guard; a failure keeps
+            // the original exchange and the run continues (the incumbent
+            // "compaction never throws" semantics — the loud ledger row
+            // and warn already landed inside the service).
+            if let Some(compaction) = self.compaction.clone() {
+                match compaction
+                    .maybe_compact_mid_run(
+                        &ctx,
+                        port,
+                        agent_id,
+                        usage_ledger.origin,
+                        usage_ledger.parent_run_id.clone(),
+                        usage_ledger.cause_ref.clone(),
+                        &crate::compaction::MidRunCompactionInput {
+                            exchange: &exchange,
+                            system_prompt: system_prompt.as_deref(),
+                            submission: &submission,
+                            tools: &tool_snapshot,
+                            last_usage: last_turn_usage.as_ref(),
+                            tail_from,
+                        },
+                        &root,
+                        compaction_seq,
+                    )
+                    .await?
+                {
+                    crate::compaction::CompactionOutcome::Compacted {
+                        exchange: compacted,
+                        plan,
+                        report,
+                    } => {
+                        tracing::info!(
+                            run_id = %run_id,
+                            turn,
+                            cut_index = plan.cut_index,
+                            summarized_tokens = plan.summarized_tokens,
+                            retained_tokens = plan.retained_tokens,
+                            context_tokens = report.context_tokens,
+                            context_window = report.context_window,
+                            "mid-run compaction applied"
+                        );
+                        exchange = compacted;
+                        // The incumbent retrigger guard holds WITHOUT
+                        // clearing `last_turn_usage` here: the next read at
+                        // this checkpoint only ever sees the usage of a
+                        // call that settled AFTER the compaction (every
+                        // path from here re-assigns it at settle time), so
+                        // the pre-compaction usage can never re-fire.
+                        tail_from = exchange.len();
+                        compaction_seq += 1;
+                    }
+                    crate::compaction::CompactionOutcome::HardTruncated {
+                        exchange: truncated,
+                        plan,
+                        report,
+                    } => {
+                        // 现役硬截断兜底（摘要请求自身超窗）：与 Compacted
+                        // 同一驱动动作，但显式标注降级——产物摘要是标记
+                        // 文本，不是模型摘要。
+                        tracing::warn!(
+                            run_id = %run_id,
+                            turn,
+                            cut_index = plan.cut_index,
+                            summarized_tokens = plan.summarized_tokens,
+                            retained_tokens = plan.retained_tokens,
+                            context_tokens = report.context_tokens,
+                            context_window = report.context_window,
+                            "mid-run compaction DEGRADED to honest hard-truncation \
+                             (the summarize request would exceed the summary model window)"
+                        );
+                        exchange = truncated;
+                        tail_from = exchange.len();
+                        compaction_seq += 1;
+                    }
+                    crate::compaction::CompactionOutcome::Failed { .. }
+                    | crate::compaction::CompactionOutcome::NotTriggered => {}
+                    crate::compaction::CompactionOutcome::Cancelled => {
+                        // The cancellation won mid-compaction — the next
+                        // loop-top gate settles the run through the ONE
+                        // cancellation path (no second settle shape here).
+                        continue 'turns;
+                    }
+                }
+            }
             // R05-T05: establish the call's deadline once (see the
             // `call_deadline` declaration); a retrying iteration reuses the
             // shared deadline.
@@ -1651,6 +1779,19 @@ impl RunSupervisor {
             // visible answer text AFTER normalization (F13); anything else
             // (tools / process-only / failure) closes the text segment as
             // `unresolved`, never a guessed final_answer.
+            //
+            // R06-T02: the compaction trigger's primary signal — the last
+            // RESOLVED call's real usage. Unknown/Invalid stays `None`
+            // (the incumbent `!message.usage → no trigger` door; an
+            // estimate never substitutes).
+            // R06-T02 FIX-08（N-2）：现役触发门 `stopReason∉{error,aborted}`
+            // ——失败 turn 的 Known usage 不捕获（失败调用的 usage 不触发
+            // 压缩；aborted 臂在 Rust 由取消面结算，到不了这里）。
+            last_turn_usage = match (&provider_result.turn, &provider_result.usage_report) {
+                (lingxi_kernel::ports::ProviderTurn::Failed { .. }, _) => None,
+                (_, lingxi_kernel::usage::ReportedUsage::Known(usage)) => Some(usage.clone()),
+                _ => None,
+            };
             let provider_turn = provider_result.turn;
             let normalized_final = match &provider_turn {
                 lingxi_kernel::ports::ProviderTurn::Final { message } => {
@@ -1846,6 +1987,10 @@ impl RunSupervisor {
                         // route identity.
                         origin: turn_origin_of(&usage_facts),
                     });
+                    // R06-T02: the tail of the compaction trigger restarts
+                    // after every assistant turn — only the tool results
+                    // beyond this point count as post-usage context.
+                    tail_from = exchange.len();
                     self.persist_model_call_completed(
                         port,
                         events,
@@ -3200,6 +3345,9 @@ impl RunSupervisor {
                         tool_calls: Vec::new(),
                         origin: turn_origin_of(&usage_facts),
                     });
+                    // R06-T02: the tail of the compaction trigger restarts
+                    // after every assistant turn (a process-only turn too).
+                    tail_from = exchange.len();
                     self.persist_model_call_completed(
                         port,
                         events,

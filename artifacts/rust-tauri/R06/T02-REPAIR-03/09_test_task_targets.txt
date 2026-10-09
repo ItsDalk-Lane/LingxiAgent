@@ -1,0 +1,29 @@
+=== rustc 版本 ===
+rustc 1.98.1 (48a229cea 2026-09-01)
+=== kernel r06_t02_compaction ===
+test planner_never_orphans_in_either_direction ... ok
+
+test result: ok. 44 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+EXIT_kernel=0
+=== adapters r06_t02_compaction_render ===
+test output_cap_key_set_matches_the_incumbent_family_split ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+EXIT_adapters=0
+=== service r06_t02_compaction ===
+test driven_run_compacts_mid_run_and_continues_with_the_summary ... ok
+test driven_run_survives_a_failed_compaction ... ok
+test failed_turn_usage_never_triggers_compaction ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.37s
+
+EXIT_service=0
+=== service r06_t02_closed_loop ===
+test a03_mid_run_compaction_lands_on_the_real_binary ... ok
+test a04_summary_provider_failure_keeps_the_original_history ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.24s
+
+EXIT_closed_loop=0

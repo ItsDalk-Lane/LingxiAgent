@@ -1,0 +1,12 @@
+$ cargo test -p lingxi-service --test r06_t02_compaction --locked failed_turn_usage（FIX-08 触发门临时回退 → 红）
+（首次夹具 3 项不可切[crossing=0] 无法区分——夹具修正为 4 项后红才成立，该迭代本身记录了夹具鉴别力的验证过程）
+---- failed_turn_usage_never_triggers_compaction stdout ----
+
+thread 'failed_turn_usage_never_triggers_compaction' (30764968) panicked at crates/lingxi-service/tests/r06_t02_compaction.rs:2001:9:
+prior #5 carries no summary item: ["compaction_summary", "assistant", "assistant", "assistant"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    failed_turn_usage_never_triggers_compaction
+EXIT=101

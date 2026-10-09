@@ -1,0 +1,40 @@
+=== command: /Users/study_superior/.cargo/bin/cargo test --locked -p lingxi-kernel --test r06_t02_compaction
+=== cwd: /Users/study_superior/Desktop/Code/LingxiAgent/rust
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running tests/r06_t02_compaction.rs (target/debug/deps/r06_t02_compaction-5e7df8e9c4417dcb)
+
+running 30 tests
+test below_threshold_is_silent ... ok
+test cache_components_count_toward_usage_total ... ok
+test force_line_at_eighty_percent_of_large_window ... ok
+test budget_report_accounts_every_component ... ok
+test instruction_carries_incumbent_format_and_no_tool_rule ... ok
+test repair_instruction_names_issues_and_carries_draft ... ok
+test reserve_floor_and_proportional_ratio ... ok
+test reserve_line_fires_before_eighty_percent_on_small_windows ... ok
+test sanitize_collapses_blank_line_runs ... ok
+test summary_output_cap_follows_the_incumbent_reserve_formula ... ok
+test summary_wrapper_and_notice_are_the_incumbent_texts ... ok
+test tail_tool_results_since_last_usage_count_toward_trigger ... ok
+test planner_no_beneficial_cut_returns_none ... ok
+test undeclared_or_zero_window_is_unavailable ... ok
+test exchange_estimate_counts_blocks_calls_and_results ... ok
+test sanitize_flags_unmatched_narration_tags ... ok
+test unknown_usage_never_triggers ... ok
+test sanitize_strips_closed_narration_blocks ... ok
+test validate_accepts_the_golden_summary ... ok
+test validate_rejects_empty_summary ... ok
+test planner_unprovable_pairs_fail_loudly ... ok
+test validate_rejects_missing_and_misordered_headings ... ok
+test zero_usage_never_triggers ... ok
+test planner_keep_recent_one_keeps_only_the_last_group ... ok
+test planner_previous_summary_is_a_valid_cut_boundary ... ok
+test planner_never_orphans_in_either_direction ... ok
+test apply_plan_replaces_old_region_with_one_summary_item ... ok
+test planner_pending_tail_is_always_retained ... ok
+test planner_cut_never_lands_on_a_tool_result ... ok
+test planner_cut_respects_keep_recent_budget ... ok
+
+test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+=== exit_code: 0

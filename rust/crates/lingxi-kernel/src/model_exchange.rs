@@ -299,6 +299,31 @@ pub enum ExchangeItem {
         provider_call_id: Option<String>,
         outcome: ToolOutcome,
     },
+    /// R06-T02: a compaction checkpoint — the model-generated summary that
+    /// REPLACES the exchange items before it in the model-facing history.
+    /// The original records stay authoritative in the run's durable event
+    /// log; this item is a model-facing PROJECTION, rendered by every
+    /// family as a plain USER-role message (the incumbent `convertToLlm`
+    /// `compactionSummary` shape) — never a system slot, never a new
+    /// instruction authority.
+    CompactionSummary {
+        /// The validated, sanitized checkpoint text (the nine-heading
+        /// structured format; see [`crate::compaction`]).
+        summary: String,
+        /// How many exchange items this summary replaced (auditability).
+        covered_items: u32,
+        /// Whether the mid-run notice rides along (the incumbent appends
+        /// `MIDRUN_COMPACTION_NOTICE` after an in-task compaction so the
+        /// model keeps working instead of pausing for confirmation).
+        mid_run: bool,
+    },
+    /// R06-T02: the compaction INSTRUCTION — the final user message of a
+    /// summarize-slot auxiliary request (host-minted, never model output,
+    /// never pushed into a run's live exchange). It exists as an exchange
+    /// item so the cache-preserving request shape [system, submission,
+    /// ...exchange, instruction] flows through the ONE typed rendering
+    /// contract; every family renders it as a plain USER-role message.
+    CompactionInstruction { text: String },
 }
 
 /// The typed input of ONE model turn (R05-T01): what

@@ -1,0 +1,23 @@
+=== R2-F-02 复现：enrichment 段族 grep（应零命中） ===
+rust/crates/lingxi-kernel/src/context.rs:1177:const SKILL_USAGE_ZH: &str = "\n## 技能使用纪律\n\n用户点名（[Use skill: …]）或任务匹配目录描述时，先用 read 读完 SKILL.md；按其要求读完必读附属文件再执行对应步骤，不委派 subagent 代读或解释。\n多步骤/子技能执行前用 todo_write 建清单，逐项完成即标 completed；按需工具遵循上述调用协议。压缩后继续遵守 <skill-recall>，需全文时按 Path 重读。";
+rust/crates/lingxi-kernel/src/context.rs:1179:const SKILL_USAGE_EN: &str = "\n## Skill Usage Discipline\n\nWhen the user names a skill ([Use skill: …]) or a task matches a catalog description, read the full SKILL.md with read first; finish any required companion files it names before executing those steps. Never delegate reading or interpreting skill instructions to a subagent.\nBefore multi-step or sub-skill work, create a todo_write list and mark each item completed as it finishes; deferred tools follow the calling protocol above. After compaction, keep honoring <skill-recall> and re-read the listed Path for full text.";
+exit=0（1=零命中，复现确认）
+
+=== R2-F-05 复现：split-turn scope 行 grep（应零命中） ===
+exit=1（1=零命中，复现确认）
+
+=== R2-F-01 复现：service 恒发 Some（4 处构造点） ===
+337:        let max_output_tokens = compaction::summary_output_cap(budget.reserve_tokens);
+375:        let request = self.summary_request(input, max_output_tokens, prior.clone());
+423:                    self.summary_request(input, max_output_tokens, prior.clone());
+485:                let repair_request = self.summary_request(input, max_output_tokens, prior);
+543:        max_output_tokens: u32,
+549:            max_output_tokens: Some(max_output_tokens),
+
+=== R2-F-04 复现：repair 载荷用 sanitized（L470/477） ===
+459:        match compaction::validate_summary(&sanitized.text, &sanitized.unmatched) {
+462:                    compaction::apply_plan(input.exchange, &plan, sanitized.text, mid_run);
+470:                let repair = compaction::build_repair_instruction(&issues, &sanitized.text);
+477:                        text: sanitized.text.clone(),
+495:                        match compaction::validate_summary(&sanitized.text, &sanitized.unmatched) {
+500:                                    sanitized.text,

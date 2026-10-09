@@ -1,0 +1,24 @@
+=== rustc 版本 ===
+rustc 1.98.1 (48a229cea 2026-09-01)
+=== 命令 ===
+/Users/study_superior/.cargo/bin/cargo run --release（探针 crate 位于 T02-REVIEW-04/probe/，path 依赖 rust/ 四 crate）
+=== 输出 ===
+    Finished `release` profile [optimized] target(s) in 0.09s
+     Running `target/release/r06-t02-r4-probe`
+REVIEWER-R06-T02-R4 对抗探针
+── P1. 无 summarize 槽 × chat 窗口 1000：回退后 fit 仍不足 → HardTruncated
+   P1 OK：回退链接手后窗口仍不足 → 诚实硬截断，0 调用 0 台账
+── P2. placeholder 恢复 × 回退链（两发都走 chat 路由）
+   P2 OK：恢复×回退成立——两发 chat-model、placeholder 逐字、台账 2 行随行
+── P3. 自动路径 × chat/summarize 双缺 → NotTriggered（入口门）
+   P3 OK：自动路径双缺在触发门即 NotTriggered——双缺 Failed 臂仅手动路径可达
+── P4. 手动 compact_now × 无槽 × chat 窗口未声明 → HardTruncated
+   P4 OK：手动 × 回退 × 窗口未声明 → HardTruncated、mid_run=false、0 调用
+── P5. 手动两轮 × 回退路由：fileOps 续传（播种 ∪ 新增）
+   P5 OK：回退路由上 fileOps 跨纪元续传成立（播种 ∪ 新增），两发 chat-model
+── P6. 修复臂 × 回退路由（repair 调用点也透传生效路由）
+   P6 OK：修复臂 × 回退链——两发 chat-model、repair 载荷 = 当轮原始文本
+── P7. 交叉锁鉴别力边界：正文稀释不在锁的契约内
+   P7 CONFIRMED（informational）：交叉锁契约 = 锚定存在性；正文保真依赖 抽查与本类人工审查，非机器门禁缺口
+ALL PROBES DONE
+PROBE_EXIT=0

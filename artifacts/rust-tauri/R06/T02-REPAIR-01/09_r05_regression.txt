@@ -1,0 +1,19 @@
+=== R05 邻接面回归（逐目标命令 cargo test --locked -p <crate> --test <target>，exit 全 0）
+--- /tmp/r05_r05_t01_binary_wiring.lingxi-service.log
+     Running tests/r05_t01_binary_wiring.rs (target/debug/deps/r05_t01_binary_wiring-accb1ca8bb78e736)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.84s
+--- /tmp/r05_r05_t05_timeouts.lingxi-service.log
+     Running tests/r05_t05_timeouts.rs (target/debug/deps/r05_t05_timeouts-fb063e2c714df376)
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.88s
+--- /tmp/r05_r05_t05_timeouts.lingxi-adapters.log
+     Running tests/r05_t05_timeouts.rs (target/debug/deps/r05_t05_timeouts-524bff1312d5bf4d)
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.51s
+--- /tmp/r05_r05_t08_closed_loop.lingxi-service.log
+     Running tests/r05_t08_closed_loop.rs (target/debug/deps/r05_t08_closed_loop-39f0f7c09e62674b)
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.77s
+--- /tmp/r05_r05_t08_production_tools.lingxi-service.log
+     Running tests/r05_t08_production_tools.rs (target/debug/deps/r05_t08_production_tools-77f8e8539c0a9a3b)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.35s
+--- /tmp/r05_r05_t08_resources.lingxi-service.log
+     Running tests/r05_t08_resources.rs (target/debug/deps/r05_t08_resources-f66968a3ba499b0b)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 334.62s

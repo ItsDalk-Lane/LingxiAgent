@@ -1,0 +1,5 @@
+$ cargo fmt --all -- --check（报告与证据全部落盘后的最终复检）
+EXIT=0
+$ cargo test --locked -p lingxi-service --test r06_t02_compaction（最终复检，含交叉锁）
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+EXIT=0

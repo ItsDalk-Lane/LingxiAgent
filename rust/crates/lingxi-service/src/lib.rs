@@ -27,6 +27,7 @@ pub mod artifactverify;
 pub mod auth;
 pub mod background;
 pub mod cancel;
+pub mod compaction;
 pub mod config;
 pub mod context_compiler;
 pub mod credentials;
@@ -668,6 +669,13 @@ pub struct ServiceDeps {
     /// endpoint (one build result — R06-A01). `None` keeps the pre-R06
     /// shape exactly (`system_prompt: None`, observation endpoint 404s).
     pub context_compiler: Option<std::sync::Arc<context_compiler::ContextCompilerService>>,
+    /// The mid-run compaction service (R06-T02): when bound, every driven
+    /// run's turn boundary runs the incumbent trigger evaluation and, on
+    /// FIRE, compacts the live exchange through the Summarize auxiliary
+    /// slot (cache-preserving request shape; failure keeps the original
+    /// exchange and the run continues). `None` keeps the pre-R06-T02
+    /// shape exactly (no compaction check at all).
+    pub compaction_service: Option<std::sync::Arc<compaction::CompactionService>>,
 }
 
 /// The formal tool plane's shared handles (R05 RR1 F24): what the real
@@ -715,6 +723,7 @@ impl Default for ServiceDeps {
             worker_model: None,
             worker_tool_registration: None,
             context_compiler: None,
+            compaction_service: None,
         }
     }
 }
@@ -780,6 +789,10 @@ impl std::fmt::Debug for ServiceDeps {
             .field(
                 "context_compiler",
                 &self.context_compiler.as_ref().map(|_| "bound"),
+            )
+            .field(
+                "compaction_service",
+                &self.compaction_service.as_ref().map(|_| "bound"),
             )
             .finish()
     }
@@ -1256,6 +1269,57 @@ impl ServiceState {
             Some(timeout) => runs.with_stream_idle_timeout(timeout),
             None => runs,
         };
+        // R06-T02: the mid-run compaction service. An injected service
+        // always wins (the test-seam rule); otherwise, when the real model
+        // chain was wired, build the production instance over the SAME
+        // gateway/credential/network plane (the Summarize auxiliary slot
+        // resolves through the one ModelGateway — C07) and the SAME quota
+        // manager as the chat loop (C06). Without a real model chain there
+        // is no compaction at all (the pre-R06-T02 shape).
+        let compaction_service = match deps.compaction_service.clone() {
+            Some(injected) => Some(injected),
+            None if wired_real_model_chain => {
+                let gateway = deps.model_gateway.clone().ok_or_else(|| {
+                    ServiceStartupError::Storage(StorageError::InvalidRequest {
+                        detail: "the real model chain was wired without a model gateway"
+                            .to_string(),
+                    })
+                })?;
+                let credential_service = deps.credential_service.clone().ok_or_else(|| {
+                    ServiceStartupError::Storage(StorageError::InvalidRequest {
+                        detail: "the real model chain was wired without a credential service"
+                            .to_string(),
+                    })
+                })?;
+                let executor =
+                    lingxi_adapters::models::auxiliary::AuxiliaryExecutor::new_with_network(
+                        Arc::clone(&gateway),
+                        credential_service
+                            as Arc<
+                                dyn lingxi_adapters::models::credentials::ProviderCredentialPort,
+                            >,
+                        lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                        deps.network_plane.clone().unwrap_or_else(
+                            lingxi_adapters::models::network::NetworkPlane::direct_isolated,
+                        ),
+                    )
+                    .map_err(|err| {
+                        ServiceStartupError::Storage(StorageError::InvalidRequest {
+                            detail: format!(
+                                "cannot construct the compaction auxiliary executor: {err}"
+                            ),
+                        })
+                    })?;
+                Some(std::sync::Arc::new(compaction::CompactionService::new(
+                    std::sync::Arc::new(executor),
+                    gateway,
+                    runs.quotas_shared(),
+                    deps.clock.clone(),
+                )))
+            }
+            None => None,
+        };
+        let runs = runs.with_compaction(compaction_service);
         // R06-T01: the session-scoped context compiler — when wired, EVERY
         // driven run's system text is its artifact's render and the
         // observation endpoint serves the SAME artifact (R06-A01); `None`

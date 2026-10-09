@@ -1,0 +1,23 @@
+=== command: /Users/study_superior/.cargo/bin/cargo test --locked -p lingxi-adapters --test r06_t02_compaction_render
+=== cwd: /Users/study_superior/Desktop/Code/LingxiAgent/rust
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.14s
+     Running tests/r06_t02_compaction_render.rs (target/debug/deps/r06_t02_compaction_render-d0a10b4e2918a205)
+
+running 11 tests
+test anthropic_compacted_exchange_pairs_every_tool_result ... ok
+test openai_no_notice_when_not_mid_run ... ok
+test anthropic_summary_notice_and_instruction_are_user_turns ... ok
+test codex_inherits_the_summary_rendering ... ok
+test responses_summary_notice_and_instruction_are_input_messages ... ok
+test google_compacted_exchange_pairs_every_function_response ... ok
+test google_summary_notice_and_instruction_are_user_parts ... ok
+test openai_compacted_exchange_has_no_orphan_tool_messages ... ok
+test openai_summary_notice_and_instruction_are_user_messages ... ok
+test responses_compacted_exchange_pairs_every_call_output ... ok
+test summary_never_enters_any_system_slot ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+=== exit_code: 0

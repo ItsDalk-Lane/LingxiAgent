@@ -1,0 +1,12 @@
+=== command: /Users/study_superior/.cargo/bin/cargo run --quiet
+=== cwd: /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/T02-REVIEW-01/probe
+probe1: cut_index = 1
+probe1: ORPHANED tool result tc0001 lands in the RETAINED region (its owner is summarized away)
+probe1: summarized items = ["A:mc0001"]
+probe1: kept items = ["A:mc0002", "R:tc0001", "A:mc0003", "R:tc0003"]
+probe1 verdict: VULNERABLE
+probe2: rust context_tokens = Some(130500), incumbent-equivalent = 100500
+probe2 verdict: DOUBLE-COUNTS cache_read
+probe3: second compaction REFUSED as unprovable: tool result tc0001 has no owning assistant turn in this exchange
+probe3 verdict: ORPHAN POISONS ALL FUTURE COMPACTIONS
+=== exit_code: 0

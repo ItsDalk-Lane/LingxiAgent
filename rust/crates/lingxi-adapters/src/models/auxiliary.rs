@@ -11,8 +11,12 @@
 //! - an unconfigured slot is a loud failure at route resolution (no
 //!   fallback onto the chat route — the fail-closed approval/guard
 //!   posture holds by construction);
-//! - a `ToolRequests` turn is a protocol anomaly here (the call declared
-//!   NO tools): it fails loudly, the calls are never executed;
+//! - a `ToolRequests` turn never executes anything: on the single-turn
+//!   text contract ([`AuxiliaryExecutor::complete`]) it fails loudly with
+//!   a message that names whether the request declared tools; slots with
+//!   an incumbent recovery semantic (R06-T02 compaction: ONE first-turn
+//!   single-call intent is answered with a placeholder result) consume
+//!   [`AuxiliaryExecutor::complete_step`] and judge the intent themselves;
 //! - an empty/reasoning-only answer is an explicit failure, never a
 //!   fabricated text;
 //! - live deltas have no subscriber in an auxiliary call (the caller
@@ -47,6 +51,20 @@ pub struct AuxiliaryRequest {
     pub max_output_tokens: Option<u32>,
     /// Host-computed absolute deadline clamping the call's network budget.
     pub deadline_unix_ms: Option<u64>,
+    /// R06-T02: 压缩请求的会话系统提示（现役缓存保留形状的第一项
+    /// `[system, submission, ...exchange, instruction]`）。None = 无系统
+    /// 槽（其他 auxiliary 槽的现役行为不变）。
+    pub system_prompt: Option<String>,
+    /// R06-T02: 压缩请求的活历史（缓存保留形状的中间段），末尾一项是
+    /// 请求作用域的 `CompactionInstruction`。空 = 无历史（其他槽不变）。
+    pub prior: Vec<lingxi_kernel::model_exchange::ExchangeItem>,
+    /// R06-T02: 压缩请求携带的 live 工具声明快照——历史里 assistant
+    /// 工具调用的 wire 名解析必需（空快照会让每个带 tool_calls 的历史
+    /// turn 渲染失败）；模型回调工具时本执行器绝不执行任何调用——
+    /// `complete()` 响亮失败，`complete_step()` 把意图交回宿主（压缩槽
+    /// 的现役 placeholder 单次恢复由 service 层实现）。None = 空快照
+    /// （其他槽不变）。
+    pub tools: Option<ToolDeclarationSnapshot>,
 }
 
 /// A settled auxiliary answer plus its correlation facts (the served-by
@@ -62,6 +80,34 @@ pub struct AuxiliaryOutcome {
     pub served_protocol: Option<String>,
     pub transport_attempts: u32,
     pub served_by: ProviderDescriptor,
+}
+
+/// R06-T02: one settled auxiliary turn with the tool-intent half exposed.
+/// [`AuxiliaryExecutor::complete`] keeps the single-turn text contract
+/// (a tool-requesting turn is a loud failure); the compaction slot consumes
+/// [`AuxiliaryExecutor::complete_step`] instead — the incumbent
+/// cache-preserving compaction run answers ONE first-turn single-call tool
+/// intent with a placeholder result and continues (`tool_recovery` phase),
+/// so the requests must reach the host instead of failing in place.
+#[derive(Debug, Clone)]
+pub enum AuxiliaryStep {
+    /// The provider answered a final text message.
+    Text(AuxiliaryOutcome),
+    /// The provider requested tool calls (never executed — an auxiliary
+    /// call has no tool plane). Carries the attempt's settle facts: a
+    /// tool-intent turn is a settled provider answer and accounts exactly
+    /// like a text turn (R05 RR1 F21).
+    ToolRequests {
+        requests: Vec<lingxi_kernel::ports::ToolRequest>,
+        /// The turn's own content blocks (text/reasoning/opaque) — the
+        /// recovery request replays them as the assistant half of the
+        /// placeholder exchange.
+        content: Vec<ContentBlock>,
+        usage_report: lingxi_kernel::usage::ReportedUsage,
+        served_protocol: Option<String>,
+        transport_attempts: u32,
+        served_by: ProviderDescriptor,
+    },
 }
 
 /// A loud auxiliary failure. The message is already scrubbed of any
@@ -158,6 +204,12 @@ impl AuxiliaryExecutor {
     /// correlation id of this invocation (worker callbacks pass
     /// `aux-{slot}-{invocation}-{cb_id}`-shaped identities so a trace can
     /// join parent and child — C04).
+    ///
+    /// Single-turn text contract: a tool-requesting turn is a loud failure
+    /// here (the message names whether the request declared tools — the
+    /// compaction slot declares the live snapshot for wire-name resolution;
+    /// every other slot declares none). Slots with an incumbent tool-intent
+    /// recovery semantic (compaction) use [`Self::complete_step`] instead.
     // R05 RR1 F21: the failure carries the attempt's settle facts (usage
     // report, attempts, resolved identity) — one construction per settled
     // call, never in a loop; boxing it would ripple through every caller
@@ -170,25 +222,107 @@ impl AuxiliaryExecutor {
         call: &ModelCallId,
         request: &AuxiliaryRequest,
     ) -> Result<AuxiliaryOutcome, AuxiliaryFailure> {
+        let declared_tools = request
+            .tools
+            .as_ref()
+            .is_some_and(|snapshot| !snapshot.declarations.is_empty());
+        match self.complete_step(ctx, slot, call, request).await {
+            Ok(AuxiliaryStep::Text(outcome)) => Ok(outcome),
+            Ok(AuxiliaryStep::ToolRequests {
+                usage_report,
+                transport_attempts,
+                served_by,
+                served_protocol,
+                ..
+            }) => {
+                let message = if declared_tools {
+                    format!(
+                        "auxiliary slot {} declared tools for history wire-name resolution \
+                         ONLY (an auxiliary call never executes tools) but the provider \
+                         answered with tool requests; the calls were NOT executed",
+                        slot.config_key()
+                    )
+                } else {
+                    format!(
+                        "auxiliary slot {} declared NO tools but the provider answered with \
+                         tool requests; the calls were NOT executed (a tool-requesting \
+                         auxiliary turn is a protocol anomaly, never silently served)",
+                        slot.config_key()
+                    )
+                };
+                Err(AuxiliaryFailure {
+                    code: ErrorCode::InvalidMessage,
+                    message,
+                    retryable: false,
+                    usage_report,
+                    transport_attempts,
+                    served_by,
+                    served_protocol,
+                })
+            }
+            Err(failure) => Err(failure),
+        }
+    }
+
+    /// Runs ONE auxiliary call to settlement and reports the settled turn
+    /// shape ([`AuxiliaryStep`]): text, or the provider's tool requests with
+    /// the attempt's full settle facts. Every failure path is identical to
+    /// [`Self::complete`].
+    #[allow(clippy::result_large_err)]
+    pub async fn complete_step(
+        &self,
+        ctx: &RunContext,
+        slot: AuxiliarySlot,
+        call: &ModelCallId,
+        request: &AuxiliaryRequest,
+    ) -> Result<AuxiliaryStep, AuxiliaryFailure> {
+        self.complete_step_for_operation(
+            ctx,
+            ModelOperation::Auxiliary(slot),
+            &format!("auxiliary slot {}", slot.config_key()),
+            call,
+            request,
+        )
+        .await
+    }
+
+    /// R06-T02（R3-F-01，§十#17）：`complete_step` 的操作显式形——调用方
+    /// 已自行完成生效路由决策（压缩服务的 summarize 槽→chat 回退链）并直接
+    /// 点名 operation；`label` 是失败消息里的诊断名。执行器自身**仍然**
+    /// 永不回退：operation 照常在 gateway 解析自己的绑定（R05 C07 纪律
+    /// 不变），回退决策只发生在调用方（显式、可声明、可测试）。
+    #[allow(clippy::result_large_err)]
+    pub async fn complete_step_for_operation(
+        &self,
+        ctx: &RunContext,
+        operation: ModelOperation,
+        label: &str,
+        call: &ModelCallId,
+        request: &AuxiliaryRequest,
+    ) -> Result<AuxiliaryStep, AuxiliaryFailure> {
         let input = ModelTurnInput {
             submission: request.prompt.clone(),
-            system_prompt: None,
+            // R06-T02: the compaction slot passes the session system prompt
+            // through (the cache-preserving shape's first segment); every
+            // other slot keeps the incumbent None.
+            system_prompt: request.system_prompt.clone(),
             turn: 1,
-            prior: Vec::new(),
-            tools: ToolDeclarationSnapshot::empty(),
+            // R06-T02: the compaction slot's live history rides here.
+            prior: request.prior.clone(),
+            // R06-T02: the compaction slot's live snapshot (wire-name
+            // resolution for history tool calls); None keeps the incumbent
+            // empty snapshot.
+            tools: request
+                .tools
+                .clone()
+                .unwrap_or_else(ToolDeclarationSnapshot::empty),
             deadline_unix_ms: request.deadline_unix_ms,
             images: request.images.clone(),
             max_output_tokens: request.max_output_tokens,
         };
         let result = self
             .provider
-            .next_turn_for_operation(
-                ctx,
-                call,
-                ModelOperation::Auxiliary(slot),
-                &input,
-                &NullSink,
-            )
+            .next_turn_for_operation(ctx, call, operation, &input, &NullSink)
             .await;
         let served_by = result
             .served_by
@@ -223,56 +357,50 @@ impl AuxiliaryExecutor {
                     return Err(fail(
                         ErrorCode::UpstreamUnavailable,
                         format!(
-                            "auxiliary slot {} settled with a final turn carrying no text \
-                             (an empty answer is an explicit failure, never a fabricated one)",
-                            slot.config_key()
+                            "{label} settled with a final turn carrying no text \
+                             (an empty answer is an explicit failure, never a fabricated one)"
                         ),
                         true,
                     ));
                 }
-                Ok(AuxiliaryOutcome {
+                Ok(AuxiliaryStep::Text(AuxiliaryOutcome {
                     text,
                     usage: result.usage,
                     usage_report: result.usage_report,
                     served_protocol: result.served_protocol,
                     transport_attempts: result.transport_attempts,
                     served_by,
-                })
+                }))
             }
-            ProviderTurn::ToolRequests { .. } => Err(fail(
-                ErrorCode::InvalidMessage,
-                format!(
-                    "auxiliary slot {} declared NO tools but the provider answered with tool \
-                     requests; the calls were NOT executed (a tool-requesting auxiliary turn \
-                     is a protocol anomaly, never silently served)",
-                    slot.config_key()
-                ),
-                false,
-            )),
+            // R06-T02: the tool-intent half is REPORTED, not judged here —
+            // `complete()` fails it loudly (single-turn slots), while the
+            // compaction slot answers ONE first-turn single-call intent with
+            // a placeholder result (the incumbent `tool_recovery` phase).
+            // The calls are NEVER executed either way.
+            ProviderTurn::ToolRequests { requests, content } => Ok(AuxiliaryStep::ToolRequests {
+                requests,
+                content,
+                usage_report: result.usage_report,
+                served_protocol: result.served_protocol,
+                transport_attempts: result.transport_attempts,
+                served_by,
+            }),
             ProviderTurn::Continue { process_note } => Err(fail(
                 ErrorCode::UpstreamUnavailable,
                 format!(
-                    "auxiliary slot {} produced a process-only turn ({process_note}); a \
-                     reasoning-only auxiliary answer carries no usable text",
-                    slot.config_key()
+                    "{label} produced a process-only turn ({process_note}); a \
+                     reasoning-only auxiliary answer carries no usable text"
                 ),
                 true,
             )),
             ProviderTurn::Empty { detail, .. } => Err(fail(
                 ErrorCode::UpstreamUnavailable,
-                format!(
-                    "auxiliary slot {} returned an empty turn: {detail}",
-                    slot.config_key()
-                ),
+                format!("{label} returned an empty turn: {detail}"),
                 true,
             )),
             ProviderTurn::Failed { error, retryable } => Err(fail(
                 error.code,
-                format!(
-                    "auxiliary slot {} failed: {}",
-                    slot.config_key(),
-                    error.message
-                ),
+                format!("{label} failed: {}", error.message),
                 retryable,
             )),
         }

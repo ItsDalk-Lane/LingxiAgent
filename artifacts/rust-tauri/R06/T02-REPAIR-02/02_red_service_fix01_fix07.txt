@@ -1,0 +1,21 @@
+$ cargo test -p lingxi-service --test r06_t02_compaction --locked
+(修复前红：FIX-01/FIX-07 实现已落地、夹具未声明 summarize 窗口 → 现役语义 window=0 即硬截断，模型路径 12/17 失败)
+test driven_run_survives_a_failed_compaction ... FAILED
+test multiple_tool_calls_in_one_turn_fail_loudly ... FAILED
+test below_threshold_never_calls_the_model ... ok
+test capability_gate_refuses_a_toolsless_summarize_route ... FAILED
+test without_compaction_service_the_drive_shape_is_unchanged ... ok
+test unknown_usage_never_triggers_the_service ... ok
+test undeclared_window_never_triggers ... ok
+test manual_compaction_skips_the_threshold_and_compacts ... FAILED
+test unprovable_pairs_fail_without_a_model_call ... ok
+test cancellation_during_the_summary_call_accounts_cancelled ... FAILED
+test provider_failure_keeps_the_original_exchange_and_accounts_it ... FAILED
+test trigger_fires_and_compacts_through_the_real_chain ... FAILED
+test repair_exhaustion_is_a_loud_failure ... FAILED
+test placeholder_recovery_answers_a_single_tool_intent_and_compacts ... FAILED
+test second_tool_intent_after_recovery_fails_loudly ... FAILED
+test repair_flow_accepts_a_fixed_summary ... FAILED
+test driven_run_compacts_mid_run_and_continues_with_the_summary ... FAILED
+test result: FAILED. 5 passed; 12 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.71s
+EXIT=101

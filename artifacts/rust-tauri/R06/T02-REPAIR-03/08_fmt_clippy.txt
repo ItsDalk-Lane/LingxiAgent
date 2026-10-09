@@ -1,0 +1,10 @@
+=== rustc 版本 ===
+rustc 1.98.1 (48a229cea 2026-09-01)
+=== cargo fmt --all -- --check ===
+（首轮两处排版差异——test 文件长行换行 + settle_summary_call 参数表——cargo fmt --all 应用后复检）
+FMT_EXIT=0（复检）
+=== cargo clippy --workspace --all-targets --locked -- -D warnings ===
+（过程中修两处：settle_summary_call 加 #[allow(clippy::too_many_arguments)]——与 compact_exchange 同型；篡改自证的 format! 改 .to_string()）
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.64s
+CLIPPY_EXIT=0

@@ -244,6 +244,9 @@ pub struct RouteCapabilities {
 /// - `output_includes_thinking` ↔ `model.compat.outputIncludesThinking`
 ///   (and the top-level `model.outputIncludesThinking` projection)
 /// - `video` ↔ `model.video === true || model.compat.hanaVideoInput === true`
+/// - `output_cap_required` ↔ `model.compat.outputCapRequired`
+///   (`core/provider-compat/output-budget.ts` 的 explicit-required 族判定面；
+///   R06-T02 摘要请求 max_tokens 族分流读它)
 #[derive(Debug, Clone, Default, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct RouteCompatHints {
@@ -259,6 +262,11 @@ pub struct RouteCompatHints {
     pub max_tokens: Option<u64>,
     #[serde(default)]
     pub context_window: Option<u64>,
+    /// `model.compat.outputCapRequired`：声明该路由的输出上限字段是协议
+    /// 必需（压缩摘要请求的族分流判定面之一；缺省 = 未声明，落到现役
+    /// 族清单判定）。
+    #[serde(default)]
+    pub output_cap_required: Option<bool>,
     #[serde(default)]
     pub quirks: Vec<String>,
     /// Thinking-level → provider wire value (`null` = the level has no wire

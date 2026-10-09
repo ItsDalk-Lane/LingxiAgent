@@ -1,0 +1,14 @@
+=== command: /Users/study_superior/.cargo/bin/cargo run --quiet
+=== cwd: artifacts/rust-tauri/R06/T02-REPAIR-01/probe（修复后探针，新签名）
+probe1: plan = None (the only reachable boundary would orphan tc0001)
+probe1 verdict: SAFE (no cut, no orphan)
+probe2: OpenAI mapping cache_read_included_in_input = Some(true)
+probe2: openai-family context_tokens = Some(100500) (incumbent = 100500)
+probe2 verdict: MATCH (no double-count)
+probe2: anthropic-family flag = Some(false), context_tokens = Some(3014) (expect 3014)
+probe2b verdict: MATCH (anthropic unchanged)
+probe3: first cut_index = 12 (pair-whole)
+probe3: second compaction planned cleanly: Some(6)
+probe3 verdict: NO POISON CASCADE
+ALL PROBES SAFE
+=== exit_code: 0

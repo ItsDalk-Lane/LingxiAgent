@@ -1,0 +1,12 @@
+[package]
+name = "r06-t02-r2-probe"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+lingxi-kernel = { path = "../../../../../rust/crates/lingxi-kernel" }
+lingxi-protocol = { path = "../../../../../rust/crates/lingxi-protocol" }
+lingxi-adapters = { path = "../../../../../rust/crates/lingxi-adapters" }
+serde_json = "1"
+
+[workspace]

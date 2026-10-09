@@ -1,0 +1,18 @@
+=== 修复前复现证据（REVIEWER-R06-T02-R1 探针，候选 = HEAD b174e3ff4 + 修复前工作树）
+=== 来源：artifacts/rust-tauri/R06/T02-REVIEW-01/probe_output.txt（逐字复制）；
+=== REPAIR 代理在动手修复前亦亲跑同一探针独立复现，verdicts 逐字一致
+=== （VULNERABLE cut=1 / DOUBLE-COUNTS 130500 vs 100500 / ORPHAN POISONS ALL FUTURE COMPACTIONS）。
+=== 该探针 crate 对修复后签名不再编译（context_tokens_from_usage 增参），属预期。
+
+=== command: /Users/study_superior/.cargo/bin/cargo run --quiet
+=== cwd: /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/T02-REVIEW-01/probe
+probe1: cut_index = 1
+probe1: ORPHANED tool result tc0001 lands in the RETAINED region (its owner is summarized away)
+probe1: summarized items = ["A:mc0001"]
+probe1: kept items = ["A:mc0002", "R:tc0001", "A:mc0003", "R:tc0003"]
+probe1 verdict: VULNERABLE
+probe2: rust context_tokens = Some(130500), incumbent-equivalent = 100500
+probe2 verdict: DOUBLE-COUNTS cache_read
+probe3: second compaction REFUSED as unprovable: tool result tc0001 has no owning assistant turn in this exchange
+probe3 verdict: ORPHAN POISONS ALL FUTURE COMPACTIONS
+=== exit_code: 0
