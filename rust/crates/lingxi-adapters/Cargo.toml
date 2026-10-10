@@ -70,3 +70,8 @@ windows-sys = { version = "=0.61.2", features = ["Win32_Foundation", "Win32_Secu
 # lingxi-browser-spike's direct dependency).
 [dev-dependencies]
 libc = "0.2.189"
+# R06-T06: every test binary of this crate links kernel; enabling the
+# guard feature on this dev-dependency edge force-links the test guard's
+# pre-main hook into all of them (unit tests + tests/*.rs). Never active
+# for `cargo build` / release (dev-dependencies only).
+lingxi-kernel = { path = "../lingxi-kernel", features = ["test-guard"] }

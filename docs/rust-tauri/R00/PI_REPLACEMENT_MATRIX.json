@@ -34,7 +34,8 @@
       "protocol_test": "受控模型流产生工具请求→授权执行→再请求→唯一终态；各入口及取消/重试/临时子会话协议对照。",
       "retirement_evidence": "生产进程树和最终打包依赖图无 Pi AgentLoop；禁用旧 Node 服务仍能完成真实工具任务。",
       "target_stage": "R03/R05/R06/R07/R11",
-      "disposition": "KERNEL_MIGRATION"
+      "disposition": "KERNEL_MIGRATION",
+      "r06_t06_progress": "share：agent_start hook 的 Rust 接管面 = kernel AgentLoopGuard 纯状态机（rust/crates/lingxi-kernel/src/memory.rs:887-1058）+ runs.rs 每 run 新建 hooks 并在 run 边界 reset（rust/crates/lingxi-service/src/runs.rs:801,1268-1315，tests/r06_t06_hooks.rs run 级断言）。生产 bootstrap with_extension_hooks(true)（lib.rs:1469）。"
     },
     {
       "id": "PI-02",
@@ -104,7 +105,8 @@
       "protocol_test": "同配置下 prompt、技能/角色卡、扩展启停/热更新、hook 次序与错误传播对照。",
       "retirement_evidence": "旧 ResourceLoader/ExtensionRuntime 不参与 Rust 任务装配；所有活跃 hook 有新 port 或明确弃用证据。",
       "target_stage": "R06/R07/R11",
-      "disposition": "KERNEL_MIGRATION"
+      "disposition": "KERNEL_MIGRATION",
+      "r06_t06_progress": "份额（本任务交付）：技能发现/白名单/启停/遮蔽（lingxi-service/src/skills.rs:347-491 + adapters skill_library.rs:63-610）、安装审核双层（skills.rs:497-656 + memorytools.rs:441-532，guard fail-closed + 一次性风险 token kernel memory.rs:799-885）、删除/scrub/孤儿（skills.rs:670-757）、bundles（skill_library.rs:692-908）、人格文件读写（persona.rs + adapters agent_memory.rs:1619-1739）、记忆存储五 store（adapters agent_memory.rs FactStore/TenetsStore/CompiledMemoryStore/ExperienceStore/DreamRevisionStore）与记忆工具面（memorytools.rs:604）。技能目录装配进上下文（R06-T06 R1 F-01 修复接线）：编译期经 SkillMaterialPort 由 SkillService 解析运行时选择（context_compiler.rs:117/:887-897 + skills.rs:932-981 runtime_skill_catalog + lib.rs:1461-1475 bootstrap 绑定；现役锚 session-coordinator.ts:2102-2110 → pi agent-session.js:784-789 → pi skills.js:275-298），条目按来源材料进 T01 冻结 skill.catalog 段；配套 skill_library.rs:228-305 active_entries（同名技能不再按名双激活）与 skills.rs:388-424 按条目状态配对。顺延 R07：deferred-result 后台投递、技能事件广播、learn_lesson/show_card 工具、desk 写面、组合导出、autolearn。"
     },
     {
       "id": "PI-05",
@@ -129,7 +131,8 @@
       "protocol_test": "read/write/edit/exec 与 grep/find/ls 参数、权限、路径、取消、结果 schema 和副作用收据对照。",
       "retirement_evidence": "Rust 路径不加载 Pi 工厂；工具目录与执行统一走同一 Rust 网关。",
       "target_stage": "R04/R07/R11",
-      "disposition": "KERNEL_MIGRATION"
+      "disposition": "KERNEL_MIGRATION",
+      "r06_t06_progress": "share：tool_call hook 的 loop-guard 派发前阻断已迁 Rust（runs.rs:2256-2280 Block → Failed 零执行器调用；tests/r06_t06_hooks.rs 第 7 次同参调用阻断 + 对照腿）。R04 网关本身不变。"
     },
     {
       "id": "PI-06",
@@ -215,7 +218,8 @@
       "protocol_test": "畸形 toolcall、工具 isError、输出截断/注入、待办节流和历史不污染对照。",
       "retirement_evidence": "Pi agent 方法猴补丁退出；相应效果由 Rust 规范化事件和上下文产物证明。",
       "target_stage": "R04/R05/R06/R11",
-      "disposition": "KERNEL_MIGRATION"
+      "disposition": "KERNEL_MIGRATION",
+      "r06_t06_progress": "share：tool_result hook 三件已迁 Rust 同一管线（hooks.rs:181-233 tool_result_guard = loop-guard 警告 + 失败连击 + L1 32KiB head/tail 截断（错误结果豁免，:211-212 语义）+ 非 knowledge_ 前缀注入扫描 hooks.rs:122-163）；Failed 结果警告前置进 error.message（runs.rs record_tool_result）。压缩路径 L1 之外的 context/before_compact 归 T02（share）。"
     },
     {
       "id": "PI-10",
@@ -252,7 +256,8 @@
       "protocol_test": "插话/跟进顺序、取消竞争、重复提交、关窗后任务存活、shutdown 清理对照。",
       "retirement_evidence": "新入口不调 Pi session.steer/sendCustomMessage/abort；同一 run 的终态只有 Rust 写入。",
       "target_stage": "R03/R06/R08/R11",
-      "disposition": "KERNEL_MIGRATION"
+      "disposition": "KERNEL_MIGRATION",
+      "r06_t06_progress": "share：session_start/session_shutdown 的 guard 复位语义 = 每 run 新建 ExtensionHooks + on_run_start reset（hooks.rs:39-42）；事件广播本体仍顺延 R07/R08。"
     },
     {
       "id": "PI-12",
@@ -1922,77 +1927,107 @@
     {
       "source_ref": "lib/extensions/agent-loop-guard-ext.ts:105",
       "event": "session_start",
-      "capability_id": "PI-04"
+      "capability_id": "PI-04",
+      "r06_t06_status": "replaced_by_rust",
+      "r06_t06_note": "kernel AgentLoopGuard per-run reset（runs.rs:1268-1275 + hooks.rs:39-42）"
     },
     {
       "source_ref": "lib/extensions/agent-loop-guard-ext.ts:110",
       "event": "agent_start",
-      "capability_id": "PI-01"
+      "capability_id": "PI-01",
+      "r06_t06_status": "replaced_by_rust",
+      "r06_t06_note": "同上：run 启动即 agent_start 语义（reset）"
     },
     {
       "source_ref": "lib/extensions/agent-loop-guard-ext.ts:114",
       "event": "session_shutdown",
-      "capability_id": "PI-11"
+      "capability_id": "PI-11",
+      "r06_t06_status": "replaced_by_rust",
+      "r06_t06_note": "同上：run 终态后 hooks 随 run 丢弃（状态不跨 run）"
     },
     {
       "source_ref": "lib/extensions/agent-loop-guard-ext.ts:118",
       "event": "tool_call",
-      "capability_id": "PI-05"
+      "capability_id": "PI-05",
+      "r06_t06_status": "replaced_by_rust",
+      "r06_t06_note": "runs.rs:2256-2280 tool_call 阻断（Block=零派发 Failed）"
     },
     {
       "source_ref": "lib/extensions/agent-loop-guard-ext.ts:164",
       "event": "tool_result",
-      "capability_id": "PI-09"
+      "capability_id": "PI-09",
+      "r06_t06_status": "replaced_by_rust",
+      "r06_t06_note": "hooks.rs:181-233 tool_result_guard + runs.rs record_tool_result 警告前置"
     },
     {
       "source_ref": "lib/extensions/compaction-guard-ext.ts:203",
       "event": "context",
-      "capability_id": "PI-03"
+      "capability_id": "PI-03",
+      "r06_t06_status": "share",
+      "r06_t06_note": "R06-T02 CompactionService 已接管（非 T06 重复实现）"
     },
     {
       "source_ref": "lib/extensions/compaction-guard-ext.ts:209",
       "event": "tool_result",
-      "capability_id": "PI-09"
+      "capability_id": "PI-09",
+      "r06_t06_status": "replaced_by_rust",
+      "r06_t06_note": "T06 hooks.rs l1_truncate_text（32KiB，错误豁免）"
     },
     {
       "source_ref": "lib/extensions/compaction-guard-ext.ts:237",
       "event": "session_before_compact",
-      "capability_id": "PI-03"
+      "capability_id": "PI-03",
+      "r06_t06_status": "share",
+      "r06_t06_note": "R06-T02 session_before_compact 已接管"
     },
     {
       "source_ref": "lib/extensions/deferred-result-ext.ts:51",
       "event": "session_start",
-      "capability_id": "PI-04"
+      "capability_id": "PI-04",
+      "r06_t06_status": "deferred",
+      "r06_t06_note": "R07 后台投递面"
     },
     {
       "source_ref": "lib/extensions/deferred-result-ext.ts:80",
       "event": "session_shutdown",
-      "capability_id": "PI-11"
+      "capability_id": "PI-11",
+      "r06_t06_status": "deferred",
+      "r06_t06_note": "R07 后台投递面"
     },
     {
       "source_ref": "lib/extensions/model-call-observer-ext.ts:30",
       "event": "before_provider_request",
-      "capability_id": "PI-08"
+      "capability_id": "PI-08",
+      "r06_t06_status": "share",
+      "r06_t06_note": "R05 usage/model_call 已接管"
     },
     {
       "source_ref": "lib/extensions/model-call-observer-ext.ts:69",
       "event": "after_provider_response",
-      "capability_id": "PI-10"
+      "capability_id": "PI-10",
+      "r06_t06_status": "share",
+      "r06_t06_note": "R05 usage/model_call 已接管"
     },
     {
       "source_ref": "core/engine.ts:3497",
       "event": "context",
-      "capability_id": "PI-03"
+      "capability_id": "PI-03",
+      "r06_t06_status": "share",
+      "r06_t06_note": "R06-T01 context compiler 已接管"
     },
     {
       "source_ref": "core/engine.ts:3509",
       "event": "before_provider_request",
-      "capability_id": "PI-08"
+      "capability_id": "PI-08",
+      "r06_t06_status": "share",
+      "r06_t06_note": "R05 已接管"
     },
     {
       "source_ref": "core/engine.ts:3542",
       "event": "context",
-      "capability_id": "PI-03"
+      "capability_id": "PI-03",
+      "r06_t06_status": "share",
+      "r06_t06_note": "R06-T01 context compiler 已接管"
     }
   ],
   "opaque_dynamic_imports": [
@@ -3603,5 +3638,10 @@
       "manual_adjacent_count": 5
     },
     "caveat": "静态闭包不证明条件分支实际运行；用户自装插件与反射式动态加载需后续真实运行取证"
+  },
+  "r06_t06_update": {
+    "updated_by": "R06-T06（人格、记忆与技能系统）执行证据；分支 codex/rust-tauri-migration，工作区候选基于 e89c91a2289c0c7182da9e2ca4b1d31dc56ca5b6",
+    "evidence": "docs/rust-tauri/R06/R06-T06_REPORT.md + artifacts/rust-tauri/R06/T06/（02_red_tests / 05_targeted_tests / 06_workspace_regression）",
+    "note": "仅在既有条目上追加 r06_t06_progress / r06_t06_status 字段；原始 R00-T03 静态分类字段未改动"
   }
 }

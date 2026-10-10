@@ -17,3 +17,19 @@ serde_json = "1.0.151"
 # Same locked version as lingxi-protocol/lingxi-adapters (no new package
 # version enters the lock).
 sha2 = "0.11.0"
+# R06-T06: test-only guard edge (pre-main RSS/time monitor for every test
+# binary). `optional = true` + the `test-guard` feature below — enabled
+# ONLY through dev-dependencies, so no build/release graph links it.
+lingxi-test-guard = { path = "../lingxi-test-guard", optional = true }
+
+[features]
+# R06-T06: force-links the guard into every test binary that links kernel
+# (see src/lib.rs). Enabled exclusively by dev-dependency edges; never by
+# a normal dependency or a default feature.
+test-guard = ["dep:lingxi-test-guard"]
+
+[dev-dependencies]
+# R06-T06: enables `test-guard` for kernel's OWN test builds (unit tests +
+# tests/*.rs) via feature unification of the self dev-dependency — the
+# guard then arms before the libtest harness of every kernel test binary.
+lingxi-kernel = { path = ".", features = ["test-guard"] }

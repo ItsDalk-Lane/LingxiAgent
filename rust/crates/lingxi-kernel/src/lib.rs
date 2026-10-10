@@ -18,9 +18,19 @@
 
 use lingxi_protocol::{AttemptId, NormalizedMessage, RunId, RunStatus, SessionId, ToolCallId};
 
+// R06-T06: with the `test-guard` feature on (enabled only through
+// dev-dependencies of the crates under test), this reference force-links the
+// test guard's pre-main hook into every test binary that links the kernel —
+// no per-test-file wiring. The feature is never enabled by a normal build or
+// release graph, so production binaries contain none of it.
+#[cfg(feature = "test-guard")]
+#[allow(unused_imports)]
+use lingxi_test_guard as _;
+
 pub mod compaction;
 pub mod context;
 pub mod invocation;
+pub mod memory;
 pub mod model_exchange;
 pub mod ports;
 pub mod recovery;

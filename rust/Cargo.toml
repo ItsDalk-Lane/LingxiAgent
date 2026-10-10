@@ -53,6 +53,11 @@ members = [
     "crates/lingxi-service",
     "crates/lingxi-adapters",
     "crates/xtask",
+    # R06-T06: test-only memory/wall-clock guard (pre-main ctor). Not a
+    # product module: it enters test builds exclusively through the
+    # `test-guard` feature edge declared by the crates under test, so
+    # `cargo build` / release graphs never link it.
+    "crates/lingxi-test-guard",
 ]
 
 [workspace.package]

@@ -767,6 +767,12 @@ fn check_tree(root: &Path, files: &BTreeMap<String, Vec<u8>>) -> Vec<String> {
     problems
 }
 
+// R06-T06: force-links the default test guard into this bin's TEST HARNESS
+// build only (cfg(test)); normal bin and release builds never see it.
+#[cfg(test)]
+#[allow(unused_imports)]
+use lingxi_test_guard as _;
+
 fn main() -> ExitCode {
     // RR-T08-F1 hardening: bind the repo root from the runtime working
     // directory and REFUSE to run against a checkout other than the one

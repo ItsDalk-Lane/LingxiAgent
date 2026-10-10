@@ -1,0 +1,16 @@
+R1 修复轮全量回归结果（总控机械收尾，2026-10-10）
+
+命令: cargo test -j 8 --workspace --locked --no-fail-fast（/Users/study_superior/.cargo/bin/cargo，rustc 1.98.1）
+退出码: 101（唯一失败为已知环境项）
+结果: 1820 passed / 1 failed
+
+唯一失败: r00_management_positive_and_negative_branches_on_real_service
+  - 签名: request to 192.168.3.5:62072 stalled during write/read exchange (POST /lingxi/v1/web-auth/login, 0 bytes read)
+  - macOS 应用防火墙（ALF）对非 loopback 自连地址的拦截，环境失败非回归（本轮 solo 复跑同签名留证
+    05_targeted_tests/repair_R1_r00_management_single_rerun*.log；R1 审查者全量轮该测试曾直接通过——环境时通时不通）
+水位对账: 修复前 1816 总数（1815/1）→ 修复后 1821 总数（1820/1）= R1 修复新增 5 测试
+  （r06_t06_skill_context 4 + guard 槽缺席 fail-closed 1），既有测试零删除零改动。
+守卫: LINGXI_TEST_GUARD 触发 0（grep 全日志无 ABORT 报告块）。
+定向补充: 修复轮 fail-fast 中止问题已用显式 --no-fail-fast --test 列表补齐——
+  05_targeted_tests/targeted_t06_suites_repair_explicit.txt（T06 全部 9 套件 57/57 exit 0）
+  05_targeted_tests/targeted_suites_repair.txt（fail-fast 于 r00 LAN 项中止，r06_t03+ 未跑到，不作为绿证）。

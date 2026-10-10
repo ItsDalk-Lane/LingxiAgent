@@ -7,6 +7,12 @@ use std::path::PathBuf;
 
 use lingxi_spike::queue::{BoundedQueue, QueueOp, QueueResult};
 
+// R06-T06: force-links the default test guard into this bin's TEST HARNESS
+// build only (cfg(test)); normal bin and release builds never see it.
+#[cfg(test)]
+#[allow(unused_imports)]
+use lingxi_test_guard as _;
+
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt()

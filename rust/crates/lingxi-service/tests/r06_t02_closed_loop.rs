@@ -14,6 +14,10 @@
 //! 文本）路由，从不读写工作区、不决定 run/审批/存储状态。不使用真实
 //! 付费凭证（apiKey 是字面量占位）；全部材料落独立临时目录。
 
+// R06-T06: this binary-level test references no crate code; the explicit
+// reference force-links the default test guard (memory/time abort) anyway.
+use lingxi_test_guard as _;
+
 use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};

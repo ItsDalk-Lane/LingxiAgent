@@ -772,6 +772,193 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         // incumbent LOCAL_ONLY /api/devices/ family).
         return RoutePolicy::LocalOnly;
     }
+    // R06-T06 记忆面（server/http/route-security.ts 分类：读 =
+    // settings.read :361-399；写 = settings.write :464-493；镜像 scope 表）。
+    {
+        let mem_read = [
+            "/lingxi/v1/memories",
+            "/lingxi/v1/memories/health",
+            "/lingxi/v1/memories/compiled",
+            "/lingxi/v1/memories/compiled/week/days",
+            "/lingxi/v1/memories/export",
+        ];
+        let mem_write_exact = [
+            "/lingxi/v1/memories",
+            "/lingxi/v1/memories/compiled",
+            "/lingxi/v1/memories/compiled/facts",
+            "/lingxi/v1/memories/compiled/today",
+            "/lingxi/v1/memories/compiled/longterm",
+            "/lingxi/v1/memories/import",
+        ];
+        if mem_read.contains(&p) && (m == "GET" || m == "HEAD") {
+            return RoutePolicy::Scope("settings.read");
+        }
+        if mem_write_exact.contains(&p) && matches!(m.as_str(), "PUT" | "POST" | "DELETE") {
+            return RoutePolicy::Scope("settings.write");
+        }
+        if p.starts_with("/lingxi/v1/memories/compiled/week/days/") && m == "PUT" {
+            return RoutePolicy::Scope("settings.write");
+        }
+        // dream 面：status/revisions 读；runs/restore 写。ticker 缺席面仍按
+        // 现役分类（memory-dream.ts 的 denyWithoutScope 位置语义）。
+        if p == "/lingxi/v1/memories/dream/status"
+            || p == "/lingxi/v1/memories/dream/revisions"
+            || (p.starts_with("/lingxi/v1/memories/dream/revisions/")
+                && !p.ends_with("/restore")
+                && m == "GET")
+        {
+            return RoutePolicy::Scope("settings.read");
+        }
+        if p == "/lingxi/v1/memories/dream/runs"
+            || (p.starts_with("/lingxi/v1/memories/dream/revisions/") && p.ends_with("/restore"))
+        {
+            if m == "GET" {
+                return RoutePolicy::Scope("settings.read");
+            }
+            return RoutePolicy::Scope("settings.write");
+        }
+        // 未列出的 /memories 变体 fail closed。
+        if p.starts_with("/lingxi/v1/memories") {
+            return RoutePolicy::LocalOnly;
+        }
+    }
+    // R06-T06 tenets/pinned/experience/agent-config/avatar 人格面
+    // （route-security.ts:100-101 avatar、:361-399/:464-493 设置面；tenets
+    // 写面现役落 STUDIO_OWNER 兜底 → 候选无 studio 面时取最严 LocalOnly，
+    // 与 R02 以来未注册面语义一致）。
+    {
+        let agents_pattern = |rest: &str| -> Option<String> {
+            p.strip_prefix("/lingxi/v1/agents/").and_then(|tail| {
+                let (id, remainder) = tail.split_once('/')?;
+                if id.is_empty() || remainder != rest {
+                    None
+                } else {
+                    Some(id.to_string())
+                }
+            })
+        };
+        let read_faces = [
+            "tenets",
+            "pinned",
+            "experience",
+            "config-flags",
+            "agents-md",
+            "ishiki",
+            "public-agents-md",
+            "public-ishiki",
+            "identity",
+            "skills/cleanup-preview",
+        ];
+        for face in read_faces {
+            if agents_pattern(face).is_some() && (m == "GET" || m == "HEAD") {
+                return RoutePolicy::Scope("settings.read");
+            }
+        }
+        let write_faces = [
+            "tenets",
+            "pinned",
+            "experience",
+            "agents-md",
+            "ishiki",
+            "public-agents-md",
+            "public-ishiki",
+            "identity",
+        ];
+        for face in write_faces {
+            if agents_pattern(face).is_some() && matches!(m.as_str(), "POST" | "PUT" | "DELETE") {
+                // tenets POST/decide/DELETE（现役 STUDIO_OWNER 兜底）→ LocalOnly；
+                // 其余设置写面 → settings.write。
+                if face == "tenets" {
+                    return RoutePolicy::LocalOnly;
+                }
+                return RoutePolicy::Scope("settings.write");
+            }
+        }
+        if agents_pattern("experience/feedback").is_some() && m == "POST" {
+            return RoutePolicy::LocalOnly;
+        }
+        if agents_pattern("config").is_some() && m == "PATCH" {
+            return RoutePolicy::LocalOnly;
+        }
+        if let Some(_agent) = agents_pattern("skills") {
+            if m == "PUT" {
+                return RoutePolicy::Scope("settings.write");
+            }
+            return RoutePolicy::LocalOnly;
+        }
+        if let Some(rest) = p.strip_prefix("/lingxi/v1/agents/") {
+            // both agents/{id}/skills/{name} 与 agents/{id}/skill-bundles/{bundleId}
+            //（"skill-bundles" 不含子串 "/skills/"，须单独匹配）。
+            let skills_patch = rest.contains("/skills/") || rest.contains("/skill-bundles/");
+            if skills_patch && m == "PATCH" {
+                return RoutePolicy::Scope("settings.write");
+            }
+        }
+        // avatar：读 = chat（route-security.ts:100 isAvatarReadRoute → chat）；
+        // 写 = settings.write；avatar-path = settings.read。
+        if let Some(_agent) = agents_pattern("avatar-path") {
+            if m == "GET" {
+                return RoutePolicy::Scope("settings.read");
+            }
+            return RoutePolicy::LocalOnly;
+        }
+        if let Some(_agent) = agents_pattern("avatar") {
+            if m == "GET" || m == "HEAD" {
+                return RoutePolicy::Scope("chat");
+            }
+            if m == "POST" || m == "DELETE" {
+                return RoutePolicy::Scope("settings.write");
+            }
+            return RoutePolicy::LocalOnly;
+        }
+    }
+    // R06-T06 skills 面（route-security.ts:495-517：GET skills/bundles =
+    // settings.read；install/reload/external-paths/bundles/export 等 =
+    // settings.write；DELETE = settings.write）。
+    {
+        if p == "/lingxi/v1/skills" && (m == "GET" || m == "HEAD") {
+            return RoutePolicy::Scope("settings.read");
+        }
+        if p == "/lingxi/v1/skills/bundles" && (m == "GET" || m == "HEAD") {
+            return RoutePolicy::Scope("settings.read");
+        }
+        let skill_write_exact = [
+            "/lingxi/v1/skills/install",
+            "/lingxi/v1/skills/reload",
+            "/lingxi/v1/skills/external-paths",
+            "/lingxi/v1/skills/bundles",
+            "/lingxi/v1/skills/bundles/order",
+        ];
+        if skill_write_exact.contains(&p) && matches!(m.as_str(), "POST" | "PUT") {
+            return RoutePolicy::Scope("settings.write");
+        }
+        if p == "/lingxi/v1/skills/external-paths" && (m == "GET" || m == "HEAD") {
+            return RoutePolicy::Scope("settings.read");
+        }
+        if p.starts_with("/lingxi/v1/skills/bundles/") {
+            if m == "PUT" || m == "POST" {
+                return RoutePolicy::Scope("settings.write");
+            }
+            if m == "DELETE" {
+                return RoutePolicy::Scope("settings.write");
+            }
+            return RoutePolicy::LocalOnly;
+        }
+        if let Some(name) = p.strip_prefix("/lingxi/v1/skills/") {
+            if !name.is_empty() && !name.contains('/') {
+                if m == "DELETE" {
+                    return RoutePolicy::Scope("settings.write");
+                }
+                return RoutePolicy::LocalOnly;
+            }
+        }
+        if p.starts_with("/lingxi/v1/skills") {
+            return RoutePolicy::LocalOnly;
+        }
+    }
+    // R06-T06 会话上下文笔记（/sessions/{id}/context-notes）由上方 sessions
+    // 子树块的终态 fail-closed return 覆盖为 LocalOnly（私有旁文件等价物，
+    // 未注册形状绝不继承 chat scope）；此处不重复分类。
     if p == "/lingxi/v1/ws" && m == "GET" {
         return RoutePolicy::Scope("chat");
     }
@@ -2859,6 +3046,253 @@ mod tests {
             }
         }
         assert_eq!(classify_route("GET", "/lingxi/v1/ws"), Scope("chat"));
+        // R06-T06 记忆面：读 = settings.read；写 = settings.write；
+        // dream status/revisions 读、runs/restore 写；未列出的变体 fail
+        // closed（classify_route T06 块的镜像断言，route-security.ts
+        // :361-399/:464-493 语义）。
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/memories"),
+            Scope("settings.read")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/memories/health"),
+            Scope("settings.read")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/memories/compiled"),
+            Scope("settings.read")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/memories/compiled/week/days"),
+            Scope("settings.read")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/memories/export"),
+            Scope("settings.read")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/memories/dream/status"),
+            Scope("settings.read")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/memories/dream/revisions"),
+            Scope("settings.read")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/memories/dream/revisions/rev_1"),
+            Scope("settings.read")
+        );
+        assert_eq!(
+            classify_route("PUT", "/lingxi/v1/memories"),
+            Scope("settings.write")
+        );
+        assert_eq!(
+            classify_route("DELETE", "/lingxi/v1/memories"),
+            Scope("settings.write")
+        );
+        assert_eq!(
+            classify_route("DELETE", "/lingxi/v1/memories/compiled"),
+            Scope("settings.write")
+        );
+        for path in [
+            "/lingxi/v1/memories/compiled/facts",
+            "/lingxi/v1/memories/compiled/today",
+            "/lingxi/v1/memories/compiled/longterm",
+        ] {
+            assert_eq!(
+                classify_route("PUT", path),
+                Scope("settings.write"),
+                "{path} PUT must be settings.write"
+            );
+            assert_eq!(
+                classify_route("GET", path),
+                LocalOnly,
+                "{path} unregistered read verb fails closed"
+            );
+        }
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/memories/import"),
+            Scope("settings.write")
+        );
+        assert_eq!(
+            classify_route("PUT", "/lingxi/v1/memories/compiled/week/days/2026-01-01"),
+            Scope("settings.write")
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/memories/dream/runs"),
+            Scope("settings.write")
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/memories/dream/revisions/rev_1/restore"),
+            Scope("settings.write")
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/memories/compiled"),
+            Scope("settings.write"),
+            "write verb on a registered write face is settings.write (router 405s the unrouted shape)"
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/memories/dream/runs"),
+            Scope("settings.read"),
+            "dream runs read-verb is read-scoped (router 405s the unrouted POST-only shape)"
+        );
+        assert_eq!(
+            classify_route("PATCH", "/lingxi/v1/memories/compiled"),
+            LocalOnly,
+            "unregistered memories verb fails closed"
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/memories/compiled/facts/extra"),
+            LocalOnly
+        );
+        // R06-T06 tenets/pinned/experience/config-flags/人格面。
+        for face in [
+            "tenets",
+            "pinned",
+            "experience",
+            "config-flags",
+            "agents-md",
+            "ishiki",
+            "public-agents-md",
+            "public-ishiki",
+            "identity",
+            "skills/cleanup-preview",
+        ] {
+            assert_eq!(
+                classify_route("GET", &format!("/lingxi/v1/agents/a1/{face}")),
+                Scope("settings.read"),
+                "agents read face {face} must be settings.read"
+            );
+        }
+        // tenets 写面（现役 STUDIO_OWNER 兜底）→ 候选 LocalOnly。
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/agents/a1/tenets"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/agents/a1/tenets/t1/decide"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("DELETE", "/lingxi/v1/agents/a1/tenets/t1"),
+            LocalOnly
+        );
+        for face in [
+            "pinned",
+            "experience",
+            "agents-md",
+            "ishiki",
+            "public-agents-md",
+            "public-ishiki",
+            "identity",
+        ] {
+            assert_eq!(
+                classify_route("PUT", &format!("/lingxi/v1/agents/a1/{face}")),
+                Scope("settings.write"),
+                "agents write face {face} must be settings.write"
+            );
+        }
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/agents/a1/experience/feedback"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("PATCH", "/lingxi/v1/agents/a1/config"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("PUT", "/lingxi/v1/agents/a1/skills"),
+            Scope("settings.write")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/agents/a1/skills"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("PATCH", "/lingxi/v1/agents/a1/skills/alpha"),
+            Scope("settings.write")
+        );
+        assert_eq!(
+            classify_route("PATCH", "/lingxi/v1/agents/a1/skill-bundles/b1"),
+            Scope("settings.write")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/agents/a1/skill-bundles/b1"),
+            LocalOnly,
+            "skill-bundles wrong verb fails closed"
+        );
+        // avatar：读 = chat（route-security.ts:100 isAvatarReadRoute）；写 =
+        // settings.write；avatar-path 读 = settings.read。
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/agents/a1/avatar"),
+            Scope("chat")
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/agents/a1/avatar"),
+            Scope("settings.write")
+        );
+        assert_eq!(
+            classify_route("DELETE", "/lingxi/v1/agents/a1/avatar"),
+            Scope("settings.write")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/agents/a1/avatar-path"),
+            Scope("settings.read")
+        );
+        assert_eq!(
+            classify_route("PUT", "/lingxi/v1/agents/a1/avatar"),
+            LocalOnly,
+            "unregistered avatar verb fails closed"
+        );
+        // R06-T06 skills 面（route-security.ts:495-517）。
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/skills"),
+            Scope("settings.read")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/skills/bundles"),
+            Scope("settings.read")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/skills/external-paths"),
+            Scope("settings.read")
+        );
+        for (method, path) in [
+            ("POST", "/lingxi/v1/skills/install"),
+            ("POST", "/lingxi/v1/skills/reload"),
+            ("PUT", "/lingxi/v1/skills/external-paths"),
+            ("POST", "/lingxi/v1/skills/bundles"),
+            ("PUT", "/lingxi/v1/skills/bundles/order"),
+            ("PUT", "/lingxi/v1/skills/bundles/b1"),
+            ("DELETE", "/lingxi/v1/skills/bundles/b1"),
+            ("DELETE", "/lingxi/v1/skills/alpha"),
+        ] {
+            assert_eq!(
+                classify_route(method, path),
+                Scope("settings.write"),
+                "{method} {path} must be settings.write"
+            );
+        }
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/skills/install"),
+            LocalOnly,
+            "skills wrong-verb fails closed"
+        );
+        assert_eq!(classify_route("GET", "/lingxi/v1/skills/alpha"), LocalOnly);
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/skills/bundles/b1"),
+            LocalOnly
+        );
+        // R06-T06 会话上下文笔记：sessions 子树的未注册形状经 sessions 块
+        // 终态 return fail closed 到 LocalOnly（私有旁文件等价物，绝不
+        // 外发为 chat scope）。
+        for method in ["GET", "HEAD", "PUT", "POST", "DELETE"] {
+            assert_eq!(
+                classify_route(method, "/lingxi/v1/sessions/s1/context-notes"),
+                LocalOnly,
+                "context notes {method} must stay LocalOnly"
+            );
+        }
         for path in [
             "/lingxi/v1/health/",
             "/lingxi/v1/me/",

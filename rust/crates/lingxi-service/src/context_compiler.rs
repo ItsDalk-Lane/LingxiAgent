@@ -25,6 +25,7 @@ use std::sync::{Arc, Mutex};
 
 use lingxi_kernel::context::{
     ContextArtifact, ContextCompileError, ContextCompileInput, ContextCompiler, RosterEntry,
+    SkillCatalogEntry,
 };
 use serde_json::Value;
 use sha2::{Digest, Sha256};
@@ -34,8 +35,19 @@ use sha2::{Digest, Sha256};
 /// 材料读取失败（缺失不算失败；其余一律响亮）。
 #[derive(Debug)]
 pub enum ContextMaterialError {
-    Read { path: PathBuf, detail: String },
-    Parse { path: PathBuf, detail: String },
+    Read {
+        path: PathBuf,
+        detail: String,
+    },
+    Parse {
+        path: PathBuf,
+        detail: String,
+    },
+    /// 运行时技能材料解析失败（SkillMaterialPort 端口；响亮失败，
+    /// 不静默降级为空目录——R06-T06 R1 F-03/F-01 同一响亮纪律）。
+    SkillMaterial {
+        detail: String,
+    },
 }
 
 impl fmt::Display for ContextMaterialError {
@@ -53,6 +65,9 @@ impl fmt::Display for ContextMaterialError {
                 "cannot parse context material {}: {detail}",
                 path.display()
             ),
+            ContextMaterialError::SkillMaterial { detail } => {
+                write!(f, "cannot resolve runtime skill material: {detail}")
+            }
         }
     }
 }
@@ -91,6 +106,17 @@ pub struct MaterialQuery {
 /// 材料采集端口（生产实现 = FileContextMaterialSource；测试可注入替身）。
 pub trait ContextMaterialSource: Send + Sync {
     fn gather(&self, query: &MaterialQuery) -> Result<ContextCompileInput, ContextMaterialError>;
+}
+
+/// 运行时技能材料端口（R06-T06 R1 F-01）：编译期对「该 agent 已启用技能」
+/// 的解析只经此端口——生产实现绑定 SkillService（启停、白名单、工作区
+/// 边界、用户覆盖顺序都在服务侧解析，镜像现役 getSkillsForAgent →
+/// skillsResult → resourceLoader.getSkills 语义槽位）。解析出的条目是
+/// `skill.catalog` 段的**来源材料**：走 T01 冻结的段注册表与预算钳制进入
+/// 发送文本，不新造任何 system 特权通道。
+pub trait SkillMaterialPort: Send + Sync {
+    fn skill_catalog(&self, agent_id: &str)
+        -> Result<Vec<SkillCatalogEntry>, ContextMaterialError>;
 }
 
 // ─── 主机事实（组合根解析一次；kernel/材料源不直接读 env） ───
@@ -727,9 +753,11 @@ impl ContextMaterialSource for FileContextMaterialSource {
             memory_md,
             tenets,
             session_started_label: format_session_started_label(query.session_started_unix_ms),
-            // SDK 会话态补充段（appendSystemPrompt/contextFiles/skills）在 Rust
-            // 侧尚无生产来源（技能目录归 T06 SkillService）；T01 恒空，
-            // kernel 格式支持完整（差异报告登记）。
+            // SDK 会话态补充段（appendSystemPrompt/contextFiles）在 Rust 侧
+            // 尚无生产来源（差异报告登记）；skills 的材料归属权在
+            // SkillMaterialPort 绑定后整体归该端口（R06-T06 R1 F-01：生产
+            // bootstrap 绑定 SkillService，见 compiled_for_run 的端口覆盖），
+            // 本材料源一侧按 T01 形状恒空。
             append_system_lines: Vec::new(),
             project_context_files: Vec::new(),
             skills: Vec::new(),
@@ -805,6 +833,9 @@ impl fmt::Debug for CompiledContext {
 /// 同一份冻结 artifact（现役会话快照语义；跨重启重编译）。
 pub struct ContextCompilerService {
     materials: Arc<dyn ContextMaterialSource>,
+    /// 运行时技能材料端口（R06-T06 R1 F-01）：绑定后 `skill.catalog` 的
+    /// 材料归属权整体移交该端口（材料源一侧的 skills 字段按 T01 形状恒空）。
+    skill_materials: Mutex<Option<Arc<dyn SkillMaterialPort>>>,
     cache: Mutex<HashMap<(String, bool), Arc<CompiledContext>>>,
 }
 
@@ -812,8 +843,18 @@ impl ContextCompilerService {
     pub fn new(materials: Arc<dyn ContextMaterialSource>) -> Self {
         Self {
             materials,
+            skill_materials: Mutex::new(None),
             cache: Mutex::new(HashMap::new()),
         }
+    }
+
+    /// 绑定运行时技能材料端口（生产 bootstrap 用 SkillService 调用；
+    /// 未绑定时保持 T01 形状——skills 恒空，段缺席）。
+    pub fn set_skill_materials(&self, port: Arc<dyn SkillMaterialPort>) {
+        *self
+            .skill_materials
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(port);
     }
 
     /// drive_run 的编译入口：provider 检查之后、首个模型调用之前调用。
@@ -834,7 +875,7 @@ impl ContextCompilerService {
         {
             return Ok(Arc::clone(hit));
         }
-        let input = self
+        let mut input = self
             .materials
             .gather(&MaterialQuery {
                 agent_id: agent_id.to_string(),
@@ -842,6 +883,18 @@ impl ContextCompilerService {
                 session_started_unix_ms: now_unix_ms,
             })
             .map_err(ContextCompileFailure::Material)?;
+        // R06-T06 R1 F-01：端口绑定后，运行时技能选择是该端口的材料——
+        // 解析失败与材料读取失败同权（响亮编译失败），绝不静默为空目录。
+        if let Some(port) = self
+            .skill_materials
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .clone()
+        {
+            input.skills = port
+                .skill_catalog(agent_id)
+                .map_err(ContextCompileFailure::Material)?;
+        }
         let artifact = ContextCompiler::compile(&input).map_err(ContextCompileFailure::Compile)?;
         let compiled = Arc::new(CompiledContext::new(artifact));
         self.cache

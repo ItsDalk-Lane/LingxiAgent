@@ -1723,6 +1723,12 @@ fn phase_takeover(ctx: &RunCtx, tr: &mut Transcript) {
     }
 }
 
+// R06-T06: force-links the default test guard into this bin's TEST HARNESS
+// build only (cfg(test)); normal bin and release builds never see it.
+#[cfg(test)]
+#[allow(unused_imports)]
+use lingxi_test_guard as _;
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let get = |flag: &str| -> Option<String> {

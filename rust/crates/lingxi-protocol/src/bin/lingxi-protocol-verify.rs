@@ -42,6 +42,12 @@ fn reencode_typed(type_name: &str, bytes: &[u8]) -> Result<Vec<u8>, String> {
     }
 }
 
+// R06-T06: force-links the default test guard into this bin's TEST HARNESS
+// build only (cfg(test)); normal bin and release builds never see it.
+#[cfg(test)]
+#[allow(unused_imports)]
+use lingxi_test_guard as _;
+
 fn main() -> ExitCode {
     // RR-T08-F1 hardening (same rule as lingxi-protocol-gen): bind the
     // repo root from the runtime working directory, never from a

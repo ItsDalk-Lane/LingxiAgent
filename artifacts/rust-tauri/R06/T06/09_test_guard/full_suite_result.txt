@@ -1,0 +1,19 @@
+##### 全量 cargo test --workspace --no-fail-fast（-j 8 有界重建）最终结果 #####
+日期: 2026-10-10 | 命令: cargo test -j 8 --workspace --no-fail-fast（包在 RSS 监控内）
+耗时: 2065s（含全量重建）| 内存峰值: 3859MB（构建阶段，全程受控）
+测试二进制: 133 | 测试用例: 1804 | 通过: 1803 | 失败: 1
+
+唯一失败: r04_a10_pty_input_reads_resize_interrupt_and_exit (r04_t05_process_tools, 'timed out waiting for terminal exit')
+  - 单跑复核: 通过（0.59s, 19MB）→ 负载型 flaky（T05 审查已记录同族：'两轮唯一失败项互异且均为负载型 flaky 单跑全过'）
+  - 与本次修复无关（PTY 时序用例；未触碰相关代码）
+
+环境性 flaky 观察: r00_management_positive_and_negative_branches_on_real_service
+  - 首轮(无 no-fail-fast)失败: 连接本机 LAN 地址 192.168.3.5 被防火墙/代理 TUN 拦截(测试自带说明为 environment failure)
+  - 本轮(no-fail-fast)通过(>60s) → 环境时通时不通
+
+关键用例套件内结果:
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+
+守卫误报: 0（全量日志中无 LINGXI_TEST_GUARD 触发）
+
+完整日志: /tmp/full-suite3.log（工作区外，如需归档请复制）

@@ -1,0 +1,22 @@
+##### DEMO B: sleeper vs guard (TEST_TIME_LIMIT_SEC=2) #####
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/zz_temp_guard_demo.rs (target/debug/deps/zz_temp_guard_demo-b680ea301690303e)
+
+running 1 test
+test temp_guard_demo_sleep_trips_time_limit ... 
+=== LINGXI_TEST_GUARD: ABORTING TEST PROCESS TO PROTECT THE MACHINE ===
+  reason  : wall clock 2.04s exceeded the 2.00s limit (TEST_TIME_LIMIT_SEC)
+  process : zz_temp_guard_demo-b680ea301690303e (pid 15967)
+  memory  : check disabled (TEST_MEM_LIMIT_MB=0)
+  elapsed : 2.04s / time budget 2.00s
+  live test threads (libtest names each thread after its test function):
+    - main
+    - temp_guard_demo_sleep_trips_time_limit
+  next    : reproduce single-threaded (`cargo test <name> -- --test-threads=1 --nocapture`);
+            adjust or disable: TEST_MEM_LIMIT_MB=16384, TEST_MEM_LIMIT_MB=0,
+            TEST_TIME_LIMIT_SEC=0 (0 = off), LINGXI_TEST_GUARD=0 (off entirely)
+===========================================================================
+error: test failed, to rerun pass `-p lingxi-service --test zz_temp_guard_demo`
+
+Caused by:
+  process didn't exit successfully: `/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/zz_temp_guard_demo-b680ea301690303e temp_guard_demo_sleep --test-threads=1` (signal: 6, SIGABRT: process abort signal)

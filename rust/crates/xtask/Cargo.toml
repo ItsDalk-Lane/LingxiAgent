@@ -21,5 +21,13 @@ libc = "0.2"
 # 使用仓库锁文件中已有的 SHA-256 实现，绑定候选文件的实际字节。
 sha2 = "0.11"
 
+[dev-dependencies]
+# R06-T06: arms the test-only memory/time guard in xtask's own test
+# binaries (referenced from a `#[cfg(test)]` item in src/main.rs).
+# Dev-only member edge; the guard crate itself carries the (locked) libc
+# and the one new pinned dependency ctor — xtask's zero-new-dependency
+# rule holds for non-test builds.
+lingxi-test-guard = { path = "../lingxi-test-guard" }
+
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.61.2", features = ["Win32_Foundation", "Win32_Storage_FileSystem"] }

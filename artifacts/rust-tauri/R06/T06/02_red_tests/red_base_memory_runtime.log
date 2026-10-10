@@ -1,0 +1,12 @@
+failures:
+    a11_cross_agent_and_invalid_ids_are_rejected
+    a11_memory_read_write_isolated_between_agents
+    a11_tenets_and_compiled_memory_scoped_per_agent
+    context_notes_session_scoped_roundtrip
+    dream_faces_report_absence_and_revisions_serve_from_store
+    experience_gating_and_feedback_shape
+    persona_files_follow_fallback_chain_and_broadcast_writes
+
+test result: FAILED. 0 passed; 7 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_t06_memory`

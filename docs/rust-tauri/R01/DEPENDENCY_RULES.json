@@ -74,6 +74,15 @@
    "established_by": "R02-T08（deliberate registry update：planned→exists，crate 落盘并由 D5 双向校验核对；DEP-07 桌面禁令自此对其生效；零新增第三方依赖——serde_json 复用锁内版本）"
   },
   {
+   "module": "lingxi-test-guard",
+   "kind": "test-infrastructure",
+   "crate_path": "rust/crates/lingxi-test-guard",
+   "status": "exists",
+   "establish_stage": "R06",
+   "responsibility": "测试进程内存（RSS）/墙钟守卫：ctor 预 main 安装采样线程，超限打印报告并 abort（R06-T06 整机内存耗尽事故防护）。非生产组件：只经 dev-dependencies 的 test-guard feature 边进入测试构建，cargo build/release 图不链接",
+   "established_by": "R06-T06（deliberate registry update：crate 落盘并由 D5 双向校验核对；DEP-07 桌面禁令对其生效。第三方依赖：libc 0.2.189 复用锁内版本，唯一新增 crate 为 ctor 0.8.0（随 dtor 0.3.0 传递），登记于 DEPENDENCY_DECISIONS.md D-12）"
+  },
+  {
    "module": "tauri-host",
    "kind": "desktop-host",
    "crate_path": "desktop/src-tauri",
@@ -225,7 +234,8 @@
     "lingxi-cli",
     "xtask",
     "lingxi-spike",
-    "lingxi-browser-spike"
+    "lingxi-browser-spike",
+    "lingxi-test-guard"
    ],
    "forbidden_dep_patterns": [
     "tauri",

@@ -137,3 +137,13 @@ rcgen = "=0.14.10"
 # for the managed tree and the unrelated sentinel. Same locked libc
 # version as the [dependencies] edge — zero new lock entries.
 libc = "0.2"
+# R06-T06: every test binary of this crate links kernel; enabling the
+# guard feature on this dev-dependency edge force-links the test guard's
+# pre-main hook into all of them (unit tests + tests/*.rs + the bins built
+# for CARGO_BIN_EXE_* tests). Never active for `cargo build` / release.
+lingxi-kernel = { path = "../lingxi-kernel", features = ["test-guard"] }
+# R06-T06: direct dev-dependency for the test binaries that link no crate
+# code at all (spawn-only wiring tests, bin test harnesses) — those carry
+# an explicit `use lingxi_test_guard as _;` so the pre-main hook is
+# force-linked there too. Dev-only.
+lingxi-test-guard = { path = "../lingxi-test-guard" }

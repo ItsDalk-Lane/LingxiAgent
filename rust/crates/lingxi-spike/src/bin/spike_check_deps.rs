@@ -89,6 +89,12 @@ fn linked_libraries(_exe: &std::path::Path) -> Result<Vec<String>, String> {
     Err("linked-library enumeration not implemented for this platform".into())
 }
 
+// R06-T06: force-links the default test guard into this bin's TEST HARNESS
+// build only (cfg(test)); normal bin and release builds never see it.
+#[cfg(test)]
+#[allow(unused_imports)]
+use lingxi_test_guard as _;
+
 fn main() {
     let mut failures: Vec<String> = Vec::new();
 

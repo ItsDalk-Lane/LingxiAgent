@@ -13,6 +13,13 @@
 //!
 //! 红线遵守：不连真实外网（全部 127.0.0.1）、不用真实账号、不读真实用户数据。
 
+// R06-T06: dev-dependency referenced only under cfg(test) — this links the
+// test guard's pre-main hook into this crate's test binaries. Never part of
+// a normal build or release (dev-dependencies only).
+#[cfg(test)]
+#[allow(unused_imports)]
+use lingxi_test_guard as _;
+
 pub mod cdp;
 pub mod launcher;
 pub mod ops;

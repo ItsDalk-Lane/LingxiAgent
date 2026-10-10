@@ -1,0 +1,31 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.82s
+     Running tests/r06_t06_skill_context.rs (target/debug/deps/r06_t06_skill_context-ed92391bc3f67486)
+
+running 3 tests
+test memory_tool_registration_failure_is_loud_not_silent ... FAILED
+test enabled_skill_catalog_reaches_the_production_system_prompt ... FAILED
+test disabled_skill_never_reaches_the_production_system_prompt ... ok
+
+failures:
+
+---- memory_tool_registration_failure_is_loud_not_silent stdout ----
+
+thread 'memory_tool_registration_failure_is_loud_not_silent' (937554) panicked at crates/lingxi-service/tests/r06_t06_skill_context.rs:396:22:
+重复注册必须 panic（响亮），不得静默跳过: ()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- enabled_skill_catalog_reaches_the_production_system_prompt stdout ----
+
+thread 'enabled_skill_catalog_reaches_the_production_system_prompt' (937553) panicked at crates/lingxi-service/tests/r06_t06_skill_context.rs:273:5:
+已启用技能必须以 skill.catalog 段进入发送文本
+
+
+failures:
+    enabled_skill_catalog_reaches_the_production_system_prompt
+    memory_tool_registration_failure_is_loud_not_silent
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_t06_skill_context`
+cargo_exit=101

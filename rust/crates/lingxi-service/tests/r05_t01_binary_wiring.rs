@@ -6,6 +6,10 @@
 //! Nothing here calls `bootstrap_with_deps` — the process under test is
 //! the shipping entrypoint.
 
+// R06-T06: this binary-level test references no crate code; the explicit
+// reference force-links the default test guard (memory/time abort) anyway.
+use lingxi_test_guard as _;
+
 use std::collections::VecDeque;
 use std::io::{BufRead, BufReader};
 use std::net::SocketAddr;

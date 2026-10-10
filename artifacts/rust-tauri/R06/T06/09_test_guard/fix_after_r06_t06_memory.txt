@@ -1,0 +1,13 @@
+##### post-fix r06_t06_memory: 3 consecutive runs, peak RSS via /usr/bin/time -l #####
+--- run 1 ---
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+        4.34 real         0.16 user         0.27 sys
+            33472512  maximum resident set size
+--- run 2 ---
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+        0.36 real         0.16 user         0.24 sys
+            33161216  maximum resident set size
+--- run 3 ---
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+        0.37 real         0.14 user         0.23 sys
+            32997376  maximum resident set size

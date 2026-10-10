@@ -12,6 +12,7 @@
 //! - [`backup`]: Online-Backup-API snapshots with manifest-verified
 //!   restores (R02-T06; never a plain copy of the active main file).
 
+pub mod agent_memory;
 pub mod backup;
 pub mod canonical_message_store;
 pub mod migrations;
@@ -20,6 +21,7 @@ pub mod run_store;
 pub mod session_admin;
 pub mod session_files;
 pub mod session_tree;
+pub mod skill_library;
 #[cfg(windows)]
 pub mod windows_acl;
 

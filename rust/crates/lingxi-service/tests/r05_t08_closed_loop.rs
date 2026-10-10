@@ -29,6 +29,10 @@
 //! - C09 live event page vs persisted projection of the same stream.
 //! - C12 repeated mixed cycles stay inside pre-registered resource bounds.
 
+// R06-T06: this binary-level test references no crate code; the explicit
+// reference force-links the default test guard (memory/time abort) anyway.
+use lingxi_test_guard as _;
+
 use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};

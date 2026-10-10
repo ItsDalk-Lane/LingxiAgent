@@ -9,6 +9,7 @@
 | 安装、功能与启动 | [README](../README.md) / [English](../README_EN.md) |
 | 开发环境、原生依赖与贡献 | [CONTRIBUTING](../CONTRIBUTING.md) |
 | 按改动选择验证 | [测试说明](../tests/README.md) |
+| Rust 测试守卫（默认内存/时间上限、环境变量、触发现象） | [R06 测试守卫](rust-tauri/R06/T06_TEST_GUARD.md) |
 | 安全报告与项目边界 | [SECURITY](../SECURITY.md) |
 
 ## 架构入口

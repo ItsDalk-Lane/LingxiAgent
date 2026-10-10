@@ -31,6 +31,10 @@
 //! - f24 worker reclamation: SIGTERM while the callback is parked reaps the
 //!   worker child (no orphan survives the service).
 
+// R06-T06: this binary-level test references no crate code; the explicit
+// reference force-links the default test guard (memory/time abort) anyway.
+use lingxi_test_guard as _;
+
 use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};

@@ -42,6 +42,7 @@ pub mod filetools;
 pub mod fsread;
 pub mod history;
 pub mod history_projection;
+pub mod hooks;
 pub mod inject;
 pub mod instance;
 pub mod invocations;
@@ -49,8 +50,11 @@ pub mod limits;
 pub mod logging;
 mod management;
 pub mod mcpbridge;
+pub mod memory;
+pub mod memorytools;
 pub mod operations;
 pub mod paths;
+pub mod persona;
 pub mod preview;
 pub mod procsupervisor;
 pub mod quotas;
@@ -69,6 +73,7 @@ pub mod session_tree;
 pub mod sessionfiles;
 pub mod sessions;
 pub mod shutdown;
+pub mod skills;
 mod static_web;
 pub mod streaming_norm;
 pub mod subagents;
@@ -210,7 +215,7 @@ use axum::extract::{ConnectInfo, Path, Request, State};
 use axum::http::{header, HeaderValue, StatusCode};
 use axum::middleware::{self, Next};
 use axum::response::{IntoResponse, Response};
-use axum::routing::{delete, get, post};
+use axum::routing::{delete, get, patch, post, put};
 use axum::{Json, Router};
 use lingxi_adapters::storage::{RunDatabase, RUNS_DB_FILE_NAME};
 use lingxi_kernel::ports::StorageError;
@@ -483,6 +488,12 @@ pub struct ServiceState {
     /// R06-T05 Round 5: the fs 直读面（授权根集合持有，对照
     /// server/routes/fs.ts 的 read / read-base64 两叶面）。
     fs_read: Arc<fsread::FsReadService>,
+    /// R06-T06: the per-agent memory service.
+    memory: Arc<memory::MemoryService>,
+    /// R06-T06: the skill service (discovery / whitelist / install audit).
+    skills: Arc<skills::SkillService>,
+    /// R06-T06: the persona file service.
+    persona: Arc<persona::PersonaService>,
     /// R06-T03: the workspace file-rollback preference (incumbent
     /// `getRollbackFileChanges`, `core/preferences-manager.ts:322-324`).
     /// Default OFF, mirroring the incumbent; a rewind/retry that requests
@@ -1172,6 +1183,28 @@ impl ServiceState {
                 }
                 None => None,
             };
+        // R06-T06：记忆/技能/人格服务（工具面注册模型侧工具需要它们）。
+        // product_dir 复用 T01 的解析链。
+        let t06_data_home = config.data_home.clone();
+        let t06_product_dir = context_compiler::resolve_product_dir(
+            std::env::var("LINGXI_PRODUCT_DIR").ok().as_deref(),
+            &std::env::current_exe().unwrap_or_else(|_| t06_data_home.join("lingxi-service")),
+            &t06_data_home,
+        );
+        let memory_service = Arc::new(memory::MemoryService::new(
+            t06_data_home.clone(),
+            layout.runtime_dir.clone(),
+        ));
+        let skills_service = Arc::new(skills::SkillService::new(
+            t06_data_home.clone(),
+            t06_product_dir.clone(),
+        ));
+        skills_service.set_clock(Arc::clone(&deps.clock));
+        skills_service.set_workspace_root(deps.workspace_root.clone());
+        let persona_service = Arc::new(persona::PersonaService::new(
+            memory_service.agents_root(),
+            t06_product_dir.clone(),
+        ));
         // R05 RR1 F24: the tool-plane handles the worker registration below
         // consumes (registry + gateway + access + workspace). Present
         // exactly when the real chain was wired with a scoped workspace.
@@ -1245,6 +1278,20 @@ impl ServiceState {
                     Arc::clone(&access),
                     workspace.clone(),
                     None,
+                    Arc::clone(&deps.clock),
+                    &budget,
+                );
+                // R06-T06: the memory/skill model-side tools. Each executor is
+                // BOUND to one agent at registration (the resolved primary
+                // agent) — there is no cross-agent handle (A11). Registration
+                // failure is a loud startup error, never a silent skip.
+                let primary_agent = memory_service.resolve_primary_agent().unwrap_or_default();
+                memorytools::register_memory_tools(
+                    &registry,
+                    gateway.as_ref(),
+                    Arc::clone(&memory_service),
+                    Arc::clone(&skills_service),
+                    primary_agent,
                     Arc::clone(&deps.clock),
                     &budget,
                 );
@@ -1379,11 +1426,61 @@ impl ServiceState {
             None => None,
         };
         let runs = runs.with_compaction(compaction_service);
+        // R06-T06: the skill install guard — the `guard` auxiliary slot over
+        // the SAME gateway/credential/network plane (fail-closed when the
+        // slot is unconfigured; install-skill.ts:96-107). Only wired when the
+        // real model chain exists; tests inject stubs via the service.
+        if wired_real_model_chain {
+            if let (Some(gateway), Some(credential_service)) =
+                (deps.model_gateway.clone(), deps.credential_service.clone())
+            {
+                let guard_executor =
+                    lingxi_adapters::models::auxiliary::AuxiliaryExecutor::new_with_network(
+                        gateway,
+                        credential_service
+                            as Arc<
+                                dyn lingxi_adapters::models::credentials::ProviderCredentialPort,
+                            >,
+                        lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                        deps.network_plane.clone().unwrap_or_else(
+                            lingxi_adapters::models::network::NetworkPlane::direct_isolated,
+                        ),
+                    )
+                    .map_err(|err| {
+                        ServiceStartupError::Storage(StorageError::InvalidRequest {
+                            detail: format!("cannot construct the skill guard executor: {err}"),
+                        })
+                    })?;
+                skills_service.set_guard(Arc::new(skills::GatewaySkillGuard::new(
+                    Arc::new(guard_executor),
+                    memory_service.resolve_primary_agent(),
+                )));
+            }
+        }
+        // R06-T06 R1 F-01: the runtime skill selection is a CONTEXT MATERIAL.
+        // Production compilers resolve it through the SkillService (the single
+        // owner of enable/disable, whitelist, workspace boundary and user
+        // override order — incumbent session-coordinator.ts:2102-2110
+        // getSkillsForAgent → skillsResult snapshot → resourceLoader.getSkills
+        // proxy → pi agent-session.js:784 loadedSkills). The resolved entries
+        // feed the FROZEN `skill.catalog` segment as source material — no new
+        // privilege channel beyond the T01 segment registry. A compiler
+        // constructed without this attach (bare test harnesses) keeps the
+        // empty pre-repair shape.
+        if let Some(compiler) = deps.context_compiler.as_ref() {
+            compiler.set_skill_materials(std::sync::Arc::clone(&skills_service)
+                as std::sync::Arc<dyn context_compiler::SkillMaterialPort>);
+        }
         // R06-T01: the session-scoped context compiler — when wired, EVERY
         // driven run's system text is its artifact's render and the
         // observation endpoint serves the SAME artifact (R06-A01); `None`
         // keeps the pre-R06 shape exactly.
         let runs = runs.with_context_compiler(deps.context_compiler.clone());
+        // R06-T06: the Pi extension hooks port — production ON (the
+        // agent-loop-guard + tool_result guard pipeline). The loop guard's
+        // block/warn behavior mirrors lib/extensions/agent-loop-guard-ext.ts;
+        // tests that need the pre-T06 shape use the builder default (off).
+        let runs = runs.with_extension_hooks(true);
         // R06-T03: the user-message recorder — when wired, every USER-origin
         // run's input lands in the session message tree (the write path of
         // fork/rewind); `None` keeps the pre-T03 shape exactly.
@@ -1810,6 +1907,10 @@ impl ServiceState {
             file_history,
             // R06-T05 Round 5: fs 直读面。
             fs_read,
+            // R06-T06：记忆/技能/人格服务。
+            memory: memory_service,
+            skills: skills_service,
+            persona: persona_service,
             rollback_file_changes: Arc::new(std::sync::atomic::AtomicBool::new(false)),
             events: Arc::clone(&events),
             rate: Arc::new(limits::RateLimiter::new(deps.rate_window_ms, deps.rate_max)),
@@ -1931,6 +2032,24 @@ impl ServiceState {
     /// R06-T05 Round 5: the fs 直读 service（授权根 + resolve）。
     pub fn fs_read(&self) -> &Arc<fsread::FsReadService> {
         &self.fs_read
+    }
+
+    /// R06-T06: the per-agent memory service (facts / tenets / compiled /
+    /// experience / dream revisions / context notes).
+    pub fn memory(&self) -> &Arc<memory::MemoryService> {
+        &self.memory
+    }
+
+    /// R06-T06: the skill service (discovery / whitelist / install audit /
+    /// bundles / removal).
+    pub fn skills(&self) -> &Arc<skills::SkillService> {
+        &self.skills
+    }
+
+    /// R06-T06: the persona file service (AGENTS.md / identity.md /
+    /// public persona / avatars — the write faces of the T01 material chain).
+    pub fn persona(&self) -> &Arc<persona::PersonaService> {
+        &self.persona
     }
 
     /// R06-T03: whether workspace file rollback is enabled (incumbent
@@ -5575,6 +5694,183 @@ pub fn build_router(state: ServiceState) -> Router {
         .route(
             "/lingxi/v1/fs/read-base64",
             get(fsread::fs_read_base64_route),
+        )
+        // ── R06-T06 记忆面（显式 agentId 是唯一归属边界）──
+        .route(
+            "/lingxi/v1/memories",
+            get(memory::memories_list_route).delete(memory::memories_delete_route),
+        )
+        .route(
+            "/lingxi/v1/memories/health",
+            get(memory::memories_health_route),
+        )
+        .route(
+            "/lingxi/v1/memories/compiled",
+            get(memory::memories_compiled_get_route).delete(memory::memories_compiled_delete_route),
+        )
+        .route(
+            "/lingxi/v1/memories/compiled/facts",
+            put(memory::memories_compiled_facts_route),
+        )
+        .route(
+            "/lingxi/v1/memories/compiled/today",
+            put(memory::memories_compiled_today_route),
+        )
+        .route(
+            "/lingxi/v1/memories/compiled/longterm",
+            put(memory::memories_compiled_longterm_route),
+        )
+        .route(
+            "/lingxi/v1/memories/compiled/week/days",
+            get(memory::memories_week_days_route),
+        )
+        .route(
+            "/lingxi/v1/memories/compiled/week/days/{date}",
+            put(memory::memories_week_day_put_route),
+        )
+        .route(
+            "/lingxi/v1/memories/export",
+            get(memory::memories_export_route),
+        )
+        .route(
+            "/lingxi/v1/memories/import",
+            post(memory::memories_import_route),
+        )
+        .route(
+            "/lingxi/v1/memories/dream/status",
+            get(memory::dream_status_route),
+        )
+        .route(
+            "/lingxi/v1/memories/dream/runs",
+            post(memory::dream_run_route),
+        )
+        .route(
+            "/lingxi/v1/memories/dream/revisions",
+            get(memory::dream_revisions_route),
+        )
+        .route(
+            "/lingxi/v1/memories/dream/revisions/{revision_id}",
+            get(memory::dream_revision_detail_route),
+        )
+        .route(
+            "/lingxi/v1/memories/dream/revisions/{revision_id}/restore",
+            post(memory::dream_revision_restore_route),
+        )
+        // ── R06-T06 tenets/pinned/experience/config 人格面 ──
+        .route(
+            "/lingxi/v1/agents/{agent_id}/tenets",
+            get(memory::tenets_list_route).post(memory::tenets_post_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/tenets/{tenet_id}/decide",
+            post(memory::tenets_decide_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/tenets/{tenet_id}",
+            delete(memory::tenets_delete_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/pinned",
+            get(memory::pinned_get_route).put(memory::pinned_put_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/experience",
+            get(memory::experience_get_route).put(memory::experience_put_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/experience/feedback",
+            post(memory::experience_feedback_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/config",
+            patch(memory::agent_config_patch_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/config-flags",
+            get(memory::agent_config_flags_route),
+        )
+        // ── R06-T06 人格文件面（ishiki/public-ishiki 为现役兼容别名）──
+        .route(
+            "/lingxi/v1/agents/{agent_id}/agents-md",
+            get(persona::agents_md_get_route).put(persona::agents_md_put_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/ishiki",
+            get(persona::agents_md_get_route).put(persona::agents_md_put_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/public-agents-md",
+            get(persona::public_agents_md_get_route).put(persona::public_agents_md_put_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/public-ishiki",
+            get(persona::public_agents_md_get_route).put(persona::public_agents_md_put_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/identity",
+            get(persona::identity_get_route).put(persona::identity_put_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/avatar",
+            get(persona::avatar_get_route)
+                .post(persona::avatar_post_route)
+                .delete(persona::avatar_delete_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/avatar-path",
+            get(persona::avatar_path_route),
+        )
+        // ── R06-T06 skills 面 ──
+        .route("/lingxi/v1/skills", get(skills::skills_list_route))
+        .route(
+            "/lingxi/v1/skills/install",
+            post(skills::skills_install_route),
+        )
+        .route(
+            "/lingxi/v1/skills/reload",
+            post(skills::skills_reload_route),
+        )
+        .route(
+            "/lingxi/v1/skills/external-paths",
+            get(skills::skills_external_paths_get_route)
+                .put(skills::skills_external_paths_put_route),
+        )
+        .route(
+            "/lingxi/v1/skills/bundles",
+            get(skills::skills_bundles_list_route).post(skills::skills_bundles_create_route),
+        )
+        .route(
+            "/lingxi/v1/skills/bundles/order",
+            put(skills::skills_bundles_order_route),
+        )
+        .route(
+            "/lingxi/v1/skills/bundles/{bundle_id}",
+            put(skills::skills_bundle_update_route).delete(skills::skills_bundle_delete_route),
+        )
+        .route(
+            "/lingxi/v1/skills/{name}",
+            delete(skills::skills_delete_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/skills",
+            put(skills::agent_skills_put_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/skills/{name}",
+            patch(skills::agent_skill_patch_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/skill-bundles/{bundle_id}",
+            patch(skills::agent_skill_bundle_patch_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}/skills/cleanup-preview",
+            get(skills::agent_skills_cleanup_preview_route),
+        )
+        // ── R06-T06 会话上下文笔记（现役 {sessionPath}.context-notes.md）──
+        .route(
+            "/lingxi/v1/sessions/{session_id}/context-notes",
+            get(memory::context_notes_get_route).put(memory::context_notes_put_route),
         )
         .route("/lingxi/v1/ws-ticket", post(ws_ticket))
         .route(

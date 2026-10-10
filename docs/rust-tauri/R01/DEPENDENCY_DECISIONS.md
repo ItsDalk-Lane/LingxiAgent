@@ -20,6 +20,7 @@ ADR 格式依据任务书 06 §1。本文件每条决策含：问题与用户目
 | rmcp | 3.4.1 | default-features=false + client,server |
 | serde / serde_json（T02 既有） | 1.0.229 / 1.0.151 | derive |
 | sha1 / sha2 / base64（T02 既有） | 0.11.0 / 0.11.0 / 0.23.1 | 握手与摘要 |
+| ctor / dtor（R06-T06 新增，测试守卫） | 0.8.0 / 0.3.0 | 预 main 初始化钩子；ctor-proc-macro 0.0.7 + dtor-proc-macro 0.0.6 传递；仅经 dev-dependencies 的 test-guard feature 边进入测试构建（详见 D-12） |
 
 锁树总计 279 个 crate（含平台条件依赖条目）。锁定机制 = Cargo.lock（精确版本）+ rust-toolchain.toml（精确工具链）；manifest 中保持 semver 兼容界（与 T02 先例一致），不以 `=` 钉死 manifest 造成双向事实源。
 
@@ -265,3 +266,27 @@ ADR 格式依据任务书 06 §1。本文件每条决策含：问题与用户目
 **退出条件：**R09 tauri-host（desktop/src-tauri，planned）建立时以本锁表为起点重新评估最新 2.x；若官方插件在 R09 真实业务面暴露缺陷，按上游 issue 升/降锁并复测本任务的能力矩阵。
 
 **受影响任务/测试：**R09（宿主集成）、R10（跨平台产物）；本任务证据 artifacts/rust-tauri/R01/T06/ 与 docs/rust-tauri/R01/{SHELL_CAPABILITY_MATRIX.json,TAURI_SPIKE_REPORT.md,R01-T06_REPORT.md}。
+
+## D-12 R06-T06 测试守卫：新增 lingxi-test-guard crate（唯一新第三方 crate = ctor 0.8.0）
+
+**问题与用户目标：**R06-T06 事故——`r06_t06_memory` 测试进程因 `urldecode` 无终止循环在 ~61 分钟里把常驻内存涨到 ~176GB，耗尽整机 96GB 内存被看门狗重启。测试面缺进程级内存/时间上限。目标：默认随 `cargo test` 对所有测试生效的守卫，且生产/发布构建零开销、零全局副作用。
+
+**不可违反契约：**第三方 crate 只能经 rust/ workspace 引入并锁定（锁表纪律）；headless workspace 无桌面依赖（DEP-07）；守卫只在测试构建启用；不使用来路不明依赖；非必要不用 unsafe（必要处逐处注明 sound 理由）。
+
+**候选及实际验证：**
+- 自定义 test harness（`harness = false`）：需改写 115+ 个测试文件，侵入过大——否决。
+- nextest setup/脚本：无法在测试进程内安装监控（且仓库当前未用 nextest）——否决。
+- `ctor` 预 main 钩子（采用）：`crates/lingxi-test-guard` 以 `#[ctor::ctor]` 在 main 前安装采样线程；经 `test-guard` feature 边由 dev-dependencies 开启，`use lingxi_test_guard as _;` 置于 kernel（feature 门控）与各无 kernel 边的 crate 的 `#[cfg(test)]` 项，使所有链接被测 crate 的测试二进制自动覆盖。实测（本机 macOS）：服务/适配器/内核集成与单元测试二进制均装载（nm 计数 + `TEST_GUARD_VERBOSE=1` armed 行），synthetic 泄漏用例在阈值处 abort（exit 134=SIGABRT，报告含测试线程名）。
+- macOS RSS 采样经 `libc::task_info(MACH_TASK_BASIC_INFO).resident_size`；Linux 经 `/proc/self/statm`。libc 0.2.189 已是锁定直接依赖（D-09），版本不变。
+- ctor 0.8.0（mmastrac，成熟维护）：`Cargo.lock` 新增 ctor/ctor-proc-macro/dtor/dtor-proc-macro 四个条目 + lingxi-test-guard workspace member；无其它新增；`cargo build`/release 图不含该边（feature 只由 dev-dependencies 开启）。
+- unsafe 使用面：仅 guard crate 内 task_info/task_threads/pthread_getname_np/内联 `libc::write` 四处，均逐处注明 SAFETY/原因（见 crate 源码）；`#[allow(deprecated)]` 两处沿用 libc 绑定而非引入 mach2 新 crate。
+
+**选择与理由：**ctor + feature 边是"默认随 cargo test 生效、零测试文件改动、release 零开销"三者同时满足的最小侵入方案；守卫自身有 11 个单元测试（阈值解析、越限判定、RSS 采样、线程名枚举、默认安装证明）。
+
+**依赖版本：**新增 ctor 0.8.0（+ 传递 dtor 0.3.0、ctor-proc-macro 0.0.7、dtor-proc-macro 0.0.6）；libc 0.2.189 复用。锁树 320 个 crate（本次决策时 `grep -c '^name = ' rust/Cargo.lock`；T03 基线 279 的历史语句不改写）。
+
+**性能/安全/兼容影响：**测试构建多一个 50ms 周期采样线程（task_info/statm 微秒级），生产图无变化；默认阈值 8GiB / 600s（时间默认上市时为 300s，收尾验证发现恰好卡在既有最慢合法用例 `approval_face_share_cases` 的固有完成线 ~300.5s 之下而误伤，上调为已知最慢合法用例 ~2 倍富余，见 `artifacts/rust-tauri/R06/T06/09_test_guard/guard_time_default_incident.txt`），`TEST_MEM_LIMIT_MB`、`TEST_TIME_LIMIT_SEC`（0=关闭）、`LINGXI_TEST_GUARD=0`（总开关）可调；`cargo test` 期间被 spawn 的真实服务子进程同样被覆盖（默认静默、阈值宽松）。已知边界：不链接任何被测 crate 的纯 synthetic 测试二进制不会被装载（rustc 不链接未引用 crate）；该边界在 crate 文档中写明。
+
+**退出条件：**若 Rust 未来提供稳定的 test-harness 级进程守卫（或 nextest 提供 in-process 资源限制），迁移并退役本 crate；退役须在 DEPENDENCY_RULES.json 同步登记。
+
+**受影响任务/测试：**全部 `cargo test` 面（kernel/adapters/service/protocol/spike/browser-spike/xtask 的测试二进制）；ownership 校验器（D5-reverse 新成员登记、DEP-07 生效）。

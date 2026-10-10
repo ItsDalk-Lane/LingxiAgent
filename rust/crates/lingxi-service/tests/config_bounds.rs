@@ -19,6 +19,10 @@
 //! values is proved by the parse-level unit tests in `src/config.rs`
 //! (parsing inspects the number only).
 
+// R06-T06: this binary-level test references no crate code; the explicit
+// reference force-links the default test guard (memory/time abort) anyway.
+use lingxi_test_guard as _;
+
 /// Asserts the loud exit-2 rejection contract for one literal flag/value
 /// pair: exit code 2, the error names the flag, and no readiness line was
 /// printed. Both arguments must be string LITERALS at the call site.

@@ -377,6 +377,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "ctor"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "352d39c2f7bef1d6ad73db6f5160efcaed66d94ef8c6c573a8410c00bf909a98"
+dependencies = [
+ "ctor-proc-macro",
+ "dtor",
+]
+
+[[package]]
+name = "ctor-proc-macro"
+version = "0.0.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "52560adf09603e58c9a7ee1fe1dcb95a16927b17c127f0ac02d6e768a0e25bc1"
+
+[[package]]
 name = "ctutils"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -433,6 +449,21 @@ dependencies = [
  "quote",
  "syn 3.0.6",
 ]
+
+[[package]]
+name = "dtor"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f1057d6c64987086ff8ed0fd3fbf377a6b7d205cc7715868cd401705f715cbe4"
+dependencies = [
+ "dtor-proc-macro",
+]
+
+[[package]]
+name = "dtor-proc-macro"
+version = "0.0.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f678cf4a922c215c63e0de95eb1ff08a958a81d47e485cf9da1e27bf6305cfa5"
 
 [[package]]
 name = "dunce"
@@ -1217,6 +1248,7 @@ version = "0.0.0"
 dependencies = [
  "base64",
  "libc",
+ "lingxi-test-guard",
  "serde",
  "serde_json",
  "sha2",
@@ -1226,7 +1258,9 @@ dependencies = [
 name = "lingxi-kernel"
 version = "0.0.0"
 dependencies = [
+ "lingxi-kernel",
  "lingxi-protocol",
+ "lingxi-test-guard",
  "serde_json",
  "sha2",
 ]
@@ -1236,6 +1270,7 @@ name = "lingxi-protocol"
 version = "0.0.0"
 dependencies = [
  "base64",
+ "lingxi-test-guard",
  "schemars",
  "serde",
  "serde_json",
@@ -1259,6 +1294,7 @@ dependencies = [
  "lingxi-adapters",
  "lingxi-kernel",
  "lingxi-protocol",
+ "lingxi-test-guard",
  "percent-encoding",
  "qrcodegen",
  "rcgen",
@@ -1285,6 +1321,7 @@ version = "0.0.0"
 dependencies = [
  "axum",
  "jsonschema",
+ "lingxi-test-guard",
  "reqwest",
  "rmcp",
  "rusqlite",
@@ -1293,6 +1330,14 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "lingxi-test-guard"
+version = "0.0.0"
+dependencies = [
+ "ctor",
+ "libc",
 ]
 
 [[package]]
@@ -3048,6 +3093,7 @@ name = "xtask"
 version = "0.1.0"
 dependencies = [
  "libc",
+ "lingxi-test-guard",
  "serde_json",
  "sha2",
  "windows-sys 0.61.2",

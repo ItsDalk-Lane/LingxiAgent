@@ -1,0 +1,38 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r00_management_leaves.rs (target/debug/deps/r00_management_leaves-31e570a1b3a4ca44)
+
+running 1 test
+test r00_management_positive_and_negative_branches_on_real_service ... FAILED
+
+failures:
+
+---- r00_management_positive_and_negative_branches_on_real_service stdout ----
+LINGXI_AUTH_REJECTED request_id="req-13d4c4f2a730999e71cd4d6492a6be7f" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:52015
+LINGXI_AUTH_REJECTED request_id="req-8c1e92cbb2a6244401ab7491dbeda10f" method=GET path=/lingxi/v1/access/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:52019
+LINGXI_AUTH_REJECTED request_id="req-511899e3ca2d6b845582ce7fefdf87d4" method=PUT path=/lingxi/v1/access/account/profile status=401 Unauthorized reason=missing_credential remote=127.0.0.1:52024
+LINGXI_AUTH_REJECTED request_id="req-cf3e2d20983836914a20683ff8b7453e" method=PUT path=/lingxi/v1/access/network status=401 Unauthorized reason=missing_credential remote=127.0.0.1:52027
+LINGXI_AUTH_REJECTED request_id="req-c70ceec05ffffe8c02736f53c86168f1" method=GET path=/lingxi/v1/access/mobile-qr.svg status=401 Unauthorized reason=missing_credential remote=127.0.0.1:52029
+LINGXI_AUTH_REJECTED request_id="req-773ca886716a393d85b5519a91b4c4bf" method=PUT path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:52035
+LINGXI_AUTH_REJECTED request_id="req-6a65663da047e04d1c2b2655fcea8acf" method=DELETE path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:52042
+LINGXI_AUTH_REJECTED request_id="req-5843a2b3a378f8ae3e8fcbbd7a6f8f8f" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:52078
+LINGXI_AUTH_REJECTED request_id="req-2a09be257349c1462147134944c44f4e" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:52080
+LINGXI_AUTH_REJECTED request_id="req-186b9be1f980ad6003e4ef5f208b1642" method=GET path=/lingxi/v1/devices status=401 Unauthorized reason=missing_credential remote=127.0.0.1:52083
+LINGXI_AUTH_REJECTED request_id="req-d269bfcf1e967cefaa07c53c482d6aec" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:52086
+LINGXI_AUTH_REJECTED request_id="req-0413c7ee7b6922faa526149264664d36" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:52089
+LINGXI_AUTH_REJECTED request_id="req-97744e2596844a59fa209dda9373c932" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:52094
+LINGXI_AUTH_REJECTED request_id="req-8f870d11953e7029a1d11913182fd853" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:52124
+LINGXI_AUTH_REJECTED request_id="req-6be712895d4c2749df95a901e7224516" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:52126
+LINGXI_AUTH_REJECTED request_id="req-800121e1a3051fbfa6d23042729635dd" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:52132
+
+thread 'r00_management_positive_and_negative_branches_on_real_service' (1251625) panicked at crates/lingxi-service/tests/r00_management_leaves.rs:49:5:
+request to 192.168.3.5:52193 stalled during write/read exchange (POST /lingxi/v1/web-auth/login, 0 bytes read so far) — if addr is a non-loopback self-address, the macOS application firewall / proxy TUN may be blocking inbound connections to this unsigned test binary; this is an environment failure surfaced honestly, not a skipped assertion
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    r00_management_positive_and_negative_branches_on_real_service
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 51.55s
+
+error: test failed, to rerun pass `-p lingxi-service --test r00_management_leaves`
+SOLO_EXIT:101

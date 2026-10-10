@@ -11,6 +11,10 @@
 //! 替身边界：stub 只扮演外部模型端点（读请求、回固定 SSE）；它从不决定
 //! 运行/审批/存储状态。人格模板走真实回落链（exe 上溯命中仓库 lib/）。
 
+// R06-T06: this binary-level test references no crate code; the explicit
+// reference force-links the default test guard (memory/time abort) anyway.
+use lingxi_test_guard as _;
+
 use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};

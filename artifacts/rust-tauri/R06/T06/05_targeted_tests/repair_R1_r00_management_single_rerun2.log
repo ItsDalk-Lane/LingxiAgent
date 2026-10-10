@@ -1,0 +1,38 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r00_management_leaves.rs (target/debug/deps/r00_management_leaves-31e570a1b3a4ca44)
+
+running 1 test
+test r00_management_positive_and_negative_branches_on_real_service ... FAILED
+
+failures:
+
+---- r00_management_positive_and_negative_branches_on_real_service stdout ----
+LINGXI_AUTH_REJECTED request_id="req-0f1c8367bf32e10a493d774ee74934eb" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55758
+LINGXI_AUTH_REJECTED request_id="req-15f1f8a3e5ca81639b54e2e38a6e2ce9" method=GET path=/lingxi/v1/access/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55762
+LINGXI_AUTH_REJECTED request_id="req-70905125db9bc23ab50900ba24124715" method=PUT path=/lingxi/v1/access/account/profile status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55767
+LINGXI_AUTH_REJECTED request_id="req-b021d9820785ae1ca17809de3352b8db" method=PUT path=/lingxi/v1/access/network status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55770
+LINGXI_AUTH_REJECTED request_id="req-56810fa82f3e3632c1d545d549fce6bf" method=GET path=/lingxi/v1/access/mobile-qr.svg status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55772
+LINGXI_AUTH_REJECTED request_id="req-74cb7c8da1e732fcd1e6e95fab72ff9b" method=PUT path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55778
+LINGXI_AUTH_REJECTED request_id="req-e4ccd3b91df274d007e2abf93ebd29dd" method=DELETE path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55785
+LINGXI_AUTH_REJECTED request_id="req-daefafa9db6505611204b4cb7db2ff79" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55804
+LINGXI_AUTH_REJECTED request_id="req-8a6d6ea78d10724f26c416920e0f4203" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55806
+LINGXI_AUTH_REJECTED request_id="req-6d1363ea185dfed1053fc01b0d900c0b" method=GET path=/lingxi/v1/devices status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55809
+LINGXI_AUTH_REJECTED request_id="req-59eb8639319d1fc82ab50763a9817435" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:55812
+LINGXI_AUTH_REJECTED request_id="req-cdeec985405e79beb5a731dea33e506f" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55815
+LINGXI_AUTH_REJECTED request_id="req-203674b1a1a33ede5cbaf622060e6d13" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:55819
+LINGXI_AUTH_REJECTED request_id="req-b53b8a81130abcc57865c6027eda557b" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55822
+LINGXI_AUTH_REJECTED request_id="req-c015660472edceb2f2e7e2ff47e929df" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55824
+LINGXI_AUTH_REJECTED request_id="req-eabf7b8b3df07973b235c7f5498a9462" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55830
+
+thread 'r00_management_positive_and_negative_branches_on_real_service' (1001981) panicked at crates/lingxi-service/tests/r00_management_leaves.rs:49:5:
+request to 192.168.3.5:55879 stalled during write/read exchange (POST /lingxi/v1/web-auth/login, 0 bytes read so far) — if addr is a non-loopback self-address, the macOS application firewall / proxy TUN may be blocking inbound connections to this unsigned test binary; this is an environment failure surfaced honestly, not a skipped assertion
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    r00_management_positive_and_negative_branches_on_real_service
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 51.64s
+
+error: test failed, to rerun pass `-p lingxi-service --test r00_management_leaves`
+single2_exit=101

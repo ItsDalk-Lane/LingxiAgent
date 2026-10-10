@@ -1,0 +1,5 @@
+cargo 1.98.1 (797e8a9bc 2026-08-05)
+rustc 1.98.1 (48a229cea 2026-09-01)
+rustfmt 1.9.0-stable (48a229ceae 2026-09-01)
+PATH cargo: /opt/homebrew/bin/cargo => Homebrew 1.93.0 (DOES NOT read rust-toolchain.toml - FORBIDDEN)
+USED: /Users/study_superior/.cargo/bin/cargo => 1.98.1 (rustup shim, reads repo rust-toolchain.toml)

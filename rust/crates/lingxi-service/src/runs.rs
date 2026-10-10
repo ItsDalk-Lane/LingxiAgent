@@ -590,6 +590,12 @@ pub struct RunSupervisor {
     /// no second prompt reconstruction). `None` (the no-compiler test
     /// wiring) keeps the pre-R06 shape exactly (`system_prompt: None`).
     context_compiler: Option<Arc<crate::context_compiler::ContextCompilerService>>,
+    /// R06-T06: the Pi extension hooks port (agent-loop-guard + tool_result
+    /// guard pipeline). `true` wires the SAME behaviors the incumbent
+    /// extensions implemented (`lib/extensions/agent-loop-guard-ext.ts`,
+    /// `compaction-guard-ext` L1); `false` keeps the pre-T06 shape exactly
+    /// (the two known-load flaky tests opt out via the builder).
+    extension_hooks: bool,
     /// R06-T02: the mid-run compaction service. When `Some`, every turn
     /// boundary runs the incumbent trigger evaluation (real usage + tail
     /// estimate against the chat route's declared window; FORCE 80% /
@@ -677,6 +683,7 @@ impl RunSupervisor {
             model_call_tuning: ModelCallTuning::default(),
             context_compiler: None,
             compaction: None,
+            extension_hooks: false,
             user_message_recorder: None,
         }
     }
@@ -717,6 +724,7 @@ impl RunSupervisor {
             model_call_tuning: ModelCallTuning::default(),
             context_compiler: None,
             compaction: None,
+            extension_hooks: false,
             user_message_recorder: None,
         })
     }
@@ -785,6 +793,13 @@ impl RunSupervisor {
         compaction: Option<Arc<crate::compaction::CompactionService>>,
     ) -> Self {
         self.compaction = compaction;
+        self
+    }
+
+    /// R06-T06: wires the extension hooks port (loop guard + tool_result
+    /// guard). Production bootstrap enables it; tests keep the default off.
+    pub fn with_extension_hooks(mut self, enabled: bool) -> Self {
+        self.extension_hooks = enabled;
         self
     }
 
@@ -1242,14 +1257,71 @@ impl RunSupervisor {
         // all four [`ToolOutcome`] states, including every zero-dispatch
         // refusal — joins the run's exchange history, so the NEXT model
         // call's typed input carries the REAL outcome (never a guess).
+        // R06-T06: the Pi extension hooks state (fresh per run — the
+        // incumbent resets on session_start/agent_start; one run IS one
+        // agent start). `None` = the pre-T06 shape, byte-identical paths.
+        let mut t06_hooks = if self.extension_hooks {
+            Some(crate::hooks::ExtensionHooks::new())
+        } else {
+            None
+        };
         macro_rules! record_tool_result {
-            ($call_id:expr, $request:expr, $outcome:expr) => {
+            ($call_id:expr, $request:expr, $outcome:expr) => {{
+                // R06-T06: the tool_result guard pipeline — loop-guard
+                // warnings + failure-streak tracking + the L1 hard cap and
+                // injection-scan warnings the incumbent extensions attached
+                // to the tool_result hook. Warnings prepend as ONE text
+                // block (incumbent prependWarnings).
+                let mut outcome: ToolOutcome = $outcome.clone();
+                if let Some(hooks) = t06_hooks.as_mut() {
+                    let is_error = matches!(outcome, ToolOutcome::Failed { .. });
+                    let content_ref: Vec<ContentBlock> = match &outcome {
+                        ToolOutcome::Success { result } => result.content.clone(),
+                        _ => Vec::new(),
+                    };
+                    // The guard state machine is name-keyed (the incumbent
+                    // extensions see tool NAMES, e.g. "read"); derive the
+                    // local name from the registry target id.
+                    let local_name = $request
+                        .target
+                        .rsplit(':')
+                        .next()
+                        .unwrap_or($request.target.as_str());
+                    let (warnings, guarded_content, any_truncated) =
+                        crate::hooks::tool_result_guard(
+                            hooks,
+                            local_name,
+                            $call_id.as_str(),
+                            is_error,
+                            &content_ref,
+                        );
+                    if let ToolOutcome::Success { result } = &mut outcome {
+                        if !warnings.is_empty() {
+                            let mut prefixed = vec![ContentBlock::Text {
+                                text: warnings.join("\n"),
+                            }];
+                            prefixed.extend(result.content.drain(..));
+                            result.content = prefixed;
+                        } else {
+                            result.content = guarded_content;
+                        }
+                        result.truncated = result.truncated || any_truncated;
+                    } else if let ToolOutcome::Failed { error } = &mut outcome {
+                        // The incumbent's prependWarnings also reaches the
+                        // model on ERROR results (the loop-guard failure
+                        // streak warnings); the Failed outcome has no content
+                        // blocks, so the error message is the carrier.
+                        if !warnings.is_empty() {
+                            error.message = format!("{}\n{}", warnings.join("\n"), error.message);
+                        }
+                    }
+                }
                 exchange.push(ExchangeItem::ToolResult {
                     tool_call_id: $call_id.clone(),
                     provider_call_id: $request.provider_call_id.clone(),
-                    outcome: $outcome.clone(),
+                    outcome,
                 })
-            };
+            }};
         }
         // R05-T05: the per-call TOTAL wall-clock budget
         // (`model_call_total_budget_ms`) of the CURRENT logical model call
@@ -2180,6 +2252,39 @@ impl RunSupervisor {
                                     ),
                                 ));
                                 continue;
+                            }
+                            // R06-T06: the agent-loop-guard tool_call hook —
+                            // a Block refuses dispatch BEFORE any executor
+                            // runs (the incumbent extension blocked at the
+                            // same semantic point, agent-loop-guard-ext.ts:118-162).
+                            // The guard is name-keyed (the incumbent sees
+                            // tool NAMES like "read") — derive the local
+                            // name from the registry target id.
+                            if let Some(hooks) = t06_hooks.as_mut() {
+                                let local_name = request
+                                    .target
+                                    .rsplit(':')
+                                    .next()
+                                    .unwrap_or(request.target.as_str());
+                                if let lingxi_kernel::memory::GuardDecision::Block(reason) = hooks
+                                    .on_tool_call(
+                                        local_name,
+                                        call_id.as_str(),
+                                        request.arguments.as_value(),
+                                    )
+                                {
+                                    own_refusals[index] = Some((
+                                        ToolOutcome::Failed {
+                                            error: ProtocolError::new(
+                                                ErrorCode::InvalidMessage,
+                                                reason.clone(),
+                                                false,
+                                            ),
+                                        },
+                                        format!("not dispatched: agent loop guard: {reason}"),
+                                    ));
+                                    continue;
+                                }
                             }
                             let Some(gateway) = tool_gateway.as_ref() else {
                                 continue;

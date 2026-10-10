@@ -38,6 +38,13 @@
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 
+// R06-T06: dev-dependency referenced only under cfg(test) — this links the
+// test guard's pre-main hook into xtask's test binaries. Never part of a
+// normal build or release (dev-dependencies only).
+#[cfg(test)]
+#[allow(unused_imports)]
+use lingxi_test_guard as _;
+
 pub mod candidate;
 pub mod runner_identity;
 pub mod stage_map;

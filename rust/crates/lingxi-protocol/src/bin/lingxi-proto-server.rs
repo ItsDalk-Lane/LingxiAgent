@@ -375,6 +375,12 @@ fn summarize_body(body: &[u8]) -> String {
     "(ok)".into()
 }
 
+// R06-T06: force-links the default test guard into this bin's TEST HARNESS
+// build only (cfg(test)); normal bin and release builds never see it.
+#[cfg(test)]
+#[allow(unused_imports)]
+use lingxi_test_guard as _;
+
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().collect();
     let port: u16 = args
