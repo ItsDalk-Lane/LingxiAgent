@@ -1,0 +1,59 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0432]: unresolved import `lingxi_service::resourceio`
+  --> crates/lingxi-service/tests/r06_t05_resourceio.rs:36:21
+   |
+36 | use lingxi_service::resourceio::{
+   |                     ^^^^^^^^^^ could not find `resourceio` in `lingxi_service`
+
+error[E0433]: cannot find `resourceio` in `lingxi_service`
+   --> crates/lingxi-service/tests/r06_t05_resourceio.rs:736:51
+    |
+736 |     let changed = |seq_size: u64| lingxi_service::resourceio::BusChanged {
+    |                                                   ^^^^^^^^^^ could not find `resourceio` in `lingxi_service`
+    |
+help: an enum with a similar name exists
+    |
+736 -     let changed = |seq_size: u64| lingxi_service::resourceio::BusChanged {
+736 +     let changed = |seq_size: u64| lingxi_service::ResourceOp::BusChanged {
+    |
+
+error[E0433]: cannot find `resourceio` in `lingxi_service`
+   --> crates/lingxi-service/tests/r06_t05_resourceio.rs:749:38
+    |
+749 |     let no_version = lingxi_service::resourceio::BusChanged {
+    |                                      ^^^^^^^^^^ could not find `resourceio` in `lingxi_service`
+    |
+help: an enum with a similar name exists
+    |
+749 -     let no_version = lingxi_service::resourceio::BusChanged {
+749 +     let no_version = lingxi_service::ResourceOp::BusChanged {
+    |
+
+error[E0433]: cannot find `resourceio` in `lingxi_service`
+   --> crates/lingxi-service/tests/r06_t05_resourceio.rs:756:41
+    |
+756 |     let _ = bus.deleted(lingxi_service::resourceio::BusDeleted {
+    |                                         ^^^^^^^^^^ could not find `resourceio` in `lingxi_service`
+    |
+help: an enum with a similar name exists
+    |
+756 -     let _ = bus.deleted(lingxi_service::resourceio::BusDeleted {
+756 +     let _ = bus.deleted(lingxi_service::ResourceOp::BusDeleted {
+    |
+
+error[E0433]: cannot find `resourceio` in `lingxi_service`
+   --> crates/lingxi-service/tests/r06_t05_resourceio.rs:763:44
+    |
+763 |     let last = bus.renamed(lingxi_service::resourceio::BusRenamed {
+    |                                            ^^^^^^^^^^ could not find `resourceio` in `lingxi_service`
+    |
+help: an enum with a similar name exists
+    |
+763 -     let last = bus.renamed(lingxi_service::resourceio::BusRenamed {
+763 +     let last = bus.renamed(lingxi_service::ResourceOp::BusRenamed {
+    |
+
+Some errors have detailed explanations: E0432, E0433.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `lingxi-service` (test "r06_t05_resourceio") due to 5 previous errors
+RED_EXIT=101

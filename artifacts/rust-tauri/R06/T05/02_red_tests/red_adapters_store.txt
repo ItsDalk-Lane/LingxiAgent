@@ -1,0 +1,18 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+error[E0432]: unresolved import `lingxi_adapters::storage::session_files`
+  --> crates/lingxi-adapters/tests/session_file_store.rs:16:5
+   |
+16 | use lingxi_adapters::storage::session_files as sf;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^-------------^^^^^^
+   |                               |
+   |                               no `session_files` in `storage`
+   |
+help: a similar name exists in the module
+   |
+16 - use lingxi_adapters::storage::session_files as sf;
+16 + use lingxi_adapters::storage::session_tree as sf;
+   |
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `lingxi-adapters` (test "session_file_store") due to 1 previous error
+EXIT=101

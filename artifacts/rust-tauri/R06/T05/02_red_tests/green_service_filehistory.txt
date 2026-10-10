@@ -1,0 +1,14 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r06_t05_filehistory.rs (target/debug/deps/r06_t05_filehistory-db909d50caad6c99)
+
+running 7 tests
+test policy_golden_table_mirrors_text_file_policy ... ok
+test workspace_hash_golden ... ok
+test record_snapshot_merge_window_and_restore_semantics ... ok
+test file_history_routes_workspace_not_tracked ... ok
+test capture_from_disk_policy_gates ... ok
+test resourceio_write_captures_history_with_origin ... ok
+test file_history_routes_full_chain_and_error_vocabulary ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+

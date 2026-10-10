@@ -1,0 +1,10 @@
+error[E0432]: unresolved import `lingxi_service::bridgemedia`
+error[E0599]: no method named `state_session_files` found for struct `TestServer` in the current scope
+error[E0599]: no method named `bridge_media` found for struct `TestServer` in the current scope
+error[E0599]: no method named `state_session_files` found for struct `TestServer` in the current scope
+error[E0599]: no method named `bridge_media` found for struct `TestServer` in the current scope
+error[E0599]: no method named `state_session_files` found for struct `TestServer` in the current scope
+error[E0599]: no method named `bridge_media` found for struct `TestServer` in the current scope
+error[E0599]: no method named `state_session_files` found for struct `TestServer` in the current scope
+error[E0599]: no method named `bridge_media` found for struct `TestServer` in the current scope
+error: could not compile `lingxi-service` (test "r06_t05_bridgemedia") due to 9 previous errors

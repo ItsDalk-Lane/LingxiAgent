@@ -1,0 +1,3 @@
+error[E0432]: unresolved import `lingxi_service::preview`
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `lingxi-service` (test "r06_t05_preview") due to 1 previous error

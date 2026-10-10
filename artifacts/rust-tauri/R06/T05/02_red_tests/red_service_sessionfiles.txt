@@ -1,0 +1,14 @@
+RED 记录（Round 2：sessionfiles 服务模块）
+timestamp_utc=2026-10-09T16:54:53Z
+command: cargo test --locked -p lingxi-service --test r06_t05_session_files
+toolchain: cargo 1.98.1 (797e8a9bc 2026-08-05)
+--- 输出尾部 ---
+error[E0432]: unresolved import `lingxi_service::sessionfiles`
+  --> crates/lingxi-service/tests/r06_t05_session_files.rs:27:21
+   |
+27 | use lingxi_service::sessionfiles::{
+   |                     ^^^^^^^^^^^^ could not find `sessionfiles` in `lingxi_service`
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `lingxi-service` (test "r06_t05_session_files") due to 1 previous error
+EXIT=101（编译失败：模块不存在，唯一错误为 E0432 unresolved import）

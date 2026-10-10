@@ -1,0 +1,99 @@
+$ cargo test -p lingxi-service -p lingxi-adapters --locked
+     Running unittests src/lib.rs (target/debug/deps/lingxi_adapters-4a6a6bb1696dbaa7)
+test result: ok. 119 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+     Running unittests src/bin/lingxi-storage-inspect.rs (target/debug/deps/lingxi_storage_inspect-325001913178b492)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/active_run_listing.rs (target/debug/deps/active_run_listing-5062b93088461857)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/backup_faults.rs (target/debug/deps/backup_faults-f98dd64ad0044ad7)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/backup_restore.rs (target/debug/deps/backup_restore-017173ce275fb352)
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+     Running tests/canonical_message_store.rs (target/debug/deps/canonical_message_store-c383758d2341a892)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+     Running tests/disk_full_fault.rs (target/debug/deps/disk_full_fault-9d4bd11c42603a91)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/event_store_reads.rs (target/debug/deps/event_store_reads-057f36ea504fa5f8)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/invocation_journal_store.rs (target/debug/deps/invocation_journal_store-dd13d8b231566801)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+     Running tests/late_result_fencing_property.rs (target/debug/deps/late_result_fencing_property-b07f9771fc4fb6d2)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s
+     Running tests/migration_idempotency.rs (target/debug/deps/migration_idempotency-9811a79d317f1a34)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/r05_t02_oauth_flows.rs (target/debug/deps/r05_t02_oauth_flows-d057871edbc18706)
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+     Running tests/r05_t03_goldens.rs (target/debug/deps/r05_t03_goldens-6ee51a1bbbacc457)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/r05_t03_rr1_replay.rs (target/debug/deps/r05_t03_rr1_replay-c594e1e35de2a603)
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/r05_t04_rr1_batch_terminal.rs (target/debug/deps/r05_t04_rr1_batch_terminal-cbd1301cff96f635)
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/r05_t04_streaming.rs (target/debug/deps/r05_t04_streaming-f4a26600db23668d)
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.51s
+     Running tests/r05_t05_compat.rs (target/debug/deps/r05_t05_compat-bbd06883f7d29a9b)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/r05_t05_timeouts.rs (target/debug/deps/r05_t05_timeouts-964b57c29c6d26cb)
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+     Running tests/r05_t06_operations.rs (target/debug/deps/r05_t06_operations-8bcfd880100f5397)
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/r05_t07_rr1_usage_strict.rs (target/debug/deps/r05_t07_rr1_usage_strict-0c13739809ba07f7)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/r05_t07_usage_families.rs (target/debug/deps/r05_t07_usage_families-ace9f719d5ddce16)
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/r06_t02_compaction_render.rs (target/debug/deps/r06_t02_compaction_render-2f61dd3185796538)
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/run_finalize_property.rs (target/debug/deps/run_finalize_property-134fc567ad513820)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+     Running tests/run_id_allocator.rs (target/debug/deps/run_id_allocator-f384a0099b2abcd3)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+     Running tests/run_lineage_store.rs (target/debug/deps/run_lineage_store-603e54982931a8d7)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/session_file_store.rs (target/debug/deps/session_file_store-1297294f9ee80984)
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+     Running tests/session_tree_r06t03.rs (target/debug/deps/session_tree_r06t03-041f97330ea694e2)
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+     Running tests/storage_transactions.rs (target/debug/deps/storage_transactions-9052691f57a7aefe)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+     Running unittests src/lib.rs (target/debug/deps/lingxi_service-0fd39fbab98cd965)
+test result: ok. 384 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.00s
+     Running unittests src/main.rs (target/debug/deps/lingxi_service-004deb9bcf7fb9df)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/bin/r04_t07_fixture.rs (target/debug/deps/r04_t07_fixture-8252bc72de78c453)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/admission_dedup_adversarial.rs (target/debug/deps/admission_dedup_adversarial-7e93e394cc37e819)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+     Running tests/admission_dedup_consistency.rs (target/debug/deps/admission_dedup_consistency-32eb0b60ff1ef6cc)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+     Running tests/auth_matrix.rs (target/debug/deps/auth_matrix-4cc09a1184d8b23f)
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.02s
+     Running tests/background_disconnect_recovery.rs (target/debug/deps/background_disconnect_recovery-f5f8a3fa30e0b3a6)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+     Running tests/background_steering.rs (target/debug/deps/background_steering-89fe065722f06737)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s
+     Running tests/cancel_link_inheritance.rs (target/debug/deps/cancel_link_inheritance-c123cf9d7ab174b9)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+     Running tests/cancel_terminal_race.rs (target/debug/deps/cancel_terminal_race-b7b3a12c39f801c1)
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.51s
+     Running tests/cancellation_tree.rs (target/debug/deps/cancellation_tree-40bad19f22e1cea4)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.71s
+     Running tests/config_bounds.rs (target/debug/deps/config_bounds-c38229b3435fbdec)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.87s
+     Running tests/event_subscription.rs (target/debug/deps/event_subscription-ed0f4b98c175d776)
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.97s
+     Running tests/execute_concurrency.rs (target/debug/deps/execute_concurrency-a064056c83b2defd)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+     Running tests/exit_race_rejections.rs (target/debug/deps/exit_race_rejections-87da82ab476914d3)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+     Running tests/input_budget_refusal.rs (target/debug/deps/input_budget_refusal-3ae15d7a3691276b)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+     Running tests/input_payload_fidelity.rs (target/debug/deps/input_payload_fidelity-2ca88d60677c3d4d)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+     Running tests/instance_lifecycle.rs (target/debug/deps/instance_lifecycle-17783f6bf9222199)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+     Running tests/invocation_journal.rs (target/debug/deps/invocation_journal-6b4c752a125fb36b)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+     Running tests/late_result_fence.rs (target/debug/deps/late_result_fence-e915a621a6ebd944)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.75s
+     Running tests/r00_management_leaves.rs (target/debug/deps/r00_management_leaves-36f38f2107d6e197)
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 51.50s

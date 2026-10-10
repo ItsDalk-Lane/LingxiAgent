@@ -478,6 +478,88 @@ CREATE INDEX idx_messages_session ON messages(session_id, seq);
 CREATE INDEX idx_messages_parent ON messages(session_id, parent_message_id);
 "#;
 
+/// R06-T05: session files (sf_ identities), their legacy-id aliases and
+/// explicit references, plus the per-workspace file-history snapshots
+/// (incumbent `lib/session-files/session-file-registry.ts` sidecar schema v1
+/// field set and `lib/file-history/history-store.ts`, carried as SQLite
+/// rows — diff ledger D1).
+///
+/// - `session_files`: one row per registered file. `file_id` is the
+///   incumbent-compatible `sf_` id and is preserved verbatim on legacy
+///   import. New rows are keyed by `id:{session_id}` owners only (D2);
+///   legacy `path:{...}` owners are converted at import time and the
+///   original paths stay visible in `legacy_file_paths_json`.
+/// - `session_file_aliases`: fork/import old ids → the canonical row
+///   (structured form of the incumbent `legacyFileIds` array), so old
+///   messages referencing a pre-fork sf_ id still resolve (R06-A09).
+/// - `session_file_refs`: explicit references (imported sidecar refs,
+///   stage/upload registrations, restore writes). The reference checker
+///   combines these with markers parsed from canonical messages.
+/// - `file_history_snapshots`: text-only snapshots keyed by the incumbent
+///   workspace hash (sha256(normalized root)[..16]).
+pub const V9_NAME: &str = "r06_t05_session_files_resources";
+pub const V9_SQL: &str = r#"
+CREATE TABLE session_files (
+    file_id              TEXT PRIMARY KEY,
+    owner_session_id     TEXT NOT NULL,
+    owner_key            TEXT NOT NULL,
+    source_key           TEXT,
+    identity_key         TEXT NOT NULL,
+    file_path            TEXT NOT NULL,
+    real_path            TEXT NOT NULL,
+    storage_kind         TEXT NOT NULL,
+    status               TEXT NOT NULL,
+    label                TEXT,
+    filename             TEXT NOT NULL,
+    mime                 TEXT NOT NULL,
+    size_bytes           INTEGER NOT NULL,
+    mtime_ms             INTEGER NOT NULL,
+    is_directory         INTEGER NOT NULL,
+    file_kind            TEXT NOT NULL,
+    origin               TEXT NOT NULL,
+    registered_at_ms     INTEGER NOT NULL,
+    updated_at_ms        INTEGER NOT NULL,
+    expires_at_ms        INTEGER,
+    legacy_file_ids_json   TEXT NOT NULL DEFAULT '[]',
+    legacy_file_paths_json TEXT NOT NULL DEFAULT '[]'
+);
+CREATE INDEX idx_session_files_owner ON session_files(owner_session_id, registered_at_ms);
+CREATE UNIQUE INDEX idx_session_files_source
+    ON session_files(owner_session_id, source_key) WHERE source_key IS NOT NULL;
+CREATE INDEX idx_session_files_real_path ON session_files(owner_session_id, real_path);
+
+CREATE TABLE session_file_aliases (
+    alias_file_id      TEXT PRIMARY KEY,
+    canonical_file_id  TEXT NOT NULL REFERENCES session_files(file_id),
+    created_at_ms      INTEGER NOT NULL
+);
+CREATE INDEX idx_session_file_aliases_canonical ON session_file_aliases(canonical_file_id);
+
+CREATE TABLE session_file_refs (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    file_id        TEXT NOT NULL,
+    session_id     TEXT NOT NULL,
+    message_id     TEXT,
+    ref_kind       TEXT NOT NULL,
+    created_at_ms  INTEGER NOT NULL
+);
+CREATE INDEX idx_session_file_refs_session ON session_file_refs(session_id);
+CREATE INDEX idx_session_file_refs_file ON session_file_refs(file_id);
+
+CREATE TABLE file_history_snapshots (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    workspace_hash   TEXT NOT NULL,
+    rel_path         TEXT NOT NULL,
+    captured_at_ms   INTEGER NOT NULL,
+    origin           TEXT NOT NULL,
+    size_bytes       INTEGER NOT NULL,
+    sha256           TEXT NOT NULL,
+    content          BLOB NOT NULL
+);
+CREATE INDEX idx_file_history_ws_path
+    ON file_history_snapshots(workspace_hash, rel_path, id);
+"#;
+
 /// The full ordered migration list. Appending a migration is a deliberate,
 /// reviewed act; editing an existing entry changes its fingerprint and is
 /// rejected on every already-migrated database.
@@ -521,6 +603,11 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 8,
         name: V8_NAME,
         sql: V8_SQL,
+    },
+    Migration {
+        version: 9,
+        name: V9_NAME,
+        sql: V9_SQL,
     },
 ];
 

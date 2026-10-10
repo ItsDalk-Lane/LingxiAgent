@@ -1,0 +1,33 @@
+=== r06_t05_resourceio (GREEN) ===
+warning: `lingxi-service` (test "r06_t05_resourceio") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r06_t05_resourceio.rs (target/debug/deps/r06_t05_resourceio-8c0bee4282d1058c)
+
+running 12 tests
+test resource_keys_and_provider_ids ... ok
+test normalize_resource_ref_golden_table ... ok
+test event_bus_dedupe_retention_and_since_stale ... ok
+test resource_provider_read_only_over_resource_service ... ok
+test kernel_cross_provider_move_rejected_loudly ... ok
+test local_fs_authorization_gate_refuses_outside_workspace ... ok
+test mount_and_url_refs_get_explicit_unsupported_provider ... ok
+test session_file_provider_stat_read_materialize_and_error_chain ... ok
+test route_without_workspace_keeps_session_file_face ... ok
+test local_fs_stat_read_write_list_search_rename_move_trash_chain ... ok
+test resourceio_route_faces_and_error_vocabulary ... ok
+test watch_registry_refcount_diagnostics_and_polling_events ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+
+=== lib resourceio 单元 ===
+test resourceio::tests::snapshot_diff_reports_child_level_events ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 377 filtered out; finished in 0.00s
+
+
+=== auth 路由表断言 ===
+test auth::tests::failed_device_registry_write_keeps_live_memory_and_disk_unchanged ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 362 filtered out; finished in 7.81s
+

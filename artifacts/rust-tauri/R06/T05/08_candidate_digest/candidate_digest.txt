@@ -1,0 +1,29 @@
+R06-T05 候选 digest（全部候选文件定型后计算，最后一步）
+
+命令：bash scripts/rust-tauri/r06_candidate_digest.sh
+时间：2026-10-10（终局全量回归完成后，之后未再动任何候选文件）
+TASK_BASE_SHA：b27dc5e4be9aed4763dda60519f0a04042fdfade
+
+候选 digest（脚本原口径，单行输出逐字）：
+e7c1e05e2b9910fd0c0d2e9317069e49a0ca60b99c52d2a2f860e7df6966be50
+
+口径说明（脚本头注释为唯一权威，此处仅复述）：
+  范围 = git diff HEAD（已跟踪改动，含暂存与未暂存）
+       + 全部未跟踪文件逐文件 sha256（LC_ALL=C 排序）。
+  排除 = artifacts/rust-tauri/R06/**（含本文件自身）
+       + 任何 candidate_digest*.txt。
+
+范围申报（诚实项）：
+1. `.vscode/settings.json`（IDE 噪声，git.ignoreLimitWarning；未 gitignore，
+   按脚本口径进入哈希输入，但**永不纳入候选、永不提交**）。同口径剔除该文件
+   的辅助值：f493ff865f0c06486bebe8e731b826013e94a660a7e963d65c09ca5552f44a92
+   （T04 审查先例：IDE 噪声经同口径排除复核唯一归因）。
+2. `docs/rust-tauri/R06/R06_PROGRESS.json` 的 diff 在口径内——内容为总控改动
+   （T02 状态更正、T04 DONE 回填、T05 IN_PROGRESS + task_base_sha），非本执行者手笔。
+3. `docs/rust-tauri/R06/R06_LEAF_MAP.json` 的 diff 在口径内——本任务 57 叶
+   t05_status/t05_anchor 标注（+171/-57，T01-T04 叶零触碰）。
+4. `docs/rust-tauri/R06/R06-T05_REPORT.md` 在口径内（未跟踪新文件）——故报告
+   正文不含 digest 值（脚本头注释纪律）。
+
+定型后零改动声明：digest 计算于报告、台账、叶图标注全部完成之后；此后
+未再编辑任何候选文件（如再有改动必须重跑本脚本并重写本文件）。

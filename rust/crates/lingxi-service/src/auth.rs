@@ -657,7 +657,114 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
                 return RoutePolicy::Scope("chat");
             }
         }
+        // R06-T05 会话文件面：列表/单件读、旧 sidecar 导入、本地与内存
+        // 附件注册——与会话读同 scope，归属闸在 handler 内重检。
+        if let Some(id) = rest.strip_suffix("/files") {
+            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        if let Some(id) = rest.strip_suffix("/files/import-legacy") {
+            if !id.is_empty() && !id.contains('/') && m == "POST" {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        if let Some(id) = rest.strip_suffix("/attachments/local") {
+            if !id.is_empty() && !id.contains('/') && m == "POST" {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        if let Some(id) = rest.strip_suffix("/attachments/blob") {
+            if !id.is_empty() && !id.contains('/') && m == "POST" {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        // {id}/files/{file_id} 单件读：唯一的中间参数形态；静态名
+        // import-legacy 不当 file_id（未注册形状 fail-closed 到底部
+        // LocalOnly）。
+        if let Some((id, file_id)) = rest.split_once("/files/") {
+            if !id.is_empty()
+                && !id.contains('/')
+                && !file_id.is_empty()
+                && !file_id.contains('/')
+                && file_id != "import-legacy"
+                && (m == "GET" || m == "HEAD")
+            {
+                return RoutePolicy::Scope("chat");
+            }
+        }
         // Known session subtree, wrong verb/shape: local only (fail closed).
+        return RoutePolicy::LocalOnly;
+    }
+    // R06-T05 资源面（server/routes/resources.ts + route-security.ts
+    // :122-126）：GET|HEAD → resources.read，POST ticket →
+    // resources.write。现役对 `?ticket=` 的 content 请求豁免鉴权中间件
+    // （server/index.ts:642）；候选人中间件对一切请求鉴权（R02 冻结），
+    // ticket 在 handler 内作内容级附加校验，故 content 也按 scope 分类。
+    if let Some(rest) = p.strip_prefix("/lingxi/v1/resources/") {
+        if let Some(id) = rest.strip_suffix("/ticket") {
+            if !id.is_empty() && !id.contains('/') && m == "POST" {
+                return RoutePolicy::Scope("resources.write");
+            }
+        }
+        if let Some(id) = rest.strip_suffix("/content") {
+            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
+                return RoutePolicy::Scope("resources.read");
+            }
+        }
+        if !rest.is_empty() && !rest.contains('/') && (m == "GET" || m == "HEAD") {
+            return RoutePolicy::Scope("resources.read");
+        }
+        // Known resources subtree, wrong verb/shape: fail closed.
+        return RoutePolicy::LocalOnly;
+    }
+    // R06-T05 Round 4 ResourceIO 面（server/routes/resource-io.ts +
+    // route-security.ts）：整族 LOCAL_ONLY —— 现役 /api/resource-io/* 的
+    // 全部 15 叶面同档，写面与读面一样只许本地属主。
+    if p.starts_with("/lingxi/v1/resource-io/") {
+        return RoutePolicy::LocalOnly;
+    }
+    // R06-T05 Round 5 HTML 预览面（server/routes/html-preview.ts 在现役
+    // server/index.ts 中挂于鉴权链之外，token 即凭证——浏览器 <img> 等
+    // 无头客户端直读；无效/过期一律 404 空体，绝不回 401/403 泄露存在性）。
+    // 建立面保留鉴权：POST 走 chat scope。
+    if p == "/lingxi/v1/preview/html" {
+        return if m == "POST" {
+            RoutePolicy::Scope("chat")
+        } else {
+            RoutePolicy::LocalOnly
+        };
+    }
+    if let Some(rest) = p.strip_prefix("/lingxi/v1/preview/html/") {
+        if m == "GET" || m == "HEAD" {
+            // {id} 或 {id}/assets/{token}/{*path} 两种形状都 Public。
+            if !rest.is_empty() {
+                return RoutePolicy::Public;
+            }
+        }
+        return RoutePolicy::LocalOnly;
+    }
+    // R06-T05 Round 5 桥媒体读面（server/routes/bridge.ts:676-701 在现役
+    // 挂于鉴权链之外，token 即凭证——外部平台直接拉取临时媒体 URL）。
+    if let Some(token) = p.strip_prefix("/lingxi/v1/bridge/media/") {
+        if (m == "GET" || m == "HEAD") && !token.is_empty() && !token.contains('/') {
+            return RoutePolicy::Public;
+        }
+        return RoutePolicy::LocalOnly;
+    }
+    // R06-T05 Round 5 文件历史面（server/routes/file-history.ts 在现役
+    // 挂于本地 API 鉴权链内）：四叶面一律 LocalOnly（快照内容即工作区
+    // 文本，绝不外发）。
+    if p == "/lingxi/v1/file-history/files"
+        || p == "/lingxi/v1/file-history/versions"
+        || p == "/lingxi/v1/file-history/snapshot"
+        || p == "/lingxi/v1/file-history/restore"
+    {
+        return RoutePolicy::LocalOnly;
+    }
+    // R06-T05 Round 5 fs 直读面（server/routes/fs.ts：本地 API 鉴权链内，
+    // bearer 即边界）：两叶面一律 LocalOnly。
+    if p == "/lingxi/v1/fs/read" || p == "/lingxi/v1/fs/read-base64" {
         return RoutePolicy::LocalOnly;
     }
     if p == "/lingxi/v1/devices/credentials" {
@@ -2570,6 +2677,75 @@ mod tests {
             classify_route("POST", "/lingxi/v1/sessions/s1/history"),
             LocalOnly
         );
+        // R06-T05 会话文件面：读写同 chat scope；错误动词/形状 fail-closed。
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/sessions/s1/files"),
+            Scope("chat")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/sessions/s1/files/sf_abc"),
+            Scope("chat")
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/sessions/s1/files/import-legacy"),
+            Scope("chat")
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/sessions/s1/attachments/local"),
+            Scope("chat")
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/sessions/s1/attachments/blob"),
+            Scope("chat")
+        );
+        // 静态名不当 file_id；未注册动词与过深形状 fail-closed。
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/sessions/s1/files/import-legacy"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/sessions/s1/files"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/sessions/s1/files/a/b"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("DELETE", "/lingxi/v1/sessions/s1/attachments/blob"),
+            LocalOnly
+        );
+        // R06-T05 资源面：GET|HEAD → resources.read；POST ticket →
+        // resources.write；错误动词/形状 fail-closed。
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/resources/res_sf_abc"),
+            Scope("resources.read")
+        );
+        assert_eq!(
+            classify_route("HEAD", "/lingxi/v1/resources/res_sf_abc/content"),
+            Scope("resources.read")
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/resources/res_sf_abc/content"),
+            Scope("resources.read")
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/resources/res_sf_abc/ticket"),
+            Scope("resources.write")
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/resources/res_sf_abc"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/resources/res_sf_abc/ticket"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/resources/a/b/content"),
+            LocalOnly
+        );
+        assert_eq!(classify_route("GET", "/lingxi/v1/resources/"), LocalOnly);
         assert_eq!(
             classify_route("GET", "/lingxi/v1/sessions/s1/history/extra"),
             LocalOnly
@@ -2586,6 +2762,102 @@ mod tests {
             classify_route("POST", "/lingxi/v1/devices/credentials"),
             LocalOnly
         );
+        // R06-T05 Round 4 ResourceIO 面：整族 LocalOnly（读写同档）。
+        for (method, path) in [
+            ("POST", "/lingxi/v1/resource-io/stat"),
+            ("POST", "/lingxi/v1/resource-io/read"),
+            ("POST", "/lingxi/v1/resource-io/list"),
+            ("POST", "/lingxi/v1/resource-io/search"),
+            ("POST", "/lingxi/v1/resource-io/write"),
+            ("POST", "/lingxi/v1/resource-io/write-expected-version"),
+            ("POST", "/lingxi/v1/resource-io/rename"),
+            ("POST", "/lingxi/v1/resource-io/move"),
+            ("POST", "/lingxi/v1/resource-io/trash"),
+            ("POST", "/lingxi/v1/resource-io/subscribe"),
+            ("POST", "/lingxi/v1/resource-io/watch"),
+            ("DELETE", "/lingxi/v1/resource-io/subscriptions/sub_1"),
+            ("DELETE", "/lingxi/v1/resource-io/watch/w_1"),
+            ("GET", "/lingxi/v1/resource-io/watch-diagnostics"),
+            ("GET", "/lingxi/v1/resource-io/events"),
+        ] {
+            assert_eq!(
+                classify_route(method, path),
+                LocalOnly,
+                "resource-io face {method} {path} must be LocalOnly"
+            );
+        }
+        // R06-T05 Round 5 预览面：POST 建立 = chat scope；GET/HEAD 读取与
+        // 素材 = Public（token 即凭证）；错误动词 fail-closed。
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/preview/html"),
+            Scope("chat")
+        );
+        assert_eq!(classify_route("GET", "/lingxi/v1/preview/html"), LocalOnly);
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/preview/html/pv_abc"),
+            Public
+        );
+        assert_eq!(
+            classify_route("HEAD", "/lingxi/v1/preview/html/pv_abc"),
+            Public
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/preview/html/pv_abc/assets/tok/a.png"),
+            Public
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/preview/html/pv_abc"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("DELETE", "/lingxi/v1/preview/html/pv_abc"),
+            LocalOnly
+        );
+        // R06-T05 Round 5 桥媒体读面：GET/HEAD Public（token 即凭证）；
+        // 其他动词/形状 fail-closed。
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/bridge/media/tok_1"),
+            Public
+        );
+        assert_eq!(
+            classify_route("HEAD", "/lingxi/v1/bridge/media/tok_1"),
+            Public
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/bridge/media/tok_1"),
+            LocalOnly
+        );
+        assert_eq!(classify_route("GET", "/lingxi/v1/bridge/media/"), LocalOnly);
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/bridge/media/a/b"),
+            LocalOnly
+        );
+        // R06-T05 Round 5 文件历史面：四叶面全动词 LocalOnly（快照内容
+        // 即工作区文本，绝不外发）。
+        for path in [
+            "/lingxi/v1/file-history/files",
+            "/lingxi/v1/file-history/versions",
+            "/lingxi/v1/file-history/snapshot",
+            "/lingxi/v1/file-history/restore",
+        ] {
+            for method in ["GET", "HEAD", "POST", "DELETE"] {
+                assert_eq!(
+                    classify_route(method, path),
+                    LocalOnly,
+                    "{method} {path} must stay LocalOnly"
+                );
+            }
+        }
+        // R06-T05 Round 5 fs 直读面：两叶面全动词 LocalOnly。
+        for path in ["/lingxi/v1/fs/read", "/lingxi/v1/fs/read-base64"] {
+            for method in ["GET", "HEAD", "POST", "DELETE"] {
+                assert_eq!(
+                    classify_route(method, path),
+                    LocalOnly,
+                    "{method} {path} must stay LocalOnly"
+                );
+            }
+        }
         assert_eq!(classify_route("GET", "/lingxi/v1/ws"), Scope("chat"));
         for path in [
             "/lingxi/v1/health/",

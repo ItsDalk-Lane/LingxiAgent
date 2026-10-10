@@ -88,6 +88,19 @@ chrono = "=0.4.45"
 # CSPRNG propagates its failures so credential issuance can REFUSE
 # (src/auth.rs).
 getrandom = "0.2"
+# R06-T05: HMAC-SHA256 for the resource-content ticket signer
+# (core/resource-ticket-service.ts signBody). hmac 0.13.0 is ALREADY a
+# locked workspace member (transitive); this edge reuses that exact
+# version — no new package version enters rust/Cargo.lock (D11).
+hmac = "0.13.0"
+# R06-T05 Round 5（D11 延展，同一纪律：全部为已锁定包版本，只加边）：
+#   - regex 1.13.1：html-preview.ts 的素材引用改写/<head> 注入正则
+#     （src|href|poster 属性扫描与 (?i)<head\b[^>]*>）。
+#   - percent-encoding 2.3.2：JS encodeURIComponent/decodeURIComponent/
+#     decodeURI 语义的逐段编码与保留集（preview 素材 URL 与桥媒体
+#     filename* RFC5987）。
+regex = "1.13.1"
+percent-encoding = "2.3.2"
 # R00 手机访问二维码：qrcodegen 1.8.0（MIT，无传递依赖）只生成标准 QR 模块；SVG 由本服务绘制。
 qrcodegen = "=1.8.0"
 libc = "0.2"

@@ -5031,7 +5031,9 @@
      "acceptance_assertions": [
       "只允许 cut/copy/paste/selectAll，并向当前 webContents 派发该命令",
       "任意其他命令抛 Unknown edit command；不能执行 shell 或未列出的系统操作"
-     ]
+     ],
+     "t05_status": "deferred",
+     "t05_anchor": "纯桌面 webContents 派发（cut/copy/paste/selectAll 白名单），服务端无对应物 → R09（Tauri host）。待裁决 J1。"
     },
     {
      "feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-COPY-ADB6B0",
@@ -5053,7 +5055,9 @@
      "acceptance_assertions": [
       "真实普通源文件复制到目标，源文件仍在",
       "相对路径、软链接、非普通文件或复制失败返回 false；目标不应伪称有效"
-     ]
+     ],
+     "t05_status": "deferred",
+     "t05_anchor": "现役实现即在 desktop/main.cjs（fs.copyFileSync + 普通文件/软链检查），服务端现役亦无 copy 路由 → R09。待裁决 J1。"
     },
     {
      "feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-EDIT-EE18A5",
@@ -5078,7 +5082,9 @@
       "非法路径或写失败不显示保存成功",
       "Markdown 封面变更发生冲突时基于新快照最多再试，仍失败则给错误",
       "先读后写不宣称跨进程原子性"
-     ]
+     ],
+     "t05_status": "share",
+     "t05_anchor": "份额 = resource-io write-expected-version（版本吻合写、冲突 409 不覆盖），r06_t05_resourceio 钉死；桌面 IPC 派发属 R09。"
     },
     {
      "feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-OPEN-CAA876",
@@ -5100,7 +5106,9 @@
      "acceptance_assertions": [
       "本地普通文件交由 OS 默认程序打开",
       "相对路径、缺失或非文件不执行；不能以 IPC 无报错推定 OS 成功"
-     ]
+     ],
+     "t05_status": "deferred",
+     "t05_anchor": "shell.openPath 纯桌面能力，服务端无对应物 → R09。待裁决 J1。"
     },
     {
      "feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-PICKER-2FB382",
@@ -5122,7 +5130,9 @@
      "acceptance_assertions": [
       "返回用户选定路径供后续上传/引用",
       "用户取消为空；选中路径不代表读取或授权写入"
-     ]
+     ],
+     "t05_status": "deferred",
+     "t05_anchor": "系统文件对话框，纯桌面能力 → R09。待裁决 J1。"
     },
     {
      "feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-READ-CC7380",
@@ -5144,7 +5154,9 @@
      "acceptance_assertions": [
       "文本读取返回文本，快照含版本，base64 读取返回不超过 20MB 的真实文件字节",
       "路径不是绝对路径、文件不存在或超出限制时返回 null/失败；只读操作不改磁盘"
-     ]
+     ],
+     "t05_status": "share",
+     "t05_anchor": "份额 = resource-io read + fsread（绝对路径授权闸、20MB 上限、base64 面）；桌面 IPC 属 R09。"
     },
     {
      "feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-WATCH-238267",
@@ -5166,7 +5178,9 @@
      "acceptance_assertions": [
       "旧 IPC 监听注册可发 file-changed；现行 viewer 通过 ResourceIO resource.changed 刷新",
       "watch-file 仅绝对路径；无 renderer 直接调用，不能声称用户直接启停旧 IPC 监听"
-     ]
+     ],
+     "t05_status": "share",
+     "t05_anchor": "份额 = resourceio watch registry + resource.changed 事件总线（轮询机制差异 D7，语义等价）；旧 IPC 监听注册属 R09。"
     },
     {
      "feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-WRITE-BINARY-45627E",
@@ -5188,7 +5202,9 @@
      "acceptance_assertions": [
       "解码 base64 并写入目标文件；可展开 ~ 路径并创建父目录",
       "无路径、非绝对路径或写失败返回 false；不能把失败回包当作有效附件"
-     ]
+     ],
+     "t05_status": "share",
+     "t05_anchor": "份额 = resource-io write（base64 解码落盘、父目录创建）；桌面 IPC 属 R09。"
     },
     {
      "feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-WRITE-LEGACY-D65090",
@@ -5210,7 +5226,9 @@
      "acceptance_assertions": [
       "有效绝对路径时 fs.writeFileSync 写入 UTF-8 内容并返回 true",
       "相对路径或写入失败返回 false；旧桥没有版本保护，外部改动可能被覆盖"
-     ]
+     ],
+     "t05_status": "share",
+     "t05_anchor": "份额 = resource-io write（legacy 文本落盘）；桌面 IPC 属 R09。"
     },
     {
      "feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-TRASH-ITEM-AF18F5",
@@ -5232,7 +5250,9 @@
      "acceptance_assertions": [
       "合法目标存在时 shell.trashItem 后书桌列表更新",
       "非法/缺失路径返回 false，不把永久删除混入"
-     ]
+     ],
+     "t05_status": "share",
+     "t05_anchor": "份额 = resource-io trash（data_home/trash 回收区 + 元数据，绝不混永久删除，D15）；桌面 IPC 属 R09。"
     },
     {
      "feature_id": "F-D09-ROUTE_BEHAVIOR-BEHAVIOR-FILE-HISTORY-FILE-HISTORY-RESTORE-POST-895DAC",
@@ -5254,7 +5274,9 @@
      "acceptance_assertions": [
       "执行“恢复文件历史版本”后核对：通过 ResourceIO 写回工作区文件、再记录恢复快照；返回路径或错误",
       "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "filehistory.rs restore 路由（safe_rel_path 复核 → ResourceIO 写回 → capture_origin=restore 快照）；r06_t05_filehistory restore 全链钉死。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ATTACHMENT-BLOB-MEDIA-1BEA3A",
@@ -5276,7 +5298,9 @@
      "acceptance_assertions": [
       "成功时核对：文件写入并登记附件",
       "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "sessionfiles.rs 附件登记 + attachments 路由：blob 媒体入库，sf_ 身份逐字节保留（A09）；r06_t05_session_files。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ATTACHMENT-BLOB-REUSE-E7CC63",
@@ -5298,7 +5322,9 @@
      "acceptance_assertions": [
       "成功时核对：复用原 sessionFile",
       "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "blob 复用去重（同内容同会话命中既有 sf_ 行）；r06_t05_session_files。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ATTACHMENT-BLOB-VOICE-478704",
@@ -5320,7 +5346,9 @@
      "acceptance_assertions": [
       "成功时核对：文件写入并带 voice-input 展示身份",
       "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "upload-blob voice-input 登记（语音链路服务端份额）；r06_t05_session_files。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ATTACHMENT-LOCAL-DIRECTORY-REFER-C406F9",
@@ -5342,7 +5370,9 @@
      "acceptance_assertions": [
       "成功时核对：登记原目录路径引用而不复制",
       "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "local 目录引用登记（external 不拷载荷）；r06_t05_session_files。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ATTACHMENT-LOCAL-FILE-SNAPSHOT-55B24F",
@@ -5364,7 +5394,9 @@
      "acceptance_assertions": [
       "成功时核对：复制快照并登记附件",
       "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "local 文件快照进 managed_cache（载荷入库 + sf_ 登记）；r06_t05_session_files。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ATTACHMENT-LOCAL-REUSE-EA3C6A",
@@ -5386,7 +5418,9 @@
      "acceptance_assertions": [
       "成功时核对：复用原 sessionFile",
       "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "local 文件复用登记（幂等命中）；r06_t05_session_files。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-MEDIA-TOKEN-READ-5F5B67",
@@ -5408,7 +5442,9 @@
      "acceptance_assertions": [
       "成功：执行“下载临时媒体”后，凭 token 读取已发布文件并按 MIME 返回附件/内联字节",
       "拒绝/边界：token 无效 404；超过 50MB 413；文件不存在 404；不应错误扩大写入或披露范围"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "bridgemedia.rs：token 读路径全量（过期/下载预算/canonical 白名单收窄不扩大披露，D16）；publish 为服务内 API，桥外发属后续阶段。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-FILE-HISTORY-FILE-HISTORY-FILES--AF8E24",
@@ -5430,7 +5466,9 @@
      "acceptance_assertions": [
       "成功：执行“列出有历史的文件”后，返回指定助手 home workspace 的已跟踪文件",
       "拒绝/边界：query.agentId 必填且 workspace 已跟踪；不应错误扩大写入或披露范围"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "filehistory.rs files GET（ORDER BY lastCapturedAt DESC，镜像 history-store :149）；r06_t05_filehistory。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-FILE-HISTORY-FILE-HISTORY-SNAPSH-A9DAA4",
@@ -5452,7 +5490,9 @@
      "acceptance_assertions": [
       "成功：执行“读取历史快照内容”后，返回快照路径、时间、来源和 UTF-8 正文",
       "拒绝/边界：query.agentId/id 正整数；不存在 404；不应错误扩大写入或披露范围"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "filehistory.rs snapshot GET（utf-8 lossy 正文 + 404 词汇镜像 :167）；r06_t05_filehistory。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-FILE-HISTORY-FILE-HISTORY-VERSIO-3A50AD",
@@ -5474,7 +5514,9 @@
      "acceptance_assertions": [
       "成功：执行“列出文件历史版本”后，返回 workspace 中 relPath 的版本清单",
       "拒绝/边界：query.agentId/relPath；relPath 不可绝对或含 ..；不应错误扩大写入或披露范围"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "filehistory.rs versions GET（capturedAt DESC,id DESC，镜像 :158）；r06_t05_filehistory。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-FS-FS-DOCX-HTML-READ-2F2B6E",
@@ -5496,7 +5538,9 @@
      "acceptance_assertions": [
       "成功时核对：返回转换的 HTML",
       "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
-     ]
+     ],
+     "t05_status": "deferred",
+     "t05_anchor": "现役 mammoth docx→HTML；Rust 锁定依赖树无等价物，新增依赖属阶段治理 → 后续阶段。待裁决 J3。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-FS-FS-READ-BASE64-READ-5C043E",
@@ -5518,7 +5562,9 @@
      "acceptance_assertions": [
       "成功时核对：返回 Base64 文本",
       "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "fsread.rs read-base64（data_home+workspace 双根授权闸、20MB 上限 D16、base64 金样钉死）；r06_t05_fsread。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-FS-FS-READ-READ-15D154",
@@ -5540,7 +5586,9 @@
      "acceptance_assertions": [
       "成功时核对：返回 UTF-8 文本",
       "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "fsread.rs read（utf-8 lossy + text/plain; charset=utf-8，403/404/413 词汇镜像 fs.ts）；r06_t05_fsread。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-FS-FS-XLSX-HTML-READ-3617DF",
@@ -5562,7 +5610,9 @@
      "acceptance_assertions": [
       "成功时核对：返回首张工作表 HTML 表格",
       "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
-     ]
+     ],
+     "t05_status": "deferred",
+     "t05_anchor": "现役 ExcelJS 首表 xlsx→HTML；同 J3 依赖冻结 → 后续阶段。待裁决 J3。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-HTML-PREVIEW-API-PREVIEW-HTML-HT-549AC6",
@@ -5584,7 +5634,9 @@
      "acceptance_assertions": [
       "给定目标与相应权限，执行“建立临时 HTML 预览”后核对：保存带令牌及到期时间的临时内容，可选限定本地素材根，返回预览 URL",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "preview.rs POST /preview/html（素材改写 + head 注入 + file: 源根闸）；r06_t05_preview。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-HTML-PREVIEW-PREVIEW-HTML-ID-ASS-2C28E5",
@@ -5606,7 +5658,9 @@
      "acceptance_assertions": [
       "给定目标与相应权限，执行“读取预览素材”后核对：令牌、有效期、路径和大小均通过后才返回被限定根内的素材，HEAD 不含正文",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "preview.rs 资产 GET（sourceRoot 含 sourceDir 校验、symlink/越界/空段一律 404 空体，D16）；r06_t05_preview。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-HTML-PREVIEW-PREVIEW-HTML-ID-HTM-20DD2E",
@@ -5628,7 +5682,9 @@
      "acceptance_assertions": [
       "给定目标与相应权限，执行“查看临时 HTML 预览”后核对：令牌匹配且未过期才返回带 CSP 的 HTML，HEAD 不含正文；否则 404",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "preview.rs id HTML GET（TTL/一次性语义按现役镜像）；r06_t05_preview。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-CONTENT-GET-78B181",
@@ -5650,7 +5706,9 @@
      "acceptance_assertions": [
       "成功时核对：GET 返回正文或分段字节",
       "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resources.rs content GET（Range 206/416、ETag 304、越权 403）；r06_t05_resources。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-CONTENT-HEAD-865A98",
@@ -5672,7 +5730,9 @@
      "acceptance_assertions": [
       "成功时核对：HEAD 仅返回元数据",
       "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resources.rs content HEAD（同 GET 头语义无体）；r06_t05_resources。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-EVENTS-4E8EDC",
@@ -5695,7 +5755,9 @@
       "给定目标与相应权限，执行“读取资源变更事件”后核对：按 since 游标返回事件；游标过期提示重新 stat",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs events（D12 严格 query、游标）；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-LIST-5FA75F",
@@ -5718,7 +5780,9 @@
       "给定目标与相应权限，执行“列出资源目录”后核对：POST 承载资源引用，经资源边界返回子项",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs list（排序/mtimeMs 整数化钉死，D15）；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-MOVE-730E59",
@@ -5741,7 +5805,9 @@
       "给定目标与相应权限，执行“移动资源”后核对：把 from 资源移动到 to 并返回结果，受资源权限边界限制",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs move（跨 provider 移动显式拒绝）；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-READ-563F04",
@@ -5764,7 +5830,9 @@
       "给定目标与相应权限，执行“读取资源正文”后核对：按 encoding 返回 UTF-8 或 base64；二进制误按 UTF-8 读取明确拒绝",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs read（local_fs 目录读响亮 400，D15）；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-RENAME-5FEFBF",
@@ -5787,7 +5855,9 @@
       "给定目标与相应权限，执行“重命名资源”后核对：把 from 资源改到 to 并返回结果，受资源权限边界限制",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs rename；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-SEARCH-2EB39A",
@@ -5810,7 +5880,9 @@
       "给定目标与相应权限，执行“搜索资源”后核对：在指定资源范围按 query 返回匹配项",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs search（query-only，D15）；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-STAT-C4F6E3",
@@ -5833,7 +5905,9 @@
       "给定目标与相应权限，执行“读取资源状态”后核对：POST 承载资源引用，只读返回大小、版本等状态",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs stat；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-SUBSCRIB-F9277C",
@@ -5856,7 +5930,9 @@
       "给定目标与相应权限，执行“订阅资源变化”后核对：登记资源事件订阅并返回 subscriptionId；服务不可用报错",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs subscribe（事件订阅）；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-SUBSCRIP-00C88B",
@@ -5879,7 +5955,9 @@
       "给定目标与相应权限，执行“取消资源事件订阅”后核对：释放指定订阅并返回 released 真值",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs subscribe 第二面；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-TRASH-BC2446",
@@ -5902,7 +5980,9 @@
       "给定目标与相应权限，执行“回收资源”后核对：把指定资源送入回收区并返回结果，受资源权限边界限制",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs trash（回收区语义，不混永久删除）；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WATCH-071B6E",
@@ -5925,7 +6005,9 @@
       "给定目标与相应权限，执行“开始监听资源”后核对：对指定资源保留监听句柄并返回 watchId",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs watch（mtime/size 轮询 + refcount，D7）；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WATCH-DI-9FF4E1",
@@ -5948,7 +6030,9 @@
       "给定目标与相应权限，执行“查看资源监听诊断”后核对：返回活跃订阅数量与监听清单，不更改资源",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs watch-diagnostics；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WATCH-WA-757539",
@@ -5971,7 +6055,9 @@
       "给定目标与相应权限，执行“结束资源监听”后核对：释放句柄，重复结束返回 released false",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs unwatch（UUID 订阅语义保留）；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WRITE-0CDC88",
@@ -5994,7 +6080,9 @@
       "给定目标与相应权限，执行“写入资源”后核对：按编码解码后经资源权限写入，返回结果；冲突为 409",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs write（非标量 content 响亮 400，D15；mount/url → unsupported_provider，D9）；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WRITE-EX-EB9E56",
@@ -6017,7 +6105,9 @@
       "给定目标与相应权限，执行“按版本写入资源”后核对：仅版本匹配时写入；冲突返回 409 且不覆盖",
       "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
       "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs write-expected-version（409 冲突不覆盖 + capture_history 触发文件历史，D8）；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCES-RESOURCES-RESOURCEID-R-127373",
@@ -6039,7 +6129,9 @@
      "acceptance_assertions": [
       "成功时核对：返回身份有权访问的元数据",
       "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resources.rs 元数据 GET（envelope/错误码词汇镜像）；r06_t05_resources。"
     },
     {
      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCES-RESOURCES-RESOURCEID-T-0EC4C0",
@@ -6061,7 +6153,9 @@
      "acceptance_assertions": [
       "成功时核对：先验权再返回短期 ticket 和内容地址",
       "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resources.rs ticket POST（resource-ticket-key 0600 持久化，D4；签发/过期/动作绑定钉死）；r06_t05_resources。"
     },
     {
      "feature_id": "F-D09-TOOL-TOOL-EDIT-C6D338",
@@ -6085,7 +6179,9 @@
       "并发改动时拒绝",
       "文件记录对应真实修改",
       "旧文本不匹配、并发改动、符号链接逃逸拒绝，用户改动不得覆盖。"
-     ]
+     ],
+     "t05_status": "share",
+     "t05_anchor": "核心语义（命中替换、并发拒绝、符号链接逃逸拒绝）由 R04-T04 filetools 已交付并验收；T05 份额 = 同一 ResourceAccess 授权闸上的 resource-io 写照；agent 工具包装（wrapResourceIoFileTools 迁移）属 R07。"
     },
     {
      "feature_id": "F-D09-TOOL-TOOL-FILE-3CBCAE",
@@ -6109,7 +6205,9 @@
       "提取文本有来源",
       "默认不覆盖已有文件",
       "不存在、覆盖策略不允许、目录提取或目标越权失败；失败时原目标不应被误覆盖。"
-     ]
+     ],
+     "t05_status": "share",
+     "t05_anchor": "份额 = 副本字节一致 + 默认不覆盖（write-expected-version/materialize）；docx/xlsx 文本提取份额与 #22/#25 同因顺延（J3）。"
     },
     {
      "feature_id": "F-D09-TOOL-TOOL-FIND-F88B0A",
@@ -6132,7 +6230,9 @@
       "命中路径准确",
       "无写入",
       "越权路径或扫描错误明确失败；无匹配返回空列表。"
-     ]
+     ],
+     "t05_status": "share",
+     "t05_anchor": "核心语义 R04-T04 filetools 已交付；T05 份额 = 授权闸上的 resource-io 读照；agent 包装属 R07。"
     },
     {
      "feature_id": "F-D09-TOOL-TOOL-GREP-EC77C2",
@@ -6155,7 +6255,9 @@
       "匹配位置正确",
       "无写入",
       "无匹配为空；无效正则/越权路径明确失败。"
-     ]
+     ],
+     "t05_status": "share",
+     "t05_anchor": "同 #48：filetools 核心已交付，T05 交付授权闸份额，R07 接工具层。"
     },
     {
      "feature_id": "F-D09-TOOL-TOOL-LS-B97D0D",
@@ -6178,7 +6280,9 @@
       "列表准确",
       "没有写入",
       "目录不存在、越权/符号链接逃逸时错误。"
-     ]
+     ],
+     "t05_status": "share",
+     "t05_anchor": "同 #48：列表准确性 filetools 已交付，T05 交付授权闸份额，R07 接工具层。"
     },
     {
      "feature_id": "F-D09-TOOL-TOOL-MATERIALIZE-AD7FAE",
@@ -6201,7 +6305,9 @@
       "本地直接返回原路径，远端副本字节与来源一致",
       "越权拒绝",
       "无ResourceIO、缺目标、资源不可读或越权时明确错误，不返回假路径。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "resourceio.rs materialize（本地直接回原路径；session_file/resource 经 resolver；越权/缺目标响亮错误，不返回假路径）；r06_t05_resourceio。"
     },
     {
      "feature_id": "F-D09-TOOL-TOOL-READ-93D523",
@@ -6224,7 +6330,9 @@
       "内容与来源一致",
       "越权无内容泄漏",
       "不存在、越权或解析失败显式说明，不泄漏路径外内容。"
-     ]
+     ],
+     "t05_status": "share",
+     "t05_anchor": "同 #48：读语义 filetools 已交付，T05 交付授权闸份额，R07 接工具层。"
     },
     {
      "feature_id": "F-D09-TOOL-TOOL-STAGE-FILES-1CD1C3",
@@ -6247,7 +6355,9 @@
       "交付列表与实际文件一致",
       "失效路径未显示成功",
       "文件不存在、非绝对路径/无会话或无法登记时失败，不宣称已交付。"
-     ]
+     ],
+     "t05_status": "implemented",
+     "t05_anchor": "sessionfiles.rs stage_files 原语（origin=stage_files；交付清单与实存一致；文件不存在/非绝对/无会话即失败，不宣称已交付）；R07 接工具层在台账申报。"
     },
     {
      "feature_id": "F-D09-TOOL-TOOL-WRITE-4F0466",
@@ -6270,7 +6380,9 @@
       "磁盘内容与请求一致",
       "冲突/越权不写",
       "并发版本冲突、路径越权/符号链接逃逸或沙盒不可用时拒绝，不覆盖用户后改。"
-     ]
+     ],
+     "t05_status": "share",
+     "t05_anchor": "同 #48：写语义 filetools 已交付，T05 交付授权闸份额，R07 接工具层。"
     },
     {
      "feature_id": "F-D09-UI_BEHAVIOR-UI-BEHAVIOR-FILE-PREVIEW-4173A0",
@@ -6295,7 +6407,9 @@
      "acceptance_assertions": [
       "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口",
       "二进制/过大文件显示信息卡；读取失败错误；独立 viewer 不回写主编辑状态"
-     ]
+     ],
+     "t05_status": "share",
+     "t05_anchor": "份额 = resource 内容读 + resource.changed 重读信号（服务端数据源）；渲染与 viewer 属 R09（叶 stage_ids 已含 R09）。"
     }
    ]
   },

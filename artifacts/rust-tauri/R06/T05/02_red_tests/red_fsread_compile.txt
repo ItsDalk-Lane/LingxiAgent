@@ -1,0 +1,45 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0433]: cannot find `fsread` in `lingxi_service`
+  --> crates/lingxi-service/tests/r06_t05_fsread.rs:58:36
+   |
+58 |     let resolved = lingxi_service::fsread::resolve_allowed_path(
+   |                                    ^^^^^^ could not find `fsread` in `lingxi_service`
+
+error[E0433]: cannot find `fsread` in `lingxi_service`
+  --> crates/lingxi-service/tests/r06_t05_fsread.rs:68:25
+   |
+68 |         lingxi_service::fsread::resolve_allowed_path(&outside.to_string_lossy(), &roots).is_none(),
+   |                         ^^^^^^ could not find `fsread` in `lingxi_service`
+
+error[E0433]: cannot find `fsread` in `lingxi_service`
+  --> crates/lingxi-service/tests/r06_t05_fsread.rs:74:29
+   |
+74 |     assert!(lingxi_service::fsread::resolve_allowed_path(&escaped, &roots).is_none());
+   |                             ^^^^^^ could not find `fsread` in `lingxi_service`
+
+error[E0433]: cannot find `fsread` in `lingxi_service`
+  --> crates/lingxi-service/tests/r06_t05_fsread.rs:79:25
+   |
+79 |         lingxi_service::fsread::resolve_allowed_path(&missing.to_string_lossy(), &roots);
+   |                         ^^^^^^ could not find `fsread` in `lingxi_service`
+
+error[E0433]: cannot find `fsread` in `lingxi_service`
+  --> crates/lingxi-service/tests/r06_t05_fsread.rs:90:25
+   |
+90 |         lingxi_service::fsread::resolve_allowed_path(&link.to_string_lossy(), &roots).is_none(),
+   |                         ^^^^^^ could not find `fsread` in `lingxi_service`
+
+error[E0433]: cannot find `fsread` in `lingxi_service`
+  --> crates/lingxi-service/tests/r06_t05_fsread.rs:97:25
+   |
+97 |         lingxi_service::fsread::resolve_allowed_path(&root_a.to_string_lossy(), &roots);
+   |                         ^^^^^^ could not find `fsread` in `lingxi_service`
+
+error[E0433]: cannot find `fsread` in `lingxi_service`
+   --> crates/lingxi-service/tests/r06_t05_fsread.rs:426:31
+    |
+426 |     f.set_len(lingxi_service::fsread::MAX_FS_READ_BYTES + 1)
+    |                               ^^^^^^ could not find `fsread` in `lingxi_service`
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `lingxi-service` (test "r06_t05_fsread") due to 7 previous errors

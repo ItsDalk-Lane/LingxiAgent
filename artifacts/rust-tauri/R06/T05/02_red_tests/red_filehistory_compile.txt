@@ -1,0 +1,30 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0432]: unresolved import `lingxi_service::filehistory`
+  --> crates/lingxi-service/tests/r06_t05_filehistory.rs:29:21
+   |
+29 | use lingxi_service::filehistory::{
+   |                     ^^^^^^^^^^^ could not find `filehistory` in `lingxi_service`
+
+error[E0433]: cannot find `filehistory` in `lingxi_service`
+   --> crates/lingxi-service/tests/r06_t05_filehistory.rs:671:25
+    |
+671 |         lingxi_service::filehistory::workspace_hash_for_root(&ws)
+    |                         ^^^^^^^^^^^ could not find `filehistory` in `lingxi_service`
+
+error[E0599]: no method named `set_file_history` found for struct `ResourceIoService` in the current scope
+   --> crates/lingxi-service/tests/r06_t05_filehistory.rs:385:8
+    |
+385 |     io.set_file_history(fx.fh.clone());
+    |        ^^^^^^^^^^^^^^^^ method not found in `ResourceIoService`
+
+error[E0609]: no field `capture_origin` on type `OpContext`
+   --> crates/lingxi-service/tests/r06_t05_filehistory.rs:406:9
+    |
+406 |     ctx.capture_origin = Some("restore".to_string());
+    |         ^^^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `principal_kind`, `principal_subject`, `session_id`, `source`, `reason` ... and 2 others
+
+Some errors have detailed explanations: E0432, E0433, E0599, E0609.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `lingxi-service` (test "r06_t05_filehistory") due to 4 previous errors

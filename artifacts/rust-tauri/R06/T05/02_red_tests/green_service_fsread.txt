@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r06_t05_fsread.rs (target/debug/deps/r06_t05_fsread-d65a08a2df63688d)
+
+running 2 tests
+test resolve_allowed_path_mirror_table ... ok
+test fs_read_routes_faces_and_error_vocabulary ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+

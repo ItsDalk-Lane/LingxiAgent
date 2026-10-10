@@ -1,0 +1,80 @@
+test c03_log_summary_oversized_legal_input_is_not_misrefused ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/input_payload_fidelity.rs (target/debug/deps/input_payload_fidelity-05d8874f56406b00)
+
+running 5 tests
+test c02_adversarial_combining_pair_straddling_the_historical_cut ... ok
+test c02_dedup_digest_corresponds_to_the_content_actually_executed ... ok
+test c02_unicode_payloads_byte_honest_on_both_entries ... ok
+test c01_foreground_boundary_lengths_deliver_the_full_input ... ok
+test c01_background_boundary_lengths_deliver_the_full_input ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+     Running tests/instance_lifecycle.rs (target/debug/deps/instance_lifecycle-b356e8ba3b4932ad)
+
+running 3 tests
+test config_source_field_reaches_the_service_config ... ok
+test locked_instance_survives_rejected_second_claim ... ok
+test crashed_owner_leaves_stale_record_and_restart_takes_over ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+     Running tests/invocation_journal.rs (target/debug/deps/invocation_journal-a631f3985bdcf6c3)
+
+running 3 tests
+test r03_a09_crash_after_side_effect_does_not_reexecute_and_receipt_is_unknown ... ok
+test journal_lifecycle_progresses_and_closes_receipts_on_the_live_chain ... ok
+test r03_a10_idempotent_key_resume_does_not_duplicate_the_external_operation ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+     Running tests/late_result_fence.rs (target/debug/deps/late_result_fence-1f6db2f90e542b43)
+
+running 5 tests
+test reconnect_resubscribes_only_and_never_restarts_a_model ... ok
+test r03_a07_late_result_after_cancel_and_next_run_pollutes_nothing ... ok
+test r03_a07_tool_result_with_stale_fence_records_unknown_and_audits ... ok
+test r03_a07_driver_fences_stale_tagged_model_result_loudly ... ok
+test r03_a07_late_attempt1_result_vs_current_attempt_is_stale_only ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.77s
+
+     Running tests/r00_management_leaves.rs (target/debug/deps/r00_management_leaves-3d0021c5c53fa12d)
+
+running 1 test
+test r00_management_positive_and_negative_branches_on_real_service ... FAILED
+
+failures:
+
+---- r00_management_positive_and_negative_branches_on_real_service stdout ----
+LINGXI_AUTH_REJECTED request_id="req-7944412ff178d28b09b8cf2c7846d395" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56018
+LINGXI_AUTH_REJECTED request_id="req-be54428fefe268e6b0405f0aaa4fcc85" method=GET path=/lingxi/v1/access/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56022
+LINGXI_AUTH_REJECTED request_id="req-9a6385bc780eed4915c49c2a92987fb8" method=PUT path=/lingxi/v1/access/account/profile status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56027
+LINGXI_AUTH_REJECTED request_id="req-3b5e47099a7c68c6797286e0ad93daa2" method=PUT path=/lingxi/v1/access/network status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56030
+LINGXI_AUTH_REJECTED request_id="req-374e653df43e70292aadae0a32970673" method=GET path=/lingxi/v1/access/mobile-qr.svg status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56032
+LINGXI_AUTH_REJECTED request_id="req-5d78928606fff4f883711c63e35e44ed" method=PUT path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56038
+LINGXI_AUTH_REJECTED request_id="req-fd1970f46f61836a2844531d4b328203" method=DELETE path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56045
+LINGXI_AUTH_REJECTED request_id="req-7576b44cdd8109fadf9c44edd6b8ef3b" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56060
+LINGXI_AUTH_REJECTED request_id="req-cb2821f73dd9a89b04b2b694bc322041" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56062
+LINGXI_AUTH_REJECTED request_id="req-0504b3a90f7bb800bbb6e3f38664950f" method=GET path=/lingxi/v1/devices status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56065
+LINGXI_AUTH_REJECTED request_id="req-7895b57b42d5b07d65c32d5366768049" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:56068
+LINGXI_AUTH_REJECTED request_id="req-7f31bb8ba461942a5fb2b64f6bef3684" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56071
+LINGXI_AUTH_REJECTED request_id="req-aa4ec9aeaed369834a1de10416023407" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:56075
+LINGXI_AUTH_REJECTED request_id="req-8a8499d148f50c8bf97f225dc556c183" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56078
+LINGXI_AUTH_REJECTED request_id="req-0eee007f06fb53261a87e1c6d9640cd3" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56080
+LINGXI_AUTH_REJECTED request_id="req-bbeda9dc6e629b01544ac5cdcd2eb716" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56086
+
+thread 'r00_management_positive_and_negative_branches_on_real_service' (33523175) panicked at crates/lingxi-service/tests/r00_management_leaves.rs:49:5:
+request to 192.168.3.5:56175 stalled during write/read exchange (POST /lingxi/v1/web-auth/login, 0 bytes read so far) — if addr is a non-loopback self-address, the macOS application firewall / proxy TUN may be blocking inbound connections to this unsigned test binary; this is an environment failure surfaced honestly, not a skipped assertion
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    r00_management_positive_and_negative_branches_on_real_service
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 51.55s
+
+error: test failed, to rerun pass `-p lingxi-service --test r00_management_leaves`

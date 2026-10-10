@@ -26,6 +26,7 @@ pub mod approval_service;
 pub mod artifactverify;
 pub mod auth;
 pub mod background;
+pub mod bridgemedia;
 pub mod cancel;
 pub mod compaction;
 pub mod config;
@@ -35,7 +36,10 @@ pub mod dedup;
 pub mod epoch;
 pub mod events;
 pub mod exectools;
+pub mod filehistory;
+pub mod filemeta;
 pub mod filetools;
+pub mod fsread;
 pub mod history;
 pub mod history_projection;
 pub mod inject;
@@ -47,11 +51,14 @@ mod management;
 pub mod mcpbridge;
 pub mod operations;
 pub mod paths;
+pub mod preview;
 pub mod procsupervisor;
 pub mod quotas;
 pub mod recovery;
 pub mod redaction;
 pub mod resourceaccess;
+pub mod resourceio;
+pub mod resources;
 pub mod runs;
 pub mod sandbox;
 mod security_audit;
@@ -59,6 +66,7 @@ pub mod serve;
 pub mod session_admin;
 pub mod session_supervisor;
 pub mod session_tree;
+pub mod sessionfiles;
 pub mod sessions;
 pub mod shutdown;
 mod static_web;
@@ -202,7 +210,7 @@ use axum::extract::{ConnectInfo, Path, Request, State};
 use axum::http::{header, HeaderValue, StatusCode};
 use axum::middleware::{self, Next};
 use axum::response::{IntoResponse, Response};
-use axum::routing::{get, post};
+use axum::routing::{delete, get, post};
 use axum::{Json, Router};
 use lingxi_adapters::storage::{RunDatabase, RUNS_DB_FILE_NAME};
 use lingxi_kernel::ports::StorageError;
@@ -452,6 +460,29 @@ pub struct ServiceState {
     /// R06-T03: the session admin service (create / rename / pin / archive /
     /// restore / delete / cleanup / search / memory toggle).
     session_admin: Arc<session_admin::SessionAdminService>,
+    /// R06-T05: the session file service (sf_ identity registry, legacy
+    /// sidecar import, fork copy, reference checker, cold-cache cleanup).
+    session_files: Arc<sessionfiles::SessionFileService>,
+    /// R06-T05: the resource service (res_ envelope / content resolution /
+    /// content ticket) over the same session-file registry.
+    resources: Arc<resources::ResourceService>,
+    /// R06-T05 Round 4: the ResourceIO face (kernel + local_fs /
+    /// session_file / resource providers + event bus + watch registry).
+    resource_io: Arc<resourceio::ResourceIoService>,
+    /// R06-T05 Round 5: the HTML preview face (pv_ id / token-gated reads /
+    /// asset root scoping, mirroring server/routes/html-preview.ts).
+    preview: Arc<preview::PreviewService>,
+    /// R06-T05 Round 5: the bridge media face (publish service API +
+    /// token-gated public read, mirroring lib/bridge/media-publisher.ts +
+    /// server/routes/bridge.ts:676-701).
+    bridge_media: Arc<bridgemedia::BridgeMediaService>,
+    /// R06-T05 Round 5: the workspace file-history face (v9
+    /// file_history_snapshots 单库表 + ResourceIO 写路径捕获，D8；
+    /// 对照 lib/file-history/* + server/routes/file-history.ts)。
+    file_history: Arc<filehistory::FileHistoryService>,
+    /// R06-T05 Round 5: the fs 直读面（授权根集合持有，对照
+    /// server/routes/fs.ts 的 read / read-base64 两叶面）。
+    fs_read: Arc<fsread::FsReadService>,
     /// R06-T03: the workspace file-rollback preference (incumbent
     /// `getRollbackFileChanges`, `core/preferences-manager.ts:322-324`).
     /// Default OFF, mirroring the incumbent; a rewind/retry that requests
@@ -1117,6 +1148,30 @@ impl ServiceState {
         // the worker model-callback port is built from it below (an
         // injected `turn_provider` keeps the whole plane test-owned).
         let wired_real_model_chain = model_gateway_for_wiring.is_some();
+        // R06-T05 Round 4: the workspace-scoped resource access is built
+        // ONCE at bootstrap whenever a workspace root is configured and
+        // shared by the tool plane (file/exec tools) and the ResourceIO
+        // face — resource-io routes get the SAME authorization gate even
+        // without a model plane wired (07_diff_ledger: the workspace root
+        // is now validated at bootstrap regardless of the model plane).
+        let workspace_access: Option<(Arc<resourceaccess::ResourceAccess>, std::path::PathBuf)> =
+            match deps.workspace_root.clone() {
+                Some(workspace) => {
+                    let access = Arc::new(
+                        resourceaccess::ResourceAccess::new(std::slice::from_ref(&workspace))
+                            .map_err(|refusal| {
+                                ServiceStartupError::Storage(StorageError::InvalidRequest {
+                                    detail: format!(
+                                        "workspace root {} is not a usable resource root: {refusal}",
+                                        workspace.display()
+                                    ),
+                                })
+                            })?,
+                    );
+                    Some((access, workspace))
+                }
+                None => None,
+            };
         // R05 RR1 F24: the tool-plane handles the worker registration below
         // consumes (registry + gateway + access + workspace). Present
         // exactly when the real chain was wired with a scoped workspace.
@@ -1147,19 +1202,7 @@ impl ServiceState {
                 toolgateway::DEFAULT_PREPARED_TTL_MS,
                 toolgateway::DEFAULT_LIVE_PREPARED_CAP,
             ));
-            if let Some(workspace) = deps.workspace_root.clone() {
-                let access = Arc::new(
-                    resourceaccess::ResourceAccess::new(std::slice::from_ref(&workspace)).map_err(
-                        |refusal| {
-                            ServiceStartupError::Storage(StorageError::InvalidRequest {
-                                detail: format!(
-                                    "workspace root {} is not a usable resource root: {refusal}",
-                                    workspace.display()
-                                ),
-                            })
-                        },
-                    )?,
-                );
+            if let Some((access, workspace)) = workspace_access.clone() {
                 let _core_file_tools = filetools::register_core_file_tools(
                     &registry,
                     gateway.as_ref(),
@@ -1649,7 +1692,93 @@ impl ServiceState {
             .await
             .map_err(ServiceStartupError::Storage)?;
         let _ = recovery_report.set(scan);
-        Ok(Self {
+        // R06-T05: session-file 服务的 lingxiHome 等价根（config 在下面的
+        // struct literal 里被 Arc 收走，先取出）。
+        let data_home = config.data_home.clone();
+        // R06-T05 资源面：信封 name/studioId 与票据 payload 的 studioId
+        // 与管理面身份同源（management 在 Ok(Self{...}) 中被移动，先取）。
+        let studio_id = management.identity_ids().1;
+        // R06-T05：资源服务共享同一会话文件服务句柄（Arc 复用，现役
+        // engine 的 sessionFiles 注册表同样是全局单例）。
+        let session_files = Arc::new(sessionfiles::SessionFileService::new(
+            data_home.clone(),
+            Arc::clone(&storage),
+            {
+                let clock = deps.clock.clone();
+                move || clock.now_unix_ms()
+            },
+        ));
+        let resources = Arc::new(resources::ResourceService::new(
+            session_files.clone(),
+            studio_id,
+            // D4：票据 key 归私有运行目录（现役 security/ 的候选人映射）。
+            layout.runtime_dir.clone(),
+            {
+                let clock = deps.clock.clone();
+                move || clock.now_unix_ms()
+            },
+        ));
+        // R06-T05 Round 4：ResourceIO 面共享同一授权闸（bootstrap 处
+        // 一次构建的 workspace_access）与同一 session_file/resource
+        // 注册表；watch 轮询间隔生产档，测试面注入更快档。
+        let resource_io = Arc::new(resourceio::ResourceIoService::new(
+            session_files.clone(),
+            resources.clone(),
+            data_home.clone(),
+            workspace_access.clone(),
+            resourceio::DEFAULT_WATCH_POLL_MS,
+            {
+                let clock = deps.clock.clone();
+                Arc::new(move || clock.now_unix_ms()) as Arc<dyn Fn() -> u64 + Send + Sync>
+            },
+        ));
+        // R06-T05 Round 5：HTML 预览面（无状态依赖，时钟注入与全局一致）。
+        let preview = Arc::new(preview::PreviewService::new({
+            let clock = deps.clock.clone();
+            move || clock.now_unix_ms()
+        }));
+        // R06-T05 Round 5：桥媒体面。baseUrl 取现役环境变量回退
+        // （engine.getBridgeMediaPublicBaseUrl?.() 无候选配置面对应物，
+        // 台账申报）；白名单 = media-roots.ts 收集器的候选映射
+        // （data_home + workspace + 用户主目录 + 临时根）。
+        let bridge_media = Arc::new(
+            bridgemedia::BridgeMediaService::new(
+                &std::env::var("LINGXI_BRIDGE_PUBLIC_BASE_URL").unwrap_or_default(),
+                &bridgemedia::collect_bridge_media_allowed_roots(
+                    &data_home,
+                    workspace_access.as_ref().map(|(_, root)| root.as_path()),
+                ),
+                {
+                    let clock = deps.clock.clone();
+                    move || clock.now_unix_ms()
+                },
+            )
+            .map_err(|err| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest {
+                    detail: format!("bridge media service: {err}"),
+                })
+            })?,
+        );
+        // R06-T05 Round 5：文件历史面（D8）。工作区根沿用已 canonical 的
+        // workspace_access；ResourceIO 写路径经 set_file_history 接线捕获
+        // （origin "event"；restore 路由经 OpContext.capture_origin 传
+        // "restore"）。
+        let file_history = Arc::new(filehistory::FileHistoryService::new(
+            Arc::clone(&storage),
+            workspace_access.as_ref().map(|(_, root)| root.clone()),
+            {
+                let clock = deps.clock.clone();
+                move || clock.now_unix_ms()
+            },
+        ));
+        resource_io.set_file_history(file_history.clone());
+        // R06-T05 Round 5：fs 直读面授权根（fs.ts :77-86 的候选映射：
+        // data_home + workspace）。
+        let fs_read = Arc::new(fsread::FsReadService::new(
+            &data_home,
+            workspace_access.as_ref().map(|(_, root)| root.as_path()),
+        ));
+        let state = Self {
             config: Arc::new(config),
             auth: Arc::new(auth),
             management: Arc::new(management),
@@ -1668,6 +1797,19 @@ impl ServiceState {
             session_admin: Arc::new(session_admin::SessionAdminService::new(Arc::clone(
                 &storage,
             ))),
+            session_files,
+            // R06-T05: 资源面（res_ 信封 / 内容解析 / 票据）。
+            resources,
+            // R06-T05 Round 4: ResourceIO 面。
+            resource_io,
+            // R06-T05 Round 5: HTML 预览面。
+            preview,
+            // R06-T05 Round 5: 桥媒体面。
+            bridge_media,
+            // R06-T05 Round 5: 文件历史面。
+            file_history,
+            // R06-T05 Round 5: fs 直读面。
+            fs_read,
             rollback_file_changes: Arc::new(std::sync::atomic::AtomicBool::new(false)),
             events: Arc::clone(&events),
             rate: Arc::new(limits::RateLimiter::new(deps.rate_window_ms, deps.rate_max)),
@@ -1702,7 +1844,20 @@ impl ServiceState {
             operations: operations_entry,
             network_plane: deps.network_plane.clone(),
             context_compiler: deps.context_compiler.clone(),
-        })
+        };
+        // R06-T05 D14：启动清扫一次（现役 server/index.ts:563-570
+        // fire-and-forget + warn 日志；失败不阻断启动）。现役 24h
+        // setInterval 不引入——常驻定时器违背 R02-T06 关停纪律，周期调度
+        // 如需由服务编排层显式加。
+        {
+            let cleanup = state.session_files().clone();
+            tokio::spawn(async move {
+                if let Err(err) = cleanup.cleanup_cold_sessions().await {
+                    eprintln!("startup session-file cleanup failed: {err}");
+                }
+            });
+        }
+        Ok(state)
     }
 
     pub fn config(&self) -> &ServiceConfig {
@@ -1738,6 +1893,44 @@ impl ServiceState {
     /// delete/cleanup/search/memory).
     pub fn session_admin(&self) -> &Arc<session_admin::SessionAdminService> {
         &self.session_admin
+    }
+
+    /// R06-T05: the session file service (sf_ registry / legacy import /
+    /// fork / reference checker / cold-cache cleanup).
+    pub fn session_files(&self) -> &Arc<sessionfiles::SessionFileService> {
+        &self.session_files
+    }
+
+    /// R06-T05: the resource service handle (res_ envelope / content /
+    /// ticket routes).
+    pub fn resources(&self) -> &Arc<resources::ResourceService> {
+        &self.resources
+    }
+
+    /// R06-T05 Round 4: the ResourceIO face (15 route faces / event bus /
+    /// watch registry).
+    pub fn resource_io(&self) -> &Arc<resourceio::ResourceIoService> {
+        &self.resource_io
+    }
+
+    /// R06-T05 Round 5: the HTML preview face handle.
+    pub fn preview(&self) -> &Arc<preview::PreviewService> {
+        &self.preview
+    }
+
+    /// R06-T05 Round 5: the bridge media face handle.
+    pub fn bridge_media(&self) -> &Arc<bridgemedia::BridgeMediaService> {
+        &self.bridge_media
+    }
+
+    /// R06-T05 Round 5: the workspace file-history service (D8).
+    pub fn file_history(&self) -> &Arc<filehistory::FileHistoryService> {
+        &self.file_history
+    }
+
+    /// R06-T05 Round 5: the fs 直读 service（授权根 + resolve）。
+    pub fn fs_read(&self) -> &Arc<fsread::FsReadService> {
+        &self.fs_read
     }
 
     /// R06-T03: whether workspace file rollback is enabled (incumbent
@@ -2060,6 +2253,36 @@ impl EndpointError {
         )
         .with_reason("body_limit_exceeded")
         .with_cause("transport.body_limit_exceeded")
+    }
+
+    /// R06-T05: an upload blob whose mime is outside the incumbent
+    /// whitelist (`shared/{image,audio,video}-mime.ts`) — 415.
+    pub fn unsupported_media_type(detail: String) -> Self {
+        Self::new(
+            StatusCode::UNSUPPORTED_MEDIA_TYPE,
+            ErrorCode::InvalidMessage,
+            detail,
+        )
+        .with_reason("unsupported_media_type")
+        .with_cause("request.unsupported_media_type")
+    }
+
+    /// R06-T05: 资源/票据面的现役错误外发（core/resource-service.ts
+    /// ResourceError 与 core/resource-ticket-service.ts
+    /// ResourceTicketError 共用一个 `{code, status}` 形状）——HTTP
+    /// status 与现役一致，现役 code 原样进 `details.reason`（候选人
+    /// protocol ErrorCode 词汇表不含资源域细目，不伪造第二套模型）。
+    pub fn resource_failure(status: StatusCode, code: &str, message: impl Into<String>) -> Self {
+        let error_code = match status {
+            StatusCode::BAD_REQUEST => ErrorCode::InvalidMessage,
+            StatusCode::FORBIDDEN => ErrorCode::Forbidden,
+            StatusCode::NOT_FOUND => ErrorCode::NotFound,
+            StatusCode::CONFLICT | StatusCode::GONE => ErrorCode::Conflict,
+            _ => ErrorCode::Internal,
+        };
+        Self::new(status, error_code, message)
+            .with_reason(code)
+            .with_cause(format!("resource.{code}"))
     }
 
     /// Maps an axum `Json` rejection: body-limit failures keep their 413,
@@ -5216,6 +5439,142 @@ pub fn build_router(state: ServiceState) -> Router {
         .route(
             "/lingxi/v1/sessions/{session_id}/export",
             get(history::session_export_route),
+        )
+        // R06-T05 会话文件面：sf_ 注册/列表/单件（alias 感知）/旧 sidecar
+        // 导入/本地与内存附件。归属闸在 handler 内先于一切实体读取。
+        .route(
+            "/lingxi/v1/sessions/{session_id}/files",
+            get(sessionfiles::list_session_files_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/files/import-legacy",
+            post(sessionfiles::import_legacy_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/files/{file_id}",
+            get(sessionfiles::get_session_file_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/attachments/local",
+            post(sessionfiles::attach_local_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/attachments/blob",
+            post(sessionfiles::attach_blob_route),
+        )
+        // R06-T05 资源面：res_ 信封读取、内容票据签发、内容读取
+        // （ETag/Range/Content-Disposition 与现役同口径；ticket 在
+        // handler 内作内容级校验——候选人中间件对一切请求鉴权，现役
+        // server/index.ts:642 的 ticket 鉴权豁免差异见 R06-T05 台账）。
+        .route(
+            "/lingxi/v1/resources/{resource_id}",
+            get(resources::get_resource_route),
+        )
+        .route(
+            "/lingxi/v1/resources/{resource_id}/ticket",
+            post(resources::issue_resource_ticket_route),
+        )
+        .route(
+            "/lingxi/v1/resources/{resource_id}/content",
+            get(resources::resource_content_route),
+        )
+        // R06-T05 Round 4 ResourceIO 面（server/routes/resource-io.ts 的
+        // 15 叶面）：stat/read/list/search/write/write-expected-version/
+        // rename/move/trash/subscribe/watch + subscriptions/{id} 与
+        // watch/{id} 释放 + watch-diagnostics + events。
+        .route("/lingxi/v1/resource-io/stat", post(resourceio::stat_route))
+        .route("/lingxi/v1/resource-io/read", post(resourceio::read_route))
+        .route("/lingxi/v1/resource-io/list", post(resourceio::list_route))
+        .route(
+            "/lingxi/v1/resource-io/search",
+            post(resourceio::search_route),
+        )
+        .route(
+            "/lingxi/v1/resource-io/write",
+            post(resourceio::write_route),
+        )
+        .route(
+            "/lingxi/v1/resource-io/write-expected-version",
+            post(resourceio::write_expected_version_route),
+        )
+        .route(
+            "/lingxi/v1/resource-io/rename",
+            post(resourceio::rename_route),
+        )
+        .route("/lingxi/v1/resource-io/move", post(resourceio::move_route))
+        .route(
+            "/lingxi/v1/resource-io/trash",
+            post(resourceio::trash_route),
+        )
+        .route(
+            "/lingxi/v1/resource-io/subscribe",
+            post(resourceio::subscribe_route),
+        )
+        .route(
+            "/lingxi/v1/resource-io/subscriptions/{subscription_id}",
+            delete(resourceio::unsubscribe_route),
+        )
+        .route(
+            "/lingxi/v1/resource-io/watch",
+            post(resourceio::watch_route),
+        )
+        .route(
+            "/lingxi/v1/resource-io/watch/{watch_id}",
+            delete(resourceio::unwatch_route),
+        )
+        .route(
+            "/lingxi/v1/resource-io/watch-diagnostics",
+            get(resourceio::watch_diagnostics_route),
+        )
+        .route(
+            "/lingxi/v1/resource-io/events",
+            get(resourceio::events_route),
+        )
+        // R06-T05 Round 5 HTML 预览面（server/routes/html-preview.ts，
+        // D5 前缀）：POST 建立（chat scope），GET/HEAD 读取与素材为
+        // Public + token 即凭证（无效/过期一律 404，见 auth.rs 分类）。
+        .route(
+            "/lingxi/v1/preview/html",
+            post(preview::create_preview_route),
+        )
+        .route(
+            "/lingxi/v1/preview/html/{id}",
+            get(preview::serve_preview_route),
+        )
+        .route(
+            "/lingxi/v1/preview/html/{id}/assets/{token}/{*asset_path}",
+            get(preview::serve_preview_asset_route),
+        )
+        // R06-T05 Round 5 桥媒体面（server/routes/bridge.ts:676-701，
+        // D5 前缀）：Public + token 即凭证，50MB → 413。
+        .route(
+            "/lingxi/v1/bridge/media/{token}",
+            get(bridgemedia::bridge_media_route),
+        )
+        // R06-T05 Round 5 文件历史面（server/routes/file-history.ts，
+        // D5 前缀）：四叶面 LocalOnly（auth.rs 分类），agentId 必填。
+        .route(
+            "/lingxi/v1/file-history/files",
+            get(filehistory::list_files_route),
+        )
+        .route(
+            "/lingxi/v1/file-history/versions",
+            get(filehistory::list_versions_route),
+        )
+        .route(
+            "/lingxi/v1/file-history/snapshot",
+            get(filehistory::snapshot_route),
+        )
+        .route(
+            "/lingxi/v1/file-history/restore",
+            post(filehistory::restore_route),
+        )
+        // R06-T05 Round 5 fs 直读面（server/routes/fs.ts :89-115，D5
+        // 前缀）：LocalOnly，授权根 = data_home + workspace。
+        .route("/lingxi/v1/fs/read", get(fsread::fs_read_route))
+        .route(
+            "/lingxi/v1/fs/read-base64",
+            get(fsread::fs_read_base64_route),
         )
         .route("/lingxi/v1/ws-ticket", post(ws_ticket))
         .route(

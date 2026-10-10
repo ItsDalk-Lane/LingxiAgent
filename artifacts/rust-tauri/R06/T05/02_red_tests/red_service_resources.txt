@@ -1,0 +1,10 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0432]: unresolved import `lingxi_service::resources`
+  --> crates/lingxi-service/tests/r06_t05_resources.rs:20:21
+   |
+20 | use lingxi_service::resources::{
+   |                     ^^^^^^^^^ could not find `resources` in `lingxi_service`
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `lingxi-service` (test "r06_t05_resources") due to 1 previous error
+EXIT=101

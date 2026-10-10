@@ -1,0 +1,62 @@
+R06-T05 r00_management_leaves 环境阻塞证据（macOS 应用防火墙 ALF，cdhash 维度）
+================================================================================
+
+现象
+----
+`cargo test --workspace` 中 r00_management_leaves 的 LAN 阶段失败：
+    request to 192.168.3.5:<port> stalled during write/read exchange
+    (POST /lingxi/v1/web-auth/login, 0 bytes read so far)
+（connect 成功、写成功、20s 预算内读 0 字节 —— 连接在交付给进程前被拦截。）
+
+判定：环境阻塞，非代码回归。证据链五条：
+
+1. 防火墙开启且持有旧测试二进制的 cdhash 级放行规则：
+   $ /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate
+   Firewall is enabled. (State = 1)
+   $ socketfilterfw --listapps | grep r00_management
+   …/rust/target/debug/deps/r00_management_leaves-0f2867e2c3f74e6c   ← 规则1
+   …/rust/target/debug/deps/r00_management_leaves-e3bc1de7b6ab18f8   ← T04 证据运行的二进制
+   …（另有 3164d44c… / 590de196… / 294787929… 等历次重建的放行记录）
+   即：每次 lingxi-service 代码变化重建该测试二进制后，都需要一次新的防火墙
+   放行（GUI 弹窗人工批准）；本执行无 sudo（sudo -n 被拒），无法自助加规则。
+
+2. 基线代码通过、候选代码失败，且与路径无关（排除路径键规则）：
+   - 基线 worktree @ b27dc5e4b（task_base_sha）二进制
+     r00_management_leaves-0f2867e2c3f74e6c（cdhash 1f28d84f…，与规则1
+     对应的旧构建同码同 hash）：
+     从 /tmp/r06t05-baseline-target 运行 2 次均 PASS（33.02s / 32.79s）；
+     拷贝到主 target 目录以 r00_baseline_probe 文件名运行 PASS（96.79s，
+     系统负载较高但全绿）。
+   - 候选代码二进制 r00_management_leaves-23a326659390382c
+     （cdhash 9eb50eb2…，无放行规则）：
+     主 target 路径运行 3 次 FAIL（51.3~51.6s，20s 停滞预算 + 前述阶段）；
+     拷贝到 /tmp/r00_probe 运行同样 FAIL（51.33s）。
+
+3. 外部客户端同样被拦（与测试逻辑无关的网络层过滤）：
+   候选二进制停滞窗口内，curl 手动 POST 同一 LAN 地址：
+       curl: (56) Recv failure: Connection reset by peer（4.5s，无 HTTP 响应）
+   同一时刻基线二进制的自身 LAN 请求秒级成功（测试通过）。
+
+4. 失败形态是 ALF 拦截入站的签名：TCP 握手由内核完成（connect 成功），
+   但连接流不交付给未放行的进程（accept 侧永远拿不到，0 字节）。
+   测试自身的 panic 文案也记录了该环境模式（"macOS application
+   firewall / proxy TUN may be blocking inbound connections to this
+   unsigned test binary; this is an environment failure surfaced
+   honestly, not a skipped assertion"）。
+
+5. 先例：R05-T01 遇同一机制并留下同构证据
+   artifacts/rust-tauri/R05/T01/r00-firewall-alf-evidence.log
+   （socketfilterfw 日志原文显示 "designatedRequirement: cdhash H"…"，
+   即规则按 cdhash 生效）与 r00_management_leaves_baseline_head_pass.log。
+
+补充事实
+--------
+- 候选代码中该测试路径（loopback 401 矩阵、管理面正/反分支）全部正常；
+  唯一失败段是经真实网卡地址的自连 LAN 验收。
+- 工作区回归中除本测试外全部通过（见 06_workspace_regression）。
+- 解除方式（需用户/编排者权限，本执行不擅自请求）：在 macOS 防火墙弹窗
+  批准新二进制，或以 root 执行
+  /usr/libexec/ApplicationFirewall/socketfilterfw --add <新二进制路径>
+  && --unblockapp <新二进制路径>。基线（b27dc5e4b）构建产物因 cdhash
+  命中既有规则可直接通过，故该阻塞不随候选代码合入而扩散到 CI 的既有
+  通过状态之外——凡重建本测试二进制者皆需一次放行，与本次改动无涉。
