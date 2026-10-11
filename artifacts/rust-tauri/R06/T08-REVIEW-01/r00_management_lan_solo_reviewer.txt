@@ -1,0 +1,37 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r00_management_leaves.rs (target/debug/deps/r00_management_leaves-31e570a1b3a4ca44)
+
+running 1 test
+LINGXI_AUTH_REJECTED request_id="req-59373c815eaf0eead33f1adc5523e666" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59873
+LINGXI_AUTH_REJECTED request_id="req-15c2fd8c8360af7df1e975ac4da2955c" method=GET path=/lingxi/v1/access/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59877
+LINGXI_AUTH_REJECTED request_id="req-2c194abe5f62b6c1562b01bb4d45904d" method=PUT path=/lingxi/v1/access/account/profile status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59882
+LINGXI_AUTH_REJECTED request_id="req-bf3912a4d3ea5b3dc1c03eeab6afc915" method=PUT path=/lingxi/v1/access/network status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59885
+LINGXI_AUTH_REJECTED request_id="req-6e0a5d5b5eae1a8718826d63296fe6b2" method=GET path=/lingxi/v1/access/mobile-qr.svg status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59887
+LINGXI_AUTH_REJECTED request_id="req-76662e2f9424742d2969f25ff67ded08" method=PUT path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59894
+LINGXI_AUTH_REJECTED request_id="req-81645fc6069bedd10a2318b087de1785" method=DELETE path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59901
+LINGXI_AUTH_REJECTED request_id="req-227cf9f3367ba9e74236810c907e4131" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59979
+LINGXI_AUTH_REJECTED request_id="req-8afe8ad3374d298bbae7736fab8570d1" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59981
+LINGXI_AUTH_REJECTED request_id="req-579720a5171b74cb47e0a21b96e26729" method=GET path=/lingxi/v1/devices status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59984
+LINGXI_AUTH_REJECTED request_id="req-17738c3df1ae81580cc8f35fb4ddc71e" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:59987
+LINGXI_AUTH_REJECTED request_id="req-c71d0d79639f8617aec295515c9a0571" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59990
+LINGXI_AUTH_REJECTED request_id="req-75e6f337e6d067fad18c3b566b751c60" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:59994
+LINGXI_AUTH_REJECTED request_id="req-ea1f98783c722ed81c0b72957f3d34a2" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:60015
+LINGXI_AUTH_REJECTED request_id="req-b97b00688ca1f5b28c1deb635556e479" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:60017
+LINGXI_AUTH_REJECTED request_id="req-7e76d8dc1e3aef460770ccc970de8545" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:60027
+LINGXI_TRANSPORT_REJECTED request_id="req-701232afe21646ae1cec5c2abc3586b9" method=POST path=/lingxi/v1/web-auth/login status=403 reason=bad_origin origin=http://evil.example host=192.168.3.5:60107 remote=192.168.3.5:60109
+test r00_management_positive_and_negative_branches_on_real_service has been running for over 60 seconds
+LINGXI_TRANSPORT_REJECTED request_id="req-42f509acbeb2a048e30f666bc830556a" method=POST path=/lingxi/v1/web-auth/login status=403 reason=bad_origin origin=https://192.168.3.5:60107 host=192.168.3.5:60107 remote=192.168.3.5:60117
+
+thread 'r00_management_positive_and_negative_branches_on_real_service' (2008962) panicked at crates/lingxi-service/tests/r00_management_leaves.rs:49:5:
+request to 192.168.3.5:60107 stalled during write/read exchange (OPTIONS /lingxi/v1/web-auth/login, 0 bytes read so far) — if addr is a non-loopback self-address, the macOS application firewall / proxy TUN may be blocking inbound connections to this unsigned test binary; this is an environment failure surfaced honestly, not a skipped assertion
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test r00_management_positive_and_negative_branches_on_real_service ... FAILED
+
+failures:
+
+failures:
+    r00_management_positive_and_negative_branches_on_real_service
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 86.03s
+
+error: test failed, to rerun pass `-p lingxi-service --test r00_management_leaves`

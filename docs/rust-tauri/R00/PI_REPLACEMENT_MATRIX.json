@@ -35,7 +35,22 @@
       "retirement_evidence": "生产进程树和最终打包依赖图无 Pi AgentLoop；禁用旧 Node 服务仍能完成真实工具任务。",
       "target_stage": "R03/R05/R06/R07/R11",
       "disposition": "KERNEL_MIGRATION",
-      "r06_t06_progress": "share：agent_start hook 的 Rust 接管面 = kernel AgentLoopGuard 纯状态机（rust/crates/lingxi-kernel/src/memory.rs:887-1058）+ runs.rs 每 run 新建 hooks 并在 run 边界 reset（rust/crates/lingxi-service/src/runs.rs:801,1268-1315，tests/r06_t06_hooks.rs run 级断言）。生产 bootstrap with_extension_hooks(true)（lib.rs:1469）。"
+      "r06_t06_progress": "share：agent_start hook 的 Rust 接管面 = kernel AgentLoopGuard 纯状态机（rust/crates/lingxi-kernel/src/memory.rs:887-1058）+ runs.rs 每 run 新建 hooks 并在 run 边界 reset（rust/crates/lingxi-service/src/runs.rs:801,1268-1315，tests/r06_t06_hooks.rs run 级断言）。生产 bootstrap with_extension_hooks(true)（lib.rs:1469）。",
+      "r06_t08_handoff": {
+        "status": "replaced_in_rust",
+        "rust_anchor": "runs.rs drive_run（R03/R05：状态机/取消树/配额/用量/重试）+ R06 全链（T01 编译器接线、T02 压缩、T06 hooks）。",
+        "r06_evidence": "R06-T08 BE-01..10 全部经真实 run 循环评测（artifacts/rust-tauri/R06/T08/05_targeted_tests/behavior_eval_final.txt，10/10 按预期，含 BE-10 故意错误行为被评分器判 fail）。",
+        "remaining": [
+          {
+            "dependency": "桥接/电话代理等外围入口的子会话编排面",
+            "owner": "R07（R00 deferred 叶）"
+          },
+          {
+            "dependency": "旧 Electron 客户端接入与退役证据",
+            "owner": "R08/R11"
+          }
+        ]
+      }
     },
     {
       "id": "PI-02",
@@ -58,7 +73,22 @@
       "protocol_test": "旧 ID/分支/fork/坏行/分页/导出 round-trip 与跨入口同一历史投影。",
       "retirement_evidence": "新任务只写 Rust 权威存储；旧 SDK SessionManager 不在生产写链，旧资料只读可导入。",
       "target_stage": "R02/R06/R08/R11",
-      "disposition": "KERNEL_MIGRATION"
+      "disposition": "KERNEL_MIGRATION",
+      "r06_t08_handoff": {
+        "status": "replaced_in_rust",
+        "rust_anchor": "T03 SessionService/session_tree（schema v8 分支索引/检查点）+ T04 CanonicalMessageStore/history_projection（LegacyRaw/legacy_fields 档案化）。",
+        "r06_evidence": "T08 BE-08 子代理 run 行为经真存储链；T03/T04 验收（R06-A05..A08）已独立复核。",
+        "remaining": [
+          {
+            "dependency": "旧 JSONL 会话数据的割接搬移（LegacyImporter 消费端）",
+            "owner": "R08"
+          },
+          {
+            "dependency": "桌面读取面的最终退役",
+            "owner": "R08/R11"
+          }
+        ]
+      }
     },
     {
       "id": "PI-03",
@@ -84,7 +114,26 @@
       "protocol_test": "长会话预算、工具配对、压缩失败不覆原历史、native/cache 路径、取消及 trace 对照。",
       "retirement_evidence": "Pi prepareCompaction/generateSummary/runAgentLoop 不在新上下文路径；压缩摘要由 Rust 归档。",
       "target_stage": "R05/R06/R11",
-      "disposition": "KERNEL_MIGRATION"
+      "disposition": "KERNEL_MIGRATION",
+      "r06_t08_handoff": {
+        "status": "replaced_in_rust",
+        "rust_anchor": "T01 kernel/context.rs + T02 kernel/compaction.rs + service/compaction.rs（FORCE/reserve 触发、缓存保留形状、工具对配对证明、硬截断兜底、summarize→chat 回退链）。",
+        "r06_evidence": "R06-A03/A04 已独立复核（T02-REVIEW-04 R4_PASS）；T02 §十 40 行矩阵 + 17 条声明差异。",
+        "remaining": [
+          {
+            "dependency": "settings.enabled 与 keepRecent/reserve 的用户覆盖面、customInstructions 注入（T02 §十#9/#13，常量冻结）",
+            "owner": "R07（配置面）"
+          },
+          {
+            "dependency": "压缩作用域升级为跨 submission 会话史（T02 §十#15；现 = 当前 run exchange）",
+            "owner": "R07/R08（持久会话消费面接线时复核）"
+          },
+          {
+            "dependency": "REG-01 post-run backstop、REG-02 enrichment 其余四段（skill-recall/plan-file/context-notes/history-recovery）",
+            "owner": "R07（各 owner 见 T02 §十#6）"
+          }
+        ]
+      }
     },
     {
       "id": "PI-04",
@@ -106,7 +155,26 @@
       "retirement_evidence": "旧 ResourceLoader/ExtensionRuntime 不参与 Rust 任务装配；所有活跃 hook 有新 port 或明确弃用证据。",
       "target_stage": "R06/R07/R11",
       "disposition": "KERNEL_MIGRATION",
-      "r06_t06_progress": "份额（本任务交付）：技能发现/白名单/启停/遮蔽（lingxi-service/src/skills.rs:347-491 + adapters skill_library.rs:63-610）、安装审核双层（skills.rs:497-656 + memorytools.rs:441-532，guard fail-closed + 一次性风险 token kernel memory.rs:799-885）、删除/scrub/孤儿（skills.rs:670-757）、bundles（skill_library.rs:692-908）、人格文件读写（persona.rs + adapters agent_memory.rs:1619-1739）、记忆存储五 store（adapters agent_memory.rs FactStore/TenetsStore/CompiledMemoryStore/ExperienceStore/DreamRevisionStore）与记忆工具面（memorytools.rs:604）。技能目录装配进上下文（R06-T06 R1 F-01 修复接线）：编译期经 SkillMaterialPort 由 SkillService 解析运行时选择（context_compiler.rs:117/:887-897 + skills.rs:932-981 runtime_skill_catalog + lib.rs:1461-1475 bootstrap 绑定；现役锚 session-coordinator.ts:2102-2110 → pi agent-session.js:784-789 → pi skills.js:275-298），条目按来源材料进 T01 冻结 skill.catalog 段；配套 skill_library.rs:228-305 active_entries（同名技能不再按名双激活）与 skills.rs:388-424 按条目状态配对。顺延 R07：deferred-result 后台投递、技能事件广播、learn_lesson/show_card 工具、desk 写面、组合导出、autolearn。"
+      "r06_t06_progress": "份额（本任务交付）：技能发现/白名单/启停/遮蔽（lingxi-service/src/skills.rs:347-491 + adapters skill_library.rs:63-610）、安装审核双层（skills.rs:497-656 + memorytools.rs:441-532，guard fail-closed + 一次性风险 token kernel memory.rs:799-885）、删除/scrub/孤儿（skills.rs:670-757）、bundles（skill_library.rs:692-908）、人格文件读写（persona.rs + adapters agent_memory.rs:1619-1739）、记忆存储五 store（adapters agent_memory.rs FactStore/TenetsStore/CompiledMemoryStore/ExperienceStore/DreamRevisionStore）与记忆工具面（memorytools.rs:604）。技能目录装配进上下文（R06-T06 R1 F-01 修复接线）：编译期经 SkillMaterialPort 由 SkillService 解析运行时选择（context_compiler.rs:117/:887-897 + skills.rs:932-981 runtime_skill_catalog + lib.rs:1461-1475 bootstrap 绑定；现役锚 session-coordinator.ts:2102-2110 → pi agent-session.js:784-789 → pi skills.js:275-298），条目按来源材料进 T01 冻结 skill.catalog 段；配套 skill_library.rs:228-305 active_entries（同名技能不再按名双激活）与 skills.rs:388-424 按条目状态配对。顺延 R07：deferred-result 后台投递、技能事件广播、learn_lesson/show_card 工具、desk 写面、组合导出、autolearn。",
+      "r06_t08_handoff": {
+        "status": "shared",
+        "rust_anchor": "T01 24 段闭合注册表（ContextArtifact/render/observation）+ T06 SkillService/SkillMaterialPort（技能目录进 skill.catalog 段）+ PersonaService。",
+        "r06_evidence": "R06-A01/A02 已独立复核；T06 R1 F-01 技能材料接线独立复证；T08 BE-02 断言工具目录只走声明通道、schema 片段不进系统提示词。",
+        "remaining": [
+          {
+            "dependency": "append_system/project_context 生产者（deferred-result 归属、工作区文件发现）",
+            "owner": "R07（生产者）/R08（壳层注入面）"
+          },
+          {
+            "dependency": "extension 受控 worker 生命周期（hooks 已迁 Rust 同管线，worker 编排面未建）",
+            "owner": "R07"
+          },
+          {
+            "dependency": "appearance 门控的 vision 能力表、IANA 时区偏好（T01 差异 #2/#3）",
+            "owner": "R07（配置/模型能力面）"
+          }
+        ]
+      }
     },
     {
       "id": "PI-05",
@@ -132,7 +200,18 @@
       "retirement_evidence": "Rust 路径不加载 Pi 工厂；工具目录与执行统一走同一 Rust 网关。",
       "target_stage": "R04/R07/R11",
       "disposition": "KERNEL_MIGRATION",
-      "r06_t06_progress": "share：tool_call hook 的 loop-guard 派发前阻断已迁 Rust（runs.rs:2256-2280 Block → Failed 零执行器调用；tests/r06_t06_hooks.rs 第 7 次同参调用阻断 + 对照腿）。R04 网关本身不变。"
+      "r06_t06_progress": "share：tool_call hook 的 loop-guard 派发前阻断已迁 Rust（runs.rs:2256-2280 Block → Failed 零执行器调用；tests/r06_t06_hooks.rs 第 7 次同参调用阻断 + 对照腿）。R04 网关本身不变。",
+      "r06_t08_handoff": {
+        "status": "replaced_in_rust",
+        "rust_anchor": "R04 ToolRegistry/ToolInvocationGateway/filetools/exectools（allowlist 经 ResourceAccess 授权闸；同名执行去重经 InvocationGateway prepared 单次句柄）+ T06 loop-guard/tool_result hook 份额。",
+        "r06_evidence": "T08 BE-01（直调四工具真实文件效果）、BE-03（嵌套 schema + 未知参数 prepare 层拒绝零派发）、BE-04（目录外工具零派发且 prompt 不放宽）、BE-05（workspace 外写零副作用）。",
+        "remaining": [
+          {
+            "dependency": "customTools 转换与按需目录的策略化装载面（现 = LIVE registry 每 turn 重建，策略装载源未接）",
+            "owner": "R07"
+          }
+        ]
+      }
     },
     {
       "id": "PI-06",
@@ -157,7 +236,18 @@
       "protocol_test": "同名模型跨 provider 不混、注册/禁用/刷新/旧模型对象、Ollama 与配置保留。",
       "retirement_evidence": "Rust 生产模型选择不调用 Pi ModelRegistry/compat 目录；停用旧 Node 不改变可用模型集合。",
       "target_stage": "R05/R07/R11",
-      "disposition": "KERNEL_MIGRATION"
+      "disposition": "KERNEL_MIGRATION",
+      "r06_t08_handoff": {
+        "status": "replaced_in_rust",
+        "rust_anchor": "R05 ConfigModelGateway/config.rs（声明式 compat、resolve_route、能力门）。",
+        "r06_evidence": "T08 BE-06 经 ConfigModelGateway 真链双族媒体评测；R05 验收独立复核。",
+        "remaining": [
+          {
+            "dependency": "供应商刷新/模型目录管理 HTTP 面（r00_management LAN 环境项照旧登记）",
+            "owner": "R07"
+          }
+        ]
+      }
     },
     {
       "id": "PI-07",
@@ -181,7 +271,22 @@
       "protocol_test": "并发刷新、撤销后迟到请求、环境变量偷读、provider 隔离与 auth.json 兼容导入。",
       "retirement_evidence": "生产凭证不通过 Pi AuthStorage/ModelRuntime 读取；旧文件只读迁移并校验轮换。",
       "target_stage": "R05/R08/R11",
-      "disposition": "KERNEL_MIGRATION"
+      "disposition": "KERNEL_MIGRATION",
+      "r06_t08_handoff": {
+        "status": "replaced_in_rust",
+        "rust_anchor": "R05 CredentialService（auth.json 锁、OAuth 刷新/撤销、无环境凭证回退）。",
+        "r06_evidence": "T08 全部替身腿经 CredentialService 单一出口（无旁路）；真实付费凭证未授权（R05 边界，最迟 R10）。",
+        "remaining": [
+          {
+            "dependency": "旧客户端凭证数据割接",
+            "owner": "R08"
+          },
+          {
+            "dependency": "真实供应商 LIVE 冒烟",
+            "owner": "R10（BLOCKED_NOT_AUTHORIZED → RR-BLK-CREDENTIALS）"
+          }
+        ]
+      }
     },
     {
       "id": "PI-08",
@@ -201,7 +306,22 @@
       "protocol_test": "实际启用协议族的流片段、工具调用、错误、特殊签名块、摘要和旁路用量对账。",
       "retirement_evidence": "新内核所有模型目的均无 Pi complete/stream；本地 direct HTTP 旁路也收归同一网关。",
       "target_stage": "R05/R07/R11",
-      "disposition": "KERNEL_MIGRATION"
+      "disposition": "KERNEL_MIGRATION",
+      "r06_t08_handoff": {
+        "status": "replaced_in_rust",
+        "rust_anchor": "R05 四族适配器 + DeltaNormalizer + OperationService 媒体面（openai-images/volcengine/minimax/dashscope/gemini/agnes/codex-image）。",
+        "r06_evidence": "T08 BE-06：同一语义媒体请求经 openai-images 与 gemini-generate-content-image 两族真链——线体形状、语义参数携带、产物落盘、凭证隔离逐项评测（评测明细 BEHAVIOR_EVAL.json BE-06）。",
+        "remaining": [
+          {
+            "dependency": "直接摘要/快照旁路等辅助槽生产者",
+            "owner": "R07"
+          },
+          {
+            "dependency": "真实多族供应商采样波动报告",
+            "owner": "R10（BLOCKED_NOT_AUTHORIZED）"
+          }
+        ]
+      }
     },
     {
       "id": "PI-09",
@@ -219,7 +339,18 @@
       "retirement_evidence": "Pi agent 方法猴补丁退出；相应效果由 Rust 规范化事件和上下文产物证明。",
       "target_stage": "R04/R05/R06/R11",
       "disposition": "KERNEL_MIGRATION",
-      "r06_t06_progress": "share：tool_result hook 三件已迁 Rust 同一管线（hooks.rs:181-233 tool_result_guard = loop-guard 警告 + 失败连击 + L1 32KiB head/tail 截断（错误结果豁免，:211-212 语义）+ 非 knowledge_ 前缀注入扫描 hooks.rs:122-163）；Failed 结果警告前置进 error.message（runs.rs record_tool_result）。压缩路径 L1 之外的 context/before_compact 归 T02（share）。"
+      "r06_t06_progress": "share：tool_result hook 三件已迁 Rust 同一管线（hooks.rs:181-233 tool_result_guard = loop-guard 警告 + 失败连击 + L1 32KiB head/tail 截断（错误结果豁免，:211-212 语义）+ 非 knowledge_ 前缀注入扫描 hooks.rs:122-163）；Failed 结果警告前置进 error.message（runs.rs record_tool_result）。压缩路径 L1 之外的 context/before_compact 归 T02（share）。",
+      "r06_t08_handoff": {
+        "status": "replaced_in_rust",
+        "rust_anchor": "T06 hooks.rs（tool_call 派发前阻断 / tool_result L1 32KiB head+tail 截断 + 注入扫描 + 失败连击 / agent loop guard 状态机）经 runs.rs 两个生产注入点。",
+        "r06_evidence": "T06 r06_t06_hooks 4 用例 + 对照腿逐字节；T08 BE-05 拒绝结果如实渲染到达模型（tool_render 四态诚实词汇）。",
+        "remaining": [
+          {
+            "dependency": "轮中待办提醒（transformContext 的 todo 提醒生产者）",
+            "owner": "R07"
+          }
+        ]
+      }
     },
     {
       "id": "PI-10",
@@ -238,7 +369,18 @@
       "protocol_test": "普通/压缩/辅助/失败调用的 callId、attempt、usage 去重及不可观测字段标注。",
       "retirement_evidence": "不依赖 Pi streamFunction/hooks 获取关键 trace；旧记录只读可查询。",
       "target_stage": "R05/R07/R11",
-      "disposition": "KERNEL_MIGRATION"
+      "disposition": "KERNEL_MIGRATION",
+      "r06_t08_handoff": {
+        "status": "replaced_in_rust",
+        "rust_anchor": "R05 model_call_usage 台账（V5/V6：wire 事实保留 + 族 inclusion 仲裁在消费侧）。",
+        "r06_evidence": "T08 BE-01..05/07/09/10 的 token 与额外调用统计全部读自该台账（BEHAVIOR_EVAL.json tokens 字段，outcome=succeeded 行实求和）。",
+        "remaining": [
+          {
+            "dependency": "观测/trace 查询 UI 面",
+            "owner": "R07/R08"
+          }
+        ]
+      }
     },
     {
       "id": "PI-11",
@@ -257,7 +399,18 @@
       "retirement_evidence": "新入口不调 Pi session.steer/sendCustomMessage/abort；同一 run 的终态只有 Rust 写入。",
       "target_stage": "R03/R06/R08/R11",
       "disposition": "KERNEL_MIGRATION",
-      "r06_t06_progress": "share：session_start/session_shutdown 的 guard 复位语义 = 每 run 新建 ExtensionHooks + on_run_start reset（hooks.rs:39-42）；事件广播本体仍顺延 R07/R08。"
+      "r06_t06_progress": "share：session_start/session_shutdown 的 guard 复位语义 = 每 run 新建 ExtensionHooks + on_run_start reset（hooks.rs:39-42）；事件广播本体仍顺延 R07/R08。",
+      "r06_t08_handoff": {
+        "status": "replaced_in_rust",
+        "rust_anchor": "R03 RunSupervisor（steer/followUp/abort/shutdown 四相取消）+ T06 每 run ExtensionHooks reset。",
+        "r06_evidence": "T08 评测轮 10 任务全部经真实 execute→run→终态链；后台 steering（background_steering 套件）保持全绿。",
+        "remaining": [
+          {
+            "dependency": "事件广播 WS 面（session-changed 等）",
+            "owner": "R07/R08（T03/T06 deferred 叶）"
+          }
+        ]
+      }
     },
     {
       "id": "PI-12",
@@ -275,7 +428,18 @@
       "protocol_test": "旧模型/思考级别/工具模式默认值与用户覆盖、配置变更代次。",
       "retirement_evidence": "新 session 设置不依赖 Pi SettingsManager。",
       "target_stage": "R05/R06/R08/R11",
-      "disposition": "KERNEL_MIGRATION"
+      "disposition": "KERNEL_MIGRATION",
+      "r06_t08_handoff": {
+        "status": "shared",
+        "rust_anchor": "config.rs 声明式配置（home/workspace/providers/models/workers）+ T01 窄扫描（locale/agent.name/agent.yuan/memory.enabled）+ T06/T07 settings 白名单键（知识/技能）。",
+        "r06_evidence": "T08 各腿经真实 --config 文件装配。",
+        "remaining": [
+          {
+            "dependency": "现役 SettingsManager 等价系统（session 默认、thinking/config 兼容、T02 §十#9 触发门开关）",
+            "owner": "R07（配置面）"
+          }
+        ]
+      }
     },
     {
       "id": "PI-13",
@@ -293,7 +457,18 @@
       "protocol_test": "base64/MIME/上限/转换失败及尺寸提示对照；模型请求不得超预算。",
       "retirement_evidence": "Rust 模型入口不调用 Pi resizeImage；可保留独立图像执行器且不读凭证。",
       "target_stage": "R05/R07/R11",
-      "disposition": "KERNEL_MIGRATION"
+      "disposition": "KERNEL_MIGRATION",
+      "r06_t08_handoff": {
+        "status": "deferred",
+        "rust_anchor": "R05 ModelTurnInput.images 渲染面（openai-completions image_url parts 等）+ 媒体操作面（图片/语音/视频生成与附件读取授权）。",
+        "r06_evidence": "T08 BE-06 媒体生成面双族评测通过。",
+        "remaining": [
+          {
+            "dependency": "图片模型入参重采样与尺寸提示（现役 photon 原生/WASM 的等价物；不引入未锁 crate 时需手写或走依赖治理）",
+            "owner": "R07（依赖治理裁决）+ R01 D 登记"
+          }
+        ]
+      }
     },
     {
       "id": "PI-14",
@@ -313,7 +488,18 @@
       "protocol_test": "全量工具描述/执行 schema 一致、未知 dialect 明确失败、optional/default/union/enum 对照。",
       "retirement_evidence": "Rust 执行器不依赖 Pi/typebox 决定参数有效性；生成协议与客户端一致。",
       "target_stage": "R01/R04/R11",
-      "disposition": "KERNEL_MIGRATION"
+      "disposition": "KERNEL_MIGRATION",
+      "r06_t08_handoff": {
+        "status": "replaced_in_rust",
+        "rust_anchor": "R04 ToolManifest/ToolSchemaDocument（json-schema/2020-12 + SchemaBudget 校验，additionalProperties:false 纪律）。",
+        "r06_evidence": "T08 BE-03：未知参数在 gateway prepare 层被当前 schema 重校验拒绝（zero dispatch）；BE-02 write schema 冻结形状经声明通道下发。",
+        "remaining": [
+          {
+            "dependency": "TypeBox 适配导出的最终退役（随旧路径退出）",
+            "owner": "R11"
+          }
+        ]
+      }
     }
   ],
   "production_entrypoint_capabilities": [
@@ -3643,5 +3829,32 @@
     "updated_by": "R06-T06（人格、记忆与技能系统）执行证据；分支 codex/rust-tauri-migration，工作区候选基于 e89c91a2289c0c7182da9e2ca4b1d31dc56ca5b6",
     "evidence": "docs/rust-tauri/R06/R06-T06_REPORT.md + artifacts/rust-tauri/R06/T06/（02_red_tests / 05_targeted_tests / 06_workspace_regression）",
     "note": "仅在既有条目上追加 r06_t06_progress / r06_t06_status 字段；原始 R00-T03 静态分类字段未改动"
+  },
+  "r06_t08_update": {
+    "updated_by": "R06-T08（工具行为评测与上下文交接）执行证据；分支 codex/rust-tauri-migration，TASK_BASE_SHA ea61380577916e9fb75a4f4c2694321af7b83923，候选以工作区未提交形式交付",
+    "evidence": "docs/rust-tauri/R06/R06_REPORT.md + docs/rust-tauri/R06/BEHAVIOR_EVAL.json + artifacts/rust-tauri/R06/T08/（01_design / 05_targeted_tests / 06_workspace_regression / eval_raw）",
+    "note": "仅在既有条目上追加 r06_t08_handoff 字段与本更新块；R00-T03 静态分类字段与 r06_t06_* 字段未改动（T06 只追加先例）",
+    "handoff_summary": {
+      "replaced_in_rust": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-09",
+        "PI-10",
+        "PI-11",
+        "PI-14"
+      ],
+      "shared": [
+        "PI-04",
+        "PI-12"
+      ],
+      "deferred": [
+        "PI-13"
+      ]
+    }
   }
 }

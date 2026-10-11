@@ -745,20 +745,29 @@ impl SubagentRuntime {
         let sessions = Arc::clone(&self.sessions);
         let principal = parent.principal.clone();
         let session_id = parent.session_id.clone();
-        // The child's concurrency lanes are its OWN (the incumbent's
-        // isolated-session semantics): one agent lane and one session
-        // lane per subagent thread, so a parked parent holding the
-        // session's model lane can never starve its child (and vice
-        // versa); total subagent concurrency stays bounded by the
-        // runtime's per-session/global caps on top.
-        let agent_lane = format!(
-            "subagent:{}",
-            request
-                .agent_id
-                .clone()
-                .unwrap_or_else(|| parent.agent_id.clone())
+        // R06-T08 fix (the behavior evaluation surfaced this): the value
+        // passed to `drive_run.agent_id` is the AGENT IDENTITY — the T01
+        // context compiler resolves the agent's persona/memory materials
+        // with it (and the tool gateway + usage ledger attribute the
+        // child's invocations to it), so it MUST be the real serving
+        // agent (`request.agent_id` falling back to the dispatching
+        // parent's agent). A child run of agent "lingxi" compiles the
+        // same trimmed subagent context the incumbent serves — never a
+        // loud compile failure for a nonexistent "subagent:<id>" agent.
+        // The child's CONCURRENCY isolation is carried by the lane
+        // parameters, not by the identity: `quota_session_lane` stays
+        // unique per subagent thread (the incumbent's isolated-session
+        // semantics — a parked parent holding the session's model lane
+        // can never starve its child), and the per-thread session lane
+        // plus the global/process caps bound total subagent concurrency.
+        let agent_identity = request
+            .agent_id
+            .clone()
+            .unwrap_or_else(|| parent.agent_id.clone());
+        let quota_session_lane = format!(
+            "{}::subagent::{}::{}",
+            parent.session_id, agent_identity, thread_id
         );
-        let quota_session_lane = format!("{}::subagent::{}", parent.session_id, thread_id);
         let task_input = request.task.clone();
         let now_ms = parent.now_ms;
         let child_run = child_run_id.clone();
@@ -777,7 +786,7 @@ impl SubagentRuntime {
                     events.as_ref(),
                     &principal,
                     &session_id,
-                    &agent_lane,
+                    &agent_identity,
                     &child_run,
                     &task_input,
                     1,

@@ -1,0 +1,17 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r06_t08_behavior_eval.rs (target/debug/deps/r06_t08_behavior_eval-42f391ede0481b64)
+
+running 10 tests
+test be01_direct_four_tools_reach_real_files ... ok
+test be02_on_demand_catalog_declared_per_turn_not_in_prompt ... ok
+test be03_complex_params_nested_edit_and_unknown_arg_refusal ... ok
+test be04_disabled_tool_never_dispatched_and_prompt_change_never_relaxes ... ok
+test be05_permission_outside_workspace_refused_and_explainable ... ok
+test be06_cross_provider_media_two_families_one_semantic_request ... ok
+test be07_material_citation_scope_isolated_and_locatable ... ok
+test be08_subagent_boundary_readonly_child_write_refused_and_visibility_trimmed ... ok
+test be09_pure_conversation_never_invokes_tools ... ok
+test be10_schema_valid_but_semantically_wrong_scores_fail_not_mixed ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.47s
+

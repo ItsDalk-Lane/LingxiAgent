@@ -1,0 +1,268 @@
+{
+  "spec_version": "1.0",
+  "stage_id": "R06",
+  "stage_name": "上下文、会话语义、记忆与知识库",
+  "status": "READY_FOR_REVIEW",
+  "source_sha": {
+    "stage_base": "c9cca6020e0990016ee0d14af406766370849a7a（R06 阶段基点，= T01 交付基点）",
+    "task_base_sha_t08": "ea61380577916e9fb75a4f4c2694321af7b83923",
+    "note": "R06 各任务以已提交 SHA 落库（见 R06_PROGRESS.json task_chain）；T08 候选（本交接的评测 + 缺陷修复）以工作区未提交形式交付，不预写其自身提交 SHA"
+  },
+  "branch": "codex/rust-tauri-migration",
+  "working_tree_digest": "由 scripts/rust-tauri/r06_candidate_digest.sh 在全部文件写完后计算（digest 载体在口径外）；值见交付消息与 artifacts/rust-tauri/R06/T08/08_candidate_digest/candidate_digest.txt",
+  "protocol_version": {
+    "context_observation": "lingxi.context-observation.v1（spanUnit=utf8-bytes）",
+    "history_projection": "lingxi-protocol history.rs（HistoryItem 七态 / RunAssociation 三态 / 不透明游标）",
+    "orchestrator_progress": "lingxi.r06.orchestrator-progress.v1",
+    "behavior_eval": "lingxi.r06.behavior-eval.v1",
+    "pi_replacement": "r00-t03-pi-replacement-v2（+ r06_t06_* / r06_t08_handoff 追加字段）"
+  },
+  "data_epoch": "runs.db schema v9（v1–v9 冻结）；知识三库独立 v1（knowledge.db / knowledge_index.db / knowledge_vector.db）；T06 context notes 落运行时目录（无 v10）",
+  "dependency_locks": {
+    "cargo_lock": "任务期间零改动（git diff rust/Cargo.lock 为空）；T05 引入的 hmac/regex/percent-encoding 与 T06 的 ctor 为已提交基线",
+    "node": "未触碰（T01–T08 零 Node 依赖变更）"
+  },
+  "accepted_tasks": [
+    {
+      "task_id": "R06-T01",
+      "name": "上下文编译器与短提示词",
+      "acceptances": [
+        "R06-A01",
+        "R06-A02"
+      ],
+      "commit_sha": "b174e3ff44c61000abbb84595cf69dfad85dd531",
+      "review": "R1_PASS"
+    },
+    {
+      "task_id": "R06-T02",
+      "name": "token预算、压缩与长会话",
+      "acceptances": [
+        "R06-A03",
+        "R06-A04"
+      ],
+      "commit_sha": "4920c59e38ddf69c8b846fb1aea896fca70d939d",
+      "review": "R4_PASS"
+    },
+    {
+      "task_id": "R06-T03",
+      "name": "会话树、重试、fork与回退",
+      "acceptances": [
+        "R06-A05",
+        "R06-A06"
+      ],
+      "commit_sha": "2cb2b064061e902ea18faa0ec38499ce32436cb7",
+      "review": "R2_PASS"
+    },
+    {
+      "task_id": "R06-T04",
+      "name": "统一消息历史、重连与导出",
+      "acceptances": [
+        "R06-A07",
+        "R06-A08"
+      ],
+      "commit_sha": "b27dc5e4be9aed4763dda60519f0a04042fdfade",
+      "review": "R1_PASS"
+    },
+    {
+      "task_id": "R06-T05",
+      "name": "会话文件、资源与产物身份",
+      "acceptances": [
+        "R06-A09",
+        "R06-A10"
+      ],
+      "commit_sha": "72c50436af68b72c74f97ed83618a6ac0fdf3caf",
+      "review": "R1_PASS（2 MEDIUM 收口义务登记）"
+    },
+    {
+      "task_id": "R06-T06",
+      "name": "人格、记忆与技能系统",
+      "acceptances": [
+        "R06-A11",
+        "R06-A12"
+      ],
+      "commit_sha": "983e4d8633420f28b44d608200e0a8653476013a",
+      "review": "R2_PASS"
+    },
+    {
+      "task_id": "R06-T07",
+      "name": "现役知识库迁移",
+      "acceptances": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "commit_sha": "5656ea446d0974c1e76a5e14648a486714d0ae66",
+      "review": "R1_PASS"
+    },
+    {
+      "task_id": "R06-T08",
+      "name": "工具行为评测与上下文交接",
+      "acceptances": [
+        "R06-A15",
+        "R06-A16"
+      ],
+      "commit_sha": null,
+      "review": "未提交候选，待独立复核（本文件由执行代理产出，不自称 PASS）"
+    }
+  ],
+  "unresolved_items": [
+    {
+      "id": "RR-BLK-CREDENTIALS",
+      "item": "真实模型评测多次采样与波动报告（含 T08 BEHAVIOR_EVAL 真实模型腿）",
+      "status": "BLOCKED_NOT_AUTHORIZED",
+      "owner_stage": "R10",
+      "blocks_stage_release": "发布授权条件项，独立处理"
+    },
+    {
+      "id": "T03-R2-F-01",
+      "item": "fork/retry/rewind 缺会话级操作互斥（现役 session-operation-lock.ts）",
+      "status": "OPEN（收口义务，二选一：收口前修复或差异台账显式申报）",
+      "owner_stage": "R06 收口裁决 / R07"
+    },
+    {
+      "id": "T03-R2-F-02..04",
+      "item": "叶图 rewind/preview 锚点陈旧；修复矩阵措辞矛盾；delete_archived_session 头注过时",
+      "status": "OPEN（LOW）",
+      "owner_stage": "R06 收口裁决"
+    },
+    {
+      "id": "T04-F-01/F-02",
+      "item": "history all 参数重复键检查；reconciliation=1 退役未单列台账",
+      "status": "OPEN（LOW，补检查或收窄声称）",
+      "owner_stage": "R06 收口裁决"
+    },
+    {
+      "id": "T05-F-01",
+      "item": "mark_session_activity / fork_session_files / collect_reference_identities 生产零调用点（冷度信号断供、fork 后旧 sf_ 断链、A10 引用保护覆盖收窄）",
+      "status": "OPEN（MEDIUM，总控已裁决：R06 收口前接线或申报归属）",
+      "owner_stage": "R06 收口裁决 / R07"
+    },
+    {
+      "id": "T05-F-02",
+      "item": "叶 #44 标注与 mount/url 成功路径缺席矛盾（J2 待裁决）",
+      "status": "OPEN（MEDIUM，随 J2 二选一）",
+      "owner_stage": "R06 收口裁决"
+    },
+    {
+      "id": "T06-OBS-R2-1",
+      "item": "skills.rs catalog 序措辞与实际扫描序（R07 接线时核对现役 getSkillsForAgent 序）",
+      "status": "OPEN（OBS）",
+      "owner_stage": "R07"
+    },
+    {
+      "id": "T07-F-01/F-02",
+      "item": "维度铁律第三门无直接测试；缓存库 open 对 schema-newer 删文件重建（TS 现役响亮保留）",
+      "status": "OPEN（LOW，补测试+收敛措辞 / 按错误码分类修复或台账补记）",
+      "owner_stage": "R06 收口裁决 / R07"
+    },
+    {
+      "id": "T08-D-T08-3",
+      "item": "线体 tool_call → DelegationRequest 铸造面与委派实验开关生产接线",
+      "status": "OPEN（R06 §1 不引入强制子代理分发；评测腿用测试注册 + R03-A11 同构）",
+      "owner_stage": "R07"
+    },
+    {
+      "id": "J1/J2/J3（T05）",
+      "item": "桌面叶归属 R09 / mount-url provider 成功路径 / docx-xlsx 依赖治理",
+      "status": "OPEN（待总控裁决）",
+      "owner_stage": "R06 收口裁决 / R07 / R09"
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "ContextCompilerService / ContextArtifact（kernel context.rs + service context_compiler.rs）",
+      "status": "已实现并独立复核（T01）",
+      "consumers": "runs.rs drive_run（system_prompt 唯一来源）+ GET /sessions/{id}/context-observation"
+    },
+    {
+      "name": "ContextBudgeter / CompactionService（kernel+service compaction.rs）",
+      "status": "已实现并独立复核（T02 R4）",
+      "consumers": "drive_run loop 顶 + 手动压缩入口 compact_now"
+    },
+    {
+      "name": "SessionService（session_tree.rs / session_admin.rs，schema v8/v9）",
+      "status": "已实现并独立复核（T03/T05）",
+      "consumers": "/lingxi/v1/sessions 管理面 + fork/retry/rewind/checkpoints"
+    },
+    {
+      "name": "CanonicalMessageStore / project_history / /history /export",
+      "status": "已实现并独立复核（T04）",
+      "consumers": "实时/重连/导出统一投影（桌面消费 R08）"
+    },
+    {
+      "name": "SessionFileStore/ResourceService/ResourceIO/preview/bridgemedia/filehistory/fsread",
+      "status": "已实现并独立复核（T05）",
+      "consumers": "附件/资源/预览/桥媒体/文件历史/fs 读"
+    },
+    {
+      "name": "MemoryService / SkillService / PersonaService / memorytools（五工具）/ ExtensionHooks",
+      "status": "已实现并独立复核（T06 R2）",
+      "consumers": "/lingxi/v1/memories* /skills* /agents/{id}/* + R04 网关工具 + runs.rs hooks 注入点"
+    },
+    {
+      "name": "KnowledgeService / knowledgetools（五工具）/ 三库",
+      "status": "已实现并独立复核（T07）",
+      "consumers": "/lingxi/v1/knowledge 16 路由 + R04 网关工具；[KnowledgeContext] 提交链挂接归 R07/R08（D11）"
+    },
+    {
+      "name": "BEHAVIOR_EVAL（r06_t08_behavior_eval.rs 评测套件 + 固定任务集）",
+      "status": "已实现（T08 交付，待独立复核）",
+      "consumers": "R07+ 回归资产：任何触及上下文/工具/网关的改动可用其作行为回归基线"
+    }
+  ],
+  "artifact_hashes": {
+    "note": "由 r06_candidate_digest.sh 最后计算；本文件不含 digest 值（载体自引用无不动点）"
+  },
+  "allowed_next_scope": {
+    "next_stage": "R07（外围能力、后台自动化与多入口接入）",
+    "must_input": [
+      "本文件 + R06_REPORT.md + 各任务报告（T01–T08）",
+      "PI_REPLACEMENT_MATRIX.json 的 r06_t06_*/r06_t08_handoff 字段（14 条能力终态归属）",
+      "BEHAVIOR_EVAL.json（行为评测基线与固定任务集）",
+      "未决项清单（本文件 unresolved_items——尤其 T05-F-01/F-02 的收口裁决结果）"
+    ],
+    "not_allowed": [
+      "未做 R06 收口裁决（T03/T04/T05/T07 收口义务二选一落定）就宣称 R06 PASS",
+      "恢复研究引擎/强制子代理分发（硬排除）",
+      "把 BLOCKED_NOT_AUTHORIZED 的真实模型项写成已验证"
+    ]
+  },
+  "review_evidence": [
+    "artifacts/rust-tauri/R06/T01-REVIEW-01 ～ T07-REVIEW-01（各任务独立评审）",
+    "artifacts/rust-tauri/R06/T08/（00_toolchain / 01_design / 02_red_tests / 03_fmt / 04_clippy / 05_targeted_tests / 06_workspace_regression / 07_diff_ledger / eval_raw）"
+  ],
+  "remote_write_authorized": false,
+  "production_data_authorized": false,
+  "paid_or_external_test_authorized": false,
+  "release_authorized": false,
+  "leaf_disposition_summary": {
+    "total_leaves": 376,
+    "implemented": 139,
+    "share": 65,
+    "deferred": 172,
+    "note": "T01 的 31 叶早于状态字段约定（报告口径：0 整叶实现 / 4 读取份额 / 27 后续阶段），计入 share+4 与 deferred+27；逐叶去向见 R06_LEAF_MAP.json 与各任务报告"
+  },
+  "pi_replacement_handoff": {
+    "matrix": "docs/rust-tauri/R00/PI_REPLACEMENT_MATRIX.json（r06_t08_handoff 字段 ×14）",
+    "replaced_in_rust": [
+      "PI-01",
+      "PI-02",
+      "PI-03",
+      "PI-05",
+      "PI-06",
+      "PI-07",
+      "PI-08",
+      "PI-09",
+      "PI-10",
+      "PI-11",
+      "PI-14"
+    ],
+    "shared": [
+      "PI-04",
+      "PI-12"
+    ],
+    "deferred": [
+      "PI-13（图片入参重采样，photon 等价物——依赖治理归 R07）"
+    ],
+    "core_dependencies_without_owner": "无——每条未退出依赖均已归属 R07/R08/R10/R11 或登记阻塞（逐条见矩阵 r06_t08_handoff.remaining）"
+  }
+}

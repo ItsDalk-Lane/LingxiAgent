@@ -1,0 +1,30 @@
+test be06_cross_provider_media_two_families_one_semantic_request ... FAILED
+test be04_disabled_tool_never_dispatched_and_prompt_change_never_relaxes ... ok
+
+thread 'be03_complex_params_nested_edit_and_unknown_arg_refusal' (1787093) panicked at crates/lingxi-service/tests/r06_t08_behavior_eval.rs:624:13:
+run run_000001a128824695_000002 settled as failed (failed.turn_budget_exceeded), wanted completed
+test be03_complex_params_nested_edit_and_unknown_arg_refusal ... FAILED
+test be09_pure_conversation_never_invokes_tools ... ok
+test be10_schema_valid_but_semantically_wrong_scores_fail_not_mixed ... ok
+
+thread 'be07_material_citation_scope_isolated_and_locatable' (1787310) panicked at crates/lingxi-service/tests/r06_t08_behavior_eval.rs:1811:13:
+ingestion never finished
+test be07_material_citation_scope_isolated_and_locatable ... FAILED
+
+thread 'be08_subagent_boundary_readonly_child_write_refused_and_visibility_trimmed' (1787341) panicked at crates/lingxi-service/tests/r06_t08_behavior_eval.rs:2319:9:
+child run never settled
+test be08_subagent_boundary_readonly_child_write_refused_and_visibility_trimmed ... FAILED
+
+failures:
+
+failures:
+    be02_on_demand_catalog_declared_per_turn_not_in_prompt
+    be03_complex_params_nested_edit_and_unknown_arg_refusal
+    be05_permission_outside_workspace_refused_and_explainable
+    be06_cross_provider_media_two_families_one_semantic_request
+    be07_material_citation_scope_isolated_and_locatable
+    be08_subagent_boundary_readonly_child_write_refused_and_visibility_trimmed
+
+test result: FAILED. 4 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 31.54s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_t08_behavior_eval`
