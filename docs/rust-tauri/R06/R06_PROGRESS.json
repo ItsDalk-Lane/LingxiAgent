@@ -347,6 +347,15 @@
     ]
   },
   "final": {
-    "status": "ACCEPTANCE_CLOSEOUT_COMMIT_PENDING（本提交推送确认后置 ACCEPTED）"
+    "status": "ACCEPTED",
+    "stage_base_sha": "c9cca6020e0990016ee0d14af406766370849a7a",
+    "final_head": "36d2efb5a672be42e4b017c5d4a93fe99b1011bf",
+    "remote_head_confirmed": true,
+    "closeout_commits": [
+      "10fbecdd2（裁决回执+交接回填）",
+      "36d2efb5a（阶段审查证据）"
+    ],
+    "r06_stage_status": "R06 ACCEPTED — READY_FOR_R07（不进入 R07）",
+    "accepted_at": "2026-10-11"
   }
 }
