@@ -30,6 +30,7 @@ use lingxi_test_guard as _;
 pub mod compaction;
 pub mod context;
 pub mod invocation;
+pub mod knowledge;
 pub mod memory;
 pub mod model_exchange;
 pub mod ports;

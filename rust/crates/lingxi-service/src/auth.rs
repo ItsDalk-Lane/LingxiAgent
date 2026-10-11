@@ -822,6 +822,13 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
             return RoutePolicy::LocalOnly;
         }
     }
+    // R06-T07 知识库面（server/routes/knowledge.ts bindKnowledgeScope：
+    // STUDIO_OWNER 归属 + studio 一致性）。候选单 studio（R10 单实例）→
+    // studio owner 的等价承担是 LocalOnly（与 T06 D8 tenets 写面同口径）。
+    // 冻结原文快照即用户资料字节，绝不外发远端 principal。
+    if p.starts_with("/lingxi/v1/knowledge") {
+        return RoutePolicy::LocalOnly;
+    }
     // R06-T06 tenets/pinned/experience/agent-config/avatar 人格面
     // （route-security.ts:100-101 avatar、:361-399/:464-493 设置面；tenets
     // 写面现役落 STUDIO_OWNER 兜底 → 候选无 studio 面时取最严 LocalOnly，
@@ -3291,6 +3298,50 @@ mod tests {
                 classify_route(method, "/lingxi/v1/sessions/s1/context-notes"),
                 LocalOnly,
                 "context notes {method} must stay LocalOnly"
+            );
+        }
+        // R06-T07 知识库面：整族 LocalOnly（bindKnowledgeScope 的 STUDIO_OWNER
+        // 归属在单 studio 候选的等价承担；冻结原文快照是用户资料字节，任何
+        // 动词都不外发远端 principal）。已注册形状与未注册子路径同档 fail
+        // closed（classify_route T07 块的镜像断言）。
+        for (method, path) in [
+            ("GET", "/lingxi/v1/knowledge/notebooks"),
+            ("POST", "/lingxi/v1/knowledge/notebooks"),
+            ("GET", "/lingxi/v1/knowledge/notebooks/knb_x"),
+            ("PATCH", "/lingxi/v1/knowledge/notebooks/knb_x"),
+            ("DELETE", "/lingxi/v1/knowledge/notebooks/knb_x"),
+            ("PUT", "/lingxi/v1/knowledge/notebooks/knb_x/settings"),
+            ("GET", "/lingxi/v1/knowledge/ingestion"),
+            ("POST", "/lingxi/v1/knowledge/notebooks/knb_x/sources"),
+            (
+                "POST",
+                "/lingxi/v1/knowledge/notebooks/knb_x/import-directory",
+            ),
+            (
+                "DELETE",
+                "/lingxi/v1/knowledge/notebooks/knb_x/sources/ksrc_x",
+            ),
+            (
+                "POST",
+                "/lingxi/v1/knowledge/notebooks/knb_x/sources/ksrc_x/refresh",
+            ),
+            (
+                "POST",
+                "/lingxi/v1/knowledge/notebooks/knb_x/sources/ksrc_x/reingest",
+            ),
+            ("DELETE", "/lingxi/v1/knowledge/sources/ksrc_x"),
+            ("GET", "/lingxi/v1/knowledge/parse-artifacts/kpa_x/blocks"),
+            ("GET", "/lingxi/v1/knowledge/parse-artifacts/kpa_x/chunks"),
+            ("GET", "/lingxi/v1/knowledge/citations/kcit_x"),
+            ("GET", "/lingxi/v1/knowledge/snapshots/ksnap_x/content"),
+            ("POST", "/lingxi/v1/knowledge/turn-scopes"),
+            ("GET", "/lingxi/v1/knowledge/turn-scopes/kts_x"),
+            ("GET", "/lingxi/v1/knowledge/unregistered-subtree"),
+        ] {
+            assert_eq!(
+                classify_route(method, path),
+                LocalOnly,
+                "knowledge {method} {path} must stay LocalOnly"
             );
         }
         for path in [

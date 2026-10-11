@@ -1,0 +1,41 @@
+R06-T07 全量回归结果摘要（EXECUTOR-R06-T07-FIN，2026-10-11）
+
+命令（rust/ 目录，/Users/study_superior/.cargo/bin/cargo，rustc 1.98.1）：
+  cargo test -j 8 --workspace --locked --no-fail-fast
+
+退出码：cargo-exit=101（恰 1 个用例级失败，见下）
+
+口径：
+  二进制 137 / 用例 1852 / 通过 1851 / 失败 1
+  唯一失败 = r00_management_positive_and_negative_branches_on_real_service
+  （r00_management_leaves；LAN 自地址 192.168.3.5 入站 TCP 交换停滞、0 bytes
+  read，测试自身诚实申报环境失败——macOS 应用防火墙/代理 TUN 对未签名测试
+  二进制入站的窗口性拦截；与 T06 §九/R1 修复轮记录同源，失败点在 OS 网络层
+  入站，早于任何 T07 知识面代码，与 T07 变更零耦合）
+
+水位核对：
+  T06 R1 修复轮后 1821 → 终局 1852 = +31（T07 新增：26 集成
+  [r06_t07_knowledge 11 + r06_t07_knowledge_tools 6 + knowledge_store_r06t07 9]
+  + 5 kernel knowledge 单元测试；auth route_policy_table 为既有测试函数的
+  断言增量，不计新用例）。只增不减，无守卫中止
+  （被 SIGABRT 的二进制无 test result 行——137 行 test result 与总数自洽）。
+
+守卫触发：0（日志中 >60s 通知共 9 条均为进度提示，全部完成；aborted 命中为
+  task_supervisor 既有通过用例名）。
+
+T07 套件（本轮内）：
+  r06_t07_knowledge        11 passed（60.78s）
+  r06_t07_knowledge_tools   6 passed（80.73s）
+  knowledge_store_r06t07    9 passed（0.02s）
+
+LAN 环境项本窗口全部数据点（同签名 0 bytes read）：
+  1. 终局定向（targeted_suites.log）……FAILED（51.52s）
+  2. solo 复核 #1（r00_management_lan_solo.txt）……FAILED（51.50s）
+  3. 全量终局（本日志）…………………FAILED（51.32s）
+  4. solo 复核 #2（r00_management_lan_solo.txt）……FAILED（51.53s）
+  按 T06 R1 先例：本窗口 TUN/防火墙持续拦截，以全量 --no-fail-fast 结果为
+  该用例在本窗口的最终环境数据点；flaky 三项
+  （cancellation_tree/shutdown_coordinator/PTY）本轮零失败。
+
+日志：full_workspace_final.log（SHA-256
+9cbf5379b04a9abc30fe2a68784b938c40c19712f414153ed1c498a87ae7fe1d）

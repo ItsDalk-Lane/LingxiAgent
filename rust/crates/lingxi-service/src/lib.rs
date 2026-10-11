@@ -46,6 +46,8 @@ pub mod hooks;
 pub mod inject;
 pub mod instance;
 pub mod invocations;
+pub mod knowledge;
+pub mod knowledgetools;
 pub mod limits;
 pub mod logging;
 mod management;
@@ -490,6 +492,10 @@ pub struct ServiceState {
     fs_read: Arc<fsread::FsReadService>,
     /// R06-T06: the per-agent memory service.
     memory: Arc<memory::MemoryService>,
+    /// R06-T07: 现役知识库服务面（笔记本/来源/摄入/检索/引用/TurnScope）。
+    knowledge: Arc<knowledge::KnowledgeService>,
+    /// R06-T07: 统一工具网关句柄（工具面测试/观测入口；运行链同一实例）。
+    tool_gateway: Option<std::sync::Arc<toolgateway::ToolInvocationGateway>>,
     /// R06-T06: the skill service (discovery / whitelist / install audit).
     skills: Arc<skills::SkillService>,
     /// R06-T06: the persona file service.
@@ -1205,6 +1211,18 @@ impl ServiceState {
             memory_service.agents_root(),
             t06_product_dir.clone(),
         ));
+        // R06-T07: 现役知识库服务。三库（facts/index/vector）+ 快照/产物文件
+        // 存储位于 data_home/knowledge；studio 归属与资源面同源（identity_ids，
+        // management:1085 先于本行构造）。
+        let knowledge_service = Arc::new(
+            knowledge::KnowledgeService::new(&t06_data_home, management.identity_ids().1).map_err(
+                |error| {
+                    ServiceStartupError::Storage(StorageError::InvalidRequest {
+                        detail: format!("knowledge service init failed: {error}"),
+                    })
+                },
+            )?,
+        );
         // R05 RR1 F24: the tool-plane handles the worker registration below
         // consumes (registry + gateway + access + workspace). Present
         // exactly when the real chain was wired with a scoped workspace.
@@ -1293,6 +1311,15 @@ impl ServiceState {
                     Arc::clone(&skills_service),
                     primary_agent,
                     Arc::clone(&deps.clock),
+                    &budget,
+                );
+                // R06-T07: the knowledge model-side tools (search/read/grep/
+                // outline/manage) — same R04 discipline, scope ceiling enforced
+                // server-side via the frozen TurnScope (never model ids).
+                knowledgetools::register_knowledge_tools(
+                    &registry,
+                    gateway.as_ref(),
+                    Arc::clone(&knowledge_service),
                     &budget,
                 );
                 tool_plane = Some((
@@ -1789,6 +1816,19 @@ impl ServiceState {
             .await
             .map_err(ServiceStartupError::Storage)?;
         let _ = recovery_report.set(scan);
+        // R06-T07: the knowledge ingestion/retrieval embedder — identity via the
+        // ONE ModelGateway, calls via OperationService::embed (R05 credential/
+        // quota/ledger chain; never a bypass). Without the real model chain the
+        // embedder stays None → ingestion lands in the EXPLICIT pending_embedding
+        // terminal state (禁静默降级).
+        if let (Some(model_gateway), Some(operations)) =
+            (deps.model_gateway.clone(), operations_entry.clone())
+        {
+            knowledge_service.set_embedder(Some(Arc::new(
+                knowledge::GatewayKnowledgeEmbedder::new(model_gateway, operations),
+            )));
+        }
+        knowledge_service.start_worker();
         // R06-T05: session-file 服务的 lingxiHome 等价根（config 在下面的
         // struct literal 里被 Arc 收走，先取出）。
         let data_home = config.data_home.clone();
@@ -1909,6 +1949,9 @@ impl ServiceState {
             fs_read,
             // R06-T06：记忆/技能/人格服务。
             memory: memory_service,
+            // R06-T07：现役知识库服务 + 统一工具网关句柄。
+            knowledge: knowledge_service,
+            tool_gateway: deps.tool_gateway.clone(),
             skills: skills_service,
             persona: persona_service,
             rollback_file_changes: Arc::new(std::sync::atomic::AtomicBool::new(false)),
@@ -2038,6 +2081,16 @@ impl ServiceState {
     /// experience / dream revisions / context notes).
     pub fn memory(&self) -> &Arc<memory::MemoryService> {
         &self.memory
+    }
+
+    /// R06-T07: 现役知识库服务（HTTP 面 + 工具面同一实例）。
+    pub fn knowledge(&self) -> &Arc<knowledge::KnowledgeService> {
+        &self.knowledge
+    }
+
+    /// R06-T07: 统一工具网关（知识工具面经同一网关执行）。
+    pub fn tool_gateway(&self) -> Option<&Arc<toolgateway::ToolInvocationGateway>> {
+        self.tool_gateway.as_ref()
     }
 
     /// R06-T06: the skill service (discovery / whitelist / install audit /
@@ -5695,6 +5748,9 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/fs/read-base64",
             get(fsread::fs_read_base64_route),
         )
+        // ── R06-T07 现役知识库面（server/routes/knowledge.ts 镜像；LocalOnly，
+        // 单 studio 归属闸在 auth 分类 + handler studio 复核）──
+        .merge(knowledge::knowledge_routes())
         // ── R06-T06 记忆面（显式 agentId 是唯一归属边界）──
         .route(
             "/lingxi/v1/memories",
