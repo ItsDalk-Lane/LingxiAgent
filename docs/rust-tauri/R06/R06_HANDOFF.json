@@ -2,7 +2,7 @@
   "spec_version": "1.0",
   "stage_id": "R06",
   "stage_name": "上下文、会话语义、记忆与知识库",
-  "status": "READY_FOR_REVIEW",
+  "status": "STAGE_REVIEW_PASS（STAGE-REVIEWER-R06-R1：15 检查全过+Gate 六项全 0〔全量 1862/0〕+收口义务全部已申报；附条件：总控裁决 T05-F-01/T05-F-02 已落定见 unresolved_items；真实模型多采样维持 BLOCKED→R10）",
   "source_sha": {
     "stage_base": "c9cca6020e0990016ee0d14af406766370849a7a（R06 阶段基点，= T01 交付基点）",
     "task_base_sha_t08": "ea61380577916e9fb75a4f4c2694321af7b83923",
@@ -100,8 +100,8 @@
         "R06-A15",
         "R06-A16"
       ],
-      "commit_sha": null,
-      "review": "未提交候选，待独立复核（本文件由执行代理产出，不自称 PASS）"
+      "commit_sha": "42038f17315b361eb049aa86e22b14b613356068",
+      "review": "R1_PASS（T08-REVIEW-01；总控回填，非行为性收口 F-STAGE-3）"
     }
   ],
   "unresolved_items": [
@@ -133,13 +133,13 @@
     {
       "id": "T05-F-01",
       "item": "mark_session_activity / fork_session_files / collect_reference_identities 生产零调用点（冷度信号断供、fork 后旧 sf_ 断链、A10 引用保护覆盖收窄）",
-      "status": "OPEN（MEDIUM，总控已裁决：R06 收口前接线或申报归属）",
+      "status": "ADJUDICATED_DECLARED（总控裁决 2026-10-11：选择申报路线——三原语〔mark_session_activity/touch_last_activity、fork_session_files、collect_reference_identities/insert_reference〕生产接线归属 R07 会话接线面〔R07-T01 会话/代理运行时装配〕；R06 不再接线；影响三点〔清扫冷度信号断供→bootstrap 清扫保守 no-op、fork 后旧 sf_ id 断链 404 响亮、引用保护生产覆盖仅导入 refs〕均已申报且方向保守不误删）",
       "owner_stage": "R06 收口裁决 / R07"
     },
     {
       "id": "T05-F-02",
       "item": "叶 #44 标注与 mount/url 成功路径缺席矛盾（J2 待裁决）",
-      "status": "OPEN（MEDIUM，随 J2 二选一）",
+      "status": "ADJUDICATED_CORRECTED（总控裁决 2026-10-11 J2：mount/url provider 成功路径顺延 R07〔外围能力/provider 治理〕；候选响亮 400 unsupported_provider 为申报差异 D9；叶 #44 t05_status implemented→share 已更正，anchor 补记）",
       "owner_stage": "R06 收口裁决"
     },
     {
@@ -163,7 +163,7 @@
     {
       "id": "J1/J2/J3（T05）",
       "item": "桌面叶归属 R09 / mount-url provider 成功路径 / docx-xlsx 依赖治理",
-      "status": "OPEN（待总控裁决）",
+      "status": "ADJUDICATED（总控裁决 2026-10-11：J1 桌面叶→R09 合法延期〔T05 R1 审查确认〕；J2 mount/url→R07 见 T05-F-02；J3 docx/xlsx 依赖治理顺延、路由面响亮 404 非降级）",
       "owner_stage": "R06 收口裁决 / R07 / R09"
     }
   ],
@@ -264,5 +264,12 @@
       "PI-13（图片入参重采样，photon 等价物——依赖治理归 R07）"
     ],
     "core_dependencies_without_owner": "无——每条未退出依赖均已归属 R07/R08/R10/R11 或登记阻塞（逐条见矩阵 r06_t08_handoff.remaining）"
+  },
+  "stage_review": {
+    "reviewer": "STAGE-REVIEWER-R06-R1",
+    "evidence": "artifacts/rust-tauri/R06/STAGE-REVIEW-R1/STAGE_REVIEW.md",
+    "verdict": "PASS",
+    "date": "2026-10-11",
+    "scope": "c9cca6020..8fdd74527"
   }
 }

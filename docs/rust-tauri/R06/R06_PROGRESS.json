@@ -325,11 +325,28 @@
     }
   ],
   "stage_review": {
-    "state": "PENDING_STAGE_REVIEW",
-    "rounds": [],
-    "note": "T01–T08 全部 DONE；按总控提示词§15 创建 STAGE-REVIEWER-R06-R1"
+    "state": "R1_PASS",
+    "rounds": [
+      {
+        "round": "R1",
+        "reviewer": "STAGE-REVIEWER-R06-R1（全新实例，未参与任何 Task 执行/修复/审查）",
+        "evidence": "artifacts/rust-tauri/R06/STAGE-REVIEW-R1/STAGE_REVIEW.md + gate.log（2896 行原始输出）",
+        "scope": "c9cca6020..8fdd74527（8 Task 提交+4 账本回填）",
+        "gate": [
+          "fmt 0",
+          "clippy 0",
+          "workspace 1862/0（r00 LAN 项本轮真实通过、flaky 零失败、guard 触发 0）",
+          "R06 七套件 47/0",
+          "check-contracts 0（56 生成文件零漂移+626 条兼容矩阵）",
+          "check-boundaries 0（736 特性/69 存储单主）"
+        ],
+        "checks": "15 项核心检查全过；收口义务盘点：全部『已申报』无未申报未修复项",
+        "findings": "F-STAGE-1 OBS（T06-REVIEW-02 缺正式裁决文档→总控已落盘 REVIEW.md 含来源声明）；F-STAGE-2（T05-F-01 归属裁决→已落定申报路线归 R07）；F-STAGE-3 OBS（HANDOFF T08 行→已回填 42038f173）；F-STAGE-4 环境（r00 LAN 既有登记）",
+        "verdict": "STAGE_VERDICT: PASS（附条件：总控二选一裁决——本账本更新即其消费记录）"
+      }
+    ]
   },
   "final": {
-    "status": "IN_PROGRESS"
+    "status": "ACCEPTANCE_CLOSEOUT_COMMIT_PENDING（本提交推送确认后置 ACCEPTED）"
   }
 }
