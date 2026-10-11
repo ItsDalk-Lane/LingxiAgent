@@ -1,0 +1,16 @@
+{"cmd": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j", "8", "-p", "lingxi-service", "--test", "r06_ar_f08_projection", "--", "--test-threads=1"], "cwd": "/Users/study_superior/.codex/worktrees/r06-w08-review/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r01-four-c-wxe8_byv", "guard": "8GiB/600s", "supervision": "subprocess child of wrapper; wrapper child of exec session"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.30s
+     Running tests/r06_ar_f08_projection.rs (rust/target/debug/deps/r06_ar_f08_projection-e030eb507f4af1a1)
+LINGXI_TEST_GUARD: armed (pid 80534, mem_limit=8192 MB, time_limit=600 s)
+
+running 7 tests
+test f08_adversarial_small_budgets_and_opaque_identity_fail_closed ... ok
+test f08_adversarial_total_budget_warning_utf8_many_blocks_and_digests ... ok
+test f08_c01_normal_large_real_read_reaches_next_wire_capped ... ok
+test f08_c02_injection_large_real_read_does_not_leak_middle_on_wire ... ok
+test f08_c03_loop_warning_multi_block_resource_reaches_next_wire_capped ... ok
+test f08_c04_raw_archive_and_model_projection_are_distinct ... ok
+test f08_error_results_stay_untruncated_with_failure_warning_on_wire ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.04s
+

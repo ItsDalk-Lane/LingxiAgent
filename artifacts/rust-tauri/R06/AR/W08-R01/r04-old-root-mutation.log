@@ -1,0 +1,21 @@
+{"cmd": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j", "8", "-p", "lingxi-service", "--test", "r06_ar_f08_projection", "f08_c02", "--", "--test-threads=1", "--nocapture"], "cwd": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-mutation-bmz7xdy6", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r04-old-root-mutation-_ddhh9zz", "guard": "8GiB/600s", "supervision": "subprocess child of wrapper; wrapper child of exec session"}
+   Compiling lingxi-service v0.0.0 (/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-mutation-bmz7xdy6/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 25.92s
+     Running tests/r06_ar_f08_projection.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-mutation-bmz7xdy6/rust/target/debug/deps/r06_ar_f08_projection-e030eb507f4af1a1)
+LINGXI_TEST_GUARD: armed (pid 85366, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+test f08_c02_injection_large_real_read_does_not_leak_middle_on_wire ... 
+thread 'f08_c02_injection_large_real_read_does_not_leak_middle_on_wire' (2757273) panicked at crates/lingxi-service/tests/r06_ar_f08_projection.rs:489:5:
+被省略中段不应重新进入实际模型线体
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    f08_c02_injection_large_real_read_does_not_leak_middle_on_wire
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.10s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_f08_projection`

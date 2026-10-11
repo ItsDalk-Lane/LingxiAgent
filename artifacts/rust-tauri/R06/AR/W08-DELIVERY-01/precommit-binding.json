@@ -1,0 +1,23 @@
+{
+  "role": "ROOT_DELIVERY_CONTROL_NOT_NEW_REVIEWER",
+  "status": "INDEPENDENT_PASS_PENDING_PRECISE_COMMIT_PUSH",
+  "time_utc": "2026-10-11T07:25:49.930668+00:00",
+  "audited_base": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+  "finding": "R06-AR-F08",
+  "reviewer": "/root/ar_w08_reviewer_01",
+  "candidate_aggregate": "55c32488cc123116c9c91ec514a2daa0215a9dc1e575d9b7ef13d448f514df06",
+  "owned": {
+    "rust/crates/lingxi-service/src/runs.rs": "eca52e6151299a43d7386fb2056908a3d86afeadc1085cd3aa55dd35b5646a6e",
+    "rust/crates/lingxi-service/src/hooks.rs": "4736be444a0a8f73d8fbe9d9745290ee3779520931e91f149fe137685471968f",
+    "rust/crates/lingxi-kernel/src/memory.rs": "75ae4cbf1ffde042f2e64054379ff155eec0e11a04ea2932e5240a4c65725de3",
+    "rust/crates/lingxi-service/tests/r06_ar_f08_projection.rs": "c43d08523a20efa14dc1e6494dbfb15bde6b5ce05b9c10a5fcd9f99b86e4e0fe"
+  },
+  "independent_manifest_files_checked": 105,
+  "manifest_mismatches": 0,
+  "four_checks": "INDEPENDENT_PASS_4_OF_4",
+  "full_original_leaf_pass_count": 0,
+  "stage_status": "R06_NOT_ACCEPTED",
+  "remaining": "other14F/all due original remaining shares/12EX/full stage and upstream closure",
+  "user_file_sha256": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3",
+  "source_digest_algorithm": "sha256(sorted path+NUL+sha256+LF)"
+}

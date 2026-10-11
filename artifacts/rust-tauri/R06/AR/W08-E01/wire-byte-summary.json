@@ -1,0 +1,91 @@
+[
+  {
+    "id": "c01",
+    "raw_text_bytes": [
+      39065
+    ],
+    "wire_tool_content_bytes_per_request": [
+      [],
+      [
+        26302
+      ]
+    ],
+    "evidence": "observations/attempt11-frozen-copy-final-tests/c01.json",
+    "raw_error_message_bytes": []
+  },
+  {
+    "id": "c02",
+    "raw_text_bytes": [
+      39079
+    ],
+    "wire_tool_content_bytes_per_request": [
+      [],
+      [
+        26451
+      ]
+    ],
+    "evidence": "observations/attempt11-frozen-copy-final-tests/c02.json",
+    "raw_error_message_bytes": []
+  },
+  {
+    "id": "c03",
+    "raw_text_bytes": [
+      78144,
+      78144,
+      78144
+    ],
+    "wire_tool_content_bytes_per_request": [
+      [],
+      [
+        26363
+      ],
+      [
+        26363,
+        26363
+      ],
+      [
+        26363,
+        26363,
+        26398
+      ]
+    ],
+    "evidence": "observations/attempt11-frozen-copy-final-tests/c03.json",
+    "raw_error_message_bytes": []
+  },
+  {
+    "id": "c04",
+    "raw_text_bytes": [
+      39079
+    ],
+    "wire_tool_content_bytes_per_request": [
+      [],
+      [
+        26451
+      ]
+    ],
+    "evidence": "observations/attempt11-frozen-copy-final-tests/c04.json",
+    "raw_error_message_bytes": []
+  },
+  {
+    "id": "error",
+    "raw_text_bytes": [
+      0,
+      0
+    ],
+    "wire_tool_content_bytes_per_request": [
+      [],
+      [
+        42055
+      ],
+      [
+        42055,
+        42180
+      ]
+    ],
+    "evidence": "observations/attempt11-frozen-copy-final-tests/error.json",
+    "raw_error_message_bytes": [
+      42032,
+      42032
+    ]
+  }
+]

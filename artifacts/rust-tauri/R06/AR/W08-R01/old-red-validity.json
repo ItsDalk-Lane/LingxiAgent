@@ -1,0 +1,37 @@
+[
+  {
+    "tag": "attempt04-old-c01",
+    "sources_match_base": {
+      "rust/crates/lingxi-service/src/runs.rs": true,
+      "rust/crates/lingxi-service/src/hooks.rs": true,
+      "rust/crates/lingxi-kernel/src/memory.rs": true
+    },
+    "log_hash_matches": true,
+    "behavior_red": false,
+    "test_count": 1,
+    "reported_exit": 0,
+    "scope": "历史执行者证据亲核有效，不冒充本Reviewer新跑；另有独立完整旧根因变异红",
+    "lock_difference": "历史组合锁9e91；当前独立固定锁d4f8，分开绑定"
+  },
+  {
+    "tag": "attempt05-old-warning-red",
+    "sources_match_base": {
+      "rust/crates/lingxi-service/src/runs.rs": true,
+      "rust/crates/lingxi-service/src/hooks.rs": true,
+      "rust/crates/lingxi-kernel/src/memory.rs": true
+    },
+    "log_hash_matches": true,
+    "behavior_red": true,
+    "test_count": 1,
+    "reported_exit": 101,
+    "scope": "历史执行者证据亲核有效，不冒充本Reviewer新跑；另有独立完整旧根因变异红",
+    "lock_difference": "历史组合锁9e91；当前独立固定锁d4f8，分开绑定"
+  },
+  {
+    "original_hooks_test": "rust/crates/lingxi-service/tests/r06_t06_hooks.rs",
+    "sha256": "e4b2f8257c7f61d732da85830402c87404500accb01232700acd3a7ece803e2f",
+    "matches_base_byte_for_byte": true,
+    "count": 4,
+    "reviewer_run": "r02-regression"
+  }
+]

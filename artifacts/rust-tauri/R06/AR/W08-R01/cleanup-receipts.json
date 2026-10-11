@@ -1,0 +1,2304 @@
+{
+  "homes": [
+    {
+      "run": "r01-four-c",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r01-four-c-wxe8_byv",
+      "file_receipts": [
+        {
+          "path": "lingxi-f08-c03-cfg-80534-1791701751861241000/service.json",
+          "bytes": 535,
+          "sha256": "efa560d4fab6cbf5c032763fb80c769f3d5c21bd7ec621bcbc873eee0931ff03"
+        },
+        {
+          "path": "lingxi-f08-c03-ws-80534-1791701751861180000/fixture.txt",
+          "bytes": 18,
+          "sha256": "6116982a6c95c59f94e5b9b1b2152a51f7d24f3c144ef3e73018eb4da3ebacbd"
+        },
+        {
+          "path": "lingxi-f08-c01-cfg-80534-1791701751667582000/service.json",
+          "bytes": 535,
+          "sha256": "bd9d129d004518a69cfa1e683b9e3cb94c754d70652943baad814a0648f4975d"
+        },
+        {
+          "path": "lingxi-f08-c02-cfg-80534-1791701751786629000/service.json",
+          "bytes": 535,
+          "sha256": "efef5ec181d8ec5a533fd85d90277a28e4ab88719f7e7cd149a4bf6c0f773d2d"
+        },
+        {
+          "path": "lingxi-f08-c01-ws-80534-1791701751667532000/fixture.txt",
+          "bytes": 39065,
+          "sha256": "043770a671bc46b0dfe3303b2b02d39fe678c8c08f5df7763911e300853880ae"
+        },
+        {
+          "path": "lingxi-f08-c04-cfg-80534-1791701751975659000/service.json",
+          "bytes": 535,
+          "sha256": "05b2a99868fa1729851b0e871560b4616a30d9037370bcff88dc9b578a6bb2bf"
+        },
+        {
+          "path": "lingxi-f08-c04-ws-80534-1791701751975576000/fixture.txt",
+          "bytes": 39079,
+          "sha256": "db3d4425708e53245210223bd153935a8033cdd7c88d7594047a8a5a30d5e77a"
+        },
+        {
+          "path": "lingxi-f08-c02-ws-80534-1791701751786547000/fixture.txt",
+          "bytes": 39079,
+          "sha256": "2d1510c34d57313bbbc00a6750527545dade2e6db65b4f4743f6632bbeb8573a"
+        },
+        {
+          "path": "lingxi-f08-error-cfg-80534-1791701752055508000/service.json",
+          "bytes": 539,
+          "sha256": "edd6b7f2e008deb580d769f2c6cb2edded59b0b80bb3d93d808dbc3ec37c01ee"
+        }
+      ],
+      "databases": [
+        {
+          "path": "lingxi-f08-c04-home-80534-1791701751975493000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c04-home-80534-1791701751975493000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c04-home-80534-1791701751975493000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c04-home-80534-1791701751975493000/lingxi-service/data/runs.db",
+          "bytes": 335872,
+          "sha256": "39c6f0be72defcba9a377f6e63529f6d5740cf1a11bb2894e47890845c267164",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-error-home-80534-1791701752055346000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-error-home-80534-1791701752055346000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-error-home-80534-1791701752055346000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-error-home-80534-1791701752055346000/lingxi-service/data/runs.db",
+          "bytes": 196608,
+          "sha256": "8e67d52e8906695e7a3df80d8f4f4d25a8ee103f9111cb07d8fc3e2b58a0956b",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 19,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 2,
+            "run_lineage": 1,
+            "model_call_usage": 3,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c02-home-80534-1791701751786435000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c02-home-80534-1791701751786435000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c02-home-80534-1791701751786435000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c02-home-80534-1791701751786435000/lingxi-service/data/runs.db",
+          "bytes": 335872,
+          "sha256": "c612545bc9bea6aedff62ece892054bb792d0e3a3c45198fb12da1045ebcba67",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c01-home-80534-1791701751667087000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c01-home-80534-1791701751667087000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c01-home-80534-1791701751667087000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c01-home-80534-1791701751667087000/lingxi-service/data/runs.db",
+          "bytes": 335872,
+          "sha256": "112ee59b748956d4d565d89fb1c214caf7728880d8a2cc43416d2de11868d90f",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c03-home-80534-1791701751861095000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c03-home-80534-1791701751861095000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c03-home-80534-1791701751861095000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c03-home-80534-1791701751861095000/lingxi-service/data/runs.db",
+          "bytes": 598016,
+          "sha256": "50107ab1742e609c2e44b5fcddb9a2e8f19da64203a9f214b327516bbde2d297",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 24,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 3,
+            "run_lineage": 1,
+            "model_call_usage": 4,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        }
+      ],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r02-regression",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r02-regression-be68yehz",
+      "file_receipts": [],
+      "databases": [],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r03-reviewer-boundaries",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r03-reviewer-boundaries-tkr8qc4r",
+      "file_receipts": [
+        {
+          "path": "lingxi-f08-reviewer-edge1-ws-84058-1791701939638423000/fixture.txt",
+          "bytes": 18,
+          "sha256": "d51e5dd6c802fe0fe9154e4877bf0a2223054481826ff2d7e9f4cfac7301fe75"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-cfg-84058-1791701939638480000/service.json",
+          "bytes": 583,
+          "sha256": "b861e5464f11b59b39766a0b7090ddf493f344a1a4811a481f17529a1a59128c"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-ws-84058-1791701939544857000/fixture.txt",
+          "bytes": 39079,
+          "sha256": "8268a99474963d8cf07f634117f716f2e04f9488f1c651e0e12acc547c103592"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-cfg-84058-1791701939544922000/service.json",
+          "bytes": 583,
+          "sha256": "62dd82f1ba220729301f01f32205056d5fae811ee672f1fbdffe0258fce288a6"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-cfg-84058-1791701939744099000/service.json",
+          "bytes": 583,
+          "sha256": "e1936dceed6c9394c7b87cc7e998475bf08284b81a184603f96736595f3d1978"
+        }
+      ],
+      "databases": [
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-84058-1791701939544665000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-84058-1791701939544665000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-84058-1791701939544665000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-84058-1791701939544665000/lingxi-service/data/runs.db",
+          "bytes": 299008,
+          "sha256": "f9f2bbb608d4b3cb13992c547100ef4ef21ba70585ed8adb87ffab9ee203cab6",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 5,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 1,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 1,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-84058-1791701939743906000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-84058-1791701939743906000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-84058-1791701939743906000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-84058-1791701939743906000/lingxi-service/data/runs.db",
+          "bytes": 102400,
+          "sha256": "18d0fcf7d641a307f93125d27dfe2f52cd528d08ff5d4dce88fa5b068faa6e0d",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-84058-1791701939638348000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-84058-1791701939638348000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-84058-1791701939638348000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-84058-1791701939638348000/lingxi-service/data/runs.db",
+          "bytes": 499712,
+          "sha256": "3925a17cb387440e8eb76ea0890d2febc129f6ba9ecd881e0296c605ad70eb59",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        }
+      ],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r04-old-root-mutation",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r04-old-root-mutation-_ddhh9zz",
+      "file_receipts": [
+        {
+          "path": "lingxi-f08-c02-cfg-85366-1791702041521308000/service.json",
+          "bytes": 557,
+          "sha256": "ca48005668e220344954d685e41dd7518e5add5bf7a1cc85844a480ff701aedb"
+        },
+        {
+          "path": "lingxi-f08-c02-ws-85366-1791702041521254000/fixture.txt",
+          "bytes": 39079,
+          "sha256": "97e33864d3bde5331bc9193ab37b24c618bc190147038e33dc8f17dd1d936d84"
+        }
+      ],
+      "databases": [
+        {
+          "path": "lingxi-f08-c02-home-85366-1791702041521085000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c02-home-85366-1791702041521085000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c02-home-85366-1791702041521085000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c02-home-85366-1791702041521085000/lingxi-service/data/runs.db",
+          "bytes": 131072,
+          "sha256": "f6ac4b4bbb16e49851351eb735202676de8245c8b605705df3189b9ec520ba40",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        }
+      ],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r05-reviewer-boundaries",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r05-reviewer-boundaries-97rxo0uh",
+      "file_receipts": [
+        {
+          "path": "lingxi-f08-reviewer-edge2-cfg-85323-1791702057776532000/service.json",
+          "bytes": 583,
+          "sha256": "4ee1507ffff22cca6b33f8d40cf228594071060e730f948e01d1927d4cd5dd85"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-ws-85323-1791702037546830000/fixture.txt",
+          "bytes": 39079,
+          "sha256": "876a5daf6ff2f4ed8cc6d80c34c7c56346ba7f090a5b0d6319e5aef5bbc0c4d0"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-cfg-85323-1791702057656498000/service.json",
+          "bytes": 583,
+          "sha256": "28421ef3bac8708aca7ac459cfda67d07e5291046f47ff8347f381a1a7548251"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-cfg-85323-1791702037546891000/service.json",
+          "bytes": 583,
+          "sha256": "f8c1f2d55f5fd2d6503685f59b273372dd61f9fede00fd5fb14ff457300e3030"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-ws-85323-1791702057656362000/fixture.txt",
+          "bytes": 18,
+          "sha256": "d51e5dd6c802fe0fe9154e4877bf0a2223054481826ff2d7e9f4cfac7301fe75"
+        }
+      ],
+      "databases": [
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-85323-1791702057776400000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-85323-1791702057776400000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-85323-1791702057776400000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-85323-1791702057776400000/lingxi-service/data/runs.db",
+          "bytes": 311296,
+          "sha256": "3d2dffa0f5307d403ecb1d4715eb2ad0f49dd7859d8cd1e979b7142ae7e73c83",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-85323-1791702037546668000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-85323-1791702037546668000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-85323-1791702037546668000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-85323-1791702037546668000/lingxi-service/data/runs.db",
+          "bytes": 299008,
+          "sha256": "fbd149e0d083a564a3e4cedcc4bcdcff5cb76319270002a0ab5f4900f608dec0",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 5,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 1,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 1,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-85323-1791702057656123000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-85323-1791702057656123000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-85323-1791702057656123000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-85323-1791702057656123000/lingxi-service/data/runs.db",
+          "bytes": 499712,
+          "sha256": "09c7820f9c453dda8060ba9bc893c4f22154abb2ae87fbae374d6b6f8a96ef43",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        }
+      ],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r06-reviewer-boundaries",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r06-reviewer-boundaries-dxc2yld1",
+      "file_receipts": [
+        {
+          "path": "lingxi-f08-reviewer-edge1-cfg-86320-1791702083228421000/service.json",
+          "bytes": 583,
+          "sha256": "e7755813a4542b71de5bd596eac82fc38f3427f8080b7c06824ebc2bc47c9786"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-cfg-86320-1791702083133788000/service.json",
+          "bytes": 583,
+          "sha256": "244abf124bd7a7a4a33d9b5ecdb5e2a1d6d7bb0224696f1fe95e6dd0eb23ae9f"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-cfg-86320-1791702083326408000/service.json",
+          "bytes": 583,
+          "sha256": "c5fb8655fdc6faf83c243382911ce93f8523c23f1892f24e68eeabaccd95127d"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-ws-86320-1791702083228358000/fixture.txt",
+          "bytes": 18,
+          "sha256": "d51e5dd6c802fe0fe9154e4877bf0a2223054481826ff2d7e9f4cfac7301fe75"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-ws-86320-1791702083133729000/fixture.txt",
+          "bytes": 39079,
+          "sha256": "0d3cf8ce9e5ad6e092845ff87a2b9ddb6adf0c596149ae7371eba7aa4e147b51"
+        }
+      ],
+      "databases": [
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-86320-1791702083133570000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-86320-1791702083133570000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-86320-1791702083133570000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-86320-1791702083133570000/lingxi-service/data/runs.db",
+          "bytes": 299008,
+          "sha256": "c336348ee89761623cb64a42ccbf0cdc247451c0fd70d98f2e16d1eb0767f51a",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 5,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 1,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 1,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-86320-1791702083228289000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-86320-1791702083228289000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-86320-1791702083228289000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-86320-1791702083228289000/lingxi-service/data/runs.db",
+          "bytes": 499712,
+          "sha256": "71b40f5ee4fba18ff1eaa1be1fcec2567ec96494303dfecaf90012d579190755",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-86320-1791702083326270000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-86320-1791702083326270000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-86320-1791702083326270000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-86320-1791702083326270000/lingxi-service/data/runs.db",
+          "bytes": 110592,
+          "sha256": "885d4dc5fbfaef7bc6649e43ca346cc026b7caf4f95080bd61f071bb657219cd",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        }
+      ],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r07-binary-warning",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r07-binary-warning-ukgndluy",
+      "file_receipts": [
+        {
+          "path": "binary-config.json",
+          "bytes": 497,
+          "sha256": "f77b3acc2312bacc72b8418f7a2d352822f367dbda053d3dc665e203488e59fe"
+        },
+        {
+          "path": "binary-workspace/fixture.txt",
+          "bytes": 39080,
+          "sha256": "7a05a90b82e502f5b3f036a4b32bfdafece3d824713b9074129870f3f9b5db14"
+        }
+      ],
+      "databases": [
+        {
+          "path": "binary-home/knowledge/knowledge.db",
+          "bytes": 4096,
+          "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "binary-home/knowledge/knowledge_index.db",
+          "bytes": 4096,
+          "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "binary-home/knowledge/knowledge_vector.db",
+          "bytes": 4096,
+          "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "binary-home/lingxi-service/data/runs.db",
+          "bytes": 339968,
+          "sha256": "dd7768b75c8f639c7c5449edfc2207f73972a81380e319b91aca7268f28313b2",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 24,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 3,
+            "run_lineage": 1,
+            "model_call_usage": 4,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        }
+      ],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r08-fmt",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r08-fmt-yjivhtpw",
+      "file_receipts": [],
+      "databases": [],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r09-clippy",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r09-clippy-re765nux",
+      "file_receipts": [],
+      "databases": [],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r10-binary-warning",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r10-binary-warning-8oimy55q",
+      "file_receipts": [
+        {
+          "path": "binary-config.json",
+          "bytes": 497,
+          "sha256": "1a1c4df46a01ccbcda21b3b398d60df90fe219c89699056e1112f3275705c35f"
+        },
+        {
+          "path": "binary-workspace/fixture.txt",
+          "bytes": 39080,
+          "sha256": "662c501ca896a908cdb440535273a92a679e366d5c332c143a10ed016d6b7485"
+        }
+      ],
+      "databases": [
+        {
+          "path": "binary-home/knowledge/knowledge.db",
+          "bytes": 4096,
+          "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "binary-home/knowledge/knowledge_index.db",
+          "bytes": 4096,
+          "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "binary-home/knowledge/knowledge_vector.db",
+          "bytes": 4096,
+          "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "binary-home/lingxi-service/data/runs.db",
+          "bytes": 339968,
+          "sha256": "696f4828629e8a438ce2fa91dcf06583a99823b3c97bef3597209c77090975e0",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 24,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 3,
+            "run_lineage": 1,
+            "model_call_usage": 4,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        }
+      ],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r11-contracts",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r11-contracts-f_n9o0m0",
+      "file_receipts": [],
+      "databases": [],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r12-boundaries",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r12-boundaries-450224ob",
+      "file_receipts": [],
+      "databases": [],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r13-four-c-binary-bound",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r13-four-c-binary-bound-mz8sj2cz",
+      "file_receipts": [
+        {
+          "path": "lingxi-f08-c03-cfg-89149-1791702245920904000/service.json",
+          "bytes": 561,
+          "sha256": "a2bce81f4e6cb464ffc6c47f91f48b579c3d8d19b522fa2801b6b9e2d05f09c3"
+        },
+        {
+          "path": "lingxi-f08-c02-ws-89149-1791702245844624000/fixture.txt",
+          "bytes": 39079,
+          "sha256": "b575233956d9b3f2a295d736c9a87df8bf660d7869418d1d823c57661967d56b"
+        },
+        {
+          "path": "lingxi-f08-c02-cfg-89149-1791702245844673000/service.json",
+          "bytes": 561,
+          "sha256": "2f8fa4e0ef79b2f8560f21e5e8aaa636b07fa6338759365bc3dc133c535180f7"
+        },
+        {
+          "path": "lingxi-f08-c03-ws-89149-1791702245920840000/fixture.txt",
+          "bytes": 18,
+          "sha256": "6116982a6c95c59f94e5b9b1b2152a51f7d24f3c144ef3e73018eb4da3ebacbd"
+        },
+        {
+          "path": "lingxi-f08-error-cfg-89149-1791702246122464000/service.json",
+          "bytes": 565,
+          "sha256": "bde0f1a9b5cd8baed267f0327f1fd652a31a6002579f57d2c3f704466cb35f68"
+        },
+        {
+          "path": "lingxi-f08-c04-ws-89149-1791702246040246000/fixture.txt",
+          "bytes": 39079,
+          "sha256": "cef56bf7e8f921f335ad58b937bed01d5c0c9a939a80f56c026446912c8586ed"
+        },
+        {
+          "path": "lingxi-f08-c04-cfg-89149-1791702246040311000/service.json",
+          "bytes": 561,
+          "sha256": "6416d4f77b259e386c1be5f70215f2979896700cfeab557fbbccae0f33b0c5e6"
+        },
+        {
+          "path": "lingxi-f08-c01-cfg-89149-1791702245736396000/service.json",
+          "bytes": 561,
+          "sha256": "6cd35264643c43694b224cf1a9cef8c88d25f19e5b98febc4e73558384b795bb"
+        },
+        {
+          "path": "lingxi-f08-c01-ws-89149-1791702245736330000/fixture.txt",
+          "bytes": 39065,
+          "sha256": "8bbb1573e2e2d2b70606381238fdc12be0b3093ce29f01ecf2ee340a6fe0f595"
+        }
+      ],
+      "databases": [
+        {
+          "path": "lingxi-f08-c01-home-89149-1791702245736204000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c01-home-89149-1791702245736204000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c01-home-89149-1791702245736204000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c01-home-89149-1791702245736204000/lingxi-service/data/runs.db",
+          "bytes": 335872,
+          "sha256": "82f8e9a39411e73c4ac745c17e874925f1dd96e3e5628999964dea8da8da6798",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c02-home-89149-1791702245844557000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c02-home-89149-1791702245844557000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c02-home-89149-1791702245844557000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c02-home-89149-1791702245844557000/lingxi-service/data/runs.db",
+          "bytes": 335872,
+          "sha256": "60b4c5cf3f1eaa9d0a21556d95c3bb28b387f8d2db6ebf96a0f0c77713799d28",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-error-home-89149-1791702246122300000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-error-home-89149-1791702246122300000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-error-home-89149-1791702246122300000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-error-home-89149-1791702246122300000/lingxi-service/data/runs.db",
+          "bytes": 81920,
+          "sha256": "4eb02a4a67ca5576809409ca19c4249db9284f27ce1192fc5e07fdbf74b62788",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 19,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 2,
+            "run_lineage": 1,
+            "model_call_usage": 3,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c04-home-89149-1791702246040163000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c04-home-89149-1791702246040163000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c04-home-89149-1791702246040163000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c04-home-89149-1791702246040163000/lingxi-service/data/runs.db",
+          "bytes": 335872,
+          "sha256": "464d4a46aa835a1f82ff119fb4efd6409ffb0b917267ad8b3370766475dcf1dc",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c03-home-89149-1791702245920762000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c03-home-89149-1791702245920762000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c03-home-89149-1791702245920762000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-c03-home-89149-1791702245920762000/lingxi-service/data/runs.db",
+          "bytes": 598016,
+          "sha256": "e496a69628cf2b7bcb85561d4ded0f45e5229a8fe78d10d6df179b1d90686f30",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 24,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 3,
+            "run_lineage": 1,
+            "model_call_usage": 4,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        }
+      ],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r14-consumer-regression",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r14-consumer-regression-am9vpbgm",
+      "file_receipts": [],
+      "databases": [],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r15-registry-baseline",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r15-registry-baseline-9_y8l2pg",
+      "file_receipts": [],
+      "databases": [],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r16-binary-restart-read-only",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r16-binary-restart-read-only-8tn92jl7",
+      "file_receipts": [
+        {
+          "path": "binary-config.json",
+          "bytes": 517,
+          "sha256": "43c78ee7f9961005b27aeff39eeb167cb7ce263cee0b0f85ed3ab41acfff025a"
+        },
+        {
+          "path": "binary-workspace/fixture.txt",
+          "bytes": 39080,
+          "sha256": "1396cbb27a79080a3b6fd605bf803350f387dea176fb5183866caa0afbd6ee87"
+        }
+      ],
+      "databases": [
+        {
+          "path": "binary-home/knowledge/knowledge.db",
+          "bytes": 4096,
+          "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "binary-home/knowledge/knowledge_index.db",
+          "bytes": 4096,
+          "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "binary-home/knowledge/knowledge_vector.db",
+          "bytes": 4096,
+          "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "binary-home/lingxi-service/data/runs.db",
+          "bytes": 339968,
+          "sha256": "113f1a04b1dce66273ad1bd7c7d1c7026febebd09ede886672f7d59b420820d5",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 24,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 3,
+            "run_lineage": 1,
+            "model_call_usage": 4,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        }
+      ],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r17-regression-binary-bound",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r17-regression-binary-bound-ky5hk0ei",
+      "file_receipts": [],
+      "databases": [],
+      "cleanup": "ONLY_WRAPPER_CREATED_SYNTHETIC_HOME",
+      "removed": true
+    },
+    {
+      "run": "r18-reviewer-input-bound",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r18-reviewer-input-bound-itjj49pd",
+      "file_receipts": [
+        {
+          "path": "lingxi-f08-reviewer-edge1-cfg-5536-1791703082169090000/service.json",
+          "bytes": 583,
+          "sha256": "5e21a9a435ecd95e5a528622d866dfe0c82da76705e4746a6979dcfea8f19532"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-cfg-5536-1791703082041888000/service.json",
+          "bytes": 583,
+          "sha256": "4fb9479840d99ca617f234e996f552df9ae798316d414344a750e5bb05ccd377"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-cfg-5536-1791703082287415000/service.json",
+          "bytes": 583,
+          "sha256": "a1232df9275b9b30515c949f45c9d3b564689f7f72e56f239b37da59fa9c4692"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-ws-5536-1791703082169020000/fixture.txt",
+          "bytes": 18,
+          "sha256": "d51e5dd6c802fe0fe9154e4877bf0a2223054481826ff2d7e9f4cfac7301fe75"
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-ws-5536-1791703082041837000/fixture.txt",
+          "bytes": 39078,
+          "sha256": "9a4259dd847281eca7d586013a408bba6991a777553c132c5563ffee790bca35"
+        }
+      ],
+      "databases": [
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-5536-1791703082041677000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-5536-1791703082041677000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-5536-1791703082041677000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge3-home-5536-1791703082041677000/lingxi-service/data/runs.db",
+          "bytes": 299008,
+          "sha256": "d7d232dc87d978703391c02d1a681e0dcd5899cc1792cad4dac3aa51af79545d",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 5,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 1,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 1,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-5536-1791703082168920000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-5536-1791703082168920000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-5536-1791703082168920000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge1-home-5536-1791703082168920000/lingxi-service/data/runs.db",
+          "bytes": 499712,
+          "sha256": "5d7641a388a0ee15ffab53953e76faa0e6e28f90e978a1e3d5fa7b5a4847bfd3",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-5536-1791703082287293000/knowledge/knowledge.db",
+          "bytes": 126976,
+          "sha256": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-5536-1791703082287293000/knowledge/knowledge_index.db",
+          "bytes": 49152,
+          "sha256": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-5536-1791703082287293000/knowledge/knowledge_vector.db",
+          "bytes": 28672,
+          "sha256": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "lingxi-f08-reviewer-edge2-home-5536-1791703082287293000/lingxi-service/data/runs.db",
+          "bytes": 77824,
+          "sha256": "f7daaff1f6cd62a0ffee445f320b600ef80558c28d6d2cac23ff2152343efbb6",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 14,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 1,
+            "run_lineage": 1,
+            "model_call_usage": 2,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        }
+      ],
+      "removed": true
+    },
+    {
+      "run": "r19-binary-input-bound",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r19-binary-input-bound-gdirj0ia",
+      "file_receipts": [
+        {
+          "path": "binary-config.json",
+          "bytes": 505,
+          "sha256": "7e0346339d39f3b4fb8255018cf6c883169402f5fa3eacc44361fa42b028d62a"
+        },
+        {
+          "path": "binary-workspace/fixture.txt",
+          "bytes": 39080,
+          "sha256": "f25e5d25582be3af4871f176149e0063985e74fd59ce86e8c830d09e97dc7d35"
+        }
+      ],
+      "databases": [
+        {
+          "path": "binary-home/knowledge/knowledge.db",
+          "bytes": 4096,
+          "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc",
+          "logical_table_counts": {
+            "notebooks": 0,
+            "notebook_config": 0,
+            "sources": 0,
+            "notebook_sources": 0,
+            "content_snapshots": 0,
+            "parse_artifacts": 0,
+            "knowledge_blocks": 0,
+            "knowledge_citations": 0,
+            "ingestion_jobs": 0,
+            "knowledge_turn_scopes": 0,
+            "knowledge_turn_scope_sources": 0
+          }
+        },
+        {
+          "path": "binary-home/knowledge/knowledge_index.db",
+          "bytes": 4096,
+          "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc",
+          "logical_table_counts": {
+            "chunk_index_variants": 0,
+            "knowledge_chunks": 0,
+            "knowledge_chunks_fts": 0,
+            "knowledge_chunks_fts_data": 2,
+            "knowledge_chunks_fts_idx": 0,
+            "knowledge_chunks_fts_docsize": 0,
+            "knowledge_chunks_fts_config": 1,
+            "knowledge_sections": 0
+          }
+        },
+        {
+          "path": "binary-home/knowledge/knowledge_vector.db",
+          "bytes": 4096,
+          "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc",
+          "logical_table_counts": {
+            "vector_index_variants": 0,
+            "chunk_vectors": 0
+          }
+        },
+        {
+          "path": "binary-home/lingxi-service/data/runs.db",
+          "bytes": 339968,
+          "sha256": "775e5c853c514a38ccf69516f4a028022bad9396b5abe46034f7954dcb5dbf47",
+          "logical_table_counts": {
+            "schema_migrations": 9,
+            "sessions": 2,
+            "runs": 1,
+            "run_attempts": 1,
+            "invocations": 0,
+            "key_events": 24,
+            "stale_result_audit": 0,
+            "sqlite_sequence": 0,
+            "invocation_journal": 3,
+            "run_lineage": 1,
+            "model_call_usage": 4,
+            "session_branch_heads": 1,
+            "checkpoints": 0,
+            "checkpoint_file_versions": 0,
+            "file_checkpoints": 0,
+            "messages": 2,
+            "session_files": 0,
+            "session_file_aliases": 0,
+            "session_file_refs": 0,
+            "file_history_snapshots": 0
+          }
+        }
+      ],
+      "removed": true
+    }
+  ],
+  "mutation": {
+    "root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-mutation-bmz7xdy6",
+    "independent_target_proof": {
+      "candidate_inode": 292246366,
+      "mutation_inode": 292359734,
+      "same_inode": false,
+      "candidate_sha": "86d4675740c46215c1ccfe7056e1cb3079e195ad376cc42a77580d3944ed9a0c",
+      "mutation_sha": "87b53f50994173ab3ea3eae1eac92b57cadf568ec80fc0e31d882af68e799a5c"
+    },
+    "removed": true
+  },
+  "probe_binary": {
+    "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W08-R01/reviewer_probe",
+    "sha256": "6325eb5aec440da3d1e2c04b69645487ce2061780f8e73b15ca19a3a80aeee57",
+    "bytes": 59634240,
+    "removed_after_all_runs": true
+  },
+  "candidate_source_target_preserved": true,
+  "scope": "只清理由本Reviewer确定新建的临时目录和可重建探针可执行文件；原测试自己的其它临时目录按原夹具清理，不对全局临时目录glob删",
+  "input_bound_probe_binary": {
+    "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W08-R01/reviewer_probe_input_bound",
+    "sha256": "c08ddca1b1fccaf39de3adefbf8a8bea35bb3dfd9691500c25b7cc58e7b6340c",
+    "bytes": 59681256,
+    "removed": true
+  }
+}

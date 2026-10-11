@@ -1,0 +1,19 @@
+{"cmd": ["/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W08-R01/reviewer_probe", "reviewer_", "--test-threads=1", "--nocapture"], "cwd": "/Users/study_superior/.codex/worktrees/r06-w08-review/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r03-reviewer-boundaries-tkr8qc4r", "guard": "8GiB/600s", "supervision": "subprocess child of wrapper; wrapper child of exec session"}
+LINGXI_TEST_GUARD: armed (pid 84058, mem_limit=8192 MB, time_limit=600 s)
+
+running 3 tests
+test reviewer_projection_storage_failure_prevents_next_wire_and_preserves_raw ... 
+thread 'reviewer_projection_storage_failure_prevents_next_wire_and_preserves_raw' (2750167) panicked at /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W08-R01/reviewer_probe.rs:316:10:
+execute accepted: Storage(Internal { detail: "reviewer synthetic projection storage error" })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test reviewer_reasoning_process_opaque_warning_boundary_real_wire ... ok
+test reviewer_required_identity_over_budget_is_honest_failure_real_wire ... ok
+
+failures:
+
+failures:
+    reviewer_projection_storage_failure_prevents_next_wire_and_preserves_raw
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.28s
+

@@ -1127,26 +1127,42 @@ fn ceil_char_boundary(buf: &[u8], mut i: usize) -> usize {
     i
 }
 
-/// Head/tail truncation keeping both ends (compaction-utils.ts:99-119):
-/// head = floor(maxBytes*0.4), tail = floor(maxBytes*0.4), UTF-8 safe.
+/// 头尾各保留最多预算的40%，同时为说明标记留空间；极小预算仍严格有界且不切坏UTF-8。
 pub fn truncate_text_head_tail(text: &str, max_bytes: usize) -> (String, bool, usize) {
     let original_bytes = text.len();
     if original_bytes <= max_bytes {
         return (text.to_string(), false, original_bytes);
     }
-    let head_bytes = max_bytes * 4 / 10;
-    let tail_bytes = max_bytes * 4 / 10;
+    // 标记本身也占预算；总结果分摊到本块时，余量可能很小甚至为零。
+    let mut marker = format!(
+        "\n\n[... {} 已省略 (原始长度 {}) ...]\n\n",
+        format_bytes(original_bytes),
+        format_bytes(original_bytes)
+    );
+    if marker.len() > max_bytes / 2 {
+        marker = "[... 已省略 ...]".to_string();
+    }
+    if marker.len() > max_bytes {
+        let end = (0..=max_bytes)
+            .rev()
+            .find(|&i| marker.is_char_boundary(i))
+            .unwrap_or(0);
+        return (marker[..end].to_string(), true, original_bytes);
+    }
+    let window_bytes = (max_bytes * 4 / 10).min((max_bytes - marker.len()) / 2);
     let buf = text.as_bytes();
-    let head_end = floor_char_boundary(buf, head_bytes.min(buf.len()));
-    let tail_start = ceil_char_boundary(buf, buf.len().saturating_sub(tail_bytes));
+    let head_end = floor_char_boundary(buf, window_bytes.min(buf.len()));
+    let tail_start = ceil_char_boundary(buf, buf.len().saturating_sub(window_bytes));
     let head = &text[..head_end];
     let tail = &text[tail_start..];
     let omitted = original_bytes - head.len() - tail.len();
-    let marker = format!(
-        "\n\n[... {} 已省略 (原始长度 {}) ...]\n\n",
-        format_bytes(omitted),
-        format_bytes(original_bytes)
-    );
+    if marker.starts_with("\n\n") {
+        marker = format!(
+            "\n\n[... {} 已省略 (原始长度 {}) ...]\n\n",
+            format_bytes(omitted),
+            format_bytes(original_bytes)
+        );
+    }
     (format!("{head}{marker}{tail}"), true, original_bytes)
 }
 

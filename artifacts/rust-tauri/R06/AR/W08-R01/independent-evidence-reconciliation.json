@@ -1,0 +1,175 @@
+[
+  {
+    "file": "observations/r13-four-c-binary-bound/c03.json",
+    "checks": [
+      {
+        "rawEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-done",
+        "projectionEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-model-projection",
+        "providerCallId": "m1",
+        "rawDigest": "62100995930b62d8fc50fcea7d7c07e2b178c46534fdfe41b4e9f634b3ef112c",
+        "projectionDigest": "3eb3d6a7cbcfa2bb7dea5de4c40d747917a10130be0b81dbd2e06380dbcc06b5",
+        "renderedBytes": 26363,
+        "truncated": true,
+        "rawSeq": "5",
+        "projectionSeq": "6"
+      },
+      {
+        "rawEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0002-done",
+        "projectionEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0002-model-projection",
+        "providerCallId": "m2",
+        "rawDigest": "62100995930b62d8fc50fcea7d7c07e2b178c46534fdfe41b4e9f634b3ef112c",
+        "projectionDigest": "3eb3d6a7cbcfa2bb7dea5de4c40d747917a10130be0b81dbd2e06380dbcc06b5",
+        "renderedBytes": 26363,
+        "truncated": true,
+        "rawSeq": "10",
+        "projectionSeq": "11"
+      },
+      {
+        "rawEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0003-done",
+        "projectionEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0003-model-projection",
+        "providerCallId": "m3",
+        "rawDigest": "62100995930b62d8fc50fcea7d7c07e2b178c46534fdfe41b4e9f634b3ef112c",
+        "projectionDigest": "5284b86ab222181aaa081a8037b3d43b6386e9fa3f5c6cbd0d230e328f25662f",
+        "renderedBytes": 26398,
+        "truncated": true,
+        "rawSeq": "15",
+        "projectionSeq": "16"
+      }
+    ],
+    "projection_count": 3,
+    "real_db_verified": true,
+    "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r13-four-c-binary-bound-mz8sj2cz/lingxi-f08-c03-home-89149-1791702245920762000"
+  },
+  {
+    "file": "observations/r13-four-c-binary-bound/error.json",
+    "checks": [
+      {
+        "rawEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-done",
+        "projectionEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-model-projection",
+        "providerCallId": "e1",
+        "rawDigest": null,
+        "projectionDigest": null,
+        "renderedBytes": 42055,
+        "truncated": false,
+        "rawSeq": "5",
+        "projectionSeq": "6"
+      },
+      {
+        "rawEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0002-done",
+        "projectionEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0002-model-projection",
+        "providerCallId": "e2",
+        "rawDigest": null,
+        "projectionDigest": null,
+        "renderedBytes": 42180,
+        "truncated": false,
+        "rawSeq": "10",
+        "projectionSeq": "11"
+      }
+    ],
+    "projection_count": 2,
+    "real_db_verified": true,
+    "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r13-four-c-binary-bound-mz8sj2cz/lingxi-f08-error-home-89149-1791702246122300000"
+  },
+  {
+    "file": "observations/r13-four-c-binary-bound/c02.json",
+    "checks": [
+      {
+        "rawEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-done",
+        "projectionEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-model-projection",
+        "providerCallId": "read_f08",
+        "rawDigest": "b7d59af2f6387192505f868242dd747b3c66f1243b8085374eebdad24f230018",
+        "projectionDigest": "b7370e2f09ace7d9e832e5d02516ac8c8cf75bba4e8a4b995b5bc412210a4ac1",
+        "renderedBytes": 26451,
+        "truncated": true,
+        "rawSeq": "5",
+        "projectionSeq": "6"
+      }
+    ],
+    "projection_count": 1,
+    "real_db_verified": true,
+    "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r13-four-c-binary-bound-mz8sj2cz/lingxi-f08-c02-home-89149-1791702245844557000"
+  },
+  {
+    "file": "observations/r13-four-c-binary-bound/c04.json",
+    "checks": [
+      {
+        "rawEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-done",
+        "projectionEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-model-projection",
+        "providerCallId": "read_f08",
+        "rawDigest": "4fd7419cd7328cd02096847b4fddec998955dcd3890bd8f5b66fb4ce6f2a461d",
+        "projectionDigest": "b7370e2f09ace7d9e832e5d02516ac8c8cf75bba4e8a4b995b5bc412210a4ac1",
+        "renderedBytes": 26451,
+        "truncated": true,
+        "rawSeq": "5",
+        "projectionSeq": "6"
+      }
+    ],
+    "projection_count": 1,
+    "real_db_verified": true,
+    "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r13-four-c-binary-bound-mz8sj2cz/lingxi-f08-c04-home-89149-1791702246040163000"
+  },
+  {
+    "file": "observations/r13-four-c-binary-bound/c01.json",
+    "checks": [
+      {
+        "rawEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-done",
+        "projectionEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-model-projection",
+        "providerCallId": "read_f08",
+        "rawDigest": "37875212cbde2183375a1c61160502037df87b28cd31c1619163e27368e3ed4f",
+        "projectionDigest": "3d10d25e5c729015b658b59c23bcf7cc81e94c08029e72b618473d3b6a2deb04",
+        "renderedBytes": 26302,
+        "truncated": true,
+        "rawSeq": "5",
+        "projectionSeq": "6"
+      }
+    ],
+    "projection_count": 1,
+    "real_db_verified": true,
+    "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r13-four-c-binary-bound-mz8sj2cz/lingxi-f08-c01-home-89149-1791702245736204000"
+  },
+  {
+    "file": "observations/r06-reviewer-boundaries/reviewer-edge2.json",
+    "checks": [
+      {
+        "rawEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-done",
+        "projectionEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-model-projection",
+        "providerCallId": "edge2",
+        "rawDigest": "abe35a0d4738f107c1c4019dcdbdb94d14692f942ddbdc4891d12dddb38ea226",
+        "projectionDigest": null,
+        "renderedBytes": 187,
+        "truncated": false,
+        "rawSeq": "5",
+        "projectionSeq": "6"
+      }
+    ],
+    "projection_count": 1,
+    "real_db_verified": true,
+    "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r06-reviewer-boundaries-dxc2yld1/lingxi-f08-reviewer-edge2-home-86320-1791702083326270000"
+  },
+  {
+    "file": "observations/r06-reviewer-boundaries/reviewer-edge3.json",
+    "checks": [],
+    "projection_count": 0,
+    "real_db_verified": true,
+    "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r06-reviewer-boundaries-dxc2yld1/lingxi-f08-reviewer-edge3-home-86320-1791702083133570000"
+  },
+  {
+    "file": "observations/r06-reviewer-boundaries/reviewer-edge1.json",
+    "checks": [
+      {
+        "rawEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-done",
+        "projectionEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-model-projection",
+        "providerCallId": "edge1",
+        "rawDigest": "285cd1cc488a2f11a57ec71f288821f607bbb56e530d1b024d90c011e8f30ec6",
+        "projectionDigest": "81d3933da53e836f779c770970cfa4b76cf3c1411a692b893f8614725481d538",
+        "renderedBytes": 10214,
+        "truncated": true,
+        "rawSeq": "5",
+        "projectionSeq": "6"
+      }
+    ],
+    "projection_count": 1,
+    "real_db_verified": true,
+    "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r06-reviewer-boundaries-dxc2yld1/lingxi-f08-reviewer-edge1-home-86320-1791702083228289000"
+  }
+]

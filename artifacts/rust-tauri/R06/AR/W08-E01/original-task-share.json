@@ -1,0 +1,173 @@
+[
+  {
+    "id": "R06-T02-Step1",
+    "expected": "迁移现役自动/手动压缩、摘要上下文、缓存保留及错误恢复，不仅按字符切聊天。",
+    "actual": "本次改的是工具成功结果硬限；原压缩26用例与真二进制A03/A04 2用例通过，未修改压缩语义。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PARTIAL_REGRESSION",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-T02-Step2",
+    "expected": "系统/当前请求/工具定义/历史/引用/输出预算与估算来源明确。",
+    "actual": "单成功结果实际渲染文本总32KiB、单文本/推理32KiB、警告自身2KiB，资源/opaque/status/换行及标记计入；真实下一wire与metadata对账。整体token层仍原实现。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PASS_F08_SHARE",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-T02-Step3",
+    "expected": "工具对/待完成调用/批准/当前目标不被压掉，摘要不当新系统指令。",
+    "actual": "模型exchange工具身份及provider关联保持；原kernel/compaction及真实A03回归通过，新增projection未替代raw完成事件。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PARTIAL_REGRESSION",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-T02-Step4",
+    "expected": "压缩经ModelGateway，失败保留原上下文并明确诊断。",
+    "actual": "原压缩经真实供应商替身失败和原始历史保留A04回归通过；F08固定身份材料超预算会明确投影失败且raw不丢。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PARTIAL_REGRESSION",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-T02-Deliverable-ContextBudgeter",
+    "expected": "五分量token预算/保守估算来源",
+    "actual": "原实现及对应回归保留；本次没有替换该交付物。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "REGRESSION_ONLY",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-T02-Deliverable-CompactionService",
+    "expected": "自动/手动同源压缩与失败保留",
+    "actual": "原实现及对应回归保留；本次没有替换该交付物。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "REGRESSION_ONLY",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-T02-Deliverable-长会话夹具",
+    "expected": "配对工具、pending尾及压缩失败夹具",
+    "actual": "原实现及对应回归保留；本次没有替换该交付物。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "REGRESSION_ONLY",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-A03",
+    "expected": "长历史未闭合工具尾自动压缩后工具对完整。",
+    "actual": "kernel待完成配对与原真二进制a03/完整压缩回归通过；本项没有跨Run历史接线。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PASS_LOCAL_REGRESSION",
+    "remaining_scope": "F01跨Run历史及F04完整历史义务OPEN；不得把本条当阶段完整验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-A04",
+    "expected": "摘要供应商失败，原始记录保留，错误明确且空摘要不覆盖。",
+    "actual": "原真二进制a04与provider_failure/原exchange保留26回归通过；新F08 raw/projection分别可查。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PASS_LOCAL_REGRESSION",
+    "remaining_scope": "F01跨Run恢复与F04历史范围仍OPEN。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-T06-Step1",
+    "expected": "现役记忆事实/摘要/信条/梦境真实流程迁移及调度由Rust负责。",
+    "actual": "原memory 7、kernel memory及service单元通过；本次未重新逐业务调度/供应商叶证明。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PARTIAL_REGRESSION",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-T06-Step2",
+    "expected": "Agent记忆隔离及来源/权限进入上下文。",
+    "actual": "原A11隔离读写/compiled/tenets/invalidID与技能绑定原测试通过；本项仅改工具输出投影。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PARTIAL_REGRESSION",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-T06-Step3",
+    "expected": "Skills发现/安装审核/启停/同步/包/人格加载、白名单/边界/覆盖顺序。",
+    "actual": "原skills 6、skill_context 4、memory人格回归通过；F05/F06/F07完整缺口仍独立跟踪。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PARTIAL_REGRESSION",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-T06-Step4",
+    "expected": "实际Pi hooks迁Rust，不重入旧Agent loop。",
+    "actual": "同一Rust Run宏9路径统一保留已guarded内容、合并警告、最终预算、durable projection；原hooks4用例名称数量断言不变且全绿。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PASS_F08_SHARE",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-T06-Step5",
+    "expected": "技能检查不等于无恶意，脚本仍经R04授权和沙盒。",
+    "actual": "原a12_layer2_gateway_refuses_out_of_workspace_skill_action拒绝越权真实网关回归通过；F08没有扩大工具授权。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PARTIAL_REGRESSION",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-T06-Deliverable-MemoryService",
+    "expected": "完整Agent范围记忆服务",
+    "actual": "原交付物未修改；F08 hook份额在source-scan.json补充真实接线及模型投影记录。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PARTIAL_REGRESSION",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-T06-Deliverable-SkillService",
+    "expected": "审核与执行双边界",
+    "actual": "原交付物未修改；F08 hook份额在source-scan.json补充真实接线及模型投影记录。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PARTIAL_REGRESSION",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-T06-Deliverable-PI_REPLACEMENT_MATRIX",
+    "expected": "全部实际hook份额有生产接线和证据",
+    "actual": "原交付物未修改；F08 hook份额在source-scan.json补充真实接线及模型投影记录。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PARTIAL_REGRESSION",
+    "remaining_scope": "其它F-ID/EX完整义务仍OPEN，本轮不替代阶段验收。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-A11",
+    "expected": "Agent A/B不同事实权限，读写隔离，子代理不扩大可见性。",
+    "actual": "原memory/skills隔离回归真实通过；本次未逐到期叶重验整个记忆业务链。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PASS_LOCAL_REGRESSION",
+    "remaining_scope": "F05和其它EX份额仍OPEN。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  },
+  {
+    "id": "R06-A12",
+    "expected": "技能含越权文件命令，安装/启用/执行保持审核且工具拒绝越权。",
+    "actual": "原skills完整6回归含guard absent fail-closed、单次确认token、真实网关越界拒绝。",
+    "evidence": "logs/attempt08-selfcheck-regression.log",
+    "status": "PASS_LOCAL_REGRESSION",
+    "remaining_scope": "F07及其它EX权限/材料上下文份额仍OPEN。",
+    "final_evidence": "logs/attempt11-frozen-copy-final-tests.log"
+  }
+]

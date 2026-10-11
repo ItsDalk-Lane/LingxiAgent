@@ -1,0 +1,47 @@
+[
+  {
+    "file": "observations/r18-reviewer-input-bound/reviewer-edge2.json",
+    "checks": [
+      {
+        "rawEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-done",
+        "projectionEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-model-projection",
+        "providerCallId": "edge2",
+        "rawDigest": "abe35a0d4738f107c1c4019dcdbdb94d14692f942ddbdc4891d12dddb38ea226",
+        "projectionDigest": null,
+        "renderedBytes": 187,
+        "truncated": false,
+        "rawSeq": "5",
+        "projectionSeq": "6"
+      }
+    ],
+    "projection_count": 1,
+    "real_db_verified": true,
+    "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r18-reviewer-input-bound-itjj49pd/lingxi-f08-reviewer-edge2-home-5536-1791703082287293000"
+  },
+  {
+    "file": "observations/r18-reviewer-input-bound/reviewer-edge3.json",
+    "checks": [],
+    "projection_count": 0,
+    "real_db_verified": true,
+    "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r18-reviewer-input-bound-itjj49pd/lingxi-f08-reviewer-edge3-home-5536-1791703082041677000"
+  },
+  {
+    "file": "observations/r18-reviewer-input-bound/reviewer-edge1.json",
+    "checks": [
+      {
+        "rawEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-done",
+        "projectionEventId": "run_000001a0dcba6c00_000001-run_000001a0dcba6c00_000001-tc0001-model-projection",
+        "providerCallId": "edge1",
+        "rawDigest": "285cd1cc488a2f11a57ec71f288821f607bbb56e530d1b024d90c011e8f30ec6",
+        "projectionDigest": "81d3933da53e836f779c770970cfa4b76cf3c1411a692b893f8614725481d538",
+        "renderedBytes": 10214,
+        "truncated": true,
+        "rawSeq": "5",
+        "projectionSeq": "6"
+      }
+    ],
+    "projection_count": 1,
+    "real_db_verified": true,
+    "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r18-reviewer-input-bound-itjj49pd/lingxi-f08-reviewer-edge1-home-5536-1791703082168920000"
+  }
+]

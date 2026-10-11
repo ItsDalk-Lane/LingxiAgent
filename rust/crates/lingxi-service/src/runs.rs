@@ -1295,17 +1295,14 @@ impl RunSupervisor {
                             is_error,
                             &content_ref,
                         );
-                    if let ToolOutcome::Success { result } = &mut outcome {
-                        if !warnings.is_empty() {
-                            let mut prefixed = vec![ContentBlock::Text {
-                                text: warnings.join("\n"),
-                            }];
-                            prefixed.extend(result.content.drain(..));
-                            result.content = prefixed;
-                        } else {
-                            result.content = guarded_content;
-                        }
-                        result.truncated = result.truncated || any_truncated;
+                    if let ToolOutcome::Success { result } = &outcome {
+                        // 警告只能加到已受限材料上；raw结果此前已由完成事件权威归档。
+                        outcome = crate::hooks::project_tool_success(
+                            result,
+                            &warnings,
+                            guarded_content,
+                            any_truncated,
+                        );
                     } else if let ToolOutcome::Failed { error } = &mut outcome {
                         // The incumbent's prependWarnings also reaches the
                         // model on ERROR results (the loop-guard failure
@@ -1316,6 +1313,53 @@ impl RunSupervisor {
                         }
                     }
                 }
+                // 单独归档模型投影；历史恢复必须消费此记录，不能把raw工具卡当作模型已见全文。
+                // 先提交再加入exchange，存储失败会响亮终止，禁止无档案的投影进入下一模型请求。
+                let raw_outcome: ToolOutcome = $outcome.clone();
+                let raw_digest = match &raw_outcome {
+                    ToolOutcome::Success { result } => Some(result.content_digest.as_str()),
+                    _ => None,
+                };
+                let projection_digest = match &outcome {
+                    ToolOutcome::Success { result } => Some(result.content_digest.as_str()),
+                    _ => None,
+                };
+                let process_status = match &outcome {
+                    ToolOutcome::Success { result } => result.status.as_deref().map(|status| match status {
+                        lingxi_kernel::ports::ToolRunStatus::Exited { code } => serde_json::json!({"kind":"exited","code":code}),
+                        lingxi_kernel::ports::ToolRunStatus::Running { handle } => serde_json::json!({"kind":"running","handle":handle}),
+                        lingxi_kernel::ports::ToolRunStatus::StopUnconfirmed { handle, detail } => serde_json::json!({"kind":"stop_unconfirmed","handle":handle,"detail":detail}),
+                    }),
+                    _ => None,
+                };
+                let projection = serde_json::json!({
+                    "type": "tool_result_model_projection",
+                    "schema": "lingxi.tool-result-model-projection.v1",
+                    "toolCallId": $call_id.as_str(),
+                    "target": $request.target,
+                    "processStatus": process_status,
+                    "providerCallId": $request.provider_call_id,
+                    "rawEventId": format!("{}-{}-done", run_id, $call_id.as_str()),
+                    "rawContentDigest": raw_digest,
+                    "projectionContentDigest": projection_digest,
+                    "result": tool_result_wire(&outcome),
+                    "renderedBytes": lingxi_adapters::models::tool_render::render_tool_outcome_text(&outcome).len(),
+                    "successBudgetBytes": crate::hooks::MAX_TOOL_SUCCESS_PROJECTION_BYTES,
+                    "errorBudgetPolicy": "untruncated",
+                    "scope": "model_context_projection_not_raw_tool_archive"
+                });
+                let committed = port.record_run_events(
+                    &ctx,
+                    vec![KeyEvent {
+                        event_id: EventId::new(format!("{}-{}-model-projection", run_id, $call_id.as_str())),
+                        payload: EventPayload::Unknown(lingxi_protocol::UnknownEventPayload {
+                            event_type: "tool_result_model_projection".to_string(),
+                            raw: projection.as_object().expect("投影为对象").clone(),
+                        }),
+                    }],
+                    now_ms,
+                ).await.map_err(DriveError::Storage)?;
+                events.publish_committed(&committed.events);
                 exchange.push(ExchangeItem::ToolResult {
                     tool_call_id: $call_id.clone(),
                     provider_call_id: $request.provider_call_id.clone(),

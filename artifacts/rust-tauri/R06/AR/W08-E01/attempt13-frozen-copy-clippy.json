@@ -1,0 +1,49 @@
+{
+  "tag": "attempt13-frozen-copy-clippy",
+  "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+  "owned_before": {
+    "rust/crates/lingxi-service/src/runs.rs": "eca52e6151299a43d7386fb2056908a3d86afeadc1085cd3aa55dd35b5646a6e",
+    "rust/crates/lingxi-service/src/hooks.rs": "4736be444a0a8f73d8fbe9d9745290ee3779520931e91f149fe137685471968f",
+    "rust/crates/lingxi-kernel/src/memory.rs": "75ae4cbf1ffde042f2e64054379ff155eec0e11a04ea2932e5240a4c65725de3",
+    "rust/crates/lingxi-service/tests/r06_ar_f08_projection.rs": "c43d08523a20efa14dc1e6494dbfb15bde6b5ce05b9c10a5fcd9f99b86e4e0fe"
+  },
+  "owned_after": {
+    "rust/crates/lingxi-service/src/runs.rs": "eca52e6151299a43d7386fb2056908a3d86afeadc1085cd3aa55dd35b5646a6e",
+    "rust/crates/lingxi-service/src/hooks.rs": "4736be444a0a8f73d8fbe9d9745290ee3779520931e91f149fe137685471968f",
+    "rust/crates/lingxi-kernel/src/memory.rs": "75ae4cbf1ffde042f2e64054379ff155eec0e11a04ea2932e5240a4c65725de3",
+    "rust/crates/lingxi-service/tests/r06_ar_f08_projection.rs": "c43d08523a20efa14dc1e6494dbfb15bde6b5ce05b9c10a5fcd9f99b86e4e0fe"
+  },
+  "toolchain": "cargo1.98.1",
+  "lock_hash": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "fixture_hash": "c43d08523a20efa14dc1e6494dbfb15bde6b5ce05b9c10a5fcd9f99b86e4e0fe",
+  "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "+1.98.1",
+    "clippy",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-j8",
+    "-p",
+    "lingxi-kernel",
+    "-p",
+    "lingxi-service",
+    "--lib",
+    "--test",
+    "r06_ar_f08_projection",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "start_time": 1791700979.896805,
+  "end_time": 1791701003.4362628,
+  "exit_code": 0,
+  "test_count": 0,
+  "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w08-attempt13-frozen-copy-clippy-qj4kau_c",
+  "evidence_sha256": "4b05159c233a14b318e5906b9cb434e8d1d8e0fcd780475724de40862187ac1a",
+  "mock_boundary": "仅loopback模型/外部工具多块应答；生产guard/消息组装/网关/存储不mock",
+  "cwd": "/Users/study_superior/.codex/worktrees/r06-w08-review/LingxiAgent",
+  "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w08-review/LingxiAgent/rust/target",
+  "status": "PASS"
+}

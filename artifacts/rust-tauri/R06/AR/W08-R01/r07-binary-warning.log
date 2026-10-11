@@ -1,0 +1,6 @@
+{"cmd": ["/usr/bin/python3", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W08-R01/binary_probe.py"], "cwd": "/Users/study_superior/.codex/worktrees/r06-w08-review/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w08-r01-r07-binary-warning-ukgndluy", "guard": "8GiB/600s", "supervision": "subprocess child of wrapper; wrapper child of exec session"}
+{"status": "FAIL", "service_exit": 0, "binary_stable": true, "child_reaped": true}
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W08-R01/binary_probe.py", line 36, in <module>
+    text=t['content'];assert len(text.encode())<=32768;assert marker not in text;assert 'High-risk prompt injection' in text;assert '已省略' in text;assert 'TAIL' in text
+AssertionError

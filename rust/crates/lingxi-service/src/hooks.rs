@@ -210,11 +210,14 @@ pub fn tool_result_guard(
     let new_content: Vec<ContentBlock> = content
         .iter()
         .map(|block| match block {
-            ContentBlock::Text { text } => {
+            ContentBlock::Text { text } | ContentBlock::Reasoning { text } => {
                 let (out, truncated) = l1_truncate_text(text);
                 if truncated {
                     any_truncated = true;
-                    ContentBlock::Text { text: out }
+                    match block {
+                        ContentBlock::Reasoning { .. } => ContentBlock::Reasoning { text: out },
+                        _ => ContentBlock::Text { text: out },
+                    }
                 } else {
                     block.clone()
                 }
@@ -225,11 +228,111 @@ pub fn tool_result_guard(
     (warnings, new_content, any_truncated)
 }
 
+/// 单块仍以32KiB为上限；整个成功结果的模型线体（含警告、资源和截断说明）
+/// 也不超过32KiB。错误结果沿原合同完整保留，不经过这个成功投影入口。
+pub const MAX_TOOL_SUCCESS_PROJECTION_BYTES: usize = DEFAULT_MAX_TOOL_RESULT_BYTES;
+pub const MAX_TOOL_WARNING_BYTES: usize = 2048;
+
+pub fn project_tool_success(
+    original: &lingxi_kernel::ports::ToolSuccess,
+    warnings: &[String],
+    guarded_content: Vec<ContentBlock>,
+    any_truncated: bool,
+) -> lingxi_kernel::ports::ToolOutcome {
+    use lingxi_adapters::models::tool_render::render_tool_outcome_text;
+    use lingxi_kernel::ports::{ToolOutcome, ToolSuccess};
+
+    let mut content = Vec::new();
+    let mut changed = any_truncated;
+    if !warnings.is_empty() {
+        let (text, truncated, _) =
+            truncate_text_head_tail(&warnings.join("\n"), MAX_TOOL_WARNING_BYTES);
+        changed |= truncated;
+        content.push(ContentBlock::Text { text });
+    }
+    content.extend(guarded_content);
+    let warning_blocks = usize::from(!warnings.is_empty());
+    let build = |content: Vec<ContentBlock>, truncated: bool| {
+        let mut result = ToolSuccess::from_content(content);
+        result.resource_refs = original.resource_refs.clone();
+        result.status = original.status.clone();
+        result.truncated = original.truncated || truncated;
+        result
+    };
+    let initial = build(content.clone(), changed);
+    if render_tool_outcome_text(&ToolOutcome::Success {
+        result: initial.clone(),
+    })
+    .len()
+        <= MAX_TOOL_SUCCESS_PROJECTION_BYTES
+    {
+        return ToolOutcome::Success { result: initial };
+    }
+
+    // 先为不能随意修改的身份、签名和进程状态及所有分隔符预留真实渲染开销。
+    // 固定材料本身放不下时明确拒绝模型投影，权威raw档案仍保留，绝不破坏资源身份/opaque。
+    let skeleton = content
+        .iter()
+        .enumerate()
+        .map(|(i, block)| match block {
+            ContentBlock::Text { .. } if i >= warning_blocks => ContentBlock::Text {
+                text: String::new(),
+            },
+            ContentBlock::Reasoning { .. } => ContentBlock::Reasoning {
+                text: String::new(),
+            },
+            other => other.clone(),
+        })
+        .collect::<Vec<_>>();
+    let skeleton_result = build(skeleton, true);
+    let reserved = render_tool_outcome_text(&ToolOutcome::Success {
+        result: skeleton_result,
+    })
+    .len()
+    .saturating_add(content.len())
+    .saturating_add(original.resource_refs.len())
+    .saturating_add(1);
+    let shrinkable = content
+        .iter()
+        .enumerate()
+        .filter(|(i, b)| {
+            matches!(b, ContentBlock::Reasoning { .. })
+                || (*i >= warning_blocks && matches!(b, ContentBlock::Text { .. }))
+        })
+        .count();
+    if reserved > MAX_TOOL_SUCCESS_PROJECTION_BYTES || shrinkable == 0 {
+        return ToolOutcome::Failed {
+            error: lingxi_protocol::ProtocolError::new(
+                lingxi_protocol::ErrorCode::InvalidMessage,
+                "Tool success model projection exceeds the 32KiB budget in required resource/opaque/status metadata; raw result is archived, content was not sent to the model",
+                false,
+            ),
+        };
+    }
+    let share = (MAX_TOOL_SUCCESS_PROJECTION_BYTES - reserved) / shrinkable;
+    for (i, block) in content.iter_mut().enumerate() {
+        match block {
+            ContentBlock::Text { text } if i >= warning_blocks => {
+                *text = truncate_text_head_tail(text, share.min(DEFAULT_MAX_TOOL_RESULT_BYTES)).0;
+            }
+            ContentBlock::Reasoning { text } => {
+                // 推理块由模型适配器作为JSON文本传输，转义最多六倍；预留其真实开销。
+                *text =
+                    truncate_text_head_tail(text, (share / 6).min(DEFAULT_MAX_TOOL_RESULT_BYTES)).0;
+            }
+            _ => {}
+        }
+    }
+    ToolOutcome::Success {
+        result: build(content, true),
+    }
+}
+
 fn text_of(content: &[ContentBlock]) -> String {
     content
         .iter()
         .filter_map(|block| match block {
-            ContentBlock::Text { text } => Some(text.as_str()),
+            ContentBlock::Text { text } | ContentBlock::Reasoning { text } => Some(text.as_str()),
             _ => None,
         })
         .collect::<Vec<_>>()

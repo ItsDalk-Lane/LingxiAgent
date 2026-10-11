@@ -1,0 +1,28 @@
+{
+  "timestamp": 1791703207.4122062,
+  "root": "/Users/study_superior/.codex/worktrees/r06-w08-review/LingxiAgent",
+  "sourceCount": 356,
+  "allRustSourceEqualStartEnd": true,
+  "ownedAggregate": "55c32488cc123116c9c91ec514a2daa0215a9dc1e575d9b7ef13d448f514df06",
+  "lock": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "executedBinariesEqual": true,
+  "stageRegistryFailureSources": {
+    "docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json": {
+      "currentSha256": "9785871fb67a4d5fdc0b469911dabecd4c7c0fb7dfab1ffae957ee9dee72ce2e",
+      "baseSha256": "9785871fb67a4d5fdc0b469911dabecd4c7c0fb7dfab1ffae957ee9dee72ce2e",
+      "unchangedFromBase": true
+    },
+    "scripts/rust-tauri/r02_registry_consistency.py": {
+      "currentSha256": "43642ef04976f416df93f76921337bb812f278ea6dc3d330167ff21806acf31b",
+      "baseSha256": "43642ef04976f416df93f76921337bb812f278ea6dc3d330167ff21806acf31b",
+      "unchangedFromBase": true
+    },
+    "rust/crates/lingxi-adapters/src/storage/migrations.rs": {
+      "currentSha256": "6abea38bc11add5c35cc1bd520676526d5680e01cf84b985a365fdc67bd2e7f2",
+      "baseSha256": "6abea38bc11add5c35cc1bd520676526d5680e01cf84b985a365fdc67bd2e7f2",
+      "unchangedFromBase": true
+    }
+  },
+  "cleanedSyntheticHomes": 19,
+  "guardClosedNever": true
+}

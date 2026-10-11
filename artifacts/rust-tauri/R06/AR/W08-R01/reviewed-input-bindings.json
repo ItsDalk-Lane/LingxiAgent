@@ -1,0 +1,62 @@
+{
+  "AGENTS.md": {
+    "absolutePath": "/Users/study_superior/.codex/worktrees/r06-w08-review/LingxiAgent/AGENTS.md",
+    "sha256": "3f98359bc0c6ab7038aec8326419a03cdbf0de6f3f185555d051ad3e489b531b"
+  },
+  "artifacts/rust-tauri/R06/AR/ENTRY-01/specification/R06_完整问题清单与修复验收总控提示词.md": {
+    "absolutePath": "/Users/study_superior/.codex/worktrees/r06-w08-review/LingxiAgent/artifacts/rust-tauri/R06/AR/ENTRY-01/specification/R06_完整问题清单与修复验收总控提示词.md",
+    "sha256": "0989765e75c4664be1b3c953e466d829339a65346c49f7c245219ae34f7b7d23"
+  },
+  "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W08_REVIEWER_TEMPLATE.md": {
+    "absolutePath": "/Users/study_superior/.codex/worktrees/r06-w08-review/LingxiAgent/docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W08_REVIEWER_TEMPLATE.md",
+    "sha256": "d5f9fbadfb79e7e2d403e816f8a19bca66b6aa5e4c24271800bbcf49800d1791"
+  },
+  "rust/crates/lingxi-service/src/history_projection.rs": {
+    "absolutePath": "/Users/study_superior/.codex/worktrees/r06-w08-review/LingxiAgent/rust/crates/lingxi-service/src/history_projection.rs",
+    "sha256": "fe6469f38b4ae5eb1eaf8e0edcecd663c7035d4df1bafa2197ef9e15c1f85d08"
+  },
+  "rust/crates/lingxi-adapters/src/models/tool_render.rs": {
+    "absolutePath": "/Users/study_superior/.codex/worktrees/r06-w08-review/LingxiAgent/rust/crates/lingxi-adapters/src/models/tool_render.rs",
+    "sha256": "6af260827431711720ba6904bc6ef7497d2260b51f179ce8e607175f754a54e0"
+  },
+  "rust/crates/lingxi-service/src/lib.rs": {
+    "absolutePath": "/Users/study_superior/.codex/worktrees/r06-w08-review/LingxiAgent/rust/crates/lingxi-service/src/lib.rs",
+    "sha256": "abb05a164499956657395906134d20beafbb277547e794d277ed26c3986ef82c"
+  },
+  "rust/crates/lingxi-service/tests/r06_t06_hooks.rs": {
+    "absolutePath": "/Users/study_superior/.codex/worktrees/r06-w08-review/LingxiAgent/rust/crates/lingxi-service/tests/r06_t06_hooks.rs",
+    "sha256": "e4b2f8257c7f61d732da85830402c87404500accb01232700acd3a7ece803e2f"
+  },
+  "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/01_通用执行约束.md": {
+    "absolutePath": "/Users/study_superior/Desktop/Code/LingxiAgent/Lingxi_Rust_Tauri_Taskbooks_2026-09-23/01_通用执行约束.md",
+    "sha256": "d4f07185735acda91b73a2aa97a42ca7ce5795babf1104968c83671131cf871c"
+  },
+  "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/02_目标架构与强制契约.md": {
+    "absolutePath": "/Users/study_superior/Desktop/Code/LingxiAgent/Lingxi_Rust_Tauri_Taskbooks_2026-09-23/02_目标架构与强制契约.md",
+    "sha256": "53dbf699675d9981b60ea5c982c4d0507afffd5184e6bebac875aae40d173c4d"
+  },
+  "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/04_阶段依赖与接口交接.md": {
+    "absolutePath": "/Users/study_superior/Desktop/Code/LingxiAgent/Lingxi_Rust_Tauri_Taskbooks_2026-09-23/04_阶段依赖与接口交接.md",
+    "sha256": "940c896508e929ec5f25c2b9020c06c2035c3f9800f43b78b1fd5e303e92bde3"
+  },
+  "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/06_风险、技术决策与退出条件.md": {
+    "absolutePath": "/Users/study_superior/Desktop/Code/LingxiAgent/Lingxi_Rust_Tauri_Taskbooks_2026-09-23/06_风险、技术决策与退出条件.md",
+    "sha256": "6c92962e5bcb739509630eb8c9cf8b96fabf67c0d51315717ae048d9b87786f0"
+  },
+  "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/91_交付与独立验收模板.md": {
+    "absolutePath": "/Users/study_superior/Desktop/Code/LingxiAgent/Lingxi_Rust_Tauri_Taskbooks_2026-09-23/91_交付与独立验收模板.md",
+    "sha256": "4ccdb44990ba0bf7fc216dd866abb4b008a615bfc363a8c107a9799df4b4f6dc"
+  },
+  "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R06_上下文、会话语义、记忆与知识库.md": {
+    "absolutePath": "/Users/study_superior/Desktop/Code/LingxiAgent/Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R06_上下文、会话语义、记忆与知识库.md",
+    "sha256": "d54e7fcc638b62fc4303ce4af8f01ba8c358fd1a90d0f85a491bfd4a439bbd2e"
+  },
+  "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/05_验收与性能协议.md": {
+    "absolutePath": "/Users/study_superior/Desktop/Code/LingxiAgent/Lingxi_Rust_Tauri_Taskbooks_2026-09-23/05_验收与性能协议.md",
+    "sha256": "d86c51f4b8571f94f0e9b457e74e79d9281d5c846e7a37d1f39edfdf47324b61"
+  },
+  "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md": {
+    "absolutePath": "/Users/study_superior/Desktop/Code/LingxiAgent/Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md",
+    "sha256": "6e84fc77a9f3124d51fe4d088fda6c8dcb96989e43d280634b94b7fc1d778560"
+  }
+}
