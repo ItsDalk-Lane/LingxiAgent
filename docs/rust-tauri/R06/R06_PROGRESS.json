@@ -5,7 +5,6 @@
   "created_at": "2026-10-08",
   "orchestrator": "R06 阶段专用总控（本轮会话）",
   "authority_scope": "仅 R06 阶段自动推进；R06 完成后停止，不进入 R07",
-
   "stage_base": {
     "base_sha": "c9cca6020e0990016ee0d14af406766370849a7a",
     "branch": "codex/rust-tauri-migration",
@@ -14,7 +13,6 @@
     "worktree_status": "clean（git status --porcelain 空输出）",
     "user_uncommitted_changes": "无"
   },
-
   "toolchain_freeze": {
     "cargo": "1.98.1 (797e8a9bc 2026-08-05)",
     "rustc": "1.98.1 (48a229cea 2026-09-01)",
@@ -24,15 +22,39 @@
     "package_lock_sha256": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
     "disk_free_at_freeze": "500Gi available (/System/Volumes/Data)"
   },
-
   "taskbook_freeze": {
     "dir": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23",
     "key_spec_files_sha256_vs_MANIFEST": "13/13 OK（00/01/02/03/04/05/06/R06/90/91/stage-index/task-catalog/acceptance-catalog）",
     "validate_bundle_py": "DOCUMENT_SPEC_INVALID——仅因包内缺《完整阅读版.html/.md》两个派生文件且存在 .DS_Store/.mimosa 运行残留；R06 执行依赖的全部规格文件逐项校验一致，不构成就绪阻断",
-    "r06_tasks": ["R06-T01","R06-T02","R06-T03","R06-T04","R06-T05","R06-T06","R06-T07","R06-T08"],
-    "r06_acceptances_all_required": ["R06-A01","R06-A02","R06-A03","R06-A04","R06-A05","R06-A06","R06-A07","R06-A08","R06-A09","R06-A10","R06-A11","R06-A12","R06-A13","R06-A14","R06-A15","R06-A16"]
+    "r06_tasks": [
+      "R06-T01",
+      "R06-T02",
+      "R06-T03",
+      "R06-T04",
+      "R06-T05",
+      "R06-T06",
+      "R06-T07",
+      "R06-T08"
+    ],
+    "r06_acceptances_all_required": [
+      "R06-A01",
+      "R06-A02",
+      "R06-A03",
+      "R06-A04",
+      "R06-A05",
+      "R06-A06",
+      "R06-A07",
+      "R06-A08",
+      "R06-A09",
+      "R06-A10",
+      "R06-A11",
+      "R06-A12",
+      "R06-A13",
+      "R06-A14",
+      "R06-A15",
+      "R06-A16"
+    ]
   },
-
   "r05_admission_verification": {
     "local_head_eq_remote": true,
     "r05_delivery_commit_in_ancestry": "d1786a34f3d3d37a399dc3a5d20f41799eaf99a4 = YES",
@@ -62,20 +84,252 @@
       "33 项 R05 冻结生产输入身份：artifacts/rust-tauri/R05/RR3/FINAL-04/command-records/frozen-inputs-postcheck.json"
     ]
   },
-
   "r00_leaf_map": "docs/rust-tauri/R06/R06_LEAF_MAP.json（T01:31 / T03:74 / T04:89 / T05:57 / T06:101 / T07:24；T02/T08 为横切任务无直接叶子）",
-
   "task_chain": [
-    {"task_id": "R06-T01", "name": "上下文编译器与短提示词", "depends_on": [], "acceptance_ids": ["R06-A01","R06-A02"], "deliverables": ["ContextCompiler","ContextArtifact","提示词差异报告"], "status": "DONE", "executor_report": "docs/rust-tauri/R06/R06-T01_REPORT.md", "review_state": "R1_PASS（artifacts/rust-tauri/R06/T01-REVIEW-01/REVIEW.md，无阻断 findings，审查者锁定工具链 1.98.1 独立复跑成立）", "commit_sha": "b174e3ff44c61000abbb84595cf69dfad85dd531", "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward）", "post_acceptance_obligations": ["F-01 LOW: TOTAL_SYSTEM_TOKEN_BUDGET 生产零引用，测试需改真实求和或 compile 加总量钳制", "F-02 MEDIUM: 执行者证据产自非锁定 1.93.0（审查者 1.98.1 已补位），后续任务执行者必须用 /Users/study_superior/.cargo/bin/cargo 并在证据记录 rustc 版本", "F-03 LOW: 候选摘要须在所有文件写完后计算", "F-04 LOW: acceptance-map.json 四处测试名陈旧需回填", "F-05 LOW: clippy/fmt 证据需带 --locked、命令回显与退出码", "F-06 LOW: 观测端点跨主体 403 需补入库测试"]},
-    {"task_id": "R06-T02", "name": "token预算、压缩与长会话", "depends_on": ["R06-T01"], "acceptance_ids": ["R06-A03","R06-A04"], "deliverables": ["ContextBudgeter","CompactionService","长会话夹具"], "status": "DONE（更正：交付后漏回填，原残留 IN_REPAIR；commit/push/review 字段早已落定）", "task_base_sha": "b174e3ff44c61000abbb84595cf69dfad85dd531", "review_state": "R1_FAIL(6)→REPAIR-R1→R2_FAIL(2阻断)→ROOT-CAUSE-SWEEP(RC-1/2/3+40行矩阵)→REPAIR-R2→R3_FAIL(R3-F-01 MEDIUM+2LOW)→REPAIR-R3→R4_PASS（T02-REVIEW-04：全部根因簇闭环复证+7新探针全绿+workspace 1612/0+digest 固化脚本可复现）", "commit_sha": "4920c59e38ddf69c8b846fb1aea896fca70d939d", "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward）", "post_acceptance_obligations": ["R4-F-01 LOW: lib.rs:673-678 与 runs.rs:597 两处注释未提 chat 回退链，顺手轮补", "R4-I-01/02 informational 登记", "提交前已删除 5 个 probe/**/target 可再生构建缓存（4.2GB→1.7MB），探针源码与输出保留"], "process_lessons_for_later_tasks": ["RC-1: 现役语义必须按端到端生产链勘察而非文件片段", "RC-2: 差异台账逐条锚定现役行号，禁误锚", "RC-3: 测试须为现役对照式（黄金线体 fixture/语义清单驱动），禁自洽测试", "digest 用 scripts/rust-tauri/r06_candidate_digest.sh 固化口径"]},
-    {"task_id": "R06-T03", "name": "会话树、重试、fork与回退", "depends_on": ["R06-T02"], "acceptance_ids": ["R06-A05","R06-A06"], "deliverables": ["SessionService","树/分支索引","回退检查"], "status": "DONE", "task_base_sha": "4920c59e38ddf69c8b846fb1aea896fca70d939d", "r00_leaf_count": 74, "review_state": "R1_FAIL（3阻断+1裁决+5LOW）→REPAIR-R1（8项finding+1观察项全修+3项同根因扩展；rewind内容级回滚落地（restored/conflicted/skipped三档+真实写回）、retry fileRollback全契约、latest覆盖×fileVersions单事务原子化）→R2_PASS（artifacts/rust-tauri/R06/T03-REVIEW-02/REVIEW.md：digest 19f82d33 一致〔IDE .vscode 噪声经同口径排除复核唯一归因〕、R1全部修复逐行核验+三套件40例亲跑全绿、v8新SQL迁移保真重测、workspace 124套件1652/0、R05七套件118例全绿、74叶无虚报）", "commit_sha": "2cb2b064061e902ea18faa0ec38499ce32436cb7", "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward 4920c59e3..2cb2b0640）", "post_acceptance_obligations": ["R2-F-01 MEDIUM: fork/retry/rewind 缺会话级操作互斥（现役 session-operation-lock.ts 任一并发第二者响亮 busy，候选仅 run 在飞 busy 闸；有界影响无数据灭失）——R06 收口前修复或在差异台账显式申报，二选一", "R2-F-02 LOW: 叶图 rewind/preview 两叶锚点仍为修复前 D1 语义且引用已不存在的测试名", "R2-F-03 LOW: 修复矩阵称 record_file_version 已移除与代码实际保留（幂等版）矛盾", "R2-F-04 LOW: delete_archived_session 头注 FK 序对 file_checkpoints 描述过时", "OBS×5 登记见 T03-REVIEW-02/REVIEW.md", ".vscode/settings.json 为 IDE 噪声（git.ignoreLimitWarning），不属于候选，不随提交"]},
-    {"task_id": "R06-T04", "name": "统一消息历史、重连与导出", "depends_on": ["R06-T03"], "acceptance_ids": ["R06-A07","R06-A08"], "deliverables": ["CanonicalMessageStore","统一历史投影","分页/导出接口"], "status": "DONE", "task_base_sha": "2cb2b064061e902ea18faa0ec38499ce32436cb7", "r00_leaf_count": 89, "r00_leaf_count_correction": "原误写 101（混入了 T06 的数），按叶图 T04=89 更正；审查者以叶图为准复核", "review_state": "R1_PASS（artifacts/rust-tauri/R06/T04-REVIEW-01/REVIEW.md：digest ce0ae1adc3f6 复跑逐字一致、workspace 1673/0 独立复跑、protocol/adapters/service/auth 定向套件全绿、89 叶逐叶复核无虚报（implemented 1/share 7/deferred 81 去向有据）、场景D 18 项对抗清单全过、RC-2/RC-3 现役锚点亲验一致；2 LOW + 6 OBS 均不阻断）", "commit_sha": "b27dc5e4be9aed4763dda60519f0a04042fdfade", "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward 2cb2b0640..b27dc5e4b）", "post_acceptance_obligations": ["F-01 LOW: history.rs:206-213 all 查询参数臂缺重复键检查（before/limit 臂均有），all=1&all=1 静默通过，与报告『重复键一律 400』声称不精确——补检查或收窄声称，二选一", "F-02 LOW: 现役公开参数 reconciliation=1（sessions.ts:1421-1435）在候选侧以 400 退役，仅见 LEAF_MAP #65 anchor 一句，差异台账 D1-D5 未单列——补台账条目", "OBS×6 登记见 T04-REVIEW-01/REVIEW.md（head 悬空静默空页/parent 成环理论可循环/PageStats 探针边界/a07 实时捕获应用公开投影/R08 UI 断言份额挂起/叶数口径 101 vs 89）"]},
-    {"task_id": "R06-T05", "name": "会话文件、资源与产物身份", "depends_on": ["R06-T04"], "acceptance_ids": ["R06-A09","R06-A10"], "deliverables": ["ResourceService","SessionFile迁移适配","文件引用检查器"], "status": "DONE", "task_base_sha": "b27dc5e4be9aed4763dda60519f0a04042fdfade", "r00_leaf_count": 57, "review_state": "R1_PASS（artifacts/rust-tauri/R06/T05-REVIEW-01/REVIEW.md：digest e7c1e05e 复算逐字一致且审查结束重算无漂移〔.vscode 噪声按 T04 先例剔除口径唯一归因〕、fmt/clippy 0、全量 1749/1 独立复跑与执行者两轮互证〔两轮唯一失败项互异且均为负载型 flaky 单跑全过；执行者 ALF 五点证据链核验成立〕、33 路由面逐面吻合、v9 迁移纯追加 v1-v8 逐字未动、RC-2 锚点抽验 12 条全真实、J1/J3 合法延期、2 MEDIUM + 2 LOW + 4 OBS 不阻断）", "commit_sha": "72c50436af68b72c74f97ed83618a6ac0fdf3caf", "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward b27dc5e4b..72c50436a）", "post_acceptance_obligations": ["F-01 MEDIUM: mark_session_activity/touch_last_activity、fork_session_files、collect_reference_identities/insert_reference 三组原语生产零调用点（冷度信号断供致 bootstrap 清扫恒 no-op、fork 后旧 sf_ id 断链 404、A10 引用保护生产覆盖仅剩导入 refs；方向全保守不误删）——总控裁决：R06 收口前完成生产接线（接线归属由后续授权轮定，天然候选为 T06 会话接线面或阶段级修复），或在差异台账显式申报接线归属与影响，二选一", "F-02 MEDIUM: 叶 #44 标 implemented 与断言矛盾（mount provider 现役成功路径 vs 候选响亮 400，J2 待裁决落定）——R06 收口前更正叶图标注或补 mount/url 成功面，随 J2 裁决二选一", "F-03 LOW: 既存两例负载型 flaky（cancellation_tree:1337 / shutdown_coordinator:445，非 T05 面，单跑全过）——登记在案，阶段收口前评估预算窗加固", "F-04 LOW: deferred 六叶未标目标阶段、stage_ids 未随 J1/J3 更新——叶图回填", "OBS×4（F-05~F-08）登记见 T05-REVIEW-01/REVIEW.md（content 全量内存读已申报/ticket 双闸差异更严格已申报/meta→read TOCTOU 与现役同形态等）", ".vscode/settings.json 为 IDE 噪声，不属于候选，不随提交", "账本本条 DELIVERING 状态转为提交时点为审查后唯一非行为性口径内增量（审查 digest 绑定 IN_PROGRESS 时点账本，T04 同先例）"]},
-    {"task_id": "R06-T06", "name": "人格、记忆与技能系统", "depends_on": ["R06-T05"], "acceptance_ids": ["R06-A11","R06-A12"], "deliverables": ["MemoryService","SkillService","PI_REPLACEMENT_MATRIX更新"], "status": "DONE", "task_base_sha": "e89c91a2289c0c7182da9e2ca4b1d31dc56ca5b6", "r00_leaf_count": 101, "review_state": "R1_PASS附条件→REPAIR-R1→R2_PASS（T06-REVIEW-02：R1 三项 findings 全部真闭环〔F-01 技能材料经 SkillMaterialPort 生产接线进 T01 skill.catalog 段+F-02 fail-closed 测试+F-03 响亮注册，独立亲读代码+亲跑确认〕、digest cb6d2e8d 开工收尾零漂移、fmt/clippy 0、定向 1462/1〔唯一失败 r00_management LAN 环境项 solo×2 同签名〕、全量 1820/1=任务水位、urldecode 事故修复有界、test-guard release 零链接 nm 复验、101 叶 62/18/21、仅 2 OBS 不阻断）", "commit_sha": "983e4d8633420f28b44d608200e0a8653476013a", "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward e89c91a22..983e4d863）", "post_acceptance_obligations": ["OBS-R2-1: skills.rs:925 文档与 catalog-unit 断言措辞称『catalog 序=用户覆盖顺序载体』但实际锁定扫描序——R07 接线时核对现役 getSkillsForAgent 返回序", "OBS-R2-2（环境）: r00_management LAN 项本窗口间歇失败（ALF 对 192.168.x 自地址入站拦截，T06 零耦合），按既有环境项口径管理", "执行期事故登记: memory.rs urldecode 死循环曾致测试进程 176GB 失控两次拖死整机——已修复+3 回归单测+lingxi-test-guard 全 133 测试二进制兜底（ctor 0.8.0 登记 D-12）；构建波次 -j 8 纪律", "T06_TEST_GUARD.md §5 记录 approval_face_share_cases ~300.5s 固有耗时为全量时长瓶颈（R04-T08 范围可后续事件化）", ".vscode/ 为 IDE 噪声不随提交", "账本本条 DELIVERING 为审查后非行为性口径内增量（T04/T05 同先例）"]},
-    {"task_id": "R06-T07", "name": "现役知识库迁移", "depends_on": ["R06-T06"], "acceptance_ids": ["R06-A13","R06-A14"], "deliverables": ["KnowledgeService","索引兼容矩阵","引用与迁移测试"], "status": "DONE", "task_base_sha": "14ebcd145606d945a3316aea99ff96ad095672ad", "r00_leaf_count": 24, "review_state": "R1_PASS（T07-REVIEW-01：digest d33af572 开工/收尾/归档后三次复算同值零漂移、fmt/clippy 0、定向 1488/1〔T07 三套件 26/26；唯一失败 r00_management LAN 环境项同签名〕、全量 1851/1=137 二进制/1852 用例与执行者申报逐字一致、水位 +31 恰为 T07 新增、A13 真诱惑夹具双向零串源+引用三环字节级程序断言、A14 真重启维度切换 fts 降级+KNOWLEDGE_VECTOR_NOT_READY+旧变体零参与、embedding 单一链 resolve_route→OperationService::embed 无第二路径、D9–D14 全部合法顺延、RC-2 锚点抽验 11 条全命中；2 LOW + 4 OBS 不阻断）", "commit_sha": "5656ea446d0974c1e76a5e14648a486714d0ae66", "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward 14ebcd145..5656ea446）", "post_acceptance_obligations": ["F-01 LOW: A14 维度铁律第三门（BLOB 长度损坏门 knowledge.rs:2586）已实现但无直接测试，报告§八/§九『三重门存储层直锁』措辞过强——补损坏 BLOB 测试+收敛措辞", "F-02 LOW: 缓存库 open 对任何失败（含 KNOWLEDGE_SCHEMA_NEWER）删文件重建（index :1869-1885/vector :2336-2350 同根因两处），TS 现役 schema-newer 响亮保留文件仅 KNOWLEDGE_INDEX_INVALID 才 reset（knowledge-index-store.ts:407-410）——按错误码分类修复或台账 D5 补记，二选一", "OBS×4 登记 T07-REVIEW-01/REVIEW.md（FTS 双通道措辞/并发写无专项用例〔Mutex+delete-wins 承担〕/台账 F 项中间 RED 日志未归档〔独立复跑兜底〕/T06 后账本 T07 行 NOT_STARTED 系总控未及时回填非执行者交付物）", ".vscode/ 为 IDE 噪声不随提交"]},
-    {"task_id": "R06-T08", "name": "工具行为评测与上下文交接", "depends_on": ["R06-T07"], "acceptance_ids": ["R06-A15","R06-A16"], "deliverables": ["R06_REPORT.md","R06_HANDOFF.json","BEHAVIOR_EVAL.json"], "status": "DELIVERING", "task_base_sha": "ea61380577916e9fb75a4f4c2694321af7b83923", "r00_leaf_count": 0, "r00_leaf_count_note": "横切任务无直接叶子（叶图口径）；评测对象为 T01–T07 全链", "review_state": "R1_PASS（T08-REVIEW-01：digest 61055b4f 开工收尾零漂移、fmt/clippy 0、评测独立重放 10/10 可复现、定向含取消三套件全绿、全量 1861/1=水位 1852→1862 只增不减〔唯一失败 r00_management LAN 环境项同签名〕、D-T08-1 裁决可接受〔T08-FIX-01 缺陷真实+修复真实+R03 取消走 CancelScope 树正交无回归、28/28 取消用例亲跑全绿〕、A15 BE-10 存在证明+四维不混算机器锁定、A16 注入不放宽安全逐字断言、jsonl↔BEHAVIOR_EVAL 10 任务零漂移、PI 矩阵纯追加 11/2/1、无虚报 PASS 无预写 SHA；1 LOW + 3 OBS 不阻断）", "commit_sha": null, "push_state": "PENDING（推送确认后回填；本字段不得预写未产生的 SHA）", "post_acceptance_obligations": ["F-01 LOW: BE-04 token 硬编码 0/0 与台账来源申报不符（同形状 BE-09 实测非零证真值）——三 run 求和或改标 not measured", "OBS-2: BE-05 expectedBehavior 残留首轮误锚词（observed 侧已改锚，D-T08-4 在案）", "OBS-3: D-T08-1 台账对旧 agent lane 语义转述不精确（实为每目标 agent 而非 per-thread；裁决结论不变）", "OBS-4: compiled_for_run 缓存键缺 agent 段——现网不触发（唯一接线面父代理回落），R07 接线委派面放开 request.agent_id 前必须补", "真实模型评测多次采样 BLOCKED_NOT_AUTHORIZED（RR-BLK-CREDENTIALS→R10，发布阻塞项登记）", ".vscode/ 为 IDE 噪声不随提交"]}
+    {
+      "task_id": "R06-T01",
+      "name": "上下文编译器与短提示词",
+      "depends_on": [],
+      "acceptance_ids": [
+        "R06-A01",
+        "R06-A02"
+      ],
+      "deliverables": [
+        "ContextCompiler",
+        "ContextArtifact",
+        "提示词差异报告"
+      ],
+      "status": "DONE",
+      "executor_report": "docs/rust-tauri/R06/R06-T01_REPORT.md",
+      "review_state": "R1_PASS（artifacts/rust-tauri/R06/T01-REVIEW-01/REVIEW.md，无阻断 findings，审查者锁定工具链 1.98.1 独立复跑成立）",
+      "commit_sha": "b174e3ff44c61000abbb84595cf69dfad85dd531",
+      "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward）",
+      "post_acceptance_obligations": [
+        "F-01 LOW: TOTAL_SYSTEM_TOKEN_BUDGET 生产零引用，测试需改真实求和或 compile 加总量钳制",
+        "F-02 MEDIUM: 执行者证据产自非锁定 1.93.0（审查者 1.98.1 已补位），后续任务执行者必须用 /Users/study_superior/.cargo/bin/cargo 并在证据记录 rustc 版本",
+        "F-03 LOW: 候选摘要须在所有文件写完后计算",
+        "F-04 LOW: acceptance-map.json 四处测试名陈旧需回填",
+        "F-05 LOW: clippy/fmt 证据需带 --locked、命令回显与退出码",
+        "F-06 LOW: 观测端点跨主体 403 需补入库测试"
+      ]
+    },
+    {
+      "task_id": "R06-T02",
+      "name": "token预算、压缩与长会话",
+      "depends_on": [
+        "R06-T01"
+      ],
+      "acceptance_ids": [
+        "R06-A03",
+        "R06-A04"
+      ],
+      "deliverables": [
+        "ContextBudgeter",
+        "CompactionService",
+        "长会话夹具"
+      ],
+      "status": "DONE（更正：交付后漏回填，原残留 IN_REPAIR；commit/push/review 字段早已落定）",
+      "task_base_sha": "b174e3ff44c61000abbb84595cf69dfad85dd531",
+      "review_state": "R1_FAIL(6)→REPAIR-R1→R2_FAIL(2阻断)→ROOT-CAUSE-SWEEP(RC-1/2/3+40行矩阵)→REPAIR-R2→R3_FAIL(R3-F-01 MEDIUM+2LOW)→REPAIR-R3→R4_PASS（T02-REVIEW-04：全部根因簇闭环复证+7新探针全绿+workspace 1612/0+digest 固化脚本可复现）",
+      "commit_sha": "4920c59e38ddf69c8b846fb1aea896fca70d939d",
+      "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward）",
+      "post_acceptance_obligations": [
+        "R4-F-01 LOW: lib.rs:673-678 与 runs.rs:597 两处注释未提 chat 回退链，顺手轮补",
+        "R4-I-01/02 informational 登记",
+        "提交前已删除 5 个 probe/**/target 可再生构建缓存（4.2GB→1.7MB），探针源码与输出保留"
+      ],
+      "process_lessons_for_later_tasks": [
+        "RC-1: 现役语义必须按端到端生产链勘察而非文件片段",
+        "RC-2: 差异台账逐条锚定现役行号，禁误锚",
+        "RC-3: 测试须为现役对照式（黄金线体 fixture/语义清单驱动），禁自洽测试",
+        "digest 用 scripts/rust-tauri/r06_candidate_digest.sh 固化口径"
+      ]
+    },
+    {
+      "task_id": "R06-T03",
+      "name": "会话树、重试、fork与回退",
+      "depends_on": [
+        "R06-T02"
+      ],
+      "acceptance_ids": [
+        "R06-A05",
+        "R06-A06"
+      ],
+      "deliverables": [
+        "SessionService",
+        "树/分支索引",
+        "回退检查"
+      ],
+      "status": "DONE",
+      "task_base_sha": "4920c59e38ddf69c8b846fb1aea896fca70d939d",
+      "r00_leaf_count": 74,
+      "review_state": "R1_FAIL（3阻断+1裁决+5LOW）→REPAIR-R1（8项finding+1观察项全修+3项同根因扩展；rewind内容级回滚落地（restored/conflicted/skipped三档+真实写回）、retry fileRollback全契约、latest覆盖×fileVersions单事务原子化）→R2_PASS（artifacts/rust-tauri/R06/T03-REVIEW-02/REVIEW.md：digest 19f82d33 一致〔IDE .vscode 噪声经同口径排除复核唯一归因〕、R1全部修复逐行核验+三套件40例亲跑全绿、v8新SQL迁移保真重测、workspace 124套件1652/0、R05七套件118例全绿、74叶无虚报）",
+      "commit_sha": "2cb2b064061e902ea18faa0ec38499ce32436cb7",
+      "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward 4920c59e3..2cb2b0640）",
+      "post_acceptance_obligations": [
+        "R2-F-01 MEDIUM: fork/retry/rewind 缺会话级操作互斥（现役 session-operation-lock.ts 任一并发第二者响亮 busy，候选仅 run 在飞 busy 闸；有界影响无数据灭失）——R06 收口前修复或在差异台账显式申报，二选一",
+        "R2-F-02 LOW: 叶图 rewind/preview 两叶锚点仍为修复前 D1 语义且引用已不存在的测试名",
+        "R2-F-03 LOW: 修复矩阵称 record_file_version 已移除与代码实际保留（幂等版）矛盾",
+        "R2-F-04 LOW: delete_archived_session 头注 FK 序对 file_checkpoints 描述过时",
+        "OBS×5 登记见 T03-REVIEW-02/REVIEW.md",
+        ".vscode/settings.json 为 IDE 噪声（git.ignoreLimitWarning），不属于候选，不随提交"
+      ]
+    },
+    {
+      "task_id": "R06-T04",
+      "name": "统一消息历史、重连与导出",
+      "depends_on": [
+        "R06-T03"
+      ],
+      "acceptance_ids": [
+        "R06-A07",
+        "R06-A08"
+      ],
+      "deliverables": [
+        "CanonicalMessageStore",
+        "统一历史投影",
+        "分页/导出接口"
+      ],
+      "status": "DONE",
+      "task_base_sha": "2cb2b064061e902ea18faa0ec38499ce32436cb7",
+      "r00_leaf_count": 89,
+      "r00_leaf_count_correction": "原误写 101（混入了 T06 的数），按叶图 T04=89 更正；审查者以叶图为准复核",
+      "review_state": "R1_PASS（artifacts/rust-tauri/R06/T04-REVIEW-01/REVIEW.md：digest ce0ae1adc3f6 复跑逐字一致、workspace 1673/0 独立复跑、protocol/adapters/service/auth 定向套件全绿、89 叶逐叶复核无虚报（implemented 1/share 7/deferred 81 去向有据）、场景D 18 项对抗清单全过、RC-2/RC-3 现役锚点亲验一致；2 LOW + 6 OBS 均不阻断）",
+      "commit_sha": "b27dc5e4be9aed4763dda60519f0a04042fdfade",
+      "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward 2cb2b0640..b27dc5e4b）",
+      "post_acceptance_obligations": [
+        "F-01 LOW: history.rs:206-213 all 查询参数臂缺重复键检查（before/limit 臂均有），all=1&all=1 静默通过，与报告『重复键一律 400』声称不精确——补检查或收窄声称，二选一",
+        "F-02 LOW: 现役公开参数 reconciliation=1（sessions.ts:1421-1435）在候选侧以 400 退役，仅见 LEAF_MAP #65 anchor 一句，差异台账 D1-D5 未单列——补台账条目",
+        "OBS×6 登记见 T04-REVIEW-01/REVIEW.md（head 悬空静默空页/parent 成环理论可循环/PageStats 探针边界/a07 实时捕获应用公开投影/R08 UI 断言份额挂起/叶数口径 101 vs 89）"
+      ]
+    },
+    {
+      "task_id": "R06-T05",
+      "name": "会话文件、资源与产物身份",
+      "depends_on": [
+        "R06-T04"
+      ],
+      "acceptance_ids": [
+        "R06-A09",
+        "R06-A10"
+      ],
+      "deliverables": [
+        "ResourceService",
+        "SessionFile迁移适配",
+        "文件引用检查器"
+      ],
+      "status": "DONE",
+      "task_base_sha": "b27dc5e4be9aed4763dda60519f0a04042fdfade",
+      "r00_leaf_count": 57,
+      "review_state": "R1_PASS（artifacts/rust-tauri/R06/T05-REVIEW-01/REVIEW.md：digest e7c1e05e 复算逐字一致且审查结束重算无漂移〔.vscode 噪声按 T04 先例剔除口径唯一归因〕、fmt/clippy 0、全量 1749/1 独立复跑与执行者两轮互证〔两轮唯一失败项互异且均为负载型 flaky 单跑全过；执行者 ALF 五点证据链核验成立〕、33 路由面逐面吻合、v9 迁移纯追加 v1-v8 逐字未动、RC-2 锚点抽验 12 条全真实、J1/J3 合法延期、2 MEDIUM + 2 LOW + 4 OBS 不阻断）",
+      "commit_sha": "72c50436af68b72c74f97ed83618a6ac0fdf3caf",
+      "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward b27dc5e4b..72c50436a）",
+      "post_acceptance_obligations": [
+        "F-01 MEDIUM: mark_session_activity/touch_last_activity、fork_session_files、collect_reference_identities/insert_reference 三组原语生产零调用点（冷度信号断供致 bootstrap 清扫恒 no-op、fork 后旧 sf_ id 断链 404、A10 引用保护生产覆盖仅剩导入 refs；方向全保守不误删）——总控裁决：R06 收口前完成生产接线（接线归属由后续授权轮定，天然候选为 T06 会话接线面或阶段级修复），或在差异台账显式申报接线归属与影响，二选一",
+        "F-02 MEDIUM: 叶 #44 标 implemented 与断言矛盾（mount provider 现役成功路径 vs 候选响亮 400，J2 待裁决落定）——R06 收口前更正叶图标注或补 mount/url 成功面，随 J2 裁决二选一",
+        "F-03 LOW: 既存两例负载型 flaky（cancellation_tree:1337 / shutdown_coordinator:445，非 T05 面，单跑全过）——登记在案，阶段收口前评估预算窗加固",
+        "F-04 LOW: deferred 六叶未标目标阶段、stage_ids 未随 J1/J3 更新——叶图回填",
+        "OBS×4（F-05~F-08）登记见 T05-REVIEW-01/REVIEW.md（content 全量内存读已申报/ticket 双闸差异更严格已申报/meta→read TOCTOU 与现役同形态等）",
+        ".vscode/settings.json 为 IDE 噪声，不属于候选，不随提交",
+        "账本本条 DELIVERING 状态转为提交时点为审查后唯一非行为性口径内增量（审查 digest 绑定 IN_PROGRESS 时点账本，T04 同先例）"
+      ]
+    },
+    {
+      "task_id": "R06-T06",
+      "name": "人格、记忆与技能系统",
+      "depends_on": [
+        "R06-T05"
+      ],
+      "acceptance_ids": [
+        "R06-A11",
+        "R06-A12"
+      ],
+      "deliverables": [
+        "MemoryService",
+        "SkillService",
+        "PI_REPLACEMENT_MATRIX更新"
+      ],
+      "status": "DONE",
+      "task_base_sha": "e89c91a2289c0c7182da9e2ca4b1d31dc56ca5b6",
+      "r00_leaf_count": 101,
+      "review_state": "R1_PASS附条件→REPAIR-R1→R2_PASS（T06-REVIEW-02：R1 三项 findings 全部真闭环〔F-01 技能材料经 SkillMaterialPort 生产接线进 T01 skill.catalog 段+F-02 fail-closed 测试+F-03 响亮注册，独立亲读代码+亲跑确认〕、digest cb6d2e8d 开工收尾零漂移、fmt/clippy 0、定向 1462/1〔唯一失败 r00_management LAN 环境项 solo×2 同签名〕、全量 1820/1=任务水位、urldecode 事故修复有界、test-guard release 零链接 nm 复验、101 叶 62/18/21、仅 2 OBS 不阻断）",
+      "commit_sha": "983e4d8633420f28b44d608200e0a8653476013a",
+      "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward e89c91a22..983e4d863）",
+      "post_acceptance_obligations": [
+        "OBS-R2-1: skills.rs:925 文档与 catalog-unit 断言措辞称『catalog 序=用户覆盖顺序载体』但实际锁定扫描序——R07 接线时核对现役 getSkillsForAgent 返回序",
+        "OBS-R2-2（环境）: r00_management LAN 项本窗口间歇失败（ALF 对 192.168.x 自地址入站拦截，T06 零耦合），按既有环境项口径管理",
+        "执行期事故登记: memory.rs urldecode 死循环曾致测试进程 176GB 失控两次拖死整机——已修复+3 回归单测+lingxi-test-guard 全 133 测试二进制兜底（ctor 0.8.0 登记 D-12）；构建波次 -j 8 纪律",
+        "T06_TEST_GUARD.md §5 记录 approval_face_share_cases ~300.5s 固有耗时为全量时长瓶颈（R04-T08 范围可后续事件化）",
+        ".vscode/ 为 IDE 噪声不随提交",
+        "账本本条 DELIVERING 为审查后非行为性口径内增量（T04/T05 同先例）"
+      ]
+    },
+    {
+      "task_id": "R06-T07",
+      "name": "现役知识库迁移",
+      "depends_on": [
+        "R06-T06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "deliverables": [
+        "KnowledgeService",
+        "索引兼容矩阵",
+        "引用与迁移测试"
+      ],
+      "status": "DONE",
+      "task_base_sha": "14ebcd145606d945a3316aea99ff96ad095672ad",
+      "r00_leaf_count": 24,
+      "review_state": "R1_PASS（T07-REVIEW-01：digest d33af572 开工/收尾/归档后三次复算同值零漂移、fmt/clippy 0、定向 1488/1〔T07 三套件 26/26；唯一失败 r00_management LAN 环境项同签名〕、全量 1851/1=137 二进制/1852 用例与执行者申报逐字一致、水位 +31 恰为 T07 新增、A13 真诱惑夹具双向零串源+引用三环字节级程序断言、A14 真重启维度切换 fts 降级+KNOWLEDGE_VECTOR_NOT_READY+旧变体零参与、embedding 单一链 resolve_route→OperationService::embed 无第二路径、D9–D14 全部合法顺延、RC-2 锚点抽验 11 条全命中；2 LOW + 4 OBS 不阻断）",
+      "commit_sha": "5656ea446d0974c1e76a5e14648a486714d0ae66",
+      "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward 14ebcd145..5656ea446）",
+      "post_acceptance_obligations": [
+        "F-01 LOW: A14 维度铁律第三门（BLOB 长度损坏门 knowledge.rs:2586）已实现但无直接测试，报告§八/§九『三重门存储层直锁』措辞过强——补损坏 BLOB 测试+收敛措辞",
+        "F-02 LOW: 缓存库 open 对任何失败（含 KNOWLEDGE_SCHEMA_NEWER）删文件重建（index :1869-1885/vector :2336-2350 同根因两处），TS 现役 schema-newer 响亮保留文件仅 KNOWLEDGE_INDEX_INVALID 才 reset（knowledge-index-store.ts:407-410）——按错误码分类修复或台账 D5 补记，二选一",
+        "OBS×4 登记 T07-REVIEW-01/REVIEW.md（FTS 双通道措辞/并发写无专项用例〔Mutex+delete-wins 承担〕/台账 F 项中间 RED 日志未归档〔独立复跑兜底〕/T06 后账本 T07 行 NOT_STARTED 系总控未及时回填非执行者交付物）",
+        ".vscode/ 为 IDE 噪声不随提交"
+      ]
+    },
+    {
+      "task_id": "R06-T08",
+      "name": "工具行为评测与上下文交接",
+      "depends_on": [
+        "R06-T07"
+      ],
+      "acceptance_ids": [
+        "R06-A15",
+        "R06-A16"
+      ],
+      "deliverables": [
+        "R06_REPORT.md",
+        "R06_HANDOFF.json",
+        "BEHAVIOR_EVAL.json"
+      ],
+      "status": "DONE",
+      "task_base_sha": "ea61380577916e9fb75a4f4c2694321af7b83923",
+      "r00_leaf_count": 0,
+      "r00_leaf_count_note": "横切任务无直接叶子（叶图口径）；评测对象为 T01–T07 全链",
+      "review_state": "R1_PASS（T08-REVIEW-01：digest 61055b4f 开工收尾零漂移、fmt/clippy 0、评测独立重放 10/10 可复现、定向含取消三套件全绿、全量 1861/1=水位 1852→1862 只增不减〔唯一失败 r00_management LAN 环境项同签名〕、D-T08-1 裁决可接受〔T08-FIX-01 缺陷真实+修复真实+R03 取消走 CancelScope 树正交无回归、28/28 取消用例亲跑全绿〕、A15 BE-10 存在证明+四维不混算机器锁定、A16 注入不放宽安全逐字断言、jsonl↔BEHAVIOR_EVAL 10 任务零漂移、PI 矩阵纯追加 11/2/1、无虚报 PASS 无预写 SHA；1 LOW + 3 OBS 不阻断）",
+      "commit_sha": "42038f17315b361eb049aa86e22b14b613356068",
+      "push_state": "CONFIRMED（origin 读回同 SHA，fast-forward ea6138057..42038f173）",
+      "post_acceptance_obligations": [
+        "F-01 LOW: BE-04 token 硬编码 0/0 与台账来源申报不符（同形状 BE-09 实测非零证真值）——三 run 求和或改标 not measured",
+        "OBS-2: BE-05 expectedBehavior 残留首轮误锚词（observed 侧已改锚，D-T08-4 在案）",
+        "OBS-3: D-T08-1 台账对旧 agent lane 语义转述不精确（实为每目标 agent 而非 per-thread；裁决结论不变）",
+        "OBS-4: compiled_for_run 缓存键缺 agent 段——现网不触发（唯一接线面父代理回落），R07 接线委派面放开 request.agent_id 前必须补",
+        "真实模型评测多次采样 BLOCKED_NOT_AUTHORIZED（RR-BLK-CREDENTIALS→R10，发布阻塞项登记）",
+        ".vscode/ 为 IDE 噪声不随提交"
+      ]
+    }
   ],
-
-  "stage_review": {"state": "NOT_STARTED", "rounds": []},
-  "final": {"status": "IN_PROGRESS"}
+  "stage_review": {
+    "state": "PENDING_STAGE_REVIEW",
+    "rounds": [],
+    "note": "T01–T08 全部 DONE；按总控提示词§15 创建 STAGE-REVIEWER-R06-R1"
+  },
+  "final": {
+    "status": "IN_PROGRESS"
+  }
 }
