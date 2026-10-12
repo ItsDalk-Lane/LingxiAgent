@@ -640,6 +640,11 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
                 return RoutePolicy::Scope("chat");
             }
         }
+        if let Some(id) = rest.strip_suffix("/operations") {
+            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
+                return RoutePolicy::Scope("chat");
+            }
+        }
         if let Some(id) = rest.strip_suffix("/branch") {
             if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
                 return RoutePolicy::Scope("chat");

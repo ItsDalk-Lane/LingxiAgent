@@ -1,0 +1,18 @@
+[
+  {
+    "label": "unchanged-positive",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-1l50d6hk/scripts/rust-tauri/r06_stage_inputs.py",
+      "--root",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-1l50d6hk",
+      "--check",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-1l50d6hk/artifacts/01-unchanged-positive"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

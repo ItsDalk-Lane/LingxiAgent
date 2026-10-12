@@ -1,0 +1,11 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/rust/crates/lingxi-kernel)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.90s
+     Running unittests src/lib.rs (rust/target-w05-e01/debug/deps/lingxi_kernel-1fd7126cc038a159)
+LINGXI_TEST_GUARD: armed (pid 9096, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+test model_exchange::tests::empty_snapshot_is_generation_zero ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 121 filtered out; finished in 0.00s
+

@@ -79,6 +79,10 @@ fn describe_prior(input: &ModelTurnInput) -> Vec<String> {
         .prior
         .iter()
         .map(|item| match item {
+            lingxi_kernel::model_exchange::ExchangeItem::UserTurn { .. } => "user".to_string(),
+            lingxi_kernel::model_exchange::ExchangeItem::CurrentSubmission => {
+                "current_submission".to_string()
+            }
             lingxi_kernel::model_exchange::ExchangeItem::AssistantTurn { .. } => {
                 "assistant".to_string()
             }

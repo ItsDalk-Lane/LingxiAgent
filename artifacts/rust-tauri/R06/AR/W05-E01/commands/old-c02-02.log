@@ -1,0 +1,20 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.86s
+     Running tests/r06_ar_f05_cache.rs (rust/target-w05-e01/debug/deps/r06_ar_f05_cache-b8ad9174ba016b7e)
+LINGXI_TEST_GUARD: armed (pid 64354, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+
+thread 'c02_real_runtime_other_agent_child_has_its_own_persona' (5251422) panicked at crates/lingxi-service/tests/r06_ar_f05_cache.rs:53:100:
+called `Result::unwrap()` on an `Err` value: ConfigFileInvalid { path: "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/rust/crates/lingxi-service/artifacts/rust-tauri/R06/AR/W05-E01/local-only/w05-c02-64354-1791718853769191000/service.json", detail: "missing required key \"home\"" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test c02_real_runtime_other_agent_child_has_its_own_persona ... FAILED
+
+failures:
+
+failures:
+    c02_real_runtime_other_agent_child_has_its_own_persona
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_f05_cache`

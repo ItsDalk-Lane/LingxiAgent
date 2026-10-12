@@ -214,9 +214,105 @@ pub async fn send_with_timeouts(
     deadline_unix_ms: Option<u64>,
     auth: &ApplicableAuth,
 ) -> Result<reqwest::Response, (ProtocolError, bool)> {
-    let response = send_head_with_timeouts(request, timeouts, deadline_unix_ms).await?;
+    send_with_timeouts_observed(request, timeouts, deadline_unix_ms, auth, None).await
+}
+
+/// 三个可观察事实：开始轮询 transport、收到响应头、连接失败证明未到服务端。
+/// 开始尝试不证明已送达；取消或进程死亡留下明确的不确定窗口。
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SendObservation {
+    AttemptStarted,
+    ResponseHeadersReceived,
+    ConnectFailedBeforeSend,
+}
+pub type SendObserver<'a> =
+    &'a (dyn Fn(SendObservation) -> Result<(), ProtocolError> + Send + Sync);
+/// 需要持久化发送意图的宿主观察器，在真实发送前有界完成异步写入。
+pub trait AsyncSendObserver: Send + Sync {
+    fn observe(
+        &self,
+        observation: SendObservation,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), ProtocolError>> + Send + '_>>;
+
+    /// 仅真实非成功响应头提供状态；旧观察器无需改变原发送计数。
+    fn rejected_response_status(
+        &self,
+        _status: u16,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), ProtocolError>> + Send + '_>>
+    {
+        Box::pin(async { Ok(()) })
+    }
+}
+#[derive(Clone, Copy)]
+enum TransportObserver<'a> {
+    Sync(SendObserver<'a>),
+    Async(&'a dyn AsyncSendObserver),
+}
+impl TransportObserver<'_> {
+    async fn observe(self, observation: SendObservation) -> Result<(), ProtocolError> {
+        match self {
+            Self::Sync(observer) => observer(observation),
+            Self::Async(observer) => observer.observe(observation).await,
+        }
+    }
+
+    async fn rejected_response_status(self, status: u16) -> Result<(), ProtocolError> {
+        match self {
+            Self::Sync(_) => Ok(()),
+            Self::Async(observer) => observer.rejected_response_status(status).await,
+        }
+    }
+}
+pub async fn send_with_timeouts_async_observed(
+    request: reqwest::RequestBuilder,
+    timeouts: &HttpTimeouts,
+    deadline_unix_ms: Option<u64>,
+    auth: &ApplicableAuth,
+    observer: &dyn AsyncSendObserver,
+) -> Result<reqwest::Response, (ProtocolError, bool)> {
+    send_with_timeouts_transport_observed(
+        request,
+        timeouts,
+        deadline_unix_ms,
+        auth,
+        Some(TransportObserver::Async(observer)),
+    )
+    .await
+}
+pub async fn send_with_timeouts_observed(
+    request: reqwest::RequestBuilder,
+    timeouts: &HttpTimeouts,
+    deadline_unix_ms: Option<u64>,
+    auth: &ApplicableAuth,
+    observer: Option<SendObserver<'_>>,
+) -> Result<reqwest::Response, (ProtocolError, bool)> {
+    send_with_timeouts_transport_observed(
+        request,
+        timeouts,
+        deadline_unix_ms,
+        auth,
+        observer.map(TransportObserver::Sync),
+    )
+    .await
+}
+async fn send_with_timeouts_transport_observed(
+    request: reqwest::RequestBuilder,
+    timeouts: &HttpTimeouts,
+    deadline_unix_ms: Option<u64>,
+    auth: &ApplicableAuth,
+    observer: Option<TransportObserver<'_>>,
+) -> Result<reqwest::Response, (ProtocolError, bool)> {
+    let response =
+        send_head_with_timeouts_transport_observed(request, timeouts, deadline_unix_ms, observer)
+            .await?;
     let status = response.status();
     if !status.is_success() {
+        if let Some(observer) = observer {
+            observer
+                .rejected_response_status(status.as_u16())
+                .await
+                .map_err(|error| (error, false))?;
+        }
         let retry_after_ms = parse_retry_after(response.headers());
         let (body_text, read_note) = read_error_body_bounded(response, deadline_unix_ms).await;
         let (mut error, retryable) =
@@ -314,6 +410,29 @@ pub async fn send_head_with_timeouts(
     timeouts: &HttpTimeouts,
     deadline_unix_ms: Option<u64>,
 ) -> Result<reqwest::Response, (ProtocolError, bool)> {
+    send_head_with_timeouts_observed(request, timeouts, deadline_unix_ms, None).await
+}
+
+async fn send_head_with_timeouts_observed(
+    request: reqwest::RequestBuilder,
+    timeouts: &HttpTimeouts,
+    deadline_unix_ms: Option<u64>,
+    observer: Option<SendObserver<'_>>,
+) -> Result<reqwest::Response, (ProtocolError, bool)> {
+    send_head_with_timeouts_transport_observed(
+        request,
+        timeouts,
+        deadline_unix_ms,
+        observer.map(TransportObserver::Sync),
+    )
+    .await
+}
+async fn send_head_with_timeouts_transport_observed(
+    request: reqwest::RequestBuilder,
+    timeouts: &HttpTimeouts,
+    deadline_unix_ms: Option<u64>,
+    observer: Option<TransportObserver<'_>>,
+) -> Result<reqwest::Response, (ProtocolError, bool)> {
     if let Some(0) = remaining_budget_ms(deadline_unix_ms) {
         let error = budget_exceeded_error(
             "model call total budget (model_call_total_budget_ms) is exhausted before the \
@@ -329,33 +448,65 @@ pub async fn send_head_with_timeouts(
             .min(std::time::Duration::from_millis(remaining)),
         None => timeouts.first_byte,
     };
-    let response = match tokio::time::timeout(window, request.send()).await {
-        Ok(Ok(response)) => response,
-        Ok(Err(err)) => {
-            // A10 (已接受不盲重发): a CONNECT-phase failure proves the
-            // request never reached the server — a bounded retry is
-            // side-effect-free. Any LATER send/head failure means the
-            // server may already hold the (billable, non-idempotent)
-            // request: no idempotency key exists, so the call settles
-            // NON-retryable — never a blind second send. (Incumbent
-            // parity: core/model-operation-client.ts marks only 429/5xx
-            // retryable; every transport failure is terminal there.)
-            let retryable = err.is_connect();
-            return Err((
-                ProtocolError::new(
+    // 请求构造失败属于尚未发送；观察器只能在可发送请求成立之后调用。
+    let (client, request) = request.build_split();
+    let request = request.map_err(|error| {
+        (
+            ProtocolError::new(
+                ErrorCode::UpstreamUnavailable,
+                format!("provider request construction failed before send: {error}"),
+                false,
+            ),
+            false,
+        )
+    })?;
+    // 通知在这个 future 真正被轮询时执行；通知与执行之间仍不能证明 wire 已发出。
+    let attempt = async {
+        if let Some(observer) = observer {
+            observer
+                .observe(SendObservation::AttemptStarted)
+                .await
+                .map_err(|e| (e, false))?;
+        }
+        match client.execute(request).await {
+            Ok(response) => {
+                if let Some(observer) = observer {
+                    observer
+                        .observe(SendObservation::ResponseHeadersReceived)
+                        .await
+                        .map_err(|e| (e, false))?;
+                }
+                Ok(response)
+            }
+            Err(err) => {
+                // A10：仅连接错误证明未送达，可保留原有有界重试；其余错误不能盲重发。
+                let retryable = err.is_connect();
+                let mut error = ProtocolError::new(
                     ErrorCode::UpstreamUnavailable,
                     format!("provider request failed before a response: {err}"),
                     retryable,
-                ),
-                retryable,
-            ));
+                );
+                if retryable {
+                    if let Some(observer) = observer {
+                        if let Err(observation_error) = observer
+                            .observe(SendObservation::ConnectFailedBeforeSend)
+                            .await
+                        {
+                            error.message.push_str(&format!("; connection failed before send, but observation persistence failed: {observation_error}"));
+                            return Err((error, false));
+                        }
+                    }
+                }
+                Err((error, retryable))
+            }
         }
+    };
+    let response = match tokio::time::timeout(window, attempt).await {
+        Ok(result) => result?,
         Err(_elapsed) => {
-            // Which bound fired? A fresh clock read decides: an exhausted
-            // deadline is the non-retryable budget failure; otherwise the
-            // first-byte window fired. BOTH are non-retryable (A10): the
-            // request was fully sent, so the server may have accepted it —
-            // a resend would be an unprovable duplicate.
+            // 重新读取时钟区分总期限耗尽和首字节等待超时。
+            // 两者都不能盲重发（A10）：已尝试传输，服务端可能已接受请求，
+            // 无法证明再次发送不会形成重复调用。
             if remaining_budget_ms(deadline_unix_ms) == Some(0) {
                 let error = budget_exceeded_error(
                     "model call total budget exhausted while waiting for the response head \
@@ -369,7 +520,7 @@ pub async fn send_head_with_timeouts(
                     ErrorCode::UpstreamUnavailable,
                     format!(
                         "provider response head did not arrive within {} ms (pre-registered \
-                         http_first_byte_timeout_ms): the request was already sent, so the \
+                         http_first_byte_timeout_ms): the request may have been sent, so the \
                          call fails NON-retryable — no blind resend of a possibly-accepted \
                          request (A10)",
                         timeouts.first_byte.as_millis()

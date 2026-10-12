@@ -1,0 +1,164 @@
+--- a/rust/crates/lingxi-adapters/src/storage/run_store.rs
++++ b/rust/crates/lingxi-adapters/src/storage/run_store.rs
+@@ -87,12 +87,35 @@
+     pub current_attempt: String,
+ }
+ 
++/// 服务所有者注册一个关闭前资源收尾；适配器不依赖服务类型。
++pub type BeforeCloseHook = Arc<
++    dyn Fn()
++            -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), StorageError>> + Send>>
++        + Send
++        + Sync,
++>;
++struct CloseLifecycle {
++    started: std::sync::atomic::AtomicBool,
++    hook: std::sync::Mutex<Option<BeforeCloseHook>>,
++    result: tokio::sync::watch::Sender<Option<Result<(), StorageError>>>,
++}
++impl Default for CloseLifecycle {
++    fn default() -> Self {
++        Self {
++            started: std::sync::atomic::AtomicBool::new(false),
++            hook: std::sync::Mutex::new(None),
++            result: tokio::sync::watch::channel(None).0,
++        }
++    }
++}
++
+ /// The new run/message database: bounded queue + dedicated SQLite worker.
+ /// Cloning shares the one queue/worker (there is exactly one per database
+ /// file per process; the composition root owns the original).
+ #[derive(Clone)]
+ pub struct RunDatabase {
+     queue: Arc<DbQueue>,
++    close_lifecycle: Arc<CloseLifecycle>,
+     admission: Arc<lingxi_kernel::session_admission::SessionAdmission>,
+     /// Process-wide atomic run-id allocator (R02 stage-repair R1 / F01,
+     /// reseeded correctly in stage-repair R2 / R2-F01, strict minted-format
+@@ -139,6 +162,15 @@
+ }
+ 
+ impl RunDatabase {
++    /// 内部恢复按宿主 call 身份读原不可改写账目，不暴露新的用户查询入口。
++    pub async fn model_usage_by_call(
++        &self,
++        call_id: String,
++    ) -> Result<Option<lingxi_kernel::usage::ModelCallUsageRecord>, StorageError> {
++        self.queue
++            .submit(move |conn| load_usage_row(conn, &call_id))
++            .await
++    }
+     /// 租约覆盖实际线程的字节访问，不能以请求取消代替线程已退出。
+     pub fn file_payload_leases(&self) -> Arc<tokio::sync::RwLock<()>> {
+         self.file_payload_leases.clone()
+@@ -156,6 +188,7 @@
+     pub async fn open(path: &Path, options: StoreOptions) -> Result<Self, StorageError> {
+         let queue = Arc::new(DbQueue::open(path, options)?);
+         let db = Self {
++            close_lifecycle: Arc::new(CloseLifecycle::default()),
+             admission: shared_session_admission(path)?,
+             queue,
+             run_id_seq: Arc::new(std::sync::atomic::AtomicU64::new(0)),
+@@ -359,10 +392,98 @@
+             .await
+     }
+ 
+-    /// Graceful close: FIFO-drains queued work, checkpoints the WAL
+-    /// (TRUNCATE) and joins the worker. See [`DbQueue::close`].
++    /// 同一 DB 只允许一次注册；关闭开始后不再接受新资源。
++    pub fn register_before_close(&self, hook: BeforeCloseHook) -> Result<(), StorageError> {
++        let mut slot = self
++            .close_lifecycle
++            .hook
++            .lock()
++            .map_err(|_| StorageError::Internal {
++                detail: "before-close registration lock poisoned".into(),
++            })?;
++        if slot.is_some()
++            || self
++                .close_lifecycle
++                .started
++                .load(std::sync::atomic::Ordering::Acquire)
++        {
++            return Err(StorageError::Conflict {
++                detail: "before-close resource already registered or close started".into(),
++            });
++        }
++        *slot = Some(hook);
++        Ok(())
++    }
++
++    /// 先收回该 DB 关联资源，再原样 FIFO drain/checkpoint/join 数据库 worker。
++    /// 注册资源的同时、重复及被取消等待者共享一次真实关闭；取消不丢掉实际 join。
++    /// 未注册资源的裸 DB 保持原队列关闭后再次关闭报错的合同。
+     pub async fn close(&self) -> Result<(), StorageError> {
+-        self.queue.close().await
++        let lifecycle = self.close_lifecycle.clone();
++        let managed_resource = {
++            let hook = lifecycle.hook.lock().map_err(|_| StorageError::Internal {
++                detail: "before-close resource lock poisoned".into(),
++            })?;
++            let managed = hook.is_some();
++            if !managed {
++                // 持有注册锁时标记关闭，防止裸 DB 关闭后才插入关联资源。
++                lifecycle
++                    .started
++                    .store(true, std::sync::atomic::Ordering::Release);
++            }
++            managed
++        };
++        if !managed_resource {
++            return self.queue.close().await;
++        }
++        let mut result = lifecycle.result.subscribe();
++        if !lifecycle
++            .started
++            .swap(true, std::sync::atomic::Ordering::AcqRel)
++        {
++            let queue = self.queue.clone();
++            let completion = lifecycle.clone();
++            tokio::spawn(async move {
++                let resource = match completion.hook.lock() {
++                    Ok(slot) => Ok(slot.clone()),
++                    Err(_) => Err(StorageError::Internal {
++                        detail: "before-close resource lock poisoned".into(),
++                    }),
++                };
++                let resource = match resource {
++                    Ok(Some(hook)) => match tokio::spawn(async move { hook().await }).await {
++                        Ok(outcome) => outcome,
++                        Err(error) => Err(StorageError::Internal {
++                            detail: format!("before-close resource task failed: {error}"),
++                        }),
++                    },
++                    Ok(None) => Ok(()),
++                    Err(error) => Err(error),
++                };
++                let database = queue.close().await;
++                let outcome = match (resource, database) {
++                    (Ok(()), outcome) => outcome,
++                    (Err(error), Ok(())) => Err(error),
++                    (Err(resource), Err(database)) => Err(StorageError::Internal {
++                        detail: format!(
++                            "resource close failed: {resource}; database close failed: {database}"
++                        ),
++                    }),
++                };
++                completion.result.send_replace(Some(outcome));
++            });
++        }
++        loop {
++            if let Some(outcome) = result.borrow_and_update().clone() {
++                return outcome;
++            }
++            result
++                .changed()
++                .await
++                .map_err(|error| StorageError::Internal {
++                    detail: format!("close result unavailable: {error}"),
++                })?;
++        }
+     }
+ 
+     /// 从实际已开始的模型调用读取原始观测。已有 key_events 为唯一持久事实，

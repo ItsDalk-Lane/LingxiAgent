@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-11T23:10:06.743707+00:00",
+  "id": "R06-USER-CONFIRMED-WORKSPACE-DELETION-01",
+  "user_answer": "已经彻底删除",
+  "classification": "NO_FURTHER_TRASH_OR_MOVED_LOCATION_SEARCH",
+  "W05_source": "10/10 exact recovered source bytes stored; not accepted",
+  "W09_source": "13/13 exact recovered source bytes stored; not accepted",
+  "W07_source": "six intermediate backups only; new executor reconstruction required",
+  "missing_original_runtime_evidence": "NOT_RECONSTRUCTED_NOT_PASS",
+  "receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/exact-mutant-byte-recovery-01.json",
+  "no_user_blame_or_additional_authorization_needed_for_safe_recovery": true
+}

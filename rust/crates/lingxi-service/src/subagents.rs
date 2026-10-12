@@ -51,16 +51,21 @@
 
 use std::collections::HashMap;
 use std::future::Future;
+use std::path::PathBuf;
 use std::pin::Pin;
 use std::sync::{Arc, Mutex, OnceLock, Weak};
 use std::time::Duration;
 
+use lingxi_adapters::storage::subagent_threads as thread_store;
+use lingxi_kernel::RunContext;
+use lingxi_kernel::model_exchange::ExchangeItem;
 use lingxi_kernel::ports::{DelegationRequest, StorageError};
 use lingxi_kernel::subagent::{
-    resolve_subagent_access, AccessRequest, RunLineage, RunOrigin, SubagentAccessDenied,
-    SubagentPolicy, ToolAccessTier,
+    AccessRequest, RunLineage, RunOrigin, SubagentAccessDenied, SubagentPolicy, ToolAccessTier,
+    resolve_subagent_access,
 };
 use lingxi_protocol::{ErrorCode, ModelCallId, ProtocolError, RunId, ToolCallId};
+use serde_json::{Value, json};
 
 use crate::cancel::CancelScope;
 use crate::events::EventService;
@@ -77,6 +82,9 @@ use lingxi_kernel::RunFinish;
 /// reports exactly that); the trait object's declared `Send + Sync`
 /// breaks the propagation without any unsafe impl.
 pub trait SubagentLauncher: Send + Sync {
+    fn flush_closeouts<'a>(&'a self) -> Pin<Box<dyn Future<Output=Result<(),StorageError>>+Send+'a>> {
+        Box::pin(async {Ok(())})
+    }
     /// Fresh dispatch (`subagent` target).
     fn dispatch(
         self: Arc<Self>,
@@ -91,13 +99,33 @@ pub trait SubagentLauncher: Send + Sync {
     ) -> Pin<Box<dyn Future<Output = Result<LaunchedChild, SubagentDispatchError>> + Send>>;
     /// Close (`subagent_close` target) — synchronous, no run is created.
     fn close(
-        &self,
-        parent: &ParentRunFacts,
-        request: &DelegationRequest,
-    ) -> Result<ClosedThread, SubagentDispatchError>;
+        self: Arc<Self>,
+        parent: ParentRunFacts,
+        request: DelegationRequest,
+    ) -> Pin<Box<dyn Future<Output = Result<ClosedThread, SubagentDispatchError>> + Send>>;
+    fn list(
+        self: Arc<Self>,
+        parent: ParentRunFacts,
+    ) -> Pin<Box<dyn Future<Output = Result<Value, SubagentDispatchError>> + Send>>;
+    fn load_history<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        agent: &'a str,
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<ExchangeItem>, StorageError>> + Send + 'a>>;
+    fn record_failure<'a>(&'a self, ctx: &'a RunContext, agent: &'a str, error: &'a ProtocolError) -> Pin<Box<dyn Future<Output=Result<(),StorageError>>+Send+'a>>;
+    fn record_history<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        agent: &'a str,
+        items: &'a [ExchangeItem],
+        replace: bool,
+    ) -> Pin<Box<dyn Future<Output = Result<(), StorageError>> + Send + 'a>>;
 }
 
 impl SubagentLauncher for SubagentRuntime {
+    fn flush_closeouts<'a>(&'a self) -> Pin<Box<dyn Future<Output=Result<(),StorageError>>+Send+'a>> {
+        Box::pin(async move {SubagentRuntime::flush_closeouts(self).await})
+    }
     fn dispatch(
         self: Arc<Self>,
         parent: ParentRunFacts,
@@ -115,11 +143,197 @@ impl SubagentLauncher for SubagentRuntime {
     }
 
     fn close(
-        &self,
-        parent: &ParentRunFacts,
-        request: &DelegationRequest,
-    ) -> Result<ClosedThread, SubagentDispatchError> {
-        SubagentRuntime::close(self, parent, request)
+        self: Arc<Self>,
+        parent: ParentRunFacts,
+        request: DelegationRequest,
+    ) -> Pin<Box<dyn Future<Output = Result<ClosedThread, SubagentDispatchError>> + Send>> {
+        Box::pin(async move { SubagentRuntime::close(&self, &parent, &request).await })
+    }
+    fn list(
+        self: Arc<Self>,
+        parent: ParentRunFacts,
+    ) -> Pin<Box<dyn Future<Output = Result<Value, SubagentDispatchError>> + Send>> {
+        Box::pin(async move { self.list_candidates(&parent).await })
+    }
+    fn load_history<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        agent: &'a str,
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<ExchangeItem>, StorageError>> + Send + 'a>> {
+        Box::pin(async move {
+            self.initialize().await?;
+            if !thread_store::has_history(&self.storage, ctx.run_id.as_str()).await? {
+                return Ok(Vec::new());
+            }
+            let raw = thread_store::load_history(&self.storage, ctx, agent).await?;
+            let history = raw
+                .iter()
+                .map(crate::model_history::decode_item)
+                .collect::<Result<Vec<_>, _>>()?;
+            // 工具正文必须与原Run正式模型投影一致；不把界面卡片或任意档案当成历史。
+            for item in &history {
+                if let ExchangeItem::ToolResult { tool_call_id, .. }=item {
+                    let projection=self.storage.query_one_text(
+                        "SELECT e.payload_json FROM key_events e JOIN subagent_history_v1 h ON h.run_id=e.run_id WHERE e.event_type='tool_result_model_projection' AND json_extract(e.payload_json,'$.toolCallId')=?1 AND h.thread_id=(SELECT thread_id FROM subagent_history_v1 WHERE run_id=?2)",
+                        vec![tool_call_id.to_string(),ctx.run_id.to_string()],
+                    ).await?.ok_or_else(||StorageError::Corrupted{detail:"subagent tool history missing authoritative projection".into()})?;
+                    let projection:Value=serde_json::from_str(&projection).map_err(|e|StorageError::Corrupted{detail:e.to_string()})?;
+                    if crate::model_history::projected_tool_item(&projection)?!=*item {
+                        return Err(StorageError::Corrupted{detail:"subagent tool history differs from authoritative projection".into()});
+                    }
+                }
+                if let ExchangeItem::AssistantTurn {tool_calls,..}=item {
+                    for call in tool_calls {
+                        let binding=call.declaration_binding.as_ref().ok_or_else(||StorageError::Corrupted{detail:"subagent history missing declaration".into()})?;
+                        let target=binding.execution.as_ref().map(|e|e.target.as_str()).unwrap_or(call.target.as_str());
+                        let digest=binding.execution.as_ref().map(|e|e.args_digest.hex.as_str()).unwrap_or(call.args_digest.hex.as_str());
+                        let fact=self.storage.query_one_text(
+                            "SELECT j.journal_id FROM invocation_journal j JOIN subagent_history_v1 h ON h.run_id=j.run_id WHERE j.journal_id=?1 AND j.target=?2 AND j.args_digest=?3 AND h.thread_id=(SELECT thread_id FROM subagent_history_v1 WHERE run_id=?4)",
+                            vec![call.tool_call_id.to_string(),target.into(),digest.into(),ctx.run_id.to_string()],
+                        ).await?;
+                        if fact.is_none(){return Err(StorageError::Corrupted{detail:"subagent request history differs from original journal".into()});}
+                    }
+                }
+            }
+            crate::model_history::validate_pairs(&history)?;
+            Ok(history)
+        })
+    }
+    fn record_failure<'a>(&'a self, ctx: &'a RunContext, agent: &'a str, error: &'a ProtocolError) -> Pin<Box<dyn Future<Output=Result<(),StorageError>>+Send+'a>> {
+        Box::pin(async move {
+            if !thread_store::has_history(&self.storage,ctx.run_id.as_str()).await? {return Ok(());}
+            thread_store::record_failure(&self.storage,ctx,agent,&format!("{}: {}",error.code.wire_name(),error.message)).await
+        })
+    }
+    fn record_history<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        agent: &'a str,
+        items: &'a [ExchangeItem],
+        replace: bool,
+    ) -> Pin<Box<dyn Future<Output = Result<(), StorageError>> + Send + 'a>> {
+        Box::pin(async move {
+            if !thread_store::has_history(&self.storage, ctx.run_id.as_str()).await? {
+                return Ok(());
+            }
+            let raw = items
+                .iter()
+                .map(crate::model_history::encode_item)
+                .collect::<Result<Vec<_>, _>>()?;
+            thread_store::record_history(&self.storage, ctx, agent, raw, replace).await
+        })
+    }
+}
+
+/// 只对真实first-party入口从实际参数提取委派，不让模型自填权限事实。
+pub(crate) fn request_delegation(
+    request: &lingxi_kernel::ports::ToolRequest,
+) -> Option<DelegationRequest> {
+    let family = request.target.strip_prefix("tool:first-party:")?;
+    if !matches!(family, "subagent" | "subagent_reply" | "subagent_close") {
+        return None;
+    }
+    let args = request.arguments.as_value();
+    Some(DelegationRequest {
+        task: if family == "subagent_close" {
+            args["reason"]
+                .as_str()
+                .or_else(|| args["task"].as_str())
+                .unwrap_or_default()
+        } else {
+            args["task"].as_str().unwrap_or_default()
+        }
+        .into(),
+        access: AccessRequest::parse(args["access"].as_str()),
+        label: args["label"]
+            .as_str()
+            .or_else(|| args["instance"].as_str())
+            .map(str::to_string),
+        agent_id: args["agent"].as_str().map(str::to_string),
+        model: args["model"].as_str().map(str::to_string),
+        thread_id: args["threadId"].as_str().map(str::to_string),
+    })
+}
+
+/// 正式模型目录复用Node的参数形状；执行由统一Run驱动接管。
+pub fn register_tools(
+    registry: &lingxi_kernel::toolcatalog::ToolRegistry,
+    gateway: &crate::toolgateway::ToolInvocationGateway,
+    budget: &lingxi_kernel::toolcatalog::SchemaBudget,
+) {
+    use lingxi_kernel::toolcatalog::*;
+    for (name, description, schema) in [
+        (
+            "subagent",
+            "创建可续接子任务，立即返回taskId/threadId；结果回父会话。agent为?或list时读取真实候选。",
+            json!({"type":"object","properties":{"task":{"type":"string"},"agent":{"type":"string"},"model":{"type":"string"},"label":{"type":"string"},"instance":{"type":"string"},"access":{"type":"string","enum":["read","write"]}},"required":["task"],"additionalProperties":false}),
+        ),
+        (
+            "subagent_reply",
+            "给当前父会话的开放子线程追加任务，续接该线程真实历史。",
+            json!({"type":"object","properties":{"threadId":{"type":"string","minLength":1},"task":{"type":"string","minLength":1},"access":{"type":"string","enum":["read","write"]}},"required":["threadId","task"],"additionalProperties":false}),
+        ),
+        (
+            "subagent_close",
+            "关闭当前父会话指定的空闲开放子线程，返回最终closed状态。",
+            json!({"type":"object","properties":{"threadId":{"type":"string","minLength":1},"reason":{"type":"string"}},"required":["threadId"],"additionalProperties":false}),
+        ),
+    ] {
+        let registered = registry
+            .register(
+                ToolManifest {
+                    origin: ToolOrigin::FirstParty,
+                    local_name: name.into(),
+                    display_name: name.into(),
+                    aliases: Vec::new(),
+                    version: "1.0.0".into(),
+                    description: description.into(),
+                    input_schema: lingxi_protocol::ToolSchemaDocument {
+                        dialect: "json-schema/2020-12".into(),
+                        schema,
+                    },
+                    output_schema: None,
+                    permission: PermissionContract {
+                        kind: PermissionKind::Read,
+                        capability_base: format!("{name}.capability"),
+                    },
+                    availability: Availability::Available,
+                    timeout_ms: Some(30_000),
+                    max_concurrency: Some(4),
+                    declared_permission: DeclaredPermission::None,
+                    recovery: lingxi_kernel::invocation::ToolRecoveryCapability::CONSERVATIVE,
+                },
+                budget,
+            )
+            .expect("子代理工具声明登记失败");
+        gateway.bind_executor(
+            registered.target_id,
+            Arc::new(DelegationOnly),
+            "子任务只通过正式Run驱动执行",
+        );
+    }
+}
+
+struct DelegationOnly;
+impl lingxi_kernel::ports::ToolExecutorPort for DelegationOnly {
+    fn execute<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        _call: &'a ToolCallId,
+        _request: &'a lingxi_kernel::ports::ToolRequest,
+    ) -> Pin<Box<dyn Future<Output = lingxi_kernel::ports::ToolExecutionResult> + Send + 'a>> {
+        Box::pin(async move {
+            lingxi_kernel::ports::ToolExecutionResult::of_ctx(
+                ctx,
+                lingxi_kernel::ports::ToolOutcome::Failed {
+                    error: ProtocolError::new(
+                        ErrorCode::Internal,
+                        "subagent request did not reach the authoritative delegation driver",
+                        false,
+                    ),
+                },
+            )
+        })
     }
 }
 
@@ -146,12 +360,26 @@ pub struct ParentRunFacts {
 pub struct LaunchedChild {
     pub child_run_id: String,
     pub thread_id: String,
+    pub status: String,
+    pub progress_error: Option<String>,
+}
+
+impl LaunchedChild {
+    pub fn result_text(&self) -> String {
+        json!({"taskId":self.child_run_id,"childRunId":self.child_run_id,"threadId":self.thread_id,"status":self.status,"progressError":self.progress_error}).to_string()
+    }
 }
 
 /// Identity of one successfully closed thread.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ClosedThread {
     pub thread_id: String,
+}
+
+impl ClosedThread {
+    pub fn result_text(&self) -> String {
+        json!({"threadId":self.thread_id,"streamStatus":"closed","status":"closed"}).to_string()
+    }
 }
 
 /// Dispatch/reply/close refusal. Every variant is loud and maps onto a
@@ -193,6 +421,10 @@ pub enum SubagentDispatchError {
     /// The supervised-task registry refused the child spawn.
     SpawnRefused {
         cap: usize,
+    },
+    AgentUnavailable {
+        agent: String,
+        detail: String,
     },
 }
 
@@ -262,6 +494,11 @@ impl SubagentDispatchError {
                 format!("supervised-task registry at its cap ({cap}); child spawn refused"),
                 false,
             ),
+            SubagentDispatchError::AgentUnavailable { agent, detail } => ProtocolError::new(
+                ErrorCode::NotFound,
+                format!("Subagent candidate unavailable: {agent}: {detail}"),
+                false,
+            ),
         }
     }
 }
@@ -307,6 +544,9 @@ impl std::fmt::Display for SubagentDispatchError {
                     f,
                     "supervised-task registry cap {cap} refused the child spawn"
                 )
+            }
+            SubagentDispatchError::AgentUnavailable { agent, detail } => {
+                write!(f, "subagent candidate {agent} unavailable: {detail}")
             }
         }
     }
@@ -390,6 +630,9 @@ pub struct SubagentRuntime {
     policy: SubagentPolicy,
     supervisor: OnceLock<Weak<RunSupervisor>>,
     state: Mutex<RuntimeState>,
+    agents_root: OnceLock<PathBuf>,
+    storage_ready: tokio::sync::OnceCell<()>,
+    pending_closeouts: Arc<Mutex<Vec<(String, String, String)>>>,
 }
 
 impl std::fmt::Debug for SubagentRuntime {
@@ -415,6 +658,9 @@ impl SubagentRuntime {
             policy,
             supervisor: OnceLock::new(),
             state: Mutex::new(RuntimeState::default()),
+            agents_root: OnceLock::new(),
+            storage_ready: tokio::sync::OnceCell::new(),
+            pending_closeouts: Arc::new(Mutex::new(Vec::new())),
         })
     }
 
@@ -431,6 +677,163 @@ impl SubagentRuntime {
         &self.policy
     }
 
+    pub fn bind_agents_root(&self, root: PathBuf) {
+        if self.agents_root.set(root).is_err() {
+            tracing::error!("subagent agent directory bound twice");
+        }
+    }
+
+    pub async fn initialize(&self) -> Result<(), StorageError> {
+        self.storage_ready.get_or_try_init(||thread_store::initialize(&self.storage)).await?;
+        flush_abnormal_closeouts(&self.storage, &self.pending_closeouts).await
+    }
+
+    pub async fn flush_closeouts(&self) -> Result<(), StorageError> {
+        flush_abnormal_closeouts(&self.storage, &self.pending_closeouts).await
+    }
+
+    async fn validate_parent(&self, parent: &ParentRunFacts) -> Result<(), SubagentDispatchError> {
+        let actual=self.storage.query_one_text(
+            "SELECT r.run_id FROM runs r JOIN sessions s ON s.session_id=r.session_id WHERE r.run_id=?1 AND r.session_id=?2 AND r.owner_kind=?3 AND r.owner_subject=?4 AND s.agent_id=?5",
+            vec![parent.parent_run_id.to_string(),parent.session_id.clone(),parent.principal.storage_kind().into(),parent.principal.storage_subject(),parent.agent_id.clone()],
+        ).await.map_err(SubagentDispatchError::Storage)?;
+        if actual.is_none() {
+            return Err(SubagentDispatchError::Storage(
+                StorageError::InvalidRequest {
+                    detail: "subagent parent ownership mismatch".into(),
+                },
+            ));
+        }
+        Ok(())
+    }
+
+    fn candidates(&self, current: &str) -> Result<Vec<Value>, SubagentDispatchError> {
+        let root = self
+            .agents_root
+            .get()
+            .ok_or(SubagentDispatchError::NotBound)?;
+        let mut candidates = Vec::new();
+        let entries = match std::fs::read_dir(root) {
+            Ok(entries) => entries,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(candidates),
+            Err(e) => {
+                return Err(SubagentDispatchError::AgentUnavailable {
+                    agent: "list".into(),
+                    detail: e.to_string(),
+                });
+            }
+        };
+        let canonical_root=std::fs::canonicalize(root).map_err(|e|SubagentDispatchError::AgentUnavailable{agent:"list".into(),detail:e.to_string()})?;
+        for entry in entries {
+            let entry = entry.map_err(|e| SubagentDispatchError::AgentUnavailable {
+                agent: "list".into(),
+                detail: e.to_string(),
+            })?;
+            let id = entry.file_name().to_string_lossy().to_string();
+            if id == current || !entry.path().join("config.yaml").is_file() {
+                continue;
+            }
+            // 先验证正式agent身份，再核实际文件归属；不直接读取模型提供的路径。
+            let roots = lingxi_adapters::storage::agent_memory::resolve_agent_roots(root, &id)
+                .map_err(|e| SubagentDispatchError::AgentUnavailable {
+                    agent: id.clone(),
+                    detail: e.to_string(),
+                })?;
+            let config_path=std::fs::canonicalize(roots.agent_dir.join("config.yaml")).map_err(|e|SubagentDispatchError::AgentUnavailable{agent:id.clone(),detail:e.to_string()})?;
+            if !config_path.starts_with(&canonical_root) {
+                return Err(SubagentDispatchError::AgentUnavailable{agent:id.clone(),detail:"agent config escapes actual roster root".into()});
+            }
+            let scan = lingxi_adapters::storage::agent_memory::config::read_agent_config(
+                &config_path,
+            )
+            .and_then(|doc| doc.scan())
+            .map_err(|e| SubagentDispatchError::AgentUnavailable {
+                agent: id.clone(),
+                detail: e.to_string(),
+            })?;
+            candidates.push(json!({"id":id,"name":scan.agent_name.unwrap_or_else(||id.clone())}));
+        }
+        candidates.sort_by(|a, b| a["id"].as_str().cmp(&b["id"].as_str()));
+        Ok(candidates)
+    }
+
+    pub async fn list_candidates(
+        &self,
+        parent: &ParentRunFacts,
+    ) -> Result<Value, SubagentDispatchError> {
+        self.initialize()
+            .await
+            .map_err(SubagentDispatchError::Storage)?;
+        self.validate_parent(parent).await?;
+        let agents = self.candidates(&parent.agent_id)?;
+        let tasks = thread_store::progress(
+            &self.storage,
+            &parent.session_id,
+            parent.principal.storage_kind(),
+            &parent.principal.storage_subject(),
+        )
+        .await
+        .map_err(SubagentDispatchError::Storage)?;
+        Ok(
+            json!({"agents":agents,"noCandidates":agents.is_empty(),"reason":if agents.is_empty(){Some("No other available agents")}else{None},"tasks":tasks}),
+        )
+    }
+
+    async fn restore_thread(&self, id: &str) -> Result<Value, SubagentDispatchError> {
+        self.initialize()
+            .await
+            .map_err(SubagentDispatchError::Storage)?;
+        let record = thread_store::read_thread(&self.storage, id)
+            .await
+            .map_err(SubagentDispatchError::Storage)?
+            .ok_or_else(|| SubagentDispatchError::ThreadNotFound {
+                thread_id: id.into(),
+            })?;
+        let required = |key: &str| {
+            record[key].as_str().map(str::to_string).ok_or_else(|| {
+                SubagentDispatchError::Storage(StorageError::Corrupted {
+                    detail: format!("subagent thread missing {key}"),
+                })
+            })
+        };
+        let thread = SubagentThread {
+            thread_id: required("threadId")?,
+            parent_session_id: required("parentSessionId")?,
+            label: record["label"].as_str().map(str::to_string),
+            tier: match record["tier"].as_str() {
+                Some("read") => ToolAccessTier::ReadOnly,
+                Some("write") => ToolAccessTier::Operate,
+                _ => {
+                    return Err(SubagentDispatchError::Storage(StorageError::Corrupted {
+                        detail: "subagent thread invalid tier".into(),
+                    }));
+                }
+            },
+            busy: record["busy"].as_bool().ok_or_else(|| {
+                SubagentDispatchError::Storage(StorageError::Corrupted {
+                    detail: "subagent thread missing busy".into(),
+                })
+            })?,
+            child_run_id: Some(required("childRunId")?),
+            status: match record["streamStatus"].as_str() {
+                Some("open") => ThreadStatus::Open,
+                Some("closed") => ThreadStatus::Closed,
+                _ => {
+                    return Err(SubagentDispatchError::Storage(StorageError::Corrupted {
+                        detail: "subagent thread invalid status".into(),
+                    }));
+                }
+            },
+            last_run_status: record["lastRunStatus"].as_str().map(str::to_string),
+        };
+        self.state
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .threads
+            .insert(id.into(), thread);
+        Ok(record)
+    }
+
     /// Dispatches a FRESH subagent child run (`subagent` tool): resolve
     /// the attenuated tier (explicit access > inherited parent mode),
     /// enforce the concurrency caps, allocate the child run, link it
@@ -440,8 +843,35 @@ impl SubagentRuntime {
     pub async fn dispatch_child(
         self: &Arc<Self>,
         parent: ParentRunFacts,
-        request: DelegationRequest,
+        mut request: DelegationRequest,
     ) -> Result<LaunchedChild, SubagentDispatchError> {
+        self.initialize()
+            .await
+            .map_err(SubagentDispatchError::Storage)?;
+        self.validate_parent(&parent).await?;
+        if let Some(agent) = request
+            .agent_id
+            .as_deref()
+            .filter(|id| *id != parent.agent_id)
+        {
+            let candidates = self.candidates(&parent.agent_id)?;
+            let selected = candidates
+                .iter()
+                .find(|a| a["id"] == agent)
+                .or_else(|| {
+                    let names: Vec<_> = candidates.iter().filter(|a| a["name"] == agent).collect();
+                    if names.len() == 1 {
+                        Some(names[0])
+                    } else {
+                        None
+                    }
+                })
+                .ok_or_else(|| SubagentDispatchError::AgentUnavailable {
+                    agent: agent.into(),
+                    detail: "not present or name ambiguous in the actual roster".into(),
+                })?;
+            request.agent_id = Some(selected["id"].as_str().unwrap().into());
+        }
         if request.task.trim().is_empty() {
             return Err(SubagentDispatchError::InvalidTarget(
                 "subagent dispatch requires a non-empty task".to_string(),
@@ -461,7 +891,7 @@ impl SubagentRuntime {
     pub async fn reply_child(
         self: &Arc<Self>,
         parent: ParentRunFacts,
-        request: DelegationRequest,
+        mut request: DelegationRequest,
     ) -> Result<LaunchedChild, SubagentDispatchError> {
         let thread_id = request
             .thread_id
@@ -469,6 +899,22 @@ impl SubagentRuntime {
             .filter(|id| !id.trim().is_empty())
             .unwrap_or_default();
         let mode = self.sessions.permission_mode(&parent.session_id);
+        self.validate_parent(&parent).await?;
+        let record = self.restore_thread(&thread_id).await?;
+        if record["ownerKind"] != parent.principal.storage_kind()
+            || record["ownerSubject"] != parent.principal.storage_subject()
+        {
+            return Err(SubagentDispatchError::ThreadNotInSession {
+                thread_id,
+                session_id: parent.session_id.clone(),
+            });
+        }
+        request.agent_id = record["agentId"].as_str().map(str::to_string);
+        if request.task.trim().is_empty() {
+            return Err(SubagentDispatchError::InvalidTarget(
+                "subagent reply requires non-empty task".into(),
+            ));
+        }
         // Validate + reserve the thread under one lock.
         let thread_tier = {
             let mut state = self
@@ -508,7 +954,7 @@ impl SubagentRuntime {
     /// (`subagent_close` tool). No run is created; the closing reason (the
     /// delegation `task` text, when non-empty) becomes the thread's
     /// recorded summary anchor.
-    pub fn close(
+    pub async fn close(
         &self,
         parent: &ParentRunFacts,
         request: &DelegationRequest,
@@ -518,25 +964,52 @@ impl SubagentRuntime {
             .clone()
             .filter(|id| !id.trim().is_empty())
             .unwrap_or_default();
-        let mut state = self
-            .state
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner());
-        let Some(thread) = state.threads.get_mut(&thread_id) else {
-            return Err(SubagentDispatchError::ThreadNotFound { thread_id });
-        };
-        if thread.parent_session_id != parent.session_id {
+        self.validate_parent(parent).await?;
+        let record = self.restore_thread(&thread_id).await?;
+        if record["ownerKind"] != parent.principal.storage_kind()
+            || record["ownerSubject"] != parent.principal.storage_subject()
+        {
             return Err(SubagentDispatchError::ThreadNotInSession {
                 thread_id,
                 session_id: parent.session_id.clone(),
             });
         }
-        if thread.status != ThreadStatus::Open {
-            return Err(SubagentDispatchError::ThreadNotOpen { thread_id });
+        {
+            let state = self
+                .state
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+            let Some(thread) = state.threads.get(&thread_id) else {
+                return Err(SubagentDispatchError::ThreadNotFound { thread_id });
+            };
+            if thread.parent_session_id != parent.session_id {
+                return Err(SubagentDispatchError::ThreadNotInSession {
+                    thread_id,
+                    session_id: parent.session_id.clone(),
+                });
+            }
+            if thread.status != ThreadStatus::Open {
+                return Err(SubagentDispatchError::ThreadNotOpen { thread_id });
+            }
+            if thread.busy {
+                return Err(SubagentDispatchError::ThreadBusy { thread_id });
+            }
         }
-        if thread.busy {
-            return Err(SubagentDispatchError::ThreadBusy { thread_id });
-        }
+        thread_store::close(
+            &self.storage,
+            &thread_id,
+            &parent.session_id,
+            parent.principal.storage_kind(),
+            &parent.principal.storage_subject(),
+            &request.task,
+        )
+        .await
+        .map_err(SubagentDispatchError::Storage)?;
+        let mut state = self.state.lock().unwrap_or_else(|p| p.into_inner());
+        let thread = state
+            .threads
+            .get_mut(&thread_id)
+            .expect("closed thread remains registered");
         thread.status = ThreadStatus::Closed;
         if !request.task.trim().is_empty() {
             thread.last_run_status = Some(format!("closed: {}", request.task.trim()));
@@ -590,6 +1063,63 @@ impl SubagentRuntime {
         parent_mode: lingxi_kernel::subagent::SessionPermissionMode,
         existing_thread: Option<String>,
     ) -> Result<LaunchedChild, SubagentDispatchError> {
+        // 先核实际父运行和主体，活父只继承它自己发出的许可及取消树节点。
+        let supervisor = self
+            .supervisor
+            .get()
+            .and_then(Weak::upgrade)
+            .ok_or(SubagentDispatchError::NotBound)?;
+        let actual_parent = self.storage.query_one_text(
+            "SELECT status FROM runs WHERE run_id=?1 AND session_id=?2 AND owner_kind=?3 AND owner_subject=?4",
+            vec![parent.parent_run_id.to_string(),parent.session_id.clone(),parent.principal.storage_kind().into(),parent.principal.storage_subject()],
+        ).await.map_err(SubagentDispatchError::Storage)?;
+        if actual_parent.is_none() {
+            return Err(SubagentDispatchError::Storage(StorageError::Conflict {
+                detail: "subagent_parent_ownership_mismatch".into(),
+            }));
+        }
+        let gate = self.storage.session_admission();
+        let inherited = supervisor
+            .task_supervisor()
+            .parent_run_permit(
+                parent.parent_run_id.as_str(),
+                &parent.session_id,
+                &parent.agent_id,
+                &parent.principal,
+                gate,
+            )
+            .map_err(SubagentDispatchError::Storage)?;
+        let parent_permit = match inherited {
+            Some(permit) => {
+                if !supervisor
+                    .run_scope(parent.parent_run_id.as_str())
+                    .is_some_and(|scope| scope.same_scope(&parent.parent_scope))
+                {
+                    return Err(SubagentDispatchError::Storage(StorageError::Conflict {
+                        detail: "subagent_parent_scope_mismatch".into(),
+                    }));
+                }
+                permit
+            }
+            None => {
+                if !matches!(
+                    actual_parent.as_deref(),
+                    Some("completed" | "failed" | "cancelled" | "interrupted")
+                ) {
+                    return Err(SubagentDispatchError::Storage(StorageError::Conflict {
+                        detail: "subagent_parent_not_settled_or_admitted".into(),
+                    }));
+                }
+                Arc::new(
+                    gate.try_acquire(&[&parent.session_id], usize::MAX)
+                        .map_err(|_| {
+                            SubagentDispatchError::Storage(StorageError::Conflict {
+                                detail: "session_busy".into(),
+                            })
+                        })?,
+                )
+            }
+        };
         // 1) Concurrency caps + thread reservation (one lock; rolled back
         //    on every failure path below).
         let session_id_for_rollback = parent.session_id.clone();
@@ -657,6 +1187,31 @@ impl SubagentRuntime {
             .clone()
             .unwrap_or_else(|| child_run_id.clone());
 
+        let agent_identity = request
+            .agent_id
+            .clone()
+            .unwrap_or_else(|| parent.agent_id.clone());
+        let reserved = json!({"threadId":thread_id,"parentSessionId":parent.session_id,
+            "ownerKind":parent.principal.storage_kind(),"ownerSubject":parent.principal.storage_subject(),
+            "agentId":agent_identity,"label":request.label,"tier":tier.wire_name(),
+            "childRunId":child_run_id,"streamStatus":"open","busy":true,
+            "lastRunStatus":null,"result":null,"error":null});
+        let previous = match thread_store::reserve(
+            &self.storage,
+            reserved,
+            parent.parent_run_id.as_str(),
+            &request.task,
+            existing_thread.is_some(),
+        )
+        .await
+        {
+            Ok(previous) => previous,
+            Err(error) => {
+                rollback_caps(self);
+                return Err(SubagentDispatchError::Storage(error));
+            }
+        };
+
         // 3) Thread record (new or continued).
         {
             let mut state = self
@@ -718,6 +1273,9 @@ impl SubagentRuntime {
             None => {
                 closeout.disarm();
                 rollback_caps(self);
+                thread_store::rollback(&self.storage, &thread_id, &child_run_id, previous)
+                    .await
+                    .map_err(SubagentDispatchError::Storage)?;
                 self.rollback_thread(&thread_id, &existing_thread);
                 return Err(SubagentDispatchError::NotBound);
             }
@@ -736,13 +1294,13 @@ impl SubagentRuntime {
         // is what the tool-policy plane needs to reproduce the
         // incumbent's ask-tier deny_on_prompt semantics (R04-SUP-01).
         let grant = DriveAuthorization {
+            knowledge_selection: None,
             lineage,
             grant: RunGrant::Subagent { tier },
             session_mode: parent_mode,
         };
         let storage = Arc::clone(&self.storage);
         let events = Arc::clone(&self.events);
-        let sessions = Arc::clone(&self.sessions);
         let principal = parent.principal.clone();
         let session_id = parent.session_id.clone();
         // R06-T08 fix (the behavior evaluation surfaced this): the value
@@ -760,10 +1318,6 @@ impl SubagentRuntime {
         // semantics — a parked parent holding the session's model lane
         // can never starve its child), and the per-thread session lane
         // plus the global/process caps bound total subagent concurrency.
-        let agent_identity = request
-            .agent_id
-            .clone()
-            .unwrap_or_else(|| parent.agent_id.clone());
         let quota_session_lane = format!(
             "{}::subagent::{}::{}",
             parent.session_id, agent_identity, thread_id
@@ -771,7 +1325,6 @@ impl SubagentRuntime {
         let task_input = request.task.clone();
         let now_ms = parent.now_ms;
         let child_run = child_run_id.clone();
-        let thread_delivery = thread_id.clone();
         let timeout = Duration::from_millis(self.policy.timeout_ms);
         let drive_supervisor = Arc::clone(&supervisor);
         let drive_scope = child_scope.clone();
@@ -780,6 +1333,24 @@ impl SubagentRuntime {
             &child_scope,
             format!("child_run:{child_run_id}"),
             async move {
+                let _run_permit = drive_supervisor
+                    .task_supervisor()
+                    .retain_authorized_run_permit(
+                        &child_run,
+                        &session_id,
+                        &agent_identity,
+                        &principal,
+                        &grant,
+                        Arc::clone(&parent_permit),
+                    );
+                // 绑定失败不启动业务，也不把另一run的登记覆盖。
+                if let Err(error) = &_run_permit {
+                    closeout_for_spawn
+                        .complete_and_deliver(&Err(DriveError::Storage(error.clone())))
+                        .await;
+                    return;
+                }
+                let _parent_permit = parent_permit;
                 let closeout = closeout_for_spawn;
                 let drive = drive_supervisor.drive_run(
                     storage.as_ref(),
@@ -804,41 +1375,35 @@ impl SubagentRuntime {
                 // scope fires and the drive settles `cancelled`
                 // through its OWN four-phase path — the future is not
                 // dropped mid-flight.
-                let mut drive = Box::pin(drive);
+                let mut drive = Box::pin(CatchChild {
+                    future: Box::pin(drive),
+                });
                 let finish = match tokio::time::timeout_at(
                     tokio::time::Instant::now() + timeout,
                     drive.as_mut(),
                 )
                 .await
                 {
-                    Ok(result) => result,
+                    Ok(Ok(result)) => result,
+                    Ok(Err(reason)) => {
+                        Err(DriveError::Internal(format!("subagent panic: {reason}")))
+                    }
                     Err(_elapsed) => {
                         drive_scope.cancel("subagent timeout");
-                        drive.await
+                        match drive.as_mut().await {
+                            Ok(result) => result,
+                            Err(reason) => {
+                                Err(DriveError::Internal(format!("subagent panic: {reason}")))
+                            }
+                        }
                     }
                 };
+                drop(drive);
                 // Delivery + bookkeeping (every finish path). The closeout
                 // guard is disarmed by `complete`; a panic or drop before
                 // this point closes out abnormally instead (exactly-once
                 // either way).
-                closeout.complete(&finish);
-                if let Err(err) = sessions.deliver_retained(
-                    &session_id,
-                    &delivery_text(&thread_delivery, &child_run, &finish),
-                ) {
-                    // Loud, never silent: the run's own durable events
-                    // remain the authoritative record; the thread
-                    // snapshot keeps the outcome queryable.
-                    tracing::error!(
-                        session_id = %session_id,
-                        thread_id = %thread_delivery,
-                        run_id = %child_run,
-                        error = %err,
-                        "subagent result delivery into the steering channel was refused \
-                         (bounded inbox full); the outcome stays queryable through the \
-                         run events and the thread snapshot"
-                    );
-                }
+                closeout.complete_and_deliver(&finish).await;
             },
         );
         match spawn_result {
@@ -852,13 +1417,27 @@ impl SubagentRuntime {
             Err(rejected) => {
                 closeout.disarm();
                 rollback_caps(self);
+                thread_store::rollback(&self.storage, &thread_id, &child_run_id, previous)
+                    .await
+                    .map_err(SubagentDispatchError::Storage)?;
                 self.rollback_thread(&thread_id, &existing_thread);
+                if existing_thread.is_some() {
+                    self.restore_thread(&thread_id).await?;
+                }
                 return Err(SubagentDispatchError::SpawnRefused { cap: rejected.cap });
             }
         }
+        // 已成功派发后，状态读取失败不能谎报“零子任务”；明确保留已接受身份与观测失败。
+        let (status,progress_error)=match self.storage.query_one_text("SELECT status FROM runs WHERE run_id=?1",vec![child_run_id.clone()]).await {
+            Ok(Some(status))=>(status,None),
+            Ok(None)=>("queued".into(),None),
+            Err(error)=>("unknown".into(),Some(error.to_string())),
+        };
         Ok(LaunchedChild {
             child_run_id,
             thread_id,
+            status,
+            progress_error,
         })
     }
 
@@ -1003,6 +1582,49 @@ impl ChildCloseout {
         );
     }
 
+    async fn complete_and_deliver(&self, finish: &Result<RunFinish, DriveError>) {
+        let status=match finish {Ok(f)=>f.status().wire_name(),Err(_)=>"failed"};
+        let prior=thread_store::read_thread(&self.runtime.storage,&self.thread_id).await;
+        let error=match finish {
+            Ok(RunFinish::Failed {cause})=>Some(prior.ok().flatten().and_then(|r|r["error"].as_str().map(str::to_string)).unwrap_or_else(||format!("{cause:?}"))),
+            Err(e)=>Some(format!("{e:?}")),_=>None,
+        };
+        let text=match error.as_deref() {
+            Some(error)=>format!("[subagent-result thread={} run={}] failed: {error}",self.thread_id,self.child_run_id),
+            None=>delivery_text(&self.thread_id,&self.child_run_id,finish),
+        };
+        match thread_store::finish(
+            &self.runtime.storage,
+            &self.thread_id,
+            &self.child_run_id,
+            status,
+            &text,
+            error.as_deref(),
+        )
+        .await
+        {
+            Ok(()) => {
+                self.complete(finish);
+                self.deliver(&text);
+            }
+            Err(error) => {
+                let failed = Err(DriveError::Storage(error));
+                self.complete(&failed);
+                self.deliver(&delivery_text(&self.thread_id, &self.child_run_id, &failed));
+            }
+        }
+    }
+
+    fn deliver(&self, text: &str) {
+        if let Err(error) = self
+            .runtime
+            .sessions
+            .deliver_retained(&self.session_id, text)
+        {
+            tracing::error!(session_id=%self.session_id,thread_id=%self.thread_id,run_id=%self.child_run_id,error=%error,"subagent result delivery refused; durable result retained");
+        }
+    }
+
     /// Disarm WITHOUT bookkeeping — exclusively for the pre-spawn refusal
     /// paths whose explicit rollbacks (caps + thread record) already ran.
     fn disarm(&self) {
@@ -1022,16 +1644,65 @@ impl Drop for ChildCloseout {
                  last resort, panicked, or never polled) — abnormal closeout: caps returned, \
                  busy cleared, honest failed status recorded"
             );
+            let reason =
+                "child run ended without delivering a result (dropped before its completion tail)"
+                    .to_string();
+            let finish = Err(DriveError::Internal(reason.clone()));
             self.runtime.note_child_finished(
                 &self.session_id,
                 &self.thread_id,
                 &self.child_run_id,
-                &Err(DriveError::Internal(
-                    "child run ended without delivering a result (dropped or panicked before \
-                     its completion tail)"
-                        .to_string(),
-                )),
+                &finish,
             );
+            self.runtime
+                .pending_closeouts
+                .lock()
+                .unwrap_or_else(|p| p.into_inner())
+                .push((self.thread_id.clone(), self.child_run_id.clone(), reason));
+            self.deliver(&delivery_text(&self.thread_id, &self.child_run_id, &finish));
+        }
+    }
+}
+
+async fn flush_abnormal_closeouts(
+    storage: &RunDatabase,
+    pending: &Mutex<Vec<(String, String, String)>>,
+) -> Result<(), StorageError> {
+    let entries = std::mem::take(&mut *pending.lock().unwrap_or_else(|p| p.into_inner()));
+    let mut entries = entries.into_iter();
+    while let Some((thread, run, reason)) = entries.next() {
+        if let Err(error) =
+            thread_store::finish(storage, &thread, &run, "failed", &reason, Some(&reason)).await
+        {
+            let mut remaining = pending.lock().unwrap_or_else(|p| p.into_inner());
+            remaining.push((thread, run, reason));
+            remaining.extend(entries);
+            return Err(error);
+        }
+    }
+    Ok(())
+}
+
+// 把真实panic原因带进同一完成尾段；不交给外层吞掉为泛化失败。
+struct CatchChild<F: Future> {
+    future: Pin<Box<F>>,
+}
+impl<F: Future> Future for CatchChild<F> {
+    type Output = Result<F::Output, String>;
+    fn poll(
+        self: Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Self::Output> {
+        match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            self.get_mut().future.as_mut().poll(cx)
+        })) {
+            Ok(std::task::Poll::Pending) => std::task::Poll::Pending,
+            Ok(std::task::Poll::Ready(value)) => std::task::Poll::Ready(Ok(value)),
+            Err(payload) => std::task::Poll::Ready(Err(payload
+                .downcast_ref::<String>()
+                .cloned()
+                .or_else(|| payload.downcast_ref::<&str>().map(|s| s.to_string()))
+                .unwrap_or_else(|| "opaque panic payload".into()))),
         }
     }
 }

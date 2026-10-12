@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_w10_embedding_identity-6a63c228ad239e4b",
+    "--exact",
+    "c03_query_uses_served_identity_during_reload_and_isolates_dimensions",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "durationSeconds": 0.7048559188842773,
+  "binarySHA256": "10e78c2f36e15d3d1f6b177969e99f6b7ec70d0b3e0891959389551bb2a03be0",
+  "syntheticHome": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f09-f13/F10/home",
+  "output": "check.log",
+  "currentBinaryConfirmedByParent": true,
+  "formalAcceptance": false
+}

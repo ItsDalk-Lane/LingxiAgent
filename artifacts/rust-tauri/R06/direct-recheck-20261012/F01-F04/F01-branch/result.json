@@ -1,0 +1,15 @@
+{
+  "test": "f01_c02_fork_restart_retry_rewind_source_delete",
+  "argv": [
+    "/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f01_history-6406a71bc3d7e3c1",
+    "f01_c02_fork_restart_retry_rewind_source_delete",
+    "--exact",
+    "--nocapture"
+  ],
+  "exit": 0,
+  "seconds": 1.42,
+  "binarySha256": "1cd6ed9d4282a0776c7987891ae8a1368b678337686b31ad4ceb9243fa5b200e",
+  "binaryMtime": 1791780610.3209572,
+  "evidence": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/F01-F04/F01-branch/check.log",
+  "role": "direct_recheck_not_formal_acceptance"
+}

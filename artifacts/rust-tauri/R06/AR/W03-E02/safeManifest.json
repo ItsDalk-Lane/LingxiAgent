@@ -1,0 +1,473 @@
+{
+  "status": "FROZEN_LOCAL_REVIEW_MANIFEST_NO_GIT_ACTION",
+  "owned_product_test_files": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/migrations.rs",
+      "sha256": "689527aae493e2d6037ad0d799a0054d6dfdd9e5c5735bfe17334ea96e3abe5d",
+      "bytes": 48303,
+      "current_sha256": "689527aae493e2d6037ad0d799a0054d6dfdd9e5c5735bfe17334ea96e3abe5d",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/mod.rs",
+      "sha256": "ca57e4683f65e0cd63e8d7301a3f8e10455c4d7dffa639216669cdb7b1375e78",
+      "bytes": 1641,
+      "current_sha256": "ca57e4683f65e0cd63e8d7301a3f8e10455c4d7dffa639216669cdb7b1375e78",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+      "sha256": "9cfd7f61515cde5205e33764b2d5564d71a4a4caad59016095b759aea2c7f51f",
+      "bytes": 155994,
+      "current_sha256": "9cfd7f61515cde5205e33764b2d5564d71a4a4caad59016095b759aea2c7f51f",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_admin.rs",
+      "sha256": "6a3db72af1ff42d3c2c43cfb5cf6432ea985ff9e800e2847557313e188baf820",
+      "bytes": 31206,
+      "current_sha256": "6a3db72af1ff42d3c2c43cfb5cf6432ea985ff9e800e2847557313e188baf820",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_operations.rs",
+      "sha256": "22ad7a3c406238a5f0f1adf3bab5f461f758cd6655f6905d863db21782a7aabf",
+      "bytes": 10674,
+      "current_sha256": "22ad7a3c406238a5f0f1adf3bab5f461f758cd6655f6905d863db21782a7aabf",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_tree.rs",
+      "sha256": "fee70e2b43da5ffd46e27c69832234527bdba4693f64221268771a089f6ebbc9",
+      "bytes": 55756,
+      "current_sha256": "fee70e2b43da5ffd46e27c69832234527bdba4693f64221268771a089f6ebbc9",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/session_file_store.rs",
+      "sha256": "b83c3b5e4fab7c8e9861d5e33f08f5d1995008e8318397bd3e585230a8e1182a",
+      "bytes": 15954,
+      "current_sha256": "b83c3b5e4fab7c8e9861d5e33f08f5d1995008e8318397bd3e585230a8e1182a",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/lib.rs",
+      "sha256": "0ef1bc9e4e78654a9246867452ac65c14da5f7b9afd14ca7e7278e87634a7fdc",
+      "bytes": 40786,
+      "current_sha256": "0ef1bc9e4e78654a9246867452ac65c14da5f7b9afd14ca7e7278e87634a7fdc",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/ports.rs",
+      "sha256": "18931ff4a4fcea405349dc76185b069a7cb1a83887dcbddc72195ee2c55aed8a",
+      "bytes": 81187,
+      "current_sha256": "18931ff4a4fcea405349dc76185b069a7cb1a83887dcbddc72195ee2c55aed8a",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/session_admission.rs",
+      "sha256": "68593700016189b1721c1c421ece4b44edbc7ae01be57aec7e7e9636c7875bec",
+      "bytes": 2115,
+      "current_sha256": "68593700016189b1721c1c421ece4b44edbc7ae01be57aec7e7e9636c7875bec",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/auth.rs",
+      "sha256": "53bc6c3f031d4c0eeb1ce9745da5ba7b8fde0d7922b2d3b6f03f36a7730c1e42",
+      "bytes": 133698,
+      "current_sha256": "53bc6c3f031d4c0eeb1ce9745da5ba7b8fde0d7922b2d3b6f03f36a7730c1e42",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/background.rs",
+      "sha256": "55189639a23a725c64950ba44d0e0a5663e5f6bd443a5ea10e0b8f8aed65ec59",
+      "bytes": 18682,
+      "current_sha256": "55189639a23a725c64950ba44d0e0a5663e5f6bd443a5ea10e0b8f8aed65ec59",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/cancel.rs",
+      "sha256": "a214b5447535cc7f581bac564deb49b98154b17e8152c8647cccc5d8d23947ae",
+      "bytes": 51710,
+      "current_sha256": "a214b5447535cc7f581bac564deb49b98154b17e8152c8647cccc5d8d23947ae",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/filetools.rs",
+      "sha256": "05739e168b7275271fe78d2932fec5b10666e8a8e7fe434e881e3cebaa524d87",
+      "bytes": 92743,
+      "current_sha256": "05739e168b7275271fe78d2932fec5b10666e8a8e7fe434e881e3cebaa524d87",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "sha256": "f4d178f1192a53ce2fa45c4013001b626868522055682c9183be4c5d5e3d6b70",
+      "bytes": 288869,
+      "current_sha256": "f4d178f1192a53ce2fa45c4013001b626868522055682c9183be4c5d5e3d6b70",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/resourceio.rs",
+      "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "bytes": 116061,
+      "current_sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "sha256": "7c9640bd0b2a75a41d69abb1027db474fc7a10b964f24454c2c40dd8e9ecc372",
+      "bytes": 240548,
+      "current_sha256": "7c9640bd0b2a75a41d69abb1027db474fc7a10b964f24454c2c40dd8e9ecc372",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_admin.rs",
+      "sha256": "f070ad013c2339e5f84202174ec0eb04a98ce58c5406d7db2badb9a95bf35e07",
+      "bytes": 20459,
+      "current_sha256": "f070ad013c2339e5f84202174ec0eb04a98ce58c5406d7db2badb9a95bf35e07",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_supervisor.rs",
+      "sha256": "ce64d215656db6dd8a221fdf64287d6deb8bdbf90bffa1c9c1f786f6ce373cc3",
+      "bytes": 25332,
+      "current_sha256": "ce64d215656db6dd8a221fdf64287d6deb8bdbf90bffa1c9c1f786f6ce373cc3",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_tree.rs",
+      "sha256": "be0019d858513edb69ed2a702e5be4959bc9864bea16fdf45e58cc907e8699ff",
+      "bytes": 48475,
+      "current_sha256": "be0019d858513edb69ed2a702e5be4959bc9864bea16fdf45e58cc907e8699ff",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/sessionfiles.rs",
+      "sha256": "aba372575848d6956a678a5f0337d0b466fa1853808fe8ab524b7d92d7fd6643",
+      "bytes": 72694,
+      "current_sha256": "aba372575848d6956a678a5f0337d0b466fa1853808fe8ab524b7d92d7fd6643",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/sessions.rs",
+      "sha256": "ce427b80baafd3f8b670dbf36ca381efa7f66b2f8794c77443bc544fafbf9cbd",
+      "bytes": 119855,
+      "current_sha256": "ce427b80baafd3f8b670dbf36ca381efa7f66b2f8794c77443bc544fafbf9cbd",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/subagents.rs",
+      "sha256": "7edf1000c3f330f0507a54768b9b8b160acb0e0a4d983194d2925932f302fcab",
+      "bytes": 46787,
+      "current_sha256": "7edf1000c3f330f0507a54768b9b8b160acb0e0a4d983194d2925932f302fcab",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "bytes": 66839,
+      "current_sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/admission_dedup_adversarial.rs",
+      "sha256": "598d0ec3eaa27ae1eeed77b47441bd791cb4364871b159303d0ada40cc505bf0",
+      "bytes": 41002,
+      "current_sha256": "598d0ec3eaa27ae1eeed77b47441bd791cb4364871b159303d0ada40cc505bf0",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/admission_dedup_consistency.rs",
+      "sha256": "a86a0d8c3ddd342c46942423cff92cc22a1523e75823983cbbbb3bd33a57bfc0",
+      "bytes": 36956,
+      "current_sha256": "a86a0d8c3ddd342c46942423cff92cc22a1523e75823983cbbbb3bd33a57bfc0",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/cancel_terminal_race.rs",
+      "sha256": "b0f88125646a3ab212b28dbc74505fb27ae9a61d915a9e042d8488d4ce30d5fd",
+      "bytes": 52810,
+      "current_sha256": "b0f88125646a3ab212b28dbc74505fb27ae9a61d915a9e042d8488d4ce30d5fd",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r04_t02_tool_gateway.rs",
+      "sha256": "478f781e3d2953130530b4cc4cb6cffcce4a63c4ccea1adec114c39ca31b2380",
+      "bytes": 74271,
+      "current_sha256": "478f781e3d2953130530b4cc4cb6cffcce4a63c4ccea1adec114c39ca31b2380",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs",
+      "sha256": "e11638f3a946e56d167db84a9513b615e99ba0b8f8550c986ae1cb41afc3db66",
+      "bytes": 94245,
+      "current_sha256": "e11638f3a946e56d167db84a9513b615e99ba0b8f8550c986ae1cb41afc3db66",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs",
+      "sha256": "1b9d52a5e88490ecdeca9e3d9fc5fa566954677da4d0dfeddda551053d7000f7",
+      "bytes": 123093,
+      "current_sha256": "1b9d52a5e88490ecdeca9e3d9fc5fa566954677da4d0dfeddda551053d7000f7",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r05_t07_usage_trace.rs",
+      "sha256": "5accfc310a471d3847d511cd5d0b58189e5b59ee17c93c65494c0fd2f6f8147c",
+      "bytes": 60095,
+      "current_sha256": "5accfc310a471d3847d511cd5d0b58189e5b59ee17c93c65494c0fd2f6f8147c",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r05_t08_resources.rs",
+      "sha256": "543e70b43291d5da6a2ec3fb4185948228e81e90dbb3797a6ea24a36b35d24f2",
+      "bytes": 70489,
+      "current_sha256": "543e70b43291d5da6a2ec3fb4185948228e81e90dbb3797a6ea24a36b35d24f2",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+      "sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+      "bytes": 110995,
+      "current_sha256": "982d6ebdc29e4af0abfac14fdd5ea6f810b510f803504c3f5dc18b435d0a8d0c",
+      "inherited_unchanged": false
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs",
+      "sha256": "d16e52c8c8daa8a53cf08f3caec4e8a78affc21c8401d2cd3298f5365faf63d4",
+      "bytes": 39475,
+      "current_sha256": "d16e52c8c8daa8a53cf08f3caec4e8a78affc21c8401d2cd3298f5365faf63d4",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/recovery_crash_points.rs",
+      "sha256": "fce24542bb3b16ce0dc182e777107039dc61cca048aa7dd1bb04177fc1849586",
+      "bytes": 39574,
+      "current_sha256": "fce24542bb3b16ce0dc182e777107039dc61cca048aa7dd1bb04177fc1849586",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/request_id_canonicalization.rs",
+      "sha256": "c6ad7d26f97b0016dde0e64adb0ff8bccd0f540e00feb0f2ccf6d49bab561317",
+      "bytes": 59556,
+      "current_sha256": "c6ad7d26f97b0016dde0e64adb0ff8bccd0f540e00feb0f2ccf6d49bab561317",
+      "inherited_unchanged": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "sha256_at_base": "ddee34a73c75cdf619c2a7139ab744c00993bd4352ae62081378cc40dba835a1",
+      "current_sha256": "87046e760557165216169bc9d558553b587d8270cff43137dcc7549c700d8ae1",
+      "reason": "必要实际 home/READY/provider 输入/关闭和本轮合成数据留证；不改原断言"
+    }
+  ],
+  "sanitized_control_files": [
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/REPORT.md",
+      "bytes": 7278,
+      "sha256": "992a991c500d82b35edc386bb0f2cedd25ada05d58414275d445d0ab4a94d398"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/results.json",
+      "bytes": 3145,
+      "sha256": "a16c70c9e0b03b6b6f803b55ebd276ce683bb540e8e12ab33931364391735a76"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/SOURCEFAMILY.json",
+      "bytes": 13365,
+      "sha256": "724babfc3221e0ed4b31af10119db51f0443e0067253ee2e8aafeee403c933da"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/SOURCEFAMILY.md",
+      "bytes": 4001,
+      "sha256": "192491c1ecb4d844bd75a3eb4988fedb756ed7c05e1f47488ce71619770d833f"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/scope-current.json",
+      "bytes": 7466882,
+      "sha256": "290b4ac2f1154b2093fb25f82c13eb814e4cb875a6da1581f11a0ab6147fdf38"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/original-task-coverage.json",
+      "bytes": 11986,
+      "sha256": "a1d13d147ec02cce69c125aec85e654d2f88693c07181607a0985a6c507e9f0b"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/owned-current-source.json",
+      "bytes": 11863,
+      "sha256": "49674dc237fe15d1ca3b3f155549b39ade26ee396d9b46c71667df809d4d6d70"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/original-assertions-preserved.json",
+      "bytes": 1047,
+      "sha256": "115552fda09e1b5980af9c74d28652f6d4c89ce27c4945adb7d8dc29e8197e8f"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/source-aggregate.json",
+      "bytes": 11883661,
+      "sha256": "1e77c8d8b1d0ee32c8bd16db38c6317f8933b81b7c1e6604f2611521f787a9b6"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/run-window-index.json",
+      "bytes": 39478,
+      "sha256": "97bd1ec1b2ba056253812d887bbdb40e3ff3238a3d4a8b32b83847d44682200c"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/actual-binary-execution-index.json",
+      "bytes": 983874,
+      "sha256": "744600f8d614a2af054b73128f1b7a702dd1b3f5c6886a6b8ea998e7fff8fbcd"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/compiled-and-observed-binary-index.json",
+      "bytes": 1268348,
+      "sha256": "ab4cf292db0d83fff49c5a1d794abbe931d8d7b74df8d288351765ba6cfacbec"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/formal-chain-settlement.json",
+      "bytes": 57089,
+      "sha256": "5b9064c5ed0ee2a98f00b389f56716c9094ac93b28ddf001fd3c50b9593f3412"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/external-control-window-index.json",
+      "bytes": 7235,
+      "sha256": "c2f69d1a24bcc8227ed938b14ce8271bd2549c610d4ace9238c82d6dc7d79430"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/four-c-self-check.json",
+      "bytes": 52537,
+      "sha256": "fb9e66fb226ff8e34ca9ff1df837c6b4211a5dde0a90220db3d4cffadfa458fc"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/consumer-scan-raw.json",
+      "bytes": 43587,
+      "sha256": "22a03985283c59ad7e7cfb1d26f9fec79da27411c058002c70c9e452b35221fe"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/migrations-original-byte-check.json",
+      "bytes": 2326,
+      "sha256": "a27b2bcd1049e6a54d55c003ecc296e3ef3f73e7c6d336e586b5bdaaca81e546"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/old-evidence-readonly-index.json",
+      "bytes": 185982,
+      "sha256": "0db8d0ef9ae49f887bec45bf88477c4fe04f00f0e5b5905a02900fde00ddee99"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/owned-final-target-relocation.json",
+      "bytes": 419,
+      "sha256": "a13e06683f9c6feea4fc62dbbef5c92e8c66546699bf3638b36a26dc5a321be5"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/owned-mutant-target-relocation.json",
+      "bytes": 3618,
+      "sha256": "17625c5768e4c995ac6bf0ff13fbb68fa97a424dd20f3b9630379ef03ff5e69e"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/owned-window01-home-relocation.json",
+      "bytes": 1797,
+      "sha256": "f3de3220c79c1ecb488bfeb3de30c575bd4363a5c7cac15300d10349428ff73f"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/formal-node-dependencies-before.json",
+      "bytes": 13471678,
+      "sha256": "d7e9202f42e00ce51400f69c72fa640fffd1be6f96659b2048ceef0e819c1f24"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/formal-node-dependencies-after.json",
+      "bytes": 13471740,
+      "sha256": "96e91b9edb9b038875447cfe4ee10dbe2259ae2b594eea3bd992acf40286d221"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/formal02-owned-incremental-cleanup.json",
+      "bytes": 103421,
+      "sha256": "a133da2852e200b4537e2f3f34466c3cba730d38bfce5fc48fa38b262e4e0166"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/initial-source-map.json",
+      "bytes": 7244,
+      "sha256": "4396871a26ce747990981d6bb76921e4e790817a46d8c968c7245854b4a37cb1"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/original-stage-scope.json",
+      "bytes": 15004800,
+      "sha256": "b5a135c7e3725f9aa01577157c4f584da9499651f71077f2edbaab0de758077e"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/original-t03-obligations.json",
+      "bytes": 660020,
+      "sha256": "52953eb336da1968ae4d51c4787cf8c7ed21b31df90fc961cd19c696dba04496"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/candidate-owned.diff",
+      "bytes": 324659,
+      "sha256": "c5d1afe3bb955d80baf5794bb82c181d8c6ea985953f3343eef36536d2dff812"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/formal-effective-target.json",
+      "bytes": 327,
+      "sha256": "0d3e1888754ce36caca621145176127e2f647c8c584c7ad98aa81a1da50db202"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/run_guard.py",
+      "bytes": 10027,
+      "sha256": "119e6b59aa138064e790892d4aa619be3c4cd5ad5658b9da3ed09404a42c0641"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/bin_runner.py",
+      "bytes": 1368,
+      "sha256": "3a34aa638c15151711b3433497d44c17805e4959c56ca1abb12410318ad079e4"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/snapshot_outputs.py",
+      "bytes": 1314,
+      "sha256": "4b734da9a7837017c3968be73e98ce683d8a7fd4c679636fbcb33b4786510bbc"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/binary_instances.py",
+      "bytes": 2563,
+      "sha256": "f735e6f62ae722fd43408f322054a6c6856b99960ce10c47f21f2fc7c924fe00"
+    },
+    {
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/runner-window-01.txt",
+      "bytes": 8716,
+      "sha256": "d8742298f80eea9781a16ea28a18b15246152fdf065cabbfd815e49da91d35bd"
+    }
+  ],
+  "exact_executed_binary_records": "actual-binary-execution-index.json",
+  "standalone_c02_controls": "external-control-window-index.json",
+  "compiled_only_and_sampled_observations": "compiled-and-observed-binary-index.json",
+  "private_default": "Every file under synthetic homes, tmpdirs, targets, raw wire/headers, SQL snapshots/dumps, private keys, credentials, binary/full archives is LOCAL_ONLY_NEVER_GIT; paths and SHA reviewable locally, never copy whole trees into Git. Logs/run metadata not allowlisted remain local-only until independently sanitized. No automated export/commit authorized.",
+  "local_only_patterns": [
+    "*/synthetic-home/**",
+    "*/service.json",
+    "*/token*",
+    "*/private*",
+    "*/wire-*.json",
+    "*/*.sql",
+    "*/*.sql.json",
+    "*/owned-files-and-sql.json",
+    "*/original-t03-provider-*.jsonl",
+    "/private/tmp/lingxi-w03-e02-*/**",
+    "*/target*/**"
+  ],
+  "local_external_evidence_roots": [
+    "/private/tmp/lingxi-w03-e02-c02-product-control-d7f5kns9",
+    "/private/tmp/lingxi-w03-e02-c02-wire-control-v2-frm3xrgq",
+    "/private/tmp/lingxi-w03-e02-c02-wire-control-znnn1az3",
+    "/private/tmp/lingxi-w03-e02-executed-bin-window-ormdye_p",
+    "/private/tmp/lingxi-w03-e02-owned-cache-cleanup-jwlw036s",
+    "/private/tmp/lingxi-w03-e02-formal02-incremental-cleanup-u6uloen4"
+  ],
+  "old_read_only": "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent; all old E01/source/target/home preserved",
+  "execution_cache_mappings": [
+    "owned-final-target-relocation.json",
+    "owned-mutant-target-relocation.json"
+  ],
+  "cleanup_receipts": [
+    "formal02-owned-incremental-cleanup.json",
+    "/private/tmp/lingxi-w03-e02-owned-cache-cleanup-jwlw036s/before.json",
+    "/private/tmp/lingxi-w03-e02-owned-cache-cleanup-jwlw036s/after.json"
+  ],
+  "no_actual_binary_deleted": true,
+  "source_runner_test_unchanged_since_final_validation": true,
+  "freeze_report_outputs_added_after_actual_windows": true
+}

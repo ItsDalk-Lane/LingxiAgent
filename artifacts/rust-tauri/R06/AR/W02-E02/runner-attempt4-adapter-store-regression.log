@@ -1,0 +1,57 @@
+COMMAND ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "--no-fail-fast", "-p", "lingxi-adapters", "--test", "session_tree_r06t03", "--test", "session_file_store", "--test", "migration_idempotency", "--", "--nocapture"]
+ISOLATED_LINGXI_HOME /tmp/lingxi-w02-e02-adapter-store-regression-4mghup2q
+START 2026-10-11T05:57:09.305141+00:00
+    Blocking waiting for file lock on build directory
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 06s
+     Running tests/migration_idempotency.rs (rust/target/debug/deps/migration_idempotency-3755c229ee1a4d1d)
+
+running 2 tests
+test tampered_version_rollback_is_rejected_not_replayed ... ok
+test repeated_migration_checks_are_idempotent ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/session_file_store.rs (rust/target/debug/deps/session_file_store-da6c9adbb414b3e9)
+
+running 12 tests
+test v9_is_the_supported_tip_with_expected_name ... ok
+test v7_to_v9_chain_preserves_prior_data_and_creates_new_tables ... ok
+test list_for_owner_orders_by_registration_then_id ... ok
+test source_key_dedup_is_scoped_to_owner ... ok
+test insert_and_get_roundtrip_preserves_all_fields ... ok
+test file_history_store_lists_files_versions_and_reads_content ... ok
+test file_history_prune_enforces_age_and_total_bytes ... ok
+test status_transitions_record_expiry_timestamp ... ok
+test alias_resolution_maps_legacy_ids_to_canonical ... ok
+test upsert_session_activity_marks_coldness_for_cleanup_probe ... ok
+test delete_session_file_removes_row_and_aliases ... ok
+test refs_roundtrip_and_session_scoped_delete ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running tests/session_tree_r06t03.rs (rust/target/debug/deps/session_tree_r06t03-da29a91af45f5f13)
+
+running 18 tests
+test fork_does_not_widen_authorizations ... ok
+test branch_reset_moves_head_and_appends_marker_without_deleting_history ... ok
+test delete_checkpoint_removes_file_versions_first ... ok
+test named_checkpoint_latest_overwrites_others_conflict ... ok
+test fork_preserves_message_fields_verbatim ... ok
+test fork_rejects_depth_beyond_two ... ok
+test ghost_run_id_is_rejected_by_foreign_key ... ok
+test latest_overwrite_with_file_paths_replaces_versions_and_contents_atomically ... ok
+test rewind_detects_external_modification_and_refuses_to_overwrite ... ok
+test fork_copies_shared_history_with_stable_ids_and_independent_writes ... ok
+test duplicate_session_id_is_loud_conflict_on_fork_and_create ... ok
+test admin_rename_pin_order_and_memory_roundtrip ... ok
+test admin_search_title_content_owner_and_like_escape ... ok
+test archive_children_counts_only_actual_flips ... ok
+test branch_reset_to_null_head_leaves_only_the_marker ... ok
+test admin_archive_restore_delete_lifecycle_gates ... ok
+test checkpoint_window_evicts_oldest_non_latest_at_201 ... ok
+test checkpoint_eviction_with_file_versions_is_fk_safe ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+

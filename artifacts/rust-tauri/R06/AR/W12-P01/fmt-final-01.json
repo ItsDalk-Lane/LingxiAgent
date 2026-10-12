@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "fmt",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--all",
+    "--",
+    "--check"
+  ],
+  "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-fmt-final-01-9j50sfel",
+  "start": 1791699753.9926589,
+  "end": 1791699755.586029,
+  "exit_code": 1,
+  "log_sha256": "dfaba692d858ef174e4fd4798865baa31c19a4ba8f5c3b68ff9faf1f8fa42b4c"
+}

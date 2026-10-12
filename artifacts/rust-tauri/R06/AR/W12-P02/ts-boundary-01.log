@@ -1,0 +1,10 @@
+{"command": ["npx", "vitest", "run", "tests/r06-ar-f12-ann-cache-preservation.test.ts", "--maxWorkers=1"], "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-ts-boundary-01-orqiffec", "start": 1791702339.180416}
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  15:05:47
+   Duration  1.65s (transform 71ms, setup 17ms, import 68ms, tests 1.51s, environment 0ms)
+

@@ -1,0 +1,57 @@
+{
+  "at": "2026-10-11T11:08:32.779735+00:00",
+  "status": "SOURCE_PREPARATION_ONLY_NOT_TEST_NOT_REVIEW",
+  "workspace": "/Users/study_superior/.codex/worktrees/r06-w09-execution/LingxiAgent",
+  "candidate_dependencies": [
+    {
+      "path": "rust/crates/lingxi-service/src/knowledge.rs",
+      "sha256": "0d9fd6679e7681b42bde359657b7a78bd9bc4862c01da2f5c96a1d3f7e439cef",
+      "bytes": 125900
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/operations.rs",
+      "sha256": "da58f7822cc80e05af0893995e3ade915c8901967ae718bb74d8f979590167ce",
+      "bytes": 103079
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/knowledge.rs",
+      "sha256": "1adbc82ca36805080b9297a6337322fd0858c1fb24a700af185d19b8ae4e5944",
+      "bytes": 31961
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/operations/embedding.rs",
+      "sha256": "c3692626e3bbc5df1d5d91cc0dded2371093775868effb739146733d9a08026b",
+      "bytes": 19402
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs",
+      "sha256": "0d37fb59194f41ec3d3af867c65e8259ca2b7a7be862f22219e5b14e29d35bed",
+      "bytes": 42930
+    }
+  ],
+  "original_R06_sha256": "d54e7fcc638b62fc4303ce4af8f01ba8c358fd1a90d0f85a491bfd4a439bbd2e",
+  "full_repair_spec_sha256": "0989765e75c4664be1b3c953e466d829339a65346c49f7c245219ae34f7b7d23",
+  "read_sections": [
+    "full repair spec F09/F10 and execution/review/gates/formula",
+    "original R06-T07 all five Steps/three deliveries/A13/A14",
+    "knowledge worker/startup/reingest/process_job",
+    "KnowledgeStore claim/requeue/complete/progress",
+    "VectorStore begin/complete/checkpoint write paths"
+  ],
+  "source_observations": [
+    "Peek first batch not consumed; later iterator submits it again; upsert can hide extra physical requests.",
+    "Worker claims queued only, startup requeues pending_embedding only; reingest accepts failed only. True crash-running409 independently reported, first Review report not yet frozen.",
+    "Failed variant rows are retained but processing first submits old chunks and statistics report checkpoint0; does not implement required gap reuse.",
+    "Ready reuse first dispatches a paid dimension probe; rules/stats need precise original wire evidence.",
+    "Vector existing matching fingerprint preserves rows; current storage completeness checks counts/ordinals; exact intended chunk-ID set and finite data need actual negative checks.",
+    "Configured identity dimensions0 before sending does not establish served dimensions; route-semantic identity/cached schema must be validated without claiming dimensions0 PASS."
+  ],
+  "dependency_order": "Finish first fresh W10 Reviewer; then fresh W09 Executor may use these explicitly unaccepted fixed five source dependencies. New W10 Repair and new W10 Reviewer required afterward; no inherited acceptance or common-file Git until all relevant reviews valid.",
+  "protected_scope": [
+    "No real home/data",
+    "No paid/live external calls",
+    "Only own checkout/evidence/test target",
+    "No registry/map retirement or skipped required checks"
+  ],
+  "not_a_f09_selfcheck": true
+}

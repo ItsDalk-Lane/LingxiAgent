@@ -1,0 +1,21 @@
+{"command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-adapters", "--test", "r06_ar_f06_config_preservation", "p02_mixed", "--", "--nocapture"], "start": 1791702394.527422, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-adapter-boundary-03-9ty5tprd", "guard": "8192MB/600s"}
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.75s
+     Running tests/r06_ar_f06_config_preservation.rs (rust/target/debug/deps/r06_ar_f06_config_preservation-cbfbb2fff0c5a669)
+LINGXI_TEST_GUARD: armed (pid 91582, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+
+thread 'p02_mixed_literal_and_merge_keys_and_alias_key_identity_remain_distinct' (2789499) panicked at crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs:344:52:
+called `Result::unwrap()` on an `Err` value: InvalidRequest("invalid agent config.yaml: memory: unsupported YAML key type; keys must be strings")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test p02_mixed_literal_and_merge_keys_and_alias_key_identity_remain_distinct ... FAILED
+
+failures:
+
+failures:
+    p02_mixed_literal_and_merge_keys_and_alias_key_identity_remain_distinct
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r06_ar_f06_config_preservation`

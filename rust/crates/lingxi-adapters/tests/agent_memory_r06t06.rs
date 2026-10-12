@@ -349,7 +349,7 @@ fn dream_revisions_list_read_restore() {
 #[test]
 fn config_patcher_preserves_unrelated_content_and_lists() {
     let text = "# 头注释\nlocale: zh\nagent:\n  name: A\nskills:\n  enabled:\n    - \"one\"\n    - \"two\"\n  workspace_disabled: []\nmemory:\n  enabled: true\n";
-    let (enabled, disabled) = am::AgentConfigPatch::read_skill_lists(text);
+    let (enabled, disabled) = am::AgentConfigPatch::read_skill_lists(text).unwrap();
     assert_eq!(enabled, vec!["one", "two"]);
     assert!(disabled.is_empty());
 
@@ -357,15 +357,16 @@ fn config_patcher_preserves_unrelated_content_and_lists() {
         text,
         &["one".into(), "three".into()],
         &["ws1".into()],
-    );
+    )
+    .unwrap();
     assert!(patched.contains("locale: zh"), "无关行保留");
     assert!(patched.contains("name: A"));
-    let (enabled2, disabled2) = am::AgentConfigPatch::read_skill_lists(&patched);
+    let (enabled2, disabled2) = am::AgentConfigPatch::read_skill_lists(&patched).unwrap();
     assert_eq!(enabled2, vec!["one", "three"]);
     assert_eq!(disabled2, vec!["ws1"]);
     // 空列表写 []（incumbent YAML 形状）
-    let emptied = am::AgentConfigPatch::write_skill_lists(&patched, &[], &[]);
-    let (enabled3, _) = am::AgentConfigPatch::read_skill_lists(&emptied);
+    let emptied = am::AgentConfigPatch::write_skill_lists(&patched, &[], &[]).unwrap();
+    let (enabled3, _) = am::AgentConfigPatch::read_skill_lists(&emptied).unwrap();
     assert!(enabled3.is_empty());
 
     // flags 读写（memory/experience/workspace_context）
@@ -375,8 +376,8 @@ fn config_patcher_preserves_unrelated_content_and_lists() {
         discover_project_skills: Some(false),
         discover_compatible_project_skills: Some(true),
     };
-    let patched_flags = am::AgentConfigPatch::write_flags(&emptied, &flags);
-    let read_back = am::AgentConfigPatch::read_flags(&patched_flags);
+    let patched_flags = am::AgentConfigPatch::write_flags(&emptied, &flags).unwrap();
+    let read_back = am::AgentConfigPatch::read_flags(&patched_flags).unwrap();
     assert_eq!(read_back.memory_enabled, Some(false));
     assert_eq!(read_back.experience_enabled, Some(true));
     assert_eq!(read_back.discover_project_skills, Some(false));
@@ -527,7 +528,8 @@ fn bundles_store_crud_and_skill_removal_scrobble() {
         "skills:\n  enabled:\n    - \"alpha\"\n    - \"gamma\"\n",
     )
     .unwrap();
-    let scrubbed = sl::collect_enabled_skills_of_other_agents(&home.join("agents"), "agentB");
+    let scrubbed =
+        sl::collect_enabled_skills_of_other_agents(&home.join("agents"), "agentB").unwrap();
     assert!(scrubbed.contains("alpha"));
     bundles.remove_skills(&["alpha".to_string()]).unwrap();
     let after = bundles.load();

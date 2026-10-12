@@ -1,0 +1,79 @@
+{
+  "files": [
+    {
+      "path": "rust/Cargo.lock",
+      "sha256": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "kind": "config"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/Cargo.toml",
+      "sha256": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+      "kind": "config"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/agent_config.rs",
+      "sha256": "e0dc11672cbcff4b8b4c03cd9a0fa2a54923aec0e8f4a5ff87b57a53eb0d34c8",
+      "kind": "product"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/agent_memory.rs",
+      "sha256": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+      "kind": "product"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/skill_library.rs",
+      "sha256": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+      "kind": "product"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/context_compiler.rs",
+      "sha256": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+      "kind": "product"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/memory.rs",
+      "sha256": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+      "kind": "product"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/memorytools.rs",
+      "sha256": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+      "kind": "product"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/persona.rs",
+      "sha256": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+      "kind": "product"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/skills.rs",
+      "sha256": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+      "kind": "product"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs",
+      "sha256": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+      "kind": "test"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs",
+      "sha256": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+      "kind": "test"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs",
+      "sha256": "03741c210e154ea2a704d3dd31a3fa0f21764512167a67734edd2365fe554224",
+      "kind": "test"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs",
+      "sha256": "3e6cf2ab2b94c26a79aa2286270973289dfdca1336d04b44276e96a139f53610",
+      "kind": "test"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs",
+      "sha256": "a21b6240578445528df0b6d3501e4dc9db47fde8addb0126184938490a6934ec",
+      "kind": "test"
+    }
+  ]
+}

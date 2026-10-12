@@ -772,6 +772,7 @@ struct IoInner {
     resources: Arc<ResourceService>,
     trash_root: PathBuf,
     workspace: Option<WorkspacePlane>,
+    file_safety: std::sync::RwLock<Arc<crate::file_safety::FileSafety>>,
     bus: ResourceEventBus,
     watches: Mutex<HashMap<String, WatchEntry>>,
     watch_ids: Mutex<HashMap<String, String>>,
@@ -810,11 +811,22 @@ impl ResourceIoService {
         watch_poll_ms: u64,
         now: Arc<dyn Fn() -> u64 + Send + Sync>,
     ) -> Self {
+        if let Some((access, _)) = &workspace {
+            for name in ["file-write-witnesses", "file-recovery-records"] {
+                // 构造时数据家已存在；无法解析的保护根在实际授权时仍不放宽。
+                access
+                    .protect_service_root(&data_home.join(name))
+                    .expect("service state protection root");
+            }
+        }
         let inner = Arc::new(IoInner {
             session_files,
             resources,
             // 现役 trashRoot = path.join(lingxiHome, "trash")
             //（sandbox-resource-io.ts :64）→ 候选人数据家目录下。
+            file_safety: std::sync::RwLock::new(Arc::new(crate::file_safety::FileSafety::new(
+                &data_home,
+            ))),
             trash_root: data_home.join("trash"),
             workspace: workspace.map(|(access, cwd)| WorkspacePlane { access, cwd }),
             bus: ResourceEventBus::new(now.clone()),
@@ -833,6 +845,13 @@ impl ResourceIoService {
         }
     }
 
+    pub fn set_file_safety(&self, safety: Arc<crate::file_safety::FileSafety>) {
+        *self.inner.file_safety.write().unwrap() = safety;
+    }
+    pub fn file_safety(&self) -> Arc<crate::file_safety::FileSafety> {
+        self.inner.file_safety.read().unwrap().clone()
+    }
+
     /// D8：组合根注入文件历史服务（一次性；重复 set 忽略并保首值）。
     pub fn set_file_history(&self, service: Arc<crate::filehistory::FileHistoryService>) {
         let _ = self.file_history.set(service);
@@ -842,6 +861,19 @@ impl ResourceIoService {
         self.file_history.get()
     }
 
+    /// 手工 HTTP 无 run 局部事实，保留原编辑语义；owned-run 必须来自同一真实存储。
+    fn blocking_permit(
+        &self,
+        ctx: &OpContext,
+    ) -> Result<Option<Arc<lingxi_kernel::session_admission::SessionPermit>>, ResourceIoError> {
+        crate::task_supervisor::retain_blocking_resource_permit(
+            ctx.principal_kind,
+            &ctx.principal_subject,
+            &ctx.session_id,
+            &self.inner.session_files.admission_gate(),
+        )
+        .map_err(|err| ResourceIoError::new(409, "resource_run_binding_mismatch", err.to_string()))
+    }
     // ── 内核分派（resource-io.ts callProvider :202-224） ──
 
     /// provider 闸：mount/url → D9 400；local_fs 缺席 → 现役 501。
@@ -866,9 +898,15 @@ impl ResourceIoService {
         Self::refuse_if_mount_or_url(&reference)?;
         match &reference {
             ResourceRef::LocalFile { .. } => {
+                let retained = self.blocking_permit(ctx)?;
                 let inner = self.inner.clone();
                 let ctx = ctx.clone();
-                spawn_blocking_io(move || inner.local_stat(&reference, &ctx)).await
+                let lease = inner.session_files.payload_lease().await;
+                spawn_blocking_io(retained, move || {
+                    let _lease = lease;
+                    inner.local_stat(&reference, &ctx)
+                })
+                .await
             }
             ResourceRef::SessionFile { .. } => self.session_file_stat(&reference).await,
             ResourceRef::Resource { .. } => self.resource_stat(&reference).await,
@@ -885,9 +923,16 @@ impl ResourceIoService {
         Self::refuse_if_mount_or_url(&reference)?;
         match &reference {
             ResourceRef::LocalFile { .. } => {
+                let retained = self.blocking_permit(ctx)?;
                 let inner = self.inner.clone();
                 let ctx = ctx.clone();
-                spawn_blocking_io(move || inner.local_read(&reference, &ctx)).await
+                let lease = inner.session_files.payload_lease().await;
+                spawn_blocking_io(retained, move || {
+                    // 请求取消不代表阻塞线程退出；租约随实际线程释放。
+                    let _lease = lease;
+                    inner.local_read(&reference, &ctx)
+                })
+                .await
             }
             ResourceRef::SessionFile { .. } => self.session_file_read(&reference).await,
             ResourceRef::Resource { .. } => self.resource_read(&reference).await,
@@ -900,9 +945,15 @@ impl ResourceIoService {
         Self::refuse_if_mount_or_url(&reference)?;
         match &reference {
             ResourceRef::LocalFile { .. } => {
+                let retained = self.blocking_permit(ctx)?;
                 let inner = self.inner.clone();
                 let ctx = ctx.clone();
-                spawn_blocking_io(move || inner.local_list(&reference, &ctx)).await
+                let lease = inner.session_files.payload_lease().await;
+                spawn_blocking_io(retained, move || {
+                    let _lease = lease;
+                    inner.local_list(&reference, &ctx)
+                })
+                .await
             }
             other => Err(ResourceIoError::capability_denied(
                 "list",
@@ -923,10 +974,13 @@ impl ResourceIoService {
         Self::refuse_if_mount_or_url(&reference)?;
         match &reference {
             ResourceRef::LocalFile { .. } => {
+                let retained = self.blocking_permit(ctx)?;
                 let inner = self.inner.clone();
                 let ctx = ctx.clone();
                 let mode = mode.map(str::to_string);
-                spawn_blocking_io(move || {
+                let lease = inner.session_files.payload_lease().await;
+                spawn_blocking_io(retained, move || {
+                    let _lease = lease;
                     inner.local_search(&reference, query.as_deref(), mode.as_deref(), limit, &ctx)
                 })
                 .await
@@ -948,11 +1002,13 @@ impl ResourceIoService {
         Self::refuse_if_mount_or_url(&reference)?;
         match &reference {
             ResourceRef::LocalFile { .. } => {
+                let retained = self.blocking_permit(ctx)?;
                 let inner = self.inner.clone();
                 let ctx2 = ctx.clone();
-                let result =
-                    spawn_blocking_io(move || inner.local_write(&reference, &content, &ctx2))
-                        .await?;
+                let result = spawn_blocking_io(retained, move || {
+                    inner.local_write(&reference, &content, &ctx2)
+                })
+                .await?;
                 self.emit_changed(&result, ctx);
                 self.capture_history(&result, ctx).await;
                 Ok(result)
@@ -981,9 +1037,10 @@ impl ResourceIoService {
         let expected_version = Value::Object(expected_version.clone());
         match &reference {
             ResourceRef::LocalFile { .. } => {
+                let retained = self.blocking_permit(ctx)?;
                 let inner = self.inner.clone();
                 let ctx2 = ctx.clone();
-                let result = spawn_blocking_io(move || {
+                let result = spawn_blocking_io(retained, move || {
                     inner.local_write_expected_version(
                         &reference,
                         &content,
@@ -1049,10 +1106,13 @@ impl ResourceIoService {
         Self::refuse_if_mount_or_url(&from_ref)?;
         match &from_ref {
             ResourceRef::LocalFile { .. } => {
+                let retained = self.blocking_permit(ctx)?;
                 let inner = self.inner.clone();
                 let ctx2 = ctx.clone();
-                let result =
-                    spawn_blocking_io(move || inner.local_move(&from_ref, &to_ref, &ctx2)).await?;
+                let result = spawn_blocking_io(retained, move || {
+                    inner.local_move(&from_ref, &to_ref, &ctx2)
+                })
+                .await?;
                 self.emit_renamed(&result, ctx);
                 Ok(result)
             }
@@ -1074,10 +1134,11 @@ impl ResourceIoService {
         Self::refuse_if_mount_or_url(&reference)?;
         match &reference {
             ResourceRef::LocalFile { .. } => {
+                let retained = self.blocking_permit(ctx)?;
                 let inner = self.inner.clone();
                 let ctx2 = ctx.clone();
                 let namespace = namespace.map(str::to_string);
-                let result = spawn_blocking_io(move || {
+                let result = spawn_blocking_io(retained, move || {
                     inner.local_trash(&reference, namespace.as_deref(), metadata, &ctx2)
                 })
                 .await?;
@@ -1106,9 +1167,15 @@ impl ResourceIoService {
         Self::refuse_if_mount_or_url(&reference)?;
         match &reference {
             ResourceRef::LocalFile { .. } => {
+                let retained = self.blocking_permit(ctx)?;
                 let inner = self.inner.clone();
                 let ctx = ctx.clone();
-                spawn_blocking_io(move || inner.local_materialize(&reference, &ctx)).await
+                let lease = inner.session_files.payload_lease().await;
+                spawn_blocking_io(retained, move || {
+                    let _lease = lease;
+                    inner.local_materialize(&reference, &ctx)
+                })
+                .await
             }
             ResourceRef::SessionFile { .. } => self.session_file_materialize(&reference).await,
             ResourceRef::Resource { .. } => self.resource_materialize(&reference).await,
@@ -1209,7 +1276,7 @@ impl ResourceIoService {
     ) -> Result<(String, crate::sessionfiles::SessionFileView, String), ResourceIoError> {
         let ResourceRef::SessionFile {
             file_id,
-            session_id: _,
+            session_id,
         } = reference
         else {
             return Err(ResourceIoError::new(
@@ -1218,19 +1285,18 @@ impl ResourceIoService {
                 format!("session file resolver cannot resolve {}", reference.kind()),
             ));
         };
-        let entry = self
-            .inner
-            .session_files
-            .get_file_global(file_id)
-            .await
-            .map_err(|err| ResourceIoError::internal(format!("session file lookup: {err}")))?
-            .ok_or_else(|| {
-                ResourceIoError::new(
-                    404,
-                    "resource_not_found",
-                    format!("session file not found: {file_id}"),
-                )
-            })?;
+        let entry = match session_id {
+            Some(id) => self.inner.session_files.get_file(id, file_id).await,
+            None => self.inner.session_files.get_file_global(file_id).await,
+        }
+        .map_err(|err| ResourceIoError::internal(format!("session file lookup: {err}")))?
+        .ok_or_else(|| {
+            ResourceIoError::new(
+                404,
+                "resource_not_found",
+                format!("session file not found: {file_id}"),
+            )
+        })?;
         if entry.status == "expired" {
             return Err(ResourceIoError::new(
                 410,
@@ -1295,6 +1361,7 @@ impl ResourceIoService {
     }
 
     async fn session_file_stat(&self, reference: &ResourceRef) -> Result<Value, ResourceIoError> {
+        let _lease = self.inner.session_files.payload_lease().await;
         let (resource_key, entry, file_path) = self.resolve_session_file(reference).await?;
         let meta = std::fs::metadata(&file_path)
             .map_err(|err| ResourceIoError::internal(format!("stat session file: {err}")))?;
@@ -1312,6 +1379,8 @@ impl ResourceIoService {
         &self,
         reference: &ResourceRef,
     ) -> Result<ResourceRead, ResourceIoError> {
+        let lease = self.inner.session_files.payload_lease().await;
+        let observer = self.inner.session_files.payload_read_observer();
         let (resource_key, entry, file_path) = self.resolve_session_file(reference).await?;
         let meta = std::fs::metadata(&file_path)
             .map_err(|err| ResourceIoError::internal(format!("stat session file: {err}")))?;
@@ -1329,10 +1398,16 @@ impl ResourceIoService {
             ));
         }
         let read_path = file_path.clone();
-        let content = tokio::task::spawn_blocking(move || std::fs::read(read_path))
-            .await
-            .map_err(|err| ResourceIoError::internal(format!("read join: {err}")))?
-            .map_err(|err| ResourceIoError::internal(format!("read session file: {err}")))?;
+        let content = tokio::task::spawn_blocking(move || {
+            let _lease = lease;
+            if let Some(observer) = observer {
+                observer();
+            }
+            std::fs::read(read_path)
+        })
+        .await
+        .map_err(|err| ResourceIoError::internal(format!("read join: {err}")))?
+        .map_err(|err| ResourceIoError::internal(format!("read session file: {err}")))?;
         Ok(ResourceRead {
             meta: serde_json::json!({
                 "resourceKey": resource_key,
@@ -1348,6 +1423,7 @@ impl ResourceIoService {
         &self,
         reference: &ResourceRef,
     ) -> Result<Value, ResourceIoError> {
+        let _lease = self.inner.session_files.payload_lease().await;
         let (resource_key, entry, file_path) = self.resolve_session_file(reference).await?;
         let meta = std::fs::metadata(&file_path)
             .map_err(|err| ResourceIoError::internal(format!("stat session file: {err}")))?;
@@ -1408,6 +1484,7 @@ impl ResourceIoService {
     }
 
     async fn resource_stat(&self, reference: &ResourceRef) -> Result<Value, ResourceIoError> {
+        let _lease = self.inner.session_files.payload_lease().await;
         let content = self.resolve_resource_content(reference).await?;
         let ResourceRef::Resource { resource_id } = reference else {
             unreachable!()
@@ -1426,15 +1503,23 @@ impl ResourceIoService {
         &self,
         reference: &ResourceRef,
     ) -> Result<ResourceRead, ResourceIoError> {
+        let lease = self.inner.session_files.payload_lease().await;
+        let observer = self.inner.session_files.payload_read_observer();
         let content = self.resolve_resource_content(reference).await?;
         let ResourceRef::Resource { resource_id } = reference else {
             unreachable!()
         };
         let read_path = content.file_path.clone();
-        let bytes = tokio::task::spawn_blocking(move || std::fs::read(read_path))
-            .await
-            .map_err(|err| ResourceIoError::internal(format!("read join: {err}")))?
-            .map_err(|err| ResourceIoError::internal(format!("read resource: {err}")))?;
+        let bytes = tokio::task::spawn_blocking(move || {
+            let _lease = lease;
+            if let Some(observer) = observer {
+                observer();
+            }
+            std::fs::read(read_path)
+        })
+        .await
+        .map_err(|err| ResourceIoError::internal(format!("read join: {err}")))?
+        .map_err(|err| ResourceIoError::internal(format!("read resource: {err}")))?;
         Ok(ResourceRead {
             meta: serde_json::json!({
                 "resourceKey": resource_key_for_ref(reference),
@@ -1450,6 +1535,7 @@ impl ResourceIoService {
         &self,
         reference: &ResourceRef,
     ) -> Result<Value, ResourceIoError> {
+        let _lease = self.inner.session_files.payload_lease().await;
         let content = self.resolve_resource_content(reference).await?;
         let ResourceRef::Resource { resource_id } = reference else {
             unreachable!()
@@ -1945,14 +2031,21 @@ fn diff_snapshots(
     events
 }
 
-async fn spawn_blocking_io<T, F>(work: F) -> Result<T, ResourceIoError>
+async fn spawn_blocking_io<T, F>(
+    retained: Option<Arc<lingxi_kernel::session_admission::SessionPermit>>,
+    work: F,
+) -> Result<T, ResourceIoError>
 where
     T: Send + 'static,
     F: FnOnce() -> Result<T, ResourceIoError> + Send + 'static,
 {
-    tokio::task::spawn_blocking(work)
-        .await
-        .map_err(|err| ResourceIoError::internal(format!("blocking io join: {err}")))?
+    tokio::task::spawn_blocking(move || {
+        // 等待者取消不能代表阻塞文件作业停止，强引用持到真实 closure 退出。
+        let _retained_permit = retained;
+        work()
+    })
+    .await
+    .map_err(|err| ResourceIoError::internal(format!("blocking io join: {err}")))?
 }
 
 fn mtime_ms_of(meta: &std::fs::Metadata) -> u64 {
@@ -2117,6 +2210,9 @@ impl IoInner {
                 file_path.display()
             )));
         }
+        if let Some(observer) = self.session_files.payload_read_observer() {
+            observer();
+        }
         let content = std::fs::read(&file_path).map_err(|err| {
             ResourceIoError::io_bad_request(format!("cannot read {}: {err}", file_path.display()))
         })?;
@@ -2148,9 +2244,45 @@ impl IoInner {
                 ResourceIoError::io_bad_request(format!("cannot create parent dirs: {err}"))
             })?;
         }
-        std::fs::write(&file_path, content).map_err(|err| {
-            ResourceIoError::io_bad_request(format!("cannot write {}: {err}", file_path.display()))
-        })?;
+        let safety = self.file_safety.read().unwrap().clone();
+        let authorize = || {
+            plane
+                .authorize(
+                    self.local_path(reference).unwrap_or(""),
+                    ResourceOp::Write,
+                    ctx,
+                )
+                .ok()
+                .as_deref()
+                == Some(file_path.as_path())
+        };
+        let result = if existed {
+            crate::file_safety::Snapshot::read(&file_path).and_then(|snapshot| {
+                safety.replace(
+                    &crate::file_safety::witness_scope(
+                        ctx.principal_kind,
+                        &ctx.principal_subject,
+                        &ctx.session_id,
+                    ),
+                    &file_path,
+                    &snapshot,
+                    content,
+                    authorize,
+                )
+            })
+        } else {
+            safety.create(
+                &crate::file_safety::witness_scope(
+                    ctx.principal_kind,
+                    &ctx.principal_subject,
+                    &ctx.session_id,
+                ),
+                &file_path,
+                content,
+                authorize,
+            )
+        };
+        result.map_err(|err| ResourceIoError::io_bad_request(err.to_string()))?;
         Ok(WorkspacePlane::mutation_result(
             &file_path,
             if existed { "modified" } else { "created" },
@@ -2169,14 +2301,16 @@ impl IoInner {
             .as_ref()
             .ok_or_else(|| ResourceIoError::provider_not_available("local_fs"))?;
         let file_path = plane.authorize(self.local_path(reference)?, ResourceOp::Write, ctx)?;
+        let snapshot = crate::file_safety::Snapshot::read(&file_path).ok();
         let current = std::fs::metadata(&file_path)
             .ok()
             .filter(|meta| meta.is_file())
             .map(|meta| version_json(&meta));
-        let matches = current
-            .as_ref()
-            .map(|current| file_versions_match(current, expected))
-            .unwrap_or(false);
+        let matches = snapshot.is_some()
+            && current
+                .as_ref()
+                .map(|current| file_versions_match(current, expected))
+                .unwrap_or(false);
         if !matches {
             // 冲突是结果不是异常（local-fs-provider.ts :126-135）。
             let mut out = serde_json::json!({
@@ -2191,7 +2325,36 @@ impl IoInner {
             }
             return Ok(out);
         }
-        self.local_write(reference, content, ctx)
+        let snapshot = snapshot.ok_or_else(|| ResourceIoError::io_bad_request("file changed"))?;
+        let safety = self.file_safety.read().unwrap().clone();
+        let result = safety.replace(
+            &crate::file_safety::witness_scope(
+                ctx.principal_kind,
+                &ctx.principal_subject,
+                &ctx.session_id,
+            ),
+            &file_path,
+            &snapshot,
+            content,
+            || {
+                plane
+                    .authorize(
+                        self.local_path(reference).unwrap_or(""),
+                        ResourceOp::Write,
+                        ctx,
+                    )
+                    .ok()
+                    .as_deref()
+                    == Some(file_path.as_path())
+            },
+        );
+        match result {
+            Ok(()) => Ok(WorkspacePlane::mutation_result(&file_path, "modified")),
+            Err(crate::file_safety::WriteError::Conflict) => Ok(
+                serde_json::json!({"ok":false,"conflict":true,"filePath":file_path.to_string_lossy(),"resourceKey":local_key(&file_path),"resource":WorkspacePlane::descriptor(&file_path)}),
+            ),
+            Err(error) => Err(ResourceIoError::io_bad_request(error.to_string())),
+        }
     }
 
     fn local_list(
@@ -2212,6 +2375,12 @@ impl IoInner {
             let entry = entry.map_err(|err| {
                 ResourceIoError::io_bad_request(format!("cannot read dir entry: {err}"))
             })?;
+            if plane
+                .authorize(&entry.path().to_string_lossy(), ResourceOp::Read, ctx)
+                .is_err()
+            {
+                continue;
+            }
             let meta = std::fs::metadata(entry.path()).map_err(|err| {
                 ResourceIoError::io_bad_request(format!("cannot stat entry: {err}"))
             })?;

@@ -1,0 +1,55 @@
+{
+  "at": "2026-10-12T02:22:02.409603+00:00",
+  "role": "ROOT_READ_ONLY_SOURCE_AND_DISPATCH_PREPARATION",
+  "work_id": "R06-EX-W04",
+  "original_leaves": 5,
+  "original_assertions": 10,
+  "spec_sha256_unchanged": "55b193c92aab93bd9289bfd352d942b8b85fe1356c3f63d9d8d76879d4c4af1d",
+  "original_register_sha256_unchanged": "db4ceda76ca3911b9e4001934bd49f6d756c800634d3fe1da481730907876fae",
+  "source_only_main_current_includes_unaccepted_dependencies": [
+    {
+      "path": "rust/crates/lingxi-service/src/memory.rs",
+      "sha256": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "sha256": "39d114c237cecf12e2bdbb115f3df07f864d2218136db3662732503c4c53ea22"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/agent_memory.rs",
+      "sha256": "1133171e2f824ae7f4e69c7123d7a2f03b379e05480e4f76647926be3d6050eb"
+    },
+    {
+      "path": "server/routes/memory-dream.ts",
+      "sha256": "21f6578a615be9aeca7fb4f0874dcdcdc279d736ec6ba32b7f6d832b53fbd546"
+    },
+    {
+      "path": "lib/memory/dream/runner.ts",
+      "sha256": "a1fb7863119e9ed96afc9d99294006969c2e9b85161c89873af8023d9ae3d9e6"
+    },
+    {
+      "path": "lib/memory/dream/model-runner.ts",
+      "sha256": "5868aba047cf5f51e641dd7874baf361b39dc27f718428dd1b1ccf3eefa03484"
+    },
+    {
+      "path": "lib/memory/dream/state-store.ts",
+      "sha256": "55243f917f0ee38888955ea5103f8c15af88785cd390f8678b0a6343f9bb7cdf"
+    },
+    {
+      "path": "lib/memory/dream/revision-store.ts",
+      "sha256": "fbc1d8278657ca84d2963736125d0544f4db090869dbdbf93fdf0da80a0d2919"
+    },
+    {
+      "path": "lib/memory/dream/memory-units.ts",
+      "sha256": "715bcac0d39599d204250f0483244c68f380081baa7eeb8eff6e29f789d92e97"
+    }
+  ],
+  "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W04_EXECUTOR_01.md",
+  "dispatch_sha256": "bab0f927550b50d1d0fb2c09c7c1131aebcd3d83f52d946960026ad73ae17909",
+  "actor": "NOT_CREATED",
+  "workspace": "NOT_PREPARED",
+  "tests": "NOT_RUN",
+  "acceptance": "NONE",
+  "stage": "NOT_RUN",
+  "R07_started": false
+}

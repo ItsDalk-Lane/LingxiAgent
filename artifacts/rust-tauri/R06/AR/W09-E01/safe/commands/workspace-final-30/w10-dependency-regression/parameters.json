@@ -1,0 +1,135 @@
+{
+  "changed": {
+    "degraded": [
+      {
+        "detail": "vector variant missing or incompatible (model=model-a; dims=2); rebuild the notebook index",
+        "reason": "KNOWLEDGE_VECTOR_NOT_READY"
+      }
+    ],
+    "mode": "fts",
+    "searchedVectorVariants": []
+  },
+  "original": {
+    "degraded": [],
+    "mode": "hybrid",
+    "searchedVectorVariants": [
+      {
+        "chunkIndexVariantId": "civ_a8a9b432c783b510d071b446ef88c9c6",
+        "chunkProfileHash": "0f9da6dad6bde4f5",
+        "dimensions": 2,
+        "parameterFingerprint": "12828c8167423189924328419054246bd4bfb85c9e8d57c085b76c8d11bf2dfa",
+        "parseArtifactId": "kpa_bc0f6463a8ef6f70c9884793",
+        "vectorIndexVariantId": "viv_6ac135e730d5efbbe21e610a00c128d3"
+      }
+    ]
+  },
+  "requestsA": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "# 资料\n\n来源隔离与模型身份必须一致。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:65418"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "来源隔离"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:65418"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "来源隔离"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:65418"
+    }
+  ],
+  "requestsNewEndpoint": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "来源隔离"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:65476"
+    }
+  ],
+  "unchanged": {
+    "degraded": [],
+    "mode": "hybrid",
+    "searchedVectorVariants": [
+      {
+        "chunkIndexVariantId": "civ_a8a9b432c783b510d071b446ef88c9c6",
+        "chunkProfileHash": "0f9da6dad6bde4f5",
+        "dimensions": 2,
+        "parameterFingerprint": "12828c8167423189924328419054246bd4bfb85c9e8d57c085b76c8d11bf2dfa",
+        "parseArtifactId": "kpa_bc0f6463a8ef6f70c9884793",
+        "vectorIndexVariantId": "viv_6ac135e730d5efbbe21e610a00c128d3"
+      }
+    ]
+  },
+  "usage": [
+    {
+      "inputTokens": 5,
+      "model": "model-a",
+      "outcome": "succeeded",
+      "outputTokens": null,
+      "protocol": "openai-embeddings",
+      "provider": "embed",
+      "transportAttempts": 1,
+      "usageState": "partial"
+    },
+    {
+      "inputTokens": 5,
+      "model": "model-a",
+      "outcome": "succeeded",
+      "outputTokens": null,
+      "protocol": "openai-embeddings",
+      "provider": "embed",
+      "transportAttempts": 1,
+      "usageState": "partial"
+    },
+    {
+      "inputTokens": 5,
+      "model": "model-a",
+      "outcome": "succeeded",
+      "outputTokens": null,
+      "protocol": "openai-embeddings",
+      "provider": "embed",
+      "transportAttempts": 1,
+      "usageState": "partial"
+    },
+    {
+      "inputTokens": 5,
+      "model": "model-a",
+      "outcome": "succeeded",
+      "outputTokens": null,
+      "protocol": "openai-embeddings",
+      "provider": "embed",
+      "transportAttempts": 1,
+      "usageState": "partial"
+    }
+  ],
+  "vectors": [
+    {
+      "dimensions": 2,
+      "key": "2cf38f6dc9624dff6e08ee5984850e11040038003abd696a09700b1dc5bb6af4",
+      "status": "ready",
+      "variant": "viv_6ac135e730d5efbbe21e610a00c128d3",
+      "vector": "0000803F00000000"
+    }
+  ]
+}

@@ -1,0 +1,292 @@
+{
+  "raw_complete_scan": "consumer-scan-raw.json",
+  "families": [
+    {
+      "family": "共享准入",
+      "files": [
+        {
+          "path": "rust/crates/lingxi-kernel/src/session_admission.rs",
+          "sha256": "68593700016189b1721c1c421ece4b44edbc7ae01be57aec7e7e9636c7875bec"
+        },
+        {
+          "path": "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+          "sha256": "9cfd7f61515cde5205e33764b2d5564d71a4a4caad59016095b759aea2c7f51f"
+        },
+        {
+          "path": "rust/crates/lingxi-kernel/src/ports.rs",
+          "sha256": "18931ff4a4fcea405349dc76185b069a7cb1a83887dcbddc72195ee2c55aed8a"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/sessions.rs",
+          "sha256": "ce427b80baafd3f8b670dbf36ca381efa7f66b2f8794c77443bc544fafbf9cbd"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/lib.rs",
+          "sha256": "f4d178f1192a53ce2fa45c4013001b626868522055682c9183be4c5d5e3d6b70"
+        }
+      ],
+      "source_contract": "按真实 canonical SQLite 路径共享 Arc；多 SID 排序一次获得；宿主身份绑定优先于 Busy；独立 home 互不拖住；生产跨进程排他由 InstanceGuard 承担。",
+      "focused_actual_named_tests": [
+        {
+          "test": "same_database_constructor_and_instance_contract",
+          "actual_ok_line": true
+        },
+        {
+          "test": "public_direct_drive_obeys_actual_same_database_admission",
+          "actual_ok_line": true
+        },
+        {
+          "test": "public_borrowed_submission_rejects_mixed_real_database_before_effects",
+          "actual_ok_line": true
+        },
+        {
+          "test": "direct_driver_independent_database_reentry_and_release",
+          "actual_ok_line": true
+        }
+      ],
+      "whole_and_formal_required": true,
+      "does_not_claim_full_stage": true
+    },
+    {
+      "family": "会话变更",
+      "files": [
+        {
+          "path": "rust/crates/lingxi-service/src/session_tree.rs",
+          "sha256": "be0019d858513edb69ed2a702e5be4959bc9864bea16fdf45e58cc907e8699ff"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/session_admin.rs",
+          "sha256": "f070ad013c2339e5f84202174ec0eb04a98ce58c5406d7db2badb9a95bf35e07"
+        },
+        {
+          "path": "rust/crates/lingxi-adapters/src/storage/session_tree.rs",
+          "sha256": "fee70e2b43da5ffd46e27c69832234527bdba4693f64221268771a089f6ebbc9"
+        },
+        {
+          "path": "rust/crates/lingxi-adapters/src/storage/session_admin.rs",
+          "sha256": "6a3db72af1ff42d3c2c43cfb5cf6432ea985ff9e800e2847557313e188baf820"
+        }
+      ],
+      "source_contract": "fork/retry/rewind/create/archive/restore/delete/cleanup 持有操作许可直到收据与关键状态落库；原 rename/pin/memory 独立元数据不被网络等待阻塞。",
+      "focused_actual_named_tests": [
+        {
+          "test": "authenticated_barrier_rewind_execute_and_cancelled_waiter",
+          "actual_ok_line": true
+        },
+        {
+          "test": "slow_model_does_not_block_independent_session_or_metadata",
+          "actual_ok_line": true
+        },
+        {
+          "test": "latest_permission_and_lifecycle_are_rechecked_before_commit",
+          "actual_ok_line": true
+        }
+      ],
+      "whole_and_formal_required": true,
+      "does_not_claim_full_stage": true
+    },
+    {
+      "family": "日志与事件",
+      "files": [
+        {
+          "path": "rust/crates/lingxi-adapters/src/storage/session_operations.rs",
+          "sha256": "22ad7a3c406238a5f0f1adf3bab5f461f758cd6655f6905d863db21782a7aabf"
+        },
+        {
+          "path": "rust/crates/lingxi-adapters/src/storage/migrations.rs",
+          "sha256": "689527aae493e2d6037ad0d799a0054d6dfdd9e5c5735bfe17334ea96e3abe5d"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/auth.rs",
+          "sha256": "53bc6c3f031d4c0eeb1ce9745da5ba7b8fde0d7922b2d3b6f03f36a7730c1e42"
+        }
+      ],
+      "source_contract": "追加 v10；v1–9 SQL 原字节不变；关键状态/事件/完成收据同事务；未知文件效果不自动重做；已删除 SID 原 journal 可授权查询且不得重新占用。",
+      "focused_actual_named_tests": [
+        {
+          "test": "positive_and_fork_event_atomicity",
+          "actual_ok_line": true
+        },
+        {
+          "test": "unknown_file_effect_survives_storage_failure_restart_and_replay",
+          "actual_ok_line": true
+        },
+        {
+          "test": "completed_fork_replay_conflict_and_recovered_event_are_consistent",
+          "actual_ok_line": true
+        },
+        {
+          "test": "retired_seed_identity_stays_deleted_and_no_journal_reuse_is_preserved",
+          "actual_ok_line": true
+        }
+      ],
+      "whole_and_formal_required": true,
+      "does_not_claim_full_stage": true
+    },
+    {
+      "family": "运行与私有凭据",
+      "files": [
+        {
+          "path": "rust/crates/lingxi-service/src/runs.rs",
+          "sha256": "7c9640bd0b2a75a41d69abb1027db474fc7a10b964f24454c2c40dd8e9ecc372"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/background.rs",
+          "sha256": "55189639a23a725c64950ba44d0e0a5663e5f6bd443a5ea10e0b8f8aed65ec59"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/subagents.rs",
+          "sha256": "7edf1000c3f330f0507a54768b9b8b160acb0e0a4d983194d2925932f302fcab"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/cancel.rs",
+          "sha256": "a214b5447535cc7f581bac564deb49b98154b17e8152c8647cccc5d8d23947ae"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/task_supervisor.rs",
+          "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/session_supervisor.rs",
+          "sha256": "ce64d215656db6dd8a221fdf64287d6deb8bdbf90bffa1c9c1f786f6ce373cc3"
+        }
+      ],
+      "source_contract": "public/borrowed/owned/durable background 实际入口校验 Storage/gate/principal/SID/Agent/issued parent/真实 CancelScope；foreground 断开只取消自己，background accepted 以实际 durable RunStart 为准；不同 Agent 的合法 child 保留父许可。",
+      "focused_actual_named_tests": [
+        {
+          "test": "actual_child_keeps_parent_admission_until_exit",
+          "actual_ok_line": true
+        },
+        {
+          "test": "actual_different_agent_child_keeps_exact_parent_permit",
+          "actual_ok_line": true
+        },
+        {
+          "test": "direct_driver_fake_agent_and_child_have_zero_effects",
+          "actual_ok_line": true
+        },
+        {
+          "test": "subagent_exact_parent_scope_and_settled_parent_are_enforced",
+          "actual_ok_line": true
+        },
+        {
+          "test": "local_owner_cross_session_owner_child_and_foreign_before_busy_are_preserved",
+          "actual_ok_line": true
+        }
+      ],
+      "whole_and_formal_required": true,
+      "does_not_claim_full_stage": true
+    },
+    {
+      "family": "物理文件退出",
+      "files": [
+        {
+          "path": "rust/crates/lingxi-service/src/filetools.rs",
+          "sha256": "05739e168b7275271fe78d2932fec5b10666e8a8e7fe434e881e3cebaa524d87"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/resourceio.rs",
+          "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/sessionfiles.rs",
+          "sha256": "aba372575848d6956a678a5f0337d0b466fa1853808fe8ab524b7d92d7fd6643"
+        }
+      ],
+      "source_contract": "native read/write/edit 及 ResourceIO stat/read/list/search/write/write_expected_version/move/trash/materialize 的实际 blocking 闭包保留强许可；错误 actor/SID/gate/CancelScope 不降为手工 HTTP 旁路；原无 issued 手工文件编辑保持原行为。ResourceIO FIFO 使用新增可信宿主消费者，不声称旧 native 本有这个消费者。",
+      "focused_actual_named_tests": [
+        {
+          "test": "actual_native_write_cancel_retains_admission_until_blocking_exit",
+          "actual_ok_line": true
+        },
+        {
+          "test": "actual_native_edit_cancel_retains_admission_until_blocking_exit",
+          "actual_ok_line": true
+        },
+        {
+          "test": "actual_resourceio_owned_write_cancel_retains_until_fifo_exit",
+          "actual_ok_line": true
+        },
+        {
+          "test": "real_gateway_cooperative_cancel_releases_after_actual_task_exit",
+          "actual_ok_line": true
+        },
+        {
+          "test": "real_http_disconnect_cancels_only_its_drive_and_reclaims_provider_socket",
+          "actual_ok_line": true
+        }
+      ],
+      "whole_and_formal_required": true,
+      "does_not_claim_full_stage": true
+    },
+    {
+      "family": "进程与外围",
+      "files": [
+        {
+          "path": "rust/crates/lingxi-service/src/procsupervisor.rs",
+          "sha256": "d586aa01efa0085f5890e73dcd056431ae84abf1b5b8aa379ce8159ff2ca7b37"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/workerrpc.rs",
+          "sha256": "4a158b5321da63d2c6a36d88da8ec7cfd21622c914fa38f7ad6dd674d4cb0788"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/workermodel.rs",
+          "sha256": "d551c2dbe25824d65385be836b5532d79af74425e768f24fd4798512937dc3d4"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/mcpbridge.rs",
+          "sha256": "e3312f6ab87ad6562233c3ec71a14e1925685a28c9879999b99731ddfa6f6fbf"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/resources.rs",
+          "sha256": "a38ca0dce4ba0b4bda2217b0b1a7a7110876b14945ac4c0ebb15f63bdf7f13da"
+        },
+        {
+          "path": "rust/crates/lingxi-service/src/management.rs",
+          "sha256": "c9402d83a16f3b0c4f6f193968b099fe29c6121968b337d6109dfeeb14c8c27d"
+        },
+        {
+          "path": "rust/crates/lingxi-adapters/src/storage/queue.rs",
+          "sha256": "705b588721103bb4a97ff66ac0eef43d1dc57ba1b2b9156692c05518107fd24c"
+        }
+      ],
+      "source_contract": "沿原 R03/R04/R05 合同保留 process supervisor 同步发 kill/有界实际退出与 unknown 结果、worker callback accounting、MCP 连接收回。persistent terminal 原 Running 跨 tool call 生命周期不是每个终端永久持本次 Run 许可。resources blocking 为只读正文、management 为密码散列/登录、queue 为应用退出 join，均无本次会话分支写入。跨平台和外部不可确认作用仍 OPEN。",
+      "focused_actual_named_tests": [],
+      "whole_and_formal_required": true,
+      "does_not_claim_full_stage": true
+    }
+  ],
+  "storage_decorator_forwarding": [
+    "admission_dedup_adversarial",
+    "admission_dedup_consistency",
+    "cancel_terminal_race",
+    "recovery_crash_points",
+    "request_id_canonicalization",
+    "r05_t07_usage_trace",
+    "r05_t07_rr1_usage_ledger"
+  ],
+  "all_current_scope_originals": "scope-current.json",
+  "test_binary_records": [
+    "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02/debug/deps/r04_t02_tool_gateway-b33f499bb7a93bf0",
+    "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02/debug/deps/r04_t04_file_tools-2532a858308d5250",
+    "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02/debug/deps/r06_t05_filehistory-2a2a1faee236cee5",
+    "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02/debug/deps/r06_t05_session_files-3391eb79436fba07",
+    "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02/debug/deps/r06_ar_f03_operations-8d2771cb1654c80c",
+    "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02/debug/deps/r06_t03_session_tree-db1bc4481f9d4533",
+    "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02/debug/deps/r06_t05_resourceio-f31b0f04c1c7a576",
+    "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02/debug/deps/r05_t07_rr1_usage_ledger-a6a71c54587ce7e1",
+    "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02/debug/deps/r06_t01_context_compiler-c543f29d5937666a",
+    "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02/debug/deps/r05_t07_usage_trace-4da2779840893ca0"
+  ],
+  "counts_are_not_original_obligation_coverage": true,
+  "final_bound_validation": {
+    "focused": "final-focused-01:134/0,10executed suites",
+    "whole": "final-workspace-01:1889/3 actual FAIL",
+    "formal": "formal-r05-02-gate: R05/R04/R03 actual FAIL, 30命令已实际exit",
+    "source_digest": "47bf2b262d78422376fe31bd663bcfe5da1975d0c207447d529f812173b7f59a",
+    "registry": "actualFAIL missing8/9/10",
+    "consumer_and_original_scope": "完整扫描consumer-scan-raw.json；原Steps/A/74叶169断言份额original-task-coverage.json与scope-current.json；不以RG匹配/测试数关闭原义务。",
+    "independent_acceptance": "PENDING_NEW_REVIEWER"
+  }
+}

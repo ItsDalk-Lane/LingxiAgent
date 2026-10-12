@@ -224,6 +224,7 @@ struct SessionSlot {
 pub struct SessionSupervisor {
     limits: SessionConcurrencyLimits,
     slots: Mutex<HashMap<String, SessionSlot>>,
+    admission: Arc<lingxi_kernel::session_admission::SessionAdmission>,
 }
 
 impl std::fmt::Debug for SessionSupervisor {
@@ -243,6 +244,7 @@ pub struct SessionLease {
     supervisor: Arc<SessionSupervisor>,
     session_id: String,
     inbox: Arc<SteeringInbox>,
+    _permit: Arc<lingxi_kernel::session_admission::SessionPermit>,
 }
 
 impl std::fmt::Debug for SessionLease {
@@ -256,6 +258,10 @@ impl SessionLease {
     /// provider turn).
     pub fn steering_inbox(&self) -> &SteeringInbox {
         &self.inbox
+    }
+
+    pub(crate) fn retained_permit(&self) -> Arc<lingxi_kernel::session_admission::SessionPermit> {
+        Arc::clone(&self._permit)
     }
 
     pub fn session_id(&self) -> &str {
@@ -284,7 +290,18 @@ impl Drop for SessionLease {
 
 impl SessionSupervisor {
     pub fn new(limits: SessionConcurrencyLimits) -> Arc<Self> {
+        Self::with_admission(
+            limits,
+            Arc::new(lingxi_kernel::session_admission::SessionAdmission::default()),
+        )
+    }
+
+    pub fn with_admission(
+        limits: SessionConcurrencyLimits,
+        admission: Arc<lingxi_kernel::session_admission::SessionAdmission>,
+    ) -> Arc<Self> {
         Arc::new(Self {
+            admission,
             limits,
             slots: Mutex::new(HashMap::new()),
         })
@@ -302,6 +319,16 @@ impl SessionSupervisor {
         self: &Arc<Self>,
         session_id: &str,
     ) -> Result<SessionLease, BusyGateError> {
+        let permit = self
+            .admission
+            .try_acquire(&[session_id], self.limits.registry_cap)
+            .map_err(|e| match e {
+                lingxi_kernel::session_admission::AdmissionError::Busy => BusyGateError::Busy,
+                lingxi_kernel::session_admission::AdmissionError::Full => {
+                    BusyGateError::RegistryFull
+                }
+            })?;
+        let permit = Arc::new(permit);
         let mut slots = self
             .slots
             .lock()
@@ -315,6 +342,7 @@ impl SessionSupervisor {
                 supervisor: Arc::clone(self),
                 session_id: session_id.to_string(),
                 inbox: Arc::clone(&slot.inbox),
+                _permit: permit,
             });
         }
         if slots.len() >= self.limits.registry_cap {
@@ -339,6 +367,7 @@ impl SessionSupervisor {
             supervisor: Arc::clone(self),
             session_id: session_id.to_string(),
             inbox,
+            _permit: permit,
         })
     }
 
@@ -375,6 +404,37 @@ impl SessionSupervisor {
     /// lifetime, bounded by the session registry cap.
     pub fn set_permission_mode(
         self: &Arc<Self>,
+        session_id: &str,
+        mode: lingxi_kernel::subagent::SessionPermissionMode,
+    ) -> Result<(), BusyGateError> {
+        let _permit = self
+            .admission
+            .try_acquire(&[session_id], self.limits.registry_cap)
+            .map_err(|e| match e {
+                lingxi_kernel::session_admission::AdmissionError::Busy => BusyGateError::Busy,
+                lingxi_kernel::session_admission::AdmissionError::Full => {
+                    BusyGateError::RegistryFull
+                }
+            })?;
+        self.set_permission_mode_admitted(session_id, mode)
+    }
+
+    pub(crate) fn mutation_permit(
+        self: &Arc<Self>,
+        session_id: &str,
+    ) -> Result<lingxi_kernel::session_admission::SessionPermit, BusyGateError> {
+        self.admission
+            .try_acquire(&[session_id], self.limits.registry_cap)
+            .map_err(|e| match e {
+                lingxi_kernel::session_admission::AdmissionError::Busy => BusyGateError::Busy,
+                lingxi_kernel::session_admission::AdmissionError::Full => {
+                    BusyGateError::RegistryFull
+                }
+            })
+    }
+
+    pub(crate) fn set_permission_mode_admitted(
+        &self,
         session_id: &str,
         mode: lingxi_kernel::subagent::SessionPermissionMode,
     ) -> Result<(), BusyGateError> {
@@ -474,12 +534,14 @@ impl SessionSupervisor {
 
     /// Observability: whether one session currently owns a run.
     pub fn is_busy(&self, session_id: &str) -> bool {
-        self.slots
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner())
-            .get(session_id)
-            .map(|slot| slot.busy)
-            .unwrap_or(false)
+        self.admission.is_busy(session_id)
+            || self
+                .slots
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner())
+                .get(session_id)
+                .map(|slot| slot.busy)
+                .unwrap_or(false)
     }
 
     /// Observability: pending steering of one session (leftover steering

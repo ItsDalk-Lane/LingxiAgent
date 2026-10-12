@@ -24,7 +24,7 @@ use rusqlite::OptionalExtension;
 use lingxi_kernel::ports::StorageError;
 
 use super::migrations;
-use super::run_store::{with_write_txn, RunDatabase};
+use super::run_store::{RunDatabase, with_write_txn};
 
 fn map_err(err: rusqlite::Error) -> StorageError {
     migrations::map_rusqlite(err)
@@ -46,6 +46,14 @@ pub struct ArchiveOutcome {
     pub archived_children: usize,
     pub detached_children: usize,
     pub skipped_streaming_children: usize,
+    pub errors: usize,
+}
+
+/// 失败仍然是错误；计数仅说明已经观察到的跳过项和整批回滚。
+#[derive(Debug, Clone)]
+pub struct ArchiveFailure {
+    pub source: StorageError,
+    pub outcome: ArchiveOutcome,
 }
 
 /// 恢复 / 删除的结局（三态，调用方映射 404/409/200，绝不静默成功）。
@@ -115,6 +123,7 @@ pub async fn create_session(
                         detail: format!("session_exists:{sid}"),
                     });
                 }
+                super::session_operations::assert_fresh_identity(conn, &sid)?;
                 conn.execute(
                     "INSERT INTO sessions \
                  (session_id, agent_id, owner_user_id, title, created_at_unix_ms, \
@@ -309,12 +318,27 @@ pub async fn archive_session(
     skip_ids: &[String],
     now_unix_ms: u64,
 ) -> Result<ArchiveOutcome, StorageError> {
+    archive_session_counted(db, session_id, child_mode, skip_ids, now_unix_ms)
+        .await
+        .map_err(|failure| failure.source)
+}
+
+pub async fn archive_session_counted(
+    db: &RunDatabase,
+    session_id: &str,
+    child_mode: Option<ChildMode>,
+    skip_ids: &[String],
+    now_unix_ms: u64,
+) -> Result<ArchiveOutcome, ArchiveFailure> {
     let sid = session_id.to_string();
     let mode = child_mode;
     let skips: Vec<String> = skip_ids.to_vec();
     let now = now_unix_ms as i64;
     let busy = db.options().busy_timeout_ms;
-    db.queue()
+    let skipped = std::sync::Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let skipped_in_txn = skipped.clone();
+    let result = db
+        .queue()
         .submit(move |conn| {
             with_write_txn(conn, busy, |conn| {
                 let lifecycle: Option<String> = conn
@@ -355,6 +379,7 @@ pub async fn archive_session(
                     archived_children: 0,
                     detached_children: 0,
                     skipped_streaming_children: 0,
+                    errors: 0,
                 };
                 match mode {
                     Some(ChildMode::DetachChildren) => {
@@ -392,9 +417,14 @@ pub async fn archive_session(
                                 }
                             }
                         }
+                        outcome.skipped_streaming_children =
+                            descendants.iter().filter(|id| skips.contains(id)).count();
+                        skipped_in_txn.store(
+                            outcome.skipped_streaming_children,
+                            std::sync::atomic::Ordering::SeqCst,
+                        );
                         for d in &descendants {
                             if skips.contains(d) {
-                                outcome.skipped_streaming_children += 1;
                                 continue;
                             }
                             // REPAIR-R1 FINDING-08：只计真实翻转的后代
@@ -424,7 +454,17 @@ pub async fn archive_session(
                 Ok(outcome)
             })
         })
-        .await
+        .await;
+    result.map_err(|source| ArchiveFailure {
+        source,
+        outcome: ArchiveOutcome {
+            // 事务未提交，已尝试的翻转不计为成功。
+            archived_children: 0,
+            detached_children: 0,
+            skipped_streaming_children: skipped.load(std::sync::atomic::Ordering::SeqCst),
+            errors: 1,
+        },
+    })
 }
 
 /// 恢复归档会话为 active（现役 restore：仅归档态允许）。
@@ -534,6 +574,12 @@ pub async fn delete_archived_session(
                     [&sid],
                 )
                 .map_err(map_err)?;
+                // 托管字节尚未实际删完时保留完整身份行，供失败后或重启恢复清扫。
+                conn.execute("DELETE FROM session_file_refs WHERE session_id=?1",[&sid]).map_err(map_err)?;
+                conn.execute("DELETE FROM session_file_aliases WHERE canonical_file_id IN (SELECT file_id FROM session_files WHERE owner_session_id=?1 AND storage_kind!='managed_cache' AND NOT EXISTS (SELECT 1 FROM session_file_refs r WHERE r.file_id=session_files.file_id))",[&sid]).map_err(map_err)?;
+                conn.execute("DELETE FROM session_files WHERE owner_session_id=?1 AND storage_kind!='managed_cache' AND NOT EXISTS (SELECT 1 FROM session_file_refs r WHERE r.file_id=session_files.file_id)",[&sid]).map_err(map_err)?;
+                // 分支锚属于本会话审计，先于其消息外键清理。
+                conn.execute("DELETE FROM run_history_anchors WHERE session_id=?1", [&sid]).map_err(map_err)?;
                 conn.execute("DELETE FROM messages WHERE session_id=?1", [&sid])
                     .map_err(map_err)?;
                 conn.execute("DELETE FROM key_events WHERE session_id=?1", [&sid])
@@ -675,6 +721,45 @@ pub struct SearchHit {
     pub last_activity_unix_ms: Option<i64>,
 }
 
+/// 标题片段围绕真正命中位置，长标题和多字节字符不会把命中截掉。
+fn title_search_snippet(title: &str, like_pattern: &str) -> String {
+    let mut escaped = false;
+    let mut query = String::new();
+    let wrapped = like_pattern.strip_prefix('%').unwrap_or(like_pattern);
+    let literal = wrapped.strip_suffix('%').unwrap_or(wrapped);
+    for ch in literal.chars() {
+        if escaped {
+            query.push(ch);
+            escaped = false;
+        } else if ch == '\\' {
+            escaped = true;
+        } else {
+            query.push(ch);
+        }
+    }
+    let text: Vec<char> = title.chars().collect();
+    let needle: Vec<char> = query.chars().map(|ch| ch.to_ascii_lowercase()).collect();
+    let folded: Vec<char> = text.iter().map(|ch| ch.to_ascii_lowercase()).collect();
+    let at = if needle.is_empty() {
+        0
+    } else {
+        folded
+            .windows(needle.len())
+            .position(|part| part == needle)
+            .unwrap_or(0)
+    };
+    let start = at.saturating_sub(35);
+    let end = (at + needle.len().max(1) + 65).min(text.len());
+    let mut snippet: String = text[start..end].iter().collect();
+    if start > 0 {
+        snippet.insert(0, '…');
+    }
+    if end < text.len() {
+        snippet.push('…');
+    }
+    snippet
+}
+
 /// 会话搜索（对照现役 /sessions/search，sessions.ts:857）：
 /// `phase=title` 匹配标题；`phase=content` 匹配消息内容。
 /// LIKE 转义在调用方拼 pattern 时完成（`\` 转义 `%`/`_`）。
@@ -750,10 +835,11 @@ pub async fn search_sessions(
                     .map_err(map_err)?;
                 for r in rows {
                     let (sid, title, created, activity) = r.map_err(map_err)?;
+                    let snippet = title_search_snippet(&title, &pat);
                     out.push(SearchHit {
                         session_id: sid,
                         title,
-                        snippet: String::new(),
+                        snippet,
                         match_kind: "title".to_string(),
                         created_at_unix_ms: created,
                         last_activity_unix_ms: activity,

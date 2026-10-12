@@ -1,0 +1,29 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.54s
+     Running tests/r06_ar_f02_file_restore.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f02_file_restore-5bd58e77c24caa47)
+
+running 1 test
+isolation tag=receipt-replay configured_home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-receipt-replay-87690-1791785084985766000 storage=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-receipt-replay-87690-1791785084985766000/lingxi-service/data/runs.db env_home= explicit_home_wins=true
+synthetic_request method=POST path=/lingxi/v1/sessions/s/checkpoints body={"filePaths":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-receipt-replay-87690-1791785084985766000/workspace/doc.txt"],"name":"A","targetMessageId":"run_000001a12eb6a8a1_000001-final"}
+synthetic_response path=/lingxi/v1/sessions/s/checkpoints status=200 body={"checkpointId":"s:A","createdAtUnixMs":1791785085094,"messageCount":2,"name":"A","sessionId":"s","targetMessageId":"run_000001a12eb6a8a1_000001-final"}
+synthetic_request method=POST path=/lingxi/v1/resource-io/write body={"content":"B","encoding":"utf-8","resource":{"kind":"local-file","path":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-receipt-replay-87690-1791785084985766000/workspace/doc.txt"},"sessionId":"s"}
+synthetic_response path=/lingxi/v1/resource-io/write status=200 body={"changeType":"modified","filePath":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-receipt-replay-87690-1791785084985766000/workspace/doc.txt","resource":{"filePath":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-receipt-replay-87690-1791785084985766000/workspace/doc.txt","kind":"local-file","path":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-receipt-replay-87690-1791785084985766000/workspace/doc.txt","provider":"local_fs"},"resourceKey":"local_fs:/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-receipt-replay-87690-1791785084985766000/workspace/doc.txt","version":{"mtimeMs":1791785085096,"size":1}}
+synthetic_request method=POST path=/lingxi/v1/sessions/s/rewind body={"checkpoint":"A","requestId":"rewind-recovery-receipt","restoreFiles":true}
+synthetic_response path=/lingxi/v1/sessions/s/rewind status=200 body={"sessionId":"s","checkpoint":"A","turnInputMessageId":"user:run_000001a12eb6a8a1_000001","newHeadMessageId":null,"resetMarkerId":"reset:s:1791785085117:4","restored":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-receipt-replay-87690-1791785084985766000/workspace/doc.txt"],"conflicted":[],"skipped":[],"failed":[],"recoveryRecords":[{"expected":{"ctime":[1791785085,106162951],"dev":16777228,"ino":309624834,"modified":"SystemTime { tv_sec: 1791785085, tv_nsec: 96065697 }","sha256":"df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c","size":1},"filePath":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-receipt-replay-87690-1791785084985766000/workspace/doc.txt","id":"131e62a4d628d44f98699b7773108cc0","replacementSha256":"559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd","retainedPath":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-receipt-replay-87690-1791785084985766000/workspace/.lingxi-recovery-131e62a4d628d44f98699b7773108cc0.original","scope":"local_user\u0000user_local\u0000s","status":"completed_original_retained","temporaryPath":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-receipt-replay-87690-1791785084985766000/workspace/.lingxi-write-131e62a4d628d44f98699b7773108cc0-0"}],"externalEffects":"not_rolled_back"}
+
+thread 'rewind_recovery_records_survive_request_replay_and_service_restart' (12809061) panicked at crates/lingxi-service/tests/r06_ar_f02_file_restore.rs:518:5:
+assertion `left == right` failed
+  left: 2
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test rewind_recovery_records_survive_request_replay_and_service_restart ... FAILED
+
+failures:
+
+failures:
+    rewind_recovery_records_survive_request_replay_and_service_restart
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 15 filtered out; finished in 0.16s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_f02_file_restore`

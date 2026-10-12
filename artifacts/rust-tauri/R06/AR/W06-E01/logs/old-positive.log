@@ -1,0 +1,46 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: unused imports: `RunLineage`, `RunOrigin`, and `ToolAccessTier`
+  --> crates/lingxi-service/tests/r06_ar_f06_config.rs:20:31
+   |
+20 | use lingxi_kernel::subagent::{RunLineage, RunOrigin, ToolAccessTier};
+   |                               ^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `ContextCompileFailure`, `scan_agent_config`, and `scan_preferences`
+  --> crates/lingxi-service/tests/r06_ar_f06_config.rs:23:5
+   |
+23 |     scan_agent_config, scan_preferences, ContextCompileFailure, ContextCompilerService,
+   |     ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DriveAuthorization` and `RunGrant`
+  --> crates/lingxi-service/tests/r06_ar_f06_config.rs:26:28
+   |
+26 | use lingxi_service::runs::{DriveAuthorization, RunGrant};
+   |                            ^^^^^^^^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `serde_json::Value`
+  --> crates/lingxi-service/tests/r06_ar_f06_config.rs:31:5
+   |
+31 | use serde_json::Value;
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: function `sha256_hex` is never used
+  --> crates/lingxi-service/tests/r06_ar_f06_config.rs:36:4
+   |
+36 | fn sha256_hex(text: &str) -> String {
+   |    ^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (test "r06_ar_f06_config") generated 5 warnings (run `cargo fix --test "r06_ar_f06_config" -p lingxi-service` to apply 4 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.48s
+     Running tests/r06_ar_f06_config.rs (rust/target/debug/deps/r06_ar_f06_config-b8da2e3b593aef1e)
+LINGXI_TEST_GUARD: armed (pid 29436, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+isolated_home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t01-boot-f06-29436-1791696760659-0 captured_calls=1
+test positive_block_disabled_real_request ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.12s
+

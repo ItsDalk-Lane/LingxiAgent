@@ -1,0 +1,171 @@
+   Compiling lingxi-service v0.0.0 (<W09_WORKSPACE>/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.02s
+     Running tests/knowledge_store_r06t07.rs (rust/target-w09-e01/debug/deps/knowledge_store_r06t07-0cbb88bd577147fb)
+LINGXI_TEST_GUARD: armed (pid 6275, mem_limit=8192 MB, time_limit=600 s)
+
+running 9 tests
+test identity_algorithms_are_deterministic_and_frozen ... ok
+test vector_store_dimension_gate_refuses_mixed_search ... ok
+test index_store_fingerprint_gate_and_fts_search ... ok
+test research_engine_tables_are_absent_from_the_new_store ... ok
+test citation_roundtrip_and_offsets ... ok
+test schema_newer_fails_loud ... ok
+test ingestion_job_lifecycle_and_delete_wins ... ok
+test facts_store_crud_membership_and_turn_scope_freeze ... ok
+test cache_corruption_resets_only_the_cache_file ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/r06_ar_w09_vector_integrity.rs (rust/target-w09-e01/debug/deps/r06_ar_w09_vector_integrity-041a13731f5f323f)
+LINGXI_TEST_GUARD: armed (pid 6278, mem_limit=8192 MB, time_limit=600 s)
+
+running 3 tests
+test exact_plan_rejects_wrong_ids_even_when_count_and_ordinals_match ... ok
+test malformed_batches_and_corrupt_checkpoints_are_refused ... ok
+test mid_batch_write_failure_rolls_back_every_new_row_and_preserves_paid_bytes ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r06_ar_w09_embedding_batches.rs (rust/target-w09-e01/debug/deps/r06_ar_w09_embedding_batches-9845dda7874ab4b2)
+LINGXI_TEST_GUARD: armed (pid 6279, mem_limit=8192 MB, time_limit=600 s)
+
+running 15 tests
+W09 c02-bind-failure: 原始请求与数据库收据已写入独立证据
+test c02_bind_failure_joins_worker_before_returning_error ... ok
+W09 c02-owner-drop: 原始请求与数据库收据已写入独立证据
+test c02_last_service_owner_drop_stops_worker_and_releases_single_writer ... ok
+W09 c02-quota-cancel: 原始请求与数据库收据已写入独立证据
+test c02_presend_quota_wait_cancel_records_no_wire_request ... ok
+LINGXI_TEST_GUARD: armed (pid 6301, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6298, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6293, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6291, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6296, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6302, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6292, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6294, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6299, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6300, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6295, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6297, mem_limit=8192 MB, time_limit=600 s)
+2026-10-11T12:19:51.692243Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_252ee7a01dfadd4ddc6e28b1 error=KNOWLEDGE_MODEL_UNAVAILABLE: provider request construction failed before send: builder error
+2026-10-11T12:19:51.693533Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_975634c82e94c21c5ff4358f error=KNOWLEDGE_MODEL_UNAVAILABLE: provider request failed before a response: error sending request for url (http://127.0.0.1:52192/v1/embeddings)
+2026-10-11T12:19:51.706987Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_c41fff9034a913f2aca7eeaa error=KNOWLEDGE_MODEL_UNAVAILABLE: embedding response carries 63 rows for 64 inputs
+2026-10-11T12:19:51.707900Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_ad8254aee85152f478b18805 error=KNOWLEDGE_STORAGE_INVALID: W09 statistics write interrupted after vector commit
+2026-10-11T12:19:51.723509Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_03f2590c3f5aa55d7ab1d0db error=KNOWLEDGE_MODEL_UNAVAILABLE: provider returned HTTP 400 Bad Request: {"data":null,"error":{"message":"W09 external injected failure"}}
+LINGXI_TEST_GUARD: armed (pid 6822, mem_limit=8192 MB, time_limit=600 s)
+W09 c01-presend-build: 原始请求与数据库收据已写入独立证据
+W09 c01-connect-failure: 原始请求与数据库收据已写入独立证据
+test c01_presend_request_construction_failure_is_not_a_physical_request ... ok
+test c01_closed_loopback_port_is_an_attempt_but_proves_not_sent ... ok
+W09 c03-invalid-short: 原始请求与数据库收据已写入独立证据
+LINGXI_TEST_GUARD: armed (pid 6823, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-sigkill-1-6279-1791721190072433000 previousInstanceId=aad4433831dc159f4f47578cabff3bc9 previousPid=6300 previousStartNonce=3bcd34aea3b70c83 previousStartedAtUnixMs=1791721191206 handshakeMismatches=none
+2026-10-11T12:19:51.739879Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/Users/[user]/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-sigkill-1-6279-1791721190072433000/lingxi-service/instance.stale.json
+LINGXI_TEST_GUARD: armed (pid 6824, mem_limit=8192 MB, time_limit=600 s)
+2026-10-11T12:19:51.746024Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_dd5c167342955552d11a8558 error=KNOWLEDGE_CONFLICT: ingestion no longer running
+2026-10-11T12:19:51.746282Z ERROR lingxi_service::knowledge: knowledge job failure could not be persisted storage_error=KNOWLEDGE_CONFLICT: ingestion status changed before write
+W09 c03-progress: 原始请求与数据库收据已写入独立证据
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-stats-after-write-6279-1791721190072203000 previousInstanceId=95aacdb7cf3000788c4c88cddb66885f previousPid=6293 previousStartNonce=0fd773fa62236431 previousStartedAtUnixMs=1791721191205 handshakeMismatches=none
+2026-10-11T12:19:51.769018Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/Users/[user]/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-stats-after-write-6279-1791721190072203000/lingxi-service/instance.stale.json
+W09 c04-content-refresh: 原始请求与数据库收据已写入独立证据
+LINGXI_TEST_GUARD: armed (pid 6826, mem_limit=8192 MB, time_limit=600 s)
+test c04_content_refresh_creates_new_plan_and_preserves_previous_paid_bytes ... ok
+2026-10-11T12:19:51.798036Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_399339d589fa0a8415bf858c error=KNOWLEDGE_CONFLICT: ingestion worker stopped; checkpoint and unknown requests preserved
+W09 c01-1: 原始请求与数据库收据已写入独立证据
+LINGXI_TEST_GUARD: armed (pid 6883, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6882, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-failed-2-6279-1791721190072540000 previousInstanceId=753203b5139fd6174eda05cb80241023 previousPid=6296 previousStartNonce=679b5665b4785dda previousStartedAtUnixMs=1791721191206 handshakeMismatches=none
+2026-10-11T12:19:51.888041Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/Users/[user]/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-failed-2-6279-1791721190072540000/lingxi-service/instance.stale.json
+W09 c02-worker-delete: 原始请求与数据库收据已写入独立证据
+LINGXI_TEST_GUARD: armed (pid 6921, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6929, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-ready-reuse-6279-1791721190072126000 previousInstanceId=863e2121561dab7e0a1bd23a2a2374a3 previousPid=6299 previousStartNonce=47f369bae67c7fad previousStartedAtUnixMs=1791721191206 handshakeMismatches=none
+2026-10-11T12:19:51.931070Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/Users/[user]/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-ready-reuse-6279-1791721190072126000/lingxi-service/instance.stale.json
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-worker-delete-6279-1791721190072124000 previousInstanceId=060d34281446dcf0fab1b5ea5dbea33d previousPid=6291 previousStartNonce=7e17d996141a1ab4 previousStartedAtUnixMs=1791721191205 handshakeMismatches=none
+2026-10-11T12:19:51.942846Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/Users/[user]/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-worker-delete-6279-1791721190072124000/lingxi-service/instance.stale.json
+W09 c02-stats-after-write: 原始请求与数据库收据已写入独立证据
+LINGXI_TEST_GUARD: armed (pid 6935, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6936, mem_limit=8192 MB, time_limit=600 s)
+W09 c02-sigkill-1: 原始请求与数据库收据已写入独立证据
+test c02_worker_ownership_and_source_delete_win ... ok
+LINGXI_TEST_GUARD: armed (pid 6937, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6938, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-ready-reuse-6279-1791721190072126000 previousInstanceId=68f724dd6812bf367e313c6077974b0a previousPid=6921 previousStartNonce=758c30d09a4ebd85 previousStartedAtUnixMs=1791721191930 handshakeMismatches=none
+2026-10-11T12:19:52.175892Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/Users/[user]/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-ready-reuse-6279-1791721190072126000/lingxi-service/instance.stale.json
+W09 c02-failed-2: 原始请求与数据库收据已写入独立证据
+LINGXI_TEST_GUARD: armed (pid 6941, mem_limit=8192 MB, time_limit=600 s)
+2026-10-11T12:19:52.258151Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_e974f17a2631eaadb8d9a2d1 error=KNOWLEDGE_MODEL_UNAVAILABLE: embedding row index 0 appears twice
+W09 c02-sigterm-active: 原始请求与数据库收据已写入独立证据
+2026-10-11T12:19:52.286659Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_9fd39664f6242138c1e36fb7 error=KNOWLEDGE_STORAGE_INVALID: W09 synthetic write failure
+W09 c03-invalid-duplicate: 原始请求与数据库收据已写入独立证据
+test c02_graceful_stop_joins_active_worker_before_compatible_gap_recovery ... ok
+LINGXI_TEST_GUARD: armed (pid 6944, mem_limit=8192 MB, time_limit=600 s)
+W09 c03-write-abort: 原始请求与数据库收据已写入独立证据
+LINGXI_TEST_GUARD: armed (pid 6945, mem_limit=8192 MB, time_limit=600 s)
+2026-10-11T12:19:52.408153Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_e6d957f50f96cc7e1a85f5ab error=KNOWLEDGE_STORAGE_INVALID: W09 job completion failure
+LINGXI_TEST_GUARD: armed (pid 6947, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-sigkill-2-6279-1791721192088748000 previousInstanceId=1bac164dc5ee0e287481532808b3c2b2 previousPid=6937 previousStartNonce=c0a473c3d3598254 previousStartedAtUnixMs=1791721192108 handshakeMismatches=none
+2026-10-11T12:19:52.428887Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/Users/[user]/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-sigkill-2-6279-1791721192088748000/lingxi-service/instance.stale.json
+LINGXI_TEST_GUARD: armed (pid 6948, mem_limit=8192 MB, time_limit=600 s)
+W09 c01-64: 原始请求与数据库收据已写入独立证据
+
+thread 'c01_exact_batch_boundaries' (5728160) panicked at crates/lingxi-service/tests/r06_ar_w09_embedding_batches.rs:471:9:
+assertion failed: usage.iter().all(|row|
+        row["transport_attempts"] == 1 && row["input_tokens"] == 5 &&
+                row["usage_state"] == "partial" &&
+            row["outcome"] == "succeeded")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test c01_exact_batch_boundaries ... FAILED
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-job-complete-6279-1791721192009523000 previousInstanceId=5658bc1d0300b36225d638dfcc39047a previousPid=6936 previousStartNonce=a6d672410c0a1374 previousStartedAtUnixMs=1791721192030 handshakeMismatches=none
+2026-10-11T12:19:52.452727Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/Users/[user]/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-job-complete-6279-1791721192009523000/lingxi-service/instance.stale.json
+LINGXI_TEST_GUARD: armed (pid 6949, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-ready-reuse-6279-1791721190072126000 previousInstanceId=eb378ac16927420c73f214682c0e6d45 previousPid=6938 previousStartNonce=e274f0816d0cb216 previousStartedAtUnixMs=1791721192175 handshakeMismatches=none
+2026-10-11T12:19:52.496305Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/Users/[user]/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-ready-reuse-6279-1791721190072126000/lingxi-service/instance.stale.json
+2026-10-11T12:19:52.536203Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_1a15e2d243c9150ec0e0edf3 error=KNOWLEDGE_MODEL_UNAVAILABLE: provider returned HTTP 400 Bad Request: {"data":null,"error":{"message":"W09 external injected failure"}}
+2026-10-11T12:19:52.542249Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_573e6719ce40eb13b965f321 error=KNOWLEDGE_MODEL_UNAVAILABLE: embedding vectors disagree on dimensionality (2 vs 3)
+2026-10-11T12:19:52.555567Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_f5df6b8c250894ed7a3f9117 error=KNOWLEDGE_STORAGE_INVALID: W09 synthetic complete failure
+W09 c03-invalid-dimension: 原始请求与数据库收据已写入独立证据
+W09 c02-job-complete: 原始请求与数据库收据已写入独立证据
+LINGXI_TEST_GUARD: armed (pid 6950, mem_limit=8192 MB, time_limit=600 s)
+test c02_post_commit_statistics_and_job_completion_fault_resume_paid_checkpoint ... ok
+W09 c03-complete-abort: 原始请求与数据库收据已写入独立证据
+LINGXI_TEST_GUARD: armed (pid 6953, mem_limit=8192 MB, time_limit=600 s)
+W09 c02-sigkill-2: 原始请求与数据库收据已写入独立证据
+LINGXI_TEST_GUARD: armed (pid 6954, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6955, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-failed-3-6279-1791721192205699000 previousInstanceId=81b4555aad891b8e741d97ea04232210 previousPid=6941 previousStartNonce=abc32883e5b2da02 previousStartedAtUnixMs=1791721192214 handshakeMismatches=none
+2026-10-11T12:19:52.655964Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/Users/[user]/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-failed-3-6279-1791721192205699000/lingxi-service/instance.stale.json
+2026-10-11T12:19:52.803082Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_e73996354152af56c0d4106e error=KNOWLEDGE_RETRIEVAL_UNAVAILABLE: embedding identity or batch shape is invalid
+2026-10-11T12:19:52.813949Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_5617322f7ae914bcd937bb94 error=KNOWLEDGE_INDEX_INVALID: vector build does not match the exact planned chunk set
+W09 c03-invalid-finite: 原始请求与数据库收据已写入独立证据
+LINGXI_TEST_GUARD: armed (pid 6957, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 6959, mem_limit=8192 MB, time_limit=600 s)
+W09 c04-ready: 原始请求与数据库收据已写入独立证据
+W09 c03-wrong-id: 原始请求与数据库收据已写入独立证据
+test c04_ready_reuse_and_changed_model_endpoint_profile_keep_paid_bytes ... ok
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-sigkill-3-6279-1791721192631806000 previousInstanceId=d977b1a98947740cd97b3a3ccadebf2f previousPid=6955 previousStartNonce=c144ebeaa5383caa previousStartedAtUnixMs=1791721192664 handshakeMismatches=none
+2026-10-11T12:19:52.872013Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/Users/[user]/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-18/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-sigkill-3-6279-1791721192631806000/lingxi-service/instance.stale.json
+LINGXI_TEST_GUARD: armed (pid 6960, mem_limit=8192 MB, time_limit=600 s)
+W09 c02-failed-3: 原始请求与数据库收据已写入独立证据
+test c02_failed_checkpoint_resumes_only_gaps ... ok
+2026-10-11T12:19:53.021315Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_772807e592dcb8fc26f52175 error=KNOWLEDGE_MODEL_UNAVAILABLE: embedding row index 99999 out of range of 64 inputs
+2026-10-11T12:19:53.035909Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_e8bfff64aa8185dcf405efb7 error=KNOWLEDGE_INDEX_INVALID: vector build does not match the exact planned chunk set
+W09 c03-invalid-index: 原始请求与数据库收据已写入独立证据
+LINGXI_TEST_GUARD: armed (pid 6997, mem_limit=8192 MB, time_limit=600 s)
+W09 c02-sigkill-3: 原始请求与数据库收据已写入独立证据
+test c02_sigkill_running_recovers_only_gaps ... ok
+W09 c03-missing-row: 原始请求与数据库收据已写入独立证据
+test c03_progress_and_storage_failure_windows_never_ready ... ok
+2026-10-11T12:19:53.157250Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_913946f58cd6ddb096137a25 error=KNOWLEDGE_MODEL_UNAVAILABLE: data[].embedding is an EMPTY vector
+W09 c03-invalid-empty: 原始请求与数据库收据已写入独立证据
+test c03_invalid_external_vector_family_cannot_complete ... ok
+
+failures:
+
+failures:
+    c01_exact_batch_boundaries
+
+test result: FAILED. 14 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.11s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_w09_embedding_batches`

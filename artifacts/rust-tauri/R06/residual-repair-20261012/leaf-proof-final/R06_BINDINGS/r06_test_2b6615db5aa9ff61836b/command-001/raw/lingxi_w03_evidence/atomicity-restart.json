@@ -1,0 +1,12 @@
+{
+  "failed_fork_event_count": "0",
+  "failed_fork_query": [
+    404,
+    "{\"code\":\"not_found\",\"details\":{\"causeId\":\"resource.not_found\",\"requestId\":\"req-9c66eacfafde12de9386b3a8b1c9fd49\"},\"message\":\"resource not found\",\"retryable\":false}"
+  ],
+  "positive_fork_preserved": true,
+  "source_operation_query": [
+    200,
+    "{\"operations\":[{\"fileEffects\":false,\"operationId\":\"session-op:387ccd2eb4c3ed1f9ec04c6c82f4300c\",\"operationKind\":\"fork\",\"receipt\":{\"authorizedFolders\":[],\"forkPointMessageId\":\"user:run_000001a12ed20b9f_000001\",\"lineageDepth\":1,\"parentSessionId\":\"sess_local_alpha\",\"permissionMode\":null,\"sessionId\":\"w03-positive\"},\"state\":\"completed\"},{\"fileEffects\":false,\"operationId\":\"session-op:453bf558835ea24cae226f94e221f3a8\",\"operationKind\":\"fork\",\"receipt\":null,\"state\":\"prepared\"}]}"
+  ]
+}

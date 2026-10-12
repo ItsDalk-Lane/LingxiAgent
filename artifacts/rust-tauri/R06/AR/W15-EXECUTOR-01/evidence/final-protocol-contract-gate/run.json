@@ -1,0 +1,377 @@
+{
+  "argv": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "run",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-j8",
+    "-p",
+    "lingxi-protocol",
+    "--bin",
+    "lingxi-protocol-gen",
+    "--",
+    "--check"
+  ],
+  "cwd": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/own.git",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "started": "2026-10-11T23:46:32.300431+00:00",
+  "effective_env": {
+    "HOME": "/Users/study_superior",
+    "LINGXI_HOME": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/home",
+    "TMPDIR": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/tmp",
+    "LINGXI_PRODUCT_DIR": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/own.git/lib",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target",
+    "LINGXI_TEST_GUARD": "1",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "TEST_MEM_LIMIT_MB": "8192"
+  },
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "controller_seconds": 2700,
+  "process_seconds": 600,
+  "process_rss_mib": 8192,
+  "supervision": "external descendant PID sampling plus internal guard",
+  "controller_pid": 49200,
+  "ended": "2026-10-11T23:46:39.940515+00:00",
+  "elapsed_seconds": 7.6465693329810165,
+  "exit_code": 0,
+  "guard_breaches": [],
+  "processes": [
+    {
+      "pid": 49200,
+      "ppid": 47358,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo run --manifest-path rust/Cargo.toml --locked -j8 -p lingxi-protocol --bin lingxi-protocol-gen -- --check",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 3.317268749990035,
+      "last_seen_elapsed": 7.5363331669941545,
+      "peak_rss_bytes": 78938112,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo"
+    },
+    {
+      "pid": 49257,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name build_script_build --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_core-1.0.229/build.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type bin --emit=dep-info,link -C embed-bitcode=no --cfg feature=\"alloc\" --cfg feature=\"result\" --cfg feature=\"std\" --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values(\"alloc\", \"default\", \"rc\", \"result\", \"std\", \"unstable\")) -C metadata=f667436ef55a650d -C extra-filename=-9a61867c59c481c8 --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/serde_core-9a61867c59c481c8 -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --cap-lints allow",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 3.469056500005536,
+      "last_seen_elapsed": 3.469056500005536,
+      "peak_rss_bytes": 802816,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 49258,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name build_script_build --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/build.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type bin --emit=dep-info,link -C embed-bitcode=no --cfg feature=\"alloc\" --cfg feature=\"default\" --cfg feature=\"derive\" --cfg feature=\"serde_derive\" --cfg feature=\"std\" --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values(\"alloc\", \"default\", \"derive\", \"rc\", \"serde_derive\", \"std\", \"unstable\")) -C metadata=4a4bb9d86998d47d -C extra-filename=-a549ee37a21d27aa --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/serde-a549ee37a21d27aa -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --cap-lints allow",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 3.469056500005536,
+      "last_seen_elapsed": 3.469056500005536,
+      "peak_rss_bytes": 180224,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 49255,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name build_script_build --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libc-0.2.189/build.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type bin --emit=dep-info,link -C embed-bitcode=no --allow=unused_qualifications --warn=clippy::unnecessary_semicolon --allow=clippy::unnecessary_cast --warn=clippy::ptr_as_ptr --allow=clippy::non_minimal_cfg --allow=clippy::missing_safety_doc --warn=clippy::map_unwrap_or --warn=clippy::manual_assert --allow=clippy::identity_op --warn=clippy::explicit_iter_loop --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values(\"align\", \"const-extern-fn\", \"default\", \"extra_traits\", \"rustc-dep-of-std\", \"rustc-std-workspace-core\", \"std\", \"use_std\")) -C metadata=12ca2ce0d52bd519 -C extra-filename=-f2d9d95be5713a5c --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/libc-f2d9d95be5713a5c -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --cap-lints allow",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 3.469056500005536,
+      "last_seen_elapsed": 3.6198173750017304,
+      "peak_rss_bytes": 1409024,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 49261,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name memchr --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/memchr-2.8.3/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 -C split-debuginfo=unpacked --cfg feature=\"alloc\" --cfg feature=\"std\" --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values(\"alloc\", \"core\", \"default\", \"libc\", \"logging\", \"rustc-dep-of-std\", \"std\", \"use_std\")) -C metadata=6e317dbb728bba9c -C extra-filename=-5fc0af584e538247 --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --cap-lints allow",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 3.6198173750017304,
+      "last_seen_elapsed": 3.6198173750017304,
+      "peak_rss_bytes": 134316032,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 49358,
+      "ppid": 49200,
+      "argv": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/serde_json-d7883f84c9428911/build-script-build",
+      "comm": "/private/tmp/lin",
+      "first_seen_elapsed": 3.6198173750017304,
+      "last_seen_elapsed": 3.768963457987411,
+      "peak_rss_bytes": 32768,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/serde_json-d7883f84c9428911/build-script-build"
+    },
+    {
+      "pid": 49262,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name syn --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-3.0.6/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no --cfg feature=\"clone-impls\" --cfg feature=\"default\" --cfg feature=\"derive\" --cfg feature=\"parsing\" --cfg feature=\"printing\" --cfg feature=\"proc-macro\" --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values(\"clone-impls\", \"default\", \"derive\", \"extra-traits\", \"fold\", \"full\", \"parsing\", \"printing\", \"proc-macro\", \"test\", \"visit\", \"visit-mut\")) -C metadata=0e743e4ac848ba66 -C extra-filename=-cbb920bc586f6acb --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --extern proc_macro2=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libproc_macro2-a93ef9e87b8d6d92.rmeta --extern quote=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libquote-e491fe83c1007e05.rmeta --extern unicode_ident=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libunicode_ident-4bf7e2bb0d89993f.rmeta --cap-lints allow",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 3.6198173750017304,
+      "last_seen_elapsed": 4.08440999998129,
+      "peak_rss_bytes": 234668032,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 49361,
+      "ppid": 49200,
+      "argv": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/serde-a549ee37a21d27aa/build-script-build",
+      "comm": "/private/tmp/lin",
+      "first_seen_elapsed": 3.6198173750017304,
+      "last_seen_elapsed": 3.768963457987411,
+      "peak_rss_bytes": 32768,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/serde-a549ee37a21d27aa/build-script-build"
+    },
+    {
+      "pid": 49363,
+      "ppid": 49200,
+      "argv": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/serde_core-9a61867c59c481c8/build-script-build",
+      "comm": "/private/tmp/lin",
+      "first_seen_elapsed": 3.6198173750017304,
+      "last_seen_elapsed": 3.768963457987411,
+      "peak_rss_bytes": 32768,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/serde_core-9a61867c59c481c8/build-script-build"
+    },
+    {
+      "pid": 49364,
+      "ppid": 49200,
+      "argv": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/libc-f2d9d95be5713a5c/build-script-build",
+      "comm": "/private/tmp/lin",
+      "first_seen_elapsed": 3.768963457987411,
+      "last_seen_elapsed": 3.768963457987411,
+      "peak_rss_bytes": 32768,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/libc-f2d9d95be5713a5c/build-script-build"
+    },
+    {
+      "pid": 49468,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name serde_core --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_core-1.0.229/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 -C split-debuginfo=unpacked --cfg feature=\"alloc\" --cfg feature=\"result\" --cfg feature=\"std\" --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values(\"alloc\", \"default\", \"rc\", \"result\", \"std\", \"unstable\")) -C metadata=76d9e9e71f4f8b1e -C extra-filename=-c5aee85cb04b963d --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --cap-lints allow --check-cfg cfg(if_docsrs_then_no_serde_core) --check-cfg cfg(no_core_cstr) --check-cfg cfg(no_core_error) --check-cfg cfg(no_core_net) --check-cfg cfg(no_core_num_saturating) --check-cfg cfg(no_diagnostic_namespace) --check-cfg cfg(no_serde_derive) --check-cfg cfg(no_std_atomic) --check-cfg cfg(no_std_atomic64) --check-cfg cfg(no_target_has_atomic)",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 3.9298922079906333,
+      "last_seen_elapsed": 4.736878750001779,
+      "peak_rss_bytes": 263618560,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 49500,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name libc --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libc-0.2.189/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 -C split-debuginfo=unpacked --allow=unused_qualifications --warn=clippy::unnecessary_semicolon --allow=clippy::unnecessary_cast --warn=clippy::ptr_as_ptr --allow=clippy::non_minimal_cfg --allow=clippy::missing_safety_doc --warn=clippy::map_unwrap_or --warn=clippy::manual_assert --allow=clippy::identity_op --warn=clippy::explicit_iter_loop --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values(\"align\", \"const-extern-fn\", \"default\", \"extra_traits\", \"rustc-dep-of-std\", \"rustc-std-workspace-core\", \"std\", \"use_std\")) -C metadata=e50a6f611480ffd9 -C extra-filename=-a2effcb1b45e6dd0 --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --cap-lints allow --cfg freebsd12 --check-cfg cfg(emscripten_old_stat_abi) --check-cfg cfg(espidf_picolibc) --check-cfg cfg(espidf_time32) --check-cfg cfg(freebsd10) --check-cfg cfg(freebsd11) --check-cfg cfg(freebsd12) --check-cfg cfg(freebsd13) --check-cfg cfg(freebsd14) --check-cfg cfg(freebsd15) --check-cfg cfg(gnu_file_offset_bits64) --check-cfg cfg(gnu_time_bits64) --check-cfg cfg(libc_deny_warnings) --check-cfg cfg(linux_time_bits64) --check-cfg cfg(musl_v1_2_3) --check-cfg cfg(musl32_time64) --check-cfg cfg(musl_redir_time64) --check-cfg cfg(vxworks_lt_25_09) --check-cfg cfg(libc_pauthtest) --check-cfg cfg(target_os,values(\"switch\",\"aix\",\"ohos\",\"hurd\",\"rtems\",\"visionos\",\"nuttx\",\"cygwin\",\"qurt\",\"qnx\")) --check-cfg cfg(target_env,values(\"illumos\",\"wasi\",\"aix\",\"ohos\",\"nto71_iosock\")) --check-cfg cfg(target_arch,values(\"loongarch64\",\"mips32r6\",\"mips64r6\",\"csky\"))",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 3.9298922079906333,
+      "last_seen_elapsed": 4.08440999998129,
+      "peak_rss_bytes": 146472960,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 49552,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name serde_derive_internals --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_derive_internals-0.30.0/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=a7c9654fbc55fc46 -C extra-filename=-e0d2cf20c26fafce --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --extern proc_macro2=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libproc_macro2-a93ef9e87b8d6d92.rmeta --extern quote=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libquote-e491fe83c1007e05.rmeta --extern syn=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libsyn-cbb920bc586f6acb.rmeta --cap-lints allow",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 4.08440999998129,
+      "last_seen_elapsed": 4.2452484169916715,
+      "peak_rss_bytes": 146341888,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 49605,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name ref_cast_impl --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ref-cast-impl-1.0.27/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type proc-macro --emit=dep-info,link -C prefer-dynamic -C embed-bitcode=no --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=46d5b0842f9702cd -C extra-filename=-a58926e5d322437d --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --extern proc_macro2=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libproc_macro2-a93ef9e87b8d6d92.rlib --extern quote=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libquote-e491fe83c1007e05.rlib --extern syn=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libsyn-cbb920bc586f6acb.rlib --extern proc_macro --cap-lints allow",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 4.2452484169916715,
+      "last_seen_elapsed": 4.2452484169916715,
+      "peak_rss_bytes": 89833472,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 49607,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name serde_derive --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_derive-1.0.229/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type proc-macro --emit=dep-info,link -C prefer-dynamic -C embed-bitcode=no --cfg feature=\"default\" --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values(\"default\", \"deserialize_in_place\")) -C metadata=cab6ff0af214bb3c -C extra-filename=-0aa16da5b457d576 --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --extern proc_macro2=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libproc_macro2-a93ef9e87b8d6d92.rlib --extern quote=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libquote-e491fe83c1007e05.rlib --extern syn=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libsyn-cbb920bc586f6acb.rlib --extern proc_macro --cap-lints allow",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 4.2452484169916715,
+      "last_seen_elapsed": 5.057074749987805,
+      "peak_rss_bytes": 245497856,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 49585,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name sha2 --edition=2024 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sha2-0.11.0/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 -C split-debuginfo=unpacked --warn=unexpected_cfgs --check-cfg cfg(sha2_backend, values(\"soft\", \"riscv-zknh\")) --check-cfg cfg(sha2_256_backend, values(\"aarch64-sha2\", \"soft\", \"riscv-zknh\", \"x86-sha\")) --check-cfg cfg(sha2_512_backend, values(\"aarch64-sha3\", \"soft\", \"riscv-zknh\", \"x86-avx2\")) --check-cfg cfg(sha2_backend_soft, values(\"compact\")) --check-cfg cfg(sha2_backend_riscv_zknh, values(\"compact\")) --cfg feature=\"alloc\" --cfg feature=\"default\" --cfg feature=\"oid\" --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values(\"alloc\", \"default\", \"oid\", \"zeroize\")) -C metadata=36c60e6abb55143d -C extra-filename=-a8cfc82ccf0d1ec0 --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --extern cfg_if=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libcfg_if-18b6443adbab19bd.rmeta --extern cpufeatures=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libcpufeatures-7b327b43a61593b1.rmeta --extern digest=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libdigest-77d5817f4f607615.rmeta --cap-lints allow",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 4.2452484169916715,
+      "last_seen_elapsed": 4.406334875005996,
+      "peak_rss_bytes": 157908992,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 49592,
+      "ppid": 49200,
+      "argv": "(rustc)",
+      "comm": "(rustc)",
+      "first_seen_elapsed": 4.2452484169916715,
+      "last_seen_elapsed": 4.2452484169916715,
+      "peak_rss_bytes": 118751232,
+      "limit_seconds": 600,
+      "controller": false,
+      "actual_executable": "(rustc)"
+    },
+    {
+      "pid": 49672,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name ref_cast --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ref-cast-1.0.27/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 -C split-debuginfo=unpacked --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=be615cb95fa64bc3 -C extra-filename=-f95f0872ae17e742 --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --extern ref_cast_impl=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libref_cast_impl-a58926e5d322437d.dylib --cap-lints allow --check-cfg cfg(no_intrinsic_type_name) --check-cfg cfg(no_phantom_pinned)",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 4.406334875005996,
+      "last_seen_elapsed": 4.570874041994102,
+      "peak_rss_bytes": 52248576,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 49657,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name schemars_derive --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/schemars_derive-1.2.2/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type proc-macro --emit=dep-info,link -C prefer-dynamic -C embed-bitcode=no --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=4348c7660bf418e0 -C extra-filename=-aaa521c553b974a2 --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --extern proc_macro2=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libproc_macro2-a93ef9e87b8d6d92.rlib --extern quote=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libquote-e491fe83c1007e05.rlib --extern serde_derive_internals=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libserde_derive_internals-e0d2cf20c26fafce.rlib --extern syn=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libsyn-cbb920bc586f6acb.rlib --extern proc_macro --cap-lints allow",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 4.406334875005996,
+      "last_seen_elapsed": 4.736878750001779,
+      "peak_rss_bytes": 160432128,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 49763,
+      "ppid": 49657,
+      "argv": "(clang)",
+      "comm": "(clang)",
+      "first_seen_elapsed": 4.736878750001779,
+      "last_seen_elapsed": 4.736878750001779,
+      "peak_rss_bytes": 14958592,
+      "limit_seconds": 600,
+      "controller": false,
+      "actual_executable": "(clang)"
+    },
+    {
+      "pid": 49768,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name serde_json --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.151/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 -C split-debuginfo=unpacked --cfg feature=\"alloc\" --cfg feature=\"default\" --cfg feature=\"std\" --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values(\"alloc\", \"arbitrary_precision\", \"default\", \"float_roundtrip\", \"indexmap\", \"preserve_order\", \"raw_value\", \"std\", \"unbounded_depth\")) -C metadata=ff9dbd6978294b19 -C extra-filename=-2863834eea567c06 --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --extern itoa=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libitoa-9e519a847d238e22.rmeta --extern memchr=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libmemchr-5fc0af584e538247.rmeta --extern serde_core=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libserde_core-c5aee85cb04b963d.rmeta --extern zmij=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libzmij-beb723c1a9672ab0.rmeta --cap-lints allow --cfg fast_arithmetic=\"64\" --check-cfg cfg(fast_arithmetic, values(\"32\", \"64\"))",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 4.895890541985864,
+      "last_seen_elapsed": 5.213507042004494,
+      "peak_rss_bytes": 165019648,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 49919,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name serde --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 -C split-debuginfo=unpacked --cfg feature=\"alloc\" --cfg feature=\"default\" --cfg feature=\"derive\" --cfg feature=\"serde_derive\" --cfg feature=\"std\" --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values(\"alloc\", \"default\", \"derive\", \"rc\", \"serde_derive\", \"std\", \"unstable\")) -C metadata=1d48e0be4c71c140 -C extra-filename=-f05a86cd946b4b96 --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --extern serde_core=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libserde_core-c5aee85cb04b963d.rmeta --extern serde_derive=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libserde_derive-0aa16da5b457d576.dylib --cap-lints allow --cfg if_docsrs_then_no_serde_core --check-cfg cfg(feature, values(\"result\")) --check-cfg cfg(if_docsrs_then_no_serde_core) --check-cfg cfg(no_core_cstr) --check-cfg cfg(no_core_error) --check-cfg cfg(no_core_net) --check-cfg cfg(no_core_num_saturating) --check-cfg cfg(no_diagnostic_namespace) --check-cfg cfg(no_serde_derive) --check-cfg cfg(no_std_atomic) --check-cfg cfg(no_std_atomic64) --check-cfg cfg(no_target_has_atomic)",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 5.213507042004494,
+      "last_seen_elapsed": 5.526419417001307,
+      "peak_rss_bytes": 127877120,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 50207,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name schemars --edition=2021 /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/schemars-1.2.2/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 -C split-debuginfo=unpacked --cfg feature=\"default\" --cfg feature=\"derive\" --cfg feature=\"schemars_derive\" --cfg feature=\"std\" --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values(\"_ui_test\", \"arrayvec07\", \"bigdecimal04\", \"bytes1\", \"chrono04\", \"default\", \"derive\", \"either1\", \"indexmap2\", \"jiff02\", \"preserve_order\", \"raw_value\", \"rust_decimal1\", \"schemars_derive\", \"semver1\", \"smallvec1\", \"smol_str02\", \"smol_str03\", \"std\", \"url2\", \"uuid1\")) -C metadata=a0f09adaacd49e3b -C extra-filename=-aa806d2bbe79b360 --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --extern dyn_clone=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libdyn_clone-8a5d2c52ba186a9d.rmeta --extern ref_cast=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libref_cast-f95f0872ae17e742.rmeta --extern schemars_derive=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libschemars_derive-aaa521c553b974a2.dylib --extern serde=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libserde-f05a86cd946b4b96.rmeta --extern serde_json=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libserde_json-2863834eea567c06.rmeta --cap-lints allow",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 5.6784589169838,
+      "last_seen_elapsed": 6.303375832998427,
+      "peak_rss_bytes": 251592704,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 50451,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name lingxi_protocol --edition=2021 crates/lingxi-protocol/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 -C split-debuginfo=unpacked --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=def39a366b61ccbf -C extra-filename=-e0ce90d2026486d4 --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --extern base64=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libbase64-fe1fb3cb1e4bf6b8.rmeta --extern schemars=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libschemars-aa806d2bbe79b360.rmeta --extern serde=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libserde-f05a86cd946b4b96.rmeta --extern serde_json=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libserde_json-2863834eea567c06.rmeta --extern sha1=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libsha1-e37d6cfb4958ccb5.rmeta --extern sha2=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libsha2-a8cfc82ccf0d1ec0.rmeta",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 6.303375832998427,
+      "last_seen_elapsed": 7.078223666991107,
+      "peak_rss_bytes": 238780416,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    },
+    {
+      "pid": 50775,
+      "ppid": 49200,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc --crate-name lingxi_protocol_gen --edition=2021 crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type bin --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 -C split-debuginfo=unpacked --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values()) -C metadata=bac5d47db66b2946 -C extra-filename=-4dae36e72a824647 --out-dir /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps -L dependency=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps --extern base64=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libbase64-fe1fb3cb1e4bf6b8.rlib --extern lingxi_protocol=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/liblingxi_protocol-e0ce90d2026486d4.rlib --extern schemars=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libschemars-aa806d2bbe79b360.rlib --extern serde=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libserde-f05a86cd946b4b96.rlib --extern serde_json=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libserde_json-2863834eea567c06.rlib --extern sha1=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libsha1-e37d6cfb4958ccb5.rlib --extern sha2=/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/libsha2-a8cfc82ccf0d1ec0.rlib",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 7.227784332993906,
+      "last_seen_elapsed": 7.227784332993906,
+      "peak_rss_bytes": 156631040,
+      "limit_seconds": 2700,
+      "controller": true,
+      "actual_executable": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc"
+    }
+  ],
+  "actual_executables_after": [
+    {
+      "path": "(clang)",
+      "sha256": null
+    },
+    {
+      "path": "(rustc)",
+      "sha256": null
+    },
+    {
+      "path": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo",
+      "sha256": "6e17e865f3a20dd55a1d212f849f58b77124179f0de7c52973096d84ba34118d"
+    },
+    {
+      "path": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustc",
+      "sha256": "766eda9d8f53afd6fc7f27b3cd2e444dd22afacb5afa710a5625fc8e45b8c941"
+    },
+    {
+      "path": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/libc-f2d9d95be5713a5c/build-script-build",
+      "sha256": "7c0717d142c2588a7ee507e757f865d1e6cb8cd1bdc34654b863e38752bdc837"
+    },
+    {
+      "path": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/serde-a549ee37a21d27aa/build-script-build",
+      "sha256": "4c54c71176e545195a7bab44fe84a42f768f8f17ee0ab621f526e3e98d4930d4"
+    },
+    {
+      "path": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/serde_core-9a61867c59c481c8/build-script-build",
+      "sha256": "8f28cf6b88e6b014c09567eb566d8b32034e1ea57409068b8516d1687695fc5a"
+    },
+    {
+      "path": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/build/serde_json-d7883f84c9428911/build-script-build",
+      "sha256": "77ca0d4a83332b586c20d21d9f62e0ce108f5b99b603a6e12607a848649effe3"
+    }
+  ],
+  "supervisor_source_sha256": "7dcbb00f53b1cbd91ce9d93be43e7daeb8281c1af7d582bf2f8adcf433dc820c"
+}

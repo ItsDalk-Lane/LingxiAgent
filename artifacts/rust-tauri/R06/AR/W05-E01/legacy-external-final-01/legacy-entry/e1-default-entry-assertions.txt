@@ -1,0 +1,29 @@
+d-1 rustDesktopEnabled: {} -> false (node), node -> false, rust -> true
+--- d-2 injection grep (exit 1) ---
+
+--- d-3 guard grep (exit 0) ---
+1438:  if (rustDesktopEnabled()) {
+--- d-3 node-body grep (exit 0) ---
+1085: * 轮询 server-info.json 等待 server 就绪
+1332:  if (fs.existsSync(path.join(lingxiHome, 'server-info.json'))) {
+1444:  const serverInfoPath = path.join(lingxiHome, "server-info.json");
+1499:        // 残留进程还活着：server-info.json 是下次启动定位它的唯一线索，保留
+1500:        console.warn(`[desktop] 残留 server PID ${existingInfo.pid} 仍存活，保留 server-info.json 供下次启动识别`);
+1968: * 实际执行 spawn + 等待 server-info.json 的内部函数。
+2076:  // 删除旧 server-info.json
+2159:  // 等待 server ready（通过轮询 server-info.json）
+6813:  // 清理 server-info.json，防止更新后新版 Electron 误连旧 server
+6815:    try { fs.unlinkSync(path.join(lingxiHome, "server-info.json")); } catch {}
+6817:    console.warn("[desktop] shutdownServer: 保留 server-info.json，供下次启动识别残留 server");
+--- d-4 bootstrap select grep (exit 0) ---
+187:      main: app.isPackaged ? "main.bundle.cjs" : "main.cjs",
+193:      main: app.isPackaged ? "main.bundle.cjs" : "main.cjs",
+195:    require(app.isPackaged ? "./main.bundle.cjs" : "./main.cjs");
+--- d-4 bootstrap require grep (exit 0) ---
+195:    require(app.isPackaged ? "./main.bundle.cjs" : "./main.cjs");
+--- d-5 cli default grep (exit 0) ---
+18:    runtime: "node",
+--- d-6 desktop mutex grep (exit 0) ---
+1333:    throw new Error('RUST_DESKTOP_NODE_SERVER_INFO_PRESENT: resolve the existing Node server before starting Rust');
+--- d-6 rust layout grep (exit 0) ---
+36:pub const RUNTIME_DIR_NAME: &str = "lingxi-service";

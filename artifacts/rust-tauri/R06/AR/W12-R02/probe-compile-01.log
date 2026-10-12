@@ -1,0 +1,17 @@
+{"command": ["python3", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W12-R02/compile-probes.py"], "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-probe-compile-01-k8gh0xw_", "start": 1791701042.729929}
+
+error[E0425]: cannot find function `getrandom` in crate `getrandom`
+   --> <anon>:191:16
+    |
+191 |     getrandom::getrandom(&mut bytes).expect("csprng id bytes");
+    |                ^^^^^^^^^ not found in `getrandom`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0425`.
+
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W12-R02/compile-probes.py", line 8, in <module>
+    r=subprocess.run(args,input=source,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=600);print(r.stdout);assert r.returncode==0
+                                                                                                                                     ^^^^^^^^^^^^^^^
+AssertionError

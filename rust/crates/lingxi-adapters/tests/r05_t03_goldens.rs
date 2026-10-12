@@ -432,6 +432,7 @@ fn build_input(spec: &InputSpec, route: &RouteSpec) -> ModelTurnInput {
                     .expect("golden arguments are effective")
                     .with_provider_call_id(call.provider_call_id.clone());
                     tool_calls.push(RequestedToolCall {
+                        declaration_binding: input.tools.bind_target(&request.target),
                         tool_call_id: host_call_id(call.seq),
                         provider_call_id: request.provider_call_id.clone(),
                         target: request.target.clone(),

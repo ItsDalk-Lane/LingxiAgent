@@ -1,0 +1,16 @@
+{
+  "binaryBefore": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+  "kind": "REAL_SEPARATE_PRODUCTION_HOME_RUN_ID_COLLISION_CONTROL",
+  "worlds": [
+    {
+      "home": "/private/tmp/lingxi-w15-r01-runtime/r01-collision-home-0",
+      "pid": 20442,
+      "ready": "LINGXI_SERVICE_READY addr=127.0.0.1:55475 home=/private/tmp/lingxi-w15-r01-runtime/r01-collision-home-0 source=cli",
+      "providerPort": 55474,
+      "actualLingxiHome": "/private/tmp/lingxi-w15-r01-runtime/r01-collision-home-0",
+      "osHome": "/Users/study_superior",
+      "serviceExitCode": 0
+    }
+  ],
+  "binaryAfter": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0"
+}

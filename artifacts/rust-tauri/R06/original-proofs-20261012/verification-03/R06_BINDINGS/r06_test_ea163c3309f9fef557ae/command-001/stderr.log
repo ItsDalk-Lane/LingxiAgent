@@ -1,0 +1,3 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r06_original_chat_proofs.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_original_chat_proofs-d12e478ae24bf3f5)
+error: test failed, to rerun pass `-p lingxi-service --test r06_original_chat_proofs`

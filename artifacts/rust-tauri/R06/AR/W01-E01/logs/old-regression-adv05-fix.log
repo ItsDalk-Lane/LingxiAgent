@@ -1,0 +1,10 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.34s
+     Running tests/admission_dedup_adversarial.rs (rust/target/debug/deps/admission_dedup_adversarial-c4e9fe998599eaf8)
+LINGXI_TEST_GUARD: armed (pid 35196, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+test adv_c05_restart_with_unknown_side_effects_refuses_explicitly ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.12s
+

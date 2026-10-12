@@ -108,6 +108,7 @@ fn exchange_with_origin(turn: ProviderTurn, origin: Option<TurnOrigin>) -> Model
         .iter()
         .enumerate()
         .map(|(i, request)| RequestedToolCall {
+            declaration_binding: input.tools.bind_target(&request.target),
             tool_call_id: ToolCallId::new(format!("rr1-tc{i:04}")),
             provider_call_id: request.provider_call_id.clone(),
             target: request.target.clone(),
@@ -534,6 +535,7 @@ fn rr1_f07_empty_text_signature_part_round_trips_verbatim() {
 fn rr1_f07_consecutive_rounds_and_reverse_results_group_per_round() {
     let budget = SchemaBudget::default();
     let mk_call = |seq: u32, id: &str, path: &str| RequestedToolCall {
+        declaration_binding: snapshot().bind_target("tool:first-party:read"),
         tool_call_id: ToolCallId::new(format!("rr1-tc{seq:04}")),
         provider_call_id: Some(id.to_string()),
         target: "tool:first-party:read".to_string(),
@@ -645,6 +647,7 @@ fn rr1_f07_f10_unmatched_or_duplicated_anchors_fail_loudly() {
     .expect("effective")
     .with_provider_call_id("real-1");
     let mk = |id: &str| RequestedToolCall {
+        declaration_binding: snapshot().bind_target(&request.target),
         tool_call_id: ToolCallId::new("rr1-tc0001"),
         provider_call_id: Some(id.to_string()),
         target: request.target.clone(),
@@ -818,6 +821,7 @@ fn rr1_f08_missing_required_reasoning_fails_closed_before_dispatch() {
             text: "reading".to_string(),
         }],
         tool_calls: vec![RequestedToolCall {
+            declaration_binding: snapshot().bind_target(&request.target),
             tool_call_id: ToolCallId::new("rr1-tc0001"),
             provider_call_id: request.provider_call_id.clone(),
             target: request.target.clone(),
@@ -1277,6 +1281,7 @@ fn deepseek_tool_round_without_carrier() -> ModelTurnInput {
             text: "reading".to_string(),
         }],
         tool_calls: vec![RequestedToolCall {
+            declaration_binding: snapshot().bind_target(&request.target),
             tool_call_id: ToolCallId::new("rr1-tc0001"),
             provider_call_id: request.provider_call_id.clone(),
             target: request.target.clone(),
@@ -1577,6 +1582,7 @@ fn rr1_f32_responses_duplicated_function_call_anchor_is_refused() {
     .expect("effective")
     .with_provider_call_id("real-1");
     let mk = |id: &str| RequestedToolCall {
+        declaration_binding: snapshot().bind_target(&request.target),
         tool_call_id: ToolCallId::new("rr1-tc0001"),
         provider_call_id: Some(id.to_string()),
         target: request.target.clone(),

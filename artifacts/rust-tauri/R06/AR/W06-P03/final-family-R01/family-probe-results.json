@@ -1,0 +1,187 @@
+{
+  "start": 1791706252.4690702,
+  "end": 1791706254.512533,
+  "binary": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent/rust/target/debug/lingxi-service",
+  "records": [
+    {
+      "name": "complex-agent-key",
+      "yaml": "? [agent]\n: {name: \"遗失姓名\"}\nmemory: {enabled: false}\n",
+      "expected_memory": false,
+      "actual_flags": [
+        400,
+        {
+          "error": "invalid agent config.yaml: root: unsupported YAML key type; keys must be strings"
+        }
+      ],
+      "execute": [
+        200,
+        {
+          "runId": "run_000001a12a03c51a_000001",
+          "runCount": 1
+        }
+      ],
+      "terminal": [
+        "failed",
+        "failed.provider_error"
+      ],
+      "provider_request": [],
+      "matches_expectation": false,
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-complex-agent-key-j6nt9gy7/home",
+      "home_source": "CLI and env both synthetic",
+      "config_unchanged": true,
+      "binary_sha256": "e2675cbe9b6102bfff1a2cf63166c18a7c96f263fe1e2cd030b3adcf0f402b17",
+      "ready": "LINGXI_SERVICE_READY addr=127.0.0.1:58258 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-complex-agent-key-j6nt9gy7/home source=cli",
+      "child_exit_code": 0,
+      "pid": 20643,
+      "command": [
+        "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent/rust/target/debug/lingxi-service",
+        "--home",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-complex-agent-key-j6nt9gy7/home",
+        "--config",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-complex-agent-key-j6nt9gy7/service.json",
+        "--bind",
+        "127.0.0.1:0"
+      ],
+      "start_time": 1791706252.4730508,
+      "end_time": 1791706252.617146,
+      "input_sha256": "fc83649d380974666949007f4b71034d97d6255822bbec116ee6f8337b438b7b",
+      "fixture_removed": true,
+      "guard_armed": true
+    },
+    {
+      "name": "complex-name-key",
+      "yaml": "agent:\n  ? [name]\n  : \"遗失姓名\"\nmemory: {enabled: false}\n",
+      "expected_memory": false,
+      "actual_flags": [
+        400,
+        {
+          "error": "invalid agent config.yaml: agent: unsupported YAML key type; keys must be strings"
+        }
+      ],
+      "execute": [
+        200,
+        {
+          "runId": "run_000001a12a03c707_000001",
+          "runCount": 1
+        }
+      ],
+      "terminal": [
+        "failed",
+        "failed.provider_error"
+      ],
+      "provider_request": [],
+      "matches_expectation": false,
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-complex-name-key-8fbzw82k/home",
+      "home_source": "CLI and env both synthetic",
+      "config_unchanged": true,
+      "binary_sha256": "e2675cbe9b6102bfff1a2cf63166c18a7c96f263fe1e2cd030b3adcf0f402b17",
+      "ready": "LINGXI_SERVICE_READY addr=127.0.0.1:58269 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-complex-name-key-8fbzw82k/home source=cli",
+      "child_exit_code": 0,
+      "pid": 20931,
+      "command": [
+        "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent/rust/target/debug/lingxi-service",
+        "--home",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-complex-name-key-8fbzw82k/home",
+        "--config",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-complex-name-key-8fbzw82k/service.json",
+        "--bind",
+        "127.0.0.1:0"
+      ],
+      "start_time": 1791706252.97927,
+      "end_time": 1791706253.1075258,
+      "input_sha256": "3f1a90ed487369ae5fb77d3fb4fdafb52c009e3b69908a61bb0910722119a6d9",
+      "fixture_removed": true,
+      "guard_armed": true
+    },
+    {
+      "name": "complex-discovery-key",
+      "yaml": "memory: {enabled: false}\nworkspace_context:\n  ? [discover_project_skills]\n  : false\n",
+      "expected_memory": false,
+      "actual_flags": [
+        400,
+        {
+          "error": "invalid agent config.yaml: workspace_context: unsupported YAML key type; keys must be strings"
+        }
+      ],
+      "execute": [
+        200,
+        {
+          "runId": "run_000001a12a03c941_000001",
+          "runCount": 1
+        }
+      ],
+      "terminal": [
+        "failed",
+        "failed.provider_error"
+      ],
+      "provider_request": [],
+      "matches_expectation": false,
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-complex-discovery-key-9rz25iof/home",
+      "home_source": "CLI and env both synthetic",
+      "config_unchanged": true,
+      "binary_sha256": "e2675cbe9b6102bfff1a2cf63166c18a7c96f263fe1e2cd030b3adcf0f402b17",
+      "ready": "LINGXI_SERVICE_READY addr=127.0.0.1:58279 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-complex-discovery-key-9rz25iof/home source=cli",
+      "child_exit_code": 0,
+      "pid": 21145,
+      "command": [
+        "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent/rust/target/debug/lingxi-service",
+        "--home",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-complex-discovery-key-9rz25iof/home",
+        "--config",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-complex-discovery-key-9rz25iof/service.json",
+        "--bind",
+        "127.0.0.1:0"
+      ],
+      "start_time": 1791706253.504744,
+      "end_time": 1791706253.699139,
+      "input_sha256": "34530df65cdaa96376eada1d19165cb254d39252e11dd4d5834b2bd897931d1c",
+      "fixture_removed": true,
+      "guard_armed": true
+    },
+    {
+      "name": "canonical-duplicate",
+      "yaml": "memory: {enabled: false}\n? [memory]\n: {enabled: true}\n",
+      "expected_memory": null,
+      "actual_flags": [
+        400,
+        {
+          "error": "invalid agent config.yaml: root: unsupported YAML key type; keys must be strings"
+        }
+      ],
+      "execute": [
+        200,
+        {
+          "runId": "run_000001a12a03cb11_000001",
+          "runCount": 1
+        }
+      ],
+      "terminal": [
+        "failed",
+        "failed.provider_error"
+      ],
+      "provider_request": [],
+      "matches_expectation": true,
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-canonical-duplicate-2ccj6080/home",
+      "home_source": "CLI and env both synthetic",
+      "config_unchanged": true,
+      "binary_sha256": "e2675cbe9b6102bfff1a2cf63166c18a7c96f263fe1e2cd030b3adcf0f402b17",
+      "ready": "LINGXI_SERVICE_READY addr=127.0.0.1:58289 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-canonical-duplicate-2ccj6080/home source=cli",
+      "child_exit_code": 0,
+      "pid": 21152,
+      "command": [
+        "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent/rust/target/debug/lingxi-service",
+        "--home",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-canonical-duplicate-2ccj6080/home",
+        "--config",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-canonical-duplicate-2ccj6080/service.json",
+        "--bind",
+        "127.0.0.1:0"
+      ],
+      "start_time": 1791706254.00773,
+      "end_time": 1791706254.161066,
+      "input_sha256": "bbfb0b2df88773973cf0f84712e889dc535916be7af6f0a6f8c297ee55f3a041",
+      "fixture_removed": true,
+      "guard_armed": true
+    }
+  ]
+}

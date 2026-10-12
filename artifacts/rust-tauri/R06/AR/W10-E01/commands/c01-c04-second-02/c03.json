@@ -1,0 +1,157 @@
+{
+  "differentDimensionC": {
+    "degraded": [
+      {
+        "detail": "vector variant missing or incompatible (model=model-c; dims=3); rebuild the notebook index",
+        "reason": "KNOWLEDGE_VECTOR_NOT_READY"
+      }
+    ],
+    "mode": "fts",
+    "searchedVectorVariants": []
+  },
+  "home": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W10-E01/commands/c01-c04-second-02/synthetic-home/lingxi-r06-ar-w10-c03-88676-1791709622137898000",
+  "inflight": {
+    "degraded": [],
+    "mode": "hybrid",
+    "searchedVectorVariants": [
+      {
+        "chunkIndexVariantId": "civ_e665b2411bc25e48584bb84899ba8139",
+        "chunkProfileHash": "0f9da6dad6bde4f5",
+        "dimensions": 2,
+        "parameterFingerprint": "87ac0bab4c9a26a26832d19b842e6806a10fb6c9b7800be0ecc34f60cc630040",
+        "parseArtifactId": "kpa_8e57fa2cba893a18260c7952",
+        "vectorIndexVariantId": "viv_9e553fe70e0c322a170960f506101ecb"
+      }
+    ]
+  },
+  "job": {
+    "artifactId": "kpa_8e57fa2cba893a18260c7952",
+    "attempt": 1,
+    "cancelledAt": null,
+    "chunkerConfigId": "8b93f0aa4fa689af",
+    "createdAt": "2026-10-11T09:07:02.497Z",
+    "embeddingStats": {
+      "chunksNewlyEmbedded": 2,
+      "chunksResumedFromCheckpoint": 0,
+      "chunksReusedFromReadyVariant": 0,
+      "model": {
+        "dimensions": 2,
+        "key": "88d845118128e1a36f72c546b95c8d7895ee2104505b7e9e6553fab086255ed1",
+        "modelId": "model-a",
+        "parameterFingerprint": "87ac0bab4c9a26a26832d19b842e6806a10fb6c9b7800be0ecc34f60cc630040",
+        "protocol": "openai-embeddings",
+        "provider": "embed"
+      },
+      "requestCount": 2,
+      "resetStaleVectors": false
+    },
+    "error": null,
+    "id": "kjob_2314d2781c1c425e81f669f2",
+    "notebookId": "knb_f7b480f1b4186e77526a285e",
+    "phase": "done",
+    "progressDone": 2,
+    "progressTotal": 1,
+    "sourceId": "ksrc_135a21cd287cf70d202c3611",
+    "status": "done",
+    "updatedAt": "2026-10-11T09:07:02.505Z"
+  },
+  "ready": "127.0.0.1:62689",
+  "requests": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "# 资料\n\n来源隔离与模型身份必须一致。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:62684"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "# 资料\n\n来源隔离与模型身份必须一致。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:62684"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "来源隔离"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:62684"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "来源隔离"
+        ],
+        "model": "model-b"
+      },
+      "endpoint": "127.0.0.1:62684"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "来源隔离"
+        ],
+        "model": "model-c"
+      },
+      "endpoint": "127.0.0.1:62684"
+    }
+  ],
+  "sameDimensionB": {
+    "degraded": [
+      {
+        "detail": "vector variant missing or incompatible (model=model-b; dims=2); rebuild the notebook index",
+        "reason": "KNOWLEDGE_VECTOR_NOT_READY"
+      }
+    ],
+    "mode": "fts",
+    "searchedVectorVariants": []
+  },
+  "usage": [
+    {
+      "model": "model-a",
+      "outcome": "succeeded",
+      "provider": "embed"
+    },
+    {
+      "model": "model-a",
+      "outcome": "succeeded",
+      "provider": "embed"
+    },
+    {
+      "model": "model-a",
+      "outcome": "succeeded",
+      "provider": "embed"
+    },
+    {
+      "model": "model-b",
+      "outcome": "succeeded",
+      "provider": "embed"
+    },
+    {
+      "model": "model-c",
+      "outcome": "succeeded",
+      "provider": "embed"
+    }
+  ],
+  "vectors": [
+    {
+      "dimensions": 2,
+      "key": "88d845118128e1a36f72c546b95c8d7895ee2104505b7e9e6553fab086255ed1",
+      "status": "ready",
+      "variant": "viv_9e553fe70e0c322a170960f506101ecb",
+      "vector": "0000803F00000000"
+    }
+  ]
+}

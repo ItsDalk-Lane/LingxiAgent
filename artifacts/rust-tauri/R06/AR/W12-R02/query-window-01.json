@@ -1,0 +1,17 @@
+{
+  "command": [
+    "node",
+    "--experimental-strip-types",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W12-R02/query-window.mjs"
+  ],
+  "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-query-window-01-b2m1lni4",
+  "start": 1791700990.360867,
+  "end": 1791700990.451434,
+  "exit_code": 0,
+  "log_sha256": "ea801297c971b6d7726cf453e6048cfcd00629228a6c18a50687e6921736ab6d",
+  "home_files": [
+    "before-lock.db",
+    "after-version-check.db"
+  ]
+}

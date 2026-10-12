@@ -1,0 +1,116 @@
+--- a/rust/crates/lingxi-kernel/src/model_exchange.rs
++++ b/rust/crates/lingxi-kernel/src/model_exchange.rs
+@@ -36,7 +36,7 @@
+ use lingxi_protocol::{ArgsDigest, ContentBlock, ModelCallId, ToolCallId, ToolSchemaDocument};
+ 
+ use crate::ports::ToolOutcome;
+-use crate::toolcatalog::{Availability, ToolRegistry};
++use crate::toolcatalog::ToolRegistry;
+ 
+ /// One tool as declared to the provider. `target` is the host identity
+ /// (the registry target id — what the journal, the gateway and the policy
+@@ -114,27 +114,14 @@
+     /// loudly ([`ToolDeclarationError::WireNameConflict`]) instead of
+     /// presenting an ambiguous mapping to the provider.
+     pub fn from_registry(registry: &ToolRegistry) -> Result<Self, ToolDeclarationError> {
+-        let snapshot = registry.snapshot();
++        let (catalog_generation, tools) = registry.model_declaration_snapshot();
+         let mut declarations = Vec::new();
+-        // Deterministic order: target id sort (snapshot order is the
+-        // registry's BTreeMap iteration — already sorted by target id).
+-        for tool in &snapshot.tools {
+-            if tool.availability != Availability::Available {
+-                continue;
+-            }
+-            let full = registry.describe_full(&tool.target_id).map_err(|_| {
+-                ToolDeclarationError::WireNameConflict {
+-                    // Unreachable in a consistent registry (the snapshot and
+-                    // the describe read the same locked state); surfaced as a
+-                    // loud build failure rather than a skipped tool.
+-                    wire_name: tool.local_name.clone(),
+-                    targets: vec![tool.target_id.as_str().to_string()],
+-                }
+-            })?;
++        for full in tools {
++            let tool = full.listing;
+             declarations.push(ToolDeclaration {
+                 target: tool.target_id.as_str().to_string(),
+                 wire_name: sanitize_wire_name(&tool.local_name),
+-                description: tool.display_name.clone(),
++                description: tool.description,
+                 input_schema: full.input_schema,
+             });
+         }
+@@ -177,9 +164,14 @@
+             }
+         }
+         Ok(Self {
+-            catalog_generation: snapshot.catalog_generation,
++            catalog_generation,
+             declarations,
+         })
++    }
++
++    /// 宿主根据实际发出的声明铸造历史绑定；模型不能自报。
++    pub fn bind_target(&self, target: &str) -> Option<HistoricalToolDeclaration> {
++        self.declarations.iter().find(|d| d.target == target).map(|declaration| HistoricalToolDeclaration { execution: None, catalog_generation: self.catalog_generation, declaration: declaration.clone() })
+     }
+ 
+     /// Reverse lookup: the host target id a provider-facing wire name maps
+@@ -192,17 +184,30 @@
+             .map(|declaration| declaration.target.as_str())
+     }
+ 
+-    /// Forward lookup: the wire name a host target was declared under in
+-    /// THIS snapshot. An adapter re-rendering the exchange history (the
+-    /// assistant turn's tool calls) uses THIS mapping; a target missing
+-    /// from the current snapshot (the registry moved mid-run) is a loud
+-    /// render failure, never a name guess.
++    /// 当前声明的名称查询。旧历史必须使用RequestedToolCall自身的可信绑定。
+     pub fn wire_name_of_target(&self, target: &str) -> Option<&str> {
+         self.declarations
+             .iter()
+             .find(|declaration| declaration.target == target)
+             .map(|declaration| declaration.wire_name.as_str())
+     }
++}
++
++/// 历史编码使用当时发送的可信声明，独立于当前执行权限。
++#[derive(Debug, Clone, PartialEq)]
++pub struct HistoricalToolDeclaration {
++    pub execution: Option<HistoricalToolExecution>,
++    pub catalog_generation: u64,
++    pub declaration: ToolDeclaration,
++}
++
++/// 目录入口与真实执行目标分别保存，避免重启时依赖当前目录猜测旧身份。
++#[derive(Debug, Clone, PartialEq)]
++pub struct HistoricalToolExecution {
++    pub target: String,
++    pub catalog_generation: u64,
++    pub arguments: serde_json::Value,
++    pub args_digest: ArgsDigest,
+ }
+ 
+ /// Provider-facing tool names must fit the strictest protocol face this
+@@ -238,6 +243,7 @@
+ /// and so audit trails can join the two vocabularies.
+ #[derive(Debug, Clone, PartialEq)]
+ pub struct RequestedToolCall {
++    pub declaration_binding: Option<HistoricalToolDeclaration>,
+     pub tool_call_id: ToolCallId,
+     pub provider_call_id: Option<String>,
+     pub target: String,
+@@ -248,6 +254,12 @@
+     pub args_summary: Option<String>,
+ }
+ 
++impl RequestedToolCall {
++    pub fn historical_wire_name(&self) -> Option<&str> {
++        self.declaration_binding.as_ref().filter(|binding| binding.catalog_generation > 0 && binding.declaration.target == self.target).map(|binding| binding.declaration.wire_name.as_str())
++    }
++}
++
+ /// The serving identity that produced one assistant turn (R05 RR1 F09).
+ ///
+ /// Provider-opaque protocol state — thinking signatures, thought

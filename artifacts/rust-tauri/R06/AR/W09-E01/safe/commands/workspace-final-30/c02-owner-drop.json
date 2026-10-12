@@ -1,0 +1,8 @@
+{
+  "both_successors_stopped_and_joined": true,
+  "clone_kept_live_worker_protected": true,
+  "duplicate_start_did_not_spawn": true,
+  "expired_weak_callback_did_not_stop_successor": true,
+  "last_owner_drop_released_os_lock": true,
+  "wire": []
+}

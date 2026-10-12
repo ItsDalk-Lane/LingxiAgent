@@ -1,0 +1,170 @@
+{
+  "argv": [
+    "<LOCAL_USER>/.cargo/bin/cargo",
+    "run",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-j8",
+    "-p",
+    "xtask",
+    "--",
+    "verify-stage",
+    "R05",
+    "--evidence",
+    "artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final"
+  ],
+  "cwd": "<W09_WORKSPACE>",
+  "toolchain": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "node": "v24.16.0",
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+  "start": "2026-10-11T13:49:31.231415+00:00",
+  "end": "2026-10-11T14:43:46.028885+00:00",
+  "exit_code": 1,
+  "elapsed_seconds": 3253.332848457998,
+  "inputs_stable": true,
+  "environment": {
+    "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/home-formal-r05-final-59",
+    "LINGXI_PRODUCT_DIR": "<W09_WORKSPACE>/lib",
+    "CARGO_TARGET_DIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target",
+    "CARGO_BUILD_JOBS": "8",
+    "TEST_MEM_LIMIT_MB": "8192",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "LINGXI_TEST_GUARD": "1",
+    "CARGO_TARGET_AARCH64_APPLE_DARWIN_RUNNER": "python3 <W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/LOCAL_ONLY_NEVER_GIT/formal-binary-runner.py",
+    "W09_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/case-formal-r05-final-59",
+    "W10_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/w10-formal-r05-final-59",
+    "TMPDIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-formal-r05-final-59",
+    "CARGO_INCREMENTAL": null,
+    "W09_FORMAL_EVIDENCE_ROOT": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final"
+  },
+  "rss_measured_mib": null,
+  "outer_budget_seconds": 20100,
+  "actual_parent_wait_reaped": true,
+  "process_group_residue": [],
+  "outer_timeout": null,
+  "executed_binaries": [],
+  "runner_sha256": "5aae3b2a8ad6395574b60b40065ed4f9c4386d3046bf320e00492e6187047765",
+  "actual_test_binary_runs": [
+    {
+      "binary": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/xtask",
+      "argv": [
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/xtask",
+        "verify-stage",
+        "R05",
+        "--evidence",
+        "artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final"
+      ],
+      "wrapper_pid": 53762,
+      "process_group": 53762,
+      "before_sha256": "87da3e7d049278087f5bd44163c25130dfec4dd180bb5241afae75dbf47cbf80",
+      "before_at": "2026-10-11T13:49:32.842803+00:00",
+      "guard_env": {
+        "LINGXI_TEST_GUARD": "1",
+        "TEST_TIME_LIMIT_SEC": "600",
+        "TEST_MEM_LIMIT_MB": "8192"
+      },
+      "product_dir": "<W09_WORKSPACE>/lib",
+      "shipping_inventory_before": {
+        "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service",
+        "sha256": "cf8c276a62ed404a661e7edda53e64c096072a2e98228b1d94a0bbee2fc79be4"
+      },
+      "case_receipts": null,
+      "actual_graph_sink": null,
+      "actual_graph_evidence_root": null,
+      "effective_case_env": {
+        "W09_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/case-formal-r05-final-59",
+        "W10_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/w10-formal-r05-final-59"
+      },
+      "actual_child_pid": 53764,
+      "exit_code": 1,
+      "actual_wait_reaped": true,
+      "elapsed_seconds": 3253.0695763330004,
+      "after_sha256": "87da3e7d049278087f5bd44163c25130dfec4dd180bb5241afae75dbf47cbf80",
+      "after_at": "2026-10-11T14:43:45.967470+00:00",
+      "shipping_inventory_after": {
+        "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service",
+        "sha256": "52b3947e119f13eb43bd19bbcd43b012a2f94c6649bc2ef42c74047fca8f108f"
+      },
+      "binary_stable": true
+    }
+  ],
+  "actual_test_binary_starts": [
+    {
+      "binary": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/xtask",
+      "argv": [
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/xtask",
+        "verify-stage",
+        "R05",
+        "--evidence",
+        "artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final"
+      ],
+      "wrapper_pid": 53762,
+      "process_group": 53762,
+      "before_sha256": "87da3e7d049278087f5bd44163c25130dfec4dd180bb5241afae75dbf47cbf80",
+      "before_at": "2026-10-11T13:49:32.842803+00:00",
+      "guard_env": {
+        "LINGXI_TEST_GUARD": "1",
+        "TEST_TIME_LIMIT_SEC": "600",
+        "TEST_MEM_LIMIT_MB": "8192"
+      },
+      "product_dir": "<W09_WORKSPACE>/lib",
+      "shipping_inventory_before": {
+        "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service",
+        "sha256": "cf8c276a62ed404a661e7edda53e64c096072a2e98228b1d94a0bbee2fc79be4"
+      },
+      "case_receipts": null,
+      "actual_graph_sink": null,
+      "actual_graph_evidence_root": null,
+      "effective_case_env": {
+        "W09_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/case-formal-r05-final-59",
+        "W10_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/w10-formal-r05-final-59"
+      }
+    }
+  ],
+  "product_resource_directory": "<W09_WORKSPACE>/lib",
+  "product_resource_anchor": {
+    "path": "lib/yuan/lingxi.md",
+    "sha256": "fff0f7a338337ee7a8f049fe5b65182d6c2c4af0ef5a3b21bae071dd346c6865",
+    "exists": true
+  },
+  "runner_after_sha256": "5aae3b2a8ad6395574b60b40065ed4f9c4386d3046bf320e00492e6187047765",
+  "cargo_runner_file_sha256": "5c285e870938697696cd7ae8120f8376726722edf09d6be890ca0487d6830ee7",
+  "preparation_failure": null,
+  "source_stability_basis": null,
+  "git_config_environment": {
+    "GIT_CONFIG_COUNT": "1",
+    "GIT_CONFIG_KEY_0": "core.excludesFile",
+    "GIT_CONFIG_VALUE_0": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/git-excludes-w09-e01"
+  },
+  "private_excludes_sha256_before": "4f3eb0ab438f91b4dcf45b12f33db265b0aa6a76f62221d0329160d50dcd6a17",
+  "private_excludes_sha256_after": "4f3eb0ab438f91b4dcf45b12f33db265b0aa6a76f62221d0329160d50dcd6a17",
+  "disposition": null,
+  "cancel_reason": null,
+  "partial_actual_test_starts": null,
+  "partial_actual_test_ends": null,
+  "partial_test_result_blocks": null,
+  "nested_group_cleanup": null,
+  "nested_group_observed_gone": null,
+  "label": "formal-r05-final-59",
+  "record_sha256": "848e683b4882149fc1e09fec10e9b4b38ce22f3350014f554c900d51e0468dd5",
+  "log_sha256": "757f1003586b5903fab1e94de830b612f1e1a6f1d6dd7bc0f070df7344287c95",
+  "inputs_before_digest": "5e75b53dedec8c0faa94fe4674731c0cbb0c53ef04aac4c53de0420e0f6abe79",
+  "inputs_after_digest": "5e75b53dedec8c0faa94fe4674731c0cbb0c53ef04aac4c53de0420e0f6abe79",
+  "inputs_count": 4928,
+  "test_results": [],
+  "guard_armed_count": 0,
+  "complete_original_metadata": "commands/formal-r05-final-59/record.json retained locally",
+  "source_binding_matches_final": true,
+  "outcome_class": "ACTUAL_EXECUTION",
+  "shipping_binaries_before": {
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-storage-inspect": "91764562bf444d5ee452305e97bad66f1ef57193f1b5d327b260f97891794172",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service": "cf8c276a62ed404a661e7edda53e64c096072a2e98228b1d94a0bbee2fc79be4"
+  },
+  "shipping_binaries_after": {
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-storage-inspect": "65071093207329b48dd073fbe39b3ca7b731ad608eb04033e2c16a5cb22a6be5",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-protocol-gen": "7f0048b570cd68e19c401e2d959585d1313496619589571d9fd7e7c658e9df16",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service": "52b3947e119f13eb43bd19bbcd43b012a2f94c6649bc2ef42c74047fca8f108f"
+  }
+}

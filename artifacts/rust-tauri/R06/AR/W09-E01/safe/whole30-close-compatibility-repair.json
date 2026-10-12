@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-11T13:05:56.887930+00:00",
+  "actual_red": "workspace-final-30/shutdown_coordinator::storage_close_failure_maps_to_exit_five original unchanged assertions",
+  "before_run_store_sha256": "682a07a892d6d004155c3dad042285e30f67e5a25383b8a17739414954ca6637",
+  "change": "registered weak resource hook close remains once/concurrent/cancel-safe cached; bare DB restores original queue.close contract, registration blocked atomically under hook lock; added exact bare double-close regression",
+  "original_assertions": "UNCHANGED",
+  "comment_only": "dispatch old timeout paragraph edited line translated to Chinese; actual old whole30 binding preserved"
+}

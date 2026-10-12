@@ -1,0 +1,18 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.21s
+     Running tests/r06_t08_behavior_eval.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_t08_behavior_eval-ef5e36c4d0a623a1)
+
+running 1 test
+
+thread 'be07_material_citation_scope_isolated_and_locatable' (12810748) panicked at crates/lingxi-service/tests/r06_t08_behavior_eval.rs:752:13:
+run run_000001a12eb6da8c_000001 settled as failed (failed.provider_error), wanted completed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test be07_material_citation_scope_isolated_and_locatable ... FAILED
+
+failures:
+
+failures:
+    be07_material_citation_scope_isolated_and_locatable
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 12 filtered out; finished in 1.63s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_t08_behavior_eval`

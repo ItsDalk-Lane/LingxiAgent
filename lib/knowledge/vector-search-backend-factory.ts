@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import path from "node:path";
 import { AnnIndexStore } from "./ann-index-store.ts";
 import { UseArchVectorBackend, type KnowledgeNativeModule } from "./usearch-vector-backend.ts";
@@ -13,12 +12,8 @@ export function createKnowledgeVectorSearchBackend(options: {
   const dbPath = path.join(options.indexesRoot, "knowledge-ann.db");
   let store: AnnIndexStore | undefined;
   try {
-    try { store = new AnnIndexStore({ dbPath, Database: options.Database, now: options.now }); }
-    catch {
-      options.log?.("knowledge ANN: rebuilding unavailable derived catalog");
-      for (const suffix of ["", "-wal", "-shm"]) fs.rmSync(`${dbPath}${suffix}`, { force: true });
-      store = new AnnIndexStore({ dbPath, Database: options.Database, now: options.now });
-    }
+    // 无法证明目录没有活跃写者；构造失败保留原件并显式回退。
+    store = new AnnIndexStore({ dbPath, Database: options.Database, now: options.now });
     // 原生扩展在后台构建和查询时加载；缺少可选依赖不影响应用启动。
     return new UseArchVectorBackend({ portable: options.portable, store,
       root: path.join(options.indexesRoot, "knowledge-ann"), loadNative: options.loadNative, log: options.log });

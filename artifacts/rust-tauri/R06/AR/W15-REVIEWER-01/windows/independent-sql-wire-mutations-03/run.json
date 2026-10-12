@@ -1,0 +1,352 @@
+{
+  "argv": [
+    "python3",
+    "artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/reviewer-tools/metrics_review.py"
+  ],
+  "cwd": "/private/tmp/lingxi-r06-w15-reviewer-01",
+  "started": "2026-10-12T00:20:08.274358+00:00",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "effective_env": {
+    "HOME": "/Users/study_superior",
+    "LINGXI_HOME": "/private/tmp/lingxi-w15-r01-runtime/home",
+    "TMPDIR": "/private/tmp/lingxi-w15-r01-runtime/tmp",
+    "LINGXI_PRODUCT_DIR": "/private/tmp/lingxi-r06-w15-reviewer-01/lib",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-w15-r01-runtime/target",
+    "CARGO_INCREMENTAL": "0",
+    "LINGXI_TEST_GUARD": "1",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "TEST_MEM_LIMIT_MB": "8192"
+  },
+  "guard": {
+    "business_seconds": 600,
+    "rss_mib": 8192,
+    "controller_seconds": 2700,
+    "sampling_interval_seconds": 0.05
+  },
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "source_before": "76b576ae8cf26174813b3439436a2a5d1aff65f42743af9e305e05ec5b6eebff",
+  "processes": [
+    {
+      "pid": 33964,
+      "ppid": 33744,
+      "argv": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/reviewer-tools/metrics_review.py",
+      "actual_executable": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "executable_sha256_first_observed": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "first_seen_elapsed": 0.2577527499815915,
+      "last_seen_elapsed": 2.1380865419923794,
+      "peak_sampled_rss_bytes": 238845952,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_at_final_table",
+        "elapsed": 2.23299579200102
+      },
+      "wait_reap": "Popen.wait executed",
+      "executable_sha256_after": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "present_after": false,
+      "exit_code": 1
+    },
+    {
+      "pid": 33972,
+      "ppid": 33964,
+      "argv": "(Python)",
+      "actual_executable": null,
+      "executable_sha256_first_observed": null,
+      "first_seen_elapsed": 0.6305981249897741,
+      "last_seen_elapsed": 0.6305981249897741,
+      "peak_sampled_rss_bytes": 59899904,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 0.7249043750052806
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": null,
+      "present_after": false
+    },
+    {
+      "pid": 33975,
+      "ppid": 33964,
+      "argv": "(Python)",
+      "actual_executable": null,
+      "executable_sha256_first_observed": null,
+      "first_seen_elapsed": 0.7249043750052806,
+      "last_seen_elapsed": 0.7249043750052806,
+      "peak_sampled_rss_bytes": 63160320,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 0.8214989579864778
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": null,
+      "present_after": false
+    },
+    {
+      "pid": 33980,
+      "ppid": 33964,
+      "argv": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/lingxi-r06-w15-reviewer-01/scripts/rust-tauri/r06_evaluation_audit.py --records /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/c03-a15-handshake/records.jsonl --facts /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/c03-a15-handshake/facts.jsonl --obligations /private/tmp/lingxi-r06-w15-reviewer-01/docs/rust-tauri/R06/repair-current/AR_ORIGINAL_OBLIGATIONS.json --scope /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/c03-a15-handshake/scope.json --root /private/tmp/lingxi-r06-w15-reviewer-01",
+      "actual_executable": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "executable_sha256_first_observed": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "first_seen_elapsed": 0.8214989579864778,
+      "last_seen_elapsed": 0.8214989579864778,
+      "peak_sampled_rss_bytes": 19005440,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 0.9154937079874799
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "present_after": false
+    },
+    {
+      "pid": 33982,
+      "ppid": 33964,
+      "argv": "(Python)",
+      "actual_executable": null,
+      "executable_sha256_first_observed": null,
+      "first_seen_elapsed": 0.9154937079874799,
+      "last_seen_elapsed": 0.9154937079874799,
+      "peak_sampled_rss_bytes": 18202624,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 1.0134309580025729
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": null,
+      "present_after": false
+    },
+    {
+      "pid": 33988,
+      "ppid": 33964,
+      "argv": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/lingxi-r06-w15-reviewer-01/scripts/rust-tauri/r06_evaluation_audit.py --records /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be01-file-false-with-pass/records.jsonl --facts /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be01-file-false-with-pass/facts.jsonl --obligations /private/tmp/lingxi-r06-w15-reviewer-01/docs/rust-tauri/R06/repair-current/AR_ORIGINAL_OBLIGATIONS.json --scope /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be01-file-false-with-pass/scope.json --root /private/tmp/lingxi-r06-w15-reviewer-01",
+      "actual_executable": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "executable_sha256_first_observed": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "first_seen_elapsed": 1.0997454579919577,
+      "last_seen_elapsed": 1.0997454579919577,
+      "peak_sampled_rss_bytes": 25280512,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 1.1930024579924066
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "present_after": false
+    },
+    {
+      "pid": 33999,
+      "ppid": 33964,
+      "argv": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/lingxi-r06-w15-reviewer-01/scripts/rust-tauri/r06_evaluation_audit.py --records /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be03-rejection-effect-false/records.jsonl --facts /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be03-rejection-effect-false/facts.jsonl --obligations /private/tmp/lingxi-r06-w15-reviewer-01/docs/rust-tauri/R06/repair-current/AR_ORIGINAL_OBLIGATIONS.json --scope /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be03-rejection-effect-false/scope.json --root /private/tmp/lingxi-r06-w15-reviewer-01",
+      "actual_executable": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "executable_sha256_first_observed": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "first_seen_elapsed": 1.1930024579924066,
+      "last_seen_elapsed": 1.1930024579924066,
+      "peak_sampled_rss_bytes": 23478272,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 1.2890987079881597
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "present_after": false
+    },
+    {
+      "pid": 34042,
+      "ppid": 33964,
+      "argv": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/lingxi-r06-w15-reviewer-01/scripts/rust-tauri/r06_evaluation_audit.py --records /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be01-expected-calls-999/records.jsonl --facts /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be01-expected-calls-999/facts.jsonl --obligations /private/tmp/lingxi-r06-w15-reviewer-01/docs/rust-tauri/R06/repair-current/AR_ORIGINAL_OBLIGATIONS.json --scope /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be01-expected-calls-999/scope.json --root /private/tmp/lingxi-r06-w15-reviewer-01",
+      "actual_executable": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "executable_sha256_first_observed": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "first_seen_elapsed": 1.2890987079881597,
+      "last_seen_elapsed": 1.2890987079881597,
+      "peak_sampled_rss_bytes": 23560192,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 1.386546082998393
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "present_after": false
+    },
+    {
+      "pid": 34130,
+      "ppid": 33964,
+      "argv": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/lingxi-r06-w15-reviewer-01/scripts/rust-tauri/r06_evaluation_audit.py --records /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-coverage-status-false/records.jsonl --facts /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-coverage-status-false/facts.jsonl --obligations /private/tmp/lingxi-r06-w15-reviewer-01/docs/rust-tauri/R06/repair-current/AR_ORIGINAL_OBLIGATIONS.json --scope /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-coverage-status-false/scope.json --root /private/tmp/lingxi-r06-w15-reviewer-01",
+      "actual_executable": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "executable_sha256_first_observed": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "first_seen_elapsed": 1.386546082998393,
+      "last_seen_elapsed": 1.386546082998393,
+      "peak_sampled_rss_bytes": 23691264,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 1.484951166989049
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "present_after": false
+    },
+    {
+      "pid": 34207,
+      "ppid": 33964,
+      "argv": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/lingxi-r06-w15-reviewer-01/scripts/rust-tauri/r06_evaluation_audit.py --records /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-outcome-coverage-false/records.jsonl --facts /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-outcome-coverage-false/facts.jsonl --obligations /private/tmp/lingxi-r06-w15-reviewer-01/docs/rust-tauri/R06/repair-current/AR_ORIGINAL_OBLIGATIONS.json --scope /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-outcome-coverage-false/scope.json --root /private/tmp/lingxi-r06-w15-reviewer-01",
+      "actual_executable": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "executable_sha256_first_observed": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "first_seen_elapsed": 1.484951166989049,
+      "last_seen_elapsed": 1.484951166989049,
+      "peak_sampled_rss_bytes": 23560192,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 1.574143167003058
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "present_after": false
+    },
+    {
+      "pid": 34219,
+      "ppid": 33964,
+      "argv": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/lingxi-r06-w15-reviewer-01/scripts/rust-tauri/r06_evaluation_audit.py --records /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be07-full-chat-claim/records.jsonl --facts /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be07-full-chat-claim/facts.jsonl --obligations /private/tmp/lingxi-r06-w15-reviewer-01/docs/rust-tauri/R06/repair-current/AR_ORIGINAL_OBLIGATIONS.json --scope /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be07-full-chat-claim/scope.json --root /private/tmp/lingxi-r06-w15-reviewer-01",
+      "actual_executable": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "executable_sha256_first_observed": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "first_seen_elapsed": 1.574143167003058,
+      "last_seen_elapsed": 1.574143167003058,
+      "peak_sampled_rss_bytes": 22659072,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 1.6686053749872372
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "present_after": false
+    },
+    {
+      "pid": 34221,
+      "ppid": 33964,
+      "argv": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/lingxi-r06-w15-reviewer-01/scripts/rust-tauri/r06_evaluation_audit.py --records /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be04-session-forgery/records.jsonl --facts /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be04-session-forgery/facts.jsonl --obligations /private/tmp/lingxi-r06-w15-reviewer-01/docs/rust-tauri/R06/repair-current/AR_ORIGINAL_OBLIGATIONS.json --scope /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-be04-session-forgery/scope.json --root /private/tmp/lingxi-r06-w15-reviewer-01",
+      "actual_executable": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "executable_sha256_first_observed": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "first_seen_elapsed": 1.6686053749872372,
+      "last_seen_elapsed": 1.6686053749872372,
+      "peak_sampled_rss_bytes": 22822912,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 1.7612704999919515
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "present_after": false
+    },
+    {
+      "pid": 34224,
+      "ppid": 33964,
+      "argv": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/lingxi-r06-w15-reviewer-01/scripts/rust-tauri/r06_evaluation_audit.py --records /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-candidate-bindings-deleted/records.jsonl --facts /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-candidate-bindings-deleted/facts.jsonl --obligations /private/tmp/lingxi-r06-w15-reviewer-01/docs/rust-tauri/R06/repair-current/AR_ORIGINAL_OBLIGATIONS.json --scope /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-candidate-bindings-deleted/scope.json --root /private/tmp/lingxi-r06-w15-reviewer-01",
+      "actual_executable": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "executable_sha256_first_observed": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "first_seen_elapsed": 1.7612704999919515,
+      "last_seen_elapsed": 1.7612704999919515,
+      "peak_sampled_rss_bytes": 21676032,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 1.8495262499782257
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "present_after": false
+    },
+    {
+      "pid": 34227,
+      "ppid": 33964,
+      "argv": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/lingxi-r06-w15-reviewer-01/scripts/rust-tauri/r06_evaluation_audit.py --records /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-comparison-mode-live-with-false-flags/records.jsonl --facts /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-comparison-mode-live-with-false-flags/facts.jsonl --obligations /private/tmp/lingxi-r06-w15-reviewer-01/docs/rust-tauri/R06/repair-current/AR_ORIGINAL_OBLIGATIONS.json --scope /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-comparison-mode-live-with-false-flags/scope.json --root /private/tmp/lingxi-r06-w15-reviewer-01",
+      "actual_executable": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "executable_sha256_first_observed": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "first_seen_elapsed": 1.8495262499782257,
+      "last_seen_elapsed": 1.8495262499782257,
+      "peak_sampled_rss_bytes": 18366464,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 1.9412195829791017
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "present_after": false
+    },
+    {
+      "pid": 34230,
+      "ppid": 33964,
+      "argv": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/lingxi-r06-w15-reviewer-01/scripts/rust-tauri/r06_evaluation_audit.py --records /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-coverage-invented-outcome/records.jsonl --facts /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-coverage-invented-outcome/facts.jsonl --obligations /private/tmp/lingxi-r06-w15-reviewer-01/docs/rust-tauri/R06/repair-current/AR_ORIGINAL_OBLIGATIONS.json --scope /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/mutants/own-coverage-invented-outcome/scope.json --root /private/tmp/lingxi-r06-w15-reviewer-01",
+      "actual_executable": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "executable_sha256_first_observed": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "first_seen_elapsed": 1.9412195829791017,
+      "last_seen_elapsed": 1.9412195829791017,
+      "peak_sampled_rss_bytes": 13139968,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 2.0352076669805683
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "present_after": false
+    },
+    {
+      "pid": 34233,
+      "ppid": 33964,
+      "argv": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/lingxi-r06-w15-reviewer-01/scripts/rust-tauri/r06_evaluation_audit.py --records /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/restored-positive/records.jsonl --facts /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/restored-positive/facts.jsonl --obligations /private/tmp/lingxi-r06-w15-reviewer-01/docs/rust-tauri/R06/repair-current/AR_ORIGINAL_OBLIGATIONS.json --scope /private/tmp/lingxi-r06-w15-reviewer-01/artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/windows/independent-sql-wire-mutations-03/restored-positive/scope.json --root /private/tmp/lingxi-r06-w15-reviewer-01",
+      "actual_executable": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "executable_sha256_first_observed": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "first_seen_elapsed": 2.0352076669805683,
+      "last_seen_elapsed": 2.0352076669805683,
+      "peak_sampled_rss_bytes": 17940480,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 2.1380865419923794
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "present_after": false
+    }
+  ],
+  "launch_binary_before": {
+    "python3": null,
+    "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0"
+  },
+  "controller_pid": 33964,
+  "ended": "2026-10-12T00:20:10.508148+00:00",
+  "elapsed_seconds": 2.2338036249857396,
+  "exit_code": 1,
+  "guard_breaches": [],
+  "source_after": "76b576ae8cf26174813b3439436a2a5d1aff65f42743af9e305e05ec5b6eebff",
+  "unsampled_process_metrics": "null/unknown; inventory cannot replace execution measurement",
+  "owned_survivors": [],
+  "supervisor_sha256": "5166fb9fed7854ad3515b5138ec981db8661eb0d35e93c37379353ce2380ae63",
+  "launch_binary_after": {
+    "python3": null,
+    "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0"
+  }
+}

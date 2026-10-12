@@ -1,0 +1,17 @@
+{
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+    "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+    "tests/r06-ar-f12-ann-cache-preservation.test.ts",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-ts-initial-01-s4kfjy5v",
+  "start": 1791702272.530245,
+  "end": 1791702281.655082,
+  "exit_code": 0,
+  "log_sha256": "c2c2d295674d5172ac68c6a03ce97a6208a82320485af9a219308a82a2d842a0"
+}

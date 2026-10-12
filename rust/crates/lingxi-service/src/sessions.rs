@@ -27,10 +27,20 @@ use lingxi_kernel::Principal as KernelPrincipal;
 use lingxi_protocol::RunStatus;
 
 use crate::auth::{Principal, PrincipalKind, LOCAL_OWNER_USER_ID};
-use crate::cancel::CancelPhase;
+use crate::cancel::{CancelPhase, CancelScope};
 use crate::events::EventService;
 use crate::runs::DriveAuthorization;
 use crate::session_supervisor::{SessionConcurrencyLimits, SessionSupervisor, SteerOutcome};
+
+/// 等待者消失只通知自己的取消树；实际任务仍持会话许可直到退出。
+struct ForegroundDisconnectGuard(Option<CancelScope>);
+impl Drop for ForegroundDisconnectGuard {
+    fn drop(&mut self) {
+        if let Some(scope) = self.0.take() {
+            scope.cancel("foreground caller disconnected");
+        }
+    }
+}
 
 /// Summary shape returned by the read endpoint (runs carry only committed
 /// facts; no echo of failed attempts).
@@ -102,9 +112,44 @@ pub enum CancelRunOutcome {
     TooLate { run_id: String, detail: String },
 }
 
+/// 用户本轮明确选中的资料；身份和范围句柄由服务创建。
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct KnowledgeSelection {
+    #[serde(default)]
+    pub notebook_ids: Vec<String>,
+    #[serde(default)]
+    pub source_ids: Vec<String>,
+}
+impl KnowledgeSelection {
+    pub fn canonicalized(&self) -> Result<Self, StorageError> {
+        if self.notebook_ids.is_empty()
+            || self.notebook_ids.len() > 64
+            || self.source_ids.len() > 256
+            || self
+                .notebook_ids
+                .iter()
+                .chain(&self.source_ids)
+                .any(|id| id.trim().is_empty() || id.len() > 256)
+        {
+            return Err(StorageError::InvalidRequest {
+                detail: "knowledge selection requires bounded notebook/source identities".into(),
+            });
+        }
+        let mut result = self.clone();
+        result.notebook_ids.sort();
+        result.notebook_ids.dedup();
+        result.source_ids.sort();
+        result.source_ids.dedup();
+        Ok(result)
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct ExecuteRequest {
+    #[serde(default)]
+    pub knowledge: Option<KnowledgeSelection>,
     /// Free-form input; bounded by the body limit. Any identity-ish fields
     /// are structurally rejected here (deny_unknown_fields) — principal
     /// comes from the auth chain, never from the payload.
@@ -124,6 +169,7 @@ pub struct ExecuteRequest {
 /// the input plus the OPTIONAL explicit idempotency key.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ExecuteSubmission<'a> {
+    pub knowledge: Option<&'a KnowledgeSelection>,
     pub input: &'a str,
     pub request_id: Option<&'a str>,
 }
@@ -134,6 +180,7 @@ impl<'a> ExecuteSubmission<'a> {
     pub fn plain(input: &'a str) -> Self {
         Self {
             input,
+            knowledge: None,
             request_id: None,
         }
     }
@@ -314,6 +361,30 @@ fn canonicalize_submission_request_id(
 /// Storage reads the session surface needs. Implemented by
 /// [`RunDatabase`] (real SQLite store) and by the in-memory fake in tests.
 pub trait SessionBackend: Send + Sync {
+    fn permission_durable(
+        &self,
+        _sid: &str,
+    ) -> impl Future<
+        Output = Result<Option<lingxi_kernel::subagent::SessionPermissionMode>, StorageError>,
+    > + Send {
+        async { Ok(None) }
+    }
+    fn persist_permission(
+        &self,
+        _sid: &str,
+        _mode: lingxi_kernel::subagent::SessionPermissionMode,
+    ) -> impl Future<Output = Result<(), StorageError>> + Send {
+        async { Ok(()) }
+    }
+
+    fn check_fresh(&self, _sid: &str) -> impl Future<Output = Result<(), StorageError>> + Send {
+        async { Ok(()) }
+    }
+    fn session_admission(
+        &self,
+    ) -> Option<std::sync::Arc<lingxi_kernel::session_admission::SessionAdmission>> {
+        None
+    }
     fn get_session(
         &self,
         session_id: &str,
@@ -361,6 +432,30 @@ pub trait SessionBackend: Send + Sync {
 /// Object-safe erasure of [`SessionBackend`] (RPITIT traits are not
 /// dyn-compatible; the blanket impl forwards).
 pub trait SessionBackendErased: Send + Sync {
+    fn permission_durable_erased<'a>(
+        &'a self,
+        sid: &'a str,
+    ) -> Pin<
+        Box<
+            dyn Future<
+                    Output = Result<
+                        Option<lingxi_kernel::subagent::SessionPermissionMode>,
+                        StorageError,
+                    >,
+                > + Send
+                + 'a,
+        >,
+    >;
+    fn persist_permission_erased<'a>(
+        &'a self,
+        sid: &'a str,
+        mode: lingxi_kernel::subagent::SessionPermissionMode,
+    ) -> Pin<Box<dyn Future<Output = Result<(), StorageError>> + Send + 'a>>;
+
+    fn check_fresh_erased<'a>(
+        &'a self,
+        sid: &'a str,
+    ) -> Pin<Box<dyn Future<Output = Result<(), StorageError>> + Send + 'a>>;
     fn get_session_erased<'a>(
         &'a self,
         session_id: &'a str,
@@ -391,6 +486,36 @@ pub trait SessionBackendErased: Send + Sync {
 }
 
 impl<T: SessionBackend> SessionBackendErased for T {
+    fn permission_durable_erased<'a>(
+        &'a self,
+        sid: &'a str,
+    ) -> Pin<
+        Box<
+            dyn Future<
+                    Output = Result<
+                        Option<lingxi_kernel::subagent::SessionPermissionMode>,
+                        StorageError,
+                    >,
+                > + Send
+                + 'a,
+        >,
+    > {
+        Box::pin(self.permission_durable(sid))
+    }
+    fn persist_permission_erased<'a>(
+        &'a self,
+        sid: &'a str,
+        mode: lingxi_kernel::subagent::SessionPermissionMode,
+    ) -> Pin<Box<dyn Future<Output = Result<(), StorageError>> + Send + 'a>> {
+        Box::pin(self.persist_permission(sid, mode))
+    }
+
+    fn check_fresh_erased<'a>(
+        &'a self,
+        sid: &'a str,
+    ) -> Pin<Box<dyn Future<Output = Result<(), StorageError>> + Send + 'a>> {
+        Box::pin(self.check_fresh(sid))
+    }
     fn get_session_erased<'a>(
         &'a self,
         session_id: &'a str,
@@ -441,6 +566,30 @@ impl<T: SessionBackend> SessionBackendErased for T {
 }
 
 impl SessionBackend for RunDatabase {
+    fn permission_durable(
+        &self,
+        sid: &str,
+    ) -> impl Future<
+        Output = Result<Option<lingxi_kernel::subagent::SessionPermissionMode>, StorageError>,
+    > + Send {
+        lingxi_adapters::storage::session_operations::permission(self, sid)
+    }
+    fn persist_permission(
+        &self,
+        sid: &str,
+        mode: lingxi_kernel::subagent::SessionPermissionMode,
+    ) -> impl Future<Output = Result<(), StorageError>> + Send {
+        lingxi_adapters::storage::session_operations::set_permission(self, sid, mode)
+    }
+
+    fn check_fresh(&self, sid: &str) -> impl Future<Output = Result<(), StorageError>> + Send {
+        lingxi_adapters::storage::session_operations::assert_executable(self, sid)
+    }
+    fn session_admission(
+        &self,
+    ) -> Option<std::sync::Arc<lingxi_kernel::session_admission::SessionAdmission>> {
+        Some(std::sync::Arc::clone(RunDatabase::session_admission(self)))
+    }
     fn get_session(
         &self,
         session_id: &str,
@@ -488,6 +637,7 @@ impl SessionBackend for RunDatabase {
 
 pub struct SessionStore {
     backend: Box<dyn SessionBackendErased>,
+    storage_admission: Option<std::sync::Arc<lingxi_kernel::session_admission::SessionAdmission>>,
     /// R03-T02: the session serialization owner — one explicit owner per
     /// session; busy sessions reject further normal submissions (frozen
     /// incumbent `session_busy` gate) and accept steering instead.
@@ -547,9 +697,15 @@ impl SessionStore {
         limits: SessionConcurrencyLimits,
         intake: std::sync::Arc<crate::shutdown::SubmissionIntake>,
     ) -> Self {
+        let storage_admission = backend.session_admission();
+        let gate = storage_admission
+            .clone()
+            .map(|a| SessionSupervisor::with_admission(limits, a))
+            .unwrap_or_else(|| SessionSupervisor::new(limits));
         Self {
             backend: Box::new(backend),
-            gate: SessionSupervisor::new(limits),
+            storage_admission,
+            gate,
             dedup: std::sync::Arc::new(crate::dedup::SubmissionDedup::default()),
             intake,
         }
@@ -621,6 +777,36 @@ impl SessionStore {
         }
     }
 
+    async fn recheck_admitted(
+        &self,
+        principal: &Principal,
+        sid: &str,
+    ) -> Result<(), SessionExecuteError> {
+        let row = self
+            .backend
+            .get_session_erased(sid)
+            .await
+            .map_err(SessionExecuteError::Storage)?
+            .ok_or(SessionExecuteError::NotFound)?;
+        if !Self::can_access(principal, &row.owner_user_id) {
+            return Err(SessionExecuteError::Forbidden);
+        }
+        self.backend
+            .check_fresh_erased(sid)
+            .await
+            .map_err(SessionExecuteError::Storage)?;
+        if let Some(mode) = self
+            .backend
+            .permission_durable_erased(sid)
+            .await
+            .map_err(SessionExecuteError::Storage)?
+        {
+            self.gate
+                .set_permission_mode_admitted(sid, mode)
+                .map_err(|_| SessionExecuteError::SessionRegistryFull)?;
+        }
+        Ok(())
+    }
     /// Executes: drives ONE run of the session through the real run
     /// lifecycle (R03-T01) — durable start (queued→running) → model/tool
     /// turns under the [`RunSupervisor`] → exactly one finalize through the
@@ -704,6 +890,24 @@ impl SessionStore {
         submission: &ExecuteSubmission<'_>,
         now_ms: u64,
     ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        self.execute_submission_with_parent(
+            port, events, supervisor, principal, session_id, submission, now_ms, None,
+        )
+        .await
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    async fn execute_submission_with_parent<P: StoragePort>(
+        &self,
+        port: &P,
+        events: &EventService,
+        supervisor: &crate::runs::RunSupervisor,
+        principal: &Principal,
+        session_id: &str,
+        submission: &ExecuteSubmission<'_>,
+        now_ms: u64,
+        parent_scope: Option<&CancelScope>,
+    ) -> Result<ExecuteAccepted, SessionExecuteError> {
         // R03 RR2/F05-01 — the SINGLE canonicalization boundary of the
         // foreground submission surface. Everything below (the dedup key,
         // the cross-restart anchor lookup, the DriveAuthorization lineage
@@ -712,6 +916,7 @@ impl SessionStore {
         // `canonicalize_submission_request_id`).
         let canonical_request_id = canonicalize_submission_request_id(submission.request_id)?;
         let submission = ExecuteSubmission {
+            knowledge: submission.knowledge,
             input: submission.input,
             request_id: canonical_request_id.as_deref(),
         };
@@ -743,6 +948,23 @@ impl SessionStore {
         // R04-T03: the session's CURRENT permission mode is snapshotted
         // into the drive authorization at admission — the run's
         // tool-policy plane adjudicates under this one stable fact.
+        let mut authorization = DriveAuthorization::user_submission(
+            submission.request_id,
+            self.gate.permission_mode(session_id),
+        );
+        authorization.knowledge_selection = submission.knowledge.cloned();
+        let kernel_principal = kernel_principal_of(principal);
+        let _run_permit = supervisor
+            .task_supervisor()
+            .retain_authorized_run_permit(
+                &run_id,
+                session_id,
+                &agent_id,
+                &kernel_principal,
+                &authorization,
+                lease.retained_permit(),
+            )
+            .map_err(SessionExecuteError::Storage)?;
         let finish = match supervisor
             .drive_run(
                 port,
@@ -755,11 +977,8 @@ impl SessionStore {
                 1,
                 now_ms,
                 Some(lease.steering_inbox()),
-                None,
-                DriveAuthorization::user_submission(
-                    submission.request_id,
-                    self.gate.permission_mode(session_id),
-                ),
+                parent_scope,
+                authorization,
                 binding.as_ref(),
                 session_id,
             )
@@ -819,6 +1038,68 @@ impl SessionStore {
         })
     }
 
+    /// 前台拥有型入口：断开等待会通知取消，但业务持权到真实清理与收据完成。
+    #[allow(clippy::too_many_arguments)]
+    pub async fn execute_submission_owned<P: StoragePort + 'static>(
+        self: &std::sync::Arc<Self>,
+        port: std::sync::Arc<P>,
+        events: std::sync::Arc<EventService>,
+        supervisor: std::sync::Arc<crate::runs::RunSupervisor>,
+        principal: Principal,
+        session_id: String,
+        input: String,
+        request_id: Option<String>,
+        now: u64,
+    ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        self.execute_submission_owned_with_knowledge(
+            port, events, supervisor, principal, session_id, input, request_id, None, now,
+        )
+        .await
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub async fn execute_submission_owned_with_knowledge<P: StoragePort + 'static>(
+        self: &std::sync::Arc<Self>,
+        port: std::sync::Arc<P>,
+        events: std::sync::Arc<EventService>,
+        supervisor: std::sync::Arc<crate::runs::RunSupervisor>,
+        principal: Principal,
+        session_id: String,
+        input: String,
+        request_id: Option<String>,
+        knowledge: Option<KnowledgeSelection>,
+        now: u64,
+    ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        let this = std::sync::Arc::clone(self);
+        // 每次调用独立创建对象，不能凭会话名扫描或取消另一次请求。
+        let scope = CancelScope::run_root("foreground-submission");
+        let mut disconnect = ForegroundDisconnectGuard(Some(scope.clone()));
+        let result = tokio::spawn(async move {
+            this.execute_submission_with_parent(
+                port.as_ref(),
+                events.as_ref(),
+                supervisor.as_ref(),
+                &principal,
+                &session_id,
+                &ExecuteSubmission {
+                    knowledge: knowledge.as_ref(),
+                    input: &input,
+                    request_id: request_id.as_deref(),
+                },
+                now,
+                Some(&scope),
+            )
+            .await
+        })
+        .await;
+        disconnect.0 = None;
+        result.map_err(|e| {
+            SessionExecuteError::Storage(StorageError::Internal {
+                detail: format!("session execution task failed: {e}"),
+            })
+        })?
+    }
+
     /// The BACKGROUND submission surface (R03-T06 deliverable 后台提交接
     /// 口): the SAME admission chain (ownership → busy gate → requestId
     /// dedup), but the drive is spawned as a DETACHED supervised task of
@@ -847,6 +1128,7 @@ impl SessionStore {
         // of the detached drive all consume this ONE canonical fact.
         let canonical_request_id = canonicalize_submission_request_id(submission.request_id)?;
         let submission = ExecuteSubmission {
+            knowledge: submission.knowledge,
             input: submission.input,
             request_id: canonical_request_id.as_deref(),
         };
@@ -875,7 +1157,7 @@ impl SessionStore {
         // capacity) retracts the reservation here because nothing was
         // spawned and nothing was written (a loud refusal, never a fake
         // acceptance).
-        crate::background::spawn_background_drive(
+        let started = crate::background::spawn_background_drive_with_started(
             supervisor,
             storage,
             events,
@@ -888,12 +1170,22 @@ impl SessionStore {
             DriveAuthorization::user_submission(
                 submission.request_id,
                 self.gate.permission_mode(session_id),
-            ),
+            )
+            .with_knowledge(submission.knowledge.cloned()),
             binding,
             now_ms,
             lease,
         )
         .map_err(|rejected| SessionExecuteError::BackgroundRegistryFull { cap: rejected.cap })?;
+        // 受理回执必须已有权威运行记录；Drop只丢通知，不触碰后台取消树。
+        started
+            .await
+            .map_err(|_| {
+                SessionExecuteError::Storage(StorageError::Conflict {
+                    detail: "background_start_unconfirmed".into(),
+                })
+            })?
+            .map_err(SessionExecuteError::from)?;
 
         tracing::info!(
             run_id = %run_id,
@@ -978,6 +1270,15 @@ impl SessionStore {
         if !Self::can_access(principal, &row.owner_user_id) {
             return Err(SessionExecuteError::Forbidden);
         }
+        match (self.storage_admission.clone(), port.session_admission()) {
+            (Some(expected), Some(actual)) if std::sync::Arc::ptr_eq(&expected, &actual) => {}
+            (None, None) => {} // 仅非权威内存端口保留原测试边界。
+            _ => {
+                return Err(SessionExecuteError::Storage(StorageError::Conflict {
+                    detail: "session_storage_binding_mismatch".into(),
+                }))
+            }
+        }
         let agent_id = row.agent_id;
 
         // R03-T04 admission. The synchronous admission closure acquires the
@@ -1030,6 +1331,7 @@ impl SessionStore {
 
         let Some(raw) = submission.request_id else {
             let (run_id, lease) = admission()?;
+            self.recheck_admitted(principal, session_id).await?;
             return Ok(AdmissionOutcome::Admitted {
                 run_id,
                 lease,
@@ -1046,7 +1348,21 @@ impl SessionStore {
             session_id: session_id.to_string(),
             request_id: request_id.clone(),
         };
-        let digest = crate::dedup::normalized_request_digest_hex(submission.input);
+        let input_digest = crate::dedup::normalized_request_digest_hex(submission.input);
+        let digest = match submission.knowledge {
+            None => input_digest,
+            Some(selection) => {
+                let selection = selection
+                    .canonicalized()
+                    .map_err(SessionExecuteError::Storage)?;
+                let encoded = serde_json::to_string(&(input_digest, selection)).map_err(|e| {
+                    SessionExecuteError::Storage(StorageError::InvalidRequest {
+                        detail: e.to_string(),
+                    })
+                })?;
+                crate::dedup::normalized_request_digest_hex(&encoded)
+            }
+        };
 
         // R03 repair G04/F05 (C05), extended by RR2/F05-01 — the
         // cross-restart same-key contract over the CANONICAL logical key.
@@ -1256,6 +1572,23 @@ impl SessionStore {
                     admitted,
                     binding,
                 })) => {
+                    if let Err(err) = self
+                        .backend
+                        .find_request_binding_erased(
+                            session_id,
+                            kernel_principal.storage_kind(),
+                            &kernel_principal.storage_subject(),
+                            &request_id,
+                        )
+                        .await
+                    {
+                        binding.release_not_started();
+                        return Err(SessionExecuteError::Storage(err));
+                    }
+                    if let Err(err) = self.recheck_admitted(principal, session_id).await {
+                        binding.release_not_started();
+                        return Err(err);
+                    }
                     return Ok(AdmissionOutcome::Admitted {
                         run_id,
                         lease: admitted,
@@ -1417,9 +1750,25 @@ impl SessionStore {
         if !Self::can_access(principal, &row.owner_user_id) {
             return Err(SessionExecuteError::Forbidden);
         }
+        let _permit = self.gate.mutation_permit(session_id).map_err(|e| match e {
+            crate::session_supervisor::BusyGateError::Busy => SessionExecuteError::Busy,
+            crate::session_supervisor::BusyGateError::RegistryFull => {
+                SessionExecuteError::SessionRegistryFull
+            }
+        })?;
+        self.recheck_admitted(principal, session_id).await?;
+        self.backend
+            .persist_permission_erased(session_id, mode)
+            .await
+            .map_err(SessionExecuteError::Storage)?;
         self.gate
-            .set_permission_mode(session_id, mode)
-            .map_err(|_| SessionExecuteError::SessionRegistryFull)
+            .set_permission_mode_admitted(session_id, mode)
+            .map_err(|e| match e {
+                crate::session_supervisor::BusyGateError::Busy => SessionExecuteError::Busy,
+                crate::session_supervisor::BusyGateError::RegistryFull => {
+                    SessionExecuteError::SessionRegistryFull
+                }
+            })
     }
 
     /// Reads the lineage of one run under the SAME ownership rule as every
@@ -1492,7 +1841,7 @@ impl From<SessionFacts> for SessionView {
     }
 }
 
-fn kernel_principal_of(principal: &Principal) -> KernelPrincipal {
+pub(crate) fn kernel_principal_of(principal: &Principal) -> KernelPrincipal {
     match principal.kind {
         PrincipalKind::LocalUser => KernelPrincipal::LocalUser,
         PrincipalKind::Device => KernelPrincipal::Device {
@@ -2257,6 +2606,7 @@ mod tests {
         let (events, dir) = event_service_for_test().await;
         let owner = owner_principal();
         let submission = ExecuteSubmission {
+            knowledge: None,
             input: "hello",
             request_id: Some("unit-c02"),
         };
@@ -2499,6 +2849,7 @@ mod tests {
         let (events, dir) = event_service_for_test().await;
         let owner = owner_principal();
         let submission = ExecuteSubmission {
+            knowledge: None,
             input: "hello",
             request_id: Some("unit-c03"),
         };
@@ -2549,6 +2900,7 @@ mod tests {
         }
         // Changed content under the same key still conflicts.
         let changed = ExecuteSubmission {
+            knowledge: None,
             input: "changed",
             request_id: Some("unit-c03"),
         };

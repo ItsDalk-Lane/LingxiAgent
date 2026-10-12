@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-11T09:43:36.659807+00:00",
+  "workspace": "/Users/study_superior/.codex/worktrees/r06-w09-execution/LingxiAgent",
+  "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "status": "PREPARED_NO_EXECUTOR_DISPATCHED_SLOT_PENDING",
+  "role": "ROOT_WORKSPACE_INPUT_PREPARATION_NOT_EXECUTOR_OR_REVIEWER",
+  "original_lock_sha": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "product_inputs": "approved bc only; no W01/W03/W06/W10/W12 unaccepted products copied",
+  "user_settings_copied": false,
+  "target": "own future rust/target, not symlink",
+  "node_modules": "shared installed read-only dependencies symlink",
+  "guard": "8192 MiB / 600 seconds, locked -j8, effective unique synthetic home every run",
+  "same_family_dependencies": "W10 and W12 overlap pending; precise later mechanical integration/fresh validation required, no inheritance of PASS"
+}

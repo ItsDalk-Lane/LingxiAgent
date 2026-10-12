@@ -1,0 +1,206 @@
+{"argv": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-adapters", "--test", "knowledge_store_r06t07", "--test", "r06_ar_f12_cache_preservation", "-p", "lingxi-service", "--test", "r06_ar_f12_cache_consumers", "--test", "r06_t07_knowledge", "--test", "r06_t07_knowledge_tools", "--", "--nocapture"], "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3", "start_utc": "2026-10-11T07:19:54.626697+00:00", "candidate": {"owned": [{"path": "rust/crates/lingxi-adapters/src/storage/knowledge.rs", "sha256": "13823120a29ca0f7767a845666c7584f56da825eec0d551bf5667e6e4f7fb347"}, {"path": "rust/crates/lingxi-service/src/knowledge.rs", "sha256": "3f98131c88c8c1c1945a87752f1702d2cfb75ffdf2454e0d88d4554edbd3c370"}, {"path": "lib/knowledge/vector-index-adapter.ts", "sha256": "33bfb74fb7b6450bebf972ede91a8d3442ce7f8baf629813bcd49c6eb65525c7"}, {"path": "lib/knowledge/knowledge-index-store.ts", "sha256": "81322defc4c3f5693efefd87939e7e4068d1d27b81d68da43699f2d534dc43e2"}, {"path": "lib/knowledge/ann-index-store.ts", "sha256": "9297282eb1609a850aadec2bd8044351897791bf22c8fe80ce4580d27a547ac9"}, {"path": "lib/knowledge/vector-search-backend-factory.ts", "sha256": "54aeefa97965fe574859085616cc74070405489cce5557c2f29abb406fb2d74d"}, {"path": "rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs", "sha256": "db9fa3f9d0052fe4e0bf285d422485eb6a3df6c3d00a91f6a33ecb1623e737fd"}, {"path": "rust/crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs", "sha256": "bd4b3d7b711e20aac3e56e4ca87b632bb804e4f265eedd0bfd2be218ad0e17e0"}, {"path": "tests/r06-ar-f12-vector-cache-preservation.test.ts", "sha256": "5eb1a93524ce4eabf542229f7c68e960b37b8062f908eaf29596721b8908b773"}, {"path": "tests/r06-ar-f12-fulltext-cache-preservation.test.ts", "sha256": "9973a3161d4d4bf7cf7ed4f079fdd45b22b1616be69d7408c1054f2bebbd6f59"}, {"path": "tests/r06-ar-f12-ann-cache-preservation.test.ts", "sha256": "9eab3eb62a547a9753557b735305a7c411744755dc033a3e95bbc7396faa35e7"}], "aggregate": "c871be5b0c751ff47e01cbec8383f95627b49037f8184a3102c31a9e8f0dd989", "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4"}, "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O", "target": "/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent/rust/target", "guard": "8192MiB/600s+parent600s", "executable": "/Users/study_superior/.cargo/bin/cargo", "executable_sha256": "ec1b9233e7f72990ecd8e62063fa7f6c3dfc2bec8e97f88bff165f9100ac696a", "mock_boundary": "Only loopback embedding provider responses; actual SQLite/storage/worker/gateway/messages"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/knowledge_store_r06t07.rs (rust/target/debug/deps/knowledge_store_r06t07-0cbb88bd577147fb)
+LINGXI_TEST_GUARD: armed (pid 6702, mem_limit=8192 MB, time_limit=600 s)
+
+running 9 tests
+test identity_algorithms_are_deterministic_and_frozen ... ok
+test vector_store_dimension_gate_refuses_mixed_search ... ok
+test research_engine_tables_are_absent_from_the_new_store ... ok
+test index_store_fingerprint_gate_and_fts_search ... ok
+test schema_newer_fails_loud ... ok
+test citation_roundtrip_and_offsets ... ok
+test ingestion_job_lifecycle_and_delete_wins ... ok
+test facts_store_crud_membership_and_turn_scope_freeze ... ok
+test cache_corruption_resets_only_the_cache_file ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/r06_ar_f12_cache_preservation.rs (rust/target/debug/deps/r06_ar_f12_cache_preservation-0adeb7f2ac6b53e6)
+LINGXI_TEST_GUARD: armed (pid 6703, mem_limit=8192 MB, time_limit=600 s)
+
+running 22 tests
+test c02_io_child ... ok
+test future_crash_child ... ok
+test guard_holder_child ... ok
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/positive-6703-1791703195589678000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/symlink-6703-1791703195589322000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/sentinel-6703-1791703195591264000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/rebuild-failure-6703-1791703195589533000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/active-6703-1791703195589530000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/io-limit-6703-1791703195589446000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/locked-6703-1791703195589331000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/close-future-wal-6703-1791703195589538000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/old-handles-6703-1791703195589535000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/crashed-future-6703-1791703195589321000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/quarantine-6703-1791703195589542000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/permission-6703-1791703195589332000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/unowned-6703-1791703195589484000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/rollback-normal-6703-1791703195589711000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/knowledge_index.db-6703-1791703195589328000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/other-process-6703-1791703195589465000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/future-wal-6703-1791703195589320000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/sqlite-lock-protocol-6703-1791703195589709000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/reset-6703-1791703195589709000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/hardlink-6703-1791703195600580000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/wal-corrupt-6703-1791703195609080000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/sentinel-6703-1791703195606678000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/symlink-6703-1791703195616281000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/sentinel-6703-1791703195617211000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/hardlink-6703-1791703195618168000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/sentinel-6703-1791703195618369000
+test adversarial_symlink_and_hardlink_never_touch_external_target ... ok
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/knowledge_vector.db-6703-1791703195625315000
+test sqlite_initialization_lock_protocol_retains_lock_until_wal_then_releases_it ... ok
+test c01_future_schema_preserves_sentinel_in_both_caches ... ok
+{"files":[{"bytes":32,"header":"65787465726e616c2d636f7272757074696f6e2d7768696c652d616374697665","sha256":"334e04911695e88a51581e30e5a8525c63d7c8860c193eeef96dc8a1535a4116","suffix":""},{"bytes":49472,"header":null,"sha256":"a264c7a72ba0225b800d0907b1c94aebeccc6abdf5d5cdcc11b51a029907bbc0","suffix":"-wal"},{"bytes":32768,"LINGXI_TEST_GUARD: armed (pid 6708, mem_limit=8192 MB, time_limit=600 s)
+header":null,"sha256":"45cd631639c01b7635d576b6b7f2c09884ae7f0f05af518e0b974c7dcdd5242b","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/active-6703-1791703195589530000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"filestest reset_and_delete_artifact_keep_live_inode_and_other_source_index ... ok
+":[{"bytes":49152,"header":"53514c69746520666f726d61742033001000020200402020000000030000000c00000000000000000000000a00000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000003002e95ca","sha256":"ab4743b9f2a821518e936d7640a94f91bf064cd939ca0c43e2a5393c9747e8bf","suffix":""}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/permission-6703-1791703195589332000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":4096,"header":"53514c69746520666f726d61742033001000020200402020000000020000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002002e95ca","sha256":"e551f3875261cb6cc21af3cd0f9d4ce695dc8ad0c36d794d031cab2a71946f30","suffix":""},{"bytes":65952,"header":null,"sha256":"211df45bd667cc15ea429025ac98cd84561926f8cfee777998dc4eca212d7db8","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"8e8ef57a6209c84716040b63337d6976b660dd317030d4e9850633ab76b27b2e","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/close-future-wal-6703-1791703195589538000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":30,"header":"636f6e6669726d6564206f6c6420636163686520636f7272757074696f6e","sha256":"86513df1e6cb4ccdff1c92d15ef9654f10b774de42c13e3623f49761e8fe646e","suffix":""},{"bytes":34,"header":null,"sha256":"3fbaf0a35e105646c6eb42d4b9267f842f58ac302c52535760d9d396e9d9d666","suffix":"-wal"}test c04_existing_old_handles_cannot_write_after_schema_upgrade ... ok
+],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/wal-corrupt-6703-1791703195609080000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":32,"header":"65787465726e616c2d636f7272757074696f6e2d7768696c652d616374697665","sha256":"334e04911695e88a51581e30e5a8525c63d7c8860c193eeef96dc8a1535a4116","suffix":""},{"bytes":49472,"header":null,"sha256":"a264c7a72ba0225b800d0907b1c94aebeccc6abdf5d5cdcc11b51a029907bbc0","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"45cd631639c01b7635d576b6b7f2c09884ae7f0f05af518e0b974c7dcdd5242b","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/active-6703-1791703195589530000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":49152,"header":"53514c69746520666f726d61742033001000020200402020000000030000000c00000000000000000000000a00000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000003002e95ca","sha256":"ab4743b9f2a821518e936d7640a94f91bf064cd939ca0c43e2a5393c9747e8bf","suffix":""},{"bytes":16512,"header":null,"sha256":"8d7b9e6b9ff76d717ba8e479ef66093cde44236c85631fc0b759c5e89cbe87fd","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"ce2038d9dab33153f5dcaaa83612c2b1bd37fbec764966ea74e62f6f11cb4cd8","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/crashed-future-6703-1791703195589321000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":49152,"header":"53514c69746520666f726d61742033001000020200402020000000030000000c00000000000000000000000a00000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000003002e95ca","sha256":"ab4743b9f2a821518e936d7640a94f91bf064cd939ca0c43e2a5393c9747e8bf","suffix":""}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/permission-6703-1791703195589332000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+rebuild failure child exit status: 0 
+running 1 test
+test c02_io_child ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.01s
+
+ LINGXI_TEST_GUARD: armed (pid 6707, mem_limit=8192 MB, time_limit=600 s)
+
+{"files":[{"bytes":49152,"header":"53514c69746520666f726d61742033001000020200402020000000030000000c00000000000000000000000a00000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000003002e95ca","sha256":"ab4743b9f2a821518e936d7640a94f91bf064cd939ca0c43e2a5393c9747e8bf","suffix":""},{"bytes":16512,"header":null,"sha256":"9e49ba38dc5ec21d7645e581423e2fd564a56f6a3f5fdcb77593de8ae1313522","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"1536cc134cf29109e440643df0b48a2a5ecb80c72484febb02d46d8308d641a4","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/future-wal-6703-1791703195589320000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":53248,"header":"53514c69746520666f726d61742033001000010100402020000000060000000d00000000000000000000000b00000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000006002e95ca","sha256":"ccbe0a88b03c2c95176f5d974d9569c72f9d97a16a3011c0b5f689522828b35b","suffix":""}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/locked-6703-1791703195589331000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+I/O child status=exit status: 0 stdout=
+running 1 test
+test c02_io_child ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.00s
+
+ stderr=LINGXI_TEST_GUARD: armed (pid 6710, mem_limit=8192 MB, time_limit=600 s)
+
+{"files":[{"bytes":39,"header":"64616d616765642d7768696c652d6f746865722d70726f636573732d686f6c64732d73746f7265","sha256":"d24215119a6fa8309cbf45ebc6276e49d7be52fde548d505818d8f2f91e713f1","suffix":""},{"bytes":4152,"header":null,"sha256":"58e917ada6dfe54cc422eb8663d26daa772eed2f53bfb7199c1a68c536e44b36","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"a78f61362fd24c2a074c02ffff1d7602307dfcb3aa70c9013947751e7adfd906","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/other-process-6703-1791703195589465000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":4096,"header":"53514c69746520666f726d61742033001000020200402020000000020000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002002e95ca","sha256":"e551f3875261cb6cc21af3cd0f9d4ce695dc8ad0c36d794d031cab2a71946f30","suffix":""},{"bytes":65952,"header":null,"sha256":"211df45bd667cc15ea429025ac98cd84561926f8cfee777998dc4eca212d7db8","suffix":"-wal"},{"bytes":32768,"header":null,"sha256test positive_normal_cache_open_and_reopen ... ok
+":"c3b0e7f370d5cb194076850960d61a04b0c38bc5d3d1e882b1f3474452213789","suffix":"-shm"}],"path":"test positive_system_temp_alias_root_is_supported_without_dropping_nofollow ... ok
+/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/close-future-wal-6703-1791703195589538000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":30,"header":"636f6e6669726d6564206f6c6420636163686520636f7272757074696f6e","sha256":"86513df1e6cb4ccdff1c92d15ef9654f10b774de42c13e3623f49761e8fe646e","suffix":""},{"bytes":34,"header":null,"sha256":"3fbaf0a35e105646c6eb42d4b9267f842f58ac302c52535760d9d396e9d9d666","suffix":"-wal"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/wal-corrupt-6703-1791703195609080000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/active-6703-1791703195738561000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/rebuild-failure-6703-1791703195743557000
+{"files":[{"bytes":49152,"header":"53514c69746520666f726d61742033001000020200402020000000030000000c00000000000000000000000a00000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000003002e95ca","sha256":"ab4743b9f2a821518e936d7640a94f91bf064cd939ca0c43e2a5393c9747e8bf","suffix":""},{"bytes":16512,"header":null,"sha256":"8d7b9e6b9ff76d717ba8e479ef66093cde44236c85631fc0b759c5e89cbe87fd","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"b65c68e88da139e8b615a0b676afb60b7e56c0e5a2962e673a47c26d54ddba9c","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/crashed-future-6703-1791703195589321000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":49152,"header":"53514c69746520666f726d61742033001000020200402020000000030000000c00000000000000000000000a00000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000003002e95ca","sha256":"ab4743b9f2a821518e936d7640a94f91bf064cd939ca0c43e2a5393c9747e8bf","suffix":""},{"bytes":16512,"header":null,"sha256":"9e49ba38dc5ec21d7645e581423e2fd564a56f6a3f5fdcb77593de8ae1313522","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"1536cc134cf29109e440643df0b48a2a5ecb80c72484febb02d46d8308d641a4","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/future-wal-6703-1791703195589320000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":39,"header":"64616d616765642d7768696c652d6f746865722d70726f636573732d686f6c64732d73746f7265","sha256":"d24215119a6fa8309cbf45ebc6276e49d7be52fde548d505818d8f2f91e713f1","suffix":""},{"bytes":4152,"header":null,"sha256":"58e917ada6dfe54cc422eb8663d26daa772eed2f53bfb7199c1a68c536e44b36","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"a78f61362fd24c2a074c02ffff1d7602307dfcb3aa70c9013947751e7adfd906","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/other-process-6703-1791703195589465000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/rollback-normal-6703-1791703195771611000
+{"files":[{"bytes":4096,"header":"53514c69746520666f726d61742033001000020200402020000000020000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002002e95ca","sha256":"e551f3875261cb6cc21af3cd0f9d4ce695dc8ad0c36d794d031cab2a71946f30","suffix":""},{"bytes":65952,"header":null,"sha256":"211df45bd667cc15ea429025ac98cd84561926f8cfee777998dc4eca212d7db8","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"d2aab46ce4bfd593110490f4f4f41116b04a45d37d866680b3f885c69185e307","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/close-future-wal-6703-1791703195589538000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/unowned-6703-1791703195772032000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/permission-6703-1791703195776957000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/io-limit-6703-1791703195783427000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/crashed-future-6703-1791703195788593000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/future-wal-6703-1791703195795158000
+{"files":[{"bytes":32,"header":"65787465726e616c2d636f7272757074696f6e2d7768696c652d616374697665","sha256":"334e04911695e88a51581e30e5a8525c63d7c8860c193eeef96dc8a1535a4116","suffix":""},{"bytes":28872,"header":null,"sha256":"a37818f58bdf796dbaea620bf32c9dda8d44f0892423cf95dec9f7e9746eb107","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"15f7f94f7a0f37f28edb7c70165aa795ab71fa1a49f1abbc6e7c2ae8703a83f8","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/active-6703-1791703195738561000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/other-process-6703-1791703195801642000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/wal-corrupt-6703-1791703195806737000
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/close-future-wal-6703-1791703195807941000
+rebuild failure child exit status: 0 
+running 1 test
+test c02_io_child ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.02s
+
+ LINGXI_TEST_GUARD: armed (pid 6711, mem_limit=8192 MB, time_limit=600 s)
+
+test c03_rebuild_io_failure_keeps_quarantined_original ... ok
+{"files":[{"bytes":32,"header":"65787465726e616c2d636f7272757074696f6e2d7768696c652d616374697665","sha256":"334e04911695e88a51581e30e5a8525c63d7c8860c193eeef96dc8a1535a4116","suffix":""},{"bytes":28872,"header":null,"sha256":"a37818f58bdf796dbaea620bf32c9dda8d44f0892423cf95dec9f7e9746eb107","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"15f7f94f7a0f37f28edb7c70165aa795ab71fa1a49f1abbc6e7c2ae8703a83f8","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/active-6703-1791703195738561000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+test c04_active_production_store_blocks_corruption_quarantine ... ok
+{"files":[{"bytes":28672,"header":"53514c69746520666f726d61742033001000020200402020000000030000000700000000000000000000000300000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000003002e95ca","sha256":"f877c56c6166b72bcf5d1219caec34f74dc639c54186e725937fcd676cb5f726","suffix":""}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/permission-6703-1791703195776957000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":30,"header":"636f6e6669726d6564206f6c6420636163686520636f7272757074696f6e","sha256":"86513df1e6cb4ccdff1c92d15ef9654f10b774de42c13e3623f49761e8fe646e","suffix":""},{"bytes":34,"header":null,"sha256":"3fbaf0a35e105646c6eb42d4b9267f842f58ac302c52535760d9d396e9d9d666","suffix":"-wal"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/wal-corrupt-6703-1791703195806737000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/quarantine-6703-1791703195876421000
+{"files":[{"bytes":28672,"header":"53514c69746520666f726d61742033001000020200402020000000030000000700000000000000000000000300000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000003002e95ca","sha256":"f877c56c6166b72bcf5d1219caec34f74dc639c54186e725937fcd676cb5f726","suffix":""}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/permission-6703-1791703195776957000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+LINGXI_TEST_GUARD: armed (pid 6713, mem_limit=8192 MB, time_limit=600 s)
+{"files":[{"bytes":28672,"header":"53514c69746520666f726d61742033001000020200402020000000030000000700000000000000000000000300000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000003002e95ca","sha256":"f877c56c6166b72bcf5d1219caec34f74dc639c54186e725937fcd676cb5f726","suffix":""},{"bytes":16512,"header":null,"sha256":"7accc06b22bcea519122938d55af962215b903afbd1d76aecf367efdf3d76744","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"219635140001ee86e78d8c68c7c90086cfb96e8872ea40518d0c112ecbdd33da","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/crashed-future-6703-1791703195788593000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":30,"header":"636f6e6669726d6564206f6c6420636163686520636f7272757074696f6e","sha256":"86513df1e6cb4ccdff1c92d15ef9654f10b774de42c13e3623f49761e8fe646e","suffix":""},{"bytes":34,"header":null,"sha256":"3fbaf0a35e105646c6eb42d4b9267f842f58ac302c52535760d9d396e9d9d666","suffix":"-wal"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/wal-corrupt-6703-1791703195806737000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":4096,"header":"test c03_unknown_corruption_and_wal_never_auto_rebuild ... ok
+53514c69746520666f726d61742033001000020200402020000000020000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002002e95ca","sha256":"e551f3875261cb6cc21af3cd0f9d4ce695dc8ad0c36d794d031cab2a71946f30","suffix":""},{"bytes":45352,"header":null,"sha256":"b2690d37c25a17236d54c01ff0a141f52d8373715386a380fb23ae0657ddcfa4","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"3a8fb42a3f214bb3032198fe64f612f0ee5c453fcd3a760846a4c0ca9b551a9f","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/close-future-wal-6703-1791703195807941000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":28672,"header":"53514c69746520666f726d61742033001000020200402020000000030000000700000000000000000000000300000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000003002e95ca","sha256":"f877c56c6166b72bcf5d1219caec34f74dc639c54186e725937fcd676cb5f726","suffix":""},{"bytes":16512,"header":null,"sha256":"0afa7a782172a1f4ec6dfc2d53139ad030a49f8cd610d0560d71c4ba68d44e58","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"8d87c67f4cec0284bd4f1475d5d436e1b83e325f31f878f40232efffb8390baf","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/future-wal-6703-1791703195795158000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":28672,"header":"53514c69746520666f726d61742033001000020200402020000000030000000700000000000000000000000300000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000003002e95ca","sha256":"f877c56c6166b72bcf5d1219caec34f74dc639c54186e725937fcd676cb5f726","suffix":""},{"bytes":16512,"header":null,"sha256":"7accc06b22bcea519122938d55af962215b903afbd1d76aecf367efdf3d76744","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"test c02_permission_errors_preserve_cache ... ok
+4eb571edaa1561b6060bc2dd2fb8d70480270bad148df1490216d1b726546017","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/crashed-future-6703-1791703195788593000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":4096,"header":"test c01_crashed_future_wal_is_not_checkpointed_by_rejection ... ok
+53514c69746520666f726d61742033001000020200402020000000020000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002002e95ca","sha256":"e551f3875261cb6cc21af3cd0f9d4ce695dc8ad0c36d794d031cab2a71946f30","suffix":""},{"bytes":45352,"header":null,"sha256":"b2690d37c25a17236d54c01ff0a141f52d8373715386a380fb23ae0657ddcfa4","suffix":"-wal"},{"bytes":32768,"header":null,test c04_supported_rollback_caches_switch_wal_and_release_initialization_locks ... ok
+"sha256":"3ca5e48ec3dd8608a67645acd670abd0af414f7e719a5005cc60afe91ee52358","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/close-future-wal-6703-1791703195807941000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":39,"header":"64616d616765642d7768696c652d6f746865722d70726f636573732d686f6c64732d73746f7265","sha256":"d24215119a6fa8309cbf45ebc6276e49d7be52fde548d505818d8f2f91e713f1","suffix":""},{"bytes":4152,"header":null,"sha256":"e57e5674358bb955a8398a8c117fbd9ce5f7830606e0ca98d5561575f66a8181","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"f7b5394ac3f0011b8676f8918c814efec5cc5a55ee2c0d397b5bb60aaeaf993b","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/other-process-6703-1791703195801642000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+I/O child status=exit status: 0 stdout=
+running 1 test
+test c02_io_child ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.00s
+
+ stderr=LINGXI_TEST_GUARD: armed (pid 6714, mem_limit=8192 MB, time_limit=600 s)
+
+{"files":[{"bytes":28672,"header":"53514c69746520666f726d61742033001000020200402020000000030000000700000000000000000000000300000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000003002e95ca","sha256":"f877c56c6166b72bcf5d1219caec34f74dc639c54186e725937fcd676cb5f726","suffix":""},{"bytes":16512,"header":null,"sha256":"0afa7a782172a1f4ec6dfc2d53139ad030a49f8cd610d0560d71c4ba68d44e58","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"8d87c67f4cec0284bd4f1475d5d436e1b83e325f31f878f40232efffb8390baf","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/future-wal-6703-1791703195795158000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":39,"header":"64616d616765642d7768696c652d6f746865722d70726f636573732d686f6c64732d73746f7265","sha256":"d24215119a6fa8309cbf45ebc6276e49d7be52fde548d505818d8f2f91e713f1","suffix":""},{"bytes":4152,"header":null,"sha256":"e57e5674358bb955a8398a8c117fbd9ce5f7830606e0ca98d5561575f66a8181","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"test c01_future_wal_live_writer_preserves_all_bytes ... ok
+f7b5394ac3f0011b8676f8918c814efec5cc5a55ee2c0d397b5bb60aaeaf993b","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/other-process-6703-1791703195801642000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":4096,"header":"53514c69746520666f726d61742033001000020200402020000000020000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002002e95ca","sha256":"e551f3875261cb6cc21af3cd0f9d4ce695dc8ad0c36d794d031cab2a71946f30","suffix":""},{"bytes":45352,"header":null,"sha256":"b2690d37c25a17236d54c01ff0a141f52d8373715386a380fb23ae0657ddcfa4","suffix":"-wal"},{"bytes":32768,"header":null,"sha256":"test c04_other_process_production_handle_prevents_quarantine ... ok
+a581e59124d1613ee947863713457ea87c8446f7ecaac352578c6ecb43629252","suffix":"-shm"}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/close-future-wal-6703-1791703195807941000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+test c02_actual_io_limit_preserves_original ... ok
+test c04_old_handles_close_without_checkpointing_future_wal_after_upgrader_closes ... ok
+test c03_owned_corruption_quarantines_only_one_cache_and_preserves_sources_and_vectors ... ok
+{"files":[{"bytes":53248,"header":"53514c69746520666f726d61742033001000010100402020000000060000000d00000000000000000000000b00000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000006002e95ca","sha256":"ccbe0a88b03c2c95176f5d974d9569c72f9d97a16a3011c0b5f689522828b35b","suffix":""}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/locked-6703-1791703195589331000/knowledge_index.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/locked-6703-1791703201080722000
+{"files":[{"bytes":32768,"header":"53514c69746520666f726d61742033001000010100402020000000060000000800000000000000000000000400000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000006002e95ca","sha256":"c67b3b17e4a98397839f2a0662e27141ba40ed460f63b31b4ef3d2110013dbe6","suffix":""}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/locked-6703-1791703201080722000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+{"files":[{"bytes":32768,"header":"53514c69746520666f726d61742033001000010100402020000000060000000800000000000000000000000400000004000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000006002e95ca","sha256":"c67b3b17e4a98397839f2a0662e27141ba40ed460f63b31b4ef3d2110013dbe6","suffix":""}],"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-final-tests-03-i7otiwl3/locked-6703-1791703201080722000/knowledge_vector.db","phase":"ACTUAL_SQLITE_FILE_SNAPSHOT"}
+test c02_sqlite_exclusive_lock_refuses_without_removal ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.87s
+
+     Running tests/r06_ar_f12_cache_consumers.rs (rust/target/debug/deps/r06_ar_f12_cache_consumers-b74a500b19beb910)
+LINGXI_TEST_GUARD: armed (pid 6757, mem_limit=8192 MB, time_limit=600 s)
+
+running 6 tests
+test deletion_cache_error_is_reported_and_source_original_remains ... ok
+test deletion_of_a_keeps_b_and_removes_all_a_versions ... ok
+test ingestion_normal_positive_keeps_pending_embedding_and_ready_fulltext ... ok
+test ingestion_future_schema_failure_keeps_new_index_status_and_reports_rejection ... ok
+test vector_ingestion_future_write_rejection_retains_paid_batch_and_error_code ... ok
+test vector_ingestion_provider_failure_records_cleanup_version_rejection ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s
+
+     Running tests/r06_t07_knowledge.rs (rust/target/debug/deps/r06_t07_knowledge-7ae0f9c2623b291a)
+LINGXI_TEST_GUARD: armed (pid 6760, mem_limit=8192 MB, time_limit=600 s)
+
+running 11 tests
+test snapshot_content_serves_bytes_with_security_headers ... ok
+test research_engine_tables_are_not_restored ... ok
+test notebook_crud_settings_and_ingestion_summary ... ok
+test citation_resolution_returns_block_snapshot_source_and_viewer ... ok
+test file_import_security_rules ... ok
+test source_delete_is_blocked_while_turn_scope_freezes_it ... ok
+test reingest_membership_and_delete_semantics ... ok
+test import_pasted_text_parses_chunks_and_ingests_with_stub_embeddings ... ok
+test ingestion_without_model_lands_pending_embedding_then_completes_after_reboot ... ok
+test settings_change_triggers_rebuild_and_variants_coexist ... ok
+test a14_switching_to_incompatible_embedding_dimension_refuses_vector_channel_until_rebuild has been running for over 60 seconds
+test a14_switching_to_incompatible_embedding_dimension_refuses_vector_channel_until_rebuild ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 61.02s
+
+     Running tests/r06_t07_knowledge_tools.rs (rust/target/debug/deps/r06_t07_knowledge_tools-98f7b4f145bdffc7)
+LINGXI_TEST_GUARD: armed (pid 7077, mem_limit=8192 MB, time_limit=600 s)
+
+running 6 tests
+test a13_citation_markdown_resolves_to_actual_text has been running for over 60 seconds
+test a13_search_within_scope_returns_only_allowed_sources has been running for over 60 seconds
+test a13_untrusted_source_instructions_stay_material_not_privilege has been running for over 60 seconds
+test knowledge_manage_actions_and_gates has been running for over 60 seconds
+test knowledge_read_pagination_and_grep_outline has been running for over 60 seconds
+test scope_violations_are_loud_not_fallback has been running for over 60 seconds
+test a13_untrusted_source_instructions_stay_material_not_privilege ... ok
+test scope_violations_are_loud_not_fallback ... ok
+test knowledge_read_pagination_and_grep_outline ... ok
+test a13_citation_markdown_resolves_to_actual_text ... ok
+test a13_search_within_scope_returns_only_allowed_sources ... ok
+test knowledge_manage_actions_and_gates ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 80.65s
+

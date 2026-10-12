@@ -1,0 +1,5 @@
+{"command": ["python3", "scripts/rust-tauri/r02_registry_consistency.py"], "start": 1791701067.224874, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-registry-n7sattgt", "guard": "8192MB/600s"}
+FAIL: count mismatch: migrations.rs MIGRATIONS has 9 entries, the registry has 7
+FAIL: v8 (r06_t03_session_tree) exists in migrations.rs MIGRATIONS but is MISSING from the registry
+FAIL: v9 (r06_t05_session_files_resources) exists in migrations.rs MIGRATIONS but is MISSING from the registry
+FAIL: registry consistency — migrations.rs MIGRATIONS and R02-T04_STORAGE_REGISTRY.json disagree (root=/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent)

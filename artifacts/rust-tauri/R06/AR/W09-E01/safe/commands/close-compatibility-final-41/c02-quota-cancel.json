@@ -1,0 +1,67 @@
+{
+  "before": {
+    "counts": {
+      "done": 0,
+      "failed": 0,
+      "pending_embedding": 0,
+      "queued": 0,
+      "running": 1
+    },
+    "jobs": [
+      {
+        "artifactId": "kpa_23a5e73a69ed2876e2ce617e",
+        "attempt": 1,
+        "cancelledAt": null,
+        "chunkerConfigId": "8b93f0aa4fa689af",
+        "createdAt": "2026-10-11T13:09:00.169Z",
+        "embeddingStats": {
+          "abandonedStaleVariantId": null,
+          "actualWrittenChunkCount": 0,
+          "attempt": 1,
+          "callAttemptCount": 1,
+          "chunksNewlyEmbedded": 0,
+          "chunksResumedFromCheckpoint": 0,
+          "chunksReusedFromReadyVariant": 0,
+          "confirmedResponseRequestCount": 0,
+          "failedCallCount": 0,
+          "failedRequestCount": 0,
+          "failedTransportAttemptCount": 0,
+          "knownNotSentAttemptCount": 0,
+          "model": null,
+          "pendingCallIntentCount": 1,
+          "pendingRequestCount": 0,
+          "plannedChunkCount": 65,
+          "previousKnownNotSentAttemptCount": 0,
+          "previousRequestCount": 0,
+          "previousTransportAttemptCount": 0,
+          "requestCount": 0,
+          "requestCountSemantics": "confirmed_or_possibly_sent_excluding_known_not_sent",
+          "resetStaleVectors": false,
+          "successfulRequestCount": 0,
+          "transportAttemptCount": 0,
+          "unknownRequestsFromPreviousAttempt": 0,
+          "unknownSentRequestCount": 0
+        },
+        "error": null,
+        "id": "kjob_3d26c3d07e96abfd03aaab42",
+        "notebookId": "knb_e32e4c0671c0363ceb8b0e7c",
+        "phase": "embed",
+        "progressDone": 0,
+        "progressTotal": 65,
+        "sourceId": "ksrc_108f20808f047e3de7e43747",
+        "status": "running",
+        "updatedAt": "2026-10-11T13:09:00.197Z"
+      }
+    ]
+  },
+  "deleted": {
+    "cancelledJobs": 1,
+    "purge": {
+      "indexVariants": true,
+      "snapshots": true
+    }
+  },
+  "ledger": [],
+  "waiting": 0,
+  "wire": []
+}

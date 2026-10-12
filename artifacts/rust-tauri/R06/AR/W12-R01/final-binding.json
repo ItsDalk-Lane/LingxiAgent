@@ -1,0 +1,114 @@
+{
+  "base": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+  "head": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+  "aggregate": "b20c5613e62946201cc148223ac8dc76cf1beee318c0b0c4869203ca1ed71a16",
+  "aggregate_matches": true,
+  "files": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/knowledge.rs",
+      "candidate_sha256": "e93ce9607943b05b32bf10addfadb47e27abbcc44d2580df55e864d469964212",
+      "candidate_matches": true,
+      "base_sha256": "9ff5675821ab54ca41592c8d6cf211b77263d9b55f9f8cf45c17801863ab4d1d",
+      "base_matches": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/knowledge.rs",
+      "candidate_sha256": "3f12c23d4cc3142943a67acd86671b1d2cadaf51f657ca8fcf98f1e3eddd1944",
+      "candidate_matches": true,
+      "base_sha256": "d9294730241e08c8e2da443cf7fab84e14124fcdc253b3f74a80ffd55b96dc90",
+      "base_matches": true
+    },
+    {
+      "path": "lib/knowledge/vector-index-adapter.ts",
+      "candidate_sha256": "d2902e8b6141a5232e2683c33f998cbeb8c1d596da4cba23709bbd8285f822e5",
+      "candidate_matches": true,
+      "base_sha256": "d0eb6fd3bbb797b461e8448f5dea048fea7ef7e1d2ab5a58f7533f980fb0f655",
+      "base_matches": true
+    },
+    {
+      "path": "lib/knowledge/knowledge-index-store.ts",
+      "candidate_sha256": "eca060010a31ffb6acac5e349fd6a8a72875c59db673bc797ce04e7ddb0862d6",
+      "candidate_matches": true,
+      "base_sha256": "eb8f98b3143dd3f4f73f0148dc142903bf1340a0d5bd9144a2943fca68371bd0",
+      "base_matches": true
+    },
+    {
+      "path": "lib/knowledge/ann-index-store.ts",
+      "candidate_sha256": "d18aace5c86d100e37e2f5932eb184044daabc4dec503800ec43a37264848404",
+      "candidate_matches": true,
+      "base_sha256": "f28c2697092034acf2f0b16a5b617dca6958a5d1ee146623188ddddc154c63c9",
+      "base_matches": true
+    },
+    {
+      "path": "lib/knowledge/vector-search-backend-factory.ts",
+      "candidate_sha256": "54aeefa97965fe574859085616cc74070405489cce5557c2f29abb406fb2d74d",
+      "candidate_matches": true,
+      "base_sha256": "eb98fd47e11125c169b1f3a43a492c3dfd4c82b931161c4a7d79de4e74eedce4",
+      "base_matches": true
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs",
+      "candidate_sha256": "8ae031904f055eff2a444b5c693dfee8872780a350f1ef4141fac1fe11c0b42b",
+      "candidate_matches": true,
+      "base_sha256": null,
+      "base_matches": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs",
+      "candidate_sha256": "2b66d17412719eb907e35bb0698d91477c5b32b9097ddf0014840b654bac4c6f",
+      "candidate_matches": true,
+      "base_sha256": null,
+      "base_matches": true
+    },
+    {
+      "path": "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+      "candidate_sha256": "51f15be7b7f25ad8e74ad4ed056c3da1ad8273c216959f094d11c105bf3efd46",
+      "candidate_matches": true,
+      "base_sha256": null,
+      "base_matches": true
+    },
+    {
+      "path": "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+      "candidate_sha256": "9973a3161d4d4bf7cf7ed4f079fdd45b22b1616be69d7408c1054f2bebbd6f59",
+      "candidate_matches": true,
+      "base_sha256": null,
+      "base_matches": true
+    },
+    {
+      "path": "tests/r06-ar-f12-ann-cache-preservation.test.ts",
+      "candidate_sha256": "9b0b9219934632ff24af69e3a759ea7c35feffad5747a2114a066983f23ac791",
+      "candidate_matches": true,
+      "base_sha256": null,
+      "base_matches": true
+    }
+  ],
+  "binaries": [
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w12-review/LingxiAgent/rust/target/debug/deps/knowledge_store_r06t07-60406ec468abc31a",
+      "sha256": "04fed75e9a82914fbee062cdac39701ac0237d38c8ca9ae0236072acdd9d0273",
+      "bytes": 6934840
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w12-review/LingxiAgent/rust/target/debug/deps/r06_ar_f12_cache_preservation-12406c3bb45b46a5",
+      "sha256": "03d4b98ca65c5ddc816882f6b87e10af01c97e9f8230d7f5e4ab0f7acee29454",
+      "bytes": 6097936
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w12-review/LingxiAgent/rust/target/debug/deps/r06_ar_f12_cache_consumers-b74a500b19beb910",
+      "sha256": "69a380af15f1ebdd763fb47022e9bbc56daa8218146bba0a1fb61ba4d2513def",
+      "bytes": 6256456
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w12-review/LingxiAgent/rust/target/debug/deps/r06_t07_knowledge-7ae0f9c2623b291a",
+      "sha256": "07951fbdec2a9a93ab4fd91525783ce6f9c8cfdd1fef0c1470846d2b339cd14d",
+      "bytes": 84881824
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w12-review/LingxiAgent/rust/target/debug/deps/r06_t07_knowledge_tools-98f7b4f145bdffc7",
+      "sha256": "4f748aaf5fbea460e4b51370c7cfc32cf92278b40dd5dcb3482685f46ad10505",
+      "bytes": 84802408
+    }
+  ],
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "settings_current_sha256": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3"
+}

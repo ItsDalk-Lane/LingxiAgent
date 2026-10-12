@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python3",
+    "scripts/rust-tauri/r02_registry_consistency.py"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-registry-01-twfuceod",
+  "start": 1791699643.350239,
+  "end": 1791699643.399331,
+  "exit_code": 1,
+  "log_sha256": "9f6b8f7e902a7e01b5e4ad2ae15f569c29dba75b62c51631eda82e0e9c8d0d0d"
+}

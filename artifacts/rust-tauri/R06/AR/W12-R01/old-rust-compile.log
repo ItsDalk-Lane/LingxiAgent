@@ -1,0 +1,11 @@
+error[E0433]: cannot find module or crate `getrandom` in this scope
+   --> <anon>:191:5
+    |
+191 |     getrandom::getrandom(&mut bytes).expect("csprng id bytes");
+    |     ^^^^^^^^^ use of unresolved module or unlinked crate `getrandom`
+    |
+    = help: you might be missing a crate named `getrandom`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0433`.

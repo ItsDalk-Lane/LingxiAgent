@@ -325,7 +325,7 @@
     }
   ],
   "stage_review": {
-    "state": "R1_PASS",
+    "state": "SUPERSEDED_PENDING_AR_REVIEW",
     "rounds": [
       {
         "round": "R1",
@@ -344,9 +344,18 @@
         "findings": "F-STAGE-1 OBS（T06-REVIEW-02 缺正式裁决文档→总控已落盘 REVIEW.md 含来源声明）；F-STAGE-2（T05-F-01 归属裁决→已落定申报路线归 R07）；F-STAGE-3 OBS（HANDOFF T08 行→已回填 42038f173）；F-STAGE-4 环境（r00 LAN 既有登记）",
         "verdict": "STAGE_VERDICT: PASS（附条件：总控二选一裁决——本账本更新即其消费记录）"
       }
-    ]
+    ],
+    "historical_state_before_ar": "R1_PASS"
   },
   "final": {
+    "status": "R06_NOT_ACCEPTED",
+    "r06_stage_status": "R06_NOT_ACCEPTED",
+    "audited_base": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+    "authority": "docs/rust-tauri/R06/repair-current/AR_PROGRESS.json",
+    "reason": "本轮R06修复与全新独立验收尚未完成",
+    "R07_READY": false
+  },
+  "historical_final_before_ar": {
     "status": "ACCEPTED",
     "stage_base_sha": "c9cca6020e0990016ee0d14af406766370849a7a",
     "final_head": "36d2efb5a672be42e4b017c5d4a93fe99b1011bf",
@@ -356,6 +365,8 @@
       "36d2efb5a（阶段审查证据）"
     ],
     "r06_stage_status": "R06 ACCEPTED — READY_FOR_R07（不进入 R07）",
-    "accepted_at": "2026-10-11"
+    "accepted_at": "2026-10-11",
+    "superseded_at": "2026-10-11T05:13:44.788435+00:00",
+    "superseded_reason": "2026-10-11用户R06-AR修复规格推翻完整验收结论；F01-F15/60C与原Steps/A/到期叶待有效独立验收，原证据和记录保留。"
   }
 }

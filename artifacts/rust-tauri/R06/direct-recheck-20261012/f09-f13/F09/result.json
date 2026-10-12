@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_w09_embedding_batches-913ec600a6d0e4df",
+    "--exact",
+    "c02_failed_checkpoint_resumes_only_gaps",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "durationSeconds": 1.4171206951141357,
+  "binarySHA256": "807970051c73b8c0e7816c67309072ef088bdffcdaf93c45639dc11a55685a4c",
+  "syntheticHome": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f09-f13/F09/home",
+  "output": "check.log",
+  "currentBinaryConfirmedByParent": true,
+  "formalAcceptance": false
+}

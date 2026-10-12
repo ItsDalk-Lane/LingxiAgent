@@ -120,7 +120,8 @@ async fn submit(
             state.runs(),
             principal,
             session,
-            &ExecuteSubmission { input, request_id },
+            &ExecuteSubmission {
+    knowledge: None, input, request_id },
             1_790_409_600_000,
         )
         .await

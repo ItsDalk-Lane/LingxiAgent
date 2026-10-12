@@ -1,0 +1,1613 @@
+{
+  "schema": "lingxi.r06.scope-source-index.v1",
+  "role": "只读资料核对辅助，不是执行者/Reviewer",
+  "snapshot_time_utc": "2026-10-11T05:28:50.738506+00:00",
+  "candidate_frozen": false,
+  "concurrent_product_edits_possible": true,
+  "scope_gaps": [
+    {
+      "id": "SPEC_GAP-2026-10-08-EXECUTION-PROMPT",
+      "requested_source": "2026-10-08 人类实际发出的原R06执行提示词",
+      "status": "MISSING",
+      "located_alternatives": [
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/92_逐阶段执行提示词.md",
+        "docs/rust-tauri/R06/R06_PROGRESS.json"
+      ],
+      "note": "已定位9月23日R06可复制模板和10月8日台账，但没有找到带日期且可证明为实际原发指令的独立捕获；二者不能冒充原发提示词。",
+      "search_scope": [
+        "仓库含ignored原任务书/任务专属资料",
+        "Downloads中Lingxi任务包与相关文本/HTML",
+        "Desktop/Code已授权任务资料文件名与相关内容；排除缓存/构建/无关个人内容"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/00_README_总入口.md",
+      "sha256": "571a58247fc66a5f8f78ea844a63564037380a2f54644c2dc5c79c739dff0ec9",
+      "bytes": 8803,
+      "lines": 83,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/01_通用执行约束.md",
+      "sha256": "d4f07185735acda91b73a2aa97a42ca7ce5795babf1104968c83671131cf871c",
+      "bytes": 8145,
+      "lines": 79,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/02_目标架构与强制契约.md",
+      "sha256": "53dbf699675d9981b60ea5c982c4d0507afffd5184e6bebac875aae40d173c4d",
+      "bytes": 11718,
+      "lines": 156,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md",
+      "sha256": "6e84fc77a9f3124d51fe4d088fda6c8dcb96989e43d280634b94b7fc1d778560",
+      "bytes": 5882,
+      "lines": 47,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/04_阶段依赖与接口交接.md",
+      "sha256": "940c896508e929ec5f25c2b9020c06c2035c3f9800f43b78b1fd5e303e92bde3",
+      "bytes": 4233,
+      "lines": 66,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/05_验收与性能协议.md",
+      "sha256": "d86c51f4b8571f94f0e9b457e74e79d9281d5c846e7a37d1f39edfdf47324b61",
+      "bytes": 10299,
+      "lines": 115,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/06_风险、技术决策与退出条件.md",
+      "sha256": "6c92962e5bcb739509630eb8c9cf8b96fabf67c0d51315717ae048d9b87786f0",
+      "bytes": 4454,
+      "lines": 37,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/90_源码依据与官方参考.md",
+      "sha256": "893ab89623b26c32843dddd479816cb11bcd2de5369d0afa0d50dfd425c78320",
+      "bytes": 11744,
+      "lines": 323,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/91_交付与独立验收模板.md",
+      "sha256": "4ccdb44990ba0bf7fc216dd866abb4b008a615bfc363a8c107a9799df4b4f6dc",
+      "bytes": 3546,
+      "lines": 63,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/92_逐阶段执行提示词.md",
+      "sha256": "7d4c3f7083db7a69d9f429ac9845f09f4406e2f2180f1e49154a6fef7c57ec06",
+      "bytes": 27711,
+      "lines": 202,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R06_上下文、会话语义、记忆与知识库.md",
+      "sha256": "d54e7fcc638b62fc4303ce4af8f01ba8c358fd1a90d0f85a491bfd4a439bbd2e",
+      "bytes": 17423,
+      "lines": 398,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/acceptance-catalog.json",
+      "sha256": "17c040690f529b9fd757606eeb3bb6f5bc0d21bd0d1e82272db6793a2338125e",
+      "bytes": 122553,
+      "lines": 2818,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/source-registry.json",
+      "sha256": "d6c3caa2e9e46953918ec27d7846b66ddd447c34d6456b6e93f2b21ffa02cea7",
+      "bytes": 10417,
+      "lines": 267,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/stage-handoff.template.json",
+      "sha256": "3a89152e23e30d5b6a30b948a3d5b98bca963fa64938e39b4d2ab50c5ceb802b",
+      "bytes": 506,
+      "lines": 21,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/stage-index.json",
+      "sha256": "e8f47e6c5f0d96c74898e978164c9a98bcfc3d089039222a4223987e59b397d1",
+      "bytes": 23482,
+      "lines": 696,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/task-catalog.json",
+      "sha256": "32ef3502f1a9223bf7f5c509c43973aa96f3983ec86d3ad3c19b8c9acfef1959",
+      "bytes": 275719,
+      "lines": 6918,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/task-result.template.json",
+      "sha256": "6542190ce5ec8e5f03c9bd6a38b7e6042fa42f7c8350a90b9d9b771353bd7ca6",
+      "bytes": 472,
+      "lines": 23,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/01_通用执行约束.md",
+      "sha256": "d4f07185735acda91b73a2aa97a42ca7ce5795babf1104968c83671131cf871c",
+      "bytes": 8145,
+      "lines": 79,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/02_目标架构与强制契约.md",
+      "sha256": "53dbf699675d9981b60ea5c982c4d0507afffd5184e6bebac875aae40d173c4d",
+      "bytes": 11718,
+      "lines": 156,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/03_功能与所有权矩阵.md",
+      "sha256": "6e84fc77a9f3124d51fe4d088fda6c8dcb96989e43d280634b94b7fc1d778560",
+      "bytes": 5882,
+      "lines": 47,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/04_阶段依赖与接口交接.md",
+      "sha256": "940c896508e929ec5f25c2b9020c06c2035c3f9800f43b78b1fd5e303e92bde3",
+      "bytes": 4233,
+      "lines": 66,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/05_验收与性能协议.md",
+      "sha256": "d86c51f4b8571f94f0e9b457e74e79d9281d5c846e7a37d1f39edfdf47324b61",
+      "bytes": 10299,
+      "lines": 115,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/06_风险、技术决策与退出条件.md",
+      "sha256": "6c92962e5bcb739509630eb8c9cf8b96fabf67c0d51315717ae048d9b87786f0",
+      "bytes": 4454,
+      "lines": 37,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R05_模型协议、凭证、流式处理与最小完整闭环.md",
+      "sha256": "a10490c115d00f1f0c5bbcf1a5e2f6b8740397103d8b8ad5cc029a3427f1a3e0",
+      "bytes": 17336,
+      "lines": 397,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R06_上下文、会话语义、记忆与知识库.md",
+      "sha256": "d54e7fcc638b62fc4303ce4af8f01ba8c358fd1a90d0f85a491bfd4a439bbd2e",
+      "bytes": 17423,
+      "lines": 398,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/specification/00_审查结论与使用入口.md",
+      "sha256": "4a4bd44cc15cb1a9ac9e56a41675b3e4d65ebe7bb3d0c1fc2d70802df106f7d6",
+      "bytes": 4188,
+      "lines": 50,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/specification/MANIFEST.sha256",
+      "sha256": "2401c4bec051cec0918e9c28e14bbb0e34f10696256ca37cbcaadf748ec14a4e",
+      "bytes": 810,
+      "lines": 9,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/specification/R06_完整问题清单与修复验收总控提示词.md",
+      "sha256": "0989765e75c4664be1b3c953e466d829339a65346c49f7c245219ae34f7b7d23",
+      "bytes": 95232,
+      "lines": 1220,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/specification/R06_完整问题清单与修复验收总控提示词.txt",
+      "sha256": "0989765e75c4664be1b3c953e466d829339a65346c49f7c245219ae34f7b7d23",
+      "bytes": 95232,
+      "lines": 1220,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/specification/R06_执行结果模板.json",
+      "sha256": "ea6afca5507c06c73c7d644b19881dcdab0a40993878239690b3fe079e8a2f76",
+      "bytes": 568,
+      "lines": 29,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/specification/R06_逐项验收清单.json",
+      "sha256": "4bda70d0e687ce55a5648ddcd4d569d1ee4d9d7a1cb2e947feca4e9b7a3bf421",
+      "bytes": 28387,
+      "lines": 614,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/specification/R06_问题与验收规格.json",
+      "sha256": "8ad43b44979ac0425eb00cd65a4c49091b4c4a16f39127a2aaf20de829b19b1e",
+      "bytes": 78345,
+      "lines": 1297,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/specification/validate_package.py",
+      "sha256": "e309c042bceab268a696cbf8749879e1092d19a1eb8d67665ecb16e1cbbbb2ab",
+      "bytes": 3473,
+      "lines": 56,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/specification/文档规格检查说明.md",
+      "sha256": "d4c8e025722438b163d3b4373a8507009ddca07a247db03090c9b45053f5c17d",
+      "bytes": 739,
+      "lines": 8,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/STAGE-REVIEW-R1/STAGE_REVIEW.md",
+      "sha256": "62c4ef24eb8a6736d0600e61cecf78504079be8615392a8d88dace99dcee5fea",
+      "bytes": 20109,
+      "lines": 186,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/T01-REVIEW-01/REVIEW.md",
+      "sha256": "de5317ef9946f64f89a3e1179e35fa44447eab3e42aab267e4c64d660f42b5f2",
+      "bytes": 17968,
+      "lines": 212,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/T02-REVIEW-01/REVIEW.md",
+      "sha256": "33912d7c65b0ea1d99a57af5991b5ee909f86f6c86743de31b0ea462cf701c84",
+      "bytes": 16938,
+      "lines": 128,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/T02-REVIEW-02/REVIEW.md",
+      "sha256": "01d1151b4e8cb4a67d16880bcbd20a4a3a384dd39af4df8911cd7028bc421465",
+      "bytes": 25317,
+      "lines": 203,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/T02-REVIEW-03/REVIEW.md",
+      "sha256": "91702526dd40586d4770ce65d12629278637ae0139e3448f7bef6657fab86ef3",
+      "bytes": 14165,
+      "lines": 117,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/T02-REVIEW-04/REVIEW.md",
+      "sha256": "f482d0b1ace4f2ffd5a254c2799af8ce9a7f09a1d62da01f558a5c5161304458",
+      "bytes": 17734,
+      "lines": 166,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/T03-REVIEW-01/REVIEW.md",
+      "sha256": "0a15f73412f4090bf0685254ee5c88fc9cc99f86d803091ec3ce9e1d505f78fd",
+      "bytes": 20826,
+      "lines": 194,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/T03-REVIEW-02/REVIEW.md",
+      "sha256": "30002d559bbcaf308787ec0dd3e8383a1f845d5f800f7b144eebe568b6d62b46",
+      "bytes": 27886,
+      "lines": 243,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/T04-REVIEW-01/REVIEW.md",
+      "sha256": "2a37e8abeece05f73d16aa3a75dcf969c4062c6c12cba1a03da45737327df3eb",
+      "bytes": 24720,
+      "lines": 210,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/T05-REVIEW-01/REVIEW.md",
+      "sha256": "d46efc4416bdee31bd68c525332df3bdf3e6502c45ebee6129db0dbe2b858ff7",
+      "bytes": 22235,
+      "lines": 271,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/T06-REVIEW-01/REVIEW.md",
+      "sha256": "6cd025e667a22a8d4327a879e7f31534d64a94ab6fd585e228fe2efa2f3abb26",
+      "bytes": 21309,
+      "lines": 142,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/T06-REVIEW-02/REVIEW.md",
+      "sha256": "7bb86c6524cdb4ee64b6a21f00cac6888b7c3973b7e8e5c4cba00b4120358ff3",
+      "bytes": 7791,
+      "lines": 54,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/T07-REVIEW-01/REVIEW.md",
+      "sha256": "d8e3fc59fcd0deb735351066504b589e6bb3981273ff72276c8710559972e9cd",
+      "bytes": 18904,
+      "lines": 228,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/T08-REVIEW-01/REVIEW.md",
+      "sha256": "3210701d35bfcb7d7987e0fff6eb1b82ec287df164897c0769cbd7b6e6d223c4",
+      "bytes": 13285,
+      "lines": 92,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+      "sha256": "476da996c4d1d951aaa5149e6b7bec3456f2e2f9bec3d711dbd92410be6d68ad",
+      "bytes": 1652714,
+      "lines": 59245,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R00/FEATURE_INVENTORY.json",
+      "sha256": "48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039",
+      "bytes": 5544750,
+      "lines": 119225,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "sha256": "462d528b17aba8b8bc9ae10912feda7778adfef92de7c3282d311dc5e7c1bac3",
+      "bytes": 5943187,
+      "lines": 132057,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R00/PI_REPLACEMENT_MATRIX.json",
+      "sha256": "76da1902c77ab27807a9e98a7c1c935dbb10e0ce73cc88fbb9feb57534195389",
+      "bytes": 126998,
+      "lines": 3861,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/BEHAVIOR_EVAL.json",
+      "sha256": "8617f42194b3509c73965347e00b50e1f84c887899499a18d4abaf3714dbf973",
+      "bytes": 21777,
+      "lines": 446,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/R06-T01_REPORT.md",
+      "sha256": "c681d43a0d3992753d7e5c5599ad7fa1f23fd609e401fe4e72979deeac20066a",
+      "bytes": 28159,
+      "lines": 253,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/R06-T02_REPORT.md",
+      "sha256": "96c5a35b324e2306dfcb0d485667a0b2f785a4f6719cf8260576edd1e91eb6e9",
+      "bytes": 88740,
+      "lines": 357,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/R06-T03_REPORT.md",
+      "sha256": "c25b46eac018a4d164d57a1320d5dbd1a535713b327130d415a3c295fa9d4971",
+      "bytes": 15118,
+      "lines": 164,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/R06-T04_REPORT.md",
+      "sha256": "d492ad379e733e2e0a461ae9896fee302cad98afd5dbd5ca8b5a2e2f9c9279a1",
+      "bytes": 14821,
+      "lines": 122,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/R06-T05_REPORT.md",
+      "sha256": "f05279ae1319b8e938d52e24ef754bd83a5fb11072a50f8a4e16121194e7ffde",
+      "bytes": 15931,
+      "lines": 119,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/R06-T06_REPORT.md",
+      "sha256": "0416ca6dc3b942a82be6bcc029b55e7ff7fcbf63ebd5d6372dc2e6f28eab0fc0",
+      "bytes": 33244,
+      "lines": 179,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/R06-T07_REPORT.md",
+      "sha256": "13df2b7f2ff4ce1aff98b9d53b01e5a3c8269479904142c7c633b8034a224254",
+      "bytes": 28496,
+      "lines": 157,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/R06_HANDOFF.json",
+      "sha256": "bf2f7425901b13f208412a36b3c8e22e315136d408c9584a06f16e37eec0540f",
+      "bytes": 13223,
+      "lines": 302,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/R06_LEAF_MAP.json",
+      "sha256": "a066a29951b1512c1de1aebff89e8e55be1eb4322f428e1ba704e3f335e53e2c",
+      "bytes": 434576,
+      "lines": 9282,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/R06_PROGRESS.json",
+      "sha256": "52cbb78eb16d217997a735059db3ca6ad3d38b151b861980b8657c294696f55a",
+      "bytes": 23105,
+      "lines": 373,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/R06_REPORT.md",
+      "sha256": "fed37efdd35acabaa2d74d8dedaf9d25632b20fb6b82e21d3ddb9f2b2e3bdf70",
+      "bytes": 17461,
+      "lines": 121,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/T06_TEST_GUARD.md",
+      "sha256": "c5fae464004fbe35cc8891c7eb9e89f20cf2f1b22c40394b6142155d1cda5ad0",
+      "bytes": 8605,
+      "lines": 129,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/AR_HANDOFF.md",
+      "sha256": "67df227a05b5120d5460779e2ae28c31e89632c84773859290a0fd9bbf244a9e",
+      "bytes": 707,
+      "lines": 10,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/AR_ISSUE_MATRIX.json",
+      "sha256": "0228f2da6d8ba2a00952fd15ac4e6edb951b0716743d3e9c723aa2578838cb8f",
+      "bytes": 104380,
+      "lines": 1794,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/AR_PROGRESS.json",
+      "sha256": "c0782fb58370b0098f408c588594ddd532b76c9142060044316d44e6e1a675cb",
+      "bytes": 4050,
+      "lines": 162,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W01_EXECUTOR_TEMPLATE.md",
+      "sha256": "4185f2b6e9dd3731c90c3ce60ca8d56b27c5ea133edde3068785c8d087437009",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W01_REPAIR_TEMPLATE.md",
+      "sha256": "28686fa0ddb17f826c6e49aa44924220d12d0ed1d4bf7a53dee1eab76efc30d5",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W01_REVIEWER_TEMPLATE.md",
+      "sha256": "ceaf4395b0d2aaac32455fdbadf55a377e90c9913e2894e2789740e7b7604105",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W02_EXECUTOR_TEMPLATE.md",
+      "sha256": "4ba63ed7b49c516a1283d3db4c9200e3e7c249ffce9bf6807b2257678fef5c55",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W02_REPAIR_TEMPLATE.md",
+      "sha256": "bc8a832c3e3dc5261d144b88aa177698f2a4165d13c64d1904d9483ff39bb6b3",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W02_REVIEWER_TEMPLATE.md",
+      "sha256": "96232d3204bc6140295b08c6de81dac507bbf91db524a6c35c99aa1a84c2c2f4",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W03_EXECUTOR_TEMPLATE.md",
+      "sha256": "4bce7fce6f833a8166fe9fa16dc60a2dbc12bdf0f70d8b3a0da27ba0d057283d",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W03_REPAIR_TEMPLATE.md",
+      "sha256": "1181bb86a1c5929207b25fe98f3a4834f195547fab669ea61b9ce3d75ddb7419",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W03_REVIEWER_TEMPLATE.md",
+      "sha256": "49e86ba23d3da00055100d8018369e60ce99227253c2b973e6316a19d90623fa",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W04_EXECUTOR_TEMPLATE.md",
+      "sha256": "f9c1e2f2bc3b840cf6c82aa8a3de5797b56707b85f618ac329ab65c7627afe6a",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W04_REPAIR_TEMPLATE.md",
+      "sha256": "303fc15d02a867ae0e4c032b03de6d0e26f4716a79ebdbbfe7250abaad280bb2",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W04_REVIEWER_TEMPLATE.md",
+      "sha256": "c51a8472b6b449a540053be7ce7982469845b51e0e4abcb75b891bef49741026",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W05_EXECUTOR_TEMPLATE.md",
+      "sha256": "d079d1b403b527375be5cb50f9e9b54b03fb69019d9962ad26e29b919b248822",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W05_REPAIR_TEMPLATE.md",
+      "sha256": "fd68f0b52efe3c87582dd5afa4c260158dbe4f12af5e565a978cead537d03bd3",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W05_REVIEWER_TEMPLATE.md",
+      "sha256": "a06bb875cd3479c8a8413f9cd93d3b96d98fe5779d0feaa1eb845f9223a939ec",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W06_EXECUTOR_TEMPLATE.md",
+      "sha256": "238cf8005795881ecf20ddc69595a44026f0c8ec03ebc2a1c89fdf6519cca339",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W06_REPAIR_TEMPLATE.md",
+      "sha256": "88ebb869b2160324edea0d5a9e562cbe0929cdab0edee9b535cd06a42df0057e",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W06_REVIEWER_TEMPLATE.md",
+      "sha256": "24a6a6265e451caa1287c4c5b92f16efffdd8be08e393806c6993072de24f511",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W07_EXECUTOR_TEMPLATE.md",
+      "sha256": "3de4c122bfc9768af530157e44344da501d4b837c1e729e63852905df9c6f94e",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W07_REPAIR_TEMPLATE.md",
+      "sha256": "4ef11b97bea4de8eccb2d5b8e54b618f6603417325dea938c3d0518e810e9ee4",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W07_REVIEWER_TEMPLATE.md",
+      "sha256": "315d48e5a2945c882cb00fb7cb62bfbb346915d670b533bb31b9cf9e9c18b9f5",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W08_EXECUTOR_TEMPLATE.md",
+      "sha256": "a7f52b2273aa2686b4db877b560fed1b94163b16fd0f27d55b689af79b321925",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W08_REPAIR_TEMPLATE.md",
+      "sha256": "533a78c84dfc50145aff59d79d99c8f5d5afb3124c50d046e808968df1740cbd",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W08_REVIEWER_TEMPLATE.md",
+      "sha256": "d5f9fbadfb79e7e2d403e816f8a19bca66b6aa5e4c24271800bbcf49800d1791",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W09_EXECUTOR_TEMPLATE.md",
+      "sha256": "289eab3eb3600cd324d81a474889e3243edd30af18f2d74983205720fedeaf21",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W09_REPAIR_TEMPLATE.md",
+      "sha256": "de92a6297ac05cc5b10ad5a0b8fc685202e7c3ddfdcc9e03100994d2447d1c19",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W09_REVIEWER_TEMPLATE.md",
+      "sha256": "06c4988b744475e2352f39ba6f46459348aa7b0ed4ef3645adab06b3938d45b5",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W10_EXECUTOR_TEMPLATE.md",
+      "sha256": "eb1cf13781b87988cc2e4fd368f2b575cd2334a9be9d3d6c37efe08fdbd66a6a",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W10_REPAIR_TEMPLATE.md",
+      "sha256": "1c505ab62f8c871fd5324b92f455e66305b7c597fce005ee8930a2a2cc6ca508",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W10_REVIEWER_TEMPLATE.md",
+      "sha256": "364da6ce9bf09a636307dd5c115c025c46e9c26a04dd0cb32d6d1d0f22b40300",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W11_EXECUTOR_TEMPLATE.md",
+      "sha256": "e6b0fd76670b6ef6cf45c0102493cb67dbf9076c51397d3e9f4e1994e6218613",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W11_REPAIR_TEMPLATE.md",
+      "sha256": "3edd0833119c671f1428a86511633d7b7bc01eb45f5ed994e5acec7509d68c47",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W11_REVIEWER_TEMPLATE.md",
+      "sha256": "f5bbff48af54128bec8f6fb7b74a63a04bb41ea90db3d58523a521cb253e724a",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W12_EXECUTOR_TEMPLATE.md",
+      "sha256": "5af395850268176d763bf6a2b943001fe4d7e8de724da70590c6609c1df950f7",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W12_REPAIR_TEMPLATE.md",
+      "sha256": "e160d31fa284b8b025fb7cf7707a27bbc007f27bd96d2c1334325fa84bf83469",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W12_REVIEWER_TEMPLATE.md",
+      "sha256": "ad18680d35475c7a70a9a3df620fa6e57cf9309de74248819f1936a44acdab9e",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W13_EXECUTOR_TEMPLATE.md",
+      "sha256": "22551cce5a4326ae51b7af28b66b0b01f3935676ba92b4f311a03872ccd6b512",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W13_REPAIR_TEMPLATE.md",
+      "sha256": "120c6ccdff01234ebec1c625b6956c4e6dd5e480bfdabb2be07e7dbe0c2cd39b",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W13_REVIEWER_TEMPLATE.md",
+      "sha256": "4f3c4d88052659622c3026a06430916464656aedbc976aa73f87df144a33e1c4",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W14_EXECUTOR_TEMPLATE.md",
+      "sha256": "b1361e15caea27749b3e22367cf91ebfd202dffa027246ad24420ccd928d6ffe",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W14_REPAIR_TEMPLATE.md",
+      "sha256": "f443348d7a417f5c4c6d158e4f338803d45137b61afc932862405d5ead171c8b",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W14_REVIEWER_TEMPLATE.md",
+      "sha256": "f2bce376a455b5acfa1dda66fb0c40de7cb08d33f77179dc63651517219e04b9",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_EXECUTOR_TEMPLATE.md",
+      "sha256": "9d1df0d41f500783704684cb83b6a663236d956b1583576ef019a86a9a7001c6",
+      "bytes": 3075,
+      "lines": 27,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_REPAIR_TEMPLATE.md",
+      "sha256": "4166c24a3e8876221a701ff0b9e12466d11be115ee41319c3a0fc7dc6cf6a453",
+      "bytes": 1541,
+      "lines": 16,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_REVIEWER_TEMPLATE.md",
+      "sha256": "1ea3f5704d128f5c6c072a7dc05f3106feac7c73164041edf843a2848ab33991",
+      "bytes": 2742,
+      "lines": 28,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/agent_memory.rs",
+      "sha256": "057a53a69fddd54e2afa65aae8a0488798815beb3bceb316a2b82111421b25b5",
+      "bytes": 83290,
+      "lines": 2288,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r06_t02_compaction_render.rs",
+      "sha256": "11bad104d5587bb11922075bf00bd4b29e1823373e94ad464f81e839d5fd8e7b",
+      "bytes": 25052,
+      "lines": 662,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/tests/r06_t01_context_compiler.rs",
+      "sha256": "1c55b17fbedfd69e0fb8ba57d78474967c046e746c145ad68b25280cc706fbc4",
+      "bytes": 20542,
+      "lines": 520,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/tests/r06_t02_compaction.rs",
+      "sha256": "ec81b7c834fab53cd2cab679e52885fd8557f981609782b180e9fc3fc1ad065e",
+      "bytes": 51950,
+      "lines": 1336,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/compaction.rs",
+      "sha256": "b9998034d64da2754047cb65f441d4bf62ef1a1d6ddcb70dd28ad632847233c8",
+      "bytes": 45835,
+      "lines": 973,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/history.rs",
+      "sha256": "7cc0c827a3d0f95b63bab4ce7f0a4c852fc607378848f33b59788f7c21c75e23",
+      "bytes": 13848,
+      "lines": 360,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/knowledge.rs",
+      "sha256": "6a299bda51378350a057456a7dd306bca78549078a2fe365310a19cfea19af18",
+      "bytes": 123863,
+      "lines": 3101,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/memory.rs",
+      "sha256": "eb9d28910c728496a14a10597f76f688b4061524b02b6da086ea827e395ac08c",
+      "bytes": 45966,
+      "lines": 1339,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/memorytools.rs",
+      "sha256": "6c81a848d7ae118ab4e5d777efd4fb0e75e050a6edb9fc577ef85f3a9d448f4f",
+      "bytes": 30862,
+      "lines": 780,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/resourceio.rs",
+      "sha256": "d36b0c7238f4f119ae8de80c72781a9079d118b79c54e9bd2837f863b557533e",
+      "bytes": 116181,
+      "lines": 3182,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/resources.rs",
+      "sha256": "a38ca0dce4ba0b4bda2217b0b1a7a7110876b14945ac4c0ebb15f63bdf7f13da",
+      "bytes": 36633,
+      "lines": 1034,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "sha256": "7ad759b09270543cc839b5c2ecc9638d75124a2de3fac34d6d3c9eefedbd6557",
+      "bytes": 230760,
+      "lines": 4533,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/skills.rs",
+      "sha256": "a800661f52ff78732a4188833d3a7733777dc560dc6284aa31cda88aec7f6890",
+      "bytes": 61214,
+      "lines": 1592,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t01_closed_loop.rs",
+      "sha256": "e71bf7392f870b362d207c221dd9b77b1de2795f0f9785cf910a5b1b19f9e7de",
+      "bytes": 21892,
+      "lines": 587,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs",
+      "sha256": "b7af02cabcc0c819e1ff7e2e68754e3e6562b4a713d152228925fe77850d7c58",
+      "bytes": 36848,
+      "lines": 997,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t02_closed_loop.rs",
+      "sha256": "18e0be52da216850d1881deb7343fc01efded57de9c249514b0721194d550111",
+      "bytes": 34981,
+      "lines": 924,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
+      "sha256": "a018e0c8aad3109f4f0dd919be5bcbbdd206221a640c268bba2631848662677b",
+      "bytes": 95661,
+      "lines": 2428,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "sha256": "ddee34a73c75cdf619c2a7139ab744c00993bd4352ae62081378cc40dba835a1",
+      "bytes": 60075,
+      "lines": 1611,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t04_history.rs",
+      "sha256": "e943aa7fe471a66a42d138fb8b4310c03cc16ced97e2ff9e605a505f3f05d545",
+      "bytes": 43163,
+      "lines": 1186,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t05_bridgemedia.rs",
+      "sha256": "2878335fa6526b96de19544c67a846c050078e7a0aeb1015ae7ebb54fcc3d01c",
+      "bytes": 17532,
+      "lines": 493,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t05_filehistory.rs",
+      "sha256": "9dec182d37e64da81f6eb9c12f3ae79f8d98b829657d2238ccde143e76956b2f",
+      "bytes": 32864,
+      "lines": 943,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t05_fsread.rs",
+      "sha256": "ab3603402a1045487440f20dab69fea0fcc49732fe5a705f7d1c5abbbd2d94b3",
+      "bytes": 16482,
+      "lines": 482,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t05_preview.rs",
+      "sha256": "fb5a5ae4df31a8f3160b56da498e4e383651c41494b050bbe2d6f04bb2a494c7",
+      "bytes": 21225,
+      "lines": 622,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
+      "sha256": "012c5afacea845a84b9e7ab70920c395305bb5477abe6dcc1c4867e31a1b1c03",
+      "bytes": 59182,
+      "lines": 1587,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t05_resources.rs",
+      "sha256": "27f3b32764b9595acba6f8890aed85e8710d29a4de56b13c1cc235a64bbd7806",
+      "bytes": 21627,
+      "lines": 634,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t05_session_files.rs",
+      "sha256": "1cbe5f4d44d8e0b7b46906a077d6abc76cd18889f252a47377f096c0a7b1973f",
+      "bytes": 32717,
+      "lines": 929,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t06_hooks.rs",
+      "sha256": "e4b2f8257c7f61d732da85830402c87404500accb01232700acd3a7ece803e2f",
+      "bytes": 15954,
+      "lines": 417,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t06_memory.rs",
+      "sha256": "6bdd7f191e196511c24a7d3456d85c72060dde02fe6c5696c7b9ee41bf9ec56a",
+      "bytes": 19239,
+      "lines": 558,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t06_skill_context.rs",
+      "sha256": "20943a67268a74900da5fc766fd82d1a452a639e8654d273c488f1ffd771bd5d",
+      "bytes": 18470,
+      "lines": 484,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t06_skills.rs",
+      "sha256": "6c1cc93cc604fb3469522c083696985ec7c3a49b0e84500abf0ec1654a6c25b7",
+      "bytes": 40166,
+      "lines": 1104,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t07_knowledge.rs",
+      "sha256": "129be0323e830bd69792bacaea3b8f91f4014404ea586862028e20dadc4cc079",
+      "bytes": 45922,
+      "lines": 1243,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t07_knowledge_tools.rs",
+      "sha256": "6849a8be8bf3adc1c7531d5a24df0c1df8c9f85a34dc6c12bb39b4945ca5ccb9",
+      "bytes": 30506,
+      "lines": 859,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t08_behavior_eval.rs",
+      "sha256": "7c39951200c477c36bb9cf118c0749ca91cfc4bc070b6082d7397919957c9996",
+      "bytes": 103812,
+      "lines": 2667,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R02.json",
+      "sha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+      "bytes": 100387,
+      "lines": 1496,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R03.json",
+      "sha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+      "bytes": 96434,
+      "lines": 2013,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R04.json",
+      "sha256": "33950d59cf10291b0e8b1f529499a1cf5028a780c4c327234b50ea67f10fbba1",
+      "bytes": 242398,
+      "lines": 4817,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/xtask/src/stage_maps/R05.json",
+      "sha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+      "bytes": 306003,
+      "lines": 5786,
+      "read_method": "complete_file_loaded; relevant prose sections inspected; structured records extracted",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "core/session-compaction-runtime.ts",
+      "sha256": "156b57bb1da4dfc14662860b1d860a9b655a3ffeaee8ca34faada20125a2bab8",
+      "bytes": 13489,
+      "lines": 303,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "lib/llm/cache-preserving-compaction-agent-run.ts",
+      "sha256": "cdf3969ef6f6826981521c84a26705ab10ba1c1c36eb409fbccc9a7f105f7d5c",
+      "bytes": 23588,
+      "lines": 637,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "lib/tools/install-skill.ts",
+      "sha256": "d5d67336f195d5d654a7f0eb6e4e7464a5caf0ea89f0ff455713915f619413d5",
+      "bytes": 24077,
+      "lines": 603,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "server/routes/skills.ts",
+      "sha256": "cd5925d6430043829ca639e38fbfe79059bf1f0bc9348e93bdfab5d679ac37b0",
+      "bytes": 22642,
+      "lines": 580,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "core/skill-manager.ts",
+      "sha256": "36537e7f9daabfcd0e858ac04c67e6ae6deb429e54fede59abd6543b6007fa7b",
+      "bytes": 16340,
+      "lines": 455,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "server/routes/memory-dream.ts",
+      "sha256": "21f6578a615be9aeca7fb4f0874dcdcdc279d736ec6ba32b7f6d832b53fbd546",
+      "bytes": 5683,
+      "lines": 140,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "core/agent.ts",
+      "sha256": "f1525d4ade1d44a9ccb1ce9be5ed250fb4027b6215e43a77772883279b152d76",
+      "bytes": 94672,
+      "lines": 1887,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "lib/memory/dream/runner.ts",
+      "sha256": "a1fb7863119e9ed96afc9d99294006969c2e9b85161c89873af8023d9ae3d9e6",
+      "bytes": 12048,
+      "lines": 403,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "lib/memory/dream/revision-store.ts",
+      "sha256": "fbc1d8278657ca84d2963736125d0544f4db090869dbdbf93fdf0da80a0d2919",
+      "bytes": 11192,
+      "lines": 317,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "lib/memory/memory-search.ts",
+      "sha256": "77616ea72d6dfa3966a2f24cf256751795a168c8e5fa065b7702b594ebf661f7",
+      "bytes": 11582,
+      "lines": 300,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/knowledge.rs",
+      "sha256": "4cfcb084e9e14e6fd77d3419503b516de37690100b251d1bb829a2ad82aabf88",
+      "bytes": 118789,
+      "lines": 2899,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "lib/knowledge/knowledge-manager.ts",
+      "sha256": "a744e4cee7e513deebb34fa33bef08c31c5390e40818774077e676ea24791cec",
+      "bytes": 81770,
+      "lines": 1878,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "lib/knowledge/source-processors.ts",
+      "sha256": "c269dd2ae39be0dd6ae7f553dd75c6611c101a163acafd8f90c8220af56769bb",
+      "bytes": 11962,
+      "lines": 326,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "server/routes/knowledge.ts",
+      "sha256": "f317e7e5725163f380153efb1f6c956bc641ea86f415a8a8df5f1ca904d5149d",
+      "bytes": 24244,
+      "lines": 658,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "lib/knowledge/ingestion-service.ts",
+      "sha256": "5655b0832e777640b0bedbade84627e57d09787c4f8d679b58db1bd8073a3082",
+      "bytes": 48094,
+      "lines": 1031,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "lib/knowledge/rerank-policy.ts",
+      "sha256": "38c70f3f0c807fbcad5ff4adf4a1818b3c59fc80cdc67eff84c40f43df3c2585",
+      "bytes": 7383,
+      "lines": 189,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "lib/resource-io/providers/mount-provider.ts",
+      "sha256": "4c85ef266f3fa18a10a124bb1db2c84bdac91228bf5f23588d7fbc4b4d9f72b0",
+      "bytes": 15502,
+      "lines": 396,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_tree.rs",
+      "sha256": "20a8ba1e19c43a4a6ca8936b9bcd2d580bd286485bdc49b85499247f5877587e",
+      "bytes": 53905,
+      "lines": 1319,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/persona.rs",
+      "sha256": "aa4bd1fc27174fc95c1fed02012736f77e0347ca1bf044c1475d542ccac02ef0",
+      "bytes": 11826,
+      "lines": 334,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/context_compiler.rs",
+      "sha256": "828a43749fc80b9ce335b4cc0d3aff3c10052b692e966e2f5f7e30994602e622",
+      "bytes": 34783,
+      "lines": 933,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    },
+    {
+      "path": "server/routes/avatar.ts",
+      "sha256": "f181e98940191f3c3868f4504770e31697c5e9326373a1344cca852f3a76dba8",
+      "bytes": 5091,
+      "lines": 148,
+      "read_method": "complete source loaded; only referenced source ranges semantically inspected",
+      "status": "SOURCE_ONLY",
+      "semantic_read_boundary": "相关条款/差异/未决与标明源区间核对；不是自动声明此文件全部实现逐行语义审查。"
+    }
+  ],
+  "lookup_notes": [
+    "原任务书目录被忽略，必须用已知路径或--hidden/明确目录读取；普通rg --files找不到不代表不存在。",
+    "sha256仅记录读取时资料快照，不是候选封印；此代理未执行Git操作、产品测试或构建。",
+    "完整文件加载/段落提取不等于运行时验证；大型输出曾截断，因此不把终端展示长度当作全文已审查的证据。"
+  ],
+  "original_archived_comparison": [
+    {
+      "source": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/01_通用执行约束.md",
+      "archive": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/01_通用执行约束.md",
+      "same_bytes": true
+    },
+    {
+      "source": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/02_目标架构与强制契约.md",
+      "archive": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/02_目标架构与强制契约.md",
+      "same_bytes": true
+    },
+    {
+      "source": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R05_模型协议、凭证、流式处理与最小完整闭环.md",
+      "archive": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R05_模型协议、凭证、流式处理与最小完整闭环.md",
+      "same_bytes": true
+    },
+    {
+      "source": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/04_阶段依赖与接口交接.md",
+      "archive": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/04_阶段依赖与接口交接.md",
+      "same_bytes": true
+    },
+    {
+      "source": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/06_风险、技术决策与退出条件.md",
+      "archive": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/06_风险、技术决策与退出条件.md",
+      "same_bytes": true
+    },
+    {
+      "source": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R06_上下文、会话语义、记忆与知识库.md",
+      "archive": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/R06_上下文、会话语义、记忆与知识库.md",
+      "same_bytes": true
+    },
+    {
+      "source": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/05_验收与性能协议.md",
+      "archive": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/05_验收与性能协议.md",
+      "same_bytes": true
+    },
+    {
+      "source": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/03_功能与所有权矩阵.md",
+      "archive": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/specifications/original_taskbooks/03_功能与所有权矩阵.md",
+      "same_bytes": true
+    }
+  ],
+  "read_boundary": "全文载入是读取完整文件字节/JSON及提取段落，语义核读是原任务/Steps/A-ID/R00映射/差异与未决/合法延期依据及指定服务TS对照。不是全部实现逐行语义审查；不把机器load说成逐条运行或逐行人工阅读。"
+}

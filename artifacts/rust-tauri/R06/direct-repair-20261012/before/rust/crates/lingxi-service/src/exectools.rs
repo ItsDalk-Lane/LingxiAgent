@@ -1,0 +1,1696 @@
+//! Native `exec_command` / `write_stdin` executors (R04-T05).
+//!
+//! REAL executors behind the T02 gateway, porting the incumbent
+//! semantics (`lib/exec-command/*`, `lib/sandbox/exec-helper.ts`,
+//! `lib/terminal/terminal-session-manager.ts`) onto the real
+//! [`crate::procsupervisor::ProcessSupervisor`]:
+//!
+//! # exec_command
+//! - Two command forms: structured `argv` (NO shell — the default answer
+//!   to "非 shell 操作用结构化 argv") or a shell `cmd` string executed
+//!   as `["/bin/bash", "-c", cmd]` (the incumbent's expressive shell
+//!   path; safety comes from authorization + the T06 sandbox surface,
+//!   NEVER from a keyword blacklist).
+//! - `workdir` (default the tool cwd) is judged by the T04
+//!   [`crate::resourceaccess::ResourceAccess`] at PREPARE (via the
+//!   gateway resource extractor) and RE-CHECKED at the executor — the
+//!   cwd of a spawned process is an authorized directory, judged by its
+//!   real target (symlinks followed).
+//! - Environment: EXPLICIT whitelist passthrough only
+//!   ([`SAFE_ENV_PASSTHROUGH`]) plus bounded caller-provided `env`
+//!   entries. The server's full environment (tokens, secrets) is NEVER
+//!   inherited — the incumbent's `env ?? process.env` is the gap this
+//!   closes (registered mapping decision).
+//! - One-shot result: the whole-stream FACTS (total bytes, the true
+//!   head, the retained tail window, in-memory evictions, spill
+//!   cap/error) drive the head+tail presentation and the `truncated`
+//!   flag (R04-RR1-F05): a legal return budget larger than the window
+//!   can never turn an evicted prefix into "complete", and only a
+//!   byte-complete spill file is ever called "Full output". Exit code
+//!   (`128+signal` for signal deaths), timeout watchdog (default 120 s,
+//!   clamped to 600 s like the incumbent) running the supervisor's
+//!   bounded termination chain, and the SPILL reference (ResourceRef)
+//!   with capped/failed states explicit.
+//! - `tty: true` starts a PTY terminal and RETURNS IMMEDIATELY with
+//!   `ToolRunStatus::Running { handle }` — "started" never masquerades
+//!   as completion. The terminal's lifetime is registered as a
+//!   persistent terminal (see the supervisor module docs).
+//! - A normally-exited command may leave backgrounded grandchildren in
+//!   its process group (the incumbent's documented behavior — `cmd &`
+//!   survives); the supervisor's audit notes it. CANCELLATION kills the
+//!   whole group.
+//!
+//! # write_stdin
+//! - `{ process_id, chars }` — writes `chars` to the terminal's master
+//!   (empty `chars` = poll) and delivers the transcript accumulated
+//!   since the previous delivery (UTF-8 boundary-safe).
+//! - Authorization: the CALLER (trusted run context) must be the
+//!   terminal's owning principal AND session — a foreign session's
+//!   `write_stdin` is refused (`WRITE_STDIN_NOT_OWNED`); unknown or
+//!   malformed handles are refused (`WRITE_STDIN_UNKNOWN_PROCESS`);
+//!   non-terminal handles (one-shot commands) are refused
+//!   (`WRITE_STDIN_NOT_INTERACTIVE`).
+//!
+//! # Cancellation wiring (the A09 chain)
+//! The executor future runs inside the run driver's CALL-level
+//! supervision; a run cancellation drops it at an await point. The
+//! [`ProcessOwnershipGuard`] drop guard then initiates the supervisor's
+//! `terminate_detached` chain (killpg synchronously, bounded tail on a
+//! supervisor-owned task) — process ownership is never lost with the
+//! future, and tokio `kill_on_drop` is never the guarantee.
+
+use std::collections::BTreeMap;
+use std::path::{Path, PathBuf};
+use std::pin::Pin;
+use std::sync::Arc;
+use std::time::Duration;
+
+use lingxi_kernel::ports::{
+    ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, ToolRunStatus, ToolSuccess,
+};
+use lingxi_kernel::toolcatalog::{
+    EffectiveArguments, SchemaBudget, ToolManifest, ToolRegistry, ToolTargetId,
+};
+use lingxi_kernel::RunContext;
+use lingxi_protocol::{
+    ContentBlock, ErrorCode, ProtocolError, ResourceId, ResourceKind, ResourceRef, ToolCallId,
+    ToolSchemaDocument,
+};
+use sha2::{Digest as _, Sha256};
+
+use crate::inject::ServiceClock;
+use crate::procsupervisor::{
+    ExitFact, ProcessHandleId, ProcessKind, ProcessOwner, ProcessSupervisor, RecordPhase,
+    SpawnSpec, SpillInfo, TerminationReason,
+};
+use crate::resourceaccess::{ResourceAccess, ResourceOp, ResourceScope};
+use crate::sandbox::{SandboxCommandRequest, SandboxNetworkRequest, SandboxPort};
+use crate::toolgateway::{ResourceExtractionInput, ResourceExtractor, ToolInvocationGateway};
+
+/// Incumbent `EXEC_COMMAND_DEFAULT_TIMEOUT_SECONDS`.
+pub const EXEC_DEFAULT_TIMEOUT_SECONDS: u64 = 120;
+/// Incumbent `EXEC_COMMAND_MAX_TIMEOUT_SECONDS` (values above clamp).
+pub const EXEC_MAX_TIMEOUT_SECONDS: u64 = 600;
+/// Incumbent result budget (50 KiB) and line budget (2000).
+pub const EXEC_RESULT_MAX_BYTES: usize = 50 * 1024;
+pub const EXEC_RESULT_MAX_LINES: usize = 2000;
+/// Default PTY dimensions (the incumbent's `cols = 80, rows = 24`).
+pub const PTY_DEFAULT_COLS: u16 = 80;
+pub const PTY_DEFAULT_ROWS: u16 = 24;
+/// Bounded caller-provided env map.
+const ENV_MAX_ENTRIES: usize = 32;
+const ENV_KEY_MAX_BYTES: usize = 64;
+const ENV_VALUE_MAX_BYTES: usize = 8 * 1024;
+
+/// The explicit environment passthrough whitelist. Everything else must
+/// come from the caller's `env` argument — the server's environment is
+/// never inherited wholesale (secrets included).
+pub const SAFE_ENV_PASSTHROUGH: &[&str] = &[
+    "PATH", "HOME", "LANG", "LC_ALL", "LC_CTYPE", "TERM", "TZ", "TMPDIR", "SHELL",
+];
+
+// ── error vocabulary (stable codes embedded in messages) ───────────────────
+
+pub const EXEC_INVALID_PARAMS: &str = "EXEC_COMMAND_INVALID_PARAMS";
+pub const EXEC_SPAWN_FAILED: &str = "EXEC_SPAWN_FAILED";
+/// The ProcessSupervisor's LIVE-PROCESS registry is at its cap: the
+/// command was refused BEFORE any OS dispatch (zero execution — R04-RR1
+/// F01). This is the supervisor's process capacity, a DIFFERENT registry
+/// from the gateway's prepared-invocation cap
+/// (`GatewayRefusal::PreparedRegistryFull` / `DEFAULT_LIVE_PREPARED_CAP`);
+/// a test that overflows the latter has not exercised this one.
+pub const EXEC_PROCESS_REGISTRY_FULL: &str = "EXEC_PROCESS_REGISTRY_FULL";
+/// The one-shot command could not be wrapped into the sandboxed execution
+/// form (missing/untrusted helper, unsupported policy, unsafe embedded
+/// path). The command was NEVER spawned — fail-closed (R04-A11).
+pub const EXEC_SANDBOX_REFUSED: &str = "EXEC_SANDBOX_REFUSED";
+pub const WRITE_STDIN_PROCESS_ID_REQUIRED: &str = "WRITE_STDIN_PROCESS_ID_REQUIRED";
+pub const WRITE_STDIN_UNKNOWN_PROCESS: &str = "WRITE_STDIN_UNKNOWN_PROCESS";
+pub const WRITE_STDIN_NOT_OWNED: &str = "WRITE_STDIN_NOT_OWNED";
+pub const WRITE_STDIN_NOT_INTERACTIVE: &str = "WRITE_STDIN_NOT_INTERACTIVE";
+
+fn failed(code: ErrorCode, message: String) -> ToolOutcome {
+    ToolOutcome::Failed {
+        error: ProtocolError::new(code, message, false),
+    }
+}
+
+/// A successful text outcome with process status and derived digest.
+fn text_success(
+    text: String,
+    truncated: bool,
+    resource_refs: Vec<ResourceRef>,
+    status: Option<ToolRunStatus>,
+) -> ToolOutcome {
+    let status = status.map(Box::new);
+    let content = vec![ContentBlock::Text { text }];
+    let value = serde_json::to_value(&content).expect("content blocks serialize");
+    let canonical = lingxi_protocol::canon::canonical_json_bytes(&value);
+    ToolOutcome::Success {
+        result: ToolSuccess {
+            content_digest: hex(&Sha256::digest(&canonical)),
+            content,
+            resource_refs,
+            truncated,
+            status,
+        },
+    }
+}
+
+fn hex(digest: &[u8]) -> String {
+    let mut out = String::with_capacity(digest.len() * 2);
+    for byte in digest {
+        out.push_str(&format!("{byte:02x}"));
+    }
+    out
+}
+
+// ── parameters ──────────────────────────────────────────────────────────────
+
+/// The validated effective parameters of one exec_command call.
+#[derive(Debug, Clone)]
+pub struct ExecParams {
+    /// The resolved argv (structured form, or `["/bin/bash", "-c", cmd]`).
+    pub argv: Vec<String>,
+    /// Whether the shell form was used.
+    pub shell_form: bool,
+    /// The original cmd string (audit).
+    pub cmd: Option<String>,
+    pub workdir: PathBuf,
+    pub timeout_seconds: u64,
+    pub timeout_clamped: bool,
+    pub max_output_bytes: usize,
+    pub env: BTreeMap<String, String>,
+    pub tty: bool,
+    pub cols: u16,
+    pub rows: u16,
+}
+
+fn parse_exec_params(args: &serde_json::Value) -> Result<ExecParams, ToolOutcome> {
+    let invalid = |detail: String| {
+        failed(
+            ErrorCode::InvalidMessage,
+            format!("{EXEC_INVALID_PARAMS}: {detail}"),
+        )
+    };
+    let cmd = args
+        .get("cmd")
+        .and_then(|v| v.as_str())
+        .map(|s| s.to_string());
+    let argv = args
+        .get("argv")
+        .and_then(|v| v.as_array())
+        .map(|items| {
+            items
+                .iter()
+                .map(|item| {
+                    item.as_str()
+                        .map(|s| s.to_string())
+                        .ok_or_else(|| "argv entries must be strings".to_string())
+                })
+                .collect::<Result<Vec<String>, String>>()
+        })
+        .transpose()
+        .map_err(invalid)?;
+    let argv = match (cmd.as_deref(), argv) {
+        (Some(cmd), None) if !cmd.trim().is_empty() => {
+            vec![
+                "/bin/bash".to_string(),
+                "-c".to_string(),
+                cmd.trim_end().to_string(),
+            ]
+        }
+        (None, Some(argv)) if !argv.is_empty() => argv,
+        (Some(_cmd), Some(_)) => {
+            return Err(invalid(
+                "pass either `cmd` (shell string) or `argv` (structured), not both".to_string(),
+            ))
+        }
+        (Some(_), None) => {
+            return Err(invalid("cmd must be a non-empty string".to_string()));
+        }
+        (None, Some(_)) => {
+            return Err(invalid(
+                "argv must be a non-empty array of non-empty strings".to_string(),
+            ));
+        }
+        (None, None) => {
+            return Err(invalid(
+                "exec_command requires either a non-empty cmd string or a non-empty argv array"
+                    .to_string(),
+            ))
+        }
+    };
+    if argv.iter().any(|a| a.is_empty()) {
+        return Err(invalid(
+            "argv must be a non-empty array of non-empty strings".to_string(),
+        ));
+    }
+    let workdir = args
+        .get("workdir")
+        .and_then(|v| v.as_str())
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .map(PathBuf::from);
+    let raw_timeout = args.get("timeout_seconds").and_then(|v| v.as_u64());
+    let (timeout_seconds, timeout_clamped) = match raw_timeout {
+        None | Some(0) => (EXEC_DEFAULT_TIMEOUT_SECONDS, false),
+        Some(secs) => {
+            if secs > EXEC_MAX_TIMEOUT_SECONDS {
+                (EXEC_MAX_TIMEOUT_SECONDS, true)
+            } else {
+                (secs, false)
+            }
+        }
+    };
+    let max_output_bytes = args
+        .get("max_output_bytes")
+        .and_then(|v| v.as_u64())
+        .map(|v| (v as usize).max(1000))
+        .unwrap_or(EXEC_RESULT_MAX_BYTES);
+    let mut env = BTreeMap::new();
+    if let Some(map) = args.get("env").and_then(|v| v.as_object()) {
+        if map.len() > ENV_MAX_ENTRIES {
+            return Err(invalid(format!(
+                "env accepts at most {ENV_MAX_ENTRIES} entries"
+            )));
+        }
+        for (key, value) in map {
+            let Some(value) = value.as_str() else {
+                return Err(invalid(format!(
+                    "env values must be strings (env.{key} is not)"
+                )));
+            };
+            if key.len() > ENV_KEY_MAX_BYTES {
+                return Err(invalid(format!(
+                    "env key {key:?} exceeds {ENV_KEY_MAX_BYTES} bytes"
+                )));
+            }
+            if value.len() > ENV_VALUE_MAX_BYTES {
+                return Err(invalid(format!(
+                    "env value for {key:?} exceeds {ENV_VALUE_MAX_BYTES} bytes"
+                )));
+            }
+            if key.is_empty() || key.contains('=') || key.contains('\0') {
+                return Err(invalid(format!(
+                    "env key {key:?} is empty or contains '=' / NUL"
+                )));
+            }
+            env.insert(key.clone(), value.to_string());
+        }
+    }
+    let tty = args.get("tty").and_then(|v| v.as_bool()).unwrap_or(false);
+    let int_of = |field: &str, lo: i64, hi: i64| -> Result<Option<u16>, ToolOutcome> {
+        match args.get(field).and_then(|v| v.as_i64()) {
+            None => Ok(None),
+            Some(v) if (lo..=hi).contains(&v) => Ok(Some(v as u16)),
+            Some(v) => Err(invalid(format!(
+                "{field} must be an integer within {lo}..={hi} (got {v})"
+            ))),
+        }
+    };
+    let cols = int_of("cols", 1, 1024)?.unwrap_or(PTY_DEFAULT_COLS);
+    let rows = int_of("rows", 1, 1024)?.unwrap_or(PTY_DEFAULT_ROWS);
+    Ok(ExecParams {
+        argv,
+        shell_form: cmd.is_some(),
+        cmd,
+        workdir: workdir.unwrap_or_default(),
+        timeout_seconds,
+        timeout_clamped,
+        max_output_bytes,
+        env,
+        tty,
+        cols,
+        rows,
+    })
+}
+
+/// Builds the child environment: whitelist passthrough + caller extras.
+/// The caller's extras may override whitelisted keys explicitly.
+pub fn build_child_env(extra: &BTreeMap<String, String>) -> BTreeMap<String, String> {
+    let mut env = BTreeMap::new();
+    for key in SAFE_ENV_PASSTHROUGH {
+        if let Ok(value) = std::env::var(key) {
+            env.insert((*key).to_string(), value);
+        }
+    }
+    for (key, value) in extra {
+        env.insert(key.clone(), value.clone());
+    }
+    env
+}
+
+// ── output rendering (the incumbent's head+tail truncation) ───────────────
+
+fn format_size(bytes: u64) -> String {
+    if bytes < 1024 {
+        format!("{bytes}B")
+    } else if bytes < 1024 * 1024 {
+        format!("{:.1}KB", bytes as f64 / 1024.0)
+    } else {
+        format!("{:.1}MB", bytes as f64 / (1024.0 * 1024.0))
+    }
+}
+
+/// Largest index `<= wanted` that sits on a UTF-8 character boundary.
+fn floor_char_boundary(text: &str, wanted: usize) -> usize {
+    let wanted = wanted.min(text.len());
+    let mut idx = wanted;
+    while idx > 0 && !text.is_char_boundary(idx) {
+        idx -= 1;
+    }
+    idx
+}
+
+/// Smallest index `>= wanted` that sits on a UTF-8 character boundary.
+fn ceil_char_boundary(text: &str, wanted: usize) -> usize {
+    let mut idx = wanted.min(text.len());
+    while idx < text.len() && !text.is_char_boundary(idx) {
+        idx += 1;
+    }
+    idx
+}
+
+/// Decodes the rolling window: a leading partial sequence (the window
+/// starts mid-character after evictions) is skipped with a replacement
+/// marker — the incumbent's continuation-byte skip.
+fn decode_window(window: &[u8]) -> String {
+    let mut start = 0usize;
+    while start < window.len() && (window[start] & 0xC0) == 0x80 {
+        start += 1;
+    }
+    let mut text = String::from_utf8_lossy(&window[start..]).into_owned();
+    if start > 0 && !text.is_empty() {
+        let mut prefixed = String::with_capacity(text.len() + 1);
+        prefixed.push('\u{FFFD}');
+        prefixed.push_str(&text);
+        text = prefixed;
+    }
+    text
+}
+
+/// Decodes the TRUE stream head for the evicted-middle presentation. A
+/// TRAILING incomplete sequence (the head window ends mid-character —
+/// its completion lives in the evicted middle) is TRIMMED and its byte
+/// count returned: fabricating a replacement character for bytes whose
+/// continuation is gone would invent content, and the eviction marker
+/// states the loss instead. Interior invalid bytes become replacement
+/// characters (deterministic, consumed).
+fn decode_head_bytes(bytes: &[u8]) -> (String, usize) {
+    match std::str::from_utf8(bytes) {
+        Ok(text) => (text.to_string(), 0),
+        Err(err) if err.error_len().is_none() => {
+            let valid = err.valid_up_to();
+            (
+                String::from_utf8_lossy(&bytes[..valid]).into_owned(),
+                bytes.len() - valid,
+            )
+        }
+        Err(_) => (String::from_utf8_lossy(bytes).into_owned(), 0),
+    }
+}
+
+/// The retained-output presentation assembled from the collector's
+/// facts (R04-RR1-F05): the TRUE head plus the rolling tail, with the
+/// evicted middle marked. When the whole stream fits the two windows it
+/// is presented whole (deduplicated); otherwise the middle loss is
+/// stated in-band and counted honestly (including a head trimmed
+/// mid-character at the eviction boundary).
+struct AssembledOutput {
+    text: String,
+    /// Real bytes of the stream present in NEITHER window (+ a head
+    /// partial trimmed at the eviction boundary). Zero == the full
+    /// stream is retained.
+    evicted_bytes: u64,
+}
+
+fn assemble_retained_output(head: &[u8], tail: &[u8], total_bytes: u64) -> AssembledOutput {
+    let head_len = head.len() as u64;
+    let tail_len = tail.len() as u64;
+    if total_bytes <= head_len + tail_len {
+        // Full stream retained: head plus the non-overlapping tail
+        // suffix (the windows overlap over the middle; the suffix is
+        // the LAST `total - head` bytes of the tail, so every byte
+        // appears exactly once).
+        let mut full = head.to_vec();
+        if total_bytes > head_len {
+            let suffix_len = (total_bytes - head_len) as usize;
+            let suffix_start = tail.len().saturating_sub(suffix_len);
+            full.extend_from_slice(&tail[suffix_start..]);
+        }
+        AssembledOutput {
+            text: String::from_utf8_lossy(&full).into_owned(),
+            evicted_bytes: 0,
+        }
+    } else {
+        let evicted = total_bytes - head_len - tail_len;
+        let (head_text, head_trimmed) = decode_head_bytes(head);
+        let tail_text = decode_window(tail);
+        let evicted_total = evicted + head_trimmed as u64;
+        let text = format!(
+            "{head_text}\n[... {} bytes of the middle evicted ...]\n{tail_text}",
+            evicted_total
+        );
+        AssembledOutput {
+            text,
+            evicted_bytes: evicted_total,
+        }
+    }
+}
+
+struct HeadTail {
+    content: String,
+    truncated: bool,
+    total_lines: usize,
+    head_lines: usize,
+    tail_lines: usize,
+}
+
+/// The incumbent `truncateHeadTail`: keep the head and the tail, mark the
+/// omitted middle precisely.
+fn truncate_head_tail(text: &str, max_lines: usize, max_bytes: usize) -> HeadTail {
+    let total_bytes = text.len();
+    let lines: Vec<&str> = text.split('\n').collect();
+    let total_lines = lines.len();
+    if total_lines <= max_lines && total_bytes <= max_bytes {
+        return HeadTail {
+            content: text.to_string(),
+            truncated: false,
+            total_lines,
+            head_lines: total_lines,
+            tail_lines: 0,
+        };
+    }
+    let head_line_budget = (max_lines / 2).max(1);
+    let tail_line_budget = max_lines.saturating_sub(head_line_budget).max(1);
+    let head_byte_budget = max_bytes / 2;
+    let tail_byte_budget = max_bytes - head_byte_budget;
+
+    let mut head_lines: Vec<&str> = Vec::new();
+    let mut head_bytes = 0usize;
+    for line in lines.iter() {
+        if head_lines.len() >= head_line_budget {
+            break;
+        }
+        let line_bytes = line.len() + usize::from(!head_lines.is_empty());
+        if head_bytes + line_bytes > head_byte_budget {
+            break;
+        }
+        head_bytes += line_bytes;
+        head_lines.push(line);
+    }
+    let mut tail_lines: Vec<&str> = Vec::new();
+    let mut tail_bytes = 0usize;
+    for line in lines.iter().rev() {
+        if tail_lines.len() >= tail_line_budget {
+            break;
+        }
+        if lines.len() - tail_lines.len() <= head_lines.len() {
+            break;
+        }
+        let line_bytes = line.len() + usize::from(!tail_lines.is_empty());
+        if tail_bytes + line_bytes > tail_byte_budget {
+            break;
+        }
+        tail_bytes += line_bytes;
+        tail_lines.push(line);
+    }
+    let head_content_bytes: usize = head_lines.iter().map(|l| l.len()).sum();
+    let tail_content_bytes: usize = tail_lines.iter().map(|l| l.len()).sum();
+    let tail_start = lines.len() - tail_lines.len();
+    if tail_start <= head_lines.len() || head_content_bytes == 0 || tail_content_bytes == 0 {
+        // Byte-split fallback. Reached when the two line segments met OR
+        // when a line-budget window could not retain actual CONTENT on
+        // either side — the single-huge-line shape (R04-RR1-F05-C02):
+        // the first/last line exceeds both byte budgets, so the line
+        // loops collected nothing (possibly only an empty trailing-line
+        // artifact) and the whole body would otherwise be replaced by a
+        // bare omission marker. The fallback keeps REAL head and tail
+        // CONTENT, split on UTF-8 character boundaries, with the precise
+        // omission size between them.
+        let head_part = &text[..floor_char_boundary(text, head_byte_budget)];
+        let tail_from = ceil_char_boundary(text, total_bytes.saturating_sub(tail_byte_budget));
+        let tail_part = &text[tail_from..];
+        let omitted = total_bytes
+            .saturating_sub(head_part.len())
+            .saturating_sub(tail_part.len());
+        let content = format!(
+            "{head_part}\n[... {} omitted ...]\n{tail_part}",
+            format_size(omitted as u64)
+        );
+        return HeadTail {
+            content,
+            truncated: true,
+            total_lines,
+            head_lines: head_part.split('\n').count(),
+            tail_lines: tail_part.split('\n').count(),
+        };
+    }
+    let omitted_lines = tail_start - head_lines.len();
+    let omitted_bytes: usize = lines[head_lines.len()..tail_start]
+        .iter()
+        .map(|l| l.len() + 1)
+        .sum();
+    let content = format!(
+        "{}\n[... {} lines / {} omitted ...]\n{}",
+        head_lines.join("\n"),
+        omitted_lines,
+        format_size(omitted_bytes as u64),
+        tail_lines.join("\n")
+    );
+    HeadTail {
+        content,
+        truncated: true,
+        total_lines,
+        head_lines: head_lines.len(),
+        tail_lines: tail_lines.len(),
+    }
+}
+
+/// The honest spill reference (R04-RR1-F05): ONLY an uncapped,
+/// un-failed spill that actually holds the whole stream is a "full
+/// output" reference. A capped spill is referenced as PARTIAL (the file
+/// holds only the first `bytes_written` bytes); a FAILED spill is never
+/// referenced at all — pointing a ResourceRef at an incomplete leftover
+/// invites reading it as the authoritative full output (the ghost-file
+/// defect).
+fn spill_resource_ref(spill: &SpillInfo) -> Option<ResourceRef> {
+    if spill.failed {
+        return None;
+    }
+    let display_name = if spill.capped {
+        format!(
+            "exec_command partial output (spill capped at {} bytes — not the full output)",
+            spill.bytes_written
+        )
+    } else {
+        "exec_command full output".to_string()
+    };
+    Some(ResourceRef {
+        resource_id: ResourceId::new(format!(
+            "exec-output:{}",
+            spill
+                .path
+                .file_name()
+                .map(|n| n.to_string_lossy().to_string())
+                .unwrap_or_else(|| "unknown".to_string())
+        )),
+        kind: ResourceKind::Artifact,
+        display_name: Some(display_name),
+        uri: Some(format!("file://{}", spill.path.display())),
+        digest: None,
+        size_bytes: Some(spill.bytes_written),
+    })
+}
+
+/// The full-output availability claim for result notices — one
+/// vocabulary, every state explicit (R04-RR1-F05 requirement 4: only a
+/// genuinely complete file may be called "Full output").
+fn full_output_claim(spill: Option<&SpillInfo>, total_bytes: u64) -> String {
+    match spill {
+        // "Full output" is claimed ONLY when the file provably holds the
+        // whole stream: not capped, not failed, byte-complete.
+        Some(spill) if !spill.capped && !spill.failed && spill.bytes_written >= total_bytes => {
+            format!("Full output: {}", spill.path.display())
+        }
+        Some(spill) if spill.capped => format!(
+            "Full output: unavailable — the spill file was capped at {} bytes (partial file: {})",
+            spill.bytes_written,
+            spill.path.display()
+        ),
+        Some(spill) => format!(
+            "Full output: unavailable — the spill write failed after {} bytes (incomplete \
+             leftover: {}; the in-memory result is unaffected)",
+            spill.bytes_written,
+            spill.path.display()
+        ),
+        None => "Full output: unavailable (no spill file was kept)".to_string(),
+    }
+}
+
+/// The transcript-spill claim appended to the ring-drop notice: only an
+/// uncapped, un-failed spill is a "full transcript"; capped/failed
+/// states are explicit (R04-RR1-F05 vocabulary for the PTY family).
+fn transcript_spill_claim(spill: Option<&SpillInfo>) -> String {
+    match spill {
+        Some(spill) if !spill.capped && !spill.failed && spill.bytes_written > 0 => {
+            format!("; full transcript: {}", spill.path.display())
+        }
+        Some(spill) if spill.capped => format!(
+            "; transcript spill capped at {} bytes (partial file: {})",
+            spill.bytes_written,
+            spill.path.display()
+        ),
+        Some(spill) => format!(
+            "; transcript spill write failed after {} bytes (incomplete file: {})",
+            spill.bytes_written,
+            spill.path.display()
+        ),
+        None => String::new(),
+    }
+}
+
+// ── the ownership drop guard ────────────────────────────────────────────────
+
+/// Initiates the supervisor's bounded termination when the executor
+/// future is dropped without settling (run cancellation). Disarmed on
+/// every normal completion path.
+pub struct ProcessOwnershipGuard {
+    supervisor: Arc<ProcessSupervisor>,
+    id: Option<ProcessHandleId>,
+}
+
+impl ProcessOwnershipGuard {
+    pub fn new(supervisor: Arc<ProcessSupervisor>, id: ProcessHandleId) -> Self {
+        Self {
+            supervisor,
+            id: Some(id),
+        }
+    }
+
+    pub fn disarm(&mut self) {
+        self.id = None;
+    }
+}
+
+impl Drop for ProcessOwnershipGuard {
+    fn drop(&mut self) {
+        if let Some(id) = self.id.take() {
+            self.supervisor
+                .terminate_detached(&id, TerminationReason::CallerDropped);
+        }
+    }
+}
+
+// ── the tools ───────────────────────────────────────────────────────────────
+
+pub struct ProcessTools {
+    supervisor: Arc<ProcessSupervisor>,
+    access: Arc<ResourceAccess>,
+    cwd: PathBuf,
+    /// The R04-T06 sandbox face. `None` keeps the T05 shape (authorized,
+    /// env-whitelisted, but NOT OS-sandboxed — results never claim
+    /// containment). `Some` wraps every one-shot argv through the port;
+    /// a sandbox that cannot fulfill the request REFUSES the command
+    /// (fail-closed — never a bare run).
+    sandbox: Option<Arc<dyn SandboxPort>>,
+}
+
+impl ProcessTools {
+    pub fn new(
+        supervisor: Arc<ProcessSupervisor>,
+        access: Arc<ResourceAccess>,
+        cwd: PathBuf,
+    ) -> Self {
+        Self {
+            supervisor,
+            access,
+            cwd,
+            sandbox: None,
+        }
+    }
+
+    /// The R04-T06 composition: process tools behind the sandbox face.
+    pub fn with_sandbox(
+        supervisor: Arc<ProcessSupervisor>,
+        access: Arc<ResourceAccess>,
+        cwd: PathBuf,
+        sandbox: Arc<dyn SandboxPort>,
+    ) -> Self {
+        Self {
+            supervisor,
+            access,
+            cwd,
+            sandbox: Some(sandbox),
+        }
+    }
+
+    pub fn supervisor(&self) -> &Arc<ProcessSupervisor> {
+        &self.supervisor
+    }
+
+    fn owner_of(ctx: &RunContext, call: &ToolCallId) -> ProcessOwner {
+        ProcessOwner {
+            principal_kind: ctx.principal.storage_kind().to_string(),
+            principal_subject: ctx.principal.storage_subject(),
+            session_id: ctx.session_id.to_string(),
+            run_id: ctx.run_id.to_string(),
+            tool_call_id: call.clone(),
+        }
+    }
+
+    /// Executor-side cwd re-check (the prepare-time derivation already
+    /// authorized the same scope; this is the near-dispatch re-derivation
+    /// the file tools perform).
+    fn authorize_cwd(
+        &self,
+        ctx: &RunContext,
+        workdir: &Path,
+    ) -> Result<ResourceScope, ToolOutcome> {
+        let path = if workdir.as_os_str().is_empty() {
+            Path::new(".")
+        } else {
+            workdir
+        };
+        self.access
+            .authorize(
+                ctx.principal.storage_kind(),
+                &ctx.principal.storage_subject(),
+                &ctx.session_id.to_string(),
+                path,
+                &self.cwd,
+                ResourceOp::Read,
+            )
+            .map_err(|refusal| failed(ErrorCode::Forbidden, format!("{refusal}")))
+    }
+
+    pub async fn run_exec_command(
+        &self,
+        ctx: &RunContext,
+        call: &ToolCallId,
+        args: &serde_json::Value,
+    ) -> ToolOutcome {
+        let params = match parse_exec_params(args) {
+            Ok(params) => params,
+            Err(outcome) => return outcome,
+        };
+        let cwd_scope = match self.authorize_cwd(ctx, &params.workdir) {
+            Ok(scope) => scope,
+            Err(outcome) => return outcome,
+        };
+        let cwd = cwd_scope.path.clone();
+        let env = build_child_env(&params.env);
+        let owner = Self::owner_of(ctx, call);
+        // R04-T06: the one-shot ISOLATED execution path. When the sandbox
+        // face is bound the argv is wrapped through it BEFORE any spawn —
+        // constraint intersection with the T04 cwd authorization above and
+        // the T05 env whitelist (this function's only env funnel): the
+        // sandbox is an additional layer, never a bypass or a second
+        // funnel. A sandbox that cannot fulfill the request refuses the
+        // command with zero side effects (fail-closed, R04-A11).
+        //
+        // `tty: true` keeps the incumbent semantics (`sandboxed = !tty &&
+        // …`): interactive terminals run WITHOUT the OS sandbox (still
+        // authorization + env-whitelist bound) and their results never
+        // claim containment — registered in the frozen capability matrix.
+        let mut argv = params.argv.clone();
+        let mut contained_by: Option<&'static str> = None;
+        if let Some(port) = self.sandbox.as_ref().filter(|_| !params.tty) {
+            match port.wrap(SandboxCommandRequest {
+                argv: params.argv.clone(),
+                // The incumbent's model-facing one-shot path is the
+                // CONTAINED variant (defaultSandboxExec denies network).
+                network: SandboxNetworkRequest::Contained,
+                cwd: Some(cwd.clone()),
+            }) {
+                Ok(wrapped) => {
+                    argv = wrapped.argv;
+                    contained_by = Some(port.backend());
+                }
+                Err(refusal) => {
+                    return failed(
+                        ErrorCode::Forbidden,
+                        format!("{EXEC_SANDBOX_REFUSED}: {refusal}"),
+                    )
+                }
+            }
+        }
+        let spec = SpawnSpec {
+            argv,
+            cwd: cwd.clone(),
+            env,
+            owner,
+            kind: if params.tty {
+                ProcessKind::PersistentTerminal
+            } else {
+                ProcessKind::OneShot
+            },
+            cols: params.cols,
+            rows: params.rows,
+        };
+        let spawned = match self.supervisor.spawn(spec).await {
+            Ok(spawned) => spawned,
+            // A capacity refusal is NOT a spawn failure: nothing was
+            // dispatched (the slot reservation precedes the OS spawn),
+            // and the caller must be able to distinguish "the command
+            // never ran" from "the binary failed to start". Hence its
+            // own vocabulary and code — never folded into
+            // EXEC_SPAWN_FAILED (R04-RR1-F01).
+            Err(failure @ crate::procsupervisor::SpawnFailure::RegistryFull) => {
+                return failed(
+                    ErrorCode::BudgetExceeded,
+                    format!("{EXEC_PROCESS_REGISTRY_FULL}: {failure}"),
+                )
+            }
+            Err(failure) => {
+                return failed(
+                    ErrorCode::UpstreamUnavailable,
+                    format!("{EXEC_SPAWN_FAILED}: {failure}"),
+                )
+            }
+        };
+        if params.tty {
+            return text_success(
+                format!(
+                    "Interactive process started (pty).\nprocess_id: {}\nstatus: running\n\
+                     cwd: {}\nUse write_stdin (process_id, chars) to interact and read output; \
+                     the process keeps running across tool calls until it exits or is closed.",
+                    spawned.id,
+                    cwd.display()
+                ),
+                false,
+                Vec::new(),
+                Some(ToolRunStatus::Running {
+                    handle: spawned.id.to_string(),
+                }),
+            );
+        }
+        // One-shot: guard ownership, wait for exit or the timeout.
+        let mut guard =
+            ProcessOwnershipGuard::new(Arc::clone(&self.supervisor), spawned.id.clone());
+        let timeout_at =
+            tokio::time::Instant::now() + Duration::from_secs(params.timeout_seconds.max(1));
+        // Which select arm fired — the deadline notice is tied to the
+        // watchdog, NOT to an assumed kill outcome.
+        let mut timeout_fired = false;
+        let phase = tokio::select! {
+            biased;
+            phase = self.supervisor.wait_terminal(&spawned.id) => phase,
+            _ = tokio::time::sleep_until(timeout_at) => {
+                timeout_fired = true;
+                // R04-RR1-F03: the receipt is mapped HONESTLY — a real
+                // observed exit keeps its real fact; an unconfirmed
+                // cleanup stays unconfirmed; nothing is invented here.
+                let receipt = self
+                    .supervisor
+                    .terminate(&spawned.id, TerminationReason::Timeout)
+                    .await;
+                match receipt.outcome {
+                    crate::procsupervisor::TerminationOutcome::Terminated { fact, .. } => {
+                        Some(RecordPhase::Terminated {
+                            reason: TerminationReason::Timeout,
+                            fact,
+                        })
+                    }
+                    // The record was already terminal when the kill was
+                    // about to fire (e.g. a natural exit raced the
+                    // deadline): echo the REAL phase — its fact is the
+                    // honest result, never a fabricated 137.
+                    crate::procsupervisor::TerminationOutcome::AlreadyTerminal(phase) => {
+                        Some(phase)
+                    }
+                    crate::procsupervisor::TerminationOutcome::CleanupTimedOut => {
+                        Some(RecordPhase::CleanupTimedOut {
+                            reason: TerminationReason::Timeout,
+                        })
+                    }
+                    crate::procsupervisor::TerminationOutcome::UnknownProcess => None,
+                }
+            }
+        };
+        guard.disarm();
+        let phase = match phase {
+            Some(phase) => phase,
+            None => {
+                return failed(
+                    ErrorCode::Internal,
+                    "the process record vanished while waiting for the exit".to_string(),
+                )
+            }
+        };
+        let snapshot = self
+            .supervisor
+            .output_snapshot(&spawned.id)
+            .unwrap_or_else(empty_output_snapshot);
+        // R04-RR1-F05: the result is assembled from the WHOLE-stream
+        // facts — the true head, the rolling tail, the total — and the
+        // completeness flag is true to those facts, never to whether
+        // the retained window happened to fit the return budget.
+        let assembled =
+            assemble_retained_output(&snapshot.head, &snapshot.window, snapshot.total_bytes);
+        let head_tail = truncate_head_tail(
+            &assembled.text,
+            EXEC_RESULT_MAX_LINES,
+            params.max_output_bytes,
+        );
+        // R04-RR1-F03: the run/exit status of the call. An exit CODE is
+        // claimed only from a REAL observed fact; a stop whose exit was
+        // not observed (CleanupTimedOut) or whose status could not be
+        // read (a failed wait) surfaces as the queryable
+        // `StopUnconfirmed` — never `Exited`, never a fabricated 137/-1.
+        let observed_code = match &phase {
+            RecordPhase::Exited { fact } | RecordPhase::Terminated { fact, .. } => {
+                fact.observed_status_code()
+            }
+            RecordPhase::Running
+            | RecordPhase::Terminating { .. }
+            | RecordPhase::CleanupTimedOut { .. } => None,
+        };
+        let unconfirmed_detail = match &phase {
+            RecordPhase::Exited {
+                fact: ExitFact::Unobserved,
+            }
+            | RecordPhase::Terminated {
+                fact: ExitFact::Unobserved,
+                ..
+            } => Some(
+                "the child's end was observed but its exit status could not be read (the \
+                 wait failed) — unconfirmed"
+                    .to_string(),
+            ),
+            RecordPhase::CleanupTimedOut { reason } => Some(format!(
+                "termination was requested ({}) but the exit was not observed within the \
+                 cleanup bound — unconfirmed",
+                reason.wire_name()
+            )),
+            _ => None,
+        };
+        let timed_out = timeout_fired;
+        let mut body = if head_tail.content.trim().is_empty() {
+            "(no output)".to_string()
+        } else {
+            head_tail.content.clone()
+        };
+        // The completeness flag: BOTH facts must be true for false — the
+        // returned body needs no omission AND the in-memory retention
+        // lost nothing. A lost middle marks truncated even when the
+        // return budget is huge (the hidden-loss counter-example).
+        let evicted_bytes = assembled.evicted_bytes;
+        let truncated = head_tail.truncated || evicted_bytes > 0;
+        if truncated || evicted_bytes > 0 {
+            let claim = full_output_claim(snapshot.spill.as_ref(), snapshot.total_bytes);
+            if head_tail.truncated {
+                body.push_str(&format!(
+                    "\n\n[Showing first {} and last {} of {} lines. {claim}]",
+                    head_tail.head_lines, head_tail.tail_lines, head_tail.total_lines,
+                ));
+            }
+            if evicted_bytes > 0 {
+                // The retention fact, stated independently of the return
+                // truncation: the shown beginning and end ARE the
+                // stream's true head and tail, and the middle bytes are
+                // gone from memory (the spill claim above/below says
+                // where the whole stream lives, if anywhere).
+                body.push_str(&format!(
+                    "\n\n[{evicted_bytes} bytes of the output middle were evicted from the \
+                     bounded in-memory head/tail windows; the shown beginning and end are the \
+                     stream's true head and tail. {}]",
+                    if head_tail.truncated {
+                        // The claim is already stated in the lines notice.
+                        String::new()
+                    } else {
+                        claim
+                    }
+                ));
+            }
+        }
+        if params.timeout_clamped {
+            body.push_str(&format!(
+                "\n\n[timeout clamped to {EXEC_MAX_TIMEOUT_SECONDS}s]"
+            ));
+        }
+        let mut resource_refs = Vec::new();
+        if let Some(spill) = snapshot.spill.as_ref().filter(|s| s.bytes_written > 0) {
+            // `None` for a failed spill: no ghost full-output reference
+            // (the failure is stated in the body notice instead).
+            resource_refs.extend(spill_resource_ref(spill));
+        }
+        if timed_out {
+            body.push_str(&format!(
+                "\n\nCommand timed out after {} seconds{}. For long-running work pass \
+                 timeout=<seconds> (max {EXEC_MAX_TIMEOUT_SECONDS}), or run with tty=true and \
+                 continue via write_stdin.",
+                params.timeout_seconds,
+                if params.timeout_seconds == EXEC_DEFAULT_TIMEOUT_SECONDS {
+                    " (default timeout)"
+                } else {
+                    ""
+                }
+            ));
+        }
+        // The exit statement matches the observed fact exactly: a real
+        // nonzero code is stated; an unconfirmed stop says so and keeps
+        // the handle queryable (R04-RR1-F03 — a kill that was merely
+        // requested never reads as an exit).
+        if let Some(code) = observed_code.filter(|code| *code != 0) {
+            body.push_str(&format!("\n\nCommand exited with code {code}"));
+        }
+        if let Some(detail) = unconfirmed_detail.as_deref() {
+            body.push_str(&format!(
+                "\n\n[stop unconfirmed] {detail}. The command's final state is not confirmed — \
+                 it may still be running or have ended unobserved; do not assume the absence \
+                 of further side effects. process_id {} remains queryable via the process \
+                 record.",
+                spawned.id
+            ));
+        }
+        // Honest containment state: the sandbox line appears ONLY when the
+        // argv actually ran behind the sandbox port (R04-T06). An
+        // unsandboxed execution never claims containment.
+        if let Some(backend) = contained_by {
+            body.push_str(&format!(
+                "\n\nsandbox: {backend} (contained; filesystem writes scoped to the \
+                 authorized roots, network denied)"
+            ));
+            // The incumbent's sandbox error translation (sandbox.writeRestricted):
+            // a denied operation surfaces as "Operation not permitted".
+            if body.contains("Operation not permitted") {
+                body.push_str(
+                    "\n\n[Security] File system writes are restricted to allowed workspace \
+                     and session paths. Check the current workspace and path syntax before \
+                     asking the user whether to change sandbox settings.",
+                );
+            }
+        }
+        let run_status = if let Some(code) = observed_code {
+            ToolRunStatus::Exited { code }
+        } else if let Some(detail) = unconfirmed_detail {
+            ToolRunStatus::StopUnconfirmed {
+                handle: spawned.id.to_string(),
+                detail,
+            }
+        } else {
+            // A non-terminal phase where a terminal one is required is an
+            // internal invariant break — stated loudly, never papered
+            // over with an invented exit.
+            return failed(
+                ErrorCode::Internal,
+                format!(
+                    "the process record reported a non-terminal phase ({phase:?}) where a \
+                     terminal one was required"
+                ),
+            );
+        };
+        text_success(body, truncated, resource_refs, Some(run_status))
+    }
+
+    pub async fn run_write_stdin(&self, ctx: &RunContext, args: &serde_json::Value) -> ToolOutcome {
+        let Some(process_id) = args
+            .get("process_id")
+            .and_then(|v| v.as_str())
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty())
+        else {
+            return failed(
+                ErrorCode::InvalidMessage,
+                format!("{WRITE_STDIN_PROCESS_ID_REQUIRED}: write_stdin requires process_id"),
+            );
+        };
+        // Handle format gate: a forged/garbage id never reaches the registry.
+        let Some(id) = ProcessHandleId::parse(&process_id) else {
+            return failed(
+                ErrorCode::NotFound,
+                format!(
+                    "{WRITE_STDIN_UNKNOWN_PROCESS}: process_id is not a process handle minted \
+                     by this service"
+                ),
+            );
+        };
+        let Some(record) = self.supervisor.record(&id) else {
+            return failed(
+                ErrorCode::NotFound,
+                format!(
+                    "{WRITE_STDIN_UNKNOWN_PROCESS}: process_id is not a process handle minted \
+                     by this service"
+                ),
+            );
+        };
+        if !matches!(record.kind, ProcessKind::PersistentTerminal) {
+            return failed(
+                ErrorCode::InvalidMessage,
+                format!(
+                    "{WRITE_STDIN_NOT_INTERACTIVE}: process {} is a one-shot command, not an \
+                     interactive terminal",
+                    process_id
+                ),
+            );
+        }
+        // Caller + session authorization (trusted context only).
+        if record.owner.principal_kind != ctx.principal.storage_kind()
+            || record.owner.principal_subject != ctx.principal.storage_subject()
+            || record.owner.session_id != ctx.session_id.to_string()
+        {
+            return failed(
+                ErrorCode::Forbidden,
+                format!(
+                    "{WRITE_STDIN_NOT_OWNED}: terminal {} belongs to another session; \
+                     write_stdin is limited to the session that started the process",
+                    process_id
+                ),
+            );
+        }
+        let chars = args.get("chars").and_then(|v| v.as_str()).unwrap_or("");
+        if !chars.is_empty() {
+            if let Err(err) = self.supervisor.pty_write(&id, chars.as_bytes()).await {
+                let phase = self.supervisor.phase_of(&id);
+                return failed(
+                    ErrorCode::Conflict,
+                    format!("write_stdin failed: {err} (phase: {phase:?})"),
+                );
+            }
+        }
+        let delivery = self
+            .supervisor
+            .pty_deliver(&id)
+            .await
+            .expect("the record exists");
+        let phase = self.supervisor.phase_of(&id).expect("the record exists");
+        let status_line = match &phase {
+            RecordPhase::Running | RecordPhase::Terminating { .. } => "running".to_string(),
+            RecordPhase::Exited { fact } => format!("exited ({})", fact.describe()),
+            RecordPhase::Terminated { reason, fact } => {
+                format!("terminated ({}; {})", reason.wire_name(), fact.describe())
+            }
+            // R04-RR1-F03: the text states exactly what is known — a
+            // termination was requested and the bound expired WITHOUT
+            // the exit being observed. It does not claim the kill was
+            // delivered (the audit carries the real sent/skip fact) and
+            // it never reads as an exit.
+            RecordPhase::CleanupTimedOut { reason } => format!(
+                "cleanup_timed_out ({}; termination was requested, exit not observed — \
+                 unconfirmed, not exited)",
+                reason.wire_name()
+            ),
+        };
+        let mut lines = vec![
+            format!("process_id: {}", record.id),
+            format!("status: {status_line}"),
+        ];
+        if !delivery.text.is_empty() {
+            lines.push(format!("output:\n{}", delivery.text));
+        }
+        // R04-RR1-F04: the four dispositions are stated as DISTINCT
+        // facts. The ring-drop message appears ONLY for real loss (the
+        // structured `truncated` flag covers exactly real loss + a
+        // held-back tail — the two always agree with these lines).
+        if delivery.dropped_undelivered_bytes > 0 {
+            lines.push(format!(
+                "[transcript truncated: {} bytes were dropped by the bounded ring before \
+                 delivery{}]",
+                delivery.dropped_undelivered_bytes,
+                transcript_spill_claim(delivery.spill.as_ref()),
+            ));
+        }
+        if delivery.pending_incomplete_bytes > 0 {
+            lines.push(format!(
+                "[{} trailing bytes of an incomplete UTF-8 sequence are held back until the \
+                 rest arrives; they are not lost and will be delivered complete]",
+                delivery.pending_incomplete_bytes,
+            ));
+        }
+        if delivery.replaced_bytes > 0 {
+            lines.push(format!(
+                "[the terminal closed mid-character: {} dangling bytes were flushed as one \
+                 U+FFFD replacement]",
+                delivery.replaced_bytes,
+            ));
+        }
+        if let Some(spill) = delivery.spill.as_ref().filter(|s| s.bytes_written > 0) {
+            if spill.failed {
+                lines.push(format!(
+                    "transcript_path: {} (incomplete — the spill write failed after {} bytes)",
+                    spill.path.display(),
+                    spill.bytes_written,
+                ));
+            } else if spill.capped {
+                lines.push(format!(
+                    "transcript_path: {} (capped at {} bytes — partial transcript)",
+                    spill.path.display(),
+                    spill.bytes_written,
+                ));
+            } else {
+                lines.push(format!("transcript_path: {}", spill.path.display()));
+            }
+        }
+        // R04-RR1-F03: text and structured status AGREE. An exit code is
+        // claimed only from a real observed fact; an unconfirmed stop
+        // (CleanupTimedOut, or a wait that failed) surfaces as the
+        // queryable StopUnconfirmed — never Exited{137}.
+        let run_status = match &phase {
+            RecordPhase::Running | RecordPhase::Terminating { .. } => {
+                Some(ToolRunStatus::Running {
+                    handle: record.id.to_string(),
+                })
+            }
+            RecordPhase::Exited { fact } | RecordPhase::Terminated { fact, .. } => {
+                match fact.observed_status_code() {
+                    Some(code) => Some(ToolRunStatus::Exited { code }),
+                    None => Some(ToolRunStatus::StopUnconfirmed {
+                        handle: record.id.to_string(),
+                        detail: "the terminal's end was observed but its exit status could \
+                                 not be read (the wait failed) — unconfirmed"
+                            .to_string(),
+                    }),
+                }
+            }
+            RecordPhase::CleanupTimedOut { reason } => Some(ToolRunStatus::StopUnconfirmed {
+                handle: record.id.to_string(),
+                detail: format!(
+                    "termination was requested ({}) but the exit was not observed within \
+                     the cleanup bound — unconfirmed",
+                    reason.wire_name()
+                ),
+            }),
+        };
+        let text = lines.join("\n");
+        text_success(text, delivery.truncated, Vec::new(), run_status)
+    }
+}
+
+// A fresh empty snapshot for the vanished-record edge (never in practice).
+fn empty_output_snapshot() -> crate::procsupervisor::OutputSnapshot {
+    crate::procsupervisor::OutputSnapshot {
+        window: Vec::new(),
+        head: Vec::new(),
+        total_bytes: 0,
+        stdout_bytes: 0,
+        stderr_bytes: 0,
+        spill: None,
+    }
+}
+
+// ── registration (the real process tools) ──────────────────────────────────
+
+/// The registered identities of the native process tools.
+#[derive(Clone)]
+pub struct CoreProcessTools {
+    pub exec_target: ToolTargetId,
+    pub write_stdin_target: ToolTargetId,
+    pub tools: Arc<ProcessTools>,
+}
+
+fn process_manifest(
+    local_name: &str,
+    capability: &str,
+    description: &str,
+    schema: serde_json::Value,
+) -> ToolManifest {
+    use lingxi_kernel::invocation::ToolRecoveryCapability;
+    use lingxi_kernel::toolcatalog::{DeclaredPermission, PermissionContract, ToolOrigin};
+    ToolManifest {
+        origin: ToolOrigin::FirstParty,
+        local_name: local_name.to_string(),
+        display_name: local_name.to_string(),
+        aliases: Vec::new(),
+        version: "1.0.0".to_string(),
+        description: description.to_string(),
+        input_schema: ToolSchemaDocument {
+            dialect: "json-schema/2020-12".to_string(),
+            schema,
+        },
+        output_schema: None,
+        permission: PermissionContract {
+            kind: lingxi_kernel::toolcatalog::PermissionKind::Execute,
+            capability_base: capability.to_string(),
+        },
+        availability: lingxi_kernel::toolcatalog::Availability::Available,
+        timeout_ms: None,
+        max_concurrency: None,
+        declared_permission: DeclaredPermission::Execute,
+        recovery: ToolRecoveryCapability::CONSERVATIVE,
+    }
+}
+
+/// Registers the REAL exec_command / write_stdin tools on the registry
+/// and binds their executors on the gateway. Composition entry — the
+/// production default bootstrap does NOT call it (no production default
+/// changes in R04).
+///
+/// `sandbox` (R04-T06): `None` keeps the T05 shape; `Some` binds the
+/// sandbox face — every one-shot exec_command runs behind it and a
+/// sandbox that cannot fulfill the request refuses the command
+/// (fail-closed).
+#[allow(clippy::too_many_arguments)]
+pub fn register_process_tools(
+    registry: &ToolRegistry,
+    gateway: &ToolInvocationGateway,
+    supervisor: Arc<ProcessSupervisor>,
+    access: Arc<ResourceAccess>,
+    cwd: PathBuf,
+    sandbox: Option<Arc<dyn SandboxPort>>,
+    _clock: Arc<dyn ServiceClock>,
+    budget: &SchemaBudget,
+) -> CoreProcessTools {
+    let tools = Arc::new(match sandbox {
+        Some(port) => ProcessTools::with_sandbox(
+            Arc::clone(&supervisor),
+            Arc::clone(&access),
+            cwd.clone(),
+            port,
+        ),
+        None => ProcessTools::new(Arc::clone(&supervisor), Arc::clone(&access), cwd.clone()),
+    });
+    let exec_manifest = process_manifest(
+        "exec_command",
+        "exec_command.run",
+        "Native Rust exec_command (R04-T05): run a command with structured argv or a shell \
+         string; bounded output with head+tail truncation, exit codes, timeout, and PTY \
+         terminals via tty=true (returns a process handle — started, not finished)",
+        serde_json::json!({
+            "type": "object",
+            "properties": {
+                "cmd": {"type": "string", "description": "Shell command string (executed via /bin/bash -c). Mutually exclusive with argv."},
+                "argv": {"type": "array", "items": {"type": "string"}, "description": "Structured argv (no shell). Mutually exclusive with cmd."},
+                "workdir": {"type": "string"},
+                "timeout_seconds": {"type": "integer", "minimum": 1},
+                "max_output_bytes": {"type": "integer", "minimum": 1000},
+                "env": {"type": "object"},
+                "tty": {"type": "boolean"},
+                "cols": {"type": "integer", "minimum": 1, "maximum": 1024},
+                "rows": {"type": "integer", "minimum": 1, "maximum": 1024}
+            },
+            "additionalProperties": false
+        }),
+    );
+    let write_stdin_manifest = process_manifest(
+        "write_stdin",
+        "write_stdin.io",
+        "Native Rust write_stdin (R04-T05): write to an interactive terminal started by \
+         exec_command tty=true and read its new output; limited to the session that owns \
+         the terminal",
+        serde_json::json!({
+            "type": "object",
+            "properties": {
+                "process_id": {"type": "string", "minLength": 1},
+                "chars": {"type": "string"}
+            },
+            "required": ["process_id"],
+            "additionalProperties": false
+        }),
+    );
+    let exec_target = registry
+        .register(exec_manifest, budget)
+        .expect("the exec_command tool registers")
+        .target_id;
+    let write_stdin_target = registry
+        .register(write_stdin_manifest, budget)
+        .expect("the write_stdin tool registers")
+        .target_id;
+    gateway.bind_executor_with_resources(
+        exec_target.clone(),
+        Arc::new(CoreProcessExecutor {
+            tools: Arc::clone(&tools),
+            kind: ProcessToolKind::ExecCommand,
+        }),
+        Some(ProcessTools::resource_extractor(
+            Arc::clone(&access),
+            cwd.clone(),
+        )),
+        "R04-T05 native exec_command executor (real processes, process-group cleanup)",
+    );
+    gateway.bind_executor(
+        write_stdin_target.clone(),
+        Arc::new(CoreProcessExecutor {
+            tools: Arc::clone(&tools),
+            kind: ProcessToolKind::WriteStdin,
+        }),
+        "R04-T05 native write_stdin executor (owner-checked terminal I/O)",
+    );
+    CoreProcessTools {
+        exec_target,
+        write_stdin_target,
+        tools,
+    }
+}
+
+impl ProcessTools {
+    /// The prepare-time resource derivation: the workdir (or the tool
+    /// cwd) must be an authorized directory (Read op — a process runs
+    /// FROM there).
+    pub fn resource_extractor(access: Arc<ResourceAccess>, cwd: PathBuf) -> ResourceExtractor {
+        Arc::new(
+            move |input: &ResourceExtractionInput, args: &EffectiveArguments| {
+                let workdir = args
+                    .as_value()
+                    .get("workdir")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.trim())
+                    .filter(|s| !s.is_empty())
+                    .map(PathBuf::from)
+                    .unwrap_or_else(|| cwd.clone());
+                let scope = access
+                    .authorize(
+                        input.principal_kind,
+                        &input.principal_subject,
+                        &input.session_id,
+                        &workdir,
+                        &cwd,
+                        ResourceOp::Read,
+                    )
+                    .map_err(|refusal| format!("{refusal}"))?;
+                Ok(vec![scope])
+            },
+        )
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum ProcessToolKind {
+    ExecCommand,
+    WriteStdin,
+}
+
+/// One executor bound to one target. Dispatches through the T02 gateway
+/// ONLY (boundary check B1).
+pub struct CoreProcessExecutor {
+    tools: Arc<ProcessTools>,
+    kind: ProcessToolKind,
+}
+
+impl ToolExecutorPort for CoreProcessExecutor {
+    fn execute<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        call: &'a ToolCallId,
+        request: &'a ToolRequest,
+    ) -> Pin<Box<dyn std::future::Future<Output = ToolExecutionResult> + Send + 'a>> {
+        let tools = Arc::clone(&self.tools);
+        let kind = self.kind;
+        let ctx = ctx.clone();
+        let call = call.clone();
+        let args = request.arguments.as_value().clone();
+        Box::pin(async move {
+            let outcome = match kind {
+                ProcessToolKind::ExecCommand => tools.run_exec_command(&ctx, &call, &args).await,
+                ProcessToolKind::WriteStdin => tools.run_write_stdin(&ctx, &args).await,
+            };
+            ToolExecutionResult::of_ctx(&ctx, outcome)
+        })
+    }
+}
+
+// ── unit tests (pure logic; the toolchain legs live in the integration
+//    suites r04_rr1_f04_* / r04_rr1_f05_*) ───────────────────────────────────
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── R04-RR1-F05-C02: a single huge line keeps REAL head/tail content ──
+
+    #[test]
+    fn truncate_head_tail_single_huge_ascii_line_keeps_head_and_tail() {
+        // One 100 KiB line, 2 KiB budget: the line exceeds both side
+        // budgets — the body must still show the true head and tail
+        // bytes, not only an omission marker.
+        let text = format!("HEAD_MARK|{}|TAIL_MARK", "x".repeat(100 * 1024));
+        let head_tail = truncate_head_tail(&text, 2000, 2048);
+        assert!(head_tail.truncated);
+        assert!(
+            head_tail.content.contains("HEAD_MARK|"),
+            "the true head content survives: {}…",
+            &head_tail.content[..80.min(head_tail.content.len())]
+        );
+        assert!(
+            head_tail.content.contains("|TAIL_MARK"),
+            "the true tail content survives"
+        );
+        assert!(head_tail.content.contains("omitted"));
+        // The shown content is meaningfully bounded by the budget.
+        assert!(head_tail.content.len() < 4 * 1024 + 64);
+    }
+
+    #[test]
+    fn truncate_head_tail_multibyte_line_cuts_on_char_boundaries() {
+        // A multibyte-only line (3 bytes/char): byte cuts must land on
+        // character boundaries — no U+FFFD, markers intact.
+        let text = format!("头标记{}尾标记", "中".repeat(20_000));
+        let head_tail = truncate_head_tail(&text, 2000, 6 * 1024);
+        assert!(head_tail.truncated);
+        assert!(head_tail.content.contains("头标记"));
+        assert!(head_tail.content.contains("尾标记"));
+        assert!(
+            !head_tail.content.contains('\u{FFFD}'),
+            "byte-boundary-safe: {}",
+            &head_tail.content[..120.min(head_tail.content.len())]
+        );
+    }
+
+    #[test]
+    fn truncate_head_tail_newline_only_at_end_keeps_both_markers() {
+        // The adversarial shape: a single huge line whose ONLY newline is
+        // the trailing one — the empty last line must not sneak into the
+        // tail budget and hide the real tail content.
+        let text = format!("HEAD_MARK|{}|TAIL_MARK\n", "y".repeat(60 * 1024));
+        let head_tail = truncate_head_tail(&text, 2000, 8 * 1024);
+        assert!(head_tail.truncated);
+        assert!(head_tail.content.contains("HEAD_MARK|"));
+        assert!(head_tail.content.contains("|TAIL_MARK"));
+    }
+
+    #[test]
+    fn truncate_head_tail_small_output_stays_whole() {
+        let text = "line1\nline2\nline3\n";
+        let head_tail = truncate_head_tail(text, 2000, 50 * 1024);
+        assert!(!head_tail.truncated);
+        assert_eq!(head_tail.content, text);
+    }
+
+    // ── R04-RR1-F05: whole-stream fact assembly ────────────────────────────
+
+    #[test]
+    fn assemble_retained_output_small_stream_is_whole_and_exact() {
+        // Total ≤ head+tail windows: the whole stream, byte-exact, no
+        // duplicated overlap.
+        let stream = b"HEAD|....middle....|TAIL".to_vec();
+        let head = &stream[..16];
+        let tail = &stream[stream.len() - 16..];
+        let assembled = assemble_retained_output(head, tail, stream.len() as u64);
+        assert_eq!(assembled.evicted_bytes, 0);
+        assert_eq!(assembled.text.as_bytes(), &stream[..]);
+    }
+
+    #[test]
+    fn assemble_retained_output_evicted_middle_is_counted_and_marked() {
+        let head = "真head".as_bytes(); // ends cleanly
+        let tail = b"\xA5tail"; // starts mid-character (the evicted char's 3rd byte)
+        let total = 64u64;
+        let assembled = assemble_retained_output(head, tail, total);
+        assert_eq!(
+            assembled.evicted_bytes,
+            total - head.len() as u64 - tail.len() as u64
+        );
+        assert!(assembled.text.contains("真head"));
+        assert!(assembled.text.contains("evicted"));
+        assert!(
+            assembled.text.contains('\u{FFFD}'),
+            "the tail's leading continuation bytes become the incumbent's \
+             continuation-skip marker"
+        );
+        assert!(assembled.text.contains("tail"));
+    }
+
+    #[test]
+    fn full_output_claim_vocabulary_is_state_exclusive() {
+        let dir = std::env::temp_dir();
+        let complete = SpillInfo {
+            path: dir.join("complete.log"),
+            bytes_written: 100,
+            capped: false,
+            failed: false,
+        };
+        assert_eq!(
+            full_output_claim(Some(&complete), 100),
+            format!("Full output: {}", dir.join("complete.log").display())
+        );
+        let capped = SpillInfo {
+            path: dir.join("capped.log"),
+            bytes_written: 50,
+            capped: true,
+            failed: false,
+        };
+        let claim = full_output_claim(Some(&capped), 100);
+        assert!(
+            claim.contains("unavailable") && claim.contains("capped"),
+            "{claim}"
+        );
+        let failed = SpillInfo {
+            path: dir.join("failed.log"),
+            bytes_written: 30,
+            capped: false,
+            failed: true,
+        };
+        let claim = full_output_claim(Some(&failed), 100);
+        assert!(
+            claim.contains("unavailable") && claim.contains("failed"),
+            "{claim}"
+        );
+        let claim = full_output_claim(None, 100);
+        assert!(claim.contains("unavailable"), "{claim}");
+    }
+
+    #[test]
+    fn transcript_spill_claim_vocabulary_is_state_exclusive() {
+        let dir = std::env::temp_dir();
+        let complete = SpillInfo {
+            path: dir.join("t-complete.log"),
+            bytes_written: 100,
+            capped: false,
+            failed: false,
+        };
+        assert_eq!(
+            transcript_spill_claim(Some(&complete)),
+            format!(
+                "; full transcript: {}",
+                dir.join("t-complete.log").display()
+            )
+        );
+        let capped = SpillInfo {
+            path: dir.join("t-capped.log"),
+            bytes_written: 50,
+            capped: true,
+            failed: false,
+        };
+        let claim = transcript_spill_claim(Some(&capped));
+        assert!(
+            claim.contains("capped") && claim.contains("partial"),
+            "{claim}"
+        );
+        assert!(!claim.contains("full transcript:"), "{claim}");
+        let failed = SpillInfo {
+            path: dir.join("t-failed.log"),
+            bytes_written: 30,
+            capped: false,
+            failed: true,
+        };
+        let claim = transcript_spill_claim(Some(&failed));
+        assert!(
+            claim.contains("failed") && claim.contains("incomplete"),
+            "{claim}"
+        );
+        assert_eq!(transcript_spill_claim(None), "");
+    }
+
+    #[test]
+    fn spill_resource_ref_never_claims_full_when_capped_or_failed() {
+        let dir = std::env::temp_dir();
+        let capped = SpillInfo {
+            path: dir.join("capped.log"),
+            bytes_written: 50,
+            capped: true,
+            failed: false,
+        };
+        let reference = spill_resource_ref(&capped).expect("capped spill still referenced");
+        assert!(reference
+            .display_name
+            .as_deref()
+            .unwrap()
+            .contains("partial"));
+        assert!(!reference
+            .display_name
+            .as_deref()
+            .unwrap()
+            .contains("exec_command full output"));
+        let failed = SpillInfo {
+            path: dir.join("failed.log"),
+            bytes_written: 30,
+            capped: false,
+            failed: true,
+        };
+        assert!(
+            spill_resource_ref(&failed).is_none(),
+            "a failed spill is never referenced (no ghost full-output file)"
+        );
+    }
+}

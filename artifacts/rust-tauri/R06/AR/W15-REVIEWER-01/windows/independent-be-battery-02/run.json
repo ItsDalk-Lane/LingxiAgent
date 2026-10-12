@@ -1,0 +1,239 @@
+{
+  "argv": [
+    "/private/tmp/lingxi-w15-r01-runtime/target/debug/deps/r06_t08_behavior_eval-1c89a5f684c9ab08",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "cwd": "/private/tmp/lingxi-r06-w15-reviewer-01",
+  "started": "2026-10-12T00:08:19.683911+00:00",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "effective_env": {
+    "HOME": "/Users/study_superior",
+    "LINGXI_HOME": "/private/tmp/lingxi-w15-r01-runtime/home",
+    "TMPDIR": "/private/tmp/lingxi-w15-r01-runtime/tmp",
+    "LINGXI_PRODUCT_DIR": "/private/tmp/lingxi-r06-w15-reviewer-01/lib",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-w15-r01-runtime/target",
+    "CARGO_INCREMENTAL": "0",
+    "LINGXI_TEST_GUARD": "1",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "TEST_MEM_LIMIT_MB": "8192"
+  },
+  "guard": {
+    "business_seconds": 600,
+    "rss_mib": 8192,
+    "controller_seconds": 2700,
+    "sampling_interval_seconds": 0.05
+  },
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "source_before": "76b576ae8cf26174813b3439436a2a5d1aff65f42743af9e305e05ec5b6eebff",
+  "processes": [
+    {
+      "pid": 98219,
+      "ppid": 97989,
+      "argv": "/private/tmp/lingxi-w15-r01-runtime/target/debug/deps/r06_t08_behavior_eval-1c89a5f684c9ab08 --test-threads=1 --nocapture",
+      "actual_executable": "/private/tmp/lingxi-w15-r01-runtime/target/debug/deps/r06_t08_behavior_eval-1c89a5f684c9ab08",
+      "executable_sha256_first_observed": "0e8c151ab01282c2edccb856921cf8497ae8d4b50b0cc43d8b8bee7c9215bae9",
+      "first_seen_elapsed": 0.28907874997821636,
+      "last_seen_elapsed": 3.2374624160001986,
+      "peak_sampled_rss_bytes": 30228480,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_at_final_table",
+        "elapsed": 3.4215977499843575
+      },
+      "wait_reap": "Popen.wait executed",
+      "executable_sha256_after": "0e8c151ab01282c2edccb856921cf8497ae8d4b50b0cc43d8b8bee7c9215bae9",
+      "present_after": false,
+      "exit_code": 0
+    },
+    {
+      "pid": 98226,
+      "ppid": 98219,
+      "argv": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service --home /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-be01-home-98219-0 --config /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-be01-cfg-98219-2/service.json --bind 127.0.0.1:0",
+      "actual_executable": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service",
+      "executable_sha256_first_observed": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+      "first_seen_elapsed": 0.9969712499878369,
+      "last_seen_elapsed": 1.7997273329820018,
+      "peak_sampled_rss_bytes": 19529728,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 1.9539233749965206
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+      "present_after": false
+    },
+    {
+      "pid": 98234,
+      "ppid": 98219,
+      "argv": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service --home /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-be02-home-98219-3 --config /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-be02-cfg-98219-5/service.json --bind 127.0.0.1:0",
+      "actual_executable": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service",
+      "executable_sha256_first_observed": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+      "first_seen_elapsed": 1.9539233749965206,
+      "last_seen_elapsed": 1.9539233749965206,
+      "peak_sampled_rss_bytes": 720896,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 2.1157822079840116
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+      "present_after": false
+    },
+    {
+      "pid": 98235,
+      "ppid": 98219,
+      "argv": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service --home /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-be03-home-98219-6 --config /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-be03-cfg-98219-8/service.json --bind 127.0.0.1:0",
+      "actual_executable": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service",
+      "executable_sha256_first_observed": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+      "first_seen_elapsed": 2.1157822079840116,
+      "last_seen_elapsed": 2.2768854999740142,
+      "peak_sampled_rss_bytes": 19398656,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 2.399390082980972
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+      "present_after": false
+    },
+    {
+      "pid": 98238,
+      "ppid": 98219,
+      "argv": "(lingxi-service)",
+      "actual_executable": null,
+      "executable_sha256_first_observed": null,
+      "first_seen_elapsed": 2.399390082980972,
+      "last_seen_elapsed": 2.399390082980972,
+      "peak_sampled_rss_bytes": 36618240,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 2.5156782909762114
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": null,
+      "present_after": false
+    },
+    {
+      "pid": 98240,
+      "ppid": 98219,
+      "argv": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service --home /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-be05-home-98219-12 --config /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-be05-cfg-98219-14/service.json --bind 127.0.0.1:0",
+      "actual_executable": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service",
+      "executable_sha256_first_observed": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+      "first_seen_elapsed": 2.5156782909762114,
+      "last_seen_elapsed": 2.5156782909762114,
+      "peak_sampled_rss_bytes": 31522816,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 2.670220749976579
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+      "present_after": false
+    },
+    {
+      "pid": 98242,
+      "ppid": 98219,
+      "argv": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service --home /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-be07-home-98219-19 --config /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-be07-cfg-98219-21/service.json --bind 127.0.0.1:0",
+      "actual_executable": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service",
+      "executable_sha256_first_observed": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+      "first_seen_elapsed": 2.670220749976579,
+      "last_seen_elapsed": 2.670220749976579,
+      "peak_sampled_rss_bytes": 22839296,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 2.831163665978238
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+      "present_after": false
+    },
+    {
+      "pid": 98245,
+      "ppid": 98219,
+      "argv": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service --home /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-be09-home-98219-25 --config /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-be09-cfg-98219-27/service.json --bind 127.0.0.1:0",
+      "actual_executable": null,
+      "executable_sha256_first_observed": null,
+      "first_seen_elapsed": 2.9542748329986352,
+      "last_seen_elapsed": 2.9542748329986352,
+      "peak_sampled_rss_bytes": 22413312,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 3.075592749984935
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": null,
+      "present_after": false
+    },
+    {
+      "pid": 98247,
+      "ppid": 98219,
+      "argv": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service --home /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-be10-home-98219-28 --config /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-be10-cfg-98219-30/service.json --bind 127.0.0.1:0",
+      "actual_executable": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service",
+      "executable_sha256_first_observed": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+      "first_seen_elapsed": 3.075592749984935,
+      "last_seen_elapsed": 3.075592749984935,
+      "peak_sampled_rss_bytes": 19841024,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_from_process_table",
+        "elapsed": 3.2374624160001986
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+      "present_after": false
+    },
+    {
+      "pid": 98249,
+      "ppid": 98219,
+      "argv": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service --home /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-usage-wire-home-98219-33 --config /private/tmp/lingxi-w15-r01-runtime/tmp/lingxi-r06t08-usage-wire-cfg-98219-35/service.json --bind 127.0.0.1:0",
+      "actual_executable": "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service",
+      "executable_sha256_first_observed": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+      "first_seen_elapsed": 3.2374624160001986,
+      "last_seen_elapsed": 3.2374624160001986,
+      "peak_sampled_rss_bytes": 19890176,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_at_final_table",
+        "elapsed": 3.71647012498579
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0",
+      "present_after": false
+    }
+  ],
+  "launch_binary_before": {
+    "/private/tmp/lingxi-w15-r01-runtime/target/debug/deps/r06_t08_behavior_eval-1c89a5f684c9ab08": "0e8c151ab01282c2edccb856921cf8497ae8d4b50b0cc43d8b8bee7c9215bae9",
+    "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0"
+  },
+  "controller_pid": 98219,
+  "ended": "2026-10-12T00:08:23.400408+00:00",
+  "elapsed_seconds": 3.7165142909798305,
+  "exit_code": 0,
+  "guard_breaches": [],
+  "source_after": "76b576ae8cf26174813b3439436a2a5d1aff65f42743af9e305e05ec5b6eebff",
+  "unsampled_process_metrics": "null/unknown; inventory cannot replace execution measurement",
+  "owned_survivors": [],
+  "supervisor_sha256": "5166fb9fed7854ad3515b5138ec981db8661eb0d35e93c37379353ce2380ae63",
+  "launch_binary_after": {
+    "/private/tmp/lingxi-w15-r01-runtime/target/debug/deps/r06_t08_behavior_eval-1c89a5f684c9ab08": "0e8c151ab01282c2edccb856921cf8497ae8d4b50b0cc43d8b8bee7c9215bae9",
+    "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0"
+  }
+}

@@ -1,0 +1,28 @@
+{"command": ["npx", "vitest", "run", "tests/r06-ar-f12-vector-cache-preservation.test.ts", "tests/r06-ar-f12-fulltext-cache-preservation.test.ts", "tests/r06-ar-f12-ann-cache-preservation.test.ts", "tests/knowledge-index-metadata-migration.test.ts", "tests/knowledge-section-index.test.ts", "tests/knowledge-query-index-separation.test.ts", "tests/knowledge-query-config-alignment.test.ts", "tests/knowledge-vector-index.test.ts", "tests/knowledge-vector-backend-parity.test.ts", "tests/knowledge-vector-backend-fallback.test.ts", "tests/knowledge-vector-shutdown.test.ts", "tests/knowledge-ann-crash-recovery.test.ts", "tests/knowledge-ann-rebuild.test.ts", "tests/knowledge-index-metadata-backfill.test.ts", "tests/knowledge-index-variants.test.ts", "tests/knowledge-ann-index-store.test.ts", "tests/knowledge-ingestion.test.ts", "tests/knowledge-lifecycle.test.ts", "--maxWorkers=1"], "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-ts-final-01-vpf4rje4", "start": 1791699730.4810638}
+
+ RUN  v4.1.10 /Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent
+
+ ❯ tests/knowledge-lifecycle.test.ts (16 tests | 1 failed) 5872ms
+     × queued job 直接取消；运行中 reindex 被 abort；一切不复活 4041ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/knowledge-lifecycle.test.ts > Knowledge 生命周期：deleteSource（§十九 delete wins） > queued job 直接取消；运行中 reindex 被 abort；一切不复活
+Error: waitFor: condition not met in time
+ ❯ waitFor tests/knowledge-lifecycle.test.ts:36:51
+     34|   const startedAt = Date.now();
+     35|   while (!condition()) {
+     36|     if (Date.now() - startedAt > timeoutMs) throw new Error("waitFor: …
+       |                                                   ^
+     37|     await sleep(10);
+     38|   }
+ ❯ tests/knowledge-lifecycle.test.ts:397:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 17 passed (18)
+      Tests  1 failed | 117 passed (118)
+   Start at  14:22:11
+   Duration  32.31s (transform 438ms, setup 84ms, import 2.00s, tests 29.11s, environment 1ms)
+

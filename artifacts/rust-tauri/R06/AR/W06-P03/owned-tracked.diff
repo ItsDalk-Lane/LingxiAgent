@@ -1,0 +1,1220 @@
+diff --git a/rust/Cargo.lock b/rust/Cargo.lock
+index 4ea8a0da5..58f1941b4 100644
+--- a/rust/Cargo.lock
++++ b/rust/Cargo.lock
+@@ -40,6 +40,29 @@ dependencies = [
+  "libc",
+ ]
+ 
++[[package]]
++name = "annotate-snippets"
++version = "0.12.16"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f211a51805bc641f3ad5b7664c77d2547af685cc33b4cd8d31964027a46f13f1"
++dependencies = [
++ "anstyle",
++ "memchr",
++ "unicode-width",
++]
++
++[[package]]
++name = "anstyle"
++version = "1.0.14"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "940b3a0ca603d1eade50a4846a2afffd5ef57a9feac2c0e2ec2e14f9ead76000"
++
++[[package]]
++name = "arraydeque"
++version = "0.5.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "7d902e3d592a523def97af8f317b08ce16b7ab854c1985a0c671e6f15cebc236"
++
+ [[package]]
+ name = "asn1-rs"
+ version = "0.7.2"
+@@ -500,6 +523,15 @@ dependencies = [
+  "simdutf8",
+ ]
+ 
++[[package]]
++name = "encoding_rs_io"
++version = "0.1.8"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "fba3fe847045ecff794b9c138293a80db914678c453ad63fbf0c6a9eb6e00b22"
++dependencies = [
++ "encoding_rs",
++]
++
+ [[package]]
+ name = "equivalent"
+ version = "1.0.2"
+@@ -722,6 +754,16 @@ dependencies = [
+  "wasm-bindgen",
+ ]
+ 
++[[package]]
++name = "granit-parser"
++version = "1.3.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e20f99e46474f56bd905c56e817ebddcf377a611f94c53ac4649e4d3fa3c0cd0"
++dependencies = [
++ "arraydeque",
++ "smallvec",
++]
++
+ [[package]]
+ name = "h2"
+ version = "0.4.19"
+@@ -1228,14 +1270,18 @@ version = "0.0.0"
+ dependencies = [
+  "base64",
+  "getrandom 0.2.17",
++ "granit-parser",
+  "httpdate",
+  "libc",
+  "lingxi-kernel",
+  "lingxi-protocol",
++ "regex",
+  "reqwest",
+  "rusqlite",
+  "serde",
++ "serde-saphyr",
+  "serde_json",
++ "serde_yaml_ng",
+  "sha2",
+  "tokio",
+  "tracing",
+@@ -1423,6 +1469,12 @@ version = "1.0.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "743fb55ba31b18fb1ecef6bdc9aa2743314978ac084044301a7eee33fb99a20d"
+ 
++[[package]]
++name = "nohash-hasher"
++version = "0.2.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "2bf50223579dc7cdcfb3bfcacf7069ff68243f8c363f62ffa99cf000a6b9c451"
++
+ [[package]]
+ name = "nom"
+ version = "7.1.3"
+@@ -2170,6 +2222,23 @@ dependencies = [
+  "serde_derive",
+ ]
+ 
++[[package]]
++name = "serde-saphyr"
++version = "1.3.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b8050abb251097357e24aff63ba2c52a6309ecb7d23a5474023df960a02694d8"
++dependencies = [
++ "annotate-snippets",
++ "base64",
++ "encoding_rs_io",
++ "granit-parser",
++ "nohash-hasher",
++ "num-traits",
++ "serde_core",
++ "smallvec",
++ "zmij",
++]
++
+ [[package]]
+ name = "serde_core"
+ version = "1.0.229"
+@@ -2237,6 +2306,19 @@ dependencies = [
+  "serde",
+ ]
+ 
++[[package]]
++name = "serde_yaml_ng"
++version = "0.10.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "7b4db627b98b36d4203a7b458cf3573730f2bb591b28871d916dfa9efabfd41f"
++dependencies = [
++ "indexmap",
++ "itoa",
++ "ryu",
++ "serde",
++ "unsafe-libyaml",
++]
++
+ [[package]]
+ name = "sha1"
+ version = "0.11.0"
+@@ -2710,6 +2792,18 @@ version = "1.0.26"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "d245f478577f809a851594d02313b640fb437e0bb33866753cff937863096954"
+ 
++[[package]]
++name = "unicode-width"
++version = "0.2.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b4ac048d71ede7ee76d585517add45da530660ef4390e49b098733c6e897f254"
++
++[[package]]
++name = "unsafe-libyaml"
++version = "0.2.11"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "673aac59facbab8a9007c7f6108d11f63b603f7cabff99fabf650fea5c32b861"
++
+ [[package]]
+ name = "untrusted"
+ version = "0.9.0"
+diff --git a/rust/crates/lingxi-adapters/Cargo.toml b/rust/crates/lingxi-adapters/Cargo.toml
+index f5b027c81..62ffa87d5 100644
+--- a/rust/crates/lingxi-adapters/Cargo.toml
++++ b/rust/crates/lingxi-adapters/Cargo.toml
+@@ -53,6 +53,13 @@ reqwest = { version = "0.13.5", features = ["json", "form", "socks"] }
+ rusqlite = { version = "0.40.2", features = ["bundled", "backup"] }
+ serde = { version = "1.0.229", features = ["derive"] }
+ serde_json = "1.0.151"
++# R06-AR-F06：真正解析 YAML，避免合法配置被逐行扫描静默误读。
++serde_yaml_ng = "=0.10.0"
++# 保留键样式与标签，标准合并与严格标签检查共用同一 YAML 解析器。
++serde-saphyr = "=1.3.0"
++granit-parser = "=1.3.0"
++# 与现役配置 schema 使用相同的标量时间戳判定；不预处理 YAML 文本。
++regex = "=1.13.1"
+ sha2 = "0.11.0"
+ # R02-T06: `time` feature flag added for the backup-while-writing
+ # integration test's head-start sleep (same locked tokio 1.53.1; the flag
+diff --git a/rust/crates/lingxi-adapters/src/storage/agent_memory.rs b/rust/crates/lingxi-adapters/src/storage/agent_memory.rs
+index ecc3d119e..a861b046d 100644
+--- a/rust/crates/lingxi-adapters/src/storage/agent_memory.rs
++++ b/rust/crates/lingxi-adapters/src/storage/agent_memory.rs
+@@ -1894,15 +1894,10 @@ impl PersonaFiles {
+     }
+ }
+ 
+-// ── agent config.yaml subset patcher ────────────────────────────────────────
+-
+-/// Line-level config.yaml patcher for the boolean/list keys the Skill/Memory
+-/// services own (`skills.enabled`, `skills.workspace_disabled`,
+-/// `workspace_context.discover_project_skills`,
+-/// `workspace_context.discover_compatible_project_skills`,
+-/// `experience.enabled`, `memory.enabled`). Everything else in the file is
+-/// preserved byte-for-byte (registered diff vs. the incumbent's full
+-/// YAML re-dump — lib/memory/config-loader.ts:114-134).
++// ── 助手配置的统一解析与更新 ────────────────────────────────────────
++#[path = "agent_config.rs"]
++pub mod config;
++
+ pub struct AgentConfigPatch;
+ 
+ #[derive(Debug, Default, Clone, PartialEq)]
+@@ -1914,241 +1909,73 @@ pub struct AgentConfigFlags {
+ }
+ 
+ impl AgentConfigPatch {
+-    pub fn read_flags(text: &str) -> AgentConfigFlags {
+-        let mut flags = AgentConfigFlags::default();
+-        let mut section = String::new();
+-        for line in text.lines() {
+-            let trimmed = line.trim_end();
+-            if trimmed.is_empty() || trimmed.trim_start().starts_with('#') {
+-                continue;
+-            }
+-            let indent = line.len() - line.trim_start().len();
+-            let body = line.trim();
+-            if indent == 0 {
+-                section = body.strip_suffix(':').unwrap_or("").trim().to_string();
+-                continue;
+-            }
+-            if indent > 2 {
+-                continue;
+-            }
+-            let Some((key, value)) = body.split_once(':') else {
+-                continue;
+-            };
+-            let value = value.trim();
+-            let parsed = match value {
+-                "true" => Some(true),
+-                "false" => Some(false),
+-                _ => None,
+-            };
+-            if let Some(parsed) = parsed {
+-                match (section.as_str(), key.trim()) {
+-                    ("memory", "enabled") => flags.memory_enabled = Some(parsed),
+-                    ("experience", "enabled") => flags.experience_enabled = Some(parsed),
+-                    ("workspace_context", "discover_project_skills") => {
+-                        flags.discover_project_skills = Some(parsed)
+-                    }
+-                    ("workspace_context", "discover_compatible_project_skills") => {
+-                        flags.discover_compatible_project_skills = Some(parsed)
+-                    }
+-                    _ => {}
+-                }
+-            }
+-        }
+-        flags
++    pub fn read_flags(text: &str) -> Result<AgentConfigFlags, MemoryError> {
++        config::AgentConfigDocument::parse(text)?.flags()
+     }
+ 
+-    pub fn read_skill_lists(text: &str) -> (Vec<String>, Vec<String>) {
+-        let read_list = |lines: &[&str], wanted: &str| -> Vec<String> {
+-            let mut out = Vec::new();
+-            let mut in_skills = false;
+-            let mut in_list = false;
+-            for line in lines {
+-                let trimmed = line.trim_end();
+-                if trimmed.is_empty() || trimmed.trim_start().starts_with('#') {
+-                    continue;
+-                }
+-                let indent = line.len() - line.trim_start().len();
+-                let body = line.trim();
+-                if indent == 0 {
+-                    in_skills = body == "skills:";
+-                    in_list = false;
+-                    continue;
+-                }
+-                if !in_skills {
+-                    continue;
+-                }
+-                if indent == 2 {
+-                    in_list = body == format!("{wanted}:");
+-                    continue;
+-                }
+-                if in_list {
+-                    if let Some(item) = body.strip_prefix("- ") {
+-                        let item = item.trim().trim_matches(['"', '\'']).to_string();
+-                        if !item.is_empty() {
+-                            out.push(item);
+-                        }
+-                    }
+-                }
+-            }
+-            out
+-        };
+-        let lines: Vec<&str> = text.lines().collect();
+-        let enabled = read_list(&lines, "enabled");
+-        let workspace_disabled = read_list(&lines, "workspace_disabled");
+-        (enabled, workspace_disabled)
+-    }
+-
+-    /// Rewrites (or inserts) `section.key` with a block list of strings,
+-    /// preserving all other lines. Empty list writes `key: []`.
+-    fn upsert_string_list(text: &str, section: &str, key: &str, items: &[String]) -> String {
+-        let mut out: Vec<String> = Vec::new();
+-        let mut in_section = false;
+-        let mut replaced = false;
+-        let mut section_body_indent: Option<usize> = None;
+-        let lines: Vec<&str> = text.lines().collect();
+-        let mut skip_list = false;
+-        for line in &lines {
+-            let trimmed = line.trim_end();
+-            let indent = line.len() - line.trim_start().len();
+-            let body = line.trim();
+-            if !trimmed.is_empty() && !body.starts_with('#') && indent == 0 {
+-                in_section = body == format!("{section}:");
+-                if in_section {
+-                    section_body_indent = None;
+-                }
+-                skip_list = false;
+-            }
+-            if in_section && indent == 2 && !body.starts_with('#') {
+-                if let Some((k, _)) = body.split_once(':') {
+-                    if k.trim() == key {
+-                        // replace the key line + its list items
+-                        let rendered = if items.is_empty() {
+-                            format!("  {key}: []")
+-                        } else {
+-                            let mut rendered = format!("  {key}:\n");
+-                            for item in items {
+-                                rendered.push_str(&format!(
+-                                    "    - \"{}\"\n",
+-                                    item.replace('"', "\\\"")
+-                                ));
+-                            }
+-                            rendered.trim_end_matches('\n').to_string()
+-                        };
+-                        out.push(rendered);
+-                        replaced = true;
+-                        skip_list = true;
+-                        continue;
+-                    }
+-                }
+-            }
+-            if skip_list {
+-                // swallow deeper-indented list items of the replaced key
+-                if trimmed.is_empty() || indent > 2 || (indent == 2 && body.starts_with("- ")) {
+-                    continue;
+-                }
+-                skip_list = false;
+-            }
+-            out.push((*line).to_string());
+-            let _ = &mut section_body_indent;
+-        }
+-        if !replaced {
+-            if !out.is_empty() && !out.last().map(|l| l.trim().is_empty()).unwrap_or(true) {
+-                out.push(String::new());
+-            }
+-            if items.is_empty() {
+-                out.push(format!("{section}:"));
+-                out.push(format!("  {key}: []"));
+-            } else {
+-                out.push(format!("{section}:"));
+-                out.push(format!("  {key}:"));
+-                for item in items {
+-                    out.push(format!("    - \"{}\"", item.replace('"', "\\\"")));
+-                }
+-            }
+-        }
+-        let mut text = out.join("\n");
+-        if !text.ends_with('\n') {
+-            text.push('\n');
+-        }
+-        text
++    pub fn read_skill_lists(text: &str) -> Result<(Vec<String>, Vec<String>), MemoryError> {
++        config::AgentConfigDocument::parse(text)?.skill_lists()
+     }
+ 
+     pub fn write_skill_lists(
+         text: &str,
+         enabled: &[String],
+         workspace_disabled: &[String],
+-    ) -> String {
+-        let patched = Self::upsert_string_list(text, "skills", "enabled", enabled);
+-        Self::upsert_string_list(&patched, "skills", "workspace_disabled", workspace_disabled)
+-    }
+-
+-    pub fn write_flags(text: &str, flags: &AgentConfigFlags) -> String {
+-        let mut out = text.to_string();
+-        let apply_bool = |text: &str, section: &str, key: &str, value: bool| -> String {
+-            let lines: Vec<&str> = text.lines().collect();
+-            let mut out: Vec<String> = Vec::new();
+-            let mut in_section = false;
+-            let mut replaced = false;
+-            for line in lines {
+-                let trimmed = line.trim_end();
+-                let indent = line.len() - line.trim_start().len();
+-                let body = line.trim();
+-                if !trimmed.is_empty() && !body.starts_with('#') && indent == 0 {
+-                    in_section = body == format!("{section}:");
+-                }
+-                if in_section && indent == 2 && !body.starts_with('#') {
+-                    if let Some((k, _)) = body.split_once(':') {
+-                        if k.trim() == key {
+-                            out.push(format!("  {key}: {value}"));
+-                            replaced = true;
+-                            continue;
+-                        }
+-                    }
+-                }
+-                out.push(line.to_string());
+-            }
+-            if !replaced {
+-                if !out.is_empty() && !out.last().map(|l| l.trim().is_empty()).unwrap_or(true) {
+-                    out.push(String::new());
+-                }
+-                out.push(format!("{section}:"));
+-                out.push(format!("  {key}: {value}"));
+-            }
+-            let mut joined = out.join("\n");
+-            if !joined.ends_with('\n') {
+-                joined.push('\n');
+-            }
+-            joined
+-        };
+-        if let Some(v) = flags.memory_enabled {
+-            out = apply_bool(&out, "memory", "enabled", v);
+-        }
+-        if let Some(v) = flags.experience_enabled {
+-            out = apply_bool(&out, "experience", "enabled", v);
+-        }
+-        if let Some(v) = flags.discover_project_skills {
+-            out = apply_bool(&out, "workspace_context", "discover_project_skills", v);
++    ) -> Result<String, MemoryError> {
++        let mut doc = config::AgentConfigDocument::parse(text)?;
++        for (key, items) in [
++            ("enabled", enabled),
++            ("workspace_disabled", workspace_disabled),
++        ] {
++            doc.set(
++                "skills",
++                key,
++                serde_yaml_ng::Value::Sequence(
++                    items
++                        .iter()
++                        .cloned()
++                        .map(serde_yaml_ng::Value::String)
++                        .collect(),
++                ),
++            );
+         }
+-        if let Some(v) = flags.discover_compatible_project_skills {
+-            out = apply_bool(
+-                &out,
++        doc.render()
++    }
++
++    pub fn write_flags(text: &str, flags: &AgentConfigFlags) -> Result<String, MemoryError> {
++        let mut doc = config::AgentConfigDocument::parse(text)?;
++        for (section, key, value) in [
++            ("memory", "enabled", flags.memory_enabled),
++            ("experience", "enabled", flags.experience_enabled),
++            (
++                "workspace_context",
++                "discover_project_skills",
++                flags.discover_project_skills,
++            ),
++            (
+                 "workspace_context",
+                 "discover_compatible_project_skills",
+-                v,
+-            );
++                flags.discover_compatible_project_skills,
++            ),
++        ] {
++            if let Some(value) = value {
++                doc.set(section, key, serde_yaml_ng::Value::Bool(value));
++            }
+         }
+-        out
++        doc.render()
+     }
+ }
+ 
+-/// Read + patch + atomically persist one agent's config.yaml.
++/// 先验证完整配置，再原子保存；失败不能覆盖原配置。
+ pub fn patch_agent_config(
+     config_path: &Path,
+-    patch: impl FnOnce(&str) -> String,
++    patch: impl FnOnce(&str) -> Result<String, MemoryError>,
+ ) -> Result<String, MemoryError> {
+-    let text = std::fs::read_to_string(config_path)
++    let text = config::read_config_text(config_path)
+         .map_err(|err| MemoryError::Io(format!("read config: {err}")))?;
+-    let patched = patch(&text);
++    config::AgentConfigDocument::parse(&text)?;
++    let patched = patch(&text)?;
++    config::AgentConfigDocument::parse(&patched)?;
+     atomic_write(config_path, &patched).map_err(MemoryError::from)?;
+     Ok(patched)
+ }
+diff --git a/rust/crates/lingxi-adapters/src/storage/skill_library.rs b/rust/crates/lingxi-adapters/src/storage/skill_library.rs
+index e00bb23bb..c8e35a174 100644
+--- a/rust/crates/lingxi-adapters/src/storage/skill_library.rs
++++ b/rust/crates/lingxi-adapters/src/storage/skill_library.rs
+@@ -657,14 +657,22 @@ pub fn list_seeded_skill_names(seed_dir: &Path) -> Vec<String> {
+ pub fn collect_enabled_skills_of_other_agents(
+     agents_root: &Path,
+     exclude_agent_id: &str,
+-) -> std::collections::HashSet<String> {
++) -> Result<std::collections::HashSet<String>, MemoryError> {
+     let mut used = std::collections::HashSet::new();
+-    let Ok(entries) = std::fs::read_dir(agents_root) else {
+-        return used;
++    let entries = match std::fs::read_dir(agents_root) {
++        Ok(entries) => entries,
++        Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(used),
++        Err(err) => return Err(MemoryError::Io(err.to_string())),
+     };
+-    for entry in entries.flatten() {
++    for entry in entries {
++        let entry = entry.map_err(|err| MemoryError::Io(err.to_string()))?;
+         let name = entry.file_name().to_string_lossy().to_string();
+-        if name == exclude_agent_id || !entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
++        if name == exclude_agent_id
++            || !entry
++                .file_type()
++                .map_err(|err| MemoryError::Io(err.to_string()))?
++                .is_dir()
++        {
+             continue;
+         }
+         let agent_dir = agents_root.join(&name);
+@@ -672,15 +680,15 @@ pub fn collect_enabled_skills_of_other_agents(
+             continue;
+         }
+         let config_path = agent_dir.join("config.yaml");
+-        if !config_path.exists() {
+-            continue;
+-        }
+-        if let Ok(text) = std::fs::read_to_string(&config_path) {
+-            let (enabled, _) = super::agent_memory::AgentConfigPatch::read_skill_lists(&text);
+-            used.extend(enabled);
+-        }
++        let text = match super::agent_memory::config::read_config_text(&config_path) {
++            Ok(text) => text,
++            Err(err) if err.kind() == std::io::ErrorKind::NotFound => continue,
++            Err(err) => return Err(MemoryError::Io(err.to_string())),
++        };
++        let (enabled, _) = super::agent_memory::AgentConfigPatch::read_skill_lists(&text)?;
++        used.extend(enabled);
+     }
+-    used
++    Ok(used)
+ }
+ 
+ // ── bundles (skill-bundles/store.ts) ────────────────────────────────────────
+@@ -799,6 +807,29 @@ impl BundlesStore {
+         }
+     }
+ 
++    /// 删除前不能把损坏或读失败的组合资料当空表，避免随后保存抹掉用户内容。
++    pub fn load_checked(&self) -> Result<Vec<Value>, MemoryError> {
++        let raw = match std::fs::read_to_string(&self.file_path) {
++            Ok(raw) => raw,
++            Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
++            Err(err) => return Err(MemoryError::Io(format!("read skill bundles: {err}"))),
++        };
++        if raw.trim().is_empty() {
++            return Ok(Vec::new());
++        }
++        let value: Value = serde_json::from_str(&raw)
++            .map_err(|err| MemoryError::InvalidRequest(format!("invalid skill bundles: {err}")))?;
++        let bundles = value
++            .get("bundles")
++            .and_then(Value::as_array)
++            .ok_or_else(|| {
++                MemoryError::InvalidRequest(
++                    "invalid skill bundles: bundles must be an array".into(),
++                )
++            })?;
++        Ok(bundles.iter().map(normalize_bundle).collect())
++    }
++
+     pub fn save(&self, bundles: &[Value]) -> Result<(), MemoryError> {
+         let normalized: Vec<Value> = bundles.iter().map(normalize_bundle).collect();
+         let value = json!({"schemaVersion": BUNDLE_SCHEMA_VERSION, "bundles": normalized});
+@@ -903,7 +934,7 @@ impl BundlesStore {
+     }
+ 
+     pub fn remove_skills(&self, names: &[String]) -> Result<Vec<Value>, MemoryError> {
+-        let bundles = self.load();
++        let bundles = self.load_checked()?;
+         let updated: Vec<Value> = bundles
+             .into_iter()
+             .map(|b| {
+diff --git a/rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs b/rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs
+index 1383dbcb6..ecfb0c17f 100644
+--- a/rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs
++++ b/rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs
+@@ -349,7 +349,7 @@ fn dream_revisions_list_read_restore() {
+ #[test]
+ fn config_patcher_preserves_unrelated_content_and_lists() {
+     let text = "# 头注释\nlocale: zh\nagent:\n  name: A\nskills:\n  enabled:\n    - \"one\"\n    - \"two\"\n  workspace_disabled: []\nmemory:\n  enabled: true\n";
+-    let (enabled, disabled) = am::AgentConfigPatch::read_skill_lists(text);
++    let (enabled, disabled) = am::AgentConfigPatch::read_skill_lists(text).unwrap();
+     assert_eq!(enabled, vec!["one", "two"]);
+     assert!(disabled.is_empty());
+ 
+@@ -357,15 +357,16 @@ fn config_patcher_preserves_unrelated_content_and_lists() {
+         text,
+         &["one".into(), "three".into()],
+         &["ws1".into()],
+-    );
++    )
++    .unwrap();
+     assert!(patched.contains("locale: zh"), "无关行保留");
+     assert!(patched.contains("name: A"));
+-    let (enabled2, disabled2) = am::AgentConfigPatch::read_skill_lists(&patched);
++    let (enabled2, disabled2) = am::AgentConfigPatch::read_skill_lists(&patched).unwrap();
+     assert_eq!(enabled2, vec!["one", "three"]);
+     assert_eq!(disabled2, vec!["ws1"]);
+     // 空列表写 []（incumbent YAML 形状）
+-    let emptied = am::AgentConfigPatch::write_skill_lists(&patched, &[], &[]);
+-    let (enabled3, _) = am::AgentConfigPatch::read_skill_lists(&emptied);
++    let emptied = am::AgentConfigPatch::write_skill_lists(&patched, &[], &[]).unwrap();
++    let (enabled3, _) = am::AgentConfigPatch::read_skill_lists(&emptied).unwrap();
+     assert!(enabled3.is_empty());
+ 
+     // flags 读写（memory/experience/workspace_context）
+@@ -375,8 +376,8 @@ fn config_patcher_preserves_unrelated_content_and_lists() {
+         discover_project_skills: Some(false),
+         discover_compatible_project_skills: Some(true),
+     };
+-    let patched_flags = am::AgentConfigPatch::write_flags(&emptied, &flags);
+-    let read_back = am::AgentConfigPatch::read_flags(&patched_flags);
++    let patched_flags = am::AgentConfigPatch::write_flags(&emptied, &flags).unwrap();
++    let read_back = am::AgentConfigPatch::read_flags(&patched_flags).unwrap();
+     assert_eq!(read_back.memory_enabled, Some(false));
+     assert_eq!(read_back.experience_enabled, Some(true));
+     assert_eq!(read_back.discover_project_skills, Some(false));
+@@ -527,7 +528,8 @@ fn bundles_store_crud_and_skill_removal_scrobble() {
+         "skills:\n  enabled:\n    - \"alpha\"\n    - \"gamma\"\n",
+     )
+     .unwrap();
+-    let scrubbed = sl::collect_enabled_skills_of_other_agents(&home.join("agents"), "agentB");
++    let scrubbed =
++        sl::collect_enabled_skills_of_other_agents(&home.join("agents"), "agentB").unwrap();
+     assert!(scrubbed.contains("alpha"));
+     bundles.remove_skills(&["alpha".to_string()]).unwrap();
+     let after = bundles.load();
+diff --git a/rust/crates/lingxi-service/src/context_compiler.rs b/rust/crates/lingxi-service/src/context_compiler.rs
+index 9447c9ac7..6c84a4a68 100644
+--- a/rust/crates/lingxi-service/src/context_compiler.rs
++++ b/rust/crates/lingxi-service/src/context_compiler.rs
+@@ -3,7 +3,7 @@
+ //! 职责切分（R01 依赖规则）：
+ //! - kernel `lingxi_kernel::context` 拥有纯确定性的编译/渲染/预算/观测视图；
+ //! - 本模块拥有「材料从哪来」（$LINGXI_HOME 文件布局、preferences、config.yaml
+-//!   窄扫描、platform note 组装、会话开始标签格式化）与「观测的 digest 装饰」
++//!   YAML 解析、platform note 组装、会话开始标签格式化）与「观测的 digest 装饰」
+ //!   （sha256 在本 crate 的锁内依赖里，kernel 不引）。
+ //!
+ //! 同源契约（R06-A01）：`ContextCompilerService::compiled_for_run` 返回的
+@@ -16,7 +16,7 @@
+ //! 变化可观测）。
+ //!
+ //! 读取纪律：材料文件缺失按现役 `safeReadFile` 语义读为空；缺失以外的 I/O
+-//! 错误与 JSON 损坏一律响亮失败（本栈 R02 完整性立场，禁止静默降级）。
++//! 错误与 JSON/YAML 损坏一律响亮失败（本栈 R02 完整性立场，禁止静默降级）。
+ 
+ use std::collections::HashMap;
+ use std::fmt;
+@@ -316,7 +316,7 @@ pub fn format_session_started_label(unix_ms: u64) -> String {
+ // ─── 文件材料源（现役 $LINGXI_HOME 布局） ───
+ 
+ /// 从 $LINGXI_HOME 文件布局采集编译材料：
+-/// - agents/{id}/config.yaml（窄扫描 locale/agent.name/agent.yuan/memory.enabled）；
++/// - agents/{id}/config.yaml（完整 YAML 解析与敏感字段类型验证）；
+ /// - agents/{id}/identity.md、AGENTS.md（resolvePersonaSource 回落链）；
+ /// - agents/{id}/memory/memory.md、memory/tenets.json、appearance-summary.json；
+ /// - user/preferences.json（userName/locale/experiments/learn_skills）；
+@@ -375,77 +375,22 @@ fn parse_json_material(path: &Path) -> Result<Option<Value>, ContextMaterialErro
+         })
+ }
+ 
+-/// config.yaml 的 T01 窄扫描结果。现役用完整 YAML 解析；本扫描器只识别
+-/// 两格缩进的四个键（顶层 locale、agent.name、agent.yuan、memory.enabled），
+-/// 注释与引号按行内规则剥离。这是已登记的子集实现（T01 报告差异节）。
+-#[derive(Debug, Default, Clone, PartialEq)]
+-pub struct AgentConfigScan {
+-    pub locale: Option<String>,
+-    pub agent_name: Option<String>,
+-    pub yuan: Option<String>,
+-    pub memory_enabled: Option<bool>,
+-}
+-
+-pub fn scan_agent_config(text: &str) -> AgentConfigScan {
+-    fn clean_value(raw: &str) -> String {
+-        // 剥离行内注释（" #" 起）与成对引号。
+-        let without_comment = raw.split(" #").next().unwrap_or(raw);
+-        let trimmed = without_comment.trim();
+-        trimmed
+-            .strip_prefix('"')
+-            .and_then(|v| v.strip_suffix('"'))
+-            .or_else(|| {
+-                trimmed
+-                    .strip_prefix('\'')
+-                    .and_then(|v| v.strip_suffix('\''))
+-            })
+-            .unwrap_or(trimmed)
+-            .to_string()
+-    }
+-    let mut scan = AgentConfigScan::default();
+-    let mut section = String::new();
+-    for line in text.lines() {
+-        let trimmed = line.trim_end();
+-        if trimmed.is_empty() || trimmed.trim_start().starts_with('#') {
+-            continue;
+-        }
+-        let indent = line.len() - line.trim_start().len();
+-        let body = line.trim();
+-        if indent == 0 {
+-            if let Some(name) = body.strip_suffix(':') {
+-                section = name.trim().to_string();
+-                continue;
+-            }
+-            if let Some((key, value)) = body.split_once(':') {
+-                section.clear();
+-                if key.trim() == "locale" {
+-                    let value = clean_value(value);
+-                    if !value.is_empty() {
+-                        scan.locale = Some(value);
+-                    }
+-                }
+-            }
+-            continue;
+-        }
+-        let Some((key, value)) = body.split_once(':') else {
+-            continue;
+-        };
+-        let key = key.trim();
+-        let value = clean_value(value);
+-        match (section.as_str(), key) {
+-            ("agent", "name") if !value.is_empty() => scan.agent_name = Some(value),
+-            ("agent", "yuan") if !value.is_empty() => scan.yuan = Some(value),
+-            ("memory", "enabled") => {
+-                scan.memory_enabled = match value.as_str() {
+-                    "true" => Some(true),
+-                    "false" => Some(false),
+-                    _ => None,
+-                };
+-            }
+-            _ => {}
+-        }
+-    }
+-    scan
++/// 配置读取与记忆、技能服务共用真正的 YAML 解析和类型验证。
++pub use lingxi_adapters::storage::agent_memory::config::AgentConfigScan;
++
++pub fn scan_agent_config(
++    text: &str,
++) -> Result<AgentConfigScan, lingxi_adapters::storage::agent_memory::MemoryError> {
++    lingxi_adapters::storage::agent_memory::config::AgentConfigDocument::parse(text)?.scan()
++}
++
++fn parse_agent_material(path: &Path) -> Result<AgentConfigScan, ContextMaterialError> {
++    lingxi_adapters::storage::agent_memory::config::read_agent_config(path)
++        .and_then(|doc| doc.scan())
++        .map_err(|err| ContextMaterialError::Parse {
++            path: path.to_path_buf(),
++            detail: err.to_string(),
++        })
+ }
+ 
+ /// preferences.json 的 T01 读取面（现役 PreferencesManager 子集）。
+@@ -651,7 +596,7 @@ fn scan_roster(
+                 if id == current_agent_id {
+                     continue;
+                 }
+-                let scan = scan_agent_config(&read_material(&config_path)?);
++                let scan = parse_agent_material(&config_path)?;
+                 others.push(RosterEntry {
+                     name: scan.agent_name.unwrap_or_else(|| id.clone()),
+                     id,
+@@ -682,7 +627,7 @@ fn scan_roster(
+ impl ContextMaterialSource for FileContextMaterialSource {
+     fn gather(&self, query: &MaterialQuery) -> Result<ContextCompileInput, ContextMaterialError> {
+         let agent_dir = self.agents_root.join(&query.agent_id);
+-        let config = scan_agent_config(&read_material(&agent_dir.join("config.yaml"))?);
++        let config = parse_agent_material(&agent_dir.join("config.yaml"))?;
+         let prefs_path = self.user_dir.join("preferences.json");
+         let prefs = scan_preferences(parse_json_material(&prefs_path)?.as_ref());
+ 
+diff --git a/rust/crates/lingxi-service/src/memory.rs b/rust/crates/lingxi-service/src/memory.rs
+index d5eae49a8..3569f12cd 100644
+--- a/rust/crates/lingxi-service/src/memory.rs
++++ b/rust/crates/lingxi-service/src/memory.rs
+@@ -31,7 +31,7 @@ use lingxi_adapters::storage::agent_memory::{
+     MemoryError, TenetsStore,
+ };
+ 
+-use crate::context_compiler::{scan_agent_config, scan_preferences};
++use crate::context_compiler::scan_preferences;
+ use crate::ServiceState;
+ 
+ pub struct MemoryService {
+@@ -58,10 +58,10 @@ impl MemoryService {
+ 
+     /// Locale chain (persona-source.ts:124-130 + agent.ts resolveLocale):
+     /// agent config locale → global prefs locale → "en".
+-    pub fn locale_is_zh(&self, agent_dir: &Path) -> bool {
+-        let config_locale = std::fs::read_to_string(agent_dir.join("config.yaml"))
+-            .ok()
+-            .and_then(|text| scan_agent_config(&text).locale);
++    pub fn locale_is_zh(&self, agent_dir: &Path) -> Result<bool, MemoryError> {
++        let config_locale = am::config::read_agent_config(&agent_dir.join("config.yaml"))?
++            .scan()?
++            .locale;
+         let prefs_locale = scan_preferences(
+             am::read_json_file(&self.user_dir().join("preferences.json")).as_ref(),
+         )
+@@ -70,7 +70,7 @@ impl MemoryService {
+             .filter(|l| !l.trim().is_empty())
+             .or(prefs_locale.filter(|l| !l.trim().is_empty()))
+             .unwrap_or_else(|| "en".to_string());
+-        locale.starts_with("zh")
++        Ok(locale.starts_with("zh"))
+     }
+ 
+     pub fn roots(&self, agent_id: &str) -> Result<am::AgentMemoryRoots, MemoryError> {
+@@ -89,7 +89,7 @@ impl MemoryService {
+ 
+     pub fn compiled_store(&self, agent_id: &str) -> Result<CompiledMemoryStore, MemoryError> {
+         let roots = self.roots(agent_id)?;
+-        let is_zh = self.locale_is_zh(&roots.agent_dir);
++        let is_zh = self.locale_is_zh(&roots.agent_dir)?;
+         Ok(CompiledMemoryStore::new(&roots.memory_dir, is_zh))
+     }
+ 
+@@ -116,8 +116,7 @@ impl MemoryService {
+     /// workspace_context policy).
+     pub fn read_flags(&self, agent_id: &str) -> Result<AgentConfigFlags, MemoryError> {
+         let path = self.config_path(agent_id)?;
+-        let text = std::fs::read_to_string(&path).map_err(|e| MemoryError::Io(e.to_string()))?;
+-        Ok(AgentConfigPatch::read_flags(&text))
++        am::config::read_agent_config(&path)?.flags()
+     }
+ 
+     pub fn patch_flags(
+@@ -1148,7 +1147,10 @@ pub async fn experience_feedback_route(
+         .take(128)
+         .collect();
+     let service = state.memory();
+-    let flags = service.read_flags(&agent_id).unwrap_or_default();
++    let flags = match service.read_flags(&agent_id) {
++        Ok(flags) => flags,
++        Err(err) => return error_response(&err),
++    };
+     let date = &am::now_iso()[..10];
+     let category = if rating == "up" {
+         "用户认可的做法"
+diff --git a/rust/crates/lingxi-service/src/memorytools.rs b/rust/crates/lingxi-service/src/memorytools.rs
+index c59a1e945..dab98f1e1 100644
+--- a/rust/crates/lingxi-service/src/memorytools.rs
++++ b/rust/crates/lingxi-service/src/memorytools.rs
+@@ -345,7 +345,7 @@ impl MemoryTools {
+             Ok(_) => {
+                 return text_success(
+                     "Memory is paused for this agent; proposals are not accepted right now.".into(),
+-                )
++                );
+             }
+             Err(err) => return failed(ErrorCode::Internal, err.to_string()),
+         }
+@@ -491,6 +491,14 @@ impl MemoryTools {
+                 );
+             }
+         };
++        // 安装前验证所属助手配置，不能先落盘再吞掉启用错误。
++        let agent = match self.bound_agent() {
++            Ok(agent) => agent,
++            Err(outcome) => return outcome,
++        };
++        if let Err(err) = self.memory.read_flags(&agent) {
++            return failed(ErrorCode::Internal, err.to_string());
++        }
+         let source_key = format!("local_path:{}", source.to_string_lossy());
+         let result = self
+             .skills
+@@ -502,7 +510,13 @@ impl MemoryTools {
+                 if ok {
+                     // onInstalled parity: add to the bound agent's enabled list
+                     if let Some(name) = value.get("skillName").and_then(Value::as_str) {
+-                        let _ = self.enable_for_agent(name);
++                        if let Err(err) = self.enable_for_agent(name) {
++                            // 安装已经发生时如实报告，不能伪称已启用或删除安装成果。
++                            return failed(
++                                ErrorCode::Internal,
++                                format!("Skill installed: {name}, but enabling failed: {err}"),
++                            );
++                        }
+                     }
+                     let mut text = format!(
+                         "Skill installed: {} (enabled for this agent).",
+@@ -534,7 +548,10 @@ impl MemoryTools {
+                         text_success(format!(
+                             "Safety review FAILED: {reason}\nExplain this risk to the user. Only after the user \
+                              explicitly accepts, retry with risk_accepted=true plus risk_confirmation_token={}.",
+-                            value.get("riskConfirmationToken").and_then(Value::as_str).unwrap_or("")
++                            value
++                                .get("riskConfirmationToken")
++                                .and_then(Value::as_str)
++                                .unwrap_or("")
+                         ))
+                     } else {
+                         failed(
+@@ -557,10 +574,10 @@ impl MemoryTools {
+             return Ok(());
+         }
+         let config_path = self.memory.config_path(&self.agent_id)?;
+-        let text = std::fs::read_to_string(&config_path)
++        let text = am::config::read_config_text(&config_path)
+             .map_err(|e| am::MemoryError::Io(e.to_string()))?;
+         let (mut enabled, workspace_disabled) =
+-            lingxi_adapters::storage::agent_memory::AgentConfigPatch::read_skill_lists(&text);
++            lingxi_adapters::storage::agent_memory::AgentConfigPatch::read_skill_lists(&text)?;
+         if !enabled.iter().any(|n| n == skill_name) {
+             enabled.push(skill_name.to_string());
+             let patched =
+@@ -568,7 +585,7 @@ impl MemoryTools {
+                     &text,
+                     &enabled,
+                     &workspace_disabled,
+-                );
++                )?;
+             am::atomic_write(&config_path, &patched).map_err(am::MemoryError::from)?;
+         }
+         Ok(())
+diff --git a/rust/crates/lingxi-service/src/persona.rs b/rust/crates/lingxi-service/src/persona.rs
+index 291f5a53b..abd28ec10 100644
+--- a/rust/crates/lingxi-service/src/persona.rs
++++ b/rust/crates/lingxi-service/src/persona.rs
+@@ -63,29 +63,31 @@ fn error_response(err: &MemoryError) -> Response {
+     (status, Json(body)).into_response()
+ }
+ 
+-fn locale_of(state: &ServiceState, agent_id: &str) -> String {
++fn locale_of(state: &ServiceState, agent_id: &str) -> Result<String, MemoryError> {
+     // config locale → prefs locale → en (shared chain with MemoryService).
+     let home = state.memory().home().to_path_buf();
+     let config_locale =
+-        std::fs::read_to_string(home.join("agents").join(agent_id).join("config.yaml"))
+-            .ok()
+-            .and_then(|text| crate::context_compiler::scan_agent_config(&text).locale);
++        am::config::read_agent_config(&home.join("agents").join(agent_id).join("config.yaml"))?
++            .scan()?
++            .locale;
+     let prefs_locale = crate::context_compiler::scan_preferences(
+         am::read_json_file(&home.join("user").join("preferences.json")).as_ref(),
+     )
+     .locale;
+-    config_locale
++    Ok(config_locale
+         .filter(|l| !l.trim().is_empty())
+         .or(prefs_locale.filter(|l| !l.trim().is_empty()))
+-        .unwrap_or_else(|| "en".to_string())
++        .unwrap_or_else(|| "en".to_string()))
+ }
+ 
+-fn yuan_of(state: &ServiceState, agent_id: &str) -> String {
+-    let home = state.memory().home().to_path_buf();
+-    std::fs::read_to_string(home.join("agents").join(agent_id).join("config.yaml"))
+-        .ok()
+-        .and_then(|text| crate::context_compiler::scan_agent_config(&text).yuan)
+-        .unwrap_or_else(|| "yuan".to_string())
++fn yuan_of(state: &ServiceState, agent_id: &str) -> Result<String, MemoryError> {
++    let home = state.memory().home();
++    Ok(
++        am::config::read_agent_config(&home.join("agents").join(agent_id).join("config.yaml"))?
++            .scan()?
++            .yuan
++            .unwrap_or_else(|| "yuan".to_string()),
++    )
+ }
+ 
+ macro_rules! persona_get_route {
+@@ -98,8 +100,8 @@ macro_rules! persona_get_route {
+             if let Err(err) = validate_agent_id(&agent_id) {
+                 return error_response(&err);
+             }
+-            let locale = locale_of(&state, &agent_id);
+-            let yuan = yuan_of(&state, &agent_id);
++            let locale = match locale_of(&state, &agent_id) { Ok(value) => value, Err(err) => return error_response(&err) };
++            let yuan = match yuan_of(&state, &agent_id) { Ok(value) => value, Err(err) => return error_response(&err) };
+             match state.persona().store().resolve_persona(&agent_id, &yuan, &locale, $kind) {
+                 Ok((content, from_template)) => {
+                     Json(json!({ "content": content, "fromTemplate": from_template })).into_response()
+diff --git a/rust/crates/lingxi-service/src/skills.rs b/rust/crates/lingxi-service/src/skills.rs
+index 9b3a09438..87a525210 100644
+--- a/rust/crates/lingxi-service/src/skills.rs
++++ b/rust/crates/lingxi-service/src/skills.rs
+@@ -149,6 +149,13 @@ fn classify_guard_reply(reply: &str) -> SkillReviewOutcome {
+ 
+ // ── service ─────────────────────────────────────────────────────────────────
+ 
++struct SkillReferenceScrub {
++    path: PathBuf,
++    before: String,
++    patched: String,
++    agent: String,
++}
++
+ pub struct SkillService {
+     home: PathBuf,
+     product_dir: PathBuf,
+@@ -334,9 +341,10 @@ impl SkillService {
+                 "agent not found: {agent_id}"
+             )));
+         }
+-        let text = std::fs::read_to_string(&path).map_err(|e| MemoryError::Io(e.to_string()))?;
+-        let (enabled, workspace_disabled) = AgentConfigPatchAlias::read_skill_lists(&text);
+-        let flags = AgentConfigPatchAlias::read_flags(&text);
++        let text =
++            am::config::read_config_text(&path).map_err(|e| MemoryError::Io(e.to_string()))?;
++        let (enabled, workspace_disabled) = AgentConfigPatchAlias::read_skill_lists(&text)?;
++        let flags = AgentConfigPatchAlias::read_flags(&text)?;
+         let policy = lingxi_kernel::memory::workspace_skill_policy_from_config(
+             flags.discover_project_skills,
+             flags.discover_compatible_project_skills,
+@@ -351,7 +359,7 @@ impl SkillService {
+         enabled: &[String],
+         workspace_disabled: &[String],
+     ) -> Result<(), MemoryError> {
+-        let patched = AgentConfigPatchAlias::write_skill_lists(text, enabled, workspace_disabled);
++        let patched = AgentConfigPatchAlias::write_skill_lists(text, enabled, workspace_disabled)?;
+         am::atomic_write(
+             &self.home.join("agents").join(agent_id).join("config.yaml"),
+             &patched,
+@@ -441,8 +449,7 @@ impl SkillService {
+             .cloned()
+             .collect();
+         let (text, _enabled, workspace_disabled, _policy) = self.read_agent_config(agent_id)?;
+-        // Patch the READ config text — the skills whitelist is a line-level
+-        // subset edit; the rest of config.yaml survives byte-for-byte
++        // 只更新所属字段，未知字段的值保留；格式按现役 YAML 保存规则规范化
+         // (skills.ts:284-310 rewrites only the skills lists).
+         self.write_agent_config(agent_id, &text, &filtered, &workspace_disabled)?;
+         Ok(filtered)
+@@ -733,42 +740,96 @@ impl SkillService {
+         if !dir.exists() {
+             return Err(MemoryError::NotFound("skill not found".into()));
+         }
++        let names = [name.to_string()];
++        self.prepare_skill_reference_scrub(&names)?;
++        sl::BundlesStore::new(&self.home).load_checked()?;
+         sl::remove_skill_directory(&self.skills_dir(), name)?;
+         // scrub all agent configs + bundles (skill-removal.ts:126-135)
+-        let scrubbed = self.scrub_skill_references(&[name.to_string()])?;
++        let scrubbed =
++            self.scrub_skill_references(&names)
++                .map_err(|err| MemoryError::Conflict {
++                    code: "SKILL_DELETED_REFERENCE_CLEANUP_FAILED".into(),
++                    message: format!("技能已删除，但引用清理失败：{err}"),
++                })?;
+         Ok(json!({ "ok": true, "scrubbedAgents": scrubbed }))
+     }
+ 
+     /// removeUserSkills reference scrub (skill-removal.ts:82-98 + bundles).
+-    fn scrub_skill_references(&self, names: &[String]) -> Result<Vec<String>, MemoryError> {
++    fn prepare_skill_reference_scrub(
++        &self,
++        names: &[String],
++    ) -> Result<Vec<SkillReferenceScrub>, MemoryError> {
+         let agents_root = self.home.join("agents");
+-        let mut scrubbed = Vec::new();
+-        let Ok(entries) = std::fs::read_dir(&agents_root) else {
+-            return Ok(scrubbed);
++        let entries = match std::fs::read_dir(&agents_root) {
++            Ok(entries) => entries,
++            Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
++            Err(err) => {
++                return Err(MemoryError::Io(format!(
++                    "read agents for skill cleanup: {err}"
++                )))
++            }
+         };
+-        for entry in entries.flatten() {
+-            if !entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
++        let mut plan = Vec::new();
++        for entry in entries {
++            let entry = entry.map_err(|err| MemoryError::Io(err.to_string()))?;
++            if !entry
++                .file_type()
++                .map_err(|err| MemoryError::Io(err.to_string()))?
++                .is_dir()
++            {
+                 continue;
+             }
+-            let config_path = entry.path().join("config.yaml");
+-            if !config_path.is_file() {
++            if entry.path().join(".deleted-agent.json").exists() {
+                 continue;
+             }
+-            let text = std::fs::read_to_string(&config_path)
+-                .map_err(|e| MemoryError::Io(e.to_string()))?;
+-            let (enabled, workspace_disabled) = AgentConfigPatchAlias::read_skill_lists(&text);
+-            let hit = enabled.iter().any(|n| names.contains(n));
+-            if hit {
+-                let filtered: Vec<String> =
+-                    enabled.into_iter().filter(|n| !names.contains(n)).collect();
++            let path = entry.path().join("config.yaml");
++            let text = match am::config::read_config_text(&path) {
++                Ok(text) => text,
++                Err(err) if err.kind() == std::io::ErrorKind::NotFound => continue,
++                Err(err) => {
++                    return Err(MemoryError::Io(format!(
++                        "read agent config before skill cleanup: {err}"
++                    )))
++                }
++            };
++            let (enabled, disabled) = AgentConfigPatchAlias::read_skill_lists(&text)?;
++            if enabled.iter().any(|name| names.contains(name)) {
++                let filtered: Vec<String> = enabled
++                    .into_iter()
++                    .filter(|name| !names.contains(name))
++                    .collect();
+                 let patched =
+-                    AgentConfigPatchAlias::write_skill_lists(&text, &filtered, &workspace_disabled);
+-                am::atomic_write(&config_path, &patched).map_err(MemoryError::from)?;
+-                scrubbed.push(entry.file_name().to_string_lossy().to_string());
++                    AgentConfigPatchAlias::write_skill_lists(&text, &filtered, &disabled)?;
++                plan.push(SkillReferenceScrub {
++                    path,
++                    before: text,
++                    patched,
++                    agent: entry.file_name().to_string_lossy().to_string(),
++                });
+             }
+         }
+-        let bundles = sl::BundlesStore::new(&self.home);
+-        let _ = bundles.remove_skills(names);
++        Ok(plan)
++    }
++    fn scrub_skill_references(&self, names: &[String]) -> Result<Vec<String>, MemoryError> {
++        let plan = self.prepare_skill_reference_scrub(names)?;
++        let mut scrubbed = Vec::new();
++        for SkillReferenceScrub {
++            path,
++            before,
++            patched,
++            agent,
++        } in plan
++        {
++            if am::config::read_config_text(&path).map_err(MemoryError::from)? != before {
++                return Err(MemoryError::Conflict {
++                    code: "AGENT_CONFIG_CHANGED".into(),
++                    message: "助手配置在技能引用清理前已改变".into(),
++                });
++            }
++            am::atomic_write(&path, &patched).map_err(MemoryError::from)?;
++            scrubbed.push(agent);
++        }
++        sl::BundlesStore::new(&self.home).remove_skills(names)?;
+         Ok(scrubbed)
+     }
+ 
+@@ -804,7 +865,7 @@ impl SkillService {
+             })
+             .collect();
+         let used_elsewhere =
+-            sl::collect_enabled_skills_of_other_agents(&self.home.join("agents"), agent_id);
++            sl::collect_enabled_skills_of_other_agents(&self.home.join("agents"), agent_id)?;
+         let skills: Vec<Value> = candidates
+             .into_iter()
+             .filter(|s| {
+@@ -935,23 +996,13 @@ impl SkillService {
+     ) -> Result<Vec<SkillCatalogEntry>, MemoryError> {
+         validate_agent_id(agent_id)?;
+         let config_path = self.home.join("agents").join(agent_id).join("config.yaml");
+-        let (enabled, workspace_disabled, policy) = if config_path.is_file() {
+-            let text = std::fs::read_to_string(&config_path)
+-                .map_err(|e| MemoryError::Io(e.to_string()))?;
+-            let (enabled, workspace_disabled) = AgentConfigPatchAlias::read_skill_lists(&text);
+-            let flags = AgentConfigPatchAlias::read_flags(&text);
+-            let policy = workspace_skill_policy_from_config(
+-                flags.discover_project_skills,
+-                flags.discover_compatible_project_skills,
+-            );
+-            (enabled, workspace_disabled, policy)
+-        } else {
+-            (
+-                Vec::new(),
+-                Vec::new(),
+-                workspace_skill_policy_from_config(None, None),
+-            )
+-        };
++        let document = am::config::read_agent_config(&config_path)?;
++        let (enabled, workspace_disabled) = document.skill_lists()?;
++        let flags = document.flags()?;
++        let policy = workspace_skill_policy_from_config(
++            flags.discover_project_skills,
++            flags.discover_compatible_project_skills,
++        );
+         let enabled_set: std::collections::HashSet<String> = enabled.into_iter().collect();
+         let disabled_set: std::collections::HashSet<String> =
+             workspace_disabled.into_iter().collect();
+diff --git a/rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs b/rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs
+index a395df22a..bdd406a27 100644
+--- a/rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs
++++ b/rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs
+@@ -153,13 +153,13 @@ fn gather(
+ fn scan_agent_config_reads_supported_keys() {
+     let scan = scan_agent_config(
+         "# comment\nlocale: zh-CN  # trailing comment\nagent:\n  name: \"灵犀\"  # bot\n  yuan: 'butter'\nmemory:\n  enabled: false\nother:\n  name: ignored\n",
+-    );
++    ).unwrap();
+     assert_eq!(scan.locale.as_deref(), Some("zh-CN"));
+     assert_eq!(scan.agent_name.as_deref(), Some("灵犀"));
+     assert_eq!(scan.yuan.as_deref(), Some("butter"));
+     assert_eq!(scan.memory_enabled, Some(false));
+     // 未知段里的同名字段不得串扰。
+-    let scan = scan_agent_config("other:\n  name: wrong\nagent:\n  yuan: ming\n");
++    let scan = scan_agent_config("other:\n  name: wrong\nagent:\n  yuan: ming\n").unwrap();
+     assert_eq!(scan.agent_name, None);
+     assert_eq!(scan.yuan.as_deref(), Some("ming"));
+ }

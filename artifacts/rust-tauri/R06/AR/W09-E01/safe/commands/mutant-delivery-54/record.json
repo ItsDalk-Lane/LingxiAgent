@@ -1,0 +1,169 @@
+{
+  "argv": [
+    "<LOCAL_USER>/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "artifacts/rust-tauri/R06/AR/W09-E01/LOCAL_ONLY_NEVER_GIT/mutant-delivery-peek/rust/Cargo.toml",
+    "--locked",
+    "-j8",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r06_ar_w09_embedding_batches",
+    "c01_exact_batch_boundaries",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "cwd": "<W09_WORKSPACE>",
+  "toolchain": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "node": "v24.16.0",
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+  "start": "2026-10-11T13:31:13.982006+00:00",
+  "end": "2026-10-11T13:31:42.702693+00:00",
+  "exit_code": 101,
+  "elapsed_seconds": 27.109464666005806,
+  "inputs_stable": true,
+  "environment": {
+    "LINGXI_HOME": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/mutant-delivery-54/LOCAL_ONLY_NEVER_GIT/synthetic-home",
+    "LINGXI_PRODUCT_DIR": "<W09_WORKSPACE>/lib",
+    "CARGO_TARGET_DIR": "<W09_WORKSPACE>/rust/target-w09-e01/mutant-peek",
+    "CARGO_BUILD_JOBS": "8",
+    "TEST_MEM_LIMIT_MB": "8192",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "LINGXI_TEST_GUARD": "1",
+    "CARGO_TARGET_AARCH64_APPLE_DARWIN_RUNNER": "python3 <W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/LOCAL_ONLY_NEVER_GIT/test-binary-runner.py",
+    "W09_EVIDENCE": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/mutant-delivery-54",
+    "W10_EVIDENCE": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/mutant-delivery-54/w10-dependency-regression",
+    "TMPDIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/",
+    "CARGO_INCREMENTAL": "0"
+  },
+  "rss_measured_mib": null,
+  "outer_budget_seconds": 2700,
+  "actual_parent_wait_reaped": true,
+  "process_group_residue": [],
+  "outer_timeout": null,
+  "executed_binaries": [
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/mutant-peek/debug/deps/r06_ar_w09_embedding_batches-49c1ded371bfaa00",
+      "sha256": "233af1515cf07a57dbe943d942c406d1b0fbc4f6b894f0567ce013413de2379e",
+      "actual_before_sha256": "233af1515cf07a57dbe943d942c406d1b0fbc4f6b894f0567ce013413de2379e",
+      "actual_after_sha256": "233af1515cf07a57dbe943d942c406d1b0fbc4f6b894f0567ce013413de2379e",
+      "cached_inventory_before_sha256": null,
+      "inventory_after_sha256": "233af1515cf07a57dbe943d942c406d1b0fbc4f6b894f0567ce013413de2379e",
+      "actual_before_unknown": false
+    }
+  ],
+  "runner_sha256": "4e4f41c4cc5bcb9a6c869424eb44ffab305110d70ad2aeb26d702dc57af22318",
+  "actual_test_binary_runs": [
+    {
+      "binary": "<W09_WORKSPACE>/rust/target-w09-e01/mutant-peek/debug/deps/r06_ar_w09_embedding_batches-49c1ded371bfaa00",
+      "argv": [
+        "<W09_WORKSPACE>/rust/target-w09-e01/mutant-peek/debug/deps/r06_ar_w09_embedding_batches-49c1ded371bfaa00",
+        "c01_exact_batch_boundaries",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "wrapper_pid": 3473,
+      "process_group": 2767,
+      "before_sha256": "233af1515cf07a57dbe943d942c406d1b0fbc4f6b894f0567ce013413de2379e",
+      "before_at": "2026-10-11T13:31:40.031957+00:00",
+      "guard_env": {
+        "LINGXI_TEST_GUARD": "1",
+        "TEST_TIME_LIMIT_SEC": "600",
+        "TEST_MEM_LIMIT_MB": "8192"
+      },
+      "product_dir": "<W09_WORKSPACE>/lib",
+      "shipping_inventory_before": {
+        "path": "<W09_WORKSPACE>/rust/target-w09-e01/mutant-peek/debug/lingxi-service",
+        "sha256": "20a6d516735cc61d00de9cff1324be753f57639edc8dc7d1645c0dc417cf65a3"
+      },
+      "actual_child_pid": 3475,
+      "exit_code": 101,
+      "actual_wait_reaped": true,
+      "elapsed_seconds": 2.4884537500038277,
+      "after_sha256": "233af1515cf07a57dbe943d942c406d1b0fbc4f6b894f0567ce013413de2379e",
+      "after_at": "2026-10-11T13:31:42.598478+00:00",
+      "shipping_inventory_after": {
+        "path": "<W09_WORKSPACE>/rust/target-w09-e01/mutant-peek/debug/lingxi-service",
+        "sha256": "20a6d516735cc61d00de9cff1324be753f57639edc8dc7d1645c0dc417cf65a3"
+      },
+      "binary_stable": true
+    }
+  ],
+  "actual_test_binary_starts": [
+    {
+      "binary": "<W09_WORKSPACE>/rust/target-w09-e01/mutant-peek/debug/deps/r06_ar_w09_embedding_batches-49c1ded371bfaa00",
+      "argv": [
+        "<W09_WORKSPACE>/rust/target-w09-e01/mutant-peek/debug/deps/r06_ar_w09_embedding_batches-49c1ded371bfaa00",
+        "c01_exact_batch_boundaries",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "wrapper_pid": 3473,
+      "process_group": 2767,
+      "before_sha256": "233af1515cf07a57dbe943d942c406d1b0fbc4f6b894f0567ce013413de2379e",
+      "before_at": "2026-10-11T13:31:40.031957+00:00",
+      "guard_env": {
+        "LINGXI_TEST_GUARD": "1",
+        "TEST_TIME_LIMIT_SEC": "600",
+        "TEST_MEM_LIMIT_MB": "8192"
+      },
+      "product_dir": "<W09_WORKSPACE>/lib",
+      "shipping_inventory_before": {
+        "path": "<W09_WORKSPACE>/rust/target-w09-e01/mutant-peek/debug/lingxi-service",
+        "sha256": "20a6d516735cc61d00de9cff1324be753f57639edc8dc7d1645c0dc417cf65a3"
+      }
+    }
+  ],
+  "product_resource_directory": "<W09_WORKSPACE>/lib",
+  "product_resource_anchor": {
+    "path": "lib/yuan/lingxi.md",
+    "sha256": "fff0f7a338337ee7a8f049fe5b65182d6c2c4af0ef5a3b21bae071dd346c6865",
+    "exists": true
+  },
+  "runner_after_sha256": "4e4f41c4cc5bcb9a6c869424eb44ffab305110d70ad2aeb26d702dc57af22318",
+  "cargo_runner_file_sha256": "278357c10b64510f5308cd9936ed46d73fe8e2c3a9eb45c7a77f73345d7a13ae",
+  "preparation_failure": null,
+  "source_stability_basis": null,
+  "git_config_environment": null,
+  "private_excludes_sha256_before": null,
+  "private_excludes_sha256_after": null,
+  "disposition": null,
+  "cancel_reason": null,
+  "partial_actual_test_starts": null,
+  "partial_actual_test_ends": null,
+  "partial_test_result_blocks": null,
+  "nested_group_cleanup": null,
+  "nested_group_observed_gone": null,
+  "label": "mutant-delivery-54",
+  "record_sha256": "e9042169d62cea2affc29a84f93a60549c85c9edc35100c6f1541848082f7f2b",
+  "log_sha256": "6582e64d31b3142410cc308e78d81af4b3000ba9e7d0eeb0af9264ebcdc00b41",
+  "inputs_before_digest": "5e75b53dedec8c0faa94fe4674731c0cbb0c53ef04aac4c53de0420e0f6abe79",
+  "inputs_after_digest": "5e75b53dedec8c0faa94fe4674731c0cbb0c53ef04aac4c53de0420e0f6abe79",
+  "inputs_count": 4928,
+  "test_results": [
+    {
+      "result": "FAILED",
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 15,
+      "seconds": 1.52
+    }
+  ],
+  "guard_armed_count": 6,
+  "complete_original_metadata": "commands/mutant-delivery-54/record.json retained locally",
+  "source_binding_matches_final": true,
+  "outcome_class": "ACTUAL_EXECUTION",
+  "shipping_binaries_before": {
+    "<W09_WORKSPACE>/rust/target-w09-e01/mutant-peek/debug/lingxi-service": "34157be9f8f391f9820bd451ad582f392ec9386956c3e69b7c2a9598e94d5aad"
+  },
+  "shipping_binaries_after": {
+    "<W09_WORKSPACE>/rust/target-w09-e01/mutant-peek/debug/lingxi-service": "20a6d516735cc61d00de9cff1324be753f57639edc8dc7d1645c0dc417cf65a3"
+  }
+}

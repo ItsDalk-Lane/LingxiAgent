@@ -1,0 +1,57 @@
+{
+  "at": "2026-10-11T23:00:37.957166+00:00",
+  "role": "ROOT_EXACT_FROZEN_BYTE_RECOVERY_ONLY",
+  "results": [
+    {
+      "family": "W05",
+      "relative_path": "rust/crates/lingxi-service/src/context_compiler.rs",
+      "original_mutant": "/Users/study_superior/.codex/r06-w05-r01-runtime/mutant/rust/crates/lingxi-service/src/context_compiler.rs",
+      "original_mutant_sha256": "fd626b871b5a76090df8fae6281cdfcc3f089d02487aa010e85b65acdca15fc6",
+      "expected_frozen_sha256": "6c9c663d1143e04d700ce14a3a3459f467d67fbf8d755aa262c719691ec84e8c",
+      "tested_in_memory_variants": [
+        {
+          "method": "remove precisely identified old-cache mutation; unchanged arguments",
+          "sha256": "a1e7abc155f9de2b65be40fe52445683a719c3f340a9589264b4ad74b13dea75"
+        },
+        {
+          "method": "same reversal; original unused snapshot session argument underscore",
+          "sha256": "6c9c663d1143e04d700ce14a3a3459f467d67fbf8d755aa262c719691ec84e8c"
+        }
+      ],
+      "exact_byte_recovery": {
+        "path": "/private/tmp/r06-exact-byte-recovery-01/W05/rust/crates/lingxi-service/src/context_compiler.rs",
+        "sha256": "6c9c663d1143e04d700ce14a3a3459f467d67fbf8d755aa262c719691ec84e8c",
+        "bytes": 38304,
+        "method": "same reversal; original unused snapshot session argument underscore"
+      },
+      "source_mutant_unchanged": true,
+      "not_new_semantic_fix": true,
+      "not_behavior_acceptance": true
+    },
+    {
+      "family": "W09",
+      "relative_path": "rust/crates/lingxi-service/src/knowledge.rs",
+      "original_mutant": "/Users/study_superior/.codex/r06-owned-review/w09-r01/private/peek-mutant/rust/crates/lingxi-service/src/knowledge.rs",
+      "original_mutant_sha256": "4a95a475d1de9ac7b680ee3eee09fd40bff597d3a320b97a44b81c12026cef91",
+      "expected_frozen_sha256": "60eadc6c14dcca4cf07860cb0255840b81bc668e70c127367bffc97655f5f91e",
+      "tested_in_memory_variants": [
+        {
+          "method": "remove precisely identified three-line peek mutation",
+          "sha256": "60eadc6c14dcca4cf07860cb0255840b81bc668e70c127367bffc97655f5f91e"
+        }
+      ],
+      "exact_byte_recovery": {
+        "path": "/private/tmp/r06-exact-byte-recovery-01/W09/rust/crates/lingxi-service/src/knowledge.rs",
+        "sha256": "60eadc6c14dcca4cf07860cb0255840b81bc668e70c127367bffc97655f5f91e",
+        "bytes": 138299,
+        "method": "remove precisely identified three-line peek mutation"
+      },
+      "source_mutant_unchanged": true,
+      "not_new_semantic_fix": true,
+      "not_behavior_acceptance": true
+    }
+  ],
+  "historical_runtime_evidence_not_reconstructed": true,
+  "no_main_product_overlay": true,
+  "no_test_or_review_run": true
+}

@@ -1,0 +1,26 @@
+{
+  "command": [
+    "node",
+    "--experimental-strip-types",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W12-R02/probe-family.mjs"
+  ],
+  "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-family-probe-01-xqyeeash",
+  "start": 1791700989.730261,
+  "end": 1791700989.980085,
+  "exit_code": 0,
+  "log_sha256": "198988a99d0201b4ccc63122403771082f741e7b4547b1df75516710c528cba7",
+  "home_files": [
+    "ann.db",
+    "fulltext.db",
+    "vector.db",
+    "vector.db.quarantine-3f4cc3de-92c6-43d8-a322-d64298c9eb27/original.db",
+    "vector.db.quarantine-3f4cc3de-92c6-43d8-a322-d64298c9eb27/original.db-wal",
+    "vector.db.quarantine-3f4cc3de-92c6-43d8-a322-d64298c9eb27/original.db-shm",
+    "vector.db.quarantine-3f4cc3de-92c6-43d8-a322-d64298c9eb27/recovery.json",
+    "fulltext.db.quarantine-b3536db2-1185-4530-8c31-c9101cb45858/original.db",
+    "fulltext.db.quarantine-b3536db2-1185-4530-8c31-c9101cb45858/original.db-wal",
+    "fulltext.db.quarantine-b3536db2-1185-4530-8c31-c9101cb45858/original.db-shm",
+    "fulltext.db.quarantine-b3536db2-1185-4530-8c31-c9101cb45858/recovery.json"
+  ]
+}

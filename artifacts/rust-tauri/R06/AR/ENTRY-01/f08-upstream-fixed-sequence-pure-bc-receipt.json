@@ -1,0 +1,38 @@
+{
+  "time_utc": "2026-10-11T08:33:11.118977+00:00",
+  "role": "ROOT_ACTUAL_EVIDENCE_BINDING_NOT_REVIEWER",
+  "status": "PURE_ACCEPTED_BC_OLD_FIXED_SEQUENCE_CONTRACT_RED_CONFIRMED",
+  "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "critical_sources": [
+    {
+      "path": "rust/Cargo.lock",
+      "actual": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+      "expected": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+      "match": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "actual": "eca52e6151299a43d7386fb2056908a3d86afeadc1085cd3aa55dd35b5646a6e",
+      "expected": "eca52e6151299a43d7386fb2056908a3d86afeadc1085cd3aa55dd35b5646a6e",
+      "match": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/cancellation_tree.rs",
+      "actual": "d107a05d3f3b33f492a9be4e37d9c93e2566318abe4e285bba1f180fa0cf7eee",
+      "expected": "d107a05d3f3b33f492a9be4e37d9c93e2566318abe4e285bba1f180fa0cf7eee",
+      "match": true
+    }
+  ],
+  "exit_code": 101,
+  "test_count": 1,
+  "guard_armed": true,
+  "child_reaped": true,
+  "synthetic_home_cleaned": true,
+  "log_sha_match": true,
+  "actual_extra_event": "tool_result_model_projection",
+  "expected_old_sequence": "all same ordered approval/state/raw/next-model/final events without extension",
+  "evidence_current_root": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01",
+  "binary_binding_boundary": "metadata no explicit executable before/after SHA; must strengthen future independent gate run, not fabricate historical marker",
+  "owner": "F14 fixed-contract synchronization and full upstream revalidation",
+  "no_claim": "no F01-caused failure, no stage PASS, no weakening approved assertion"
+}

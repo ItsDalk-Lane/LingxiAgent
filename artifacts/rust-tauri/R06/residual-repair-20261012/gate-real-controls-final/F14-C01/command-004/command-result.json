@@ -1,0 +1,108 @@
+{
+  "binding": {
+    "package": "lingxi-adapters",
+    "suite": "r06_ar_f14_migration_receipts",
+    "test": "c01_v8_upgrade_preserves_receipts_and_restarts_are_idempotent",
+    "kind": "rust_integration_test",
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-adapters",
+      "--test",
+      "r06_ar_f14_migration_receipts",
+      "c01_v8_upgrade_preserves_receipts_and_restarts_are_idempotent",
+      "--",
+      "--exact",
+      "--nocapture"
+    ],
+    "timeoutSecs": 900
+  },
+  "argv": [
+    "rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-adapters",
+    "--test",
+    "r06_ar_f14_migration_receipts",
+    "c01_v8_upgrade_preserves_receipts_and_restarts_are_idempotent",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "sourceBeforeSha256": "58d736d36260eaa46b776f7bc963ebec85928d4fe7f6886b7e4265c0e70afab5",
+  "exitCode": 0,
+  "timedOut": false,
+  "stdout": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/F14-C01/command-004/stdout.log",
+  "stderr": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/F14-C01/command-004/stderr.log",
+  "timeoutSecs": 900,
+  "syntheticEnvironment": {
+    "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/F14-C01/command-004/runtime/home",
+    "TMPDIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/F14-C01/command-004/runtime/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib",
+    "W01_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/F14-C01/command-004/raw/w01_evidence",
+    "W09_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/F14-C01/command-004/raw/w09_evidence",
+    "W10_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/F14-C01/command-004/raw/w10_evidence",
+    "W11_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/F14-C01/command-004/raw/w11_evidence",
+    "LINGXI_W03_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/F14-C01/command-004/raw/lingxi_w03_evidence",
+    "LINGXI_F05_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/F14-C01/command-004/raw/lingxi_f05_evidence",
+    "LINGXI_F08_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/F14-C01/command-004/raw/lingxi_f08_evidence",
+    "R06_T08_RAW_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/F14-C01/command-004/raw/t08",
+    "R06_T08_EVAL_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/F14-C01/command-004/raw/t08-evaluations.jsonl"
+  },
+  "actualArgv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-adapters",
+    "--test",
+    "r06_ar_f14_migration_receipts",
+    "c01_v8_upgrade_preserves_receipts_and_restarts_are_idempotent",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "pid": 90361,
+  "elapsedSecs": 0.404,
+  "outputCheck": {
+    "valid": false,
+    "expectedTest": "c01_v8_upgrade_preserves_receipts_and_restarts_are_idempotent",
+    "runningCounts": [
+      "1"
+    ],
+    "resultSummaries": [
+      [
+        "ok",
+        "1",
+        "0",
+        "0"
+      ]
+    ],
+    "passedTestNames": [],
+    "reason": "必须精确执行登记的一个测试；0 匹配、忽略、失败或名称错绑均不能通过"
+  },
+  "stdoutSha256": "f81ee1ca458d55b9c306442d8fe8cc3eb8bde2208692571be676c29a9822236b",
+  "stderrSha256": "b90922c46ede23783c02198b71381224978dbd92866e76b017dbf00d31c93ada",
+  "sourceAfterSha256": "58d736d36260eaa46b776f7bc963ebec85928d4fe7f6886b7e4265c0e70afab5",
+  "sourceStable": true,
+  "localPassed": false
+}

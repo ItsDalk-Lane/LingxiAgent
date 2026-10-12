@@ -1,0 +1,37 @@
+{
+  "at": "2026-10-11T23:13:46.059055+00:00",
+  "role": "ROOT_EXACT_BYTE_RECOVERY_WITH_FROZEN_SHA_ONLY",
+  "source": "/private/tmp/lingxi-w03-r01-1d66t3nh/mutation-native/rust/crates/lingxi-service/src/filetools.rs",
+  "sourceSHA": "90c4f8d57d340f958cd84c5cb1a731a525d35ec3bd51cdea06f0916a6cf2ef08",
+  "expected": "05739e168b7275271fe78d2932fec5b10666e8a8e7fe434e881e3cebaa524d87",
+  "variants_checked_in_memory": [
+    {
+      "variable": "_retained",
+      "sha256": "c069c888526feefcaeb32c63e7d7011d08c0a01c08b0751d1c96cc3c5ed08fde"
+    },
+    {
+      "variable": "_permit",
+      "sha256": "0253c7eed7bbccbd2a326a2212a27dcf31bdc11205f772e9b8bd77e77b8f4766"
+    },
+    {
+      "variable": "_run_permit",
+      "sha256": "e035d8fd4c9ceaca4afafc95cd1021285f0026b9112a728c706a644e01d5ab21"
+    },
+    {
+      "variable": "_lease",
+      "sha256": "ac59810179443c58d0e13222dbbb96778801188f2034d9f3ea20ae63dc725251"
+    },
+    {
+      "variable": "_blocking_permit",
+      "sha256": "3de72608209fac3c15caf8510eb731abe739d14ad47c8a583846aae330adb05c"
+    },
+    {
+      "variable": "_guard",
+      "sha256": "c60c73754ea5031d04ea4e016bbd3c131159303d81b0f8795fb89a5397fb3c51"
+    }
+  ],
+  "match": null,
+  "mutant_unchanged": true,
+  "not_new_semantic_fix": true,
+  "not_acceptance": true
+}

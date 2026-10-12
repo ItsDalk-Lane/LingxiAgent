@@ -95,7 +95,7 @@ use crate::stage_map::{
     is_stage_neutral_kind, LeafDeferredCase, StageMap, SupplementalLeaf, BASIS_AUTH_PRIMITIVE_ONLY,
     BASIS_CLIENT_ONLY_STAGE_CONFLICT, BASIS_DEFERRED_TO_LATER_STAGE, BASIS_DEFERRED_TO_R07,
     BASIS_FULL_ORIGINAL_BEHAVIOR, BASIS_PROTOCOL, BASIS_R02_SHARE_SATISFIED,
-    BASIS_ROUTE_PRESENT_STATIC, BASIS_STAGE_SHARE_SATISFIED,
+    BASIS_REQUIRED_BEHAVIOR_PENDING, BASIS_ROUTE_PRESENT_STATIC, BASIS_STAGE_SHARE_SATISFIED,
 };
 use crate::RESULT_VERSION;
 
@@ -705,6 +705,18 @@ fn roll_up_supplemental_leaf(
     repo_root: &Path,
     evidence_root: &Path,
 ) -> LeafRollUp {
+    if leaf.basis_kind == BASIS_REQUIRED_BEHAVIOR_PENDING {
+        return LeafRollUp {
+            status: "BLOCKED".to_string(),
+            reason: format!(
+                "本阶段必需行为尚缺完整逐断言证据，登记和局部检查不等于完成：{}",
+                leaf.evidence_required
+            ),
+            assertion_results: Vec::new(),
+            deferred_case_results: Vec::new(),
+            early_evidence: None,
+        };
+    }
     if leaf.basis_kind == BASIS_CLIENT_ONLY_STAGE_CONFLICT {
         return LeafRollUp {
             status: "BLOCKED".to_string(),

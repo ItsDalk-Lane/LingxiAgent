@@ -386,6 +386,14 @@ pub async fn bridge_media_route(
     let Some(entry) = state.bridge_media().resolve(&token) else {
         return (StatusCode::NOT_FOUND, "media not found").into_response();
     };
+    // 媒体票据不扩大内部恢复对象的读取权限。
+    if state
+        .resource_io()
+        .file_safety()
+        .is_protected(&entry.real_path)
+    {
+        return (StatusCode::NOT_FOUND, "media not found").into_response();
+    }
     let meta = match std::fs::metadata(&entry.real_path) {
         Ok(meta) if meta.is_file() => meta,
         _ => return (StatusCode::NOT_FOUND, "media not found").into_response(),

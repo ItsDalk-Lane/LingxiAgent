@@ -1,0 +1,58 @@
+{
+  "at": "2026-10-11T12:41:49.205181+00:00",
+  "role": "ROOT_ACTUAL_FAILED_TEST_RECORD_READBACK_NOT_INDEPENDENT_REVIEW",
+  "finding_ref": "R06-AR-F07-OBS-LIVE-CATALOG-HISTORY",
+  "status": "ACTUAL_EXECUTOR_TEST_FAILURE_RECORD_CONFIRMED_RAW_WIRE_SQL_FINAL_MANIFEST_PENDING",
+  "metadata": {
+    "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/commands/candidate-extra-tools-02.json",
+    "sha256": "39dd58c9dfffaf283c256e2a5ad87f1e2e40d0c8eb5cb9f013c7b01cc30a53ef"
+  },
+  "log": {
+    "path": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/commands/candidate-extra-tools-02.log",
+    "sha256": "c364f363072f623be789d1ed40628d5bc4f123399c4bb0016c1c7a99382d95eb"
+  },
+  "argv": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r06_ar_f05_cache",
+    "--locked",
+    "-j8",
+    "--",
+    "--nocapture"
+  ],
+  "exit_code": 101,
+  "actual_counts": {
+    "passed": 3,
+    "failed": 1,
+    "ignored": 0,
+    "measured": 0,
+    "filtered_out": 0
+  },
+  "input_unchanged": true,
+  "guard": {
+    "timeSeconds": 600,
+    "memoryMiB": 8192,
+    "enabled": true
+  },
+  "timed_out": false,
+  "memory_guard_triggered": false,
+  "remaining_after_cleanup": [],
+  "test_binary_cached_and_post_build": {
+    "executableBefore": {
+      "rust/target-w05-e01/debug/deps/r06_ar_f05_cache-b8ad9174ba016b7e": "d37c592f08908738a6387f6638b82d32e0f54b103d1950a3f93f4772601152c6",
+      "rust/target-w05-e01/debug/deps/r06_ar_f05_cache-b1f7d67d183e3de8": "a4edceb458f3266628e2441e784d188278af37c62cbbe2ee7ffea1d413bb092c"
+    },
+    "executableAfter": {
+      "rust/target-w05-e01/debug/deps/r06_ar_f05_cache-b8ad9174ba016b7e": "36d72a6153a5ce5ea8749a649db3c59f1fb273213fe5556931d86fc4ff5b800d",
+      "rust/target-w05-e01/debug/deps/r06_ar_f05_cache-b1f7d67d183e3de8": "a4edceb458f3266628e2441e784d188278af37c62cbbe2ee7ffea1d413bb092c"
+    }
+  },
+  "failed_test": "c01_actual_calls_keep_system_frozen_and_tools_live_after_revocation",
+  "executor_next": "Original named revocation test and all assertions retained failing; separate description_update positive added, plus raw wire/actual observations/SQL retained for final binding. New tests/evidence edits invalidate current candidate results until repeat.",
+  "root_readback_limit": "Only complete command/log counts and hashes read here; actual SQLite/wire/per-execution binaries await final exact manifest and fresh independent Reviewer. No stage acceptance."
+}

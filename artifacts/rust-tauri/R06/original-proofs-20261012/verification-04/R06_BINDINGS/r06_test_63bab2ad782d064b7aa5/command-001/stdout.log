@@ -1,0 +1,22 @@
+
+running 1 test
+test original_tools_use_authentic_run_scope_and_frozen_citable_source ... FAILED
+
+successes:
+
+successes:
+
+failures:
+
+---- original_tools_use_authentic_run_scope_and_frozen_citable_source stdout ----
+
+thread 'original_tools_use_authentic_run_scope_and_frozen_citable_source' (13446115) panicked at crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:1394:5:
+assertion failed: none["hits"].as_array().unwrap().is_empty()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    original_tools_use_authentic_run_scope_and_frozen_citable_source
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.70s
+

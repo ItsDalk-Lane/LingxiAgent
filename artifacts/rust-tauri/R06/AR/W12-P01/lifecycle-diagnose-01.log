@@ -1,0 +1,26 @@
+{"command": ["npx", "vitest", "run", "tests/knowledge-lifecycle.test.ts", "--maxWorkers=1", "--reporter=verbose"], "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-lifecycle-diagnose-01-tkbxwdfm", "start": 1791699823.498661}
+
+ RUN  v4.1.10 /Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent
+
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 生命周期：schema v12 迁移 > v11→v12：orphan/cancelled 列与活跃唯一索引就位；存量重复活跃行收敛为最新一条 39ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 生命周期：schema v12 迁移 > 应用层幂等 ensure 由唯一索引兜底：enqueue 重复目标只产生一个活跃 job 33ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 生命周期：三层模型（§十八） > 移除一个 membership、其他笔记本仍引用 → Source 与派生索引全部保留 362ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 生命周期：三层模型（§十八） > 移除最后 membership → orphan 标记；默认保留期内不物理删 44ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 生命周期：三层模型（§十八） > 过保留期 GC → 全部物理痕迹清空（行、字节、产物、FTS/向量变体） 50ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 生命周期：三层模型（§十八） > 有活跃 turn scope 冻结引用 → GC 跳过；scope 关闭后可清 53ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 生命周期：三层模型（§十八） > GC 防御：orphan 标记与活跃 membership 并存（复活窗口）→ 清标记跳过不误删 32ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 生命周期：deleteSource（§十九 delete wins） > queued job 直接取消；运行中 reindex 被 abort；一切不复活 36ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 生命周期：deleteSource（§十九 delete wins） > cancelled job 拒绝手动重试（failed+cancelled_at 不可 requeue，delete wins 不复活） 29ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 生命周期：deleteSource（§十九 delete wins） > 活跃 turn scope 冻结引用 → deleteSource 显式 409 拒绝 29ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 摄入并发模型（§十六） > 两个不同 (artifact, profile) 的 job 并行（嵌入调用交错） 108ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 摄入并发模型（§十六） > 同 key（同 artifact+profile）两个 job 串行：嵌入调用不重叠 166ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 摄入并发模型（§十六） > Provider Semaphore 限流：同 (provider, model) 并发嵌入请求数不超上限 195ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 摄入并发模型（§十六） > 最小请求间隔生效：同 provider 两次派发至少间隔 minRequestIntervalMs 136ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge watcher 兼容（§七十）：共享源按 membership 各自 ensure 变体 > 同源多笔记本不同分块配置 → refresh 后两个 profile 变体并存，不重复建工作 304ms
+ ✓ tests/knowledge-lifecycle.test.ts > Knowledge 零引用变体诊断（§十八 DerivedIndexVariant） > 零引用 chunk 变体只检测不清理；活跃 profile 的变体不进候选 309ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  14:23:43
+   Duration  2.48s (transform 183ms, setup 17ms, import 479ms, tests 1.92s, environment 0ms)
+

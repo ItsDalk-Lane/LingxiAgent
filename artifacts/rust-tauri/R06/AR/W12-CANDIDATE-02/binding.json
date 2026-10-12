@@ -1,0 +1,75 @@
+{
+  "base": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+  "workspace": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+  "owned": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/knowledge.rs",
+      "sha256": "a123a9e0b11e0a95f630c18f8e002c36889905364361eaa34e89bad22506db01",
+      "bytes": 121999,
+      "base_sha256": "9ff5675821ab54ca41592c8d6cf211b77263d9b55f9f8cf45c17801863ab4d1d"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/knowledge.rs",
+      "sha256": "3f98131c88c8c1c1945a87752f1702d2cfb75ffdf2454e0d88d4554edbd3c370",
+      "bytes": 125213,
+      "base_sha256": "d9294730241e08c8e2da443cf7fab84e14124fcdc253b3f74a80ffd55b96dc90"
+    },
+    {
+      "path": "lib/knowledge/vector-index-adapter.ts",
+      "sha256": "4c74ef0a579de04195ac1b7612b398f5dc8d558c17eac83051b6f55b488b8877",
+      "bytes": 55844,
+      "base_sha256": "d0eb6fd3bbb797b461e8448f5dea048fea7ef7e1d2ab5a58f7533f980fb0f655"
+    },
+    {
+      "path": "lib/knowledge/knowledge-index-store.ts",
+      "sha256": "eca060010a31ffb6acac5e349fd6a8a72875c59db673bc797ce04e7ddb0862d6",
+      "bytes": 59220,
+      "base_sha256": "eb8f98b3143dd3f4f73f0148dc142903bf1340a0d5bd9144a2943fca68371bd0"
+    },
+    {
+      "path": "lib/knowledge/ann-index-store.ts",
+      "sha256": "d18aace5c86d100e37e2f5932eb184044daabc4dec503800ec43a37264848404",
+      "bytes": 7816,
+      "base_sha256": "f28c2697092034acf2f0b16a5b617dca6958a5d1ee146623188ddddc154c63c9"
+    },
+    {
+      "path": "lib/knowledge/vector-search-backend-factory.ts",
+      "sha256": "54aeefa97965fe574859085616cc74070405489cce5557c2f29abb406fb2d74d",
+      "bytes": 1535,
+      "base_sha256": "eb98fd47e11125c169b1f3a43a492c3dfd4c82b931161c4a7d79de4e74eedce4"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs",
+      "sha256": "f9790bf638769199b40af3b540cb34d2fa897c28e91b4cec0af91f9b09fe4b9b",
+      "bytes": 23546,
+      "base_sha256": null
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs",
+      "sha256": "bd4b3d7b711e20aac3e56e4ca87b632bb804e4f265eedd0bfd2be218ad0e17e0",
+      "bytes": 15557,
+      "base_sha256": null
+    },
+    {
+      "path": "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+      "sha256": "5eb1a93524ce4eabf542229f7c68e960b37b8062f908eaf29596721b8908b773",
+      "bytes": 13856,
+      "base_sha256": null
+    },
+    {
+      "path": "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+      "sha256": "9973a3161d4d4bf7cf7ed4f079fdd45b22b1616be69d7408c1054f2bebbd6f59",
+      "bytes": 5438,
+      "base_sha256": null
+    },
+    {
+      "path": "tests/r06-ar-f12-ann-cache-preservation.test.ts",
+      "sha256": "9b0b9219934632ff24af69e3a759ea7c35feffad5747a2114a066983f23ac791",
+      "bytes": 4141,
+      "base_sha256": null
+    }
+  ],
+  "aggregate": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+  "independent_review": "NOT_RUN",
+  "rebind_reason": "正确按工作区2021格式；无语义变更，但新SHA需最终运行绑定"
+}

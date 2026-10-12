@@ -1,0 +1,29 @@
+{
+  "id": "R06-CONTROL-AVAILABILITY-RECONCILIATION-02",
+  "at": "2026-10-12T00:26:37.920658+00:00",
+  "role": "ROOT_CONTROL_ONLY_ACTUAL_READBACK",
+  "user_confirmation": "已经彻底删除",
+  "deletion_not_performed_by_root": true,
+  "historical_preparation_fields_retained": true,
+  "latest_actor_and_availability": [
+    {
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01",
+      "actor": "/root/ar_w10_reviewer_01",
+      "latest_actor_status": "ENDED_INDEPENDENT_REVIEW_FAIL",
+      "workspace_exists": false
+    },
+    {
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w01-first-review-source-01",
+      "actor": "/root/ar_w01_reviewer_01",
+      "latest_actor_status": "ERRORED_PLATFORM_DAYBREAK_ACCESS_REQUIRED_REVIEW_INCOMPLETE",
+      "workspace_exists": false
+    }
+  ],
+  "acceptance": "NONE",
+  "closed_count": 1,
+  "open_count": 14,
+  "actors_count": 36,
+  "staged_paths_actual": [],
+  "settings_sha256": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3",
+  "R07_started": false
+}

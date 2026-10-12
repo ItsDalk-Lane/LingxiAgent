@@ -1,0 +1,137 @@
+{
+  "actualRequests": [],
+  "dimensions": "UNKNOWN_NOT_SENT",
+  "fingerprint": "805bd6fd916ffffcb1dc4d34086e299b8b378ba35fef33694d63e8649c2f1340",
+  "model": "model-a",
+  "protocolChecks": [
+    {
+      "compatibility": "paired role, text, generation unchanged; model/provider/endpoint changed refused",
+      "documentBody": {
+        "encoding_format": "float",
+        "input": [
+          "协议合成资料"
+        ],
+        "model": "model-a"
+      },
+      "documentUrl": "http://127.0.0.1:50017/v1/embeddings",
+      "evidenceLevel": "ADAPTER_BUILD_AND_FINGERPRINT_ONLY_NO_DISPATCH",
+      "fingerprint": "805bd6fd916ffffcb1dc4d34086e299b8b378ba35fef33694d63e8649c2f1340",
+      "protocol": "openai-embeddings",
+      "queryBody": {
+        "encoding_format": "float",
+        "input": [
+          "协议合成资料"
+        ],
+        "model": "model-a"
+      },
+      "queryUrl": "http://127.0.0.1:50017/v1/embeddings"
+    },
+    {
+      "compatibility": "paired role, text, generation unchanged; model/provider/endpoint changed refused",
+      "documentBody": {
+        "input": [
+          "协议合成资料"
+        ],
+        "model": "model-a",
+        "options": {
+          "num_ctx": 2048
+        }
+      },
+      "documentUrl": "http://127.0.0.1:50017/api/embed",
+      "evidenceLevel": "ADAPTER_BUILD_AND_FINGERPRINT_ONLY_NO_DISPATCH",
+      "fingerprint": "516e55d1ba30adb08cbaf74eb8d13b89a891f7fe8e312f1da37947d62b2ac735",
+      "protocol": "ollama-embed",
+      "queryBody": {
+        "input": [
+          "协议合成资料"
+        ],
+        "model": "model-a",
+        "options": {
+          "num_ctx": 2048
+        }
+      },
+      "queryUrl": "http://127.0.0.1:50017/api/embed"
+    },
+    {
+      "compatibility": "paired role, text, generation unchanged; model/provider/endpoint changed refused",
+      "documentBody": {
+        "requests": [
+          {
+            "content": {
+              "parts": [
+                {
+                  "text": "协议合成资料"
+                }
+              ]
+            },
+            "model": "models/model-a"
+          }
+        ]
+      },
+      "documentUrl": "http://127.0.0.1:50017/v1/models/model-a:batchEmbedContents",
+      "evidenceLevel": "ADAPTER_BUILD_AND_FINGERPRINT_ONLY_NO_DISPATCH",
+      "fingerprint": "1272f2188df4bb351ef609e1e06da524cacf4be878b656069ebd0ce914cbad12",
+      "protocol": "gemini-embed",
+      "queryBody": {
+        "requests": [
+          {
+            "content": {
+              "parts": [
+                {
+                  "text": "协议合成资料"
+                }
+              ]
+            },
+            "model": "models/model-a"
+          }
+        ]
+      },
+      "queryUrl": "http://127.0.0.1:50017/v1/models/model-a:batchEmbedContents"
+    },
+    {
+      "compatibility": "paired role, text, generation unchanged; model/provider/endpoint changed refused",
+      "documentBody": {
+        "input": [
+          "协议合成资料"
+        ],
+        "input_type": "document",
+        "model": "model-a"
+      },
+      "documentUrl": "http://127.0.0.1:50017/v1/v1/embeddings",
+      "evidenceLevel": "ADAPTER_BUILD_AND_FINGERPRINT_ONLY_NO_DISPATCH",
+      "fingerprint": "814e82cea3f3a709e4a344028daa8bfdd3c749f6ace421bfa355a7767a3823c6",
+      "protocol": "voyage-embeddings",
+      "queryBody": {
+        "input": [
+          "协议合成资料"
+        ],
+        "input_type": "query",
+        "model": "model-a"
+      },
+      "queryUrl": "http://127.0.0.1:50017/v1/v1/embeddings"
+    },
+    {
+      "compatibility": "paired role, text, generation unchanged; model/provider/endpoint changed refused",
+      "documentBody": {
+        "model": "model-a",
+        "texts": [
+          "协议合成资料"
+        ],
+        "type": "db"
+      },
+      "documentUrl": "http://127.0.0.1:50017/v1/embeddings?GroupId=group-a",
+      "evidenceLevel": "ADAPTER_BUILD_AND_FINGERPRINT_ONLY_NO_DISPATCH",
+      "fingerprint": "6cd8ad674343e849f8b67a62cc84c4bd077effd14b405a1254050daa6a0e4f10",
+      "protocol": "minimax-embeddings",
+      "queryBody": {
+        "model": "model-a",
+        "texts": [
+          "协议合成资料"
+        ],
+        "type": "query"
+      },
+      "queryUrl": "http://127.0.0.1:50017/v1/embeddings?GroupId=group-a"
+    }
+  ],
+  "provider": "embed"
+}

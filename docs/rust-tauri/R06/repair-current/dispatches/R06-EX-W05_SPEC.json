@@ -1,0 +1,311 @@
+{
+  "id": "R06-EX-05",
+  "title": "记忆修订恢复的失败窗口与实际保留策略",
+  "original_requirements": [
+    {
+      "id": "R06-T06-S01",
+      "clause": "迁移现役记忆事实/摘要/信条/梦境等实际流程的数据访问与调度调用；业务状态和模型调用由Rust负责。"
+    },
+    {
+      "id": "R06-T06-S02",
+      "clause": "按Agent隔离记忆查询与写入；现役知识内容/外装技能材料均按来源和权限进入上下文。"
+    }
+  ],
+  "r00_feature_ids": [
+    "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-REVI-76EE73",
+    "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-REVI-1CE6A9",
+    "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-STAT-B45ECE",
+    "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-REVI-041F93",
+    "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-RUNS-A9AD4C"
+  ],
+  "reported_gap": "agent_memory.rs restore依次写facts/today/longterm/week；仅预保存修订，无pending恢复，T06 D3/D4/D5自申报不能免除损坏/重启边界。",
+  "deadline": "R06 阶段验收前：这里只要求当前核心/服务份额",
+  "status": "NOT_RUN",
+  "evidence_level": "SOURCE_ONLY",
+  "runtime_evidence": [],
+  "coverage_by_existing_f": "R06-AR-F15要求完整性，但F01-F14的具体修复不自动涵盖此行为；保留为extra，不改原F编号",
+  "production_paths": [
+    "rust/crates/lingxi-adapters/src/storage/agent_memory.rs"
+  ],
+  "proposed_real_checks": [
+    "注入第二段写失败/恢复中进程退出后核对每段原/新一致与可恢复修订；外部变化不能被静默覆盖",
+    "有效retention/retain策略经服务操作可证，来源材料保护；恢复不存在/有冲突版本明确错误"
+  ],
+  "legal_later_basis": [
+    {
+      "task_id": "R07-T01",
+      "original_goal": "什么时候触发与谁执行继续分离。",
+      "original_steps": [
+        "迁移现役cron/提醒/插件动作/Agent后台执行/心跳入口，保持时区、开关、触发条件和用户可见设置。",
+        "调度器只生成有唯一triggerId的提交，执行/取消/恢复交给R03；不要为cron另写Agent循环。",
+        "明确错过触发、系统睡眠唤醒、时钟调整、夏令时重复/缺失时间和任务重叠策略；保留现役语义并写成测试。",
+        "持久化触发收据与通知结果；重启不重复发送已确认提醒，对未知外发按R03策略处理。"
+      ]
+    }
+  ],
+  "current_vs_later": "周期触发与后台清理调度可后续；R06当前restore的可恢复性和已接受设置不得仅申报延期。",
+  "suggested_work_unit": {
+    "id": "R06-EX-W05",
+    "scope": "记忆修订恢复的失败窗口与实际保留策略",
+    "agent_policy": "一次性边界明确的工作单，主代理整合；不创建长期代理",
+    "prerequisites": [
+      "先核对原生产调用链与有效配置，再以当前真实服务/模型替身验证；不得mock被验收核心"
+    ],
+    "review_required": "全新审查者在实际候选上独立实验，资料核对不签关闭"
+  },
+  "r00_original_assertions": [
+    {
+      "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-REVI-76EE73",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "成功：执行“列出记忆修订”后，返回指定助手修订清单",
+        "拒绝/边界：ticker 不可用 503；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-76EE734926B4",
+        "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-REVI-76EE73",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户列出记忆修订",
+        "then": "返回指定助手修订清单",
+        "assertions": [
+          "成功：执行“列出记忆修订”后，返回指定助手修订清单",
+          "拒绝/边界：ticker 不可用 503；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-REVI-1CE6A9",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "成功：执行“对比记忆修订”后，返回修订内容及现读当前编译快照",
+        "拒绝/边界：revision 不存在 404；current 每次实时快照；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-1CE6A92200DB",
+        "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-REVI-1CE6A9",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户对比记忆修订",
+        "then": "返回修订内容及现读当前编译快照",
+        "assertions": [
+          "成功：执行“对比记忆修订”后，返回修订内容及现读当前编译快照",
+          "拒绝/边界：revision 不存在 404；current 每次实时快照；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-STAT-B45ECE",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "成功：执行“查看记忆整理状态”后，返回指定助手 ticker 当前状态",
+        "拒绝/边界：ticker 不可用 503；助手不存在 404；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-B45ECEC543C6",
+        "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-STAT-B45ECE",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户查看记忆整理状态",
+        "then": "返回指定助手 ticker 当前状态",
+        "assertions": [
+          "成功：执行“查看记忆整理状态”后，返回指定助手 ticker 当前状态",
+          "拒绝/边界：ticker 不可用 503；助手不存在 404；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-REVI-041F93",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "成功：执行“恢复记忆修订”后，将所选修订内容恢复到当前记忆并返回结果",
+        "拒绝/边界：settings.write；revision 不存在 404；内容已变化/忙时冲突，失败 500；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-041F938C351F",
+        "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-REVI-041F93",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户恢复记忆修订",
+        "then": "将所选修订内容恢复到当前记忆并返回结果",
+        "assertions": [
+          "成功：执行“恢复记忆修订”后，将所选修订内容恢复到当前记忆并返回结果",
+          "拒绝/边界：settings.write；revision 不存在 404；内容已变化/忙时冲突，失败 500；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-RUNS-A9AD4C",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "成功：执行“手动触发记忆整理”后，启动一次手动 dream，返回 202 与运行信息",
+        "拒绝/边界：settings.write；记忆关闭/忙/已有运行返回 409；ticker 不可用 503；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-A9AD4C7F76AE",
+        "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-RUNS-A9AD4C",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户手动触发记忆整理",
+        "then": "启动一次手动 dream，返回 202 与运行信息",
+        "assertions": [
+          "成功：执行“手动触发记忆整理”后，启动一次手动 dream，返回 202 与运行信息",
+          "拒绝/边界：settings.write；记忆关闭/忙/已有运行返回 409；ticker 不可用 503；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    }
+  ],
+  "report_sources": [
+    "docs/rust-tauri/R06/R06-T06_REPORT.md"
+  ],
+  "triage": "原义务需真实实验与范围核对，未确证当前Bug；不得因本清单推定修复完成/无需验证",
+  "legacy_comparison_excerpt": [
+    {
+      "path": "lib/memory/dream/revision-store.ts",
+      "line": 235,
+      "end_line": 280,
+      "original_source": "      fs.rmSync(pendingPath(memoryDir), { force: true });\n    } catch (rollbackErr: any) {\n      throw new Error(`Dream apply failed and rollback also failed: ${rollbackErr?.message || rollbackErr}`, { cause: err });\n    }\n    throw err;\n  }\n}\n\nexport function restoreDreamRevision(memoryDir: string, revisionId: string, memoryMdPath?: string) {\n  const revision = readDreamRevision(memoryDir, revisionId);\n  const current = snapshotDreamSections(memoryDir);\n  if (dreamSectionsHash(current) === dreamSectionsHash(revision.before)) return current;\n\n  const safetyRevision = createDreamRevision(memoryDir, {\n    runId: `restore-${crypto.randomUUID()}`,\n    trigger: \"manual\",\n    before: current,\n    kind: \"pre_restore\",\n    restoresRevisionId: revision.revisionId,\n    retainRevisionIds: [revision.revisionId],\n  });\n  const resolvedMemoryMdPath = memoryMdPath || path.join(memoryDir, \"memory.md\");\n  fs.mkdirSync(dreamDir(memoryDir), { recursive: true });\n  atomicWriteSync(pendingPath(memoryDir), `${JSON.stringify({\n    schemaVersion: 1,\n    revisionId: safetyRevision.revisionId,\n    targetRevisionId: revision.revisionId,\n    startedAt: new Date().toISOString(),\n    operation: \"restore\",\n  }, null, 2)}\\n`);\n\n  try {\n    const restored = applyAllFiles(memoryDir, revision.before, resolvedMemoryMdPath);\n    fs.rmSync(pendingPath(memoryDir), { force: true });\n    return restored;\n  } catch (err) {\n    try {\n      applyAllFiles(memoryDir, current, resolvedMemoryMdPath);\n      fs.rmSync(pendingPath(memoryDir), { force: true });\n    } catch (rollbackErr: any) {\n      throw new Error(`Dream restore failed and rollback also failed: ${rollbackErr?.message || rollbackErr}`, { cause: err });\n    }\n    throw err;\n  }\n}\n",
+      "status": "SOURCE_ONLY"
+    }
+  ]
+}

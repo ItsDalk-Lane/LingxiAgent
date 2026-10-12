@@ -1,0 +1,101 @@
+diff --git a/rust/crates/lingxi-service/src/toolgateway.rs b/rust/crates/lingxi-service/src/toolgateway.rs
+index 1a891a176..453b83b78 100644
+--- a/rust/crates/lingxi-service/src/toolgateway.rs
++++ b/rust/crates/lingxi-service/src/toolgateway.rs
+@@ -86,6 +86,48 @@ use lingxi_protocol::{ErrorCode, ProtocolError, ToolCallId};
+ use crate::inject::ServiceClock;
+ use crate::resourceaccess::ResourceScope;
+ 
++/// 监督器在真实工具子任务内注入生命周期；不从 arguments 读取。
++#[derive(Clone)]
++pub(crate) struct TrustedToolLifetime {
++    pub cancel: crate::cancel::CancelScope,
++    pub deadline_unix_ms: u64,
++    pub budget_ms: u64,
++}
++tokio::task_local! {
++    pub(crate) static TOOL_LIFETIME: TrustedToolLifetime;
++    static KNOWLEDGE_RUNTIME: crate::operations::EmbeddingCallRuntime;
++}
++
++pub(crate) fn knowledge_runtime(
++    ctx: &RunContext,
++    call: &ToolCallId,
++) -> Result<crate::operations::EmbeddingCallRuntime, ProtocolError> {
++    KNOWLEDGE_RUNTIME
++        .try_with(Clone::clone)
++        .map_err(|_| {
++            ProtocolError::new(
++                ErrorCode::Unauthorized,
++                "knowledge embedding requires a trusted gateway context",
++                false,
++            )
++        })
++        .and_then(|runtime| {
++            if runtime.ownership.session_id.as_deref() != Some(ctx.session_id.as_str())
++                || runtime.ownership.run_id.as_deref() != Some(ctx.run_id.as_str())
++                || runtime.ownership.attempt.as_deref() != Some(ctx.attempt.as_str())
++                || runtime.ownership.parent_tool_call_id.as_deref() != Some(call.as_str())
++                || runtime.ownership.principal_subject != ctx.principal.storage_subject()
++            {
++                return Err(ProtocolError::new(
++                    ErrorCode::Unauthorized,
++                    "knowledge embedding owner mismatch",
++                    false,
++                ));
++            }
++            Ok(runtime)
++        })
++}
++
+ /// The trusted facts a resource-scope derivation may see (R04-T04). All
+ /// of them come from the trusted entry's [`RunContext`] — a model
+ /// payload can never populate this input.
+@@ -1328,8 +1370,45 @@ impl ToolInvocationGateway {
+             "gateway dispatch: every re-verification passed; dispatching the server-bound \
+              effective arguments to the bound executor"
+         );
+-        let mut executed = self
+-            .dispatch_executor(ctx, call_id, &request, &binding.executor)
++        let lifetime =
++            TOOL_LIFETIME
++                .try_with(Clone::clone)
++                .unwrap_or_else(|_| TrustedToolLifetime {
++                    cancel: crate::cancel::CancelScope::background_root(&format!(
++                        "host-tool:{}",
++                        call_id.as_str()
++                    )),
++                    deadline_unix_ms: record.expires_at_unix_ms,
++                    budget_ms: record
++                        .expires_at_unix_ms
++                        .saturating_sub(record.created_at_unix_ms),
++                });
++        let runtime = crate::operations::EmbeddingCallRuntime {
++            ownership: crate::operations::OperationOwnership {
++                principal_kind: ctx.principal.storage_kind().to_string(),
++                principal_subject: ctx.principal.storage_subject(),
++                agent_id: Some(record.agent_id.clone()),
++                session_id: Some(ctx.session_id.to_string()),
++                run_id: Some(ctx.run_id.to_string()),
++                attempt: Some(ctx.attempt.to_string()),
++                parent_tool_call_id: Some(call_id.to_string()),
++                cause_ref: format!("tool:{}", call_id.as_str()),
++                deadline_unix_ms: lifetime.deadline_unix_ms.min(record.expires_at_unix_ms),
++                budget_ms: lifetime.budget_ms.min(
++                    record
++                        .expires_at_unix_ms
++                        .saturating_sub(record.created_at_unix_ms),
++                ),
++            },
++            cancel: lifetime.cancel,
++            request_key: format!("tool:{}:{}:{}", ctx.run_id, ctx.attempt, call_id),
++            manual_retry_authorized: false,
++        };
++        let mut executed = KNOWLEDGE_RUNTIME
++            .scope(
++                runtime,
++                self.dispatch_executor(ctx, call_id, &request, &binding.executor),
++            )
+             .await?;
+         // 6) R04-A15 — the DELIVERY-REGISTRATION audit. The executor ran,
+         //    so this is NOT a zero-dispatch refusal: a SUCCESS whose

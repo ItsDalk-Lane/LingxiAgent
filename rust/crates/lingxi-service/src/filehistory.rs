@@ -699,3 +699,23 @@ pub async fn restore_route(
         Err(err) => json_error(StatusCode::INTERNAL_SERVER_ERROR, err.to_string()),
     }
 }
+
+/// 基础 write/edit 与 ResourceIO 共用正式历史存储。回调在文件工具的物理线程执行。
+pub struct FileHistoryChangeLog {
+    history: Arc<FileHistoryService>,
+    runtime: tokio::runtime::Handle,
+}
+impl FileHistoryChangeLog {
+    pub fn new(history: Arc<FileHistoryService>) -> Self {
+        Self {
+            history,
+            runtime: tokio::runtime::Handle::current(),
+        }
+    }
+}
+impl crate::filetools::FileChangeLog for FileHistoryChangeLog {
+    fn record(&self, record: crate::filetools::FileModificationRecord) {
+        self.runtime
+            .block_on(self.history.capture_from_disk(&record.path, "tool"));
+    }
+}

@@ -236,6 +236,108 @@ impl CompactionService {
     /// 会话命令面（slash 派发）不属于本任务范围——Rust 侧尚无其宿主
     /// （run 外历史面归 R06-T04）；本入口是触发源无关的执行面，未来
     /// 命令面直接调它。
+    /// 新Run恢复完整分支时，没有本Run上一调用usage；按标明来源的保守请求估算检查。
+    /// 不改变原mid-run的真实usage判定，避免每次用户输入重新把预算当成空历史。
+    #[allow(clippy::too_many_arguments)]
+    pub async fn maybe_compact_restored<P: StoragePort>(
+        &self,
+        ctx: &RunContext,
+        port: &P,
+        agent_id: &str,
+        origin: &'static str,
+        parent_run_id: Option<String>,
+        cause_ref: Option<String>,
+        input: &MidRunCompactionInput<'_>,
+        cancel: &CancelScope,
+        sequence: u32,
+    ) -> Result<CompactionOutcome, StorageError> {
+        let dispatch = self
+            .gateway
+            .resolve_dispatch(&ModelRouteRequest::for_operation(ModelOperation::Chat))
+            .map_err(|e| StorageError::InvalidRequest {
+                detail: e.to_string(),
+            })?;
+        let Some(budget) = ContextBudget::for_declared_window(
+            dispatch.compat.as_ref().and_then(|c| c.context_window),
+        ) else {
+            return Ok(CompactionOutcome::NotTriggered);
+        };
+        let facts = TurnBudgetFacts {
+            system_tokens: input
+                .system_prompt
+                .map(|s| u64::from(estimate_text_tokens(s)))
+                .unwrap_or(0),
+            submission_tokens: u64::from(estimate_text_tokens(input.submission)),
+            tool_declaration_tokens: estimate_tool_declaration_tokens(input.tools),
+            history_tokens: compaction::estimate_exchange_tokens(input.exchange),
+            tail_tokens: 0,
+            last_usage: None,
+            usage_inclusion: usage_inclusion_of(dispatch.route.protocol),
+        };
+        let estimated = facts
+            .system_tokens
+            .saturating_add(facts.submission_tokens)
+            .saturating_add(facts.tool_declaration_tokens)
+            .saturating_add(facts.history_tokens);
+        if estimated < budget.context_window.saturating_mul(4) / 5
+            && estimated < budget.context_window.saturating_sub(budget.reserve_tokens)
+        {
+            return Ok(CompactionOutcome::NotTriggered);
+        }
+        let mut report = budget.report(&facts);
+        report.context_tokens = estimated;
+        tracing::info!(run_id=%ctx.run_id,estimated, "restored history budget source=conservative_context_estimator");
+        let outcome = self
+            .compact_exchange(
+                ctx,
+                port,
+                agent_id,
+                origin,
+                parent_run_id,
+                cause_ref,
+                input,
+                cancel,
+                sequence,
+                &budget,
+                report,
+                false,
+                Some(&dispatch),
+            )
+            .await?;
+        Ok(match outcome {
+            CompactionOutcome::NotTriggered => CompactionOutcome::Failed {
+                detail: "restored_history_budget_no_safe_cut".into(),
+            },
+            other => other,
+        })
+    }
+
+    /// 恢复后的实际首请求必须给输出留出声明的预算；估算无安全余量时明确拒绝。
+    pub fn restored_request_fits(
+        &self,
+        input: &MidRunCompactionInput<'_>,
+    ) -> Result<bool, StorageError> {
+        let dispatch = self
+            .gateway
+            .resolve_dispatch(&ModelRouteRequest::for_operation(ModelOperation::Chat))
+            .map_err(|e| StorageError::InvalidRequest {
+                detail: e.to_string(),
+            })?;
+        let Some(budget) = ContextBudget::for_declared_window(
+            dispatch.compat.as_ref().and_then(|c| c.context_window),
+        ) else {
+            return Ok(true);
+        };
+        let tokens = input
+            .system_prompt
+            .map(|s| u64::from(estimate_text_tokens(s)))
+            .unwrap_or(0)
+            .saturating_add(u64::from(estimate_text_tokens(input.submission)))
+            .saturating_add(estimate_tool_declaration_tokens(input.tools))
+            .saturating_add(compaction::estimate_exchange_tokens(input.exchange));
+        Ok(tokens <= budget.context_window.saturating_sub(budget.reserve_tokens))
+    }
+
     #[allow(clippy::too_many_arguments)]
     pub async fn compact_now<P: StoragePort>(
         &self,
@@ -820,17 +922,22 @@ impl CompactionService {
                 let calls: Vec<RequestedToolCall> = requests
                     .into_iter()
                     .enumerate()
-                    .map(|(index, request)| RequestedToolCall {
+                    .map(|(index, tool_request)| RequestedToolCall {
+                        // 绑定此次辅助请求真实携带的说明，不用当前目录重建旧身份。
+                        declaration_binding: request
+                            .tools
+                            .as_ref()
+                            .and_then(|tools| tools.bind_target(&tool_request.target)),
                         tool_call_id: ToolCallId::new(format!(
                             "{}-tc{:04}",
                             call_id.as_str(),
                             index + 1
                         )),
-                        provider_call_id: request.provider_call_id,
-                        target: request.target,
-                        arguments: request.arguments,
-                        args_digest: request.args_digest,
-                        args_summary: request.args_summary,
+                        provider_call_id: tool_request.provider_call_id,
+                        target: tool_request.target,
+                        arguments: tool_request.arguments,
+                        args_digest: tool_request.args_digest,
+                        args_summary: tool_request.args_summary,
                     })
                     .collect();
                 let emitted = calls

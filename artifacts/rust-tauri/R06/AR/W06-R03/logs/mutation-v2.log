@@ -1,0 +1,9 @@
+{"command": ["python3", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/mutation-v2.py"], "start": 1791707718.899032, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-mutation-v2-0j_11mbx", "guard": "8192MB/600s"}
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/mutation-v2.py", line 33, in <module>
+    testfp=next(F.glob('lingxi-service-*/test-integration-test-r06_ar_f06_config.json'));testargs=deps(testfp);testargs=[v.replace(str(D/'liblingxi_service-7547adafbd47d443.rlib'),str(rlib)) for v in testargs]
+                                                                                                  ~~~~^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/mutation-v2.py", line 13, in deps
+    assert len(choices)==1,(name,choices)
+           ^^^^^^^^^^^^^^^
+AssertionError: ('regex', [])

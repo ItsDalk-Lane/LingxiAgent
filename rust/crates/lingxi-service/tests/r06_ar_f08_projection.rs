@@ -624,6 +624,80 @@ impl lingxi_kernel::ports::ToolExecutorPort for ExternalOutcome {
 }
 
 #[tokio::test]
+async fn f08_budget_refusal_keeps_raw_success_and_continues_with_readable_history() {
+    use lingxi_kernel::ports::{ToolOutcome, ToolSuccess};
+    let stub = StubServer::start(vec![
+        openai_tool_call("budget-refusal", "read", r#"{"path":"fixture.txt"}"#, 10, 3),
+        openai_final("明确处理超限错误后完成"),
+        openai_final("下一轮读取历史后完成"),
+    ]).await;
+    let boot = boot("budget-refusal", &stub).await;
+    std::fs::write(boot.workspace.join("fixture.txt"), "合法合成文件").unwrap();
+    // 复用worker多文件结果形状：每个名称在系统路径长度内，累计固定资料超过32KiB。
+    let artifacts_dir = boot.workspace.join("a".repeat(190)).join("b".repeat(190));
+    std::fs::create_dir_all(&artifacts_dir).unwrap();
+    let paths = (0..100).map(|i| artifacts_dir.join(format!("f{i}.txt")).to_string_lossy().into_owned()).collect::<Vec<_>>();
+    for path in &paths {
+        std::fs::write(path, b"x").unwrap();
+    }
+    let worker_line = serde_json::json!({"kind":"result","id":"synthetic","ok":true,"claimed_files":paths});
+    assert!(worker_line.to_string().len() < lingxi_service::workerrpc::WORKER_MAX_LINE_BYTES);
+    let mut original = ToolSuccess::from_content(vec![ContentBlock::Text { text: "RAW-SUCCESS-KEPT".into() }]);
+    original.resource_refs = paths.iter().map(|path| lingxi_protocol::ResourceRef {
+        resource_id: lingxi_protocol::ResourceId::new(format!("worker:synthetic:{path}")),
+        kind: lingxi_protocol::ResourceKind::Artifact,
+        display_name: Some(path.clone()),
+        uri: Some(format!("file://{path}")),
+        digest: None,
+        size_bytes: Some(1),
+    }).collect();
+    boot.state.tool_gateway().unwrap().bind_executor(
+        lingxi_kernel::toolcatalog::ToolTargetId::parse("tool:first-party:read"),
+        Arc::new(ExternalOutcome(ToolOutcome::Success { result: original.clone() })),
+        "仅合成外部工具应答，真实网关、投影、档案和历史继续运行",
+    );
+    let run = execute(&boot.state, "处理超限的多文件结果").await;
+    finish(&boot.state, &run).await;
+    let events = evidence(&boot.state, &stub, &run, "budget-refusal").await;
+    let requests = stub.requests();
+    assert_eq!(requests.len(), 2, "超限只能拒绝结果投影，不能中断本轮");
+    let tools = tool_messages(&requests[1].body);
+    assert_eq!(tools.len(), 1);
+    let error = tools[0]["content"].as_str().unwrap();
+    assert!(error.contains("Tool success model projection exceeds the 32KiB budget"), "必须实际到达预算拒绝分支：{error}");
+    assert!(!error.contains("RAW-SUCCESS-KEPT"));
+    let raw = events.iter().find_map(|event| match &event.payload {
+        EventPayload::Known(KnownEventPayload::ToolCallCompleted(p)) => Some(&p.result),
+        _ => None,
+    }).unwrap();
+    assert_eq!(raw.status, lingxi_protocol::ToolResultStatus::Success);
+    assert_eq!(raw.content, original.content);
+    assert_eq!(raw.resource_refs, original.resource_refs);
+    assert!(!raw.truncated);
+    let projection = events.iter().find_map(|event| match &event.payload {
+        EventPayload::Unknown(p) if p.event_type == "tool_result_model_projection" => Some(serde_json::Value::Object(p.raw.clone())),
+        _ => None,
+    }).unwrap();
+    assert_eq!(projection["result"]["status"], "failed");
+    assert!(projection["rawContentDigest"].is_null());
+    assert!(projection["projectionContentDigest"].is_null());
+    lingxi_service::model_history::projected_tool_item(&projection).unwrap();
+    // 严格读取规则继续拒绝带成功摘要的失败投影，不能靠放松检查修复。
+    let mut corrupt = projection.clone();
+    corrupt["rawContentDigest"] = serde_json::json!(original.content_digest);
+    assert!(lingxi_service::model_history::projected_tool_item(&corrupt).is_err());
+    let next = execute(&boot.state, "继续使用上一轮历史").await;
+    finish(&boot.state, &next).await;
+    let requests = stub.requests();
+    assert_eq!(requests.len(), 3, "下一轮必须成功恢复此前错误投影");
+    let historical = tool_messages(&requests[2].body);
+    assert_eq!(historical.len(), 1);
+    assert_eq!(historical[0]["content"], tools[0]["content"]);
+    save_evidence("budget-refusal-history", &serde_json::json!({"firstRun":run,"nextRun":next,"wire":requests.iter().map(|r|&r.body).collect::<Vec<_>>(),"projection":projection,"raw":raw}));
+    stub.stop().await;
+}
+
+#[tokio::test]
 async fn f08_c03_loop_warning_multi_block_resource_reaches_next_wire_capped() {
     let stub = StubServer::start(vec![
         openai_tool_call("m1", "read", r#"{"path":"fixture.txt"}"#, 10, 3),

@@ -1,0 +1,4 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.05s
+     Running tests/subagent_closeout.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/subagent_closeout-f8645a1adf868115)
+error: test failed, to rerun pass `-p lingxi-service --test subagent_closeout`

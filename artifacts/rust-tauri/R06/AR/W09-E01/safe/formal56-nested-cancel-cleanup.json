@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-11T13:45:34.573100+00:00",
+  "nested_group": 38227,
+  "actual_starts": 50,
+  "actual_ends": 50,
+  "all_actual_wrapper_wait_reaped": true,
+  "nested_group_observed_gone": true,
+  "Cargo_exitcode": "UNKNOWN adopted orphan; no own waitpid claim",
+  "extra_signal_sent": false,
+  "stderr_tail": "000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/background_disconnect_recovery-3f4b0a43cef46a79)\nLINGXI_TEST_GUARD: armed (pid 45399, mem_limit=8192 MB, time_limit=600 s)\n     Running tests/background_steering.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/background_steering-dc7408cd519ed822)\nLINGXI_TEST_GUARD: armed (pid 45411, mem_limit=8192 MB, time_limit=600 s)\n     Running tests/cancel_link_inheritance.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/cancel_link_inheritance-e5f5d953d20e1991)\nLINGXI_TEST_GUARD: armed (pid 45424, mem_limit=8192 MB, time_limit=600 s)\nerror: test failed, to rerun pass `-p lingxi-service --test cancel_link_inheritance`\n"
+}

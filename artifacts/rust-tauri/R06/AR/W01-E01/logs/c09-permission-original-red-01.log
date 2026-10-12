@@ -1,0 +1,24 @@
+    Blocking waiting for file lock on package cache
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.75s
+     Running tests/r05_t07_usage_trace.rs (rust/target/debug/deps/r05_t07_usage_trace-b0491d5b47fdfaa4)
+LINGXI_TEST_GUARD: armed (pid 7726, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+test c09_owner_scoped_queries_isolate_and_secrets_never_enter_the_db ... FAILED
+
+failures:
+
+---- c09_owner_scoped_queries_isolate_and_secrets_never_enter_the_db stdout ----
+
+thread 'c09_owner_scoped_queries_isolate_and_secrets_never_enter_the_db' (4444968) panicked at crates/lingxi-service/tests/r05_t07_usage_trace.rs:1285:10:
+other drive settles: Storage(InvalidRequest { detail: "model_history: principal/agent/session mismatch" })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    c09_owner_scoped_queries_isolate_and_secrets_never_enter_the_db
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.08s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t07_usage_trace`

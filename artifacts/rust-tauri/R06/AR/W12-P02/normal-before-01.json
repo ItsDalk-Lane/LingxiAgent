@@ -1,0 +1,13 @@
+{
+  "command": [
+    "node",
+    "--experimental-strip-types",
+    "artifacts/rust-tauri/R06/AR/W12-P02/probe-normal-init.mjs"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-normal-before-01-rk6kx4vk",
+  "start": 1791702112.5250099,
+  "end": 1791702112.6065438,
+  "exit_code": 0,
+  "log_sha256": "f63b7dfc00348bd5f6d33951e66e1cda1a23d3d325428c888650cc34d3f545af"
+}

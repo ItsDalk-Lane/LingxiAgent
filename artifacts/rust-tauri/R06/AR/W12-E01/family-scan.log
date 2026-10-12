@@ -1,0 +1,20 @@
+lib/knowledge/vector-index-adapter.ts:292:  rebuild(): void;
+lib/knowledge/vector-index-adapter.ts:333:    this.openWithRecovery();
+lib/knowledge/vector-index-adapter.ts:336:  private openWithRecovery() {
+lib/knowledge/vector-index-adapter.ts:1172:  rebuild(): void {
+lib/knowledge/vector-index-adapter.ts:1173:    // SQLite事务阻止其它写者；serialize包含已提交WAL内容，不unlink活跃句柄。
+lib/knowledge/vector-index-adapter.ts:292:  rebuild(): void;
+lib/knowledge/vector-index-adapter.ts:333:    this.openWithRecovery();
+lib/knowledge/vector-index-adapter.ts:336:  private openWithRecovery() {
+lib/knowledge/vector-index-adapter.ts:1172:  rebuild(): void {
+lib/knowledge/vector-index-adapter.ts:1173:    // SQLite事务阻止其它写者；serialize包含已提交WAL内容，不unlink活跃句柄。
+lib/knowledge/knowledge-index-store.ts:371:    this.openWithRecovery();
+lib/knowledge/knowledge-index-store.ts:374:  private openWithRecovery() {
+lib/knowledge/knowledge-index-store.ts:386:        try { fs.unlinkSync(`${this.dbPath}${suffix}`); } catch (error: any) {
+lib/knowledge/knowledge-index-store.ts:1173:  reset() {
+lib/knowledge/knowledge-index-store.ts:1177:      try { fs.unlinkSync(`${this.dbPath}${suffix}`); } catch (error: any) {
+lib/knowledge/knowledge-index-store.ts:1183:    this.openWithRecovery();
+rust/crates/lingxi-adapters/src/storage/knowledge.rs:1466:            let _ = std::fs::remove_file(self.root.join(&snapshot.storage_path));
+rust/crates/lingxi-adapters/src/storage/knowledge.rs:2546:    /// 显式失效只清同一SQLite事务中的派生行，不unlink活跃数据库。
+rust/crates/lingxi-adapters/src/storage/knowledge.rs:2547:    pub fn reset(&self) -> Result<(), KnowledgeError> {
+rust/crates/lingxi-service/src/knowledge.rs:808:            match std::fs::remove_file(artifact_path) {

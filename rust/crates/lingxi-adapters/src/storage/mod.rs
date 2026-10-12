@@ -23,6 +23,7 @@ pub mod session_admin;
 pub mod session_files;
 pub mod session_tree;
 pub mod skill_library;
+pub mod subagent_threads;
 #[cfg(windows)]
 pub mod windows_acl;
 
@@ -40,3 +41,5 @@ pub use queue::{
 pub use run_store::{
     wal_sidecar_path, ActiveRunFacts, RunDatabase, RunSummaryRow, SessionRow, RUNS_DB_FILE_NAME,
 };
+
+pub mod session_operations;

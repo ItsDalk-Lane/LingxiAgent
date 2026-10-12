@@ -168,6 +168,7 @@ async fn shutdown_window_rejects_concurrent_submissions_and_settles_existing_tas
             &owner_principal(),
             "sess_local_alpha",
             &ExecuteSubmission {
+                knowledge: None,
                 input: "existing task parked at its tool",
                 request_id: Some("exit-1"),
             },
@@ -224,6 +225,7 @@ async fn shutdown_window_rejects_concurrent_submissions_and_settles_existing_tas
             let text = format!("exit-race-{n}");
             let submission = if n % 3 == 0 {
                 ExecuteSubmission {
+                    knowledge: None,
                     input: &text,
                     request_id: Some("fresh-exit-race"),
                 }
@@ -286,6 +288,7 @@ async fn shutdown_window_rejects_concurrent_submissions_and_settles_existing_tas
             &owner,
             "sess_local_alpha",
             &ExecuteSubmission {
+                knowledge: None,
                 input: "existing task parked at its tool",
                 request_id: Some("exit-1"),
             },

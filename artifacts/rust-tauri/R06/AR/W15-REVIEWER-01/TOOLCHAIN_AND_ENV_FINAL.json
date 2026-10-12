@@ -1,0 +1,21 @@
+{
+  "cargoCommand": "/Users/study_superior/.cargo/bin/cargo",
+  "actualVersion": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "lockSha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "actualCargoExecutableSha256": [
+    {
+      "path": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo",
+      "sha256": "6e17e865f3a20dd55a1d212f849f58b77124179f0de7c52973096d84ba34118d"
+    }
+  ],
+  "perWindowEffectiveEnvironment": "WINDOW_INDEX.json",
+  "osHomeInherited": "/Users/study_superior",
+  "productDir": "/private/tmp/lingxi-r06-w15-reviewer-01/lib",
+  "externalHomeTmpTarget": true,
+  "incremental": "0",
+  "allActualGuardBreaches": [],
+  "sampledPeakRssBytes": 2053505024,
+  "unknownExecutablePaths": 1536,
+  "unknownRssOnSampledRecords": 0,
+  "measurementLimit": "unobserved transient processes unknown; sampledRSS not absolute peak"
+}

@@ -1,0 +1,48 @@
+{
+  "at": "2026-10-11T15:22:59.136793+00:00",
+  "role": "ROOT_PARTIAL_EXISTING_EX03_ACTUAL_METADATA_READBACK_NOT_REVIEW_VERDICT",
+  "id": "R06-EX03-OBS-PACKAGE-AGENT-INSTALL-01",
+  "existing_obligation": "R06-EX-03",
+  "existing_work_unit": "R06-EX-W03",
+  "original_evidence": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-first-review-source-01/artifacts/rust-tauri/R06/AR/W05-R01/ex03-package.json",
+  "original_evidence_sha256": "76a94340fc3c4b1b2c91529e7777c3a43d11362ebbe52e89cb7f1fc25fdb9808",
+  "independent_actor": "/root/ar_w05_reviewer_01",
+  "actual_status": "FAIL",
+  "package_attachment_copy_positive": true,
+  "agent_id_install_automatically_enabled": false,
+  "explicit_enable_positive_control": true,
+  "archive_formats": [
+    {
+      "format": "zip",
+      "status": 400,
+      "response": {
+        "code": "SKILL_UNSUPPORTED_FORMAT",
+        "details": {
+          "requestId": "req-342e50476c6903fca150500f35b59bf9"
+        },
+        "error": "unsupported skill package format"
+      }
+    },
+    {
+      "format": "skill",
+      "status": 400,
+      "response": {
+        "code": "SKILL_UNSUPPORTED_FORMAT",
+        "details": {
+          "requestId": "req-504436c093c4d8cf2578ca9782bcccb0"
+        },
+        "error": "unsupported skill package format"
+      }
+    }
+  ],
+  "service_exit_codes": [
+    0
+  ],
+  "binary_before_sha256": "bed649803b429123835b55e08dc6318b31dc7957eb6355515ac26a9c93239df0",
+  "binary_after_sha256": "bed649803b429123835b55e08dc6318b31dc7957eb6355515ac26a9c93239df0",
+  "cleanup": "service waited/reaped; external loopback closed/joined; owned synthetic home LOCAL_ONLY_NEVER_GIT",
+  "authority_case_preconditions_and_full_root_cause": "PENDING_COMPLETE_REVIEWER_REPORT_VERIFICATION",
+  "only_synthetic_loopback": "REVIEWER_REPORTED",
+  "status": "OPEN_ACTUAL_ORIGINAL_OBLIGATION_RED_NO_EX03_TASK_REVIEW_OR_STAGE_ACCEPTANCE",
+  "completed_formal_Reviewer_FAIL_count_increment": false
+}

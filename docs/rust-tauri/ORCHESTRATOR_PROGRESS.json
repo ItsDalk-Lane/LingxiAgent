@@ -5971,7 +5971,7 @@
       "blockers": []
     }
   },
-  "current_task": "R05 RR3 FINAL-04 全新独立终审 PASS：offline_gate=PASS、stage_readiness=ACCEPTED_OFFLINE_SCOPE_WITH_REGISTERED_LIVE_DEFERRALS、R06_READY=true；E04 已回填主文档矩阵（SELF_CHECKED 待 E-REVIEW-05）；Git 零暂存/零提交/零推送（不预写）；LIVE/平台延期按原登记（最迟 R10/R09-R10）。",
+  "current_task": "R06 AR 修复：F01—F15、60C及原八Task/16A/到期叶完整闭环；禁止进入R07。旧R05流水及current_head字段保留为历史，不作为当前R06验收坐标。",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",
@@ -5991,5 +5991,12 @@
       "stage_reviewer": "after ZCode reports all stage T tasks done, root creates fresh Codex subagent for independent stage review",
       "stage_repair": "failed stage review repaired by ZCode; root creates a fresh Codex subagent for re-review"
     }
+  },
+  "r06_ar_current": {
+    "status": "R06_NOT_ACCEPTED",
+    "authority": "docs/rust-tauri/R06/repair-current/AR_PROGRESS.json",
+    "audited_base": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+    "R07_READY": false,
+    "recorded_at": "2026-10-11T05:13:44.788435+00:00"
   }
 }

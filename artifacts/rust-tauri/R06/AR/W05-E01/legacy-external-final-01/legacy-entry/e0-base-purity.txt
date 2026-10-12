@@ -1,0 +1,5 @@
+HEAD=201584f2917a7fd96d6ea603bdeddbd420082cfe
+diff-vs-base: empty
+index: clean
+status-all: 0 entries
+construction: shared immutable Git objects + independent HEAD/index + complete verified BASE materialization (CoW only for identical blobs) + isolated node_modules (no checkout -f, no clean -fd, no commit)

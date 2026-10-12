@@ -1,0 +1,16 @@
+
+running 1 test
+test fs_read_routes_faces_and_error_vocabulary ... ok
+
+successes:
+
+---- fs_read_routes_faces_and_error_vocabulary stdout ----
+LINGXI_AUTH_REJECTED request_id="req-348ba7a160ec15c4d352e856b95f0944" method=GET path=/lingxi/v1/fs/read status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57088
+LINGXI_AUTH_REJECTED request_id="req-63d452982b088a9f6fec9f1237b7c64d" method=GET path=/lingxi/v1/fs/read-base64 status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57089
+
+
+successes:
+    fs_read_routes_faces_and_error_vocabulary
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.12s
+

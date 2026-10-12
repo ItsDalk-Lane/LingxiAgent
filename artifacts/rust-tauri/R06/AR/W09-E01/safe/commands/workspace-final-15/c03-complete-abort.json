@@ -1,0 +1,990 @@
+{
+  "after": [
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_c3bbef40d25381b456ee0091867f0bf4",
+      "ordinal": 0,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_26991bfa18ac6c8993ca456c197074fe",
+      "ordinal": 1,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_8cb62ae25a818d10871cd687ee29a887",
+      "ordinal": 2,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_e2cd6c56613191961f89eb42c73b4af7",
+      "ordinal": 3,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0aa83b8663082dc8d930667943dcdb86",
+      "ordinal": 4,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_82a8d0803f594b44e160134afd219f71",
+      "ordinal": 5,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0479b4f4104863e1c4c831c0b004b7a8",
+      "ordinal": 6,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_d933e2cfa883b68211ac775f9a4b9eb5",
+      "ordinal": 7,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_9d69a25291e9cadf6cfdc4326eb86a49",
+      "ordinal": 8,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_ed49363fd0ac44d13cd81bed829f2dc4",
+      "ordinal": 9,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_6bc89c0d9976b8d656abfde71c804f76",
+      "ordinal": 10,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_503266f934c51a76fa4782617f99b182",
+      "ordinal": 11,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_015fdd8fb9dfce82149d9f77bf661423",
+      "ordinal": 12,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_f820db0671305934abff1005b597ee47",
+      "ordinal": 13,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_ebb532369fd4590c2c7d0123f96fd3da",
+      "ordinal": 14,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0509b6dbc6483f8ba2094f91fded4b9b",
+      "ordinal": 15,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_520d092d46b46aef1933e7d370443d8e",
+      "ordinal": 16,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_26d2ae32d79a744fdc3b3283f10e91e8",
+      "ordinal": 17,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_ef6e6326ab0ba644e9fcd7e2ce4b62e8",
+      "ordinal": 18,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_fadd36a0833da7a6935eec67632e340f",
+      "ordinal": 19,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_3f07c71f883f0c1babbce67553808a5e",
+      "ordinal": 20,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_8336c5e945c6b5683e44d0fcd23a9070",
+      "ordinal": 21,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_5871fc576005dc277216700a1817ad25",
+      "ordinal": 22,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_22b71bf021bd3e9967ae03f3c6f30fb7",
+      "ordinal": 23,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_887b31a96f218218784d57e0199fe0d4",
+      "ordinal": 24,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_bd9c4ef64cbeb21b126da6acaeeec668",
+      "ordinal": 25,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_7e06987be1e4c1a02387cdaf9a9d0022",
+      "ordinal": 26,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_dc8507beac8d2f1afacfdbb568437d1f",
+      "ordinal": 27,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_d2c3105517b1a08d836f0f77d6c01a53",
+      "ordinal": 28,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_b5b5ee4905c388b8da45b80c1ea6f42a",
+      "ordinal": 29,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_a6b10afabba228f754c0c56fcefa6939",
+      "ordinal": 30,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_c1ffdca5f8c73c6a185b919c28731da7",
+      "ordinal": 31,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_f27ae90d239a1690f71973b1c21542a2",
+      "ordinal": 32,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_1799ec984ba639302ebd1c08e987a1f8",
+      "ordinal": 33,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_924f89ea1051b87623dc685a711068ec",
+      "ordinal": 34,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_15b31c1372237f408a2015b1504597cf",
+      "ordinal": 35,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_63d800d5b57a21d829d6649ee0148162",
+      "ordinal": 36,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_f815aae455221cd3474714858b72d489",
+      "ordinal": 37,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_430ec273ffc0db785c276d95e3d3ac7e",
+      "ordinal": 38,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_6faf8a7486b4c7c337dbfd7855622606",
+      "ordinal": 39,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_8dd80bc7ef1138c12ddbee0f24ebabc1",
+      "ordinal": 40,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_42901f097265550b2bd56292cda88152",
+      "ordinal": 41,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0b0faefee9537a71e94460da6f8582af",
+      "ordinal": 42,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_af27ce0bbc409795a5ab79576415fe97",
+      "ordinal": 43,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0adf4d0e6a6a9157ce3cd69c5b6b04fa",
+      "ordinal": 44,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_402e88a0bfaeb3ca9aab7b31af650b08",
+      "ordinal": 45,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_f76022c11ea51be6b2cb336ca9d353e9",
+      "ordinal": 46,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_4e06497de8e30251de8785ffe9865529",
+      "ordinal": 47,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_dacca825bc79926d796805ed71c79bee",
+      "ordinal": 48,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_59cc89987a67464e8d8c09c1e19cc1bb",
+      "ordinal": 49,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_151b58b67c677631df4a2329ff353c59",
+      "ordinal": 50,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_f92ef8750e64658d1b90ea7f49ce66d1",
+      "ordinal": 51,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_95054da638be439af4de91af30881d19",
+      "ordinal": 52,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_09e39726cac3f0f93412dc995ada9ba1",
+      "ordinal": 53,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_36d72471517655f3106bd1cbf34c4ddc",
+      "ordinal": 54,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_d551e8bc123a535e40485933647e4fc1",
+      "ordinal": 55,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_be4f55defc024784a977e9159e48d8ca",
+      "ordinal": 56,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_231b9d8054c876cfec8d37f16aa5ac3c",
+      "ordinal": 57,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_e5fc164844e06fdd0ede7fb03902e865",
+      "ordinal": 58,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_50943fc4751236b21c4798c97d3cb858",
+      "ordinal": 59,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_2b82734a99d6e6c1e765b68b7d6ded7d",
+      "ordinal": 60,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_1be8d688147b019af19c1a74d976d5ee",
+      "ordinal": 61,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_9891a6154a3cb5885f9db1e8813728b1",
+      "ordinal": 62,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_98a48cd5ce7ea0d05f740eab2c34d4c5",
+      "ordinal": 63,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_ac9a5a95756f79a38caffa48aec719ab",
+      "ordinal": 64,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    }
+  ],
+  "before": [
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_c3bbef40d25381b456ee0091867f0bf4",
+      "ordinal": 0,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_26991bfa18ac6c8993ca456c197074fe",
+      "ordinal": 1,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_8cb62ae25a818d10871cd687ee29a887",
+      "ordinal": 2,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_e2cd6c56613191961f89eb42c73b4af7",
+      "ordinal": 3,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0aa83b8663082dc8d930667943dcdb86",
+      "ordinal": 4,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_82a8d0803f594b44e160134afd219f71",
+      "ordinal": 5,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0479b4f4104863e1c4c831c0b004b7a8",
+      "ordinal": 6,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_d933e2cfa883b68211ac775f9a4b9eb5",
+      "ordinal": 7,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_9d69a25291e9cadf6cfdc4326eb86a49",
+      "ordinal": 8,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_ed49363fd0ac44d13cd81bed829f2dc4",
+      "ordinal": 9,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_6bc89c0d9976b8d656abfde71c804f76",
+      "ordinal": 10,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_503266f934c51a76fa4782617f99b182",
+      "ordinal": 11,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_015fdd8fb9dfce82149d9f77bf661423",
+      "ordinal": 12,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_f820db0671305934abff1005b597ee47",
+      "ordinal": 13,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_ebb532369fd4590c2c7d0123f96fd3da",
+      "ordinal": 14,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0509b6dbc6483f8ba2094f91fded4b9b",
+      "ordinal": 15,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_520d092d46b46aef1933e7d370443d8e",
+      "ordinal": 16,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_26d2ae32d79a744fdc3b3283f10e91e8",
+      "ordinal": 17,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_ef6e6326ab0ba644e9fcd7e2ce4b62e8",
+      "ordinal": 18,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_fadd36a0833da7a6935eec67632e340f",
+      "ordinal": 19,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_3f07c71f883f0c1babbce67553808a5e",
+      "ordinal": 20,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_8336c5e945c6b5683e44d0fcd23a9070",
+      "ordinal": 21,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_5871fc576005dc277216700a1817ad25",
+      "ordinal": 22,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_22b71bf021bd3e9967ae03f3c6f30fb7",
+      "ordinal": 23,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_887b31a96f218218784d57e0199fe0d4",
+      "ordinal": 24,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_bd9c4ef64cbeb21b126da6acaeeec668",
+      "ordinal": 25,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_7e06987be1e4c1a02387cdaf9a9d0022",
+      "ordinal": 26,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_dc8507beac8d2f1afacfdbb568437d1f",
+      "ordinal": 27,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_d2c3105517b1a08d836f0f77d6c01a53",
+      "ordinal": 28,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_b5b5ee4905c388b8da45b80c1ea6f42a",
+      "ordinal": 29,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_a6b10afabba228f754c0c56fcefa6939",
+      "ordinal": 30,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_c1ffdca5f8c73c6a185b919c28731da7",
+      "ordinal": 31,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_f27ae90d239a1690f71973b1c21542a2",
+      "ordinal": 32,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_1799ec984ba639302ebd1c08e987a1f8",
+      "ordinal": 33,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_924f89ea1051b87623dc685a711068ec",
+      "ordinal": 34,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_15b31c1372237f408a2015b1504597cf",
+      "ordinal": 35,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_63d800d5b57a21d829d6649ee0148162",
+      "ordinal": 36,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_f815aae455221cd3474714858b72d489",
+      "ordinal": 37,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_430ec273ffc0db785c276d95e3d3ac7e",
+      "ordinal": 38,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_6faf8a7486b4c7c337dbfd7855622606",
+      "ordinal": 39,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_8dd80bc7ef1138c12ddbee0f24ebabc1",
+      "ordinal": 40,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_42901f097265550b2bd56292cda88152",
+      "ordinal": 41,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0b0faefee9537a71e94460da6f8582af",
+      "ordinal": 42,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_af27ce0bbc409795a5ab79576415fe97",
+      "ordinal": 43,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0adf4d0e6a6a9157ce3cd69c5b6b04fa",
+      "ordinal": 44,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_402e88a0bfaeb3ca9aab7b31af650b08",
+      "ordinal": 45,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_f76022c11ea51be6b2cb336ca9d353e9",
+      "ordinal": 46,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_4e06497de8e30251de8785ffe9865529",
+      "ordinal": 47,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_dacca825bc79926d796805ed71c79bee",
+      "ordinal": 48,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_59cc89987a67464e8d8c09c1e19cc1bb",
+      "ordinal": 49,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_151b58b67c677631df4a2329ff353c59",
+      "ordinal": 50,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_f92ef8750e64658d1b90ea7f49ce66d1",
+      "ordinal": 51,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_95054da638be439af4de91af30881d19",
+      "ordinal": 52,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_09e39726cac3f0f93412dc995ada9ba1",
+      "ordinal": 53,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_36d72471517655f3106bd1cbf34c4ddc",
+      "ordinal": 54,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_d551e8bc123a535e40485933647e4fc1",
+      "ordinal": 55,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_be4f55defc024784a977e9159e48d8ca",
+      "ordinal": 56,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_231b9d8054c876cfec8d37f16aa5ac3c",
+      "ordinal": 57,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_e5fc164844e06fdd0ede7fb03902e865",
+      "ordinal": 58,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_50943fc4751236b21c4798c97d3cb858",
+      "ordinal": 59,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_2b82734a99d6e6c1e765b68b7d6ded7d",
+      "ordinal": 60,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_1be8d688147b019af19c1a74d976d5ee",
+      "ordinal": 61,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_9891a6154a3cb5885f9db1e8813728b1",
+      "ordinal": 62,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_98a48cd5ce7ea0d05f740eab2c34d4c5",
+      "ordinal": 63,
+      "vector_index_variant_id": "viv_5ef068beb9505e5fc77a25cf7254a2db"
+    }
+  ],
+  "final": {
+    "artifactId": "kpa_55567e16e9d14bc2b946583c",
+    "attempt": 1,
+    "cancelledAt": null,
+    "chunkerConfigId": "8b93f0aa4fa689af",
+    "createdAt": "2026-10-11T12:12:34.322Z",
+    "embeddingStats": {
+      "abandonedStaleVariantId": null,
+      "actualWrittenChunkCount": 65,
+      "attempt": 1,
+      "callAttemptCount": 2,
+      "checkpointVariantId": "viv_5ef068beb9505e5fc77a25cf7254a2db",
+      "chunksNewlyEmbedded": 65,
+      "chunksResumedFromCheckpoint": 0,
+      "chunksReusedFromReadyVariant": 0,
+      "failedCallCount": 0,
+      "failedRequestCount": 0,
+      "model": {
+        "dimensions": 2,
+        "key": "c8e354337b5feeb5d0bdc2d5d837e83a66d5e55541635d9a5f13498a7b2a360e",
+        "modelId": "model-a",
+        "parameterFingerprint": "50dd1af23fcadedc0bd686f25a5ed591cc2485710193fd5d8c2b4037a294e1fc",
+        "protocol": "openai-embeddings",
+        "provider": "embed"
+      },
+      "pendingCallIntentCount": 0,
+      "pendingRequestCount": 0,
+      "plannedChunkCount": 65,
+      "previousRequestCount": 0,
+      "requestCount": 2,
+      "resetStaleVectors": false,
+      "successfulRequestCount": 2,
+      "unknownRequestsFromPreviousAttempt": 0
+    },
+    "error": "KNOWLEDGE_STORAGE_INVALID: W09 synthetic complete failure",
+    "id": "kjob_2e3dacdcc446bc8a801bfeb0",
+    "notebookId": "knb_db910b243f353107f24acfa0",
+    "phase": "embed",
+    "progressDone": 65,
+    "progressTotal": 65,
+    "sourceId": "ksrc_1fd6e401a555f17e0269dfa4",
+    "status": "failed",
+    "updatedAt": "2026-10-11T12:12:34.436Z"
+  },
+  "mid": {
+    "counts": {
+      "done": 0,
+      "failed": 0,
+      "pending_embedding": 0,
+      "queued": 0,
+      "running": 1
+    },
+    "jobs": [
+      {
+        "artifactId": "kpa_55567e16e9d14bc2b946583c",
+        "attempt": 1,
+        "cancelledAt": null,
+        "chunkerConfigId": "8b93f0aa4fa689af",
+        "createdAt": "2026-10-11T12:12:34.322Z",
+        "embeddingStats": {
+          "abandonedStaleVariantId": null,
+          "actualWrittenChunkCount": 64,
+          "attempt": 1,
+          "callAttemptCount": 2,
+          "checkpointVariantId": "viv_5ef068beb9505e5fc77a25cf7254a2db",
+          "chunksNewlyEmbedded": 64,
+          "chunksResumedFromCheckpoint": 0,
+          "chunksReusedFromReadyVariant": 0,
+          "failedCallCount": 0,
+          "failedRequestCount": 0,
+          "model": {
+            "dimensions": 2,
+            "key": "c8e354337b5feeb5d0bdc2d5d837e83a66d5e55541635d9a5f13498a7b2a360e",
+            "modelId": "model-a",
+            "parameterFingerprint": "50dd1af23fcadedc0bd686f25a5ed591cc2485710193fd5d8c2b4037a294e1fc",
+            "protocol": "openai-embeddings",
+            "provider": "embed"
+          },
+          "pendingCallIntentCount": 1,
+          "pendingRequestCount": 1,
+          "plannedChunkCount": 65,
+          "previousRequestCount": 0,
+          "requestCount": 2,
+          "resetStaleVectors": false,
+          "successfulRequestCount": 1,
+          "unknownRequestsFromPreviousAttempt": 0
+        },
+        "error": null,
+        "id": "kjob_2e3dacdcc446bc8a801bfeb0",
+        "notebookId": "knb_db910b243f353107f24acfa0",
+        "phase": "embed",
+        "progressDone": 64,
+        "progressTotal": 65,
+        "sourceId": "ksrc_1fd6e401a555f17e0269dfa4",
+        "status": "running",
+        "updatedAt": "2026-10-11T12:12:34.403Z"
+      }
+    ]
+  },
+  "usage": [
+    {
+      "input_tokens": 320,
+      "model": "model-a",
+      "model_call_id": "op-embedding-1791720754365-0",
+      "outcome": "succeeded",
+      "provider": "embed",
+      "transport_attempts": 1,
+      "usage_state": "partial"
+    },
+    {
+      "input_tokens": 5,
+      "model": "model-a",
+      "model_call_id": "op-embedding-1791720754408-1",
+      "outcome": "succeeded",
+      "provider": "embed",
+      "transport_attempts": 1,
+      "usage_state": "partial"
+    }
+  ],
+  "variants": [
+    {
+      "id": "viv_5ef068beb9505e5fc77a25cf7254a2db",
+      "status": "failed"
+    }
+  ],
+  "wire": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "Chapter 0000 W09唯一章节\n\n唯一计划块0000的独立合成资料。",
+          "Chapter 0001 W09唯一章节\n\n唯一计划块0001的独立合成资料。",
+          "Chapter 0002 W09唯一章节\n\n唯一计划块0002的独立合成资料。",
+          "Chapter 0003 W09唯一章节\n\n唯一计划块0003的独立合成资料。",
+          "Chapter 0004 W09唯一章节\n\n唯一计划块0004的独立合成资料。",
+          "Chapter 0005 W09唯一章节\n\n唯一计划块0005的独立合成资料。",
+          "Chapter 0006 W09唯一章节\n\n唯一计划块0006的独立合成资料。",
+          "Chapter 0007 W09唯一章节\n\n唯一计划块0007的独立合成资料。",
+          "Chapter 0008 W09唯一章节\n\n唯一计划块0008的独立合成资料。",
+          "Chapter 0009 W09唯一章节\n\n唯一计划块0009的独立合成资料。",
+          "Chapter 0010 W09唯一章节\n\n唯一计划块0010的独立合成资料。",
+          "Chapter 0011 W09唯一章节\n\n唯一计划块0011的独立合成资料。",
+          "Chapter 0012 W09唯一章节\n\n唯一计划块0012的独立合成资料。",
+          "Chapter 0013 W09唯一章节\n\n唯一计划块0013的独立合成资料。",
+          "Chapter 0014 W09唯一章节\n\n唯一计划块0014的独立合成资料。",
+          "Chapter 0015 W09唯一章节\n\n唯一计划块0015的独立合成资料。",
+          "Chapter 0016 W09唯一章节\n\n唯一计划块0016的独立合成资料。",
+          "Chapter 0017 W09唯一章节\n\n唯一计划块0017的独立合成资料。",
+          "Chapter 0018 W09唯一章节\n\n唯一计划块0018的独立合成资料。",
+          "Chapter 0019 W09唯一章节\n\n唯一计划块0019的独立合成资料。",
+          "Chapter 0020 W09唯一章节\n\n唯一计划块0020的独立合成资料。",
+          "Chapter 0021 W09唯一章节\n\n唯一计划块0021的独立合成资料。",
+          "Chapter 0022 W09唯一章节\n\n唯一计划块0022的独立合成资料。",
+          "Chapter 0023 W09唯一章节\n\n唯一计划块0023的独立合成资料。",
+          "Chapter 0024 W09唯一章节\n\n唯一计划块0024的独立合成资料。",
+          "Chapter 0025 W09唯一章节\n\n唯一计划块0025的独立合成资料。",
+          "Chapter 0026 W09唯一章节\n\n唯一计划块0026的独立合成资料。",
+          "Chapter 0027 W09唯一章节\n\n唯一计划块0027的独立合成资料。",
+          "Chapter 0028 W09唯一章节\n\n唯一计划块0028的独立合成资料。",
+          "Chapter 0029 W09唯一章节\n\n唯一计划块0029的独立合成资料。",
+          "Chapter 0030 W09唯一章节\n\n唯一计划块0030的独立合成资料。",
+          "Chapter 0031 W09唯一章节\n\n唯一计划块0031的独立合成资料。",
+          "Chapter 0032 W09唯一章节\n\n唯一计划块0032的独立合成资料。",
+          "Chapter 0033 W09唯一章节\n\n唯一计划块0033的独立合成资料。",
+          "Chapter 0034 W09唯一章节\n\n唯一计划块0034的独立合成资料。",
+          "Chapter 0035 W09唯一章节\n\n唯一计划块0035的独立合成资料。",
+          "Chapter 0036 W09唯一章节\n\n唯一计划块0036的独立合成资料。",
+          "Chapter 0037 W09唯一章节\n\n唯一计划块0037的独立合成资料。",
+          "Chapter 0038 W09唯一章节\n\n唯一计划块0038的独立合成资料。",
+          "Chapter 0039 W09唯一章节\n\n唯一计划块0039的独立合成资料。",
+          "Chapter 0040 W09唯一章节\n\n唯一计划块0040的独立合成资料。",
+          "Chapter 0041 W09唯一章节\n\n唯一计划块0041的独立合成资料。",
+          "Chapter 0042 W09唯一章节\n\n唯一计划块0042的独立合成资料。",
+          "Chapter 0043 W09唯一章节\n\n唯一计划块0043的独立合成资料。",
+          "Chapter 0044 W09唯一章节\n\n唯一计划块0044的独立合成资料。",
+          "Chapter 0045 W09唯一章节\n\n唯一计划块0045的独立合成资料。",
+          "Chapter 0046 W09唯一章节\n\n唯一计划块0046的独立合成资料。",
+          "Chapter 0047 W09唯一章节\n\n唯一计划块0047的独立合成资料。",
+          "Chapter 0048 W09唯一章节\n\n唯一计划块0048的独立合成资料。",
+          "Chapter 0049 W09唯一章节\n\n唯一计划块0049的独立合成资料。",
+          "Chapter 0050 W09唯一章节\n\n唯一计划块0050的独立合成资料。",
+          "Chapter 0051 W09唯一章节\n\n唯一计划块0051的独立合成资料。",
+          "Chapter 0052 W09唯一章节\n\n唯一计划块0052的独立合成资料。",
+          "Chapter 0053 W09唯一章节\n\n唯一计划块0053的独立合成资料。",
+          "Chapter 0054 W09唯一章节\n\n唯一计划块0054的独立合成资料。",
+          "Chapter 0055 W09唯一章节\n\n唯一计划块0055的独立合成资料。",
+          "Chapter 0056 W09唯一章节\n\n唯一计划块0056的独立合成资料。",
+          "Chapter 0057 W09唯一章节\n\n唯一计划块0057的独立合成资料。",
+          "Chapter 0058 W09唯一章节\n\n唯一计划块0058的独立合成资料。",
+          "Chapter 0059 W09唯一章节\n\n唯一计划块0059的独立合成资料。",
+          "Chapter 0060 W09唯一章节\n\n唯一计划块0060的独立合成资料。",
+          "Chapter 0061 W09唯一章节\n\n唯一计划块0061的独立合成资料。",
+          "Chapter 0062 W09唯一章节\n\n唯一计划块0062的独立合成资料。",
+          "Chapter 0063 W09唯一章节\n\n唯一计划块0063的独立合成资料。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:61818"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "Chapter 0064 W09唯一章节\n\n唯一计划块0064的独立合成资料。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:61818"
+    }
+  ]
+}

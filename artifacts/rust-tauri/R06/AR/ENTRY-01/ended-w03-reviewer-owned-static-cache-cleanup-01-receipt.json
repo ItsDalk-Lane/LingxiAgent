@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-11T14:59:27.989296+00:00",
+  "role": "ROOT_ENDED_OWNED_GENERATED_NONRUNTIME_CACHE_ONLY",
+  "before_record": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w03-reviewer-owned-static-cache-cleanup-01-before.json",
+  "before_record_sha256": "be1bcf555c432fd4d16787415fc3677360fea405347c37d8010887e8689d3ac8",
+  "owner": "/root/ar_w03_reviewer_01",
+  "deleted_count": 7789,
+  "deleted_logical_bytes": 9789417099,
+  "protected_executable_count": 528,
+  "all_protected_executables_SHA_unchanged": true,
+  "candidate_product_count": 37,
+  "all_candidate_products_SHA_unchanged": true,
+  "ownership_records_unchanged": true,
+  "actual_lsof_before_mutation_exit": 1,
+  "free_before_bytes": 22191341568,
+  "free_after_bytes": 31990652928,
+  "free_change_not_exclusive_cleanup_due_to_concurrent_work": true,
+  "raw_files_homes_runtime_binaries_targets_not_removed": true,
+  "blocked_reviewer_not_retried_or_completed": true,
+  "old_fail_not_erased": true
+}

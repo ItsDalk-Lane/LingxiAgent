@@ -1,0 +1,33 @@
+{
+  "at": "2026-10-11T11:17:03.273048+00:00",
+  "role": "ROOT_READBACK_OF_FRESH_REVIEWER_FINAL_NOT_NEW_REVIEW",
+  "verdict": "FAIL",
+  "reviewer": "/root/ar_w10_reviewer_01",
+  "safe_manifest_sha256": "227aefc869bf8a1140f9385276775885181c5601dd50658f854a525a32425dd4",
+  "safe_file_count": 98,
+  "safe_bytes": 35307885,
+  "report_sha256": "64ec075955864f1440a33b3daad928c159a851fd46ed11cd08d26a6287847f23",
+  "final_binding_sha256": "41fdbc03d9c8c05304a67a3a019fa9226d371290fcb1581a17b181248895ce86",
+  "owned_five_unchanged_and_W09_duplicate_equal": true,
+  "executed_binary_bindings_rechecked": 13,
+  "full_stage_gates": {
+    "R05_verify_stage": "NOT_RUN",
+    "R04_verify_stage": "NOT_RUN",
+    "R03_verify_stage": "NOT_RUN",
+    "full_rust_workspace_tests": "NOT_RUN",
+    "full_npm_and_audit_seal": "NOT_RUN; directed legacy E5 BY_SCOPE SKIP",
+    "R06_formal_registered_gate": "NOT_RUN; F14 remains OPEN"
+  },
+  "finding_ids": [
+    "R01-F01",
+    "R01-F02",
+    "R01-F03",
+    "R01-F04",
+    "R01-F05",
+    "R01-F06",
+    "R01-F07"
+  ],
+  "source_products_main_copied": false,
+  "git_mutation": false,
+  "R07": false
+}

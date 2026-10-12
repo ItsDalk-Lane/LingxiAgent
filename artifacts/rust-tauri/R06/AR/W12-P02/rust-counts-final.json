@@ -1,0 +1,39 @@
+{
+  "suites": [
+    {
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0
+    },
+    {
+      "passed": 22,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0
+    },
+    {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0
+    },
+    {
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0
+    },
+    {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0
+    }
+  ],
+  "registered_tests": 54,
+  "child_helpers_registered": 3,
+  "helpers_not_counted_twice": true,
+  "guard_armed": true,
+  "log_sha256": "38d65d04c7044cb501ad6211463c443c3e2f2cfc7b51ebfceec28380bbb6a913"
+}

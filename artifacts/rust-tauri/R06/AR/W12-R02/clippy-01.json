@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "clippy",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-j8",
+    "-p",
+    "lingxi-adapters",
+    "-p",
+    "lingxi-service",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-clippy-01-ho8kjuc8",
+  "start": 1791701185.522667,
+  "end": 1791701186.09625,
+  "exit_code": 0,
+  "log_sha256": "5d42646a01e1ba1d865b401269710e39551d163ba7d702f61bb3117aaa0a9600",
+  "home_files": []
+}

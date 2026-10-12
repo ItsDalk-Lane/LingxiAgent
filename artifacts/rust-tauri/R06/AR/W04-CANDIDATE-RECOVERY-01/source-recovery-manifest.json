@@ -1,0 +1,138 @@
+{
+  "at": "2026-10-12T03:51:58.134611+00:00",
+  "role": "ROOT_EXACT_SAVED_PRODUCT_SOURCE_RECOVERY_ONLY",
+  "family": "W04",
+  "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "owned_count": 19,
+  "rows": [
+    {
+      "path": "rust/crates/lingxi-service/src/stagefiles.rs",
+      "sha256": "a144c12f5fd8d5e0bcb8a97ec249cbef81a4db88595c7932005306b087e1dc07",
+      "bytes": 8657,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-service/src/stagefiles.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "sha256": "3997aa643ff3151b2011c35bc66c1b67b2c0e845dd3a01e0f57f36bb8e44b600",
+      "bytes": 80610,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/canonical_message_store.rs",
+      "sha256": "517209277070025bdfecfdf473c55c97ee4b4564b69d207ff4c928f0a6a6b4a9",
+      "bytes": 20977,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-adapters/src/storage/canonical_message_store.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/migrations.rs",
+      "sha256": "68d7147824860116919333f8c06acc785bc7b06e832f730eff6ee40a99f8d7ac",
+      "bytes": 48162,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-adapters/src/storage/migrations.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+      "sha256": "f576bc8bb8f9875836cec679c239a54a6d9f5bb5693410cd90a29ebf9f370060",
+      "bytes": 154331,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-adapters/src/storage/run_store.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_admin.rs",
+      "sha256": "54b8758c337ecefcbd856a6b8936fff8f8f1815a4e4a58008d789b96264bc16c",
+      "bytes": 32078,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-adapters/src/storage/session_admin.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_files.rs",
+      "sha256": "62f9e7fc662cb65bebb11149a230d7998c9d14959c6b4e7cb620da47b0fe791c",
+      "bytes": 72185,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-adapters/src/storage/session_files.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_tree.rs",
+      "sha256": "8d79c31ffa8f05399c5648261d09ddc94297b1490e47115e9d68d694f76f8c7e",
+      "bytes": 54997,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-adapters/src/storage/session_tree.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/lib.rs",
+      "sha256": "dc2e4077818902d3cb23a7a8ca888a5a7d0a07b4123f2f1dc4348b05fcb42eb2",
+      "bytes": 41525,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-kernel/src/lib.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/filehistory.rs",
+      "sha256": "4381cf3dcd8d6d8ecc56c1a7c4a0ea1ecdb87f99282b922c23ded4858f9958cd",
+      "bytes": 24074,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-service/src/filehistory.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/history.rs",
+      "sha256": "86aff747bf46191508548c07eea406aecbba39c857c7380c4e512cba18f9d828",
+      "bytes": 14939,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-service/src/history.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/history_projection.rs",
+      "sha256": "c5a58db61f8bd68f9ff0e4ca89ab7efc28e7b48e2455da8c6d1f850b297996a5",
+      "bytes": 43466,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-service/src/history_projection.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "sha256": "f8a623df0ad4ccf4c46263faff7ab7104c31db982284112a2d57a0dfc7366542",
+      "bytes": 286272,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-service/src/lib.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/resourceio.rs",
+      "sha256": "e601ae56074a0944fdccabc7b20199c232fc37e19d8c0399621ded91baf6d7e4",
+      "bytes": 116393,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-service/src/resourceio.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/resources.rs",
+      "sha256": "f863773a7686c9b9c71ad11de5813cf5e936937b76071cb6903c149724c682f6",
+      "bytes": 36747,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-service/src/resources.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "sha256": "4aca68384344338cba02d801f73fdb323a5833d77f89f1407bfa9c35fead2d72",
+      "bytes": 234550,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-service/src/runs.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_admin.rs",
+      "sha256": "8fab00d74346455e3bb78ebbb25a7971c2a266a7260b981b49ca893b49b82263",
+      "bytes": 15245,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-service/src/session_admin.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_tree.rs",
+      "sha256": "6a744d1613b9e6e2aa7975a592d4b6d54e911e57f4abcf8c2e7e42bc568e9838",
+      "bytes": 37576,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-service/src/session_tree.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/sessionfiles.rs",
+      "sha256": "c2a046d4fe418475e3557053a03342a17f4c209f6afd2448c8f96fa0b4c3c0b1",
+      "bytes": 70092,
+      "actual_saved_source": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/frozen-source/rust/crates/lingxi-service/src/sessionfiles.rs"
+    }
+  ],
+  "original_snapshot_sha256": "58c0a6c79730a727cd1ef33e93b499427f1ad26a134267b32c3ac99b54d40929",
+  "original_patch_sha256": "e0a976774819e3923ca7cf8be34af6b34720ffa975a7a7397c2fb0a84ce0b9d8",
+  "all_current_and_saved_full_file_SHA_match": true,
+  "main_product_overlay": "NONE",
+  "review_preparation_product": "EXACT_W04_V4_19_FILES_ONLY_NO_OTHER_UNACCEPTED_SOURCE",
+  "review_workspace": "/private/tmp/lingxi-r06-w04-reviewer-01",
+  "review_actor": "NOT_CREATED",
+  "formal_chain": "ORIGINAL_CONTROLLED_WINDOW_STILL_RUNNING_NO_FINAL_EXIT",
+  "missing_actor_final_safe_Handoff_END": "NOT_RECONSTRUCTED_AS_AUTHOR_COMPLETION",
+  "source_archive_home_DB_config_binary_copied": "NONE_LOCAL_ONLY",
+  "historical_runtime_results_recreated": false,
+  "new_tests_by_root_or_Reviewer": "NOT_RUN",
+  "acceptance": "NONE",
+  "Stage": "NOT_RUN",
+  "R07_started": false
+}

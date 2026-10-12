@@ -1,0 +1,23 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r06_ar_f01_history.rs (rust/target/debug/deps/r06_ar_f01_history-369cc4500f952c90)
+LINGXI_TEST_GUARD: armed (pid 92236, mem_limit=8192 MB, time_limit=600 s)
+
+running 5 tests
+{"case": "c01", "status": "PASS", "checks": ["C01 actual wire roles/order/current once/session isolation/UI no archive duplicates", "legacy plain user/assistant history restored without guessed run"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c01-F01-e94a965a767f9c2fc1e4dc28ffcb5817-evidence.json"}
+
+test f01_c01_real_authenticated_history_and_isolation ... ok
+{"case": "c02", "status": "PASS", "checks": ["C02 real ancestor tool executed once; fork mutually exclusive nonce/restart/rewind old suffix absent", "fork archive survives real source delete without source Run FK"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c02-F01-740af0a059e38f4f25c429a92e6478ca-evidence.json"}
+
+test f01_c02_fork_restart_retry_rewind_source_delete ... ok
+{"case": "c03", "status": "PASS", "checks": ["C03 real read raw complete/F08 projection only/restart IDs/no re-execution", "scope/source binding corruption rejected before provider request", "opaque exact restored; changed serving provider explicitly failed before wire"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c03-F01-359f9a8d073b313cb735104a6b845a78-evidence.json"}
+
+test f01_c03_projected_tools_opaque_origins_corruption ... ok
+{"case": "families", "status": "PASS", "checks": ["openai-completions actual wire chronological roles", "anthropic-messages actual wire chronological roles", "google-generative-ai actual wire chronological roles", "openai-responses actual wire chronological roles", "openai-codex-responses actual wire chronological roles"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/families-F01-993cd43f1fba46a8dc71b8fbdc997807-evidence.json"}
+
+test f01_all_five_families_actual_wire_roles ... ok
+{"case": "c04", "status": "PASS", "checks": ["C04 multiple actual Runs trigger summary; version+retained suffix survive restart; all authoritative originals immutable", "summary failure no fake successful version/all prior originals survive restart", "real binary shutdown cancellation/no late fabricated model success/history preserved on restart"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c04-F01-1e01cdeaecad72d7865bc5d5b0e82317-evidence.json"}
+
+test f01_c04_cross_run_compaction_failure_restart ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.91s
+

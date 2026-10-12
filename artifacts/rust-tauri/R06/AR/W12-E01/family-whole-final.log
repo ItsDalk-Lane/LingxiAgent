@@ -1,0 +1,101 @@
+rust/crates/lingxi-service/src/knowledge.rs:484:            self.rebuild_notebook(notebook_id)?;
+rust/crates/lingxi-service/src/knowledge.rs:505:    pub fn rebuild_notebook(&self, notebook_id: &str) -> Result<(), KnowledgeError> {
+rust/crates/lingxi-service/src/knowledge.rs:808:            match std::fs::remove_file(artifact_path) {
+rust/crates/lingxi-service/src/knowledge.rs:1222:                    detail: "index stale or missing; rebuild pending".into(),
+rust/crates/lingxi-service/src/knowledge.rs:1287:                                            "vector variant missing or incompatible (model={}; dims={}); rebuild the notebook index",
+rust/crates/lingxi-service/src/knowledge.rs:1993:            "resetStaleVectors": build.reset_stale,
+lib/knowledge/vector-index-adapter.ts:43: *                             （resetStaleVectors=true，调用方必须留痕，不静默）；
+lib/knowledge/vector-index-adapter.ts:197:  resetStaleVectors: boolean;
+lib/knowledge/vector-index-adapter.ts:261:   * 指纹/维度漂移 → 显式清旧向量重建（resetStaleVectors=true）；一致 → 保留断点向量。
+lib/knowledge/vector-index-adapter.ts:292:  rebuild(): void;
+lib/knowledge/vector-index-adapter.ts:928:        return { vectorIndexVariantId: anchor.vectorIndexVariantId, resetStaleVectors: false };
+lib/knowledge/vector-index-adapter.ts:937:        // 内容已变，向量不再是任何可用断点）；调用方按 resetStaleVectors 留痕。
+lib/knowledge/vector-index-adapter.ts:946:        return { vectorIndexVariantId: anchor.vectorIndexVariantId, resetStaleVectors: true };
+lib/knowledge/vector-index-adapter.ts:952:      return { vectorIndexVariantId: anchor.vectorIndexVariantId, resetStaleVectors: false };
+lib/knowledge/vector-index-adapter.ts:1172:  rebuild(): void {
+lib/knowledge/vector-index-adapter.ts:1173:    // SQLite事务阻止其它写者；serialize包含已提交WAL内容，不unlink活跃句柄。
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:7://! - 分支重置：分支头回移 + 追加 `hana-session-branch-reset` 标记，旧历史不删
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:54:/// `run_id = None` 用于无 run 归属的条目（用户输入消息、reset 标记）——
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:154:/// 分支头回移 + 追加 `hana-session-branch-reset` 标记（同事务；旧历史不删）。
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:156:/// retryBranchParentId = null，分支投影只剩 reset 标记）。
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:157:/// 标记 id 在事务内铸造（`reset:{session}:{now}:{seq}`——单写者下 seq
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:163:    /// 触发重置的回合输入消息（现役 reset 记录的 sourceEntryId）。
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:266:/// `include_markers`：是否把 `hana-session-branch-reset` 标记条目纳入投影
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:267:/// （分支历史投影 = true，reset 测试要看标记；fork 内容链 = false，fork 复制
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:278:            // （legacy_tail：跳过 branch-reset 等标记条目，落到真实历史尾）。
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:307:            // 从 head 回溯到 root；`include_markers=false` 时跳过 branch-reset
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:874:/// 分支头回移 + 追加 `hana-session-branch-reset` 标记（同事务；旧历史不删）。
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:875:/// 标记 id 事务内铸造为 `reset:{session_id}:{now}:{seq}`（单写者下 seq 单调，
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:878:pub async fn reset_branch_head(
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:891:                // 1) 追加 reset 标记（parent=新头，append-only）。
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:900:                let marker_id = format!("reset:{sid}:{now}:{seq}");
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:915:                // run_id = NULL：reset 标记无 run 归属（v8 run_id 可空但保 FK——
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:921:                 VALUES (?1,?2,NULL,'system',?3,NULL,?4,?5,?6,'hana-session-branch-reset')",
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:925:                // 2) 分支头指向 reset 标记（持久化头，revision 递增）。
+rust/crates/lingxi-adapters/src/storage/session_tree.rs:945:/// R06-T03：提交一条会话树管理事件（`session_created` / `session_branch_reset`
+rust/crates/lingxi-adapters/src/storage/migrations.rs:395:/// The `messages` rebuild follows the v7 precedent: SQLite cannot alter a
+rust/crates/lingxi-adapters/src/storage/migrations.rs:924:/// (the startup path) must refuse, never rebuild, truncate or recreate.
+rust/crates/lingxi-adapters/src/storage/migrations.rs:984:            // columns to an existing table by table rebuild either); the
+lib/knowledge/source-processors.ts:271:export function rebuildBlocksFromProcessorOutput(input: {
+lib/knowledge/types.ts:496:  resetStaleVectors: boolean;
+lib/knowledge/knowledge-store.ts:629:    || typeof parsed.resetStaleVectors !== "boolean"
+lib/knowledge/knowledge-store.ts:4569:   * 指纹漂移重建是唯一回退场景，由 embedding_stats.resetStaleVectors 显式留痕）。
+lib/knowledge/knowledge-store.ts:4733:      || typeof stats.resetStaleVectors !== "boolean"
+rust/crates/lingxi-adapters/src/storage/knowledge.rs:1466:            let _ = std::fs::remove_file(self.root.join(&snapshot.storage_path));
+rust/crates/lingxi-adapters/src/storage/knowledge.rs:2335:            "INSERT INTO knowledge_chunks_fts(knowledge_chunks_fts) VALUES ('rebuild')",
+rust/crates/lingxi-adapters/src/storage/knowledge.rs:2546:    /// 显式失效只清同一SQLite事务中的派生行，不unlink活跃数据库。
+rust/crates/lingxi-adapters/src/storage/knowledge.rs:2547:    pub fn reset(&self) -> Result<(), KnowledgeError> {
+rust/crates/lingxi-adapters/src/storage/knowledge.rs:2647:    pub reset_stale: bool,
+rust/crates/lingxi-adapters/src/storage/knowledge.rs:2692:    /// begin：既有行指纹或维度漂移 → 显式清旧向量重建（resetStaleVectors 留痕）；
+rust/crates/lingxi-adapters/src/storage/knowledge.rs:2718:        let reset_stale = match &existing {
+rust/crates/lingxi-adapters/src/storage/knowledge.rs:2741:            reset_stale,
+lib/knowledge/knowledge-manager.ts:44:  rebuildBlocksFromProcessorOutput,
+lib/knowledge/knowledge-manager.ts:639:        fs.rmSync(path.join(this.artifactsRoot, snapshotId), { recursive: true, force: true });
+lib/knowledge/knowledge-manager.ts:649:      fs.rmSync(path.join(this.sourcesRoot, input.sourceId), { recursive: true, force: true });
+lib/knowledge/knowledge-manager.ts:1518:      const blocks = rebuildBlocksFromProcessorOutput({ output, locatorMap: existing.locatorMap });
+rust/crates/lingxi-adapters/src/storage/backup.rs:139:    match std::fs::remove_file(path) {
+rust/crates/lingxi-adapters/src/storage/backup.rs:439:        let _ = std::fs::remove_file(&tmp);
+rust/crates/lingxi-adapters/src/storage/backup.rs:577:            let _ = std::fs::remove_file(&target_path);
+rust/crates/lingxi-adapters/src/storage/backup.rs:580:        let _ = std::fs::remove_file(&target_path);
+rust/crates/lingxi-adapters/src/storage/backup.rs:589:        let _ = std::fs::remove_file(&target_path);
+rust/crates/lingxi-adapters/src/storage/backup.rs:595:        let _ = std::fs::remove_file(&target_path);
+rust/crates/lingxi-adapters/src/storage/run_store.rs:77:/// CURRENT attempt — everything needed to rebuild a write context that the
+rust/crates/lingxi-adapters/src/storage/run_store.rs:562:    /// One row carries everything the recovery coordinator needs to rebuild
+rust/crates/lingxi-adapters/src/storage/run_store.rs:1005:/// rebuilds the public [`InvocationJournalEntry`] via
+rust/crates/lingxi-adapters/src/storage/agent_memory.rs:73:    match std::fs::remove_file(path) {
+rust/crates/lingxi-adapters/src/storage/agent_memory.rs:605:                "INSERT INTO facts_fts(facts_fts) VALUES ('rebuild') RETURNING 1",
+rust/crates/lingxi-adapters/src/storage/agent_memory.rs:1212:    pub fn write_reset_marker(&self) -> Result<String, MemoryError> {
+rust/crates/lingxi-adapters/src/storage/agent_memory.rs:1221:        atomic_write(&self.path("reset.json"), &text).map_err(MemoryError::from)?;
+rust/crates/lingxi-adapters/src/storage/agent_memory.rs:1225:    pub fn read_reset_at(&self) -> Option<String> {
+rust/crates/lingxi-adapters/src/storage/agent_memory.rs:1226:        let raw = safe_read(&self.path("reset.json"));
+rust/crates/lingxi-adapters/src/storage/agent_memory.rs:1414:    /// rebuildIndex (experience.ts:29-61).
+rust/crates/lingxi-adapters/src/storage/agent_memory.rs:1415:    pub fn rebuild_index(&self) -> Result<(), MemoryError> {
+rust/crates/lingxi-adapters/src/storage/agent_memory.rs:1490:        self.rebuild_index()?;
+rust/crates/lingxi-adapters/src/storage/agent_memory.rs:1529:        self.rebuild_index()
+lib/knowledge/scope-snapshot-compiler.ts:206:            warnings.push(`${row.sourceId}:${metadata.id}:previous_chunk_version_rebuild_pending`);
+lib/knowledge/usearch-vector-backend.ts:158:          await fs.promises.unlink(path.join(this.root, directory.name, file.name));
+lib/knowledge/usearch-vector-backend.ts:198:      if (row) fs.rmSync(path.join(this.root, row.fileName), { force: true });
+lib/knowledge/usearch-vector-backend.ts:297:      try { fs.rmSync(temporaryFile, { force: true }); } catch { this.log(`knowledge ANN: temporary cleanup failed ${job.id}`); }
+lib/knowledge/knowledge-index-store.ts:500:      // 外联 FTS 表随新表重建为空，用 rebuild 从内容表整体回填，无需逐行重插。
+lib/knowledge/knowledge-index-store.ts:501:      this.db.exec(`INSERT INTO knowledge_chunks_fts(knowledge_chunks_fts) VALUES('rebuild');`);
+lib/knowledge/knowledge-index-store.ts:938:   * 只读、无自愈——行损坏由检索路径的 reset 自愈负责，这里如实抛出。
+lib/knowledge/knowledge-index-store.ts:1197:  reset() {
+lib/knowledge/knowledge-index-store.ts:1198:    // SQLite事务阻止其它写者；serialize包含已提交WAL内容，不unlink活跃句柄。
+lib/knowledge/knowledge-query-service.ts:523:          // 保留原始构建错误（索引库损坏走外层 reset 自愈，此时行已不存在）。
+lib/knowledge/knowledge-query-service.ts:535:      this.deps.indexStore.reset();
+lib/knowledge/knowledge-query-service.ts:704:        degraded.push({ ...anchor, reason: "KNOWLEDGE_INDEX_BUILDING", detail: "index stale (source changed, rebuild pending)" });
+lib/knowledge/knowledge-query-service.ts:715:   * 时 reset 索引库一次，并把全部 scope 降级为 missing 交给后台摄入补齐——
+lib/knowledge/knowledge-query-service.ts:743:      this.deps.indexStore.reset();
+lib/knowledge/knowledge-query-service.ts:751:          detail: "index reset after corruption; rebuild enqueued in background",
+lib/knowledge/knowledge-query-service.ts:883:        resetStaleVectors: false,
+lib/knowledge/knowledge-query-service.ts:952:            stats.resetStaleVectors = begin.resetStaleVectors;
+lib/knowledge/knowledge-query-service.ts:990:      vectorIndex.rebuild();
+lib/knowledge/knowledge-query-service.ts:1003:  // KNOWLEDGE_INDEX_INVALID 损坏自愈（reset/rebuild，§十三 exception recovery）。
+lib/knowledge/knowledge-query-service.ts:1176:          // chunk 行损坏（spans 解析失败等）：与 search 同一自愈语义——reset 后
+lib/knowledge/knowledge-query-service.ts:1179:          this.deps.indexStore.reset();
+lib/knowledge/knowledge-query-service.ts:1188:              detail: "index reset after corruption; rebuild enqueued in background",
+lib/knowledge/knowledge-query-service.ts:1294:      // 向量库损坏自愈（§十三）：rebuild 后变体必然全失（缓存级重建），本轮降级
+lib/knowledge/knowledge-query-service.ts:1296:      vectorIndex!.rebuild();
+lib/knowledge/ingestion-service.ts:506:        this.log(`knowledge ingestion: background rebuild enqueue failed for ${sourceId}: ${describeIngestionError(error)}`);
+lib/knowledge/ingestion-service.ts:943:        if (stats.resetStaleVectors) {
+lib/knowledge/ingestion-service.ts:944:          this.log(`knowledge ingestion: vector variant reset after fingerprint/dimension drift (job ${current.id})`);

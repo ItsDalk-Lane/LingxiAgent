@@ -1,0 +1,50 @@
+
+/Users/study_superior/Desktop/Code/LingxiAgent/lib/knowledge/ann-index-store.ts
+   32:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   35:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  147:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/study_superior/Desktop/Code/LingxiAgent/lib/knowledge/knowledge-index-store.ts
+    12:27   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   104:33   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   109:26   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   184:29   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   336:14   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   358:15   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   360:30   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   812:70   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   846:59   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   861:59   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   885:34   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   923:33   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   954:46   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   993:29   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1133:117  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1176:65   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/study_superior/Desktop/Code/LingxiAgent/lib/knowledge/vector-index-adapter.ts
+    84:27   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   298:14   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   312:15   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   314:30   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   439:94   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   455:92   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   456:31   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   619:30   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   638:82   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   779:127  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   813:31   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   822:58   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   829:70   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   865:27   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   872:26   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   881:127  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1089:38   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1142:24   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1155:44   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/study_superior/Desktop/Code/LingxiAgent/lib/knowledge/vector-search-backend-factory.ts
+  9:73  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 39 problems (0 errors, 39 warnings)
+

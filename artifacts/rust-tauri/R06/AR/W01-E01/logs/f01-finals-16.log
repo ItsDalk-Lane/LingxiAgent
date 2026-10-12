@@ -1,0 +1,16 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.27s
+     Running tests/r06_ar_f01_history.rs (rust/target/debug/deps/r06_ar_f01_history-369cc4500f952c90)
+LINGXI_TEST_GUARD: armed (pid 36028, mem_limit=8192 MB, time_limit=600 s)
+
+running 8 tests
+test f01_archive_child_append_race_and_reset_foreign_writer_controls ... ok
+test f01_child_inherits_authorized_material_only ... ok
+test f01_c01_real_authenticated_history_and_isolation ... ok
+test f01_unknown_outcome_actual_crash_wire_diagnostic ... ok
+test f01_c02_fork_restart_retry_rewind_source_delete ... ok
+test f01_all_five_families_actual_wire_roles ... ok
+test f01_c04_cross_run_compaction_failure_restart ... ok
+test f01_c03_projected_tools_opaque_origins_corruption ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.16s
+

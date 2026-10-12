@@ -1,0 +1,39 @@
+{
+  "argv": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "fmt",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--all",
+    "--",
+    "--check"
+  ],
+  "cwd": "/private/tmp/lingxi-r06-w15-reviewer-01",
+  "started": "2026-10-12T00:10:20.014428+00:00",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "effective_env": {
+    "HOME": "/Users/study_superior",
+    "LINGXI_HOME": "/private/tmp/lingxi-w15-r01-runtime/home",
+    "TMPDIR": "/private/tmp/lingxi-w15-r01-runtime/tmp",
+    "LINGXI_PRODUCT_DIR": "/private/tmp/lingxi-r06-w15-reviewer-01/lib",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-w15-r01-runtime/target",
+    "CARGO_INCREMENTAL": "0",
+    "LINGXI_TEST_GUARD": "1",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "TEST_MEM_LIMIT_MB": "8192"
+  },
+  "guard": {
+    "business_seconds": 600,
+    "rss_mib": 8192,
+    "controller_seconds": 2700,
+    "sampling_interval_seconds": 0.05
+  },
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "source_before": "76b576ae8cf26174813b3439436a2a5d1aff65f42743af9e305e05ec5b6eebff",
+  "processes": [],
+  "launch_binary_before": {
+    "/Users/study_superior/.cargo/bin/cargo": "ec1b9233e7f72990ecd8e62063fa7f6c3dfc2bec8e97f88bff165f9100ac696a",
+    "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0"
+  },
+  "controller_pid": 3753
+}

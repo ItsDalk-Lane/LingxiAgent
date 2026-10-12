@@ -1,0 +1,34 @@
+{
+  "status": "PRODUCT_SOURCE_FROZEN_WORKSPACE06_RUNNING_NOT_READY",
+  "foreground": "authenticated execute -> SessionStore -> public drive_run wrapper -> unique drive_run_with_started -> gate/current input -> ModelHistory.load -> compiler/actual provider",
+  "background": "same unique driver; real record_run_started transaction triggers oneshot before returning accepted; unstarted failure compensated; receiver drop does not cancel background",
+  "child": "formal SubagentRuntime dispatch -> trusted attenuated grant -> same driver; full parent conversation not loaded; actual FileContextMaterialSource/ContextCompiler and allowed profile/persona material retained; EX03 persona cache wrong dimension observed separately OPEN",
+  "archive": "dedicated ENTRY_TYPE model_history nodes; Session actual owner separate from original actorKind/actorSubject; authorized current reader independently checked (LocalUser broad, Device/Web exact owner, Automation deny); Agent/sourceRun/sourceSession/boundSession/input-anchor/checksum/child exclusions and live source actor exact; source-deleted lawful fork self-contained; RunFK NULL",
+  "branch": "same active branch head/revision CAS; service SessionService fork invokes same ModelHistory parser read-only only retained prefix, validates tool pairing/opaque actual usage original provider/model/protocol/run/session/call/actor before storage transaction; validates original header/checksum before boundSession rebinding; unrelated suffix ignored; legacy raw-only fork original copy allowed but model restore loud-refused; no duplicated decoder",
+  "compaction": "same summary version+retained suffix atomic archive replace; immutable authoritative history; conservative declared-window first restored request check; failed summary retains originals",
+  "recovery": "only explicit recent CancelRegistry Abandoned plus exact source run/session/owner/Agent and conservative existing journal/single-finalize; no tool replay/no fabricated ToolCallCompleted",
+  "families": [
+    "openai-completions",
+    "anthropic-messages",
+    "google-generative-ai",
+    "openai-responses",
+    "openai-codex-responses"
+  ],
+  "noMigration": "existing messages entry_type internal archive; no schema version or migration registered; MigrationInspector unchanged; F14 public consumers/fixed-count compatibility remain OPEN",
+  "W03Integration": "NOT_PRESENT in W01 source: issued TaskSupervisor sameDB permit/binding and owned foreground Drop scope lifecycle; requires root integration and complete new-source retest/independent Reviewer",
+  "newPathsActual": [
+    "rust/crates/lingxi-service/src/model_history.rs",
+    "rust/crates/lingxi-service/tests/r06_ar_f01_history.rs",
+    "rust/crates/lingxi-service/tests/fixtures/r06_ar_f01_probe.py"
+  ],
+  "kernelPorts": "untouched by F01; W03 separately extends real DB gate/binding and requires post-integration rerun",
+  "currentSelfCheck": "f01-finals-17: actual 43/43, all source+1069 nonRust+evidence scripts pre/post unchanged",
+  "scopeUnclosed": [
+    "EX03/F05 ContextCompiler cache missing Agent dimension: actual allowed override wire, persona incorrect; root ordered separate owner",
+    "F08/upstream current combo ordered-event integration stale: pure-bc actual failures retained",
+    "F03 shared lifecycle/authorization/owned waiter scope/durable start composite not yet integrated",
+    "F14 migration/branch-internal-entry compatibility audit incomplete; no new migration in F01",
+    "F02/F03/EX01/EX02/EX11 and rest originalStage OPEN",
+    "A08 frozen large-history I/O not independently done"
+  ]
+}

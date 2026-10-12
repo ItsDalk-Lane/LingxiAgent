@@ -1,0 +1,1725 @@
+{
+  "label": "workspace-frozen-20",
+  "final": true,
+  "exit": 101,
+  "targets": [
+    {
+      "target": "Running unittests src/lib.rs (rust/target-w09-e01/debug/deps/lingxi_adapters-08891693a21d73df)",
+      "result": "ok",
+      "passed": 119,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/bin/lingxi-storage-inspect.rs (rust/target-w09-e01/debug/deps/lingxi_storage_inspect-149a8da8222fc3ff)",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/active_run_listing.rs (rust/target-w09-e01/debug/deps/active_run_listing-59231531a918859c)",
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/agent_memory_r06t06.rs (rust/target-w09-e01/debug/deps/agent_memory_r06t06-9df8c9f4b0ff7a47)",
+      "result": "ok",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/backup_faults.rs (rust/target-w09-e01/debug/deps/backup_faults-2805ba97150d8c69)",
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/backup_restore.rs (rust/target-w09-e01/debug/deps/backup_restore-d2dcc141d6e2a4ed)",
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/canonical_message_store.rs (rust/target-w09-e01/debug/deps/canonical_message_store-7e71bf9dc10a5589)",
+      "result": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/disk_full_fault.rs (rust/target-w09-e01/debug/deps/disk_full_fault-adfa2c7b7f3eda14)",
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/event_store_reads.rs (rust/target-w09-e01/debug/deps/event_store_reads-c95a0013547fbf9c)",
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/invocation_journal_store.rs (rust/target-w09-e01/debug/deps/invocation_journal_store-eba14770e7929475)",
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/knowledge_store_r06t07.rs (rust/target-w09-e01/debug/deps/knowledge_store_r06t07-f4ecebe485202202)",
+      "result": "ok",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/late_result_fencing_property.rs (rust/target-w09-e01/debug/deps/late_result_fencing_property-bfe66acf3ae304e1)",
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/migration_idempotency.rs (rust/target-w09-e01/debug/deps/migration_idempotency-e942ea6511b62d19)",
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t02_oauth_flows.rs (rust/target-w09-e01/debug/deps/r05_t02_oauth_flows-027c944d79a3722b)",
+      "result": "ok",
+      "passed": 21,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t03_goldens.rs (rust/target-w09-e01/debug/deps/r05_t03_goldens-38f4851e02d86b05)",
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t03_rr1_replay.rs (rust/target-w09-e01/debug/deps/r05_t03_rr1_replay-48e973613ec69c40)",
+      "result": "ok",
+      "passed": 33,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t04_rr1_batch_terminal.rs (rust/target-w09-e01/debug/deps/r05_t04_rr1_batch_terminal-afa86a77023e29f7)",
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t04_streaming.rs (rust/target-w09-e01/debug/deps/r05_t04_streaming-ec339850fc73b3ca)",
+      "result": "ok",
+      "passed": 18,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t05_compat.rs (rust/target-w09-e01/debug/deps/r05_t05_compat-2309aea4d92b8029)",
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t05_timeouts.rs (rust/target-w09-e01/debug/deps/r05_t05_timeouts-a8809dc8404f2ea2)",
+      "result": "ok",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t06_operations.rs (rust/target-w09-e01/debug/deps/r05_t06_operations-5a78c1b4cfff1faa)",
+      "result": "ok",
+      "passed": 27,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t07_rr1_usage_strict.rs (rust/target-w09-e01/debug/deps/r05_t07_rr1_usage_strict-367ab53b41085754)",
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t07_usage_families.rs (rust/target-w09-e01/debug/deps/r05_t07_usage_families-681f08ccb55f87cc)",
+      "result": "ok",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_ar_w09_vector_integrity.rs (rust/target-w09-e01/debug/deps/r06_ar_w09_vector_integrity-bdf8926f2a91bf49)",
+      "result": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t02_compaction_render.rs (rust/target-w09-e01/debug/deps/r06_t02_compaction_render-29d0c1a374ab3565)",
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/run_finalize_property.rs (rust/target-w09-e01/debug/deps/run_finalize_property-d25aa231ffb49448)",
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/run_id_allocator.rs (rust/target-w09-e01/debug/deps/run_id_allocator-4557579b1171d252)",
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/run_lineage_store.rs (rust/target-w09-e01/debug/deps/run_lineage_store-3912e8ae838df482)",
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/session_file_store.rs (rust/target-w09-e01/debug/deps/session_file_store-1cab4ae4c3af0fdd)",
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/session_tree_r06t03.rs (rust/target-w09-e01/debug/deps/session_tree_r06t03-ab890dff2dfe6977)",
+      "result": "ok",
+      "passed": 18,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/storage_transactions.rs (rust/target-w09-e01/debug/deps/storage_transactions-64370c114e95eea8)",
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/lib.rs (rust/target-w09-e01/debug/deps/lingxi_browser_spike-21922237f585d80e)",
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/bin/spike_browser.rs (rust/target-w09-e01/debug/deps/spike_browser-1f2d989b467b70df)",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/bin/spike_pdf.rs (rust/target-w09-e01/debug/deps/spike_pdf-0c6f4c9632f9866a)",
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/lib.rs (rust/target-w09-e01/debug/deps/lingxi_kernel-094bb4151f357e00)",
+      "result": "ok",
+      "passed": 122,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t01_context_compiler.rs (rust/target-w09-e01/debug/deps/r06_t01_context_compiler-489c582c010312fe)",
+      "result": "ok",
+      "passed": 20,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t02_compaction.rs (rust/target-w09-e01/debug/deps/r06_t02_compaction-2a93e01aa5acb098)",
+      "result": "ok",
+      "passed": 44,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/lib.rs (rust/target-w09-e01/debug/deps/lingxi_protocol-9b84322372dbbbf5)",
+      "result": "ok",
+      "passed": 25,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/bin/lingxi-proto-server.rs (rust/target-w09-e01/debug/deps/lingxi_proto_server-f24b68a96075a29e)",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/bin/lingxi-protocol-gen.rs (rust/target-w09-e01/debug/deps/lingxi_protocol_gen-3aa0bf84ca2e8c94)",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/bin/lingxi-protocol-verify.rs (rust/target-w09-e01/debug/deps/lingxi_protocol_verify-4046271e9c8e85d9)",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/lib.rs (rust/target-w09-e01/debug/deps/lingxi_service-fed47d112dfd427c)",
+      "result": "ok",
+      "passed": 387,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": [
+        "thread 'procsupervisor::tests::drain_records_a_panicked_task_honestly' (5814435) panicked at crates/lingxi-service/src/procsupervisor.rs:3967:13:",
+        "thread 'task_supervisor::tests::panicking_child_is_contained_and_returned_as_panicked' (5814590) panicked at crates/lingxi-service/src/task_supervisor.rs:853:21:"
+      ]
+    },
+    {
+      "target": "Running unittests src/main.rs (rust/target-w09-e01/debug/deps/lingxi_service-c1b7a7820dfd6051)",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/bin/r04_t07_fixture.rs (rust/target-w09-e01/debug/deps/r04_t07_fixture-b19e3c07924144f6)",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/admission_dedup_adversarial.rs (rust/target-w09-e01/debug/deps/admission_dedup_adversarial-65b0b2c6c62f884b)",
+      "result": "FAILED",
+      "passed": 4,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "adv_c05_restart_with_unknown_side_effects_refuses_explicitly"
+      ],
+      "cause_lines": [
+        "thread 'adv_c05_restart_with_unknown_side_effects_refuses_explicitly' (5816107) panicked at crates/lingxi-service/tests/admission_dedup_adversarial.rs:473:10:"
+      ]
+    },
+    {
+      "target": "Running tests/admission_dedup_consistency.rs (rust/target-w09-e01/debug/deps/admission_dedup_consistency-a877aefb04b73fdb)",
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/auth_matrix.rs (rust/target-w09-e01/debug/deps/auth_matrix-d09f49dea52f525f)",
+      "result": "ok",
+      "passed": 24,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/background_disconnect_recovery.rs (rust/target-w09-e01/debug/deps/background_disconnect_recovery-3f4b0a43cef46a79)",
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/background_steering.rs (rust/target-w09-e01/debug/deps/background_steering-dc7408cd519ed822)",
+      "result": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/cancel_link_inheritance.rs (rust/target-w09-e01/debug/deps/cancel_link_inheritance-e5f5d953d20e1991)",
+      "result": "FAILED",
+      "passed": 6,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "subagent_timeout_settles_a_parked_quota_wait"
+      ],
+      "cause_lines": [
+        "thread 'subagent_timeout_settles_a_parked_quota_wait' (5817549) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:387:9:"
+      ]
+    },
+    {
+      "target": "Running tests/cancel_terminal_race.rs (rust/target-w09-e01/debug/deps/cancel_terminal_race-d2a0803b53ca4a12)",
+      "result": "ok",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/cancellation_tree.rs (rust/target-w09-e01/debug/deps/cancellation_tree-b3a582b4ff422c09)",
+      "result": "FAILED",
+      "passed": 6,
+      "failed": 2,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "panicking_tool_child_is_supervised_and_the_run_settles_loudly",
+        "approval_wait_round_trips_approve_and_reject_legs"
+      ],
+      "cause_lines": [
+        "thread 'panicking_tool_child_is_supervised_and_the_run_settles_loudly' (5820120) panicked at crates/lingxi-service/tests/cancellation_tree.rs:226:49:",
+        "thread 'panicking_tool_child_is_supervised_and_the_run_settles_loudly' (5820120) panicked at crates/lingxi-service/tests/cancellation_tree.rs:1535:5:",
+        "  left: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"tool_call_completed\", \"tool_result_model_projection\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\"]",
+        " right: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"tool_call_completed\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\"]",
+        "thread 'approval_wait_round_trips_approve_and_reject_legs' (5820117) panicked at crates/lingxi-service/tests/cancellation_tree.rs:1779:5:",
+        "  left: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"run_state_changed\", \"run_state_changed\", \"tool_call_completed\", \"tool_result_model_projection\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\", \"final_message_committed\"]",
+        " right: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"run_state_changed\", \"run_state_changed\", \"tool_call_completed\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\", \"final_message_committed\"]"
+      ]
+    },
+    {
+      "target": "Running tests/config_bounds.rs (rust/target-w09-e01/debug/deps/config_bounds-238f8b55c2ebe01d)",
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/event_subscription.rs (rust/target-w09-e01/debug/deps/event_subscription-a033e791aef2173b)",
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/execute_concurrency.rs (rust/target-w09-e01/debug/deps/execute_concurrency-ecaca029cdbf8c91)",
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/exit_race_rejections.rs (rust/target-w09-e01/debug/deps/exit_race_rejections-215eca14cff0bbc5)",
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/input_budget_refusal.rs (rust/target-w09-e01/debug/deps/input_budget_refusal-0ec4f68a2273fa19)",
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/input_payload_fidelity.rs (rust/target-w09-e01/debug/deps/input_payload_fidelity-ba831ba8fc97c770)",
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/instance_lifecycle.rs (rust/target-w09-e01/debug/deps/instance_lifecycle-dce62daa804b6162)",
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/invocation_journal.rs (rust/target-w09-e01/debug/deps/invocation_journal-ecc90d063471817d)",
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/late_result_fence.rs (rust/target-w09-e01/debug/deps/late_result_fence-cf6692bd7e13ab35)",
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r00_management_leaves.rs (rust/target-w09-e01/debug/deps/r00_management_leaves-f24ef2551ec864d8)",
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r00_static_web_leaves.rs (rust/target-w09-e01/debug/deps/r00_static_web_leaves-ecb49608edf68f3f)",
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r03_t08_acceptance_matrix.rs (rust/target-w09-e01/debug/deps/r03_t08_acceptance_matrix-ec6a1a77c2e7c47c)",
+      "result": "FAILED",
+      "passed": 15,
+      "failed": 2,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "combo_crash_recovery_is_honestly_interrupted",
+        "leaf_parent_cancel_stops_child"
+      ],
+      "cause_lines": [
+        "thread 'combo_crash_recovery_is_honestly_interrupted' (5832209) panicked at crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs:1129:14:",
+        "thread 'leaf_parent_cancel_stops_child' (5832220) panicked at crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs:1500:14:"
+      ]
+    },
+    {
+      "target": "Running tests/r04_rr1_f02_reaper_cleanup.rs (rust/target-w09-e01/debug/deps/r04_rr1_f02_reaper_cleanup-f7cf02f7e3b0e592)",
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": [
+        "thread 'rr1_f02_c03_adversarial_panicking_pump_is_observed_and_honest' (5832497) panicked at crates/lingxi-service/src/procsupervisor.rs:2792:13:"
+      ]
+    },
+    {
+      "target": "Running tests/r04_rr1_f03_stop_honesty.rs (rust/target-w09-e01/debug/deps/r04_rr1_f03_stop_honesty-ab214e5da2bc6286)",
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r04_rr1_f04_pty_consumption.rs (rust/target-w09-e01/debug/deps/r04_rr1_f04_pty_consumption-542bf0220c913fee)",
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r04_rr1_f05_output_integrity.rs (rust/target-w09-e01/debug/deps/r04_rr1_f05_output_integrity-1f2b466aacdbba79)",
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r04_rr1_f05_spill_failure.rs (rust/target-w09-e01/debug/deps/r04_rr1_f05_spill_failure-8f07b6c17982f210)",
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r04_t01_tool_catalog.rs (rust/target-w09-e01/debug/deps/r04_t01_tool_catalog-186ce68fb25a6528)",
+      "result": "FAILED",
+      "passed": 5,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain"
+      ],
+      "cause_lines": [
+        "thread 'adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain' (5835500) panicked at crates/lingxi-service/tests/r04_t01_tool_catalog.rs:780:10:"
+      ]
+    },
+    {
+      "target": "Running tests/r04_t02_tool_gateway.rs (rust/target-w09-e01/debug/deps/r04_t02_tool_gateway-61350d8b5de56531)",
+      "result": "ok",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r04_t03_approval_service.rs (rust/target-w09-e01/debug/deps/r04_t03_approval_service-5a0df677f7a6b507)",
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r04_t04_file_tools.rs (rust/target-w09-e01/debug/deps/r04_t04_file_tools-be948adc85b9c4c0)",
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r04_t05_process_tools.rs (rust/target-w09-e01/debug/deps/r04_t05_process_tools-6e8f250ea3186c06)",
+      "result": "ok",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r04_t05_registry_capacity.rs (rust/target-w09-e01/debug/deps/r04_t05_registry_capacity-ee8958560a6f40eb)",
+      "result": "ok",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r04_t06_sandbox.rs (rust/target-w09-e01/debug/deps/r04_t06_sandbox-3bfa8b39a3542f98)",
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r04_t07_mcp_and_workers.rs (rust/target-w09-e01/debug/deps/r04_t07_mcp_and_workers-e70c8519f1b8e6a4)",
+      "result": "ok",
+      "passed": 19,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r04_t08_tool_matrix.rs (rust/target-w09-e01/debug/deps/r04_t08_tool_matrix-fe64cab26649e9e8)",
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t01_binary_wiring.rs (rust/target-w09-e01/debug/deps/r05_t01_binary_wiring-7cd5c9ca2ecff78c)",
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t01_model_plane.rs (rust/target-w09-e01/debug/deps/r05_t01_model_plane-9636e751a9852f12)",
+      "result": "ok",
+      "passed": 24,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t02_credentials.rs (rust/target-w09-e01/debug/deps/r05_t02_credentials-4afac6d8afc444a1)",
+      "result": "ok",
+      "passed": 38,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t03_protocol_adapters.rs (rust/target-w09-e01/debug/deps/r05_t03_protocol_adapters-87d6729a6a6b21c9)",
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t04_streaming.rs (rust/target-w09-e01/debug/deps/r05_t04_streaming-f8d93fc18bd068c1)",
+      "result": "ok",
+      "passed": 18,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t05_network.rs (rust/target-w09-e01/debug/deps/r05_t05_network-f6ae5345629dd569)",
+      "result": "ok",
+      "passed": 21,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t05_timeouts.rs (rust/target-w09-e01/debug/deps/r05_t05_timeouts-33865142849be705)",
+      "result": "ok",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t06_operations.rs (rust/target-w09-e01/debug/deps/r05_t06_operations-3312dfa164026601)",
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t06_rr1_media_resource.rs (rust/target-w09-e01/debug/deps/r05_t06_rr1_media_resource-2d3956772a4e173d)",
+      "result": "ok",
+      "passed": 17,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t06_rr1_system_speech.rs (rust/target-w09-e01/debug/deps/r05_t06_rr1_system_speech-9c3861f6a85a164b)",
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t06_worker_model.rs (rust/target-w09-e01/debug/deps/r05_t06_worker_model-77fb858f866b0b10)",
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t07_persistence.rs (rust/target-w09-e01/debug/deps/r05_t07_persistence-bd94f3467855fb6a)",
+      "result": "FAILED",
+      "passed": 4,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "old_ledger_rows_survive_a_model_config_reload"
+      ],
+      "cause_lines": [
+        "thread 'old_ledger_rows_survive_a_model_config_reload' (5930141) panicked at crates/lingxi-service/tests/r05_t07_persistence.rs:430:10:"
+      ]
+    },
+    {
+      "target": "Running tests/r05_t07_rr1_usage_ledger.rs (rust/target-w09-e01/debug/deps/r05_t07_rr1_usage_ledger-86403f6105e6ec71)",
+      "result": "ok",
+      "passed": 15,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t07_usage_trace.rs (rust/target-w09-e01/debug/deps/r05_t07_usage_trace-6eb4379be5cdf600)",
+      "result": "ok",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t08_closed_loop.rs (rust/target-w09-e01/debug/deps/r05_t08_closed_loop-2109da1b20e54b56)",
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t08_production_tools.rs (rust/target-w09-e01/debug/deps/r05_t08_production_tools-bbd8b61f87293c1e)",
+      "result": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r05_t08_resources.rs (rust/target-w09-e01/debug/deps/r05_t08_resources-dd31f9c22872dbc7)",
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_ar_f08_projection.rs (rust/target-w09-e01/debug/deps/r06_ar_f08_projection-485d4d877f7e9378)",
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_ar_w09_embedding_batches.rs (rust/target-w09-e01/debug/deps/r06_ar_w09_embedding_batches-dae336279e2e98d2)",
+      "result": "ok",
+      "passed": 15,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_ar_w10_embedding_identity.rs (rust/target-w09-e01/debug/deps/r06_ar_w10_embedding_identity-4d74d95bb3749e90)",
+      "result": "ok",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t01_closed_loop.rs (rust/target-w09-e01/debug/deps/r06_t01_closed_loop-e33d856577fae1c9)",
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t01_context_compiler.rs (rust/target-w09-e01/debug/deps/r06_t01_context_compiler-144a171f080c6b7f)",
+      "result": "ok",
+      "passed": 21,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t02_closed_loop.rs (rust/target-w09-e01/debug/deps/r06_t02_closed_loop-126503580810af56)",
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t02_compaction.rs (rust/target-w09-e01/debug/deps/r06_t02_compaction-e98ff86757e618ca)",
+      "result": "ok",
+      "passed": 26,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t03_session_tree.rs (rust/target-w09-e01/debug/deps/r06_t03_session_tree-c15c21c630ae2b1b)",
+      "result": "ok",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t04_history.rs (rust/target-w09-e01/debug/deps/r06_t04_history-6a53eaf75d33ad08)",
+      "result": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t05_bridgemedia.rs (rust/target-w09-e01/debug/deps/r06_t05_bridgemedia-702792c74d38841c)",
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t05_filehistory.rs (rust/target-w09-e01/debug/deps/r06_t05_filehistory-ecea22980db197d0)",
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t05_fsread.rs (rust/target-w09-e01/debug/deps/r06_t05_fsread-c42a84f8f746aaf7)",
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t05_preview.rs (rust/target-w09-e01/debug/deps/r06_t05_preview-c849aa82cc09d5f8)",
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t05_resourceio.rs (rust/target-w09-e01/debug/deps/r06_t05_resourceio-c0c3fac302c19e40)",
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t05_resources.rs (rust/target-w09-e01/debug/deps/r06_t05_resources-d83ba8045f4c6e0f)",
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t05_session_files.rs (rust/target-w09-e01/debug/deps/r06_t05_session_files-a2b4fb92af671611)",
+      "result": "ok",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t06_hooks.rs (rust/target-w09-e01/debug/deps/r06_t06_hooks-ebd1ce0af9e61194)",
+      "result": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t06_memory.rs (rust/target-w09-e01/debug/deps/r06_t06_memory-04cde0df23cd96ad)",
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t06_skill_context.rs (rust/target-w09-e01/debug/deps/r06_t06_skill_context-2540ae88262301fc)",
+      "result": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t06_skills.rs (rust/target-w09-e01/debug/deps/r06_t06_skills-d9f0f86a8c5b1255)",
+      "result": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t07_knowledge.rs (rust/target-w09-e01/debug/deps/r06_t07_knowledge-57ba864e3c5dd48b)",
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t07_knowledge_tools.rs (rust/target-w09-e01/debug/deps/r06_t07_knowledge_tools-25f32e55d3b6f5af)",
+      "result": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/r06_t08_behavior_eval.rs (rust/target-w09-e01/debug/deps/r06_t08_behavior_eval-3865546752edd2e0)",
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/recovery_crash_points.rs (rust/target-w09-e01/debug/deps/recovery_crash_points-2333bcb4bb5d616e)",
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/recovery_startup_scan.rs (rust/target-w09-e01/debug/deps/recovery_startup_scan-12f0578f22f63caf)",
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/request_dedup.rs (rust/target-w09-e01/debug/deps/request_dedup-df9ac715e3845bf7)",
+      "result": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/request_id_canonicalization.rs (rust/target-w09-e01/debug/deps/request_id_canonicalization-b73a535cb4dffa05)",
+      "result": "FAILED",
+      "passed": 6,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "rr2_f05_c02_restart_matrix_foreground_background_confirmed_unknown"
+      ],
+      "cause_lines": [
+        "thread 'rr2_f05_c02_restart_matrix_foreground_background_confirmed_unknown' (6014544) panicked at crates/lingxi-service/tests/request_id_canonicalization.rs:547:10:"
+      ]
+    },
+    {
+      "target": "Running tests/resource_limits.rs (rust/target-w09-e01/debug/deps/resource_limits-5dfe17507632bc9d)",
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/run_lifecycle.rs (rust/target-w09-e01/debug/deps/run_lifecycle-db982f1310f95692)",
+      "result": "FAILED",
+      "passed": 11,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "r03_a01_three_model_calls_produce_exactly_one_task_terminal"
+      ],
+      "cause_lines": [
+        "thread 'r03_a01_three_model_calls_produce_exactly_one_task_terminal' (6014917) panicked at crates/lingxi-service/tests/run_lifecycle.rs:442:5:",
+        "  left: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"tool_call_completed\", \"tool_result_model_projection\", \"model_call_started\", \"model_call_completed\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\", \"final_message_committed\"]",
+        " right: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"tool_call_completed\", \"model_call_started\", \"model_call_completed\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\", \"final_message_committed\"]"
+      ]
+    },
+    {
+      "target": "Running tests/service_health.rs (rust/target-w09-e01/debug/deps/service_health-26a0ec667b81601f)",
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/service_persistence.rs (rust/target-w09-e01/debug/deps/service_persistence-0922bbd370f90570)",
+      "result": "FAILED",
+      "passed": 1,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "execute_persists_runs_that_survive_a_full_restart"
+      ],
+      "cause_lines": [
+        "thread 'execute_persists_runs_that_survive_a_full_restart' (6016312) panicked at crates/lingxi-service/tests/service_persistence.rs:84:10:"
+      ]
+    },
+    {
+      "target": "Running tests/session_serialization.rs (rust/target-w09-e01/debug/deps/session_serialization-059f8a48195b56bc)",
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/shutdown_coordinator.rs (rust/target-w09-e01/debug/deps/shutdown_coordinator-e57940e8efde1cdd)",
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/subagent_closeout.rs (rust/target-w09-e01/debug/deps/subagent_closeout-155dfebe8fca79e8)",
+      "result": "FAILED",
+      "passed": 7,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls"
+      ],
+      "cause_lines": [
+        "thread 'panicking_background_exits_are_recorded_and_reaped_without_a_waiter' (6017027) panicked at crates/lingxi-service/tests/subagent_closeout.rs:1238:17:",
+        "thread 'panicking_background_exits_are_recorded_and_reaped_without_a_waiter' (6017027) panicked at crates/lingxi-service/tests/subagent_closeout.rs:1238:17:",
+        "thread 'panicking_background_exits_are_recorded_and_reaped_without_a_waiter' (6017027) panicked at crates/lingxi-service/tests/subagent_closeout.rs:1238:17:",
+        "thread 'child_provider_panic_closes_out_and_the_thread_continues' (6017023) panicked at crates/lingxi-service/tests/subagent_closeout.rs:136:47:",
+        "thread 'parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls' (6017028) panicked at crates/lingxi-service/tests/subagent_closeout.rs:297:9:"
+      ]
+    },
+    {
+      "target": "Running tests/subagent_lifecycle.rs (rust/target-w09-e01/debug/deps/subagent_lifecycle-b0faf18626b4d12d)",
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/subagent_permission_inheritance.rs (rust/target-w09-e01/debug/deps/subagent_permission_inheritance-217d129cf8d30e27)",
+      "result": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/tls_web_login.rs (rust/target-w09-e01/debug/deps/tls_web_login-26a1947b44a24568)",
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running tests/tool_receipt_unknown.rs (rust/target-w09-e01/debug/deps/tool_receipt_unknown-ffddf8cd40b0e65d)",
+      "result": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": [
+        "thread 'f04_c01_adv_panic_before_side_effect_is_still_unknown' (6018210) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:199:21:",
+        "thread 'f04_c04_adv_control_verified_idempotent_recovery_uses_only_the_original_key' (6018214) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:209:21:",
+        "thread 'f04_c04_recovery_and_repeat_recovery_do_not_redo_unknown' (6018215) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:209:21:",
+        "thread 'f04_c02_dispatched_no_result_variants_classify_consistently_unknown' (6018212) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:209:21:",
+        "thread 'f04_c01_panic_after_side_effect_journals_unknown_not_confirmed_failure' (6018211) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:209:21:",
+        "thread 'f04_c03_trusted_negatives_survive_alongside_the_unknown' (6018213) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:209:21:",
+        "thread 'f04_c02_dispatched_no_result_variants_classify_consistently_unknown' (6018212) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:199:21:"
+      ]
+    },
+    {
+      "target": "Running unittests src/lib.rs (rust/target-w09-e01/debug/deps/lingxi_spike-b71872c0b3c94ea6)",
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/bin/spike_check_deps.rs (rust/target-w09-e01/debug/deps/spike_check_deps-6ac06b9c4ab300e8)",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/bin/spike_health.rs (rust/target-w09-e01/debug/deps/spike_health-9c3b829dfaaac2a3)",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/bin/spike_mcp_handshake.rs (rust/target-w09-e01/debug/deps/spike_mcp_handshake-e6cd35cd9e10b917)",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/bin/spike_schema_validate.rs (rust/target-w09-e01/debug/deps/spike_schema_validate-2a8d8962477f3eff)",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/bin/spike_sqlite_queue.rs (rust/target-w09-e01/debug/deps/spike_sqlite_queue-fc62afa9ac78e2ae)",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/bin/spike_tls_probe.rs (rust/target-w09-e01/debug/deps/spike_tls_probe-3301bdc082118180)",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/lib.rs (rust/target-w09-e01/debug/deps/lingxi_test_guard-21ee405834c342a5)",
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Running unittests src/main.rs (rust/target-w09-e01/debug/deps/xtask-06b22ce01067b44c)",
+      "result": "ok",
+      "passed": 121,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Doc-tests lingxi_adapters",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Doc-tests lingxi_browser_spike",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Doc-tests lingxi_kernel",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Doc-tests lingxi_protocol",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Doc-tests lingxi_service",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Doc-tests lingxi_spike",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    },
+    {
+      "target": "Doc-tests lingxi_test_guard",
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [],
+      "cause_lines": []
+    }
+  ],
+  "failed_targets": [
+    {
+      "target": "Running tests/admission_dedup_adversarial.rs (rust/target-w09-e01/debug/deps/admission_dedup_adversarial-65b0b2c6c62f884b)",
+      "result": "FAILED",
+      "passed": 4,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "adv_c05_restart_with_unknown_side_effects_refuses_explicitly"
+      ],
+      "cause_lines": [
+        "thread 'adv_c05_restart_with_unknown_side_effects_refuses_explicitly' (5816107) panicked at crates/lingxi-service/tests/admission_dedup_adversarial.rs:473:10:"
+      ]
+    },
+    {
+      "target": "Running tests/cancel_link_inheritance.rs (rust/target-w09-e01/debug/deps/cancel_link_inheritance-e5f5d953d20e1991)",
+      "result": "FAILED",
+      "passed": 6,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "subagent_timeout_settles_a_parked_quota_wait"
+      ],
+      "cause_lines": [
+        "thread 'subagent_timeout_settles_a_parked_quota_wait' (5817549) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:387:9:"
+      ]
+    },
+    {
+      "target": "Running tests/cancellation_tree.rs (rust/target-w09-e01/debug/deps/cancellation_tree-b3a582b4ff422c09)",
+      "result": "FAILED",
+      "passed": 6,
+      "failed": 2,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "panicking_tool_child_is_supervised_and_the_run_settles_loudly",
+        "approval_wait_round_trips_approve_and_reject_legs"
+      ],
+      "cause_lines": [
+        "thread 'panicking_tool_child_is_supervised_and_the_run_settles_loudly' (5820120) panicked at crates/lingxi-service/tests/cancellation_tree.rs:226:49:",
+        "thread 'panicking_tool_child_is_supervised_and_the_run_settles_loudly' (5820120) panicked at crates/lingxi-service/tests/cancellation_tree.rs:1535:5:",
+        "  left: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"tool_call_completed\", \"tool_result_model_projection\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\"]",
+        " right: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"tool_call_completed\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\"]",
+        "thread 'approval_wait_round_trips_approve_and_reject_legs' (5820117) panicked at crates/lingxi-service/tests/cancellation_tree.rs:1779:5:",
+        "  left: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"run_state_changed\", \"run_state_changed\", \"tool_call_completed\", \"tool_result_model_projection\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\", \"final_message_committed\"]",
+        " right: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"run_state_changed\", \"run_state_changed\", \"tool_call_completed\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\", \"final_message_committed\"]"
+      ]
+    },
+    {
+      "target": "Running tests/r03_t08_acceptance_matrix.rs (rust/target-w09-e01/debug/deps/r03_t08_acceptance_matrix-ec6a1a77c2e7c47c)",
+      "result": "FAILED",
+      "passed": 15,
+      "failed": 2,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "combo_crash_recovery_is_honestly_interrupted",
+        "leaf_parent_cancel_stops_child"
+      ],
+      "cause_lines": [
+        "thread 'combo_crash_recovery_is_honestly_interrupted' (5832209) panicked at crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs:1129:14:",
+        "thread 'leaf_parent_cancel_stops_child' (5832220) panicked at crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs:1500:14:"
+      ]
+    },
+    {
+      "target": "Running tests/r04_t01_tool_catalog.rs (rust/target-w09-e01/debug/deps/r04_t01_tool_catalog-186ce68fb25a6528)",
+      "result": "FAILED",
+      "passed": 5,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain"
+      ],
+      "cause_lines": [
+        "thread 'adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain' (5835500) panicked at crates/lingxi-service/tests/r04_t01_tool_catalog.rs:780:10:"
+      ]
+    },
+    {
+      "target": "Running tests/r05_t07_persistence.rs (rust/target-w09-e01/debug/deps/r05_t07_persistence-bd94f3467855fb6a)",
+      "result": "FAILED",
+      "passed": 4,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "old_ledger_rows_survive_a_model_config_reload"
+      ],
+      "cause_lines": [
+        "thread 'old_ledger_rows_survive_a_model_config_reload' (5930141) panicked at crates/lingxi-service/tests/r05_t07_persistence.rs:430:10:"
+      ]
+    },
+    {
+      "target": "Running tests/request_id_canonicalization.rs (rust/target-w09-e01/debug/deps/request_id_canonicalization-b73a535cb4dffa05)",
+      "result": "FAILED",
+      "passed": 6,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "rr2_f05_c02_restart_matrix_foreground_background_confirmed_unknown"
+      ],
+      "cause_lines": [
+        "thread 'rr2_f05_c02_restart_matrix_foreground_background_confirmed_unknown' (6014544) panicked at crates/lingxi-service/tests/request_id_canonicalization.rs:547:10:"
+      ]
+    },
+    {
+      "target": "Running tests/run_lifecycle.rs (rust/target-w09-e01/debug/deps/run_lifecycle-db982f1310f95692)",
+      "result": "FAILED",
+      "passed": 11,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "r03_a01_three_model_calls_produce_exactly_one_task_terminal"
+      ],
+      "cause_lines": [
+        "thread 'r03_a01_three_model_calls_produce_exactly_one_task_terminal' (6014917) panicked at crates/lingxi-service/tests/run_lifecycle.rs:442:5:",
+        "  left: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"tool_call_completed\", \"tool_result_model_projection\", \"model_call_started\", \"model_call_completed\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\", \"final_message_committed\"]",
+        " right: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"tool_call_completed\", \"model_call_started\", \"model_call_completed\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\", \"final_message_committed\"]"
+      ]
+    },
+    {
+      "target": "Running tests/service_persistence.rs (rust/target-w09-e01/debug/deps/service_persistence-0922bbd370f90570)",
+      "result": "FAILED",
+      "passed": 1,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "execute_persists_runs_that_survive_a_full_restart"
+      ],
+      "cause_lines": [
+        "thread 'execute_persists_runs_that_survive_a_full_restart' (6016312) panicked at crates/lingxi-service/tests/service_persistence.rs:84:10:"
+      ]
+    },
+    {
+      "target": "Running tests/subagent_closeout.rs (rust/target-w09-e01/debug/deps/subagent_closeout-155dfebe8fca79e8)",
+      "result": "FAILED",
+      "passed": 7,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls"
+      ],
+      "cause_lines": [
+        "thread 'panicking_background_exits_are_recorded_and_reaped_without_a_waiter' (6017027) panicked at crates/lingxi-service/tests/subagent_closeout.rs:1238:17:",
+        "thread 'panicking_background_exits_are_recorded_and_reaped_without_a_waiter' (6017027) panicked at crates/lingxi-service/tests/subagent_closeout.rs:1238:17:",
+        "thread 'panicking_background_exits_are_recorded_and_reaped_without_a_waiter' (6017027) panicked at crates/lingxi-service/tests/subagent_closeout.rs:1238:17:",
+        "thread 'child_provider_panic_closes_out_and_the_thread_continues' (6017023) panicked at crates/lingxi-service/tests/subagent_closeout.rs:136:47:",
+        "thread 'parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls' (6017028) panicked at crates/lingxi-service/tests/subagent_closeout.rs:297:9:"
+      ]
+    }
+  ],
+  "target_count": 149,
+  "actual_wait_reaped": null,
+  "process_group_residue": null
+}

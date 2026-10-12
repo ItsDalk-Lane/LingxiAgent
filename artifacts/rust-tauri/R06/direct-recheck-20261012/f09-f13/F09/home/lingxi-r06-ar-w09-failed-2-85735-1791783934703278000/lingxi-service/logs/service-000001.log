@@ -1,0 +1,1 @@
+2026-10-12T05:45:34.976136Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_8c4c205a814b46b8135f1015 error=KNOWLEDGE_MODEL_UNAVAILABLE: provider returned HTTP 400 Bad Request: {"data":null,"error":{"message":"W09 external injected failure"}}

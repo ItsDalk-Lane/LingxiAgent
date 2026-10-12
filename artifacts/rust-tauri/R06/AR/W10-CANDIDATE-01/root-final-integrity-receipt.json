@@ -1,0 +1,109 @@
+{
+  "at": "2026-10-11T10:43:35.150570+00:00",
+  "role": "ROOT_FREEZE_INTEGRITY_READBACK_NOT_INDEPENDENT_REVIEW",
+  "source": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent",
+  "review_fixed_workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01",
+  "manifest_sha256": "ff1842e803ffb68c26f6c1e9d5d7b3e2fbd7f525833efe9f8e744853b4f792a8",
+  "candidate_manifest_sha256": "73ae44aa3615a5497f42c44a04c4fe1e390d337064d4b1721d19659db7dd2ea1",
+  "report_sha256": "51206b332586bbd402323f6794ffbb135e19c18d9a2516e75c2276e3dcdb884a",
+  "safe_exact_allowlist_count": 749,
+  "safe_exact_bytes": 251269992,
+  "local_only_files_not_copied": 1432,
+  "owned5_equal_source_and_two_fixed_copies": true,
+  "final_scenario9_service24_adapter36": [
+    {
+      "run": "final-nine-cases-13",
+      "actual_exit": 0,
+      "source_before_after_equal": true,
+      "log_sha_equal": true,
+      "actual_summary_lines": [
+        "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.04s"
+      ],
+      "record_sha256": "db2e8201a5ad687b2f6674a9d096d059a45c0cc44135b00741fe8c661b8476bc",
+      "executed_binaries": [
+        {
+          "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r06_ar_w10_embedding_identity-a492dffe06646973",
+          "sha256": "e29b002352f36da2155156f2b9c40489708563ff71e568af82df73ea88432c2f"
+        }
+      ]
+    },
+    {
+      "run": "affected-old-service-final-02",
+      "actual_exit": 0,
+      "source_before_after_equal": true,
+      "log_sha_equal": true,
+      "actual_summary_lines": [
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s",
+        "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 60.69s",
+        "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 80.73s"
+      ],
+      "record_sha256": "69df4dec7af460e6231cc0bc111dd8736fe626b4410e8f8da8e8c9d9200fdca5",
+      "executed_binaries": [
+        {
+          "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t06_operations-38d1ae7b39915a9f",
+          "sha256": "d650cdd3d41b69c3809b5b1673a02df92b1c98b303bc556fc208e3391a528bb5"
+        },
+        {
+          "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r06_t07_knowledge-7ae0f9c2623b291a",
+          "sha256": "30405219c9d44abd868a4c17573f737cb9e404a02f0560853da774bda5e29207"
+        },
+        {
+          "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r06_t07_knowledge_tools-98f7b4f145bdffc7",
+          "sha256": "4bb8caeb258e691690b6f4813941013c1ba0caa224f0dd894e28c0fe078dcc3f"
+        }
+      ]
+    },
+    {
+      "run": "affected-old-adapters-final-02",
+      "actual_exit": 0,
+      "source_before_after_equal": true,
+      "log_sha_equal": true,
+      "actual_summary_lines": [
+        "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+        "test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s"
+      ],
+      "record_sha256": "d29629982696d944bd59e7823317864f3eb86b7f2970469dc8c3d17f9941a63f",
+      "executed_binaries": [
+        {
+          "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/knowledge_store_r06t07-60406ec468abc31a",
+          "sha256": "d4c2fb1d64df972d2bdbf633c611580c48e57b59ea6e0c0b06b7c6fc2cbf901a"
+        },
+        {
+          "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t06_operations-7af6297027d2d65e",
+          "sha256": "e01069422e4be36162fb996c30415bdb3abfdcc9fd94515e90e81cb28bd21f4b"
+        }
+      ]
+    }
+  ],
+  "binary_current_readback": [
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r06_ar_w10_embedding_identity-a492dffe06646973",
+      "executor_manifest_sha256": "e29b002352f36da2155156f2b9c40489708563ff71e568af82df73ea88432c2f",
+      "root_current_sha256": "4a357c1f3211ebcac8a22cf0f99c7d50eaee07cdcf8d0296d56868524a84d67e",
+      "current_matches_manifest": false,
+      "boundary": "mutable target current byte identity not proof of historical run; Reviewer must freshly compile its own protected source and bind own executed binaries"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/xtask",
+      "executor_manifest_sha256": "3b09b48f62f1889dc7760757b3e017b9cf9dee1ffb4495508083f13bbd9b4248",
+      "root_current_sha256": "3b09b48f62f1889dc7760757b3e017b9cf9dee1ffb4495508083f13bbd9b4248",
+      "current_matches_manifest": true,
+      "boundary": "mutable target current byte identity not proof of historical run; Reviewer must freshly compile its own protected source and bind own executed binaries"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/lingxi-service",
+      "actual_executed_sha256": "dd46e9b6c0de2c37c33ef003dbb6f6edca9963cc7caedb5fb0a0658c7e66b271",
+      "root_current_sha256": "dd46e9b6c0de2c37c33ef003dbb6f6edca9963cc7caedb5fb0a0658c7e66b271",
+      "current_matches_actual": true
+    }
+  ],
+  "preparation_error_preserved": "First root integrity call asserted mutable current test binary must equal earlier run manifest; actual target testbin differs after later Cargo builds while five source and all749 evidence still equal. No source/evidence rewritten, not a business red. Current discrepancy explicit for independent Reviewer, no inherited binary PASS.",
+  "formal_layers": "Actual R05/R04/R03 overall FAIL, fixed behavior source stable; after-run report/manifest additions are receipts not behavior changes",
+  "C04": "BLOCKED_DEPENDENCY_F09_NOT_CLOSED",
+  "fresh_independent_review": "NOT_RUN_NOT_CREATED_YET",
+  "main_product_copied": false,
+  "user_settings_copied": false,
+  "secret_header_capture": "executor no-secret-header; root no-private-key text found; sensitive original homes NEVER_GIT",
+  "original_archive_target_git_copied": false,
+  "status": "READY_FOR_FIRST_NEW_INDEPENDENT_REVIEW_NOT_ACCEPTED"
+}

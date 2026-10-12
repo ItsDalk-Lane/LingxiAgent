@@ -1,0 +1,51 @@
+{
+  "at": "2026-10-11T14:00:21.912569+00:00",
+  "scope": "Prepared future dispatches only; active W03/W05/W09 execution source/environment not changed",
+  "dispatches": [
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W03_REVIEWER_01.md",
+      "sha256": "608cfcd046ce4c01dc3b31eaaf2f1bc5f49493b23c6b52befa5a4ddb7b15b9cc"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W05_REVIEWER_01.md",
+      "sha256": "b33d0349dd8fd98c417552fb9b8ef1c4d5ac07aa4a81dd21a70bd5f9dabb8338"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W09_REVIEWER_01.md",
+      "sha256": "86884b13fa6f975fca9d859203b9fae1ca0407346789c990e52110e68a6f50fb"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-STAGE_REVIEWER_TEMPLATE.md",
+      "sha256": "c0baaa237039c235f9844e45b8cee2beebf70c8f3767fa1198941087af3beab7"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W04_EXECUTOR_01.md",
+      "sha256": "aeb9cffcf02e30614a4650978bfb87b8d5b11fe1884b14cfe9f12609784f8f3d"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W07_EXECUTOR_01.md",
+      "sha256": "8de49a788315318e53eb635e5dc84fd71da9e2ba87d43a7e733e36da324884b8"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W11_EXECUTOR_01.md",
+      "sha256": "1431e00a7c49e05dd4adac304d8cb768be9440720019c6f61a353fc455043e2c"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W13_EXECUTOR_01.md",
+      "sha256": "286a1fe50d7f41b6faa93e2aca456033e9c627a8e7b1810386121ba3587ac7b4"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W14_EXECUTOR_01.md",
+      "sha256": "4caa052068482398b0e015c7b87d8df46ed12bd29986aa72e87158d916f0629b"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_EXECUTOR_01.md",
+      "sha256": "2ed87ff91ead446352b7556b06ff56b7532a696578248f422a9ad03240de0711"
+    }
+  ],
+  "effective_home_clarification": "LINGXI_HOME synthetic; OS HOME inherited",
+  "future_explicit_build_cache_option": "CARGO_INCREMENTAL=0; runtime features/guards/budgets/locked toolchain preserved",
+  "actual_cache_inventory_correction": "X_OK empty .lock is not actual executable program",
+  "no_new_actor": true,
+  "no_behavior_pass": true
+}

@@ -1,0 +1,47 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.01s
+     Running tests/r06_ar_w10_embedding_identity.rs (rust/target/debug/deps/r06_ar_w10_embedding_identity-a492dffe06646973)
+LINGXI_TEST_GUARD: armed (pid 4611, mem_limit=8192 MB, time_limit=600 s)
+
+running 9 tests
+W10 configured-identity: 原始请求与数据库收据已写入独立证据
+test configured_unknown_dimensions_and_parameter_compatibility_are_explicit ... ok
+
+thread 'legacy_paid_identity_is_preserved_and_requires_explicit_rebuild' (3755617) panicked at crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs:956:6:
+called `Result::unwrap()` on an `Err` value: SqliteFailure(Error { code: ConstraintViolation, extended_code: 787 }, Some("FOREIGN KEY constraint failed"))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test legacy_paid_identity_is_preserved_and_requires_explicit_rebuild ... FAILED
+W10 positive: 原始请求与数据库收据已写入独立证据
+W10 c01: 原始请求与数据库收据已写入独立证据
+test positive_production_ingestion_four_way_identity ... ok
+test c01_resolved_route_is_immutable_across_pre_send_reload ... ok
+W10 c03: 原始请求与数据库收据已写入独立证据
+W10 parameters: 原始请求与数据库收据已写入独立证据
+test c03_query_uses_served_identity_during_reload_and_isolates_dimensions ... ok
+test same_model_endpoint_change_is_incompatible_but_unchanged_reload_is_compatible ... ok
+W10 c02: 原始请求与数据库收据已写入独立证据
+test c02_same_dimension_reload_never_poisons_first_variant ... ok
+W10 c04-before: 原始请求与数据库收据已写入独立证据
+LINGXI_TEST_GUARD: armed (pid 4616, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_DATA_EPOCH_BLOCKED reason=unstamped-home-with-data
+[data-epoch] The data safety gate refused startup (unstamped-home-with-data): unrecognized existing data found: binary-config.json; this data home carries no epoch stamp, and adopting existing data is an explicit cutover action (R08), never an automatic startup decision
+[data-epoch] 数据安全闸拒绝启动（unstamped-home-with-data）：unrecognized existing data found: binary-config.json; this data home carries no epoch stamp, and adopting existing data is an explicit cutover action (R08), never an automatic startup decision
+[data-epoch] 请保留现场文件，使用维护/恢复流程处理；不要删除未知状态后强行启动。
+
+2026-10-11T09:12:06.055236Z ERROR lingxi_service: data-epoch gate refused startup (exit 2) reason="unstamped-home-with-data" home=/Users/[user]/.codex/worktrees/r06-w10-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W10-E01/commands/nine-cases-06/synthetic-home/lingxi-r06-ar-w10-crash-running-4611-1791709924874660000
+
+thread 'crash_running_job_is_explicitly_refused_and_preserves_paid_vectors' (3755616) panicked at crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs:768:17:
+binary exited before READY
+test crash_running_job_is_explicitly_refused_and_preserves_paid_vectors ... FAILED
+W10 c04: 原始请求与数据库收据已写入独立证据
+test c04_failed_build_restarts_under_changed_identity_without_reusing_old_space ... ok
+
+failures:
+
+failures:
+    crash_running_job_is_explicitly_refused_and_preserves_paid_vectors
+    legacy_paid_identity_is_preserved_and_requires_explicit_rebuild
+
+test result: FAILED. 7 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.25s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_w10_embedding_identity`

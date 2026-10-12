@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "serverKind": "lingxi-service",
+  "serverVersion": "0.0.0",
+  "wireProtocolMin": 1,
+  "wireProtocolMax": 1,
+  "dataEpoch": 1,
+  "instanceId": "103502698ff302835c80dfb6455fc839",
+  "startNonce": "130663084f0d9b0e",
+  "pid": 80932,
+  "bindAddr": "127.0.0.1:58687",
+  "transport": "http",
+  "startedAtUnixMs": 1791780715738,
+  "homePath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-repair-20261012/synthetic-home/F09/lingxi-r06-ar-w09-exact-65-80922-1791780715731120000"
+}

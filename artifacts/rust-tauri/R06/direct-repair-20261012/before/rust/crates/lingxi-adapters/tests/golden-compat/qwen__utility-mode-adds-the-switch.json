@@ -1,0 +1,31 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "qwen",
+  "case": "utility-mode-adds-the-switch",
+  "model": {
+    "provider": "custom",
+    "id": "qwen3-32b",
+    "baseUrl": "https://dashscope.aliyuncs.com/v1",
+    "api": "openai-completions",
+    "quirks": [
+      "enable_thinking"
+    ]
+  },
+  "payload": {
+    "model": "qwen3-32b",
+    "messages": []
+  },
+  "options": {
+    "mode": "utility"
+  },
+  "expected": {
+    "thinkingFormat": "qwen",
+    "reasoningProfile": null,
+    "matched": "qwen",
+    "result": {
+      "model": "qwen3-32b",
+      "messages": [],
+      "enable_thinking": false
+    }
+  }
+}

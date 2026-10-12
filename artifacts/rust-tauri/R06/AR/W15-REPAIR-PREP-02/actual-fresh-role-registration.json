@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-12T02:15:05.184288+00:00",
+  "actor": "/root/ar_w15_repair_02",
+  "role": "ACTUALLY_CREATED_FRESH_EMPTY_HISTORY_REPAIR_AFTER_TRANSPORT_INTERRUPTION",
+  "workspace": "/private/tmp/lingxi-r06-w15-repair-02",
+  "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_REPAIR_02.md",
+  "dispatch_sha256": "83879ee88d728cd62703beb850050197e7b23155bf401d671f2dd23e73a4f824",
+  "replaced_interrupted_actor": "/root/ar_w15_repair_01",
+  "role_reuse": false,
+  "original_completed_formal_FAIL_count": 1,
+  "source_transfer": "artifacts/rust-tauri/R06/AR/W15-REPAIR-PREP-02/transport-interruption-exact-partial-recovery.json",
+  "product_acceptance": "NONE",
+  "tests_by_new_actor": "NOT_RUN_AT_REGISTRATION",
+  "stage": "NOT_RUN",
+  "R07_started": false
+}

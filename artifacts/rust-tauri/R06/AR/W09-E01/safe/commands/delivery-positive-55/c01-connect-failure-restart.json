@@ -1,0 +1,87 @@
+{
+  "done": {
+    "artifactId": "kpa_57a30c47da29c6867a9ee0b0",
+    "attempt": 2,
+    "cancelledAt": null,
+    "chunkerConfigId": "8b93f0aa4fa689af",
+    "createdAt": "2026-10-11T13:32:35.458Z",
+    "embeddingStats": {
+      "abandonedStaleVariantId": null,
+      "actualWrittenChunkCount": 1,
+      "attempt": 2,
+      "callAttemptCount": 1,
+      "checkpointVariantId": "viv_24c0f7867d9c4fee1aad9b74eb019f1e",
+      "chunksNewlyEmbedded": 1,
+      "chunksResumedFromCheckpoint": 0,
+      "chunksReusedFromReadyVariant": 0,
+      "confirmedResponseRequestCount": 1,
+      "failedCallCount": 0,
+      "failedRequestCount": 0,
+      "failedTransportAttemptCount": 0,
+      "knownNotSentAttemptCount": 0,
+      "model": {
+        "dimensions": 2,
+        "key": "2b69f97dd98caa8ccb78ecfa66e6f64bfab8d94e1c2d99ab2a366f760ca0737b",
+        "modelId": "model-a",
+        "parameterFingerprint": "4762e437152822df509964144f5b6d46a0ac079e20bd93702efad9d189d2a94b",
+        "protocol": "openai-embeddings",
+        "provider": "embed"
+      },
+      "pendingCallIntentCount": 0,
+      "pendingRequestCount": 0,
+      "plannedChunkCount": 1,
+      "previousKnownNotSentAttemptCount": 1,
+      "previousRequestCount": 0,
+      "previousTransportAttemptCount": 1,
+      "requestCount": 1,
+      "requestCountSemantics": "confirmed_or_possibly_sent_excluding_known_not_sent",
+      "resetStaleVectors": false,
+      "successfulRequestCount": 1,
+      "transportAttemptCount": 1,
+      "unknownRequestsFromPreviousAttempt": 0,
+      "unknownSentRequestCount": 0
+    },
+    "error": null,
+    "id": "kjob_73db0f31f11283b620614317",
+    "notebookId": "knb_960a992450872f6e0efd066a",
+    "phase": "done",
+    "progressDone": 1,
+    "progressTotal": 1,
+    "sourceId": "ksrc_b92c2ad24f86ee247ec1688b",
+    "status": "done",
+    "updatedAt": "2026-10-11T13:32:35.578Z"
+  },
+  "knownNotSentNeverDeductedTwice": true,
+  "ledger": [
+    {
+      "input_tokens": null,
+      "model": "model-a",
+      "model_call_id": "op-embedding-1791725555461-0",
+      "outcome": "failed",
+      "provider": "embed",
+      "transport_attempts": 1,
+      "usage_state": "unknown"
+    },
+    {
+      "input_tokens": 5,
+      "model": "model-a",
+      "model_call_id": "op-embedding-1791725555576-0",
+      "outcome": "succeeded",
+      "provider": "embed",
+      "transport_attempts": 1,
+      "usage_state": "partial"
+    }
+  ],
+  "wire": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "Chapter 0000 W09唯一章节\n\n唯一计划块0000的独立合成资料。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:54608"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+
+running 1 test
+test thread_registry_refusal_leaves_no_permanent_reservations ... FAILED
+
+successes:
+
+successes:
+
+failures:
+
+---- thread_registry_refusal_leaves_no_permanent_reservations stdout ----
+
+thread 'thread_registry_refusal_leaves_no_permanent_reservations' (13521194) panicked at crates/lingxi-service/tests/subagent_closeout.rs:375:14:
+run settles: Storage(Corrupted { detail: "model_history: 可信历史声明代次缺失" })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'thread_registry_refusal_leaves_no_permanent_reservations' (13521194) panicked at crates/lingxi-service/tests/subagent_closeout.rs:375:14:
+run settles: Storage(Corrupted { detail: "model_history: 可信历史声明代次缺失" })
+
+thread 'thread_registry_refusal_leaves_no_permanent_reservations' (13521194) panicked at crates/lingxi-service/tests/subagent_closeout.rs:644:39:
+parent B settles with the refusal: JoinError::Panic(Id(6), "run settles: Storage(Corrupted { detail: \"model_history: 可信历史声明代次缺失\" })", ...)
+
+
+failures:
+    thread_registry_refusal_leaves_no_permanent_reservations
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.14s
+

@@ -1,0 +1,821 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:243:
+ 
+ fn storage_sqlite(error: rusqlite::Error) -> KnowledgeError {
+     let code = match error.sqlite_error_code() {
+-        Some(rusqlite::ErrorCode::DatabaseBusy | rusqlite::ErrorCode::DatabaseLocked) =>
+-            "KNOWLEDGE_STORAGE_BUSY",
+-        Some(rusqlite::ErrorCode::PermissionDenied | rusqlite::ErrorCode::ReadOnly) =>
+-            "KNOWLEDGE_STORAGE_PERMISSION",
+-        Some(rusqlite::ErrorCode::SystemIoFailure | rusqlite::ErrorCode::DiskFull | rusqlite::ErrorCode::CannotOpen) =>
+-            "KNOWLEDGE_STORAGE_IO",
+-        Some(rusqlite::ErrorCode::DatabaseCorrupt | rusqlite::ErrorCode::NotADatabase) =>
+-            "KNOWLEDGE_STORAGE_CORRUPT",
++        Some(rusqlite::ErrorCode::DatabaseBusy | rusqlite::ErrorCode::DatabaseLocked) => {
++            "KNOWLEDGE_STORAGE_BUSY"
++        }
++        Some(rusqlite::ErrorCode::PermissionDenied | rusqlite::ErrorCode::ReadOnly) => {
++            "KNOWLEDGE_STORAGE_PERMISSION"
++        }
++        Some(
++            rusqlite::ErrorCode::SystemIoFailure
++            | rusqlite::ErrorCode::DiskFull
++            | rusqlite::ErrorCode::CannotOpen,
++        ) => "KNOWLEDGE_STORAGE_IO",
++        Some(rusqlite::ErrorCode::DatabaseCorrupt | rusqlite::ErrorCode::NotADatabase) => {
++            "KNOWLEDGE_STORAGE_CORRUPT"
++        }
+         _ => "KNOWLEDGE_STORAGE_INVALID",
+     };
+     KnowledgeError::new(code, format!("knowledge SQLite: {error}"))
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:260:
+     let conn = Connection::open(path).map_err(storage_sqlite)?;
+     // 先只读版本；旧程序不能先改 journal_mode 再拒绝未来版本。
+     check_user_version(&conn, supported)?;
+-    conn.pragma_update(None, "journal_mode", "WAL").map_err(storage_sqlite)?;
+-    conn.pragma_update(None, "synchronous", "NORMAL").map_err(storage_sqlite)?;
++    conn.pragma_update(None, "journal_mode", "WAL")
++        .map_err(storage_sqlite)?;
++    conn.pragma_update(None, "synchronous", "NORMAL")
++        .map_err(storage_sqlite)?;
+     Ok(conn)
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:268:
+ fn check_user_version(conn: &Connection, supported: i64) -> Result<(), KnowledgeError> {
+-    let current: i64 = conn.query_row("PRAGMA user_version", [], |row| row.get(0))
++    let current: i64 = conn
++        .query_row("PRAGMA user_version", [], |row| row.get(0))
+         .map_err(storage_sqlite)?;
+     if current > supported {
+-        return Err(KnowledgeError::new("KNOWLEDGE_SCHEMA_NEWER",
+-            format!("knowledge schema version {current} is newer than supported {supported}")));
++        return Err(KnowledgeError::new(
++            "KNOWLEDGE_SCHEMA_NEWER",
++            format!("knowledge schema version {current} is newer than supported {supported}"),
++        ));
+     }
+     Ok(())
+ }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:286:
+     match std::fs::symlink_metadata(path) {
+         Ok(meta) => {
+             if !meta.is_file() {
+-                return Err(KnowledgeError::new("KNOWLEDGE_STORAGE_UNSAFE", "knowledge cache must be a regular file"));
++                return Err(KnowledgeError::new(
++                    "KNOWLEDGE_STORAGE_UNSAFE",
++                    "knowledge cache must be a regular file",
++                ));
+             }
+             #[cfg(unix)]
+             {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:293:
+                 use std::os::unix::fs::MetadataExt;
+                 if meta.nlink() != 1 {
+-                    return Err(KnowledgeError::new("KNOWLEDGE_STORAGE_UNSAFE", "knowledge cache has multiple hard links"));
++                    return Err(KnowledgeError::new(
++                        "KNOWLEDGE_STORAGE_UNSAFE",
++                        "knowledge cache has multiple hard links",
++                    ));
+                 }
+             }
+             Ok(Some(meta))
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:303:
+ }
+ 
+ fn cache_identity(path: &Path) -> Result<String, KnowledgeError> {
+-    let meta = regular_file(path)?.ok_or_else(|| KnowledgeError::storage_invalid("cache disappeared"))?;
++    let meta =
++        regular_file(path)?.ok_or_else(|| KnowledgeError::storage_invalid("cache disappeared"))?;
+     #[cfg(unix)]
+     {
+         use std::os::unix::fs::MetadataExt;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:317:
+ }
+ 
+ fn ownership_record(path: &Path) -> Result<String, KnowledgeError> {
+-    Ok(format!("lingxi-cache-v1\n{}\n{}\n", path.file_name().unwrap().to_string_lossy(), cache_identity(path)?))
++    Ok(format!(
++        "lingxi-cache-v1\n{}\n{}\n",
++        path.file_name().unwrap().to_string_lossy(),
++        cache_identity(path)?
++    ))
+ }
+ 
+ fn record_cache_owner(path: &Path) -> Result<(), KnowledgeError> {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:324:
+     let marker = sidecar(path, ".owner");
+     regular_file(&marker)?;
+     let temporary = sidecar(path, &format!(".owner-{}", new_id("tmp")));
+-    let mut file = OpenOptions::new().write(true).create_new(true).open(&temporary).map_err(storage_io)?;
+-    file.write_all(ownership_record(path)?.as_bytes()).map_err(storage_io)?;
++    let mut file = OpenOptions::new()
++        .write(true)
++        .create_new(true)
++        .open(&temporary)
++        .map_err(storage_io)?;
++    file.write_all(ownership_record(path)?.as_bytes())
++        .map_err(storage_io)?;
+     file.sync_all().map_err(storage_io)?;
+     std::fs::rename(&temporary, marker).map_err(storage_io)
+ }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:332:
+ 
+-fn try_cache_connection(path: &Path, supported: i64, schema: &str) -> Result<Connection, KnowledgeError> {
++fn try_cache_connection(
++    path: &Path,
++    supported: i64,
++    schema: &str,
++) -> Result<Connection, KnowledgeError> {
+     let conn = open_connection(path, supported)?;
+     conn.execute_batch(schema).map_err(storage_sqlite)?;
+-    conn.pragma_update(None, "user_version", supported).map_err(storage_sqlite)?;
++    conn.pragma_update(None, "user_version", supported)
++        .map_err(storage_sqlite)?;
+     Ok(conn)
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:340:
+ /// 正常打开持有共享恢复锁；损坏隔离必须独占，且不能有任何 WAL/journal。
+ /// 无法确认归属/静止点时保留原件并拒绝，绝不尝试删除 sidecar。
+-fn open_cache(path: &Path, supported: i64, schema: &str) -> Result<(Connection, File), KnowledgeError> {
++fn open_cache(
++    path: &Path,
++    supported: i64,
++    schema: &str,
++) -> Result<(Connection, File), KnowledgeError> {
+     regular_file(path)?;
+     let guard_path = sidecar(path, ".guard");
+     regular_file(&guard_path)?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:346:
+-    let guard = OpenOptions::new().read(true).write(true).create(true).truncate(false)
+-        .open(&guard_path).map_err(storage_io)?;
+-    guard.try_lock_shared().map_err(|e| KnowledgeError::new("KNOWLEDGE_STORAGE_BUSY", format!("cache recovery lock: {e}")))?;
++    let guard = OpenOptions::new()
++        .read(true)
++        .write(true)
++        .create(true)
++        .truncate(false)
++        .open(&guard_path)
++        .map_err(storage_io)?;
++    guard.try_lock_shared().map_err(|e| {
++        KnowledgeError::new(
++            "KNOWLEDGE_STORAGE_BUSY",
++            format!("cache recovery lock: {e}"),
++        )
++    })?;
+     let first = match try_cache_connection(path, supported, schema) {
+         Ok(conn) => {
+             record_cache_owner(path)?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:357:
+         return Err(first);
+     }
+     guard.unlock().map_err(storage_io)?;
+-    guard.try_lock().map_err(|e| KnowledgeError::new("KNOWLEDGE_STORAGE_BUSY", format!("cache recovery requires exclusive ownership: {e}")))?;
++    guard.try_lock().map_err(|e| {
++        KnowledgeError::new(
++            "KNOWLEDGE_STORAGE_BUSY",
++            format!("cache recovery requires exclusive ownership: {e}"),
++        )
++    })?;
+     // 锁升级后重新验证：另一个打开者可能已恢复，或版本已改变。
+     match try_cache_connection(path, supported, schema) {
+         Ok(conn) => {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:364:
+             record_cache_owner(path)?;
+             return Ok((conn, guard));
+         }
+-        Err(error) if error.code == "KNOWLEDGE_STORAGE_CORRUPT" => {},
++        Err(error) if error.code == "KNOWLEDGE_STORAGE_CORRUPT" => {}
+         Err(error) => return Err(error),
+     }
+     for suffix in ["-wal", "-shm", "-journal"] {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:374:
+     }
+     let marker = sidecar(path, ".owner");
+     if regular_file(&marker)?.is_none() {
+-        return Err(KnowledgeError::new("KNOWLEDGE_STORAGE_CORRUPT", "cache ownership unknown; original preserved"));
++        return Err(KnowledgeError::new(
++            "KNOWLEDGE_STORAGE_CORRUPT",
++            "cache ownership unknown; original preserved",
++        ));
+     }
+     let expected_owner = ownership_record(path)?;
+     if std::fs::read_to_string(&marker).map_err(storage_io)? != expected_owner {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:381:
+-        return Err(KnowledgeError::new("KNOWLEDGE_STORAGE_CORRUPT", "cache ownership changed; original preserved"));
++        return Err(KnowledgeError::new(
++            "KNOWLEDGE_STORAGE_CORRUPT",
++            "cache ownership changed; original preserved",
++        ));
+     }
+     // 无 sidecar 的只读检查避免把迁移 SQL 或权限错误当作可重建损坏。
+     let probe = Connection::open_with_flags(path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:387:
+         Ok(result) => result != "ok",
+         Err(error) => storage_sqlite(error).code == "KNOWLEDGE_STORAGE_CORRUPT",
+     };
+-    if !confirmed { return Err(first); }
++    if !confirmed {
++        return Err(first);
++    }
+     if ownership_record(path)? != expected_owner {
+-        return Err(KnowledgeError::new("KNOWLEDGE_STORAGE_UNSAFE", "cache identity changed before quarantine"));
++        return Err(KnowledgeError::new(
++            "KNOWLEDGE_STORAGE_UNSAFE",
++            "cache identity changed before quarantine",
++        ));
+     }
+     let quarantine = sidecar(path, &format!(".quarantine-{}", new_id("cache")));
+     std::fs::create_dir(&quarantine).map_err(storage_io)?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:2015:
+     /// 打开缓存；未来版本/权限/锁/I/O保留原件，只有确证损坏才隔离恢复。
+     pub fn open(root: &Path) -> Result<Self, KnowledgeError> {
+         std::fs::create_dir_all(root).map_err(storage_io)?;
+-        let (conn, guard) = open_cache(&root.join("knowledge_index.db"), INDEX_SCHEMA_VERSION, INDEX_SCHEMA_SQL)?;
+-        Ok(Self { conn: Mutex::new(conn), _recovery_guard: guard })
++        let (conn, guard) = open_cache(
++            &root.join("knowledge_index.db"),
++            INDEX_SCHEMA_VERSION,
++            INDEX_SCHEMA_SQL,
++        )?;
++        Ok(Self {
++            conn: Mutex::new(conn),
++            _recovery_guard: guard,
++        })
+     }
+ 
+     pub fn ensure_chunk_index_variant(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:2355:
+         let mut conn = lock_conn(&self.conn);
+         let tx = conn.transaction().map_err(storage_sqlite)?;
+         tx.execute("DELETE FROM knowledge_chunks WHERE variant_id IN (SELECT id FROM chunk_index_variants WHERE parse_artifact_id=?1)", params![artifact]).map_err(storage_sqlite)?;
+-        tx.execute("DELETE FROM chunk_index_variants WHERE parse_artifact_id=?1", params![artifact]).map_err(storage_sqlite)?;
+-        tx.execute("DELETE FROM knowledge_sections WHERE parse_artifact_id=?1", params![artifact]).map_err(storage_sqlite)?;
++        tx.execute(
++            "DELETE FROM chunk_index_variants WHERE parse_artifact_id=?1",
++            params![artifact],
++        )
++        .map_err(storage_sqlite)?;
++        tx.execute(
++            "DELETE FROM knowledge_sections WHERE parse_artifact_id=?1",
++            params![artifact],
++        )
++        .map_err(storage_sqlite)?;
+         tx.commit().map_err(storage_sqlite)
+     }
+-
+ }
+ 
+ const INDEX_SCHEMA_SQL: &str = r#"
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:2470:
+ impl KnowledgeVectorStore {
+     pub fn open(root: &Path) -> Result<Self, KnowledgeError> {
+         std::fs::create_dir_all(root).map_err(storage_io)?;
+-        let (conn, guard) = open_cache(&root.join("knowledge_vector.db"), VECTOR_SCHEMA_VERSION, VECTOR_SCHEMA_SQL)?;
+-        Ok(Self { conn: Mutex::new(conn), _recovery_guard: guard })
++        let (conn, guard) = open_cache(
++            &root.join("knowledge_vector.db"),
++            VECTOR_SCHEMA_VERSION,
++            VECTOR_SCHEMA_SQL,
++        )?;
++        Ok(Self {
++            conn: Mutex::new(conn),
++            _recovery_guard: guard,
++        })
+     }
+ 
+     /// begin：既有行指纹或维度漂移 → 显式清旧向量重建（resetStaleVectors 留痕）；
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/session_tree.rs:1307:
+     operation: impl FnOnce(Vec<String>) -> Result<T, StorageError> + Send + 'static,
+ ) -> Result<T, StorageError> {
+     let session = session_id.to_owned();
+-    db.queue().submit(move |conn| {
+-        let folders: String = conn.query_row(
+-            "SELECT authorized_folders_json FROM sessions WHERE session_id=?1",
+-            [&session], |r| r.get(0),
+-        ).map_err(map_err)?;
+-        let roots: Vec<String> = serde_json::from_str(&folders).map_err(|e| StorageError::InvalidRequest {detail:format!("invalid current file authorization: {e}")})?;
+-        operation(roots)
+-    }).await
++    db.queue()
++        .submit(move |conn| {
++            let folders: String = conn
++                .query_row(
++                    "SELECT authorized_folders_json FROM sessions WHERE session_id=?1",
++                    [&session],
++                    |r| r.get(0),
++                )
++                .map_err(map_err)?;
++            let roots: Vec<String> =
++                serde_json::from_str(&folders).map_err(|e| StorageError::InvalidRequest {
++                    detail: format!("invalid current file authorization: {e}"),
++                })?;
++            operation(roots)
++        })
++        .await
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:5:
+ 
+ fn fixture(tag: &str) -> PathBuf {
+     let home = PathBuf::from(std::env::var_os("LINGXI_HOME").expect("独立 LINGXI_HOME"));
+-    let root = home.join(format!("{tag}-{}-{}", std::process::id(),
+-        std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
++    let root = home.join(format!(
++        "{tag}-{}-{}",
++        std::process::id(),
++        std::time::SystemTime::now()
++            .duration_since(std::time::UNIX_EPOCH)
++            .unwrap()
++            .as_nanos()
++    ));
+     std::fs::create_dir_all(&root).unwrap();
+     eprintln!("synthetic knowledge root={}", root.display());
+     root
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:17:
+     let root = fixture("positive");
+     drop(KnowledgeIndexStore::open(&root).expect("正常索引"));
+     drop(KnowledgeVectorStore::open(&root).expect("正常向量"));
+-    assert!(KnowledgeIndexStore::open(&root).unwrap().list_ready_variant_metadata("absent").unwrap().is_empty());
+-    assert!(KnowledgeVectorStore::open(&root).unwrap().list_variants_by_artifact("absent").unwrap().is_empty());
++    assert!(KnowledgeIndexStore::open(&root)
++        .unwrap()
++        .list_ready_variant_metadata("absent")
++        .unwrap()
++        .is_empty());
++    assert!(KnowledgeVectorStore::open(&root)
++        .unwrap()
++        .list_variants_by_artifact("absent")
++        .unwrap()
++        .is_empty());
+ }
+ 
+ #[test]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:30:
+         conn.execute_batch("CREATE TABLE sentinel(value TEXT); INSERT INTO sentinel VALUES('unique-paid-vector-or-index'); PRAGMA user_version=999;").unwrap();
+         drop(conn);
+         let before = std::fs::read(&path).unwrap();
+-        let result = if name == "knowledge_index.db" { KnowledgeIndexStore::open(&root).map(|_| ()) } else { KnowledgeVectorStore::open(&root).map(|_| ()) };
++        let result = if name == "knowledge_index.db" {
++            KnowledgeIndexStore::open(&root).map(|_| ())
++        } else {
++            KnowledgeVectorStore::open(&root).map(|_| ())
++        };
+         let error = result.expect_err("未来版本不能伪装损坏后重建");
+         assert_eq!(error.code, "KNOWLEDGE_SCHEMA_NEWER");
+         assert_eq!(std::fs::read(&path).unwrap(), before);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:37:
+         let conn = Connection::open(&path).unwrap();
+-        assert_eq!(conn.query_row("SELECT value FROM sentinel", [], |r| r.get::<_, String>(0)).unwrap(), "unique-paid-vector-or-index");
+-        assert_eq!(conn.query_row("PRAGMA user_version", [], |r| r.get::<_, i64>(0)).unwrap(),999);
++        assert_eq!(
++            conn.query_row("SELECT value FROM sentinel", [], |r| r.get::<_, String>(0))
++                .unwrap(),
++            "unique-paid-vector-or-index"
++        );
++        assert_eq!(
++            conn.query_row("PRAGMA user_version", [], |r| r.get::<_, i64>(0))
++                .unwrap(),
++            999
++        );
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:43:
+-fn open_cache(root: &std::path::Path, name: &str) -> Result<(), lingxi_kernel::knowledge::KnowledgeError> {
+-    if name == "knowledge_index.db" { KnowledgeIndexStore::open(root).map(|_| ()) }
+-    else { KnowledgeVectorStore::open(root).map(|_| ()) }
++fn open_cache(
++    root: &std::path::Path,
++    name: &str,
++) -> Result<(), lingxi_kernel::knowledge::KnowledgeError> {
++    if name == "knowledge_index.db" {
++        KnowledgeIndexStore::open(root).map(|_| ())
++    } else {
++        KnowledgeVectorStore::open(root).map(|_| ())
++    }
+ }
+ 
+ fn snapshot(path: &std::path::Path) -> Vec<(String, Vec<u8>)> {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:49:
+-    ["", "-wal", "-shm"].into_iter().filter_map(|suffix| {
+-        let p = PathBuf::from(format!("{}{suffix}", path.display()));
+-        std::fs::read(p).ok().map(|b| (suffix.to_owned(), b))
+-    }).collect()
++    ["", "-wal", "-shm"]
++        .into_iter()
++        .filter_map(|suffix| {
++            let p = PathBuf::from(format!("{}{suffix}", path.display()));
++            std::fs::read(p).ok().map(|b| (suffix.to_owned(), b))
++        })
++        .collect()
+ }
+ 
+ #[test]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:61:
+         let writer = Connection::open(&path).unwrap();
+         writer.execute_batch("PRAGMA journal_mode=WAL; PRAGMA wal_autocheckpoint=0; CREATE TABLE sentinel(value TEXT); INSERT INTO sentinel VALUES('paid-vector'); PRAGMA user_version=999; BEGIN IMMEDIATE; INSERT INTO sentinel VALUES('active-uncommitted');").unwrap();
+         let before = snapshot(&path);
+-        assert_eq!(before.len(),3,"夹具必须真的有WAL和SHM");
++        assert_eq!(before.len(), 3, "夹具必须真的有WAL和SHM");
+         let error = open_cache(&root, name).expect_err("未来版本必须拒绝");
+-        assert_eq!(error.code,"KNOWLEDGE_SCHEMA_NEWER");
+-        assert_eq!(snapshot(&path),before,"主库及必要WAL/SHM不改变");
++        assert_eq!(error.code, "KNOWLEDGE_SCHEMA_NEWER");
++        assert_eq!(snapshot(&path), before, "主库及必要WAL/SHM不改变");
+         writer.execute_batch("COMMIT;").unwrap();
+-        assert_eq!(writer.query_row("SELECT count(*) FROM sentinel",[],|r|r.get::<_,i64>(0)).unwrap(),2);
++        assert_eq!(
++            writer
++                .query_row("SELECT count(*) FROM sentinel", [], |r| r.get::<_, i64>(0))
++                .unwrap(),
++            2
++        );
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:79:
+         let writer = Connection::open(&path).unwrap();
+         writer.execute_batch("PRAGMA journal_mode=DELETE; CREATE TABLE sentinel(value TEXT); INSERT INTO sentinel VALUES('lock-evidence'); BEGIN EXCLUSIVE;").unwrap();
+         let before = snapshot(&path);
+-        let error = open_cache(&root,name).expect_err("锁冲突不得伪成功");
+-        assert_eq!(error.code,"KNOWLEDGE_STORAGE_BUSY","{error}");
+-        assert_eq!(snapshot(&path),before);
++        let error = open_cache(&root, name).expect_err("锁冲突不得伪成功");
++        assert_eq!(error.code, "KNOWLEDGE_STORAGE_BUSY", "{error}");
++        assert_eq!(snapshot(&path), before);
+         writer.execute_batch("COMMIT;").unwrap();
+         drop(writer);
+-        open_cache(&root,name).unwrap();
+-        let conn=Connection::open(&path).unwrap();
+-        assert_eq!(conn.query_row("SELECT value FROM sentinel",[],|r|r.get::<_,String>(0)).unwrap(),"lock-evidence");
++        open_cache(&root, name).unwrap();
++        let conn = Connection::open(&path).unwrap();
++        assert_eq!(
++            conn.query_row("SELECT value FROM sentinel", [], |r| r.get::<_, String>(0))
++                .unwrap(),
++            "lock-evidence"
++        );
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:95:
+ fn c02_permission_errors_preserve_cache() {
+     use std::os::unix::fs::PermissionsExt;
+     for name in ["knowledge_index.db", "knowledge_vector.db"] {
+-        let root=fixture("permission");
+-        open_cache(&root,name).unwrap();
+-        let path=root.join(name);
+-        let before=snapshot(&path);
+-        std::fs::set_permissions(&root,std::fs::Permissions::from_mode(0o555)).unwrap();
+-        std::fs::set_permissions(&path,std::fs::Permissions::from_mode(0o444)).unwrap();
+-        let result=open_cache(&root,name);
+-        std::fs::set_permissions(&root,std::fs::Permissions::from_mode(0o755)).unwrap();
+-        std::fs::set_permissions(&path,std::fs::Permissions::from_mode(0o644)).unwrap();
+-        let error=result.expect_err("真实权限错误");
+-        assert_eq!(error.code,"KNOWLEDGE_STORAGE_PERMISSION","{error}");
+-        assert_eq!(snapshot(&path),before);
+-        open_cache(&root,name).unwrap();
++        let root = fixture("permission");
++        open_cache(&root, name).unwrap();
++        let path = root.join(name);
++        let before = snapshot(&path);
++        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o555)).unwrap();
++        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o444)).unwrap();
++        let result = open_cache(&root, name);
++        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o755)).unwrap();
++        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o644)).unwrap();
++        let error = result.expect_err("真实权限错误");
++        assert_eq!(error.code, "KNOWLEDGE_STORAGE_PERMISSION", "{error}");
++        assert_eq!(snapshot(&path), before);
++        open_cache(&root, name).unwrap();
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:114:
+ #[cfg(unix)]
+ #[test]
+ fn c02_io_child() {
+-    let Some(root)=std::env::var_os("F12_IO_ROOT") else { return; };
+-    let name=std::env::var("F12_IO_CACHE").unwrap();
++    let Some(root) = std::env::var_os("F12_IO_ROOT") else {
++        return;
++    };
++    let name = std::env::var("F12_IO_CACHE").unwrap();
+     // 限额只作用于此合成子进程，避免影响并行验收者。
+     unsafe {
+-        libc::signal(libc::SIGXFSZ,libc::SIG_IGN);
+-        let limit=libc::rlimit{rlim_cur:0,rlim_max:0};
+-        assert_eq!(libc::setrlimit(libc::RLIMIT_FSIZE,&limit),0);
++        libc::signal(libc::SIGXFSZ, libc::SIG_IGN);
++        let limit = libc::rlimit {
++            rlim_cur: 0,
++            rlim_max: 0,
++        };
++        assert_eq!(libc::setrlimit(libc::RLIMIT_FSIZE, &limit), 0);
+     }
+-    let error=open_cache(std::path::Path::new(&root),&name).expect_err("实际文件写限额应失败");
+-    assert_eq!(error.code,"KNOWLEDGE_STORAGE_IO","{error}");
++    let error = open_cache(std::path::Path::new(&root), &name).expect_err("实际文件写限额应失败");
++    assert_eq!(error.code, "KNOWLEDGE_STORAGE_IO", "{error}");
+ }
+ 
+ #[cfg(unix)]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:130:
+ #[test]
+ fn c02_actual_io_limit_preserves_original() {
+     for name in ["knowledge_index.db", "knowledge_vector.db"] {
+-        let root=fixture("io-limit");
+-        open_cache(&root,name).unwrap();
+-        let path=root.join(name);
+-        let conn=Connection::open(&path).unwrap();
++        let root = fixture("io-limit");
++        open_cache(&root, name).unwrap();
++        let path = root.join(name);
++        let conn = Connection::open(&path).unwrap();
+         conn.execute_batch("PRAGMA journal_mode=DELETE; CREATE TABLE sentinel(value TEXT); INSERT INTO sentinel VALUES('io-evidence');").unwrap();
+         drop(conn);
+-        let before=std::fs::read(&path).unwrap();
+-        let output=std::process::Command::new(std::env::current_exe().unwrap())
+-            .args(["--exact","c02_io_child","--nocapture"])
+-            .env("F12_IO_ROOT",&root).env("F12_IO_CACHE",name).output().unwrap();
+-        eprintln!("I/O child status={} stdout={} stderr={}",output.status,String::from_utf8_lossy(&output.stdout),String::from_utf8_lossy(&output.stderr));
++        let before = std::fs::read(&path).unwrap();
++        let output = std::process::Command::new(std::env::current_exe().unwrap())
++            .args(["--exact", "c02_io_child", "--nocapture"])
++            .env("F12_IO_ROOT", &root)
++            .env("F12_IO_CACHE", name)
++            .output()
++            .unwrap();
++        eprintln!(
++            "I/O child status={} stdout={} stderr={}",
++            output.status,
++            String::from_utf8_lossy(&output.stdout),
++            String::from_utf8_lossy(&output.stderr)
++        );
+         assert!(output.status.success());
+-        assert_eq!(std::fs::read(&path).unwrap(),before);
+-        open_cache(&root,name).unwrap();
++        assert_eq!(std::fs::read(&path).unwrap(), before);
++        open_cache(&root, name).unwrap();
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:150:
+ fn quarantine_originals(root: &std::path::Path) -> Vec<PathBuf> {
+-    std::fs::read_dir(root).unwrap().filter_map(|entry| {
+-        let path=entry.unwrap().path();
+-        path.file_name().unwrap().to_string_lossy().contains(".quarantine-").then(||path.join("original.db"))
+-    }).collect()
++    std::fs::read_dir(root)
++        .unwrap()
++        .filter_map(|entry| {
++            let path = entry.unwrap().path();
++            path.file_name()
++                .unwrap()
++                .to_string_lossy()
++                .contains(".quarantine-")
++                .then(|| path.join("original.db"))
++        })
++        .collect()
+ }
+ 
+ #[test]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:158:
+ fn c03_owned_corruption_quarantines_only_one_cache_and_preserves_sources_and_vectors() {
+     use lingxi_adapters::storage::knowledge::KnowledgeFactStore;
+     for name in ["knowledge_index.db", "knowledge_vector.db"] {
+-        let root=fixture("quarantine");
+-        let facts=KnowledgeFactStore::open(&root).unwrap();
+-        let (_,source_snapshot)=facts.create_source_with_snapshot("studio","pasted_text","原文",&serde_json::json!({}),b"immutable source evidence","text/plain").unwrap();
++        let root = fixture("quarantine");
++        let facts = KnowledgeFactStore::open(&root).unwrap();
++        let (_, source_snapshot) = facts
++            .create_source_with_snapshot(
++                "studio",
++                "pasted_text",
++                "原文",
++                &serde_json::json!({}),
++                b"immutable source evidence",
++                "text/plain",
++            )
++            .unwrap();
+         drop(facts);
+-        open_cache(&root,"knowledge_index.db").unwrap();
+-        let vectors=KnowledgeVectorStore::open(&root).unwrap();
+-        let build=vectors.begin_variant_build("civ-unique","artifact-unique","paid-model","fingerprint",2).unwrap();
+-        vectors.upsert_batch(&build.variant_id,&[lingxi_adapters::storage::knowledge::VectorEntry{chunk_id:"chunk".into(),ordinal:0,vector:vec![0.2,0.8]}]).unwrap();
+-        vectors.complete_build(&build.variant_id,1).unwrap();
++        open_cache(&root, "knowledge_index.db").unwrap();
++        let vectors = KnowledgeVectorStore::open(&root).unwrap();
++        let build = vectors
++            .begin_variant_build(
++                "civ-unique",
++                "artifact-unique",
++                "paid-model",
++                "fingerprint",
++                2,
++            )
++            .unwrap();
++        vectors
++            .upsert_batch(
++                &build.variant_id,
++                &[lingxi_adapters::storage::knowledge::VectorEntry {
++                    chunk_id: "chunk".into(),
++                    ordinal: 0,
++                    vector: vec![0.2, 0.8],
++                }],
++            )
++            .unwrap();
++        vectors.complete_build(&build.variant_id, 1).unwrap();
+         drop(vectors);
+-        let facts_before=std::fs::read(root.join("knowledge.db")).unwrap();
+-        let source_before=std::fs::read(root.join(&source_snapshot.storage_path)).unwrap();
+-        let other=if name=="knowledge_index.db" {"knowledge_vector.db"} else {"knowledge_index.db"};
+-        let other_before=std::fs::read(root.join(other)).unwrap();
+-        let corrupt=b"not a sqlite file, retained for diagnostics";
+-        std::fs::write(root.join(name),corrupt).unwrap();
+-        open_cache(&root,name).expect("确证自有静止损坏可恢复");
+-        let backups=quarantine_originals(&root);
+-        assert_eq!(backups.len(),1);
+-        assert_eq!(std::fs::read(&backups[0]).unwrap(),corrupt);
+-        assert_eq!(std::fs::read(root.join("knowledge.db")).unwrap(),facts_before);
+-        assert_eq!(std::fs::read(root.join(&source_snapshot.storage_path)).unwrap(),source_before);
+-        assert_eq!(std::fs::read(root.join(other)).unwrap(),other_before);
+-        open_cache(&root,name).expect("重启后正常");
+-        assert_eq!(quarantine_originals(&root).len(),1,"不能再次隔离正常新库");
++        let facts_before = std::fs::read(root.join("knowledge.db")).unwrap();
++        let source_before = std::fs::read(root.join(&source_snapshot.storage_path)).unwrap();
++        let other = if name == "knowledge_index.db" {
++            "knowledge_vector.db"
++        } else {
++            "knowledge_index.db"
++        };
++        let other_before = std::fs::read(root.join(other)).unwrap();
++        let corrupt = b"not a sqlite file, retained for diagnostics";
++        std::fs::write(root.join(name), corrupt).unwrap();
++        open_cache(&root, name).expect("确证自有静止损坏可恢复");
++        let backups = quarantine_originals(&root);
++        assert_eq!(backups.len(), 1);
++        assert_eq!(std::fs::read(&backups[0]).unwrap(), corrupt);
++        assert_eq!(
++            std::fs::read(root.join("knowledge.db")).unwrap(),
++            facts_before
++        );
++        assert_eq!(
++            std::fs::read(root.join(&source_snapshot.storage_path)).unwrap(),
++            source_before
++        );
++        assert_eq!(std::fs::read(root.join(other)).unwrap(), other_before);
++        open_cache(&root, name).expect("重启后正常");
++        assert_eq!(quarantine_originals(&root).len(), 1, "不能再次隔离正常新库");
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:189:
+ #[test]
+ fn c03_unknown_corruption_and_wal_never_auto_rebuild() {
+     for name in ["knowledge_index.db", "knowledge_vector.db"] {
+-        let root=fixture("unowned");
+-        let path=root.join(name);
+-        std::fs::write(&path,b"unknown object").unwrap();
+-        assert_eq!(open_cache(&root,name).unwrap_err().code,"KNOWLEDGE_STORAGE_CORRUPT");
+-        assert_eq!(std::fs::read(&path).unwrap(),b"unknown object");
++        let root = fixture("unowned");
++        let path = root.join(name);
++        std::fs::write(&path, b"unknown object").unwrap();
++        assert_eq!(
++            open_cache(&root, name).unwrap_err().code,
++            "KNOWLEDGE_STORAGE_CORRUPT"
++        );
++        assert_eq!(std::fs::read(&path).unwrap(), b"unknown object");
+         assert!(quarantine_originals(&root).is_empty());
+-        let owned=fixture("wal-corrupt");
+-        open_cache(&owned,name).unwrap();
+-        let path=owned.join(name);
+-        std::fs::write(&path,b"confirmed old cache corruption").unwrap();
+-        std::fs::write(PathBuf::from(format!("{}-wal",path.display())),b"valuable WAL must not be discarded").unwrap();
+-        let before=snapshot(&path);
+-        assert_eq!(open_cache(&owned,name).unwrap_err().code,"KNOWLEDGE_STORAGE_BUSY");
+-        assert_eq!(snapshot(&path),before);
++        let owned = fixture("wal-corrupt");
++        open_cache(&owned, name).unwrap();
++        let path = owned.join(name);
++        std::fs::write(&path, b"confirmed old cache corruption").unwrap();
++        std::fs::write(
++            PathBuf::from(format!("{}-wal", path.display())),
++            b"valuable WAL must not be discarded",
++        )
++        .unwrap();
++        let before = snapshot(&path);
++        assert_eq!(
++            open_cache(&owned, name).unwrap_err().code,
++            "KNOWLEDGE_STORAGE_BUSY"
++        );
++        assert_eq!(snapshot(&path), before);
+         assert!(quarantine_originals(&owned).is_empty());
+     }
+ }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:210:
+ #[test]
+ fn c04_active_production_store_blocks_corruption_quarantine() {
+     for name in ["knowledge_index.db", "knowledge_vector.db"] {
+-        let root=fixture("active");
+-        let index=(name=="knowledge_index.db").then(||KnowledgeIndexStore::open(&root).unwrap());
+-        let vector=(name=="knowledge_vector.db").then(||KnowledgeVectorStore::open(&root).unwrap());
+-        let path=root.join(name);
+-        std::fs::write(&path,b"external-corruption-while-active").unwrap();
+-        let before=snapshot(&path);
+-        let error=open_cache(&root,name).unwrap_err();
+-        assert_eq!(error.code,"KNOWLEDGE_STORAGE_BUSY");
+-        assert_eq!(snapshot(&path),before);
++        let root = fixture("active");
++        let index =
++            (name == "knowledge_index.db").then(|| KnowledgeIndexStore::open(&root).unwrap());
++        let vector =
++            (name == "knowledge_vector.db").then(|| KnowledgeVectorStore::open(&root).unwrap());
++        let path = root.join(name);
++        std::fs::write(&path, b"external-corruption-while-active").unwrap();
++        let before = snapshot(&path);
++        let error = open_cache(&root, name).unwrap_err();
++        assert_eq!(error.code, "KNOWLEDGE_STORAGE_BUSY");
++        assert_eq!(snapshot(&path), before);
+         assert!(quarantine_originals(&root).is_empty());
+-        drop(index);drop(vector);
++        drop(index);
++        drop(vector);
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:229:
+ fn adversarial_symlink_and_hardlink_never_touch_external_target() {
+     use std::os::unix::fs::symlink;
+     for name in ["knowledge_index.db", "knowledge_vector.db"] {
+-        for link_kind in ["symlink","hardlink"] {
+-            let root=fixture(link_kind);
+-            let outside=fixture("sentinel").join("outside.db");
+-            std::fs::write(&outside,b"external-sentinel").unwrap();
+-            if link_kind=="symlink" { symlink(&outside,root.join(name)).unwrap(); }
+-            else { std::fs::hard_link(&outside,root.join(name)).unwrap(); }
+-            let error=open_cache(&root,name).unwrap_err();
+-            assert_eq!(error.code,"KNOWLEDGE_STORAGE_UNSAFE");
+-            assert_eq!(std::fs::read(&outside).unwrap(),b"external-sentinel");
++        for link_kind in ["symlink", "hardlink"] {
++            let root = fixture(link_kind);
++            let outside = fixture("sentinel").join("outside.db");
++            std::fs::write(&outside, b"external-sentinel").unwrap();
++            if link_kind == "symlink" {
++                symlink(&outside, root.join(name)).unwrap();
++            } else {
++                std::fs::hard_link(&outside, root.join(name)).unwrap();
++            }
++            let error = open_cache(&root, name).unwrap_err();
++            assert_eq!(error.code, "KNOWLEDGE_STORAGE_UNSAFE");
++            assert_eq!(std::fs::read(&outside).unwrap(), b"external-sentinel");
+         }
+     }
+ }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:244:
+ 
+ #[test]
+ fn reset_and_delete_artifact_keep_live_inode_and_other_source_index() {
+-    let root=fixture("reset");
+-    let index=KnowledgeIndexStore::open(&root).unwrap();
+-    let first=index.ensure_chunk_index_variant("artifact-a","profile","finger-a").unwrap();
+-    let second=index.ensure_chunk_index_variant("artifact-b","profile","finger-b").unwrap();
+-    let path=root.join("knowledge_index.db");
+-    let reader=Connection::open(&path).unwrap();
+-    let count=||reader.query_row("SELECT count(*) FROM chunk_index_variants",[],|r|r.get::<_,i64>(0)).unwrap();
+-    assert_eq!(count(),2);
++    let root = fixture("reset");
++    let index = KnowledgeIndexStore::open(&root).unwrap();
++    let first = index
++        .ensure_chunk_index_variant("artifact-a", "profile", "finger-a")
++        .unwrap();
++    let second = index
++        .ensure_chunk_index_variant("artifact-b", "profile", "finger-b")
++        .unwrap();
++    let path = root.join("knowledge_index.db");
++    let reader = Connection::open(&path).unwrap();
++    let count = || {
++        reader
++            .query_row("SELECT count(*) FROM chunk_index_variants", [], |r| {
++                r.get::<_, i64>(0)
++            })
++            .unwrap()
++    };
++    assert_eq!(count(), 2);
+     index.remove_artifact("artifact-a").unwrap();
+-    assert_eq!(count(),1);
++    assert_eq!(count(), 1);
+     assert!(index.get_variant(&second.id).unwrap().is_some());
+     assert!(index.get_variant(&first.id).unwrap().is_none());
+     index.reset().unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:260:
+-    assert!(path.exists(),"活跃数据库不能unlink");
+-    assert_eq!(count(),0,"已有连接与新连接看到相同事务");
++    assert!(path.exists(), "活跃数据库不能unlink");
++    assert_eq!(count(), 0, "已有连接与新连接看到相同事务");
+     assert!(KnowledgeIndexStore::open(&root).is_ok());
+ }
+ 

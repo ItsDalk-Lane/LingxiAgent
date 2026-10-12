@@ -1,0 +1,1451 @@
+{
+  "C_ids": [
+    {
+      "id": "R06-AR-F06-C01",
+      "status": "PASS_BOUNDED_EXECUTED",
+      "named_samples": "block and flow false preserved on actual provider wire",
+      "evidence": [
+        "four-c.json",
+        "mutation-v3-results.json"
+      ],
+      "limit": "does not prove full YAML schema equivalence"
+    },
+    {
+      "id": "R06-AR-F06-C02",
+      "status": "PASS_BOUNDED_EXECUTED",
+      "named_samples": "quotes, #, comments, escapes, Unicode, CRLF/BOM preserved",
+      "evidence": [
+        "four-c.json"
+      ],
+      "limit": "not every possible string production"
+    },
+    {
+      "id": "R06-AR-F06-C03",
+      "status": "FAIL",
+      "named_samples": "original25 tests green; invalid !!null/!!int uppercase lexemes accepted in actual binary and gateway",
+      "evidence": [
+        "four-c.json",
+        "extra-v3-typed-results.json",
+        "gateway-extra-results.json"
+      ]
+    },
+    {
+      "id": "R06-AR-F06-C04",
+      "status": "FAIL",
+      "named_samples": "original missing/empty/partial/example defaults green, legal uppercase-prefix strings destroyed by memory-only patch; malformed explicit tags accepted",
+      "evidence": [
+        "four-c.json",
+        "extra-v3-typed-results.json",
+        "gateway-extra-results.json"
+      ]
+    }
+  ],
+  "root_causes": [
+    {
+      "id": "RC01",
+      "title": "逐行解析和缺字段默认混淆",
+      "original_requirement_ids": [
+        "F06-REPAIR-01/02/03/04",
+        "C01/C02/C03/C04",
+        "T01-S01/S04",
+        "T06-S01/S03"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-service/src/context_compiler.rs:381,388,628",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:176"
+      ],
+      "all_affected_path_ids": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "review_status": "PASS_BOUNDED_CASES",
+      "execution_level": "EXECUTED_BOUNDED_PLUS_SOURCE_INFERRED",
+      "own_evidence": [
+        "four-c.json",
+        "regression.json",
+        "final-r01-contract-results.json",
+        "final-family-R02/semantic-check-results-v2.json",
+        "incumbent-typed-results.json"
+      ],
+      "remaining": "No claim entire schema/full Task/stage acceptance; new scalar mismatch remains OPEN"
+    },
+    {
+      "id": "RC02",
+      "title": "非字符串键、重复身份与被覆盖merge源旁路",
+      "original_requirement_ids": [
+        "F06-REPAIR-01/02/04",
+        "C01/C03/C04",
+        "T01-S01/S04",
+        "T06-S02/S03"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:43,112,157"
+      ],
+      "all_affected_path_ids": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "review_status": "PASS_BOUNDED_CASES",
+      "execution_level": "EXECUTED_BOUNDED_PLUS_SOURCE_INFERRED",
+      "own_evidence": [
+        "four-c.json",
+        "regression.json",
+        "final-r01-contract-results.json",
+        "final-family-R02/semantic-check-results-v2.json",
+        "incumbent-typed-results.json"
+      ],
+      "remaining": "No claim entire schema/full Task/stage acceptance; new scalar mismatch remains OPEN"
+    },
+    {
+      "id": "RC03",
+      "title": "普通字符串<<误当merge，保存改变层级",
+      "original_requirement_ids": [
+        "F06-REPAIR-01/03/04",
+        "C03/C04",
+        "T01-S01/S03/S04",
+        "T06-S01/S02/S03"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:51,185,283"
+      ],
+      "all_affected_path_ids": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "review_status": "PASS_BOUNDED_CASES",
+      "execution_level": "EXECUTED_BOUNDED_PLUS_SOURCE_INFERRED",
+      "own_evidence": [
+        "four-c.json",
+        "regression.json",
+        "final-r01-contract-results.json",
+        "final-family-R02/semantic-check-results-v2.json",
+        "incumbent-typed-results.json"
+      ],
+      "remaining": "No claim entire schema/full Task/stage acceptance; new scalar mismatch remains OPEN"
+    },
+    {
+      "id": "RC04",
+      "title": "标签身份擦除以及库已知本地别名不同于现役schema",
+      "original_requirement_ids": [
+        "F06-REPAIR-01/02/04",
+        "C03/C04",
+        "T01-S01/S04",
+        "T06-S01/S03"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:55,83,84,185",
+        "serde-saphyr-1.3.0/src/de/tags.rs:118",
+        "serde-saphyr-1.3.0/src/de/live_events.rs:551",
+        "serde-saphyr-1.3.0/src/de/deserializer.rs:763"
+      ],
+      "all_affected_path_ids": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "review_status": "FAIL_NEW_SAME_FAMILY",
+      "execution_level": "EXECUTED_BOUNDED_PLUS_SOURCE_INFERRED",
+      "own_evidence": [
+        "four-c.json",
+        "regression.json",
+        "final-r01-contract-results.json",
+        "final-family-R02/semantic-check-results-v2.json",
+        "incumbent-typed-results.json",
+        "extra-v3-typed-results.json",
+        "gateway-extra-results.json"
+      ],
+      "remaining": "No claim entire schema/full Task/stage acceptance; new scalar mismatch remains OPEN"
+    },
+    {
+      "id": "RC05",
+      "title": "公共Value与serializer兼容不等于原类型/未知语义保真",
+      "original_requirement_ids": [
+        "F06-REPAIR-01/02/04",
+        "C03/C04",
+        "T06-S03",
+        "common-unknown-config-protection"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:190,214,240,283",
+        "serde-saphyr-1.3.0/src/de/deserializer.rs:526,763",
+        "serde_yaml_ng-0.10.0/src/value/de.rs:55",
+        "serde_yaml_ng-0.10.0/src/value/ser.rs:17"
+      ],
+      "all_affected_path_ids": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "review_status": "FAIL_NEW_SAME_FAMILY",
+      "execution_level": "EXECUTED_BOUNDED_PLUS_SOURCE_INFERRED",
+      "own_evidence": [
+        "four-c.json",
+        "regression.json",
+        "final-r01-contract-results.json",
+        "final-family-R02/semantic-check-results-v2.json",
+        "incumbent-typed-results.json",
+        "extra-v3-typed-results.json",
+        "gateway-extra-results.json"
+      ],
+      "remaining": "No claim entire schema/full Task/stage acceptance; new scalar mismatch remains OPEN"
+    },
+    {
+      "id": "RC06",
+      "title": "副作用之后解析失败及吞错造成收据不实",
+      "original_requirement_ids": [
+        "F06-REPAIR-02/04",
+        "C03/C04",
+        "T06-S03/S05",
+        "common-tool-result-contract"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-service/src/memorytools.rs:496,513,572",
+        "rust/crates/lingxi-service/src/skills.rs:709,736,743,774"
+      ],
+      "all_affected_path_ids": [
+        "P06",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "review_status": "FAIL_NEW_SAME_FAMILY",
+      "execution_level": "EXECUTED_BOUNDED_PLUS_SOURCE_INFERRED",
+      "own_evidence": [
+        "four-c.json",
+        "regression.json",
+        "final-r01-contract-results.json",
+        "final-family-R02/semantic-check-results-v2.json",
+        "incumbent-typed-results.json",
+        "extra-v3-typed-results.json",
+        "gateway-extra-results.json"
+      ],
+      "remaining": "No claim entire schema/full Task/stage acceptance; new scalar mismatch remains OPEN"
+    },
+    {
+      "id": "RC07",
+      "title": "前置图先全量分配，后置成熟预算无法保护它",
+      "original_requirement_ids": [
+        "F06-REPAIR-01/02",
+        "common-error-resource-boundary"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:43,157,185,289",
+        "serde-saphyr-1.3.0/src/de/budget.rs:113,269",
+        "granit-parser-1.3.0/src/options.rs:67"
+      ],
+      "all_affected_path_ids": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "review_status": "EXECUTED_DEPTH_BOUNDARY_SOURCE_INFERRED_OTHER_BUDGETS",
+      "execution_level": "EXECUTED_BOUNDED_PLUS_SOURCE_INFERRED",
+      "own_evidence": [
+        "four-c.json",
+        "regression.json",
+        "final-r01-contract-results.json",
+        "final-family-R02/semantic-check-results-v2.json",
+        "incumbent-typed-results.json"
+      ],
+      "remaining": "No claim entire schema/full Task/stage acceptance; new scalar mismatch remains OPEN"
+    },
+    {
+      "id": "RC08",
+      "title": "写回后重采集与会话缓存失效混淆",
+      "original_requirement_ids": [
+        "F05-C01/C02/C03/C04",
+        "T01-S03",
+        "T06-S01/S03"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-service/src/context_compiler.rs:782,812,818,851",
+        "rust/crates/lingxi-service/src/memory.rs:128",
+        "rust/crates/lingxi-service/src/skills.rs:348"
+      ],
+      "all_affected_path_ids": [
+        "P01",
+        "P02",
+        "P03",
+        "P05",
+        "P06",
+        "P07"
+      ],
+      "review_status": "PASS_F06_NEW_SESSION_ONLY_F05_SAME_SESSION_OPEN",
+      "execution_level": "EXECUTED_BOUNDED_PLUS_SOURCE_INFERRED",
+      "own_evidence": [
+        "four-c.json",
+        "regression.json",
+        "final-r01-contract-results.json",
+        "final-family-R02/semantic-check-results-v2.json",
+        "incumbent-typed-results.json"
+      ],
+      "remaining": "No claim entire schema/full Task/stage acceptance; new scalar mismatch remains OPEN"
+    }
+  ],
+  "paths": [
+    {
+      "id": "P01",
+      "entry": "authenticated execute → SessionStore → RunSupervisor → drive_run",
+      "chain": [
+        "config file",
+        "AgentConfigDocument.parse",
+        "scan",
+        "gather",
+        "ContextArtifact",
+        "actual provider wire",
+        "observation"
+      ],
+      "source": [
+        "rust/crates/lingxi-service/src/lib.rs:1514",
+        "rust/crates/lingxi-service/src/runs.rs:1166",
+        "rust/crates/lingxi-service/src/context_compiler.rs:381,388,628,805"
+      ],
+      "review_status": "EXECUTED_FAIL_NEW_SCALAR",
+      "evidence": [
+        "extra-v3-results.json"
+      ],
+      "new_scalar_family_runtime_exact": true,
+      "source_inference": "All share AgentConfigDocument/parser. New scalar family not injected independently through every subordinate route."
+    },
+    {
+      "id": "P02",
+      "entry": "gather → scan_roster other agents",
+      "chain": [
+        "peer config file",
+        "parse_agent_material",
+        "scan",
+        "roster material",
+        "provider wire"
+      ],
+      "source": [
+        "rust/crates/lingxi-service/src/context_compiler.rs:569,594"
+      ],
+      "review_status": "EXECUTED_BOUNDED_SOURCE_INFERRED_NEW_SCALAR",
+      "evidence": [
+        "four-c.json"
+      ],
+      "new_scalar_family_runtime_exact": false,
+      "source_inference": "All share AgentConfigDocument/parser. New scalar family not injected independently through every subordinate route."
+    },
+    {
+      "id": "P03",
+      "entry": "MemoryService locale/compiled store/health/config flags GET/PATCH",
+      "chain": [
+        "read",
+        "full parse",
+        "scan/flags",
+        "HTTP status",
+        "patch old+candidate validation",
+        "atomic write",
+        "GET/new gather"
+      ],
+      "source": [
+        "rust/crates/lingxi-service/src/memory.rs:62,117,128,325,1202,1257",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs:1911,1945,1970"
+      ],
+      "review_status": "EXECUTED_FAIL_NEW_SCALAR",
+      "evidence": [
+        "extra-v3-results.json"
+      ],
+      "new_scalar_family_runtime_exact": true,
+      "source_inference": "All share AgentConfigDocument/parser. New scalar family not injected independently through every subordinate route."
+    },
+    {
+      "id": "P04",
+      "entry": "experience GET/PUT and feedback",
+      "chain": [
+        "read_flags",
+        "full parse",
+        "experience gate",
+        "experience file read/write",
+        "HTTP receipt"
+      ],
+      "source": [
+        "rust/crates/lingxi-service/src/memory.rs:1024,1054,1150"
+      ],
+      "review_status": "EXECUTED_BOUNDED_SOURCE_INFERRED_NEW_SCALAR",
+      "evidence": [
+        "regression.json"
+      ],
+      "new_scalar_family_runtime_exact": false,
+      "source_inference": "All share AgentConfigDocument/parser. New scalar family not injected independently through every subordinate route."
+    },
+    {
+      "id": "P05",
+      "entry": "persona routes → locale_of/yuan_of → fallback templates",
+      "chain": [
+        "read config",
+        "parse/scan",
+        "resolve locale/yuan",
+        "template or user override",
+        "HTTP"
+      ],
+      "source": [
+        "rust/crates/lingxi-service/src/persona.rs:70,86,103"
+      ],
+      "review_status": "EXECUTED_BOUNDED_SOURCE_INFERRED_NEW_SCALAR",
+      "evidence": [
+        "four-c.json"
+      ],
+      "new_scalar_family_runtime_exact": false,
+      "source_inference": "All share AgentConfigDocument/parser. New scalar family not injected independently through every subordinate route."
+    },
+    {
+      "id": "P06",
+      "entry": "skills list/runtime selection/full set/single enable/disable/bundle enable",
+      "chain": [
+        "read config",
+        "full validation",
+        "lists+flags",
+        "workspace policy",
+        "runtime visible intersection",
+        "write lists",
+        "atomic write",
+        "reread/catalog"
+      ],
+      "source": [
+        "rust/crates/lingxi-service/src/skills.rs:326,348,370,426,452,1535"
+      ],
+      "review_status": "EXECUTED_BOUNDED_SOURCE_INFERRED_NEW_SCALAR",
+      "evidence": [
+        "four-c.json"
+      ],
+      "new_scalar_family_runtime_exact": false,
+      "source_inference": "All share AgentConfigDocument/parser. New scalar family not injected independently through every subordinate route."
+    },
+    {
+      "id": "P07",
+      "entry": "compiled_for_run SkillMaterialPort → runtime_skill_catalog",
+      "chain": [
+        "read_agent_config",
+        "parse full document",
+        "lists+flags",
+        "resolve runtime selection",
+        "filter disable_model_invocation",
+        "artifact render",
+        "wire"
+      ],
+      "source": [
+        "rust/crates/lingxi-service/src/lib.rs:1514",
+        "rust/crates/lingxi-service/src/skills.rs:941",
+        "rust/crates/lingxi-service/src/context_compiler.rs:835"
+      ],
+      "review_status": "EXECUTED_BOUNDED_SOURCE_INFERRED_NEW_SCALAR",
+      "evidence": [
+        "four-c.json"
+      ],
+      "new_scalar_family_runtime_exact": false,
+      "source_inference": "All share AgentConfigDocument/parser. New scalar family not injected independently through every subordinate route."
+    },
+    {
+      "id": "P08",
+      "entry": "cleanup-preview → compute_orphan_skills → collect peer enabled references",
+      "chain": [
+        "current config list",
+        "candidate user pool",
+        "peer live configs excluding tombstones",
+        "read_skill_lists full parse",
+        "shared reference filter",
+        "HTTP preview"
+      ],
+      "source": [
+        "rust/crates/lingxi-service/src/skills.rs:782,807,1573",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs:658,683"
+      ],
+      "review_status": "EXECUTED_BOUNDED_SOURCE_INFERRED_NEW_SCALAR",
+      "evidence": [
+        "final-family-R02/effects-probe-results-v2.json"
+      ],
+      "new_scalar_family_runtime_exact": false,
+      "source_inference": "All share AgentConfigDocument/parser. New scalar family not injected independently through every subordinate route."
+    },
+    {
+      "id": "P09",
+      "entry": "DELETE skill → scrub references across agents/bundles",
+      "chain": [
+        "current list validation",
+        "remove directory",
+        "peer config parse",
+        "filtered lists render",
+        "atomic config writes",
+        "bundle removal",
+        "HTTP receipt"
+      ],
+      "source": [
+        "rust/crates/lingxi-service/src/skills.rs:709,736,743,759,764,774"
+      ],
+      "review_status": "EXECUTED_BOUNDED_SOURCE_INFERRED_NEW_SCALAR",
+      "evidence": [
+        "four-c.json"
+      ],
+      "new_scalar_family_runtime_exact": false,
+      "source_inference": "All share AgentConfigDocument/parser. New scalar family not injected independently through every subordinate route."
+    },
+    {
+      "id": "P10",
+      "entry": "ToolInvocationGateway → tenet_propose",
+      "chain": [
+        "trusted bound agent",
+        "read_flags/full parse",
+        "master switch",
+        "tenet store",
+        "ToolOutcome/receipt"
+      ],
+      "source": [
+        "rust/crates/lingxi-service/src/memorytools.rs:343",
+        "rust/crates/lingxi-service/src/memorytools.rs:595"
+      ],
+      "review_status": "EXECUTED_BOUNDED_SOURCE_INFERRED_NEW_SCALAR",
+      "evidence": [
+        "regression.json"
+      ],
+      "new_scalar_family_runtime_exact": false,
+      "source_inference": "All share AgentConfigDocument/parser. New scalar family not injected independently through every subordinate route."
+    },
+    {
+      "id": "P11",
+      "entry": "ToolInvocationGateway → install_skill → install review → enable_for_agent",
+      "chain": [
+        "bound agent",
+        "config preflight",
+        "skill review/install",
+        "reread config",
+        "write enabled list",
+        "atomic write",
+        "success or partial-effect Failed"
+      ],
+      "source": [
+        "rust/crates/lingxi-service/src/memorytools.rs:447,496,513,572",
+        "rust/crates/lingxi-service/src/skills.rs:611,656"
+      ],
+      "review_status": "EXECUTED_FAIL_NEW_SCALAR",
+      "evidence": [
+        "gateway-extra-results.json"
+      ],
+      "new_scalar_family_runtime_exact": true,
+      "source_inference": "All share AgentConfigDocument/parser. New scalar family not injected independently through every subordinate route."
+    },
+    {
+      "id": "P12",
+      "entry": "AgentConfigPatch direct adapter read/write and patch_agent_config",
+      "chain": [
+        "read old config",
+        "full parse/type validation",
+        "set owned field only",
+        "mature serialization",
+        "candidate validation where patch uses it",
+        "atomic write",
+        "same parser reload",
+        "incumbent YAML oracle"
+      ],
+      "source": [
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs:1911,1920,1945,1970",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:272,283,289"
+      ],
+      "review_status": "EXECUTED_FAIL_NEW_SCALAR",
+      "evidence": [
+        "extra-v3-results.json"
+      ],
+      "new_scalar_family_runtime_exact": true,
+      "source_inference": "All share AgentConfigDocument/parser. New scalar family not injected independently through every subordinate route."
+    }
+  ],
+  "commands": [
+    {
+      "id": "boundaries",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "run",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "-p",
+        "xtask",
+        "--",
+        "check-boundaries"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707586.036653,
+      "end_time": 1791707586.743187,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/boundaries.log",
+      "log_sha256": "88ab27d1fd0e8aad260d58bc58ef48cca6f0884840d589213d1cc76378a47b8c",
+      "wrapper_record": "boundaries.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-boundaries-5c0oz_1g",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "cancellation",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "cancellation_tree",
+        "approval_wait_round_trips_approve_and_reject_legs",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 101,
+      "start_time": 1791707852.960862,
+      "end_time": 1791707855.6209111,
+      "tests": 1,
+      "passed": 0,
+      "failed": 1,
+      "log": "logs/cancellation.log",
+      "log_sha256": "ba731c7b1dfd98cea93f61b9cdbbfcd788d739d3ea79b871d500a4d4f3bf90b7",
+      "wrapper_record": "cancellation.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-cancellation-iet30bq9",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "FAIL_INHERITED_BASELINE"
+    },
+    {
+      "id": "clippy",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "clippy",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "-j8",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707329.997194,
+      "end_time": 1791707330.4541178,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/clippy.log",
+      "log_sha256": "fdbe65bc6a7d2282ff0bf1ab09c5005796b6326afd2850c7a8d59647202bbec9",
+      "wrapper_record": "clippy.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-clippy-_tu4gmys",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "contracts",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "run",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "-p",
+        "xtask",
+        "--",
+        "check-contracts"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707580.024099,
+      "end_time": 1791707585.9446342,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/contracts.log",
+      "log_sha256": "d497273074cdb86856eb9b13a56b4db944519c40996b7e89bf5d3c56b038b4b6",
+      "wrapper_record": "contracts.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-contracts-687h1cia",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "extra-oracle",
+      "command": [
+        "node",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-oracle.mjs",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-v2-results.json",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-typed-results.json"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 1,
+      "start_time": 1791707485.001913,
+      "end_time": 1791707485.114657,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/extra-oracle.log",
+      "log_sha256": "d444b5d9e026ac02a7b35e7c4aee7a889f40650c7bfd22c93d6718b802f9a7e5",
+      "wrapper_record": "extra-oracle.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-extra-oracle-njklwxgx",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "FAIL_WITH_HELPER_BLINDSPOT",
+      "note": "early unknown-null helper skipped read-error comparison; corrected v3 is authoritative"
+    },
+    {
+      "id": "extra-v2",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-v2.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707442.0366201,
+      "end_time": 1791707445.062561,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/extra-v2.log",
+      "log_sha256": "d64969d8a872feeb74ab722e39b9a31b5f72fa0bcde8baf157e0135dc1ef8cc4",
+      "wrapper_record": "extra-v2.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-extra-v2-rodcrr5n",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "FAIL_OBSERVED",
+      "note": "collector exit0 does not indicate business PASS; see corrected oracle/inner behavior"
+    },
+    {
+      "id": "extra-v3-oracle",
+      "command": [
+        "node",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-v3-oracle.mjs",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-v3-results.json",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-v3-typed-results.json"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 1,
+      "start_time": 1791707733.247097,
+      "end_time": 1791707733.3679569,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/extra-v3-oracle.log",
+      "log_sha256": "6653f540f3a9ec3408887a279589589e01ef8099580708011d8cd957228632cf",
+      "wrapper_record": "extra-v3-oracle.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-extra-v3-oracle-aux428g7",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "FAIL"
+    },
+    {
+      "id": "extra-v3",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-v3.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707538.1090078,
+      "end_time": 1791707545.188614,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/extra-v3.log",
+      "log_sha256": "9206b32be09c958892e3ba8d9a031ca38940cb02491c3c5579d6a50a9ac04ee4",
+      "wrapper_record": "extra-v3.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-extra-v3-jo42crs8",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "FAIL_OBSERVED",
+      "note": "collector exit0 does not indicate business PASS; see corrected oracle/inner behavior"
+    },
+    {
+      "id": "extra",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": -15,
+      "start_time": 1791707380.290245,
+      "end_time": 1791707415.984321,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/extra.log",
+      "log_sha256": "8e5dac8dbe748b292c054861f784458a072a1a5528747b34cf0ae001735fd68c",
+      "wrapper_record": "extra.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-extra-v4pzibr9",
+      "home_removed": true,
+      "execution_level": "PROBE_ERROR",
+      "business_status": "NOT_RUN_PROBE_SETUP_FAILURE"
+    },
+    {
+      "id": "f08-regression",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f08_projection",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707586.87627,
+      "end_time": 1791707590.725128,
+      "tests": 7,
+      "passed": 7,
+      "failed": 0,
+      "log": "logs/f08-regression.log",
+      "log_sha256": "54ca7a813173ea2f420765518e1b6a34b6e3240582e5ba49bb1277d6a01f39b0",
+      "wrapper_record": "f08-regression.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-f08-regression-55lbtvw2",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "fmt",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "fmt",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707578.358264,
+      "end_time": 1791707579.931168,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/fmt.log",
+      "log_sha256": "83e475dc4a74ead8495d335e0999636a567d689499d2aa17955325627a62161b",
+      "wrapper_record": "fmt.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-fmt-6ic2u26f",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "four-c",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f06_config",
+        "--test",
+        "r06_ar_f06_binary",
+        "-p",
+        "lingxi-adapters",
+        "--test",
+        "r06_ar_f06_config_preservation",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707266.7671208,
+      "end_time": 1791707276.116726,
+      "tests": 25,
+      "passed": 25,
+      "failed": 0,
+      "log": "logs/four-c.log",
+      "log_sha256": "ae42e7a8260457ab22d6fc0e9d64bd8852bc85abc390efd8ea85292dbddbd21e",
+      "wrapper_record": "four-c.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-four-c-yuq99tqb",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "gateway-extra",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/gateway-extra.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707850.7727842,
+      "end_time": 1791707865.1137931,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/gateway-extra.log",
+      "log_sha256": "744175ef091b7976d04f5dd09d27fb8f3c70a562f73eab786de07ec8f9f33a95",
+      "wrapper_record": "gateway-extra.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-gateway-extra-mn7ojt0v",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "FAIL_OBSERVED",
+      "note": "collector exit0 does not indicate business PASS; see corrected oracle/inner behavior"
+    },
+    {
+      "id": "incumbent-typed",
+      "command": [
+        "node",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/typed-oracle.mjs",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/logs/four-c.log",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/incumbent-typed-results.json"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707418.892398,
+      "end_time": 1791707419.0794592,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/incumbent-typed.log",
+      "log_sha256": "4226f8d0bb4d6a9c61c3d63ec1ce625ec648af4c68fc9800c99517d90472deb0",
+      "wrapper_record": "incumbent-typed.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-incumbent-typed-_wh8qdtq",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "mutation-v2",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/mutation-v2.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 1,
+      "start_time": 1791707718.899032,
+      "end_time": 1791707733.155423,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/mutation-v2.log",
+      "log_sha256": "b9e6ae2d960dfb43a333f61fd7b38e7660cee2a4fb6b45075c0bd48bc4d91745",
+      "wrapper_record": "mutation-v2.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-mutation-v2-0j_11mbx",
+      "home_removed": true,
+      "execution_level": "PROBE_ERROR",
+      "business_status": "NOT_RUN_PROBE_SETUP_FAILURE"
+    },
+    {
+      "id": "mutation-v3",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/mutation-v3.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707836.276025,
+      "end_time": 1791707850.688203,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/mutation-v3.log",
+      "log_sha256": "ab53b9a9f9d6f156db445aa4b6f8832570ffd778a82e7c879e38376a5e648ccf",
+      "wrapper_record": "mutation-v3.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-mutation-v3-8j7rsayx",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS_EXPECTED_MUTATION_RED",
+      "inner_exit": 101,
+      "note": "production old scanner mutant compiled, normal control green, required C01 red"
+    },
+    {
+      "id": "mutation",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/mutation.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 1,
+      "start_time": 1791707689.531273,
+      "end_time": 1791707689.650819,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/mutation.log",
+      "log_sha256": "2e0e7bc4c260d830056c9632bd372d66dca9739b8129e4d44476106b6c0c9875",
+      "wrapper_record": "mutation.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-mutation-u68ghr2z",
+      "home_removed": true,
+      "execution_level": "PROBE_ERROR",
+      "business_status": "NOT_RUN_PROBE_SETUP_FAILURE"
+    },
+    {
+      "id": "r01-contract",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/final-r01-contract.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707418.2663229,
+      "end_time": 1791707418.344955,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/r01-contract.log",
+      "log_sha256": "ec1963abf329b2bd5edaed663e271fe684be5a208a3fcb971fbad8f84f7bdc71",
+      "wrapper_record": "r01-contract.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-r01-contract-yf4l436w",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "r01-effects-probe",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/final-family-R01/effects-probe.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707401.72861,
+      "end_time": 1791707404.139905,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/r01-effects-probe.log",
+      "log_sha256": "3bc6a23166e1d9dcc74ac1fd59394b0d9287f4d2d8b2c4a7cbd5020b98e86687",
+      "wrapper_record": "r01-effects-probe.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-r01-effects-probe-6isawn7u",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "r01-family-probe",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/final-family-R01/family-probe.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707399.4555159,
+      "end_time": 1791707401.58805,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/r01-family-probe.log",
+      "log_sha256": "7d22add36325b637362d7bb02fc3fe210b4658d5f0bfe5213a6344d2b15ff037",
+      "wrapper_record": "r01-family-probe.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-r01-family-probe-pfa2ljll",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "r01-probe",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/final-family-R01/probe.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707394.736278,
+      "end_time": 1791707399.3579671,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/r01-probe.log",
+      "log_sha256": "ce180c33400e739e51a22d53300d82bcb9866366659a91f48a89ec87af9745c6",
+      "wrapper_record": "r01-probe.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-r01-probe-9724ata6",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "r02-additional-family-v2",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/final-family-R02/additional-family-v2.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707413.728877,
+      "end_time": 1791707416.43643,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/r02-additional-family-v2.log",
+      "log_sha256": "b499b5f2c18d918b0c69160fe5921b8dfab73f120e7e7d494207d18dcba7028f",
+      "wrapper_record": "r02-additional-family-v2.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-r02-additional-family-v2-f6enjn7j",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "r02-effects-probe-v2",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/final-family-R02/effects-probe-v2.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707409.927628,
+      "end_time": 1791707413.6148548,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/r02-effects-probe-v2.log",
+      "log_sha256": "24b9bb3f13ae4a3635380b19558ec173c0885aa85fa2c8496fb2428500b3552f",
+      "wrapper_record": "r02-effects-probe-v2.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-r02-effects-probe-v2-pxf0a24_",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "r02-probe-v2",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/final-family-R02/probe-v2.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707404.2788749,
+      "end_time": 1791707409.825494,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/r02-probe-v2.log",
+      "log_sha256": "ad68048b28cc4bc77596dd205f8db98cf574dea862b92349eaa9bc4f17c0a997",
+      "wrapper_record": "r02-probe-v2.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-r02-probe-v2-19soqgud",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "r02-semantic",
+      "command": [
+        "node",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/final-family-R02/semantic-check-v2.mjs"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707418.4693692,
+      "end_time": 1791707418.5673332,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/r02-semantic.log",
+      "log_sha256": "759306f73d509aafebaa8b778396d6c2b52e81e3c597549d5c93343ad8e31628",
+      "wrapper_record": "r02-semantic.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-r02-semantic-5fwmslpf",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "r02-tagcheck",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/final-family-R02/tagged-check-v2.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707418.6765609,
+      "end_time": 1791707418.7467039,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/r02-tagcheck.log",
+      "log_sha256": "f5b530f22c0ffab68d9e0a22f021074745205439209b3cded4d5b2b24174e4b8",
+      "wrapper_record": "r02-tagcheck.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-r02-tagcheck-y4prfjgs",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "r02-tagged-value-v2",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/final-family-R02/tagged-value-v2.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707416.5353851,
+      "end_time": 1791707418.162684,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/r02-tagged-value-v2.log",
+      "log_sha256": "02a4c813c9fa171112a90ee7aa80413cba723b230e7a91d96f37c1e2137fa7c2",
+      "wrapper_record": "r02-tagged-value-v2.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-r02-tagged-value-v2-l74g32ne",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "registry",
+      "command": [
+        "python3",
+        "scripts/rust-tauri/r02_registry_consistency.py"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 1,
+      "start_time": 1791707590.824278,
+      "end_time": 1791707590.902818,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "log": "logs/registry.log",
+      "log_sha256": "67187d8e845597ca64e6369abe682a05944f7b0e60f3553e629b245a0465f05d",
+      "wrapper_record": "registry.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-registry-lxj3r1vq",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "FAIL_INHERITED_BASELINE"
+    },
+    {
+      "id": "regression",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "--no-fail-fast",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_t01_context_compiler",
+        "--test",
+        "r06_t01_closed_loop",
+        "--test",
+        "r06_t06_memory",
+        "--test",
+        "r06_t06_skills",
+        "--test",
+        "r06_t06_skill_context",
+        "--test",
+        "r06_t06_hooks",
+        "-p",
+        "lingxi-adapters",
+        "--test",
+        "agent_memory_r06t06",
+        "-p",
+        "lingxi-kernel",
+        "--test",
+        "r06_t01_context_compiler",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707297.494772,
+      "end_time": 1791707300.369535,
+      "tests": 77,
+      "passed": 77,
+      "failed": 0,
+      "log": "logs/regression.log",
+      "log_sha256": "b8e7e14dbadb597f4ccac5ea5d62e778c05174d903f2cfc85f04ee7efba2ea7f",
+      "wrapper_record": "regression.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-regression-sfmsd25v",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    },
+    {
+      "id": "upstream-affected",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "--no-fail-fast",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r05_t01_binary_wiring",
+        "--test",
+        "r05_t08_closed_loop",
+        "--test",
+        "r04_t02_tool_gateway",
+        "--test",
+        "r03_t08_acceptance_matrix",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "exit_code": 0,
+      "start_time": 1791707733.3858502,
+      "end_time": 1791707748.7124941,
+      "tests": 43,
+      "passed": 43,
+      "failed": 0,
+      "log": "logs/upstream-affected.log",
+      "log_sha256": "c99baf4e798bc9036f7d0aa9c1ea1fd18d414afe35914765a7065ee06dae1ff8",
+      "wrapper_record": "upstream-affected.json",
+      "source_stable": true,
+      "peak_rss_mb": null,
+      "unique_synthetic_home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-upstream-affected-uhcxdqsn",
+      "home_removed": true,
+      "execution_level": "EXECUTED",
+      "business_status": "PASS"
+    }
+  ],
+  "original_obligations": "original-obligation-review.json",
+  "full_scope": "full-original-scope-preserved.json",
+  "A_to_G": {
+    "A": "354/101 config association +1234/281 scope retained; whole Tasks/A01A02A11A12/leaf NOT_RUN, config share failed",
+    "B": "actual fourC25 +original77 +fresh all historical cases +additional scalar family actual binary+gateway",
+    "C": "isolated source copy production scanner mutation compile0/testcompile0/blockgreen/flowred101; initial setup errors not red proof",
+    "D": "actual wire, bytes, install/delete and truthful late IO partial receipt; source/bin/home/guard/cleanup bound",
+    "E": "F05 same-session still OPEN; original owners/deadlines retained; RSS null; registry baselineFAIL",
+    "F": "F08seven andR05/R04/R03 affected43 realPASS; cancellationFAIL inherited; final stage and full upstream must rerun",
+    "G": "binding-before/after all292 sources+15+lock+bin+settings equal; no product/Git writes"
+  },
+  "not_run": [
+    "full workspace Rust test battery",
+    "full R02-R05 formal acceptance",
+    "final combined R06 stage closure",
+    "Windows/Linux/release packaging",
+    "live provider/paid calls",
+    "all full original Tasks/A IDs/281 leaves/687 assertions",
+    "F05 same-session next Run prompt cache closure",
+    "byte/event/node/scalar/alias maximum-budget runtime stress (depth actual only)"
+  ]
+}

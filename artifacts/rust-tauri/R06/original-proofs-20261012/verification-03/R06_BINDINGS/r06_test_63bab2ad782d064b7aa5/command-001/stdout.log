@@ -1,0 +1,22 @@
+
+running 1 test
+test original_tools_use_authentic_run_scope_and_frozen_citable_source ... FAILED
+
+successes:
+
+successes:
+
+failures:
+
+---- original_tools_use_authentic_run_scope_and_frozen_citable_source stdout ----
+
+thread 'original_tools_use_authentic_run_scope_and_frozen_citable_source' (13399962) panicked at crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:1248:90:
+called `Result::unwrap()` on an `Err` value: KnowledgeError { code: "KNOWLEDGE_STORAGE_BUSY", message: "knowledge SQLite: database is locked" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    original_tools_use_authentic_run_scope_and_frozen_citable_source
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.09s
+

@@ -1,0 +1,28 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.31s
+     Running tests/subagent_closeout.rs (rust/target/bc-proof/debug/deps/subagent_closeout-d79e66d1e2b0dc20)
+LINGXI_TEST_GUARD: armed (pid 8708, mem_limit=8192 MB, time_limit=600 s)
+
+running 8 tests
+test drain_expired_child_is_finally_reaped_after_its_actual_exit ... ok
+test panicking_background_exits_are_recorded_and_reaped_without_a_waiter ... ok
+test finished_background_drives_reap_both_registries ... ok
+test thread_registry_refusal_leaves_no_permanent_reservations ... ok
+test child_provider_panic_closes_out_and_the_thread_continues ... ok
+test late_and_duplicate_completions_cannot_corrupt_the_closeout ... ok
+test parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap ... ok
+test parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls ... FAILED
+
+failures:
+
+---- parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls stdout ----
+
+thread 'parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls' (4448650) panicked at crates/lingxi-service/tests/subagent_closeout.rs:297:9:
+timed out waiting for the child queues behind the parked parent turn
+
+
+failures:
+    parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls
+
+test result: FAILED. 7 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.54s
+
+error: test failed, to rerun pass `-p lingxi-service --test subagent_closeout`

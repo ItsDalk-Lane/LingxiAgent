@@ -1,0 +1,501 @@
+{
+  "at": "2026-10-11T10:32:25.777514+00:00",
+  "executed_path_from_original_log": [
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/lingxi_adapters-734af3c24ef2482d",
+      "sha256_post_execution": "00e0803560bd56f2ff75acaca95b447245759db8a5f9c9eae7e8a5c6e33c2df4",
+      "log": "verify-R05-final-01/R05_SUITES/lib-adapters_models__openai_completions__tests__a_history_target_missing_from_the_snapshot_fails_loudly.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t07_rr1_usage_ledger-a6a71c54587ce7e1",
+      "sha256_post_execution": "7dc5d8b07d97cba989dc20e8b413ae2c9b6aabf4c796d7985b8305d952d850f6",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t07_rr1_usage_ledger.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/lingxi_service-a4f08e303f9d7fb0",
+      "sha256_post_execution": "d32ced8a73256f30b2db905364a788f57eba5049f4d884992dad318af76f6549",
+      "log": "verify-R05-final-01/R04_REGRESSION/R04_RR1_REPAIR/lib_procsupervisor__tests__transcript_property_eviction_accounting_counts_only_real_loss.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t04_streaming-90fec2d4219573b1",
+      "sha256_post_execution": "3ce9a732d08aa79bf5af1a9ad95975af9177402d9295cfdce1c4919e0848bfe6",
+      "log": "verify-R05-final-01/R05_SUITES/adp_r05_t04_streaming.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t05_network-c914ca03a7569bf0",
+      "sha256_post_execution": "c34f0df2e5ae2bc603ca0675811e167c5f353b511e25ac61ae7327d2a81b7e22",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t05_network.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t06_worker_model-db6490450bdb2559",
+      "sha256_post_execution": "af469dc1a0923dbd1a8e3c45387530e390921a1e465b9507bddbfb80b9e8f115",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t06_worker_model.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/lingxi_kernel-1fd7126cc038a159",
+      "sha256_post_execution": "a8b5823812f70df849e74005c9486bf7c6eef3eeebbb0b56e3f9e8c3410a2a02",
+      "log": "verify-R05-final-01/R05_SUITES/lib-kernel_model_exchange__tests__wire_name_collisions_resolve_deterministically_or_fail_loudly.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t03_goldens-d3df2f6a13b8d061",
+      "sha256_post_execution": "f03ca454756355ec45610e86ef47637f879329d1c678e33a12bf0e442139c66f",
+      "log": "verify-R05-final-01/R05_SUITES/adp_r05_t03_goldens.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t05_timeouts-505d9a1753d93404",
+      "sha256_post_execution": "4bd16fd869df92d25843e3a07425c359a780b22ef4952b2edb163958f9c6e3e4",
+      "log": "verify-R05-final-01/R05_SUITES/adp_r05_t05_timeouts.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t08_production_tools-ce80f00efba62857",
+      "sha256_post_execution": "6e285a37592cf19e76c3bf132a1829d794d623a6b395ea5775dbee118ede4f4c",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t08_production_tools.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t06_rr1_system_speech-c8715e59ea880ad6",
+      "sha256_post_execution": "9e1fff45fd8b144e7dbcd2dddfb82f724a9b7fe6b9272bdf2a02398e0b714a8c",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t06_rr1_system_speech.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t01_model_plane-69462c0b2fb16347",
+      "sha256_post_execution": "713411f0428d5ae1a8c8559e20304fc976791e66a654f88ea62b556ba1bb5f64",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t01_model_plane.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t07_usage_families-754ef60632b4f981",
+      "sha256_post_execution": "9c7c1cf9b040f06abf95bb23879e66aa7e13fa4a9ee21cc5290b3cb3dcc8d039",
+      "log": "verify-R05-final-01/R05_SUITES/adp_r05_t07_usage_families.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t05_compat-6861fbc5575871a1",
+      "sha256_post_execution": "1c8895177e98cedb8b86961c641434ecc99637079abf0df77af253bb86da9022",
+      "log": "verify-R05-final-01/R05_SUITES/adp_r05_t05_compat.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t06_operations-7af6297027d2d65e",
+      "sha256_post_execution": "e01069422e4be36162fb996c30415bdb3abfdcc9fd94515e90e81cb28bd21f4b",
+      "log": "verify-R05-final-01/R05_SUITES/adp_r05_t06_operations.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t07_rr1_usage_strict-143dfd7f9552810e",
+      "sha256_post_execution": "29b51448443938886e5cdcdb4a0c34dcdf673f210a56a4a82fd4e07ef251306d",
+      "log": "verify-R05-final-01/R05_SUITES/adp_r05_t07_rr1_usage_strict.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t06_operations-38d1ae7b39915a9f",
+      "sha256_post_execution": "d650cdd3d41b69c3809b5b1673a02df92b1c98b303bc556fc208e3391a528bb5",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t06_operations.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t03_protocol_adapters-d8b84e35c3d89e18",
+      "sha256_post_execution": "440392e06ac62d435d2dca30cfc296944f1bfddb2e4200c3883fcdb53311e2d1",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t03_protocol_adapters.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t04_rr1_batch_terminal-6b238430c05c435f",
+      "sha256_post_execution": "cbb6406cc34d2e0f8af36f3083046a1307185b0d67d2a29f03c0630ca7e2a229",
+      "log": "verify-R05-final-01/R05_SUITES/adp_r05_t04_rr1_batch_terminal.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t04_streaming-68d2e6d9b157eb63",
+      "sha256_post_execution": "7ac7edbfd037a1cdeb548b10ef6bfc7ed6fa240c0e82ac13dfa2baf0dc56a6cd",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t04_streaming.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t01_binary_wiring-a1a199c3f0ea13b8",
+      "sha256_post_execution": "e6b7af20924160a6155757c2203bcc4901d53216f35156d71a9d4d0221f75686",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t01_binary_wiring.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t02_credentials-1e7b0abdcbcfe6bb",
+      "sha256_post_execution": "7c87514e0dec6a8afe0277e7b6db961ff16695d5f0699c61a7389da0da7012f3",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t02_credentials.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t07_persistence-bc22ee460a84d5e0",
+      "sha256_post_execution": "7a0c98321997e75d0a1ad33fec71b19c1bef59e3639eb070f3628cb46f943720",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t07_persistence.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t05_timeouts-ddd7a3fb9c8dccd7",
+      "sha256_post_execution": "7a86d30350d47ef9521b73334a27d6c8d478e662eaa75d900cf0221db0b3e895",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t05_timeouts.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t03_rr1_replay-c31f9bd26e053bc1",
+      "sha256_post_execution": "7e93e7db1ac71146bb1a0b0b2721ad80eeb69b030a66ab1c59b6c6dde3a22b9d",
+      "log": "verify-R05-final-01/R05_SUITES/adp_r05_t03_rr1_replay.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t06_rr1_media_resource-aa511c416fefa1d5",
+      "sha256_post_execution": "87eb7b44abbd3b01cb911ab55fd46d60cbd677a10f21328c8ef41e5ccdc7fa4e",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t06_rr1_media_resource.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t08_closed_loop-9b192c22d532c243",
+      "sha256_post_execution": "5173302a25f3e1fe51c3edb57e2bced99fccf3c113628a3dbbe009d69881660f",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t08_closed_loop.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t08_resources-d4d485336617686f",
+      "sha256_post_execution": "39793570fa85f907ac6abe2f350e712447b5bb712b80c08cb0de0524321b2aa4",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t08_resources.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t07_usage_trace-4da2779840893ca0",
+      "sha256_post_execution": "79e490e0d0a093c87ed4447486fe79af7ffbbfdbb10e7f033ac96d6961cf3c5a",
+      "log": "verify-R05-final-01/R05_SUITES/svc_r05_t07_usage_trace.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t02_oauth_flows-40a519cd5a6326ab",
+      "sha256_post_execution": "c85af7c7111bf65041b0ed7ba21fe7a9ee541ac3598a4ce83afa4bdffcafac87",
+      "log": "verify-R05-final-01/R05_SUITES/adp_r05_t02_oauth_flows.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/lingxi_adapters-08891693a21d73df",
+      "sha256_post_execution": "06fdfb4e394623b4f8f588774bbeb503c09770b62c29a1bbc19e337b984feeae",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/lingxi_storage_inspect-149a8da8222fc3ff",
+      "sha256_post_execution": "1e67920fad75995cf2e8f4406fa5490c7c3878d7e842f47f7b7d96e976459727",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/active_run_listing-59231531a918859c",
+      "sha256_post_execution": "30b8135a9e7f34462e29dc77fe37071725cb48bd1c67fa4e9ed5b6383f381dd4",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/agent_memory_r06t06-9df8c9f4b0ff7a47",
+      "sha256_post_execution": "af2700da8c2565cb78fae2462217b9abbb4f7949465a2715df6be0fd3a6360c4",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/backup_faults-2805ba97150d8c69",
+      "sha256_post_execution": "c6c50620d7fe360856b48ad01fccd11a3e6be7545e3bf4067f94ff66c12e4bd4",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/backup_restore-d2dcc141d6e2a4ed",
+      "sha256_post_execution": "47d4e353b6634e29716b04fd4657640adb112ad8c1c2c92dd23e321db3878b2d",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/canonical_message_store-7e71bf9dc10a5589",
+      "sha256_post_execution": "4ffdea03a40a91790f5fefee0efa34e19bf6743f330cc28553201cf0ed21484d",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/disk_full_fault-adfa2c7b7f3eda14",
+      "sha256_post_execution": "53ef1de4ac436590fca79fb59be836795aac1d4169650fc6865325160f406419",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/event_store_reads-c95a0013547fbf9c",
+      "sha256_post_execution": "390d2388d6707a29fab1c0c450cd795cb7f5ebd971aa45dee77e4be1f3a7a745",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/invocation_journal_store-eba14770e7929475",
+      "sha256_post_execution": "3e69a9a18ebf6fce8d577acb22f05ea0829847e65ee8717d38515876792f1e3b",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/knowledge_store_r06t07-f4ecebe485202202",
+      "sha256_post_execution": "a1057af0191e325a39f9175b64cfa59e11607c64d4213a04a50707c3ea9e9cc5",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/late_result_fencing_property-bfe66acf3ae304e1",
+      "sha256_post_execution": "b48a19b09c54a1b35b0716e60aeb64501c5ca3d2cf09c6d49779d773ee727a1f",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/migration_idempotency-e942ea6511b62d19",
+      "sha256_post_execution": "a8c472db4a472f24ab1a7fefb419c620719e3d9f59f720e20412ffdef9b4d51b",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t02_oauth_flows-027c944d79a3722b",
+      "sha256_post_execution": "eef2523bd28d99877ea14b1b07d5422bd198106b58745031f5a5dab21bef6d17",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t03_goldens-38f4851e02d86b05",
+      "sha256_post_execution": "ee2279f934fb35bd45e727037de6578dabf7585a485da270b800fc59ba62df6f",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t03_rr1_replay-48e973613ec69c40",
+      "sha256_post_execution": "07c66a417cd55aaa1785272cb7823e2b00907d9d7620a6f0fb973e3abdb67d4d",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t04_rr1_batch_terminal-afa86a77023e29f7",
+      "sha256_post_execution": "82f044395f2f0a93b157116303d49d583f6b09ac94d638695232c66516f72e73",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t04_streaming-ec339850fc73b3ca",
+      "sha256_post_execution": "eac5798c92680ff18549fbaba76d23d35747ce05470744e10d42c0f967646674",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t05_compat-2309aea4d92b8029",
+      "sha256_post_execution": "5eeff61df9ae9e96b1afd53b21ceb57318a68f41a1e3a96bb72a5a6aaec7145f",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t05_timeouts-a8809dc8404f2ea2",
+      "sha256_post_execution": "f382f8d6f38d5ec4f1a3ff69dc4c9bb889e7899086f6cfb61c041ae69a35db8a",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t06_operations-5a78c1b4cfff1faa",
+      "sha256_post_execution": "c91de6e6b44e73ad74077e852e13677df23eb3bf87206cd314452af538103576",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t07_rr1_usage_strict-367ab53b41085754",
+      "sha256_post_execution": "3b52b880d51128099ed40b8b2a173af67d20d9e6daad5094483dbbf7361294d2",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r05_t07_usage_families-681f08ccb55f87cc",
+      "sha256_post_execution": "24c5642a132ce102ab9c1a988ebfc1e5a114d14354c3e65400fbcafe792209d5",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r06_t02_compaction_render-29d0c1a374ab3565",
+      "sha256_post_execution": "ea073e620a56824cc9a225f3f1e7185d1455a89964e075eca66759a16aa39c1c",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/run_finalize_property-d25aa231ffb49448",
+      "sha256_post_execution": "8107fc88d1b9a78afd040f833e64ab6843bb0e3f315a87bcde35470ad1bc44e9",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/run_id_allocator-4557579b1171d252",
+      "sha256_post_execution": "79181045cec5cff44d125155ab26aa1295cd3cf7b774f0a93374abca7e695466",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/run_lineage_store-3912e8ae838df482",
+      "sha256_post_execution": "d845aa4c3e8848fd9dc55260e90d17f8dabaed1451a01cc3958630314a93157f",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/session_file_store-1cab4ae4c3af0fdd",
+      "sha256_post_execution": "e01e59b47aa616f2a57de4991e609216b9ddcc1211eab38af77070cf5c5f670d",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/session_tree_r06t03-ab890dff2dfe6977",
+      "sha256_post_execution": "027d69e3499fde0c9baf02f9ec0534f7e3ff7f90121e8f318fe48d5f11c2f01e",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/storage_transactions-64370c114e95eea8",
+      "sha256_post_execution": "30431681a29adc181aeec693f677a4a20417c06ef75743762db488a9776ad33b",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/lingxi_browser_spike-21922237f585d80e",
+      "sha256_post_execution": "e75749ec7f3722cfb0c850fc555b973f65662900f8d7c55223e8f4fedcefbdf1",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/spike_browser-1f2d989b467b70df",
+      "sha256_post_execution": "0b63e82468a428eb24092c10becbec540e94ad7bb9e50aa88944b6cd6f54c291",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/spike_pdf-0c6f4c9632f9866a",
+      "sha256_post_execution": "856e9e8eb3de821b90e42d7ded7f49d287d06d0c25953e9a9c26c61002ea614b",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/lingxi_kernel-094bb4151f357e00",
+      "sha256_post_execution": "0fd5caa9e88fd1533eb9594d055cacd6752dd97d46fa153f17fc69eba3b72299",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r06_t01_context_compiler-489c582c010312fe",
+      "sha256_post_execution": "c71438245420962a7ef597b12b05e05e89498ce21708f0a8911b9991dbbb7633",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r06_t02_compaction-2a93e01aa5acb098",
+      "sha256_post_execution": "ed4af23df116a3757783c3e3ec9dd5c2a10d92eeb92eec0bd4d999dd327dbab5",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/lingxi_protocol-9b84322372dbbbf5",
+      "sha256_post_execution": "8cf49f4568fa7433ea117d7456c743627867a1835942b156d2f878b8e93571dc",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/lingxi_proto_server-f24b68a96075a29e",
+      "sha256_post_execution": "2bab0b5a2494179241e70afa675243f14f2ac1c82c9a42cc1e3e08e537d65e10",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/lingxi_protocol_gen-3aa0bf84ca2e8c94",
+      "sha256_post_execution": "fc3a1daccae898e6ccbd666f6529b56981cefc6d7969a1bd76abd513e41b6e27",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/lingxi_protocol_verify-4046271e9c8e85d9",
+      "sha256_post_execution": "2215d77ff3597f95f859c06ec898fd62c46582c6cdc1ea9c738286b5b401676c",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/lingxi_service-fed47d112dfd427c",
+      "sha256_post_execution": "0b00364f33c161fe892e54ca0cccea268f9cc2e0d0abbea873c58b7e3476acab",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/lingxi_service-c1b7a7820dfd6051",
+      "sha256_post_execution": "fb99dc8af0559296027eda2a080aa12fa4407b122dc961bacadd8578a4f2cf98",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r04_t07_fixture-b19e3c07924144f6",
+      "sha256_post_execution": "d1c3f27e1e3162574d78c266e07f15dedd60d6a421f8b52a27dd908608eb4a29",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/admission_dedup_adversarial-65b0b2c6c62f884b",
+      "sha256_post_execution": "99a9b2fd7eca8bd113f749cea441678565589baf84d4012449c4f162b4aacecc",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/admission_dedup_consistency-a877aefb04b73fdb",
+      "sha256_post_execution": "bb22948227d915a5cce9983787a3d27e8ac5e4cfc37b4d20bacfb9d6a7a118e8",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/auth_matrix-d09f49dea52f525f",
+      "sha256_post_execution": "375e752f8157da4eca5025b38df42fe61a82dfd7722efdca88d80ed6ca515d94",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/background_disconnect_recovery-3f4b0a43cef46a79",
+      "sha256_post_execution": "994d36aa2db1790b98d40a15012e529162f3d158b4d9f9be826e2b4e9fbbfc03",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/background_steering-dc7408cd519ed822",
+      "sha256_post_execution": "8a53cfb21e0aec427f054803b50fac7fd574c74bdd29dfafe87bbc81ccf90fc6",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/cancel_link_inheritance-e5f5d953d20e1991",
+      "sha256_post_execution": "3273968d0e7c5e0aad41f6a9b2733db2d02c4899528bbc2cd381cd5ea7de6de2",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/rust_test_workspace/stderr.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r04_rr1_f02_reaper_cleanup-0212db2487b22bce",
+      "sha256_post_execution": "f7fe9dcc4063d86e875af87a248478128cdb02480d56cfaf1982a21a58ae6492",
+      "log": "verify-R05-final-01/R04_REGRESSION/R04_RR1_REPAIR/r04_rr1_f02_reaper_cleanup.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r04_rr1_f04_pty_consumption-140d42f3a11f4e77",
+      "sha256_post_execution": "7f1992fcebf28031c9184170c4de71c5904935439fc7a3972acb83ae9cf081cf",
+      "log": "verify-R05-final-01/R04_REGRESSION/R04_RR1_REPAIR/r04_rr1_f04_pty_consumption.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r04_rr1_f05_output_integrity-1709427eb8117464",
+      "sha256_post_execution": "037147b4e90610f37a68857fa08fd2f250abe7f484eb70388f0203fbac7ca971",
+      "log": "verify-R05-final-01/R04_REGRESSION/R04_RR1_REPAIR/r04_rr1_f05_output_integrity.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r04_rr1_f05_spill_failure-a5c25013481680d9",
+      "sha256_post_execution": "a003d97db77c7457959f9c5ea930b88312912def005ea0662e15e3f3a01f84d3",
+      "log": "verify-R05-final-01/R04_REGRESSION/R04_RR1_REPAIR/r04_rr1_f05_spill_failure.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r04_rr1_f03_stop_honesty-8a07012a805fdb85",
+      "sha256_post_execution": "54d5f69c65682ab89aee6ac164a3cae4c405a37695e5fddfbf10b684126b4da8",
+      "log": "verify-R05-final-01/R04_REGRESSION/R04_RR1_REPAIR/r04_rr1_f03_stop_honesty.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r04_t05_registry_capacity-ce863133eb8f2b30",
+      "sha256_post_execution": "17f12ee34617821e7e089162d175227026f94d4a8332bb1ebb023211a97e5200",
+      "log": "verify-R05-final-01/R04_REGRESSION/R04_RR1_REPAIR/r04_t05_registry_capacity.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r04_t08_tool_matrix-dd95be5104c67a3b",
+      "sha256_post_execution": "3d268a664d25cee2d3b1e33830a575373ef7ac4d461d39c1dc0afb7487803128",
+      "log": "verify-R05-final-01/R04_REGRESSION/R04_MATRIX/integration.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/late_result_fencing_property-9f742f8a54e94c24",
+      "sha256_post_execution": "9b2a852fc7ade847aefe5c162172ea3793150d4cd07d36111ef564843d1f3644",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/A16/p4-full-property-group.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/run_finalize_property-95fc8dc48d6f06b0",
+      "sha256_post_execution": "c26ce3a26a7bc26c24863bf80c7b443757788461d8a9df38360aeb4abbea46d4",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/A16/p4-full-property-group.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/subagent_closeout-f797c45f3d5211c3",
+      "sha256_post_execution": "8cd4b804b550060c563c15916e9857155462d4420fc86833d8d706fef5e87e3b",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/G07_REPAIR/subagent_closeout.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/admission_dedup_adversarial-a0df1941698bf2fc",
+      "sha256_post_execution": "491bb4848cda6caaacf6f4c63b998ac6f9ecddb6d2afdd0a3d328573d04bce93",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/G07_REPAIR/admission_dedup_adversarial.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/cancel_terminal_race-16f93564431be2f5",
+      "sha256_post_execution": "411bf8c03d0787432e7a657ead81cc3f6e5719cec5bd8a640d3d1f765e2de8ab",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/G07_REPAIR/cancel_terminal_race.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/cancel_link_inheritance-62caee968cfd22f4",
+      "sha256_post_execution": "9ceea14f50984656db0b1832bf09b051447ee87bf23e588b3b8e8b9062547138",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/G07_REPAIR/cancel_link_inheritance.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/tool_receipt_unknown-6d1a58969c960ff3",
+      "sha256_post_execution": "431032609617c0dfe5e7feb626b5e5a3d1372e9088075eb834809b058e0c2bb7",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/G07_REPAIR/tool_receipt_unknown.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/input_budget_refusal-1f46c5f203699d01",
+      "sha256_post_execution": "da5565ecc108b2f89a7e6aaa4a18193cad8a72d1312bc81f09d2035e615a8757",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/G07_REPAIR/input_budget_refusal.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/request_id_canonicalization-21e3b04265c55c3c",
+      "sha256_post_execution": "4e7ff2575eb59ddcff87463d5126e82e2fcac2cd018bd0bb2b795e4e156d1ef1",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/G07_REPAIR/request_id_canonicalization.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/admission_dedup_consistency-a2f9f5dfe74329c9",
+      "sha256_post_execution": "e96ecf32be95f4344bd08e3cfe6276dbb61b7d38a9d81043d9ac44aa8f630245",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/G07_REPAIR/admission_dedup_consistency.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/input_payload_fidelity-c79fdc36b0f25e07",
+      "sha256_post_execution": "e93591a68885b7355d809d08a6691c269208105404f0e421503f886e9518fb9b",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/G07_REPAIR/input_payload_fidelity.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/background_steering-a7cd1a3502167869",
+      "sha256_post_execution": "ffe12224526d558cacd22ea7d839301e579c9cde6886c445dc610a69971a4007",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/G07_REPAIR/background_steering.log"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r03_t08_acceptance_matrix-d48a71954a878803",
+      "sha256_post_execution": "420310dd345d850520753434b3e7305e76d3e88cbe850ec8711e5fba0a7a9e78",
+      "log": "verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/A15/integration.log"
+    }
+  ],
+  "boundary": "Post-execution hash of actual logged paths in exclusive target; no simultaneous source edits/foreign target sharing. Protocol dispatch shipping binary separately captured in actual crash-running receipt. This is not a new at-dispatch attestation for every historical script command."
+}

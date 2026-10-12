@@ -1,0 +1,93 @@
+{
+  "job": {
+    "artifactId": "kpa_27fd1b3ee12b299cbb29e658",
+    "attempt": 1,
+    "cancelledAt": null,
+    "chunkerConfigId": "8b93f0aa4fa689af",
+    "createdAt": "2026-10-11T12:37:47.420Z",
+    "embeddingStats": {
+      "abandonedStaleVariantId": null,
+      "actualWrittenChunkCount": 1,
+      "attempt": 1,
+      "callAttemptCount": 1,
+      "checkpointVariantId": "viv_d69abad53f4c1891c163f24531d76799",
+      "chunksNewlyEmbedded": 1,
+      "chunksResumedFromCheckpoint": 0,
+      "chunksReusedFromReadyVariant": 0,
+      "confirmedResponseRequestCount": 1,
+      "failedCallCount": 0,
+      "failedRequestCount": 0,
+      "failedTransportAttemptCount": 0,
+      "knownNotSentAttemptCount": 0,
+      "model": {
+        "dimensions": 2,
+        "key": "eee4707bed577f88c7f11cf812cd9921b7507a8c0d182843acbc799f4ae9d4c5",
+        "modelId": "model-a",
+        "parameterFingerprint": "a709da905eb8a45b11bbb92fc106518ca8f19e3d5fd806dca1c4b867434f64cc",
+        "protocol": "openai-embeddings",
+        "provider": "embed"
+      },
+      "pendingCallIntentCount": 0,
+      "pendingRequestCount": 0,
+      "plannedChunkCount": 1,
+      "previousKnownNotSentAttemptCount": 0,
+      "previousRequestCount": 0,
+      "previousTransportAttemptCount": 0,
+      "requestCount": 1,
+      "requestCountSemantics": "confirmed_or_possibly_sent_excluding_known_not_sent",
+      "resetStaleVectors": false,
+      "successfulRequestCount": 1,
+      "transportAttemptCount": 1,
+      "unknownRequestsFromPreviousAttempt": 0,
+      "unknownSentRequestCount": 0
+    },
+    "error": null,
+    "id": "kjob_41640d62e4243fe18f567754",
+    "notebookId": "knb_0576402a736faab0c4f675e2",
+    "phase": "done",
+    "progressDone": 1,
+    "progressTotal": 1,
+    "sourceId": "ksrc_932306fe2e6d93f6e874b705",
+    "status": "done",
+    "updatedAt": "2026-10-11T12:37:47.426Z"
+  },
+  "ledger": [
+    {
+      "input_tokens": 5,
+      "model": "model-a",
+      "model_call_id": "op-embedding-1791722267424-0",
+      "outcome": "succeeded",
+      "provider": "embed",
+      "transport_attempts": 1,
+      "usage_state": "partial"
+    }
+  ],
+  "plan": [
+    {
+      "chunk_id": "chunk_d659232221d8e8f74d9bd026ccf6c7d5",
+      "ordinal": 0,
+      "text": "Chapter 0000 W09唯一章节\n\n唯一计划块0000的独立合成资料。"
+    }
+  ],
+  "ready": "LINGXI_SERVICE_READY addr=127.0.0.1:49672 home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/workspace-frozen-20/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-exact-1-97072-1791722266723864000 source=env",
+  "requests": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "Chapter 0000 W09唯一章节\n\n唯一计划块0000的独立合成资料。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:49646"
+    }
+  ],
+  "vectors": [
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_d659232221d8e8f74d9bd026ccf6c7d5",
+      "ordinal": 0,
+      "vector_index_variant_id": "viv_d69abad53f4c1891c163f24531d76799"
+    }
+  ]
+}

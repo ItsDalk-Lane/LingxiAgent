@@ -1,0 +1,31 @@
+COMMAND ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-service", "--test", "r06_ar_f02_file_restore", "--", "--nocapture"]
+ISOLATED_LINGXI_HOME /tmp/lingxi-w02-e02-final-selfcheck-fcns_beh
+START 2026-10-11T05:54:07.714286+00:00
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0603]: function `encode_uri_component` is private
+   --> crates/lingxi-service/tests/r06_ar_f02_file_restore.rs:897:38
+    |
+897 |             lingxi_service::preview::encode_uri_component(retained)
+    |                                      ^^^^^^^^^^^^^^^^^^^^ private function
+    |
+note: the function `encode_uri_component` is defined here
+   --> crates/lingxi-service/src/preview.rs:56:1
+    |
+ 56 | pub(crate) fn encode_uri_component(value: &str) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0603]: function `encode_uri_component` is private
+   --> crates/lingxi-service/tests/r06_ar_f02_file_restore.rs:924:42
+    |
+924 |                 lingxi_service::preview::encode_uri_component(state_file.to_str().unwrap())
+    |                                          ^^^^^^^^^^^^^^^^^^^^ private function
+    |
+note: the function `encode_uri_component` is defined here
+   --> crates/lingxi-service/src/preview.rs:56:1
+    |
+ 56 | pub(crate) fn encode_uri_component(value: &str) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0603`.
+error: could not compile `lingxi-service` (test "r06_ar_f02_file_restore") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

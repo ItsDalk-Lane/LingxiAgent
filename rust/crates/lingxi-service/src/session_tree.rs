@@ -24,7 +24,8 @@
 
 use std::sync::Arc;
 
-use serde::Serialize;
+use lingxi_adapters::storage::session_operations::{self, Begin, Operation, Prepare};
+use serde::{Deserialize, Serialize};
 
 use lingxi_adapters::storage::session_tree as store;
 use lingxi_adapters::storage::RunDatabase;
@@ -56,6 +57,10 @@ pub enum SessionTreeError {
     /// 会话 id 撞库（fork new_session_id / 创建会话；对照现役
     /// sessions.ts:587 active_session_conflict → 409；REPAIR-R1 观察项：
     /// 不再落 Internal 500）。
+    /// 实际删除操作墓碑持有旧业务身份，明确冲突而不是永久忙。
+    IdentityRetired {
+        session_id: String,
+    },
     SessionExists {
         session_id: String,
     },
@@ -78,6 +83,15 @@ impl From<StorageError> for SessionTreeError {
                 if detail.contains("not on the current branch") =>
             {
                 SessionTreeError::ForkTargetInvalid
+            }
+            StorageError::Conflict { detail }
+                if detail.starts_with("session_identity_retired:") =>
+            {
+                SessionTreeError::IdentityRetired {
+                    session_id: detail
+                        .trim_start_matches("session_identity_retired:")
+                        .to_string(),
+                }
             }
             StorageError::Conflict { detail } if detail.starts_with("session_exists:") => {
                 SessionTreeError::SessionExists {
@@ -110,7 +124,7 @@ impl From<logic::ResolveTargetError> for SessionTreeError {
 }
 
 /// fork 结果视图。
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ForkView {
     pub session_id: String,
@@ -135,7 +149,7 @@ pub enum FileRollbackMode {
 /// skipped=已是目标态无需写回；failed=写回/校验 IO 失败（未覆盖现状）。
 /// `ok` = 无冲突无失败且 reason 为空；`reason` 承载整体级说明
 /// （如 retry 锚点无检查点 → "no_checkpoint"，对照现役 restoreTurn 同款）。
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FileRestoreReport {
     pub ok: bool,
@@ -144,6 +158,8 @@ pub struct FileRestoreReport {
     pub conflicted: Vec<String>,
     pub skipped: Vec<String>,
     pub failed: Vec<String>,
+    #[serde(default)]
+    pub recovery_records: Vec<serde_json::Value>,
 }
 
 impl FileRestoreReport {
@@ -155,6 +171,7 @@ impl FileRestoreReport {
             conflicted: Vec::new(),
             skipped: Vec::new(),
             failed: Vec::new(),
+            recovery_records: Vec::new(),
         }
     }
 }
@@ -163,7 +180,7 @@ impl FileRestoreReport {
 /// 客户端随后经 execute 提交为全新 run——不覆盖旧结果）。
 /// `file_rollback_report`：fileRollback=workspace 时的逐文件恢复报告
 /// （对照现役 session-turn-actions.ts 的 fileRollbackReport；未请求时缺省）。
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RetryOutcome {
     pub session_id: String,
@@ -180,7 +197,7 @@ pub struct RetryOutcome {
 /// REPAIR-R1 FINDING-05（管理者裁决）：内容级回滚——无冲突文件真实写回
 /// 存档内容；逐文件三档判定（restored/conflicted/skipped/failed），
 /// 冲突文件保留用户修改，分支照常回移（设计稿 A06 原语义），绝不伪称全部撤销。
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RewindReceipt {
     pub session_id: String,
@@ -196,12 +213,14 @@ pub struct RewindReceipt {
     pub skipped: Vec<String>,
     /// 写回/校验 IO 失败的文件（现状未被覆盖）。
     pub failed: Vec<String>,
+    #[serde(default)]
+    pub recovery_records: Vec<serde_json::Value>,
     /// 外部副作用（网络/bash）绝不回滚，也绝不伪称已回滚。
     pub external_effects: String,
 }
 
 /// rewind 预览（只读）：若执行将发生的分支重置点与逐文件判定。
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RewindPreview {
     pub session_id: String,
@@ -212,7 +231,7 @@ pub struct RewindPreview {
 }
 
 /// 预览中的单文件判定。
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FilePreview {
     pub file_path: String,
@@ -228,97 +247,168 @@ async fn restore_checkpoint_files(
     storage: &RunDatabase,
     session_id: &str,
     checkpoint_id: &str,
+    operation: &Operation,
+    principal: &Principal,
+    safety: Arc<crate::file_safety::FileSafety>,
+    access: Option<Arc<crate::resourceaccess::ResourceAccess>>,
 ) -> Result<FileRestoreReport, SessionTreeError> {
-    let versions = store::list_file_versions(storage, checkpoint_id)
-        .await
-        .map_err(SessionTreeError::from)?;
-    let contents = store::list_file_contents(storage, checkpoint_id)
-        .await
-        .map_err(SessionTreeError::from)?;
-    let content_by_path: std::collections::HashMap<&str, &[u8]> = contents
-        .iter()
-        .map(|c| (c.file_path.as_str(), c.content.as_slice()))
-        .collect();
-    // 见证集：该文件在本会话全部检查点中被记录过的所有哈希。
-    let witnessed = store::list_session_file_hashes(storage, session_id)
-        .await
-        .map_err(SessionTreeError::from)?;
-    let mut witnessed_by_path: std::collections::HashMap<&str, Vec<String>> =
-        std::collections::HashMap::new();
-    for (path, sha) in &witnessed {
-        witnessed_by_path
-            .entry(path.as_str())
-            .or_default()
-            .push(sha.clone());
-    }
-
-    let mut report = FileRestoreReport {
-        ok: true,
-        reason: None,
-        restored: Vec::new(),
-        conflicted: Vec::new(),
-        skipped: Vec::new(),
-        failed: Vec::new(),
-    };
-    for v in &versions {
-        let empty: &[String] = &[];
-        let witnessed_set = witnessed_by_path
-            .get(v.file_path.as_str())
-            .map(|v| v.as_slice())
-            .unwrap_or(empty);
-        match std::fs::read(&v.file_path) {
-            Ok(bytes) => {
-                let cur = logic::sha256_hex(&bytes);
-                match logic::judge_file_restore(&v.file_path, &v.sha256, &cur, witnessed_set) {
-                    logic::FileRestoreVerdict::Skipped => {
-                        report.skipped.push(v.file_path.clone());
-                    }
-                    logic::FileRestoreVerdict::Restore => {
-                        // 写回存档内容并复读校验（写坏/读坏如实入 failed，
-                        // 绝不在收据里谎称 restored）。
-                        let archived = content_by_path.get(v.file_path.as_str());
-                        let Some(archived) = archived else {
-                            // 版本行存在但内容行缺席（历史库/旧检查点）：
-                            // 无内容可写回，按冲突处理——不覆盖现状。
-                            report.conflicted.push(v.file_path.clone());
-                            continue;
-                        };
-                        let write_ok = std::fs::write(&v.file_path, archived).is_ok()
-                            && std::fs::read(&v.file_path)
-                                .map(|b| logic::sha256_hex(&b) == v.sha256)
-                                .unwrap_or(false);
-                        if write_ok {
-                            report.restored.push(v.file_path.clone());
-                        } else {
-                            report.failed.push(v.file_path.clone());
-                        }
-                    }
-                    logic::FileRestoreVerdict::Conflicted => {
-                        report.conflicted.push(v.file_path.clone());
-                    }
+    session_operations::arm_files(storage, session_id, operation).await?;
+    let versions = store::list_file_versions(storage, checkpoint_id).await?;
+    let contents = store::list_file_contents(storage, checkpoint_id).await?;
+    let session = session_id.to_owned();
+    let principal = crate::sessions::kernel_principal_of(principal);
+    // 与授权变更共用数据库写队列：操作期间不会接受旧授权的并行更新。
+    store::with_current_file_authorization(storage, session_id, move |roots| {
+        let scope = crate::file_safety::witness_scope(
+            principal.storage_kind(),
+            &principal.storage_subject(),
+            &session,
+        );
+        let mut report = FileRestoreReport {
+            ok: true,
+            reason: None,
+            restored: vec![],
+            conflicted: vec![],
+            skipped: vec![],
+            failed: vec![],
+            recovery_records: vec![],
+        };
+        for v in versions {
+            let path = std::path::Path::new(&v.file_path);
+            let authorize = || {
+                current_file_access(&roots, &principal, &session, path)
+                    && shared_file_access(access.as_deref(), &principal, &session, path)
+            };
+            if !authorize() || safety.is_protected(path) {
+                report.conflicted.push(v.file_path);
+                continue;
+            }
+            let snapshot = match crate::file_safety::Snapshot::read(path) {
+                Ok(s) => s,
+                Err(_) => {
+                    report.conflicted.push(v.file_path);
+                    continue;
+                }
+            };
+            let Some(content) = contents.iter().find(|c| c.file_path == v.file_path) else {
+                report.conflicted.push(v.file_path);
+                continue;
+            };
+            if content.content.len() as u64 != v.size_bytes as u64
+                || logic::sha256_hex(&content.content) != v.sha256
+            {
+                report.failed.push(v.file_path);
+                continue;
+            }
+            if logic::sha256_hex(&snapshot.bytes) == v.sha256 {
+                report.skipped.push(v.file_path);
+                continue;
+            }
+            if !safety.witnessed(&scope, path, &snapshot) {
+                report.conflicted.push(v.file_path);
+                continue;
+            }
+            let result = safety.replace(&scope, path, &snapshot, &content.content, authorize);
+            if let Some(record) = safety.last_recovery(path) {
+                report.recovery_records.push(record);
+            }
+            match result {
+                Ok(()) => report.restored.push(v.file_path),
+                Err(crate::file_safety::WriteError::Conflict) => {
+                    report.conflicted.push(v.file_path)
+                }
+                Err(crate::file_safety::WriteError::Failed(_)) => report.failed.push(v.file_path),
+                Err(crate::file_safety::WriteError::Unknown(_)) => {
+                    report.reason = Some("write_may_have_occurred".into());
+                    report.failed.push(v.file_path);
                 }
             }
-            // 文件在检查点之后被删除 = 外部修改的一种，判冲突（D1 加固保留：
-            // 绝不在用户删掉文件后悄无声息地当无事发生）。
-            Err(_) => report.conflicted.push(v.file_path.clone()),
         }
-    }
-    report.ok = report.conflicted.is_empty() && report.failed.is_empty();
-    Ok(report)
+        report.ok = report.conflicted.is_empty() && report.failed.is_empty();
+        Ok(report)
+    })
+    .await
+    .map_err(SessionTreeError::from)
 }
 
-/// SessionService：会话树管理面的服务编排。
+fn current_file_access(
+    roots: &[String],
+    principal: &lingxi_kernel::Principal,
+    session: &str,
+    path: &std::path::Path,
+) -> bool {
+    let roots: Vec<std::path::PathBuf> = roots.iter().map(std::path::PathBuf::from).collect();
+    // 授权根自身被换成链接也拒绝，不能重新解析后扩大原授权。
+    if roots
+        .iter()
+        .any(|p| p.canonicalize().ok().as_deref() != Some(p.as_path()))
+    {
+        return false;
+    }
+    crate::resourceaccess::ResourceAccess::new(&roots)
+        .ok()
+        .and_then(|a| {
+            a.authorize(
+                principal.storage_kind(),
+                &principal.storage_subject(),
+                session,
+                path,
+                std::path::Path::new("/"),
+                crate::resourceaccess::ResourceOp::Write,
+            )
+            .ok()
+        })
+        .map(|s| s.path == path)
+        .unwrap_or(false)
+}
+
+fn shared_file_access(
+    access: Option<&crate::resourceaccess::ResourceAccess>,
+    principal: &lingxi_kernel::Principal,
+    session: &str,
+    path: &std::path::Path,
+) -> bool {
+    access
+        .map(|a| {
+            a.authorize(
+                principal.storage_kind(),
+                &principal.storage_subject(),
+                session,
+                path,
+                std::path::Path::new("/"),
+                crate::resourceaccess::ResourceOp::Write,
+            )
+            .map(|s| s.path == path)
+            .unwrap_or(false)
+        })
+        .unwrap_or(true)
+}
+
+#[derive(Clone)]
 pub struct SessionService {
     storage: Arc<RunDatabase>,
     events: Arc<EventService>,
+    file_safety: Arc<crate::file_safety::FileSafety>,
+    resource_access: Option<Arc<crate::resourceaccess::ResourceAccess>>,
+    probe: Arc<std::sync::Mutex<Option<Arc<dyn SessionOperationProbe>>>>,
+    session_files: Option<Arc<crate::sessionfiles::SessionFileService>>,
 }
 
+/// 故障/竞态观察点只暂停时序，不替换准入、存储或业务逻辑。
+pub trait SessionOperationProbe: Send + Sync {
+    fn reached<'a>(
+        &'a self,
+        kind: &'a str,
+        sid: &'a str,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ()> + Send + 'a>>;
+}
 /// rewind 请求（打包以控制参数个数）。
 pub struct RewindRequest<'a> {
     pub checkpoint_name: &'a str,
     pub restore_files: bool,
     pub file_rollback_enabled: bool,
-    pub busy: bool,
+    pub principal: &'a Principal,
+    pub request_id: Option<&'a str>,
     pub now_unix_ms: u64,
 }
 
@@ -350,24 +440,261 @@ fn as_logic_nodes(rows: &[(String, Option<String>, String)]) -> Vec<logic::Branc
 
 impl SessionService {
     pub fn new(storage: Arc<RunDatabase>, events: Arc<EventService>) -> Self {
-        Self { storage, events }
+        Self {
+            storage: Arc::clone(&storage),
+            events,
+            session_files: None,
+            file_safety: Arc::new(crate::file_safety::FileSafety::new(
+                storage
+                    .db_path()
+                    .parent()
+                    .unwrap_or_else(|| std::path::Path::new(".")),
+            )),
+            resource_access: None,
+            probe: Arc::new(std::sync::Mutex::new(None)),
+        }
+    }
+
+    pub fn with_session_files(
+        mut self,
+        files: Arc<crate::sessionfiles::SessionFileService>,
+    ) -> Self {
+        self.session_files = Some(files);
+        self
+    }
+
+    pub fn with_file_safety(
+        mut self,
+        safety: Arc<crate::file_safety::FileSafety>,
+        access: Option<Arc<crate::resourceaccess::ResourceAccess>>,
+    ) -> Self {
+        self.file_safety = safety;
+        self.resource_access = access;
+        self
+    }
+
+    pub fn set_operation_probe(&self, probe: Option<Arc<dyn SessionOperationProbe>>) {
+        *self.probe.lock().unwrap_or_else(|p| p.into_inner()) = probe;
+    }
+    async fn operation_observed(&self, kind: &str, sid: &str) {
+        let probe = self.probe.lock().unwrap_or_else(|p| p.into_inner()).clone();
+        if let Some(probe) = probe {
+            probe.reached(kind, sid).await;
+        }
+    }
+    /// 先取得真实操作权，随后重读权限和生命周期；重复收据仍须当前归属允许。
+    #[allow(clippy::too_many_arguments)]
+    async fn begin_command(
+        &self,
+        principal: &Principal,
+        sid: &str,
+        ids: &[&str],
+        kind: &str,
+        request_id: Option<&str>,
+        input: serde_json::Value,
+        _file_effects: bool,
+        now: u64,
+    ) -> Result<(lingxi_kernel::session_admission::SessionPermit, Begin), SessionTreeError> {
+        // 先按归属筛选，不向未授权主体泄漏忙状态；取得权后仍重读。
+        let before = store::get_session_row(&self.storage, sid)
+            .await?
+            .ok_or(SessionTreeError::NotFound)?;
+        if !crate::sessions::SessionStore::can_access(principal, &before.owner_user_id) {
+            return Err(SessionTreeError::Forbidden);
+        }
+        let permit = self
+            .storage
+            .session_admission()
+            .try_acquire(
+                ids,
+                crate::session_supervisor::SessionConcurrencyLimits::DEFAULT_REGISTRY_CAP,
+            )
+            .map_err(|_| SessionTreeError::Busy)?;
+        let row = store::get_session_row(&self.storage, sid)
+            .await?
+            .ok_or(SessionTreeError::NotFound)?;
+        if !crate::sessions::SessionStore::can_access(principal, &row.owner_user_id) {
+            return Err(SessionTreeError::Forbidden);
+        }
+        let request_id = request_id
+            .map(crate::dedup::validate_request_id)
+            .transpose()
+            .map_err(|detail| SessionTreeError::InvalidTarget { detail })?;
+        let mut random = [0u8; 16];
+        getrandom::getrandom(&mut random).map_err(|e| {
+            SessionTreeError::Storage(StorageError::Internal {
+                detail: format!("operation identity: {e}"),
+            })
+        })?;
+        let opid = format!(
+            "session-op:{}",
+            random
+                .iter()
+                .map(|b| format!("{b:02x}"))
+                .collect::<String>()
+        );
+        let kp = crate::sessions::kernel_principal_of(principal);
+        let begin = session_operations::begin(
+            &self.storage,
+            Prepare {
+                session_id: sid,
+                owner_kind: kp.storage_kind(),
+                owner_subject: &kp.storage_subject(),
+                operation_id: &opid,
+                request_id: request_id.as_deref(),
+                kind,
+                digest: &logic::sha256_hex(input.to_string().as_bytes()),
+                file_effects: false,
+                now,
+            },
+        )
+        .await?;
+        if matches!(&begin, Begin::Fresh(_)) {
+            self.operation_observed(kind, sid).await;
+        }
+        Ok((permit, begin))
+    }
+
+    /// 操作任务拥有lease，客户端取消等待不能让已入队写入失去保护。
+    #[allow(clippy::too_many_arguments)]
+    pub async fn fork_session(
+        &self,
+        principal: &Principal,
+        source: &str,
+        new_id: &str,
+        boundary: &str,
+        request_id: Option<&str>,
+        now: u64,
+    ) -> Result<ForkView, SessionTreeError> {
+        let (svc, p, source, new_id, boundary, rid) = (
+            self.clone(),
+            principal.clone(),
+            source.to_string(),
+            new_id.to_string(),
+            boundary.to_string(),
+            request_id.map(str::to_string),
+        );
+        tokio::spawn(async move {
+            svc.fork_inner(&p, &source, &new_id, &boundary, rid.as_deref(), now)
+                .await
+        })
+        .await
+        .map_err(|e| {
+            SessionTreeError::Storage(StorageError::Internal {
+                detail: format!("fork operation task: {e}"),
+            })
+        })?
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub async fn retry_turn(
+        &self,
+        principal: &Principal,
+        sid: &str,
+        target: Option<&str>,
+        rollback: FileRollbackMode,
+        enabled: bool,
+        request_id: Option<&str>,
+        now: u64,
+    ) -> Result<RetryOutcome, SessionTreeError> {
+        let (svc, p, sid, target, rid) = (
+            self.clone(),
+            principal.clone(),
+            sid.to_string(),
+            target.map(str::to_string),
+            request_id.map(str::to_string),
+        );
+        tokio::spawn(async move {
+            svc.retry_inner(
+                &p,
+                &sid,
+                target.as_deref(),
+                rollback,
+                enabled,
+                rid.as_deref(),
+                now,
+            )
+            .await
+        })
+        .await
+        .map_err(|e| {
+            SessionTreeError::Storage(StorageError::Internal {
+                detail: format!("retry operation task: {e}"),
+            })
+        })?
+    }
+    pub async fn rewind_to_checkpoint(
+        &self,
+        sid: &str,
+        req: RewindRequest<'_>,
+    ) -> Result<RewindReceipt, SessionTreeError> {
+        let (svc, p, sid, checkpoint, rid) = (
+            self.clone(),
+            req.principal.clone(),
+            sid.to_string(),
+            req.checkpoint_name.to_string(),
+            req.request_id.map(str::to_string),
+        );
+        let (restore_files, file_rollback_enabled, now_unix_ms) = (
+            req.restore_files,
+            req.file_rollback_enabled,
+            req.now_unix_ms,
+        );
+        tokio::spawn(async move {
+            svc.rewind_inner(
+                &sid,
+                RewindRequest {
+                    principal: &p,
+                    checkpoint_name: &checkpoint,
+                    request_id: rid.as_deref(),
+                    restore_files,
+                    file_rollback_enabled,
+                    now_unix_ms,
+                },
+            )
+            .await
+        })
+        .await
+        .map_err(|e| {
+            SessionTreeError::Storage(StorageError::Internal {
+                detail: format!("rewind operation task: {e}"),
+            })
+        })?
     }
 
     /// fork：busy/深度/目标闸 → 复制保留段 → 发布 `session_created`。
     /// 授权目录与权限档继承快照，绝不扩大（安全红线）。
-    pub async fn fork_session(
+    async fn fork_inner(
         &self,
         principal: &Principal,
         source_session_id: &str,
         new_session_id: &str,
         boundary_message_id: &str,
-        busy: bool,
+        request_id: Option<&str>,
         now_unix_ms: u64,
     ) -> Result<ForkView, SessionTreeError> {
-        if busy {
-            return Err(SessionTreeError::Busy);
-        }
-        let outcome = store::fork_session(
+        let (_permit,begin)=self.begin_command(principal,source_session_id,&[source_session_id,new_session_id],"fork",request_id,serde_json::json!({"newSessionId":new_session_id,"boundaryMessageId":boundary_message_id}),false,now_unix_ms).await?;
+        let operation = match begin {
+            Begin::Replay(value) => {
+                return serde_json::from_value(value).map_err(|e| {
+                    SessionTreeError::Storage(StorageError::Corrupted {
+                        detail: e.to_string(),
+                    })
+                })
+            }
+            Begin::Fresh(op) => op,
+        };
+        let source = store::get_session_row(&self.storage, source_session_id)
+            .await?
+            .ok_or(SessionTreeError::NotFound)?;
+        crate::model_history::ModelHistory::new(Arc::clone(&self.storage))
+            .validate_fork_prefix(
+                &crate::sessions::kernel_principal_of(principal),
+                &source.agent_id,
+                source_session_id,
+                boundary_message_id,
+            )
+            .await?;
+        let (outcome, envelope) = store::fork_session_committed_with_files(
             &self.storage,
             store::ForkRequest {
                 source_session_id,
@@ -375,31 +702,13 @@ impl SessionService {
                 boundary_message_id,
                 now_unix_ms,
             },
+            Some(operation),
+            self.session_files
+                .as_ref()
+                .map(|files| files.home().to_path_buf()),
         )
-        .await
-        .map_err(SessionTreeError::from)?;
-        // 提交成功后发布 session_created（Unknown 透传）。
-        let mut fields = serde_json::Map::new();
-        fields.insert("sessionId".into(), outcome.session_id.clone().into());
-        fields.insert(
-            "parentSessionId".into(),
-            outcome.parent_session_id.clone().into(),
-        );
-        fields.insert(
-            "forkedFromEntryId".into(),
-            outcome.fork_point_message_id.clone().into(),
-        );
-        let envelope = store::stage_key_event(
-            &self.storage,
-            &outcome.session_id,
-            &format!("{new_session_id}-fork"),
-            store::unknown_payload("session_created", fields),
-            now_unix_ms,
-        )
-        .await
-        .map_err(SessionTreeError::from)?;
+        .await?;
         self.events.publish_committed(&[envelope]);
-        let _ = principal; // 归属校验在路由层（get_for），此处编排层不重复
         Ok(ForkView {
             session_id: outcome.session_id,
             parent_session_id: outcome.parent_session_id,
@@ -419,21 +728,31 @@ impl SessionService {
     /// 重置前对工作区做内容级回滚（与 rewind 同一恢复机制；锚点 = 回合输入
     /// 消息对应的检查点，无检查点 → no_checkpoint 报告且**不阻塞**分支重置，
     /// 对照现役 restoreTurn 的 no_checkpoint 与逐文件失败不阻塞 commit）。
-    pub async fn retry_turn(
+    #[allow(clippy::too_many_arguments)]
+    async fn retry_inner(
         &self,
+        principal: &Principal,
         session_id: &str,
         target_message_id: Option<&str>,
         file_rollback: FileRollbackMode,
         file_rollback_enabled: bool,
-        busy: bool,
+        request_id: Option<&str>,
         now_unix_ms: u64,
     ) -> Result<RetryOutcome, SessionTreeError> {
-        if busy {
-            return Err(SessionTreeError::Busy);
-        }
         if file_rollback == FileRollbackMode::Workspace && !file_rollback_enabled {
             return Err(SessionTreeError::FileRollbackDisabled);
         }
+        let (_permit,begin)=self.begin_command(principal,session_id,&[session_id],"retry",request_id,serde_json::json!({"targetMessageId":target_message_id,"fileRollback":format!("{file_rollback:?}")}),file_rollback==FileRollbackMode::Workspace,now_unix_ms).await?;
+        let operation = match begin {
+            Begin::Replay(value) => {
+                return serde_json::from_value(value).map_err(|e| {
+                    SessionTreeError::Storage(StorageError::Corrupted {
+                        detail: e.to_string(),
+                    })
+                })
+            }
+            Begin::Fresh(op) => op,
+        };
         let rows = store::list_branch_messages(&self.storage, session_id)
             .await
             .map_err(SessionTreeError::from)?;
@@ -467,7 +786,16 @@ impl SessionService {
             .map_err(SessionTreeError::from)?;
             let report = match anchor {
                 Some(cp) => {
-                    restore_checkpoint_files(&self.storage, session_id, &cp.checkpoint_id).await?
+                    restore_checkpoint_files(
+                        &self.storage,
+                        session_id,
+                        &cp.checkpoint_id,
+                        &operation,
+                        principal,
+                        Arc::clone(&self.file_safety),
+                        self.resource_access.clone(),
+                    )
+                    .await?
                 }
                 None => FileRestoreReport::no_checkpoint(),
             };
@@ -476,18 +804,6 @@ impl SessionService {
             None
         };
 
-        let marker_id = store::reset_branch_head(
-            &self.storage,
-            store::ResetBranchHead {
-                session_id,
-                new_head_message_id: point.new_head_message_id.as_deref(),
-                reason: "retry",
-                source_message_id: Some(&point.turn_input_message_id),
-                now_unix_ms,
-            },
-        )
-        .await
-        .map_err(SessionTreeError::from)?;
         let mut fields = serde_json::Map::new();
         fields.insert("sessionId".into(), session_id.into());
         fields.insert(
@@ -508,15 +824,21 @@ impl SessionService {
                 })?,
             );
         }
-        let envelope = store::stage_key_event(
+        let receipt = serde_json::json!({"sessionId":session_id,"turnInputMessageId":point.turn_input_message_id,"turnInputContentJson":content_json,"newHeadMessageId":point.new_head_message_id,"resetMarkerId":"","fileRollbackReport":file_rollback_report});
+        let (marker_id, envelope) = store::reset_branch_head_committed(
             &self.storage,
-            session_id,
-            &marker_id,
-            store::unknown_payload("session_branch_reset", fields),
-            now_unix_ms,
+            store::ResetBranchHead {
+                session_id,
+                new_head_message_id: point.new_head_message_id.as_deref(),
+                reason: "retry",
+                source_message_id: Some(&point.turn_input_message_id),
+                now_unix_ms,
+            },
+            Some(operation),
+            fields,
+            receipt,
         )
-        .await
-        .map_err(SessionTreeError::from)?;
+        .await?;
         self.events.publish_committed(&[envelope]);
         Ok(RetryOutcome {
             session_id: session_id.to_string(),
@@ -535,7 +857,7 @@ impl SessionService {
     /// 系统从未见过的版本或文件被删（外部修改）→ conflicted，该文件保留
     /// 用户修改。冲突不阻塞分支回移（设计稿 A06 原语义），收据逐文件如实
     /// 标注，绝不伪称全部撤销；外部副作用恒 not_rolled_back。
-    pub async fn rewind_to_checkpoint(
+    async fn rewind_inner(
         &self,
         session_id: &str,
         req: RewindRequest<'_>,
@@ -544,15 +866,35 @@ impl SessionService {
             checkpoint_name,
             restore_files,
             file_rollback_enabled,
-            busy,
+            principal,
+            request_id,
             now_unix_ms,
         } = req;
-        if busy {
-            return Err(SessionTreeError::Busy);
-        }
         if restore_files && !file_rollback_enabled {
             return Err(SessionTreeError::FileRollbackDisabled);
         }
+        let (_permit, begin) = self
+            .begin_command(
+                principal,
+                session_id,
+                &[session_id],
+                "rewind",
+                request_id,
+                serde_json::json!({"checkpoint":checkpoint_name,"restoreFiles":restore_files}),
+                restore_files,
+                now_unix_ms,
+            )
+            .await?;
+        let operation = match begin {
+            Begin::Replay(value) => {
+                return serde_json::from_value(value).map_err(|e| {
+                    SessionTreeError::Storage(StorageError::Corrupted {
+                        detail: e.to_string(),
+                    })
+                })
+            }
+            Begin::Fresh(op) => op,
+        };
         let cp = store::get_checkpoint(&self.storage, session_id, checkpoint_name)
             .await
             .map_err(SessionTreeError::from)?
@@ -566,7 +908,16 @@ impl SessionService {
         // 内容级文件恢复（rewind/retry 共用机制）；restore_files=false 时
         // 只回分支不动文件。
         let file_report = if restore_files {
-            restore_checkpoint_files(&self.storage, session_id, &cp.checkpoint_id).await?
+            restore_checkpoint_files(
+                &self.storage,
+                session_id,
+                &cp.checkpoint_id,
+                &operation,
+                principal,
+                Arc::clone(&self.file_safety),
+                self.resource_access.clone(),
+            )
+            .await?
         } else {
             FileRestoreReport {
                 ok: true,
@@ -575,24 +926,15 @@ impl SessionService {
                 conflicted: Vec::new(),
                 skipped: Vec::new(),
                 failed: Vec::new(),
+                recovery_records: Vec::new(),
             }
         };
 
+        self.operation_observed("rewind:after-files", session_id)
+            .await;
+
         // 分支头回移 + reset 标记（同事务；旧历史不删）。文件冲突不阻塞
         // 分支回移——收据如实标注 conflicted，用户文件原样保留。
-        let marker_id = store::reset_branch_head(
-            &self.storage,
-            store::ResetBranchHead {
-                session_id,
-                new_head_message_id: point.new_head_message_id.as_deref(),
-                reason: "checkpoint_rewind",
-                source_message_id: Some(&point.turn_input_message_id),
-                now_unix_ms,
-            },
-        )
-        .await
-        .map_err(SessionTreeError::from)?;
-
         // 提交成功后发布 session_branch_reset。
         let mut fields = serde_json::Map::new();
         fields.insert("sessionId".into(), session_id.into());
@@ -604,15 +946,21 @@ impl SessionService {
                 None => serde_json::Value::Null,
             },
         );
-        let envelope = store::stage_key_event(
+        let receipt = serde_json::json!({"sessionId":session_id,"checkpoint":checkpoint_name,"turnInputMessageId":point.turn_input_message_id,"newHeadMessageId":point.new_head_message_id,"resetMarkerId":"","restored":file_report.restored,"conflicted":file_report.conflicted,"skipped":file_report.skipped,"failed":file_report.failed,"recoveryRecords":file_report.recovery_records,"externalEffects":"not_rolled_back"});
+        let (marker_id, envelope) = store::reset_branch_head_committed(
             &self.storage,
-            session_id,
-            &marker_id,
-            store::unknown_payload("session_branch_reset", fields),
-            now_unix_ms,
+            store::ResetBranchHead {
+                session_id,
+                new_head_message_id: point.new_head_message_id.as_deref(),
+                reason: "checkpoint_rewind",
+                source_message_id: Some(&point.turn_input_message_id),
+                now_unix_ms,
+            },
+            Some(operation),
+            fields,
+            receipt,
         )
-        .await
-        .map_err(SessionTreeError::from)?;
+        .await?;
         self.events.publish_committed(&[envelope]);
 
         Ok(RewindReceipt {
@@ -625,6 +973,7 @@ impl SessionService {
             conflicted: file_report.conflicted,
             skipped: file_report.skipped,
             failed: file_report.failed,
+            recovery_records: file_report.recovery_records,
             external_effects: "not_rolled_back".to_string(),
         })
     }
@@ -634,6 +983,7 @@ impl SessionService {
     /// 不发布任何事件。偏好闸与执行同口径（restore_files 需偏好已开）。
     pub async fn preview_rewind(
         &self,
+        principal: &Principal,
         session_id: &str,
         checkpoint_name: &str,
         restore_files: bool,
@@ -654,42 +1004,55 @@ impl SessionService {
             let versions = store::list_file_versions(&self.storage, &cp.checkpoint_id)
                 .await
                 .map_err(SessionTreeError::from)?;
-            let witnessed = store::list_session_file_hashes(&self.storage, session_id)
-                .await
-                .map_err(SessionTreeError::from)?;
-            let mut witnessed_by_path: std::collections::HashMap<&str, Vec<String>> =
-                std::collections::HashMap::new();
-            for (path, sha) in &witnessed {
-                witnessed_by_path
-                    .entry(path.as_str())
-                    .or_default()
-                    .push(sha.clone());
-            }
+            let contents = store::list_file_contents(&self.storage, &cp.checkpoint_id).await?;
+            let session = store::get_session_row(&self.storage, session_id)
+                .await?
+                .ok_or(SessionTreeError::NotFound)?;
+            let kernel = crate::sessions::kernel_principal_of(principal);
             for v in versions {
-                let empty: &[String] = &[];
-                let witnessed_set = witnessed_by_path
-                    .get(v.file_path.as_str())
-                    .map(|w| w.as_slice())
-                    .unwrap_or(empty);
-                let verdict = match std::fs::read(&v.file_path) {
-                    Ok(bytes) => {
-                        let cur = logic::sha256_hex(&bytes);
-                        match logic::judge_file_restore(
-                            &v.file_path,
-                            &v.sha256,
-                            &cur,
-                            witnessed_set,
-                        ) {
-                            logic::FileRestoreVerdict::Skipped => "skipped",
-                            logic::FileRestoreVerdict::Restore => "restored",
-                            logic::FileRestoreVerdict::Conflicted => "conflicted",
+                let path = std::path::Path::new(&v.file_path);
+                let verdict = if self.file_safety.is_protected(path)
+                    || !current_file_access(&session.authorized_folders, &kernel, session_id, path)
+                    || !shared_file_access(
+                        self.resource_access.as_deref(),
+                        &kernel,
+                        session_id,
+                        path,
+                    ) {
+                    "conflicted"
+                } else {
+                    match crate::file_safety::Snapshot::read(path) {
+                        Ok(snapshot) => {
+                            match contents.iter().find(|c| c.file_path == v.file_path) {
+                                Some(content)
+                                    if logic::sha256_hex(&content.content) == v.sha256
+                                        && content.content.len() as u64 == v.size_bytes as u64 =>
+                                {
+                                    if logic::sha256_hex(&snapshot.bytes) == v.sha256 {
+                                        "skipped"
+                                    } else if self.file_safety.witnessed(
+                                        &crate::file_safety::witness_scope(
+                                            kernel.storage_kind(),
+                                            &kernel.storage_subject(),
+                                            session_id,
+                                        ),
+                                        path,
+                                        &snapshot,
+                                    ) {
+                                        "restored"
+                                    } else {
+                                        "conflicted"
+                                    }
+                                }
+                                _ => "failed",
+                            }
                         }
+                        Err(_) => "conflicted",
                     }
-                    Err(_) => "conflicted",
                 };
                 files.push(FilePreview {
                     file_path: v.file_path,
-                    verdict: verdict.to_string(),
+                    verdict: verdict.into(),
                 });
             }
         }
@@ -721,14 +1084,38 @@ impl SessionService {
     ///   原子落库（latest 覆盖 = 子行随行替换，无残留无 PK 冲突）；
     ///   `turn_input_message_id` 回填为目标消息的回合输入（retry fileRollback
     ///   锚点，对照现役按 turnInputEntryId 取回合快照）。
-    pub async fn create_checkpoint(
+    async fn create_checkpoint_inner(
         &self,
+        principal: &Principal,
         session_id: &str,
         name: &str,
         target_message_id: &str,
         file_paths: &[String],
         now_unix_ms: u64,
     ) -> Result<store::CheckpointRow, SessionTreeError> {
+        let row = store::get_session_row(&self.storage, session_id)
+            .await?
+            .ok_or(SessionTreeError::NotFound)?;
+        if !crate::sessions::SessionStore::can_access(principal, &row.owner_user_id) {
+            return Err(SessionTreeError::Forbidden);
+        }
+        let _permit = self
+            .storage
+            .session_admission()
+            .try_acquire(
+                &[session_id],
+                crate::session_supervisor::SessionConcurrencyLimits::DEFAULT_REGISTRY_CAP,
+            )
+            .map_err(|_| SessionTreeError::Busy)?;
+        let current = store::get_session_row(&self.storage, session_id)
+            .await?
+            .ok_or(SessionTreeError::NotFound)?;
+        if !crate::sessions::SessionStore::can_access(principal, &current.owner_user_id) {
+            return Err(SessionTreeError::Forbidden);
+        }
+        if current.lifecycle != "active" {
+            return Err(SessionTreeError::Busy);
+        }
         let nodes = branch_nodes(&self.storage, session_id).await?;
         let pos = nodes
             .iter()
@@ -773,9 +1160,30 @@ impl SessionService {
                         file_path: path.clone(),
                     });
                 }
-                let bytes = std::fs::read(&canon).map_err(|e| SessionTreeError::InvalidTarget {
-                    detail: format!("checkpoint file {path} not readable: {e}"),
-                })?;
+                let kernel = crate::sessions::kernel_principal_of(principal);
+                if self.file_safety.is_protected(&canon)
+                    || !current_file_access(
+                        &session.authorized_folders,
+                        &kernel,
+                        session_id,
+                        &canon,
+                    )
+                    || !shared_file_access(
+                        self.resource_access.as_deref(),
+                        &kernel,
+                        session_id,
+                        &canon,
+                    )
+                {
+                    return Err(SessionTreeError::FileNotAuthorized {
+                        file_path: path.clone(),
+                    });
+                }
+                let bytes = crate::file_safety::Snapshot::read(&canon)
+                    .map(|s| s.bytes)
+                    .map_err(|e| SessionTreeError::InvalidTarget {
+                        detail: format!("checkpoint file {path} not readable: {e}"),
+                    })?;
                 // 对照现役 checkpoint-store 的 utf-8/base64 双态标记；
                 // BLOB 始终存原始字节，该标记仅描述内容形态。
                 let encoding = if std::str::from_utf8(&bytes).is_ok() {
@@ -809,6 +1217,44 @@ impl SessionService {
         .map_err(SessionTreeError::from)
     }
 
+    pub async fn create_checkpoint(
+        &self,
+        principal: &Principal,
+        sid: &str,
+        name: &str,
+        target: &str,
+        files: &[String],
+        now: u64,
+    ) -> Result<store::CheckpointRow, SessionTreeError> {
+        let (svc, principal, sid, name, target, files) = (
+            self.clone(),
+            principal.clone(),
+            sid.to_string(),
+            name.to_string(),
+            target.to_string(),
+            files.to_vec(),
+        );
+        tokio::spawn(async move {
+            svc.create_checkpoint_inner(&principal, &sid, &name, &target, &files, now)
+                .await
+        })
+        .await
+        .map_err(|e| {
+            SessionTreeError::Storage(StorageError::Internal {
+                detail: e.to_string(),
+            })
+        })?
+    }
+    pub async fn delete_checkpoint(&self, sid: &str, name: &str) -> Result<bool, SessionTreeError> {
+        let (svc, sid, name) = (self.clone(), sid.to_string(), name.to_string());
+        tokio::spawn(async move { svc.delete_checkpoint_inner(&sid, &name).await })
+            .await
+            .map_err(|e| {
+                SessionTreeError::Storage(StorageError::Internal {
+                    detail: e.to_string(),
+                })
+            })?
+    }
     /// 列出会话的具名检查点（创建时间升序）。
     pub async fn list_checkpoints(
         &self,
@@ -820,11 +1266,19 @@ impl SessionService {
     }
 
     /// 删除具名检查点（不存在 → false → 路由 404）。
-    pub async fn delete_checkpoint(
+    async fn delete_checkpoint_inner(
         &self,
         session_id: &str,
         name: &str,
     ) -> Result<bool, SessionTreeError> {
+        let _permit = self
+            .storage
+            .session_admission()
+            .try_acquire(
+                &[session_id],
+                crate::session_supervisor::SessionConcurrencyLimits::DEFAULT_REGISTRY_CAP,
+            )
+            .map_err(|_| SessionTreeError::Busy)?;
         store::delete_checkpoint(&self.storage, session_id, name)
             .await
             .map_err(SessionTreeError::from)

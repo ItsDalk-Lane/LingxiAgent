@@ -1,0 +1,15 @@
+
+running 1 test
+
+thread 'c01_actual_calls_keep_system_frozen_and_tools_live_after_description_update' (12701355) panicked at crates/lingxi-service/tests/r06_ar_f05_cache.rs:439:5:
+真实读取的正对照
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test c01_actual_calls_keep_system_frozen_and_tools_live_after_description_update ... FAILED
+
+failures:
+
+failures:
+    c01_actual_calls_keep_system_frozen_and_tools_live_after_description_update
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.20s
+

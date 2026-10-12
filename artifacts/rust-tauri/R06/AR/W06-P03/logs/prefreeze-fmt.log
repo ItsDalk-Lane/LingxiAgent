@@ -1,0 +1,94 @@
+{"command": ["/Users/study_superior/.cargo/bin/cargo", "fmt", "--manifest-path", "rust/Cargo.toml", "--all", "--", "--check"], "start": 1791705569.2188091, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-prefreeze-fmt-figl0xgk", "guard": "8192MB/600s"}
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs:894:
+             false,
+         ),
+     ];
+-    let resource_depth=format!("future: {}x{}", "[".repeat(65), "]".repeat(65));
+-    let mut resource_alias=String::from("a0: &a0 [ok]\n");
+-    for i in 1..20 {resource_alias.push_str(&format!("a{i}: &a{i} [*a{}, *a{}, *a{}, *a{}]\n",i-1,i-1,i-1,i-1));}
++    let resource_depth = format!("future: {}x{}", "[".repeat(65), "]".repeat(65));
++    let mut resource_alias = String::from("a0: &a0 [ok]\n");
++    for i in 1..20 {
++        resource_alias.push_str(&format!(
++            "a{i}: &a{i} [*a{}, *a{}, *a{}, *a{}]\n",
++            i - 1,
++            i - 1,
++            i - 1,
++            i - 1
++        ));
++    }
+     let cases=cases.into_iter().chain([
+         ("p03-depth-budget",resource_depth.as_str(),true,false,false,false),
+         ("p03-alias-budget",resource_alias.as_str(),true,false,false,false),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs:998:
+             assert_eq!(flags.0, 400, "{name}");
+             assert_eq!(terminal, "failed", "{name}");
+             assert!(requests.is_empty(), "{name}");
+-            let experience_before=std::fs::read(effective.join("agents/lingxi/experience/p02.md")).unwrap();
+-            for (method,url,body) in [
+-                ("GET","/lingxi/v1/agents/lingxi/identity",None),
+-                ("PUT","/lingxi/v1/agents/lingxi/experience",Some(serde_json::json!({"content":"# 不得写入\n错误配置"}))),
+-                ("POST","/lingxi/v1/agents/lingxi/experience/feedback",Some(serde_json::json!({"rating":"up","excerpt":"不得写入"}))),
+-                ("PUT","/lingxi/v1/agents/lingxi/skills",Some(serde_json::json!({"enabled":["shared-p02"]}))),
+-                ("PATCH","/lingxi/v1/agents/lingxi/skills/shared-p02",Some(serde_json::json!({"enabled":true}))),
++            let experience_before =
++                std::fs::read(effective.join("agents/lingxi/experience/p02.md")).unwrap();
++            for (method, url, body) in [
++                ("GET", "/lingxi/v1/agents/lingxi/identity", None),
++                (
++                    "PUT",
++                    "/lingxi/v1/agents/lingxi/experience",
++                    Some(serde_json::json!({"content":"# 不得写入\n错误配置"})),
++                ),
++                (
++                    "POST",
++                    "/lingxi/v1/agents/lingxi/experience/feedback",
++                    Some(serde_json::json!({"rating":"up","excerpt":"不得写入"})),
++                ),
++                (
++                    "PUT",
++                    "/lingxi/v1/agents/lingxi/skills",
++                    Some(serde_json::json!({"enabled":["shared-p02"]})),
++                ),
++                (
++                    "PATCH",
++                    "/lingxi/v1/agents/lingxi/skills/shared-p02",
++                    Some(serde_json::json!({"enabled":true})),
++                ),
+             ] {
+-                let result=http_json(child.addr,method,url,Some(&token),body.as_ref()).await;
+-                println!("p03_reject_consumer name={name} method={method} path={url} receipt={result:?}");
+-                assert_eq!(result.0,400,"{name} {url}");
+-                assert_eq!(std::fs::read_to_string(&config).unwrap(),yaml);
+-                assert_eq!(std::fs::read(effective.join("agents/lingxi/experience/p02.md")).unwrap(),experience_before);
++                let result = http_json(child.addr, method, url, Some(&token), body.as_ref()).await;
++                println!(
++                    "p03_reject_consumer name={name} method={method} path={url} receipt={result:?}"
++                );
++                assert_eq!(result.0, 400, "{name} {url}");
++                assert_eq!(std::fs::read_to_string(&config).unwrap(), yaml);
++                assert_eq!(
++                    std::fs::read(effective.join("agents/lingxi/experience/p02.md")).unwrap(),
++                    experience_before
++                );
+             }
+         } else {
+             assert_eq!(flags.0, 200, "{name}");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f06_config.rs:550:
+         attempt: lingxi_protocol::AttemptId::new("run-config#a1"),
+         generation: 1,
+     };
+-    let resource_depth=format!("future: {}x{}", "[".repeat(65), "]".repeat(65));
++    let resource_depth = format!("future: {}x{}", "[".repeat(65), "]".repeat(65));
+     for (i, yaml) in [
+         "memory: {enabled: false}",
+         "memory: {enabled: 'false'}",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f06_config.rs:764:
+         generation: 1,
+     };
+     let mut failures = Vec::new();
+-    let resource_depth=format!("future: {}x{}", "[".repeat(65), "]".repeat(65));
++    let resource_depth = format!("future: {}x{}", "[".repeat(65), "]".repeat(65));
+     for (i, yaml) in [
+         "memory: {enabled: false}\nskills: {\"<<\": {enabled: [must-not-enable]}}\nfuture: {\"<<\": {marker: keep}}",
+         "memory: {enabled: !custom true}",

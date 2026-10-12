@@ -134,7 +134,7 @@ enum ToolKind {
 }
 
 impl KnowledgeTools {
-    async fn run_search(&self, ctx: &RunContext, params: &Value) -> ToolOutcome {
+    async fn run_search(&self, ctx: &RunContext, call: &ToolCallId, params: &Value) -> ToolOutcome {
         if let Err(outcome) = reject_unknown_params(
             params,
             &[
@@ -193,13 +193,30 @@ impl KnowledgeTools {
             section_keys: string_list(params, "sectionKeys"),
             limit,
         };
-        let result = match self.knowledge.search_in_scope(&request).await {
+        let runtime = match crate::toolgateway::knowledge_runtime(ctx, call) {
+            Ok(runtime) => runtime,
+            Err(error) => return ToolOutcome::Failed { error },
+        };
+        let result = match self
+            .knowledge
+            .search_in_scope_owned(&request, &runtime)
+            .await
+        {
             Ok(result) => result,
             Err(error) => return knowledge_failed(&error),
         };
         // span 命中直接回读冻结原文（引文引用由程序签发）。
         let mut hits: Vec<Value> = Vec::new();
         for hit in &result.hits {
+            if let Err(error) = runtime.check() {
+                return ToolOutcome::Failed {
+                    error: lingxi_protocol::ProtocolError::new(
+                        error.code,
+                        error.message,
+                        error.retryable,
+                    ),
+                };
+            }
             let mut item = json!({
                 "sourceId": hit.source_id,
                 "sourceName": hit.source_name,
@@ -523,7 +540,7 @@ impl ToolExecutorPort for KnowledgeTools {
     fn execute<'a>(
         &'a self,
         ctx: &'a RunContext,
-        _call: &'a ToolCallId,
+        call: &'a ToolCallId,
         request: &'a lingxi_kernel::ports::ToolRequest,
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ToolExecutionResult> + Send + 'a>> {
         let params = args_of(request);
@@ -539,8 +556,27 @@ impl ToolExecutorPort for KnowledgeTools {
             knowledge: Arc::clone(&self.knowledge),
         });
         Box::pin(async move {
+            if !matches!(kind, ToolKind::Manage) {
+                let scope_id = match require_scope_id(&params) {
+                    Ok(value) => value,
+                    Err(outcome) => return ToolExecutionResult::of_ctx(ctx, outcome),
+                };
+                let runtime = match crate::toolgateway::knowledge_runtime(ctx, call) {
+                    Ok(value) => value,
+                    Err(error) => {
+                        return ToolExecutionResult::of_ctx(ctx, ToolOutcome::Failed { error })
+                    }
+                };
+                let agent_id = runtime.ownership.agent_id.as_deref().unwrap_or_default();
+                if let Err(error) = executor
+                    .knowledge
+                    .validate_run_scope(&scope_id, ctx, agent_id)
+                {
+                    return ToolExecutionResult::of_ctx(ctx, knowledge_failed(&error));
+                }
+            }
             let outcome = match kind {
-                ToolKind::Search => executor.run_search(ctx, &params).await,
+                ToolKind::Search => executor.run_search(ctx, call, &params).await,
                 ToolKind::Read => executor.run_read(ctx, &params).await,
                 ToolKind::Grep => executor.run_grep(ctx, &params).await,
                 ToolKind::Outline => executor.run_outline(ctx, &params).await,

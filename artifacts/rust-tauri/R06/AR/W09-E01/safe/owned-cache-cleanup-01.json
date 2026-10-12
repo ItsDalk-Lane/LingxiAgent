@@ -1,0 +1,25 @@
+{
+  "owner": "W09-E01 mutant target only",
+  "path": "<W09_WORKSPACE>/rust/target-w09-e01/mutant-peek/debug/incremental",
+  "reason": "parent actual disk pressure; completed/actual reaped mutant40; regenerateable Rust incremental cache only",
+  "cache_files_removed": 2784,
+  "cache_logical_bytes": 1810082902,
+  "active_matching_compiler_or_binary_processes": [],
+  "mutant40_actual_reaped": true,
+  "before_free_bytes": 16801460224,
+  "executed_and_shipping_binaries_before": {
+    "debug/deps/lingxi_service-5dc97bd3dd301af9": "34157be9f8f391f9820bd451ad582f392ec9386956c3e69b7c2a9598e94d5aad",
+    "debug/deps/r06_ar_w09_embedding_batches-9845dda7874ab4b2": "31be3f288dd513f3dcedbce92b1ab0a35a336166f9829621b93624f8125668f4",
+    "debug/deps/r04_t07_fixture-215b99f4bb2f265c": "cc6f8ace9c5e00dfc96924335b84ccdf312f431456b4557a007ed7add220078b",
+    "debug/lingxi-service": "34157be9f8f391f9820bd451ad582f392ec9386956c3e69b7c2a9598e94d5aad"
+  },
+  "start": "2026-10-11T13:12:30.046046+00:00",
+  "after_free_bytes": 17777721344,
+  "executed_and_shipping_binaries_after": {
+    "debug/deps/lingxi_service-5dc97bd3dd301af9": "34157be9f8f391f9820bd451ad582f392ec9386956c3e69b7c2a9598e94d5aad",
+    "debug/deps/r06_ar_w09_embedding_batches-9845dda7874ab4b2": "31be3f288dd513f3dcedbce92b1ab0a35a336166f9829621b93624f8125668f4",
+    "debug/deps/r04_t07_fixture-215b99f4bb2f265c": "cc6f8ace9c5e00dfc96924335b84ccdf312f431456b4557a007ed7add220078b",
+    "debug/lingxi-service": "34157be9f8f391f9820bd451ad582f392ec9386956c3e69b7c2a9598e94d5aad"
+  },
+  "end": "2026-10-11T13:12:30.514043+00:00"
+}

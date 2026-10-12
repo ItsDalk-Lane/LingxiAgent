@@ -1,0 +1,53 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r06_ar_f01_history.rs (rust/target/debug/deps/r06_ar_f01_history-369cc4500f952c90)
+LINGXI_TEST_GUARD: armed (pid 60763, mem_limit=8192 MB, time_limit=600 s)
+
+running 8 tests
+test f01_archive_child_append_race_and_reset_foreign_writer_controls ... ok
+test f01_child_inherits_authorized_material_only ... ok
+test f01_c01_real_authenticated_history_and_isolation ... ok
+test f01_unknown_outcome_actual_crash_wire_diagnostic ... ok
+test f01_c02_fork_restart_retry_rewind_source_delete ... ok
+test f01_all_five_families_actual_wire_roles ... ok
+test f01_c04_cross_run_compaction_failure_restart ... ok
+test f01_c03_projected_tools_opaque_origins_corruption ... ok
+
+successes:
+
+---- f01_c01_real_authenticated_history_and_isolation stdout ----
+{"case": "c01", "status": "PASS", "checks": ["C01 actual wire roles/order/current once/session isolation/UI no archive duplicates", "legacy plain user/assistant history restored without guessed run"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c01-F01-214807ac91870bbca1b6265bbf813334-evidence.json"}
+
+
+---- f01_unknown_outcome_actual_crash_wire_diagnostic stdout ----
+{"case": "uncertain", "status": "PASS", "checks": ["actual tool side effect +1/crash/recovery: old requestId refused; fresh accepted; explicit Unknown model diagnostic/no completion receipt/no old tool execution; parked process exited"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/uncertain-F01-8075a1a35d7f197d297389d3f6f18e1c-evidence.json"}
+
+
+---- f01_c02_fork_restart_retry_rewind_source_delete stdout ----
+{"case": "c02", "status": "PASS", "checks": ["C02 real ancestor tool executed once; fork mutually exclusive nonce/restart/rewind old suffix absent", "fork archive survives real source delete without source Run FK"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c02-F01-1c87cadc937e38724257a82251f204e2-evidence.json"}
+
+
+---- f01_all_five_families_actual_wire_roles stdout ----
+{"case": "families", "status": "PASS", "checks": ["openai-completions actual wire chronological roles", "anthropic-messages actual wire chronological roles", "google-generative-ai actual wire chronological roles", "openai-responses actual wire chronological roles", "openai-codex-responses actual wire chronological roles"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/families-F01-7500adb44ff4b5866637f746a6ec73cf-evidence.json"}
+
+
+---- f01_c04_cross_run_compaction_failure_restart stdout ----
+{"case": "c04", "status": "PASS", "checks": ["C04 multiple actual Runs trigger summary; version+retained suffix survive restart; all authoritative originals immutable", "summary failure no fake successful version/all prior originals survive restart", "real binary shutdown cancellation/no late fabricated model success/history preserved on restart"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c04-F01-92d06f36590eb18bf147fa8a18861abc-evidence.json"}
+
+
+---- f01_c03_projected_tools_opaque_origins_corruption stdout ----
+{"case": "c03", "status": "PASS", "checks": ["C03 real read raw complete/F08 projection only/restart IDs/no re-execution", "scope/source binding corruption rejected before provider request", "opaque exact restored; changed serving provider explicitly failed before wire", "raw-only legacy fork rejects before wire/keeps original raw/no re-execution", "plain legacy fork exact usage positive; unknown-source/cross-owner explicit rejection/no fallback/zero wire", "same-owner other-session checksum-valid archive rejected before wire/original retained", "actual process status/digests/provider identity retained across restart; no execution replay", "real tool side effect once/raw completion+F08 projection retained; history append failure stops before next model wire/no fabricated completion archive", "bad digest success rejected before wire; genuine succeeded journal/original corrupt archive retained/no re-execution", "bad digest unknown rejected before wire; genuine succeeded journal/original corrupt archive retained/no re-execution", "bad digest forged_refusal rejected before wire; genuine succeeded journal/original corrupt archive retained/no re-execution", "bad digest missing_source rejected before wire; genuine succeeded journal/original corrupt archive retained/no re-execution", {"mode": "tool_pair", "status": 500, "targetCreated": false, "wireBefore": 2, "wireAfter": 2}, {"mode": "opaque_origin_missing", "status": 500, "targetCreated": false, "wireBefore": 1, "wireAfter": 1}, {"mode": "opaque_origin_forged", "status": 500, "targetCreated": false, "wireBefore": 1, "wireAfter": 1}, {"mode": "actor", "status": 500, "targetCreated": false, "wireBefore": 2, "wireAfter": 2}, "bad suffix outside boundary does not reject valid prefix", "source-deleted self-contained archive remains valid on next authorized fork"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c03-F01-4cd4089fc3aec8e61d2fcd107e8a3829-evidence.json"}
+
+
+
+successes:
+    f01_all_five_families_actual_wire_roles
+    f01_archive_child_append_race_and_reset_foreign_writer_controls
+    f01_c01_real_authenticated_history_and_isolation
+    f01_c02_fork_restart_retry_rewind_source_delete
+    f01_c03_projected_tools_opaque_origins_corruption
+    f01_c04_cross_run_compaction_failure_restart
+    f01_child_inherits_authorized_material_only
+    f01_unknown_outcome_actual_crash_wire_diagnostic
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.74s
+

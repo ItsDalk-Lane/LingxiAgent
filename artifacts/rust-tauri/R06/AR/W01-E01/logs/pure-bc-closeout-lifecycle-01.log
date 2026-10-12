@@ -1,0 +1,37 @@
+    Blocking waiting for file lock on package cache
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/baseline-source/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.62s
+     Running tests/run_lifecycle.rs (rust/target/bc-proof/debug/deps/run_lifecycle-a8177d8982e74036)
+LINGXI_TEST_GUARD: armed (pid 7725, mem_limit=8192 MB, time_limit=600 s)
+
+running 12 tests
+test duplicate_finalize_replays_and_conflicting_finalize_is_diagnosed ... ok
+test no_provider_configuration_is_explicit_and_r02_compatible ... ok
+test non_retryable_failure_settles_without_extra_attempts ... ok
+test empty_reply_completes_without_final_and_names_the_cause ... ok
+test r03_a01_three_model_calls_produce_exactly_one_task_terminal ... FAILED
+test process_only_run_completes_without_final_and_names_the_cause ... ok
+test terminal_run_rejects_late_attempts_and_events_loudly ... ok
+test tool_request_without_executor_is_a_loud_failure ... ok
+test tool_partial_failure_has_its_own_outcome_not_a_fabricated_answer ... ok
+test turn_budget_exhaustion_fails_loudly_never_fake_completes ... ok
+test retryable_provider_failure_reopens_attempt_on_the_same_run ... ok
+test retry_budget_exhaustion_fails_loudly_with_attempt_count_honest ... ok
+
+failures:
+
+---- r03_a01_three_model_calls_produce_exactly_one_task_terminal stdout ----
+
+thread 'r03_a01_three_model_calls_produce_exactly_one_task_terminal' (4444947) panicked at crates/lingxi-service/tests/run_lifecycle.rs:442:5:
+assertion `left == right` failed: middle model-call ends are process facts, never task terminals
+  left: ["run_state_changed", "model_call_started", "model_call_completed", "tool_call_started", "tool_call_completed", "tool_result_model_projection", "model_call_started", "model_call_completed", "model_call_started", "model_call_completed", "run_state_changed", "final_message_committed"]
+ right: ["run_state_changed", "model_call_started", "model_call_completed", "tool_call_started", "tool_call_completed", "model_call_started", "model_call_completed", "model_call_started", "model_call_completed", "run_state_changed", "final_message_committed"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    r03_a01_three_model_calls_produce_exactly_one_task_terminal
+
+test result: FAILED. 11 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.91s
+
+error: test failed, to rerun pass `-p lingxi-service --test run_lifecycle`

@@ -1,0 +1,121 @@
+{
+  "family": "anthropic-messages",
+  "case": "forward",
+  "route": {"provider": "anthropic-golden", "model": "claude-golden-3-7"},
+  "input": {
+    "submission": "总结一下 release 笔记并给出风险点",
+    "system_prompt": "You are the golden harness persona.",
+    "tools": [
+      {
+        "target": "tool:first-party:read",
+        "wire_name": "read",
+        "description": "Read a file 读取文件",
+        "schema": {
+          "type": "object",
+          "properties": {"path": {"type": "string", "description": "absolute path 绝对路径"}},
+          "required": ["path"],
+          "additionalProperties": false
+        }
+      },
+      {
+        "target": "tool:plugin:deep-research",
+        "wire_name": "deep_research_tool__cross_language_long_name____exactly_64_chars",
+        "description": "Deep research 深度研究 with a deliberately long wire name",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "object",
+              "description": "嵌套查询 deeply nested",
+              "properties": {
+                "filters": {
+                  "type": "object",
+                  "properties": {
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {"type": "string", "enum": ["alpha", "βeta", "文件", "ガンマ"]},
+                          "weight": {"type": "number"}
+                        },
+                        "required": ["name"]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": ["query"]
+        }
+      }
+    ],
+    "prior": []
+  },
+  "expected_request": {
+    "model": "claude-golden-3-7",
+    "max_tokens": 16384,
+    "system": "You are the golden harness persona.",
+    "messages": [
+      {"role": "user", "content": "总结一下 release 笔记并给出风险点"}
+    ],
+    "stream": false,
+    "tools": [
+      {
+        "name": "read",
+        "description": "Read a file 读取文件",
+        "input_schema": {
+          "type": "object",
+          "properties": {"path": {"type": "string", "description": "absolute path 绝对路径"}},
+          "required": ["path"],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "deep_research_tool__cross_language_long_name____exactly_64_chars",
+        "description": "Deep research 深度研究 with a deliberately long wire name",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "object",
+              "description": "嵌套查询 deeply nested",
+              "properties": {
+                "filters": {
+                  "type": "object",
+                  "properties": {
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {"type": "string", "enum": ["alpha", "βeta", "文件", "ガンマ"]},
+                          "weight": {"type": "number"}
+                        },
+                        "required": ["name"]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": ["query"]
+        }
+      }
+    ]
+  },
+  "response_wire": {
+    "id": "msg_golden",
+    "model": "claude-lies",
+    "content": [{"type": "text", "text": "Done: v0.1.35 已发布。"}],
+    "stop_reason": "end_turn",
+    "usage": {"input_tokens": 101, "output_tokens": 21}
+  },
+  "expected_turn": {
+    "kind": "final",
+    "content": [{"text": "Done: v0.1.35 已发布。"}],
+    "usage": {"input_tokens": 101, "output_tokens": 21}
+  }
+}

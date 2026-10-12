@@ -1,0 +1,9 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.24s
+     Running tests/r06_ar_f08_projection.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f08_projection-fc2eed55d7fb7c0b)
+
+running 1 test
+test f08_budget_refusal_keeps_raw_success_and_continues_with_readable_history ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.19s
+

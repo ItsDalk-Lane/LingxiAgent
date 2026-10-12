@@ -1,0 +1,33 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.23s
+     Running tests/agent_memory_r06t06.rs (rust/target/debug/deps/agent_memory_r06t06-6a28abd6f59a8f02)
+LINGXI_TEST_GUARD: armed (pid 31008, mem_limit=8192 MB, time_limit=600 s)
+
+running 14 tests
+test pii_scrub_matches_incumbent_patterns ... ok
+test config_patcher_preserves_unrelated_content_and_lists ... ok
+test context_notes_cap_and_roundtrip ... ok
+test a11_cross_agent_ids_are_rejected ... ok
+test experience_record_and_index_and_feedback_shape ... ok
+test persona_fallback_chain_and_avatar_formats ... ok
+test catalog_scan_and_runtime_selection_whitelist ... ok
+test a11_tenets_are_isolated_per_agent ... ok
+test install_package_validates_structure_and_rewrites_metadata ... ok
+test compiled_sections_assemble_memory_md_golden ... ok
+test compiled_reset_and_clear_and_legacy_migration ... ok
+test bundles_store_crud_and_skill_removal_scrobble ... ok
+test a11_facts_are_physically_isolated_per_agent ... ok
+test dream_revisions_list_read_restore ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/r06_ar_f06_config_preservation.rs (rust/target/debug/deps/r06_ar_f06_config_preservation-38f4e230afd8a4f0)
+LINGXI_TEST_GUARD: armed (pid 31012, mem_limit=8192 MB, time_limit=600 s)
+
+running 3 tests
+test c03_aliases_and_merge_keys_follow_standard_yaml_semantics ... ok
+test c04_updates_preserve_all_unknown_nested_values_and_escaped_lists ... ok
+test c03_duplicate_sensitive_keys_and_nested_keys_fail_before_writing ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

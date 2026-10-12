@@ -1,0 +1,64 @@
+{
+  "at": "2026-10-11T10:32:25.778752+00:00",
+  "status": "READY_FOR_INDEPENDENT_REVIEW",
+  "issue_status": "NOT_COMPLETED",
+  "blocked_dependency": "F09 current running-job recovery / mandatory C04",
+  "independent_acceptance": false,
+  "worktree": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "owned": [
+    {
+      "path": "rust/crates/lingxi-service/src/knowledge.rs",
+      "sha256": "0d9fd6679e7681b42bde359657b7a78bd9bc4862c01da2f5c96a1d3f7e439cef"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/operations.rs",
+      "sha256": "da58f7822cc80e05af0893995e3ade915c8901967ae718bb74d8f979590167ce"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/knowledge.rs",
+      "sha256": "1adbc82ca36805080b9297a6337322fd0858c1fb24a700af185d19b8ae4e5944"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/operations/embedding.rs",
+      "sha256": "c3692626e3bbc5df1d5d91cc0dded2371093775868effb739146733d9a08026b"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs",
+      "sha256": "0d37fb59194f41ec3d3af867c65e8259ca2b7a7be862f22219e5b14e29d35bed"
+    }
+  ],
+  "owned_digest_sha256": "533b8e44f60b4d72522ab69d8b022a524c0ff091d8b571a8fda6eb25f5a83dda",
+  "lock": {
+    "path": "rust/Cargo.lock",
+    "sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+    "unchanged": true
+  },
+  "final_test_binary": [
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/deps/r06_ar_w10_embedding_identity-a492dffe06646973",
+      "sha256": "e29b002352f36da2155156f2b9c40489708563ff71e568af82df73ea88432c2f"
+    }
+  ],
+  "shipping_binary": {
+    "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/lingxi-service",
+    "actual_executed_sha256": "dd46e9b6c0de2c37c33ef003dbb6f6edca9963cc7caedb5fb0a0658c7e66b271",
+    "readyA": "LINGXI_SERVICE_READY addr=127.0.0.1:62265 home=/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W10-E01/commands/final-nine-cases-13/synthetic-home/lingxi-r06-ar-w10-crash-running-79672-1791710964151971000 source=env",
+    "readyB": "LINGXI_SERVICE_READY addr=127.0.0.1:62270 home=/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W10-E01/commands/final-nine-cases-13/synthetic-home/lingxi-r06-ar-w10-crash-running-79672-1791710964151971000 source=env"
+  },
+  "formal_runner_binary": [
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target/debug/xtask",
+      "sha256": "3b09b48f62f1889dc7760757b3e017b9cf9dee1ffb4495508083f13bbd9b4248"
+    }
+  ],
+  "formal_binding": "Three formal stages stable; all overall FAIL. Later handoff evidence appended after completion; owned remained exact.",
+  "target": {
+    "path": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/target",
+    "symlink": false,
+    "classification": "LOCAL_ONLY_REBUILDABLE_NEVER_GIT"
+  },
+  "no_commit_push": true,
+  "no_main_product_write": true,
+  "no_paid_or_real_user_data": true
+}

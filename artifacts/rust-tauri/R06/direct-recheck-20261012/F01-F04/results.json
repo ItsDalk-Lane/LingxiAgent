@@ -1,0 +1,77 @@
+[
+  {
+    "test": "f01_c02_fork_restart_retry_rewind_source_delete",
+    "argv": [
+      "/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f01_history-6406a71bc3d7e3c1",
+      "f01_c02_fork_restart_retry_rewind_source_delete",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "seconds": 1.42,
+    "binarySha256": "1cd6ed9d4282a0776c7987891ae8a1368b678337686b31ad4ceb9243fa5b200e",
+    "binaryMtime": 1791780610.3209572,
+    "evidence": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/F01-F04/F01-branch/check.log",
+    "role": "direct_recheck_not_formal_acceptance"
+  },
+  {
+    "test": "ar_f02_c02_ancestor_link_and_false_checkpoint_source",
+    "argv": [
+      "/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f02_file_restore-5bd58e77c24caa47",
+      "ar_f02_c02_ancestor_link_and_false_checkpoint_source",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "seconds": 0.19,
+    "binarySha256": "7b39c2974159754c5723f32b76b1b0a4fd7cf83b869a9c77ec5e38add7d634a6",
+    "binaryMtime": 1791780576.7098932,
+    "evidence": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/F01-F04/F02-links/check.log",
+    "role": "direct_recheck_not_formal_acceptance"
+  },
+  {
+    "test": "authenticated_barrier_rewind_execute_and_cancelled_waiter",
+    "argv": [
+      "/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f03_operations-e105ff127ca409f5",
+      "authenticated_barrier_rewind_execute_and_cancelled_waiter",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "seconds": 2.88,
+    "binarySha256": "23d25a4ec31a40f8f4725bcb8446f4866b208ddc322907813ecda58ad6972572",
+    "binaryMtime": 1791780611.8151414,
+    "evidence": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/F01-F04/F03-admission/check.log",
+    "role": "direct_recheck_not_formal_acceptance"
+  },
+  {
+    "test": "f04_c02_real_activity_cleanup_and_clock_rollback",
+    "argv": [
+      "/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f04_lifecycle-a66288ed3134b9a4",
+      "f04_c02_real_activity_cleanup_and_clock_rollback",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "seconds": 0.23,
+    "binarySha256": "1c4f184d9f4a57bce5d0b7dd8dd2d9a620c6f329b93207795ebbd169a5a9d9b4",
+    "binaryMtime": 1791780370.9695432,
+    "evidence": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/F01-F04/F04-cleanup/check.log",
+    "role": "direct_recheck_not_formal_acceptance"
+  },
+  {
+    "test": "f04_permanent_delete_removes_owned_cache_and_retains_other_branch",
+    "argv": [
+      "/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f04_lifecycle-a66288ed3134b9a4",
+      "f04_permanent_delete_removes_owned_cache_and_retains_other_branch",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "seconds": 0.14,
+    "binarySha256": "1c4f184d9f4a57bce5d0b7dd8dd2d9a620c6f329b93207795ebbd169a5a9d9b4",
+    "binaryMtime": 1791780370.9695432,
+    "evidence": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/F01-F04/F04-delete/check.log",
+    "role": "direct_recheck_not_formal_acceptance"
+  }
+]

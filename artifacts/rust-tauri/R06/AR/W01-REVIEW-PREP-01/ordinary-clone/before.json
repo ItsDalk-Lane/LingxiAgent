@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-11T11:12:17.814891+00:00",
+  "source_head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "source_index_sha256": "28eec248bc4c48329f30bad90c45f85b9aa4f41719fafe84cd6363356bccb051",
+  "source_settings_sha256": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3",
+  "source_staged": [],
+  "destination": "/Users/study_superior/.codex/r06-isolated-checkouts/w01-first-review-source-01",
+  "purpose": "fresh W01 Reviewer candidate own git directory for unchanged original legacy gate, not StageReviewer",
+  "reserved_worktree_not_used_reason": "original directed legacy materialization requires .git directory; reserved managed worktree has .git file; avoid known preparation BLOCKED"
+}

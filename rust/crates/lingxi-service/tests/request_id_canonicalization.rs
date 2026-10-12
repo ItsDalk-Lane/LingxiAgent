@@ -569,6 +569,7 @@ async fn submit_fg_port<P: StoragePort>(
     request_id: &str,
 ) -> Result<ExecuteAccepted, SessionExecuteError> {
     let submission = ExecuteSubmission {
+        knowledge: None,
         input,
         request_id: Some(request_id),
     };
@@ -594,6 +595,7 @@ async fn submit_fg_as(
     request_id: &str,
 ) -> Result<ExecuteAccepted, SessionExecuteError> {
     let submission = ExecuteSubmission {
+        knowledge: None,
         input,
         request_id: Some(request_id),
     };
@@ -617,6 +619,7 @@ async fn submit_bg(
     request_id: &str,
 ) -> Result<ExecuteAccepted, SessionExecuteError> {
     let submission = ExecuteSubmission {
+        knowledge: None,
         input,
         request_id: Some(request_id),
     };

@@ -1,0 +1,67 @@
+{
+  "argv": [
+    "python3",
+    "scripts/rust-tauri/r02_registry_consistency.py"
+  ],
+  "cwd": "/private/tmp/lingxi-r06-w15-reviewer-01",
+  "started": "2026-10-12T00:07:29.998795+00:00",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "effective_env": {
+    "HOME": "/Users/study_superior",
+    "LINGXI_HOME": "/private/tmp/lingxi-w15-r01-runtime/home",
+    "TMPDIR": "/private/tmp/lingxi-w15-r01-runtime/tmp",
+    "LINGXI_PRODUCT_DIR": "/private/tmp/lingxi-r06-w15-reviewer-01/lib",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-w15-r01-runtime/target",
+    "CARGO_INCREMENTAL": "0",
+    "LINGXI_TEST_GUARD": "1",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "TEST_MEM_LIMIT_MB": "8192"
+  },
+  "guard": {
+    "business_seconds": 600,
+    "rss_mib": 8192,
+    "controller_seconds": 2700,
+    "sampling_interval_seconds": 0.05
+  },
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "source_before": "76b576ae8cf26174813b3439436a2a5d1aff65f42743af9e305e05ec5b6eebff",
+  "processes": [
+    {
+      "pid": 95695,
+      "ppid": 95479,
+      "argv": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python scripts/rust-tauri/r02_registry_consistency.py",
+      "actual_executable": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "executable_sha256_first_observed": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "first_seen_elapsed": 0.2667147910105996,
+      "last_seen_elapsed": 0.2667147910105996,
+      "peak_sampled_rss_bytes": 5767168,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_at_final_table",
+        "elapsed": 0.36069554099231027
+      },
+      "wait_reap": "Popen.wait executed",
+      "executable_sha256_after": "c9ce7b8516f24348a0e589e3004fd1246dc04756168b98bb8bd71fc67d0b8868",
+      "present_after": false,
+      "exit_code": 1
+    }
+  ],
+  "launch_binary_before": {
+    "python3": null,
+    "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0"
+  },
+  "controller_pid": 95695,
+  "ended": "2026-10-12T00:07:30.359492+00:00",
+  "elapsed_seconds": 0.3607204160070978,
+  "exit_code": 1,
+  "guard_breaches": [],
+  "source_after": "76b576ae8cf26174813b3439436a2a5d1aff65f42743af9e305e05ec5b6eebff",
+  "unsampled_process_metrics": "null/unknown; inventory cannot replace execution measurement",
+  "owned_survivors": [],
+  "supervisor_sha256": "5166fb9fed7854ad3515b5138ec981db8661eb0d35e93c37379353ce2380ae63",
+  "launch_binary_after": {
+    "python3": null,
+    "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0"
+  }
+}

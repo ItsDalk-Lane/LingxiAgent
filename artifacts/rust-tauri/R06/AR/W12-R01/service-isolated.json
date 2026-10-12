@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-j8",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r06_ar_f12_cache_consumers",
+    "--test",
+    "r06_t07_knowledge",
+    "--test",
+    "r06_t07_knowledge_tools",
+    "--",
+    "--nocapture"
+  ],
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r01-service-isolated-gtv1m5tg",
+  "start": 1791698443.87101,
+  "end": 1791698620.3669271,
+  "exit_code": 0,
+  "log_sha256": "de84a90d1dcca3c9be6c918eb1d1e99356843004fad0ac0d383f115134a30764"
+}

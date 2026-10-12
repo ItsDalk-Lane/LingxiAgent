@@ -1,0 +1,11 @@
+{
+  "source": "artifacts/rust-tauri/R06/AR/W06-P03/old-gateway-config.rs",
+  "source_sha": "96cbdede83962466fe6a5b2e851192d18676c18db62daf8eb56a8644c65daa2a",
+  "immutable_old_service_source_sha": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+  "libs": {
+    "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/deps/liblingxi_service-ea9e2ede584aa26c.rlib": "9d0dca45d18f3dca4e8a9e26d461957547282acb1f510580e9618ef37ff339d2",
+    "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/deps/liblingxi_adapters-fb1c10968bfbc6af.rlib": "2ee04bedca523b98628185426c674867669577ad9966fec0599e1f2c9eea51d4"
+  },
+  "method": "exact historical compiled real Gateway/MemoryTools old shared implementation; test fixture simpler legal normal positive; no product mutation",
+  "source_sha_after_fixture_path_fix": "02e9b01bbfa31caea2cfd357145bd98a3edc4b88d6747c08d2fa275c29902609"
+}

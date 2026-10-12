@@ -2,7 +2,7 @@
   "spec_version": "1.0",
   "stage_id": "R06",
   "stage_name": "上下文、会话语义、记忆与知识库",
-  "status": "STAGE_REVIEW_PASS（STAGE-REVIEWER-R06-R1：15 检查全过+Gate 六项全 0〔全量 1862/0〕+收口义务全部已申报；附条件：总控裁决 T05-F-01/T05-F-02 已落定见 unresolved_items；真实模型多采样维持 BLOCKED→R10）",
+  "status": "R06_NOT_ACCEPTED",
   "source_sha": {
     "stage_base": "c9cca6020e0990016ee0d14af406766370849a7a（R06 阶段基点，= T01 交付基点）",
     "task_base_sha_t08": "ea61380577916e9fb75a4f4c2694321af7b83923",
@@ -213,17 +213,11 @@
     "note": "由 r06_candidate_digest.sh 最后计算；本文件不含 digest 值（载体自引用无不动点）"
   },
   "allowed_next_scope": {
-    "next_stage": "R07（外围能力、后台自动化与多入口接入）",
-    "must_input": [
-      "本文件 + R06_REPORT.md + 各任务报告（T01–T08）",
-      "PI_REPLACEMENT_MATRIX.json 的 r06_t06_*/r06_t08_handoff 字段（14 条能力终态归属）",
-      "BEHAVIOR_EVAL.json（行为评测基线与固定任务集）",
-      "未决项清单（本文件 unresolved_items——尤其 T05-F-01/F-02 的收口裁决结果）"
-    ],
+    "next_stage": null,
+    "allowed": "仅R06修复、三层检查、全新阶段审查、授权Git交付；通过后停止",
     "not_allowed": [
-      "未做 R06 收口裁决（T03/T04/T05/T07 收口义务二选一落定）就宣称 R06 PASS",
-      "恢复研究引擎/强制子代理分发（硬排除）",
-      "把 BLOCKED_NOT_AUTHORIZED 的真实模型项写成已验证"
+      "当前不可开始R07",
+      "不得以已申报/归R07关闭本阶段必需缺口"
     ]
   },
   "review_evidence": [
@@ -271,5 +265,37 @@
     "verdict": "PASS",
     "date": "2026-10-11",
     "scope": "c9cca6020..8fdd74527"
+  },
+  "historical_status_before_ar": {
+    "status": "STAGE_REVIEW_PASS（STAGE-REVIEWER-R06-R1：15 检查全过+Gate 六项全 0〔全量 1862/0〕+收口义务全部已申报；附条件：总控裁决 T05-F-01/T05-F-02 已落定见 unresolved_items；真实模型多采样维持 BLOCKED→R10）",
+    "stage_review": {
+      "reviewer": "STAGE-REVIEWER-R06-R1",
+      "evidence": "artifacts/rust-tauri/R06/STAGE-REVIEW-R1/STAGE_REVIEW.md",
+      "verdict": "PASS",
+      "date": "2026-10-11",
+      "scope": "c9cca6020..8fdd74527"
+    },
+    "allowed_next_scope": {
+      "next_stage": "R07（外围能力、后台自动化与多入口接入）",
+      "must_input": [
+        "本文件 + R06_REPORT.md + 各任务报告（T01–T08）",
+        "PI_REPLACEMENT_MATRIX.json 的 r06_t06_*/r06_t08_handoff 字段（14 条能力终态归属）",
+        "BEHAVIOR_EVAL.json（行为评测基线与固定任务集）",
+        "未决项清单（本文件 unresolved_items——尤其 T05-F-01/F-02 的收口裁决结果）"
+      ],
+      "not_allowed": [
+        "未做 R06 收口裁决（T03/T04/T05/T07 收口义务二选一落定）就宣称 R06 PASS",
+        "恢复研究引擎/强制子代理分发（硬排除）",
+        "把 BLOCKED_NOT_AUTHORIZED 的真实模型项写成已验证"
+      ]
+    },
+    "superseded_at": "2026-10-11T05:13:44.788435+00:00",
+    "reason": "R06-AR-F01至F15推翻旧完整验收，登记不替代关闭到期义务。"
+  },
+  "current_ar": {
+    "authority": "docs/rust-tauri/R06/repair-current/AR_PROGRESS.json",
+    "issue_matrix": "docs/rust-tauri/R06/repair-current/AR_ISSUE_MATRIX.json",
+    "R07_READY": false,
+    "stage_review": "NOT_RUN"
   }
 }

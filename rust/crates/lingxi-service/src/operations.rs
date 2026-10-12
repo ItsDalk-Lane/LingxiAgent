@@ -69,6 +69,18 @@ use sha2::Digest as _;
 
 use crate::quotas::{QuotaManager, QuotaResource};
 
+#[path = "embedding_operation.rs"]
+mod embedding_operation;
+pub use embedding_operation::{EmbeddingCallRuntime, EmbeddingOwnedOutcome, OperationOwnership};
+
+/// 实际完成的嵌入调用收据；身份与用量、协议构建都来自同一份不可变路由。
+#[derive(Debug, Clone)]
+pub struct ServedEmbeddingOutcome {
+    pub outcome: dialects::embedding::EmbeddingOutcome,
+    pub route: ResolvedModelRoute,
+    pub parameter_fingerprint: String,
+}
+
 /// The failure shape of one operation call (scrubbed at the provider
 /// layer before it gets here — no credential material rides it).
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -183,6 +195,12 @@ pub struct OperationService {
     dispatcher: OperationDispatcher,
     egress: Arc<EgressGuard>,
     products_root: PathBuf,
+    /// 同一已付请求串行认领，避免并发补账变成重复外发；弱引用不保留历史锁。
+    embedding_locks: std::sync::Mutex<BTreeMap<String, std::sync::Weak<tokio::sync::Mutex<()>>>>,
+    /// 真实阻塞写入沿同一监督器登记，租约由物理 closure 持有到退出。
+    embedding_io: Arc<crate::task_supervisor::TaskSupervisor>,
+    /// 已付字节在真实持久化前由服务持有；监督器丢弃等待 future 也不能丢结果。
+    embedding_paid: Arc<std::sync::Mutex<BTreeMap<String, Option<serde_json::Value>>>>,
     /// The local tracking registry of async media tasks (in-memory by
     /// design: media-task persistence is the registered R07 business
     /// surface; R05 RR1 F18 keeps the host records unambiguous and
@@ -223,6 +241,10 @@ pub struct OperationCallContext {
 /// operation plane has no run/session of its own — the row is internal
 /// accounting (owner-scoped queries never return it).
 pub struct OperationUsageFact {
+    /// 知识调用的服务端稳定身份；普通独立 operation 保持原合同。
+    pub stable_call_id: Option<String>,
+    pub ownership: Option<OperationOwnership>,
+    pub transport_unknown: bool,
     pub operation: String,
     pub provider: String,
     pub model: String,
@@ -249,6 +271,23 @@ pub struct OperationUsageFact {
 /// caller surfaces it — an accounting failure never masquerades as an
 /// operation success).
 pub trait OperationUsageSink: Send + Sync {
+    /// 恢复只能认原宿主 call，不把已经落账的已知用量降为未知。
+    fn recorded<'a>(
+        &'a self,
+        _call_id: String,
+    ) -> std::pin::Pin<
+        Box<
+            dyn std::future::Future<
+                    Output = Result<
+                        Option<lingxi_kernel::usage::ModelCallUsageRecord>,
+                        lingxi_kernel::ports::StorageError,
+                    >,
+                > + Send
+                + 'a,
+        >,
+    > {
+        Box::pin(async { Ok(None) })
+    }
     fn record<'a>(
         &'a self,
         fact: OperationUsageFact,
@@ -278,6 +317,22 @@ impl LedgerOperationUsageSink {
 }
 
 impl OperationUsageSink for LedgerOperationUsageSink {
+    fn recorded<'a>(
+        &'a self,
+        call_id: String,
+    ) -> std::pin::Pin<
+        Box<
+            dyn std::future::Future<
+                    Output = Result<
+                        Option<lingxi_kernel::usage::ModelCallUsageRecord>,
+                        lingxi_kernel::ports::StorageError,
+                    >,
+                > + Send
+                + 'a,
+        >,
+    > {
+        Box::pin(async move { self.storage.model_usage_by_call(call_id).await })
+    }
     fn record<'a>(
         &'a self,
         fact: OperationUsageFact,
@@ -291,12 +346,14 @@ impl OperationUsageSink for LedgerOperationUsageSink {
         Box::pin(async move {
             use std::sync::atomic::Ordering;
             static SINK_SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
-            let model_call_id = format!(
-                "op-{}-{}-{}",
-                fact.operation,
-                self.clock.now_unix_ms(),
-                SINK_SEQ.fetch_add(1, Ordering::Relaxed)
-            );
+            let model_call_id = fact.stable_call_id.clone().unwrap_or_else(|| {
+                format!(
+                    "op-{}-{}-{}",
+                    fact.operation,
+                    self.clock.now_unix_ms(),
+                    SINK_SEQ.fetch_add(1, Ordering::Relaxed)
+                )
+            });
             // R05 RR1 F21: a carried context makes the row a session-scoped
             // accounting fact (joinable to its run); a None context keeps
             // the plane-root shape (session-less internal accounting).
@@ -312,13 +369,24 @@ impl OperationUsageSink for LedgerOperationUsageSink {
             let record = lingxi_kernel::usage::ModelCallUsageRecord {
                 session_id,
                 run_id,
-                attempt,
+                attempt: fact
+                    .ownership
+                    .as_ref()
+                    .and_then(|o| o.attempt.clone())
+                    .or(attempt),
                 model_call_id,
                 purpose: fact.operation.clone(),
                 origin: "operation".to_string(),
                 parent_run_id: None,
-                cause_ref,
-                parent_tool_call_id: None,
+                cause_ref: fact
+                    .ownership
+                    .as_ref()
+                    .map(|o| o.cause_ref.clone())
+                    .or(cause_ref),
+                parent_tool_call_id: fact
+                    .ownership
+                    .as_ref()
+                    .and_then(|o| o.parent_tool_call_id.clone()),
                 provider: fact.provider,
                 model: fact.model,
                 protocol: fact.protocol,
@@ -337,7 +405,11 @@ impl OperationUsageSink for LedgerOperationUsageSink {
                 // every operation fact settles within its own dispatch —
                 // the count is always observed (Some), `None` is reserved
                 // for dropped-before-settlement calls.
-                transport_attempts: Some(fact.transport_attempts),
+                transport_attempts: if fact.transport_unknown {
+                    None
+                } else {
+                    Some(fact.transport_attempts)
+                },
                 outcome: fact.outcome,
                 started_at_unix_ms: fact.started_at_unix_ms,
                 settled_at_unix_ms: fact.settled_at_unix_ms,
@@ -546,6 +618,9 @@ impl OperationService {
             egress: Arc::new(egress),
             products_root,
             tasks: std::sync::Mutex::new(BTreeMap::new()),
+            embedding_locks: std::sync::Mutex::new(BTreeMap::new()),
+            embedding_io: Arc::new(crate::task_supervisor::TaskSupervisor::new(128)),
+            embedding_paid: Arc::new(std::sync::Mutex::new(BTreeMap::new())),
             usage_sink: None,
             process_supervisor: None,
         })
@@ -615,6 +690,9 @@ impl OperationService {
             return Ok(());
         };
         sink.record(OperationUsageFact {
+            stable_call_id: None,
+            ownership: None,
+            transport_unknown: false,
             operation: operation.to_string(),
             provider: route.provider.clone(),
             model: route.model.clone(),
@@ -976,10 +1054,36 @@ impl OperationService {
         deadline_unix_ms: Option<u64>,
         context: Option<&OperationCallContext>,
     ) -> Result<dialects::embedding::EmbeddingOutcome, OperationFailure> {
+        self.embed_served(request, deadline_unix_ms, context)
+            .await
+            .map(|served| served.outcome)
+    }
+
+    /// 返回实际发送身份，避免调用者再次读取配置给结果贴标签。
+    pub async fn embed_served(
+        &self,
+        request: dialects::embedding::EmbeddingRequest,
+        deadline_unix_ms: Option<u64>,
+        context: Option<&OperationCallContext>,
+    ) -> Result<ServedEmbeddingOutcome, OperationFailure> {
+        self.embed_served_observed(request, deadline_unix_ms, context, None)
+            .await
+    }
+
+    /// 知识任务区分调用意图、transport 尝试、响应确认与已知未发送。
+    pub async fn embed_served_observed(
+        &self,
+        request: dialects::embedding::EmbeddingRequest,
+        deadline_unix_ms: Option<u64>,
+        context: Option<&OperationCallContext>,
+        observer: Option<lingxi_adapters::models::dispatch::SendObserver<'_>>,
+    ) -> Result<ServedEmbeddingOutcome, OperationFailure> {
         let started_at = lingxi_adapters::models::dispatch::unix_ms_now();
         dialects::embedding::validate_embedding_request(&request)
             .map_err(OperationFailure::from_protocol)?;
         let (route, auth) = self.resolve(ModelOperation::Embedding).await?;
+        let parameter_fingerprint =
+            dialects::embedding::embedding_space_fingerprint(&route, &request);
         let _permit = match self.admit("operations:embedding", deadline_unix_ms).await {
             Ok(permit) => permit,
             Err(refusal) => {
@@ -993,19 +1097,30 @@ impl OperationService {
         };
         let plan = dialects::embedding::build_embedding(&route, &auth, &request)
             .map_err(OperationFailure::from_protocol)?;
+        let sent = std::sync::atomic::AtomicU32::new(0);
+        let observed_send = |observation| {
+            if let Some(observer) = observer {
+                observer(observation)?;
+            }
+            if observation == lingxi_adapters::models::dispatch::SendObservation::AttemptStarted {
+                sent.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            }
+            Ok(())
+        };
         let body = match self
             .dispatcher
-            .execute_json(&plan, deadline_unix_ms, &auth)
+            .execute_json_observed(&plan, deadline_unix_ms, &auth, Some(&observed_send))
             .await
         {
-            Ok(body) => body,
+            Ok((body, _)) => body,
             Err(pair) => {
                 // R05-T07 (C03): a possibly-billable request with no usable
                 // usage still leaves its accounting row (unknown ≠ 0).
-                self.record_operation_usage(
+                self.record_operation_usage_with_attempts(
                     "embedding",
                     &route,
                     ReportedUsage::Unknown,
+                    sent.load(std::sync::atomic::Ordering::Relaxed),
                     context,
                     CallOutcome::Failed,
                     Some(started_at),
@@ -1043,7 +1158,11 @@ impl OperationService {
                     Some(started_at),
                 )
                 .await?;
-                Ok(outcome)
+                Ok(ServedEmbeddingOutcome {
+                    outcome,
+                    route,
+                    parameter_fingerprint,
+                })
             }
             Err(failure) => {
                 self.record_operation_usage(

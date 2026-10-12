@@ -1,0 +1,44 @@
+[
+  {
+    "suite": "r06_ar_f02_file_restore",
+    "name": "rewind_recovery_records_survive_request_replay_and_service_restart",
+    "exitCode": 101,
+    "elapsedSeconds": 19.7
+  },
+  {
+    "suite": "r06_ar_f13_submission",
+    "name": "real_http_500_retry_advances_only_attempt_and_preserves_frozen_sources",
+    "exitCode": 101,
+    "elapsedSeconds": 3.11
+  },
+  {
+    "suite": "r06_ar_f08_projection",
+    "name": "f08_budget_refusal_keeps_raw_success_and_continues_with_readable_history",
+    "exitCode": 101,
+    "elapsedSeconds": 2.55
+  },
+  {
+    "suite": "r06_ar_f13_submission",
+    "name": "real_submission_freezes_selected_sources_and_rejects_old_or_foreign_scope",
+    "exitCode": 101,
+    "elapsedSeconds": 0.16
+  },
+  {
+    "suite": "r06_ar_f08_projection",
+    "name": "f08_c03_loop_warning_multi_block_resource_reaches_next_wire_capped",
+    "exitCode": 0,
+    "elapsedSeconds": 0.31
+  },
+  {
+    "suite": "r06_t08_behavior_eval",
+    "name": "be02_on_demand_catalog_declared_per_turn_not_in_prompt",
+    "exitCode": 101,
+    "elapsedSeconds": 4.72
+  },
+  {
+    "suite": "r06_t08_behavior_eval",
+    "name": "be07_material_citation_scope_isolated_and_locatable",
+    "exitCode": 101,
+    "elapsedSeconds": 1.89
+  }
+]

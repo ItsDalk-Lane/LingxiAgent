@@ -1,0 +1,10 @@
+{"command": ["npx", "vitest", "run", "tests/r06-ar-f12-vector-cache-preservation.test.ts", "--maxWorkers=1"], "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-ts-new-03-8l8fqjea", "start": 1791699410.5156229}
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+
+ Test Files  1 passed (1)
+      Tests  15 passed (15)
+   Start at  14:16:54
+   Duration  509ms (transform 92ms, setup 29ms, import 66ms, tests 348ms, environment 0ms)
+

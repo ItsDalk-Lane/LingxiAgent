@@ -1,0 +1,99 @@
+{
+  "argv": [
+    "<LOCAL_USER>/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-j8",
+    "-p",
+    "lingxi-adapters",
+    "--test",
+    "r06_ar_w09_vector_integrity",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "<W09_WORKSPACE>",
+  "toolchain": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "node": "v24.16.0",
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+  "start": "2026-10-11T12:43:41.047945+00:00",
+  "end": "2026-10-11T12:43:53.859540+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 11.521196375004365,
+  "inputs_stable": true,
+  "environment": {
+    "LINGXI_HOME": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/close-double-error-28/LOCAL_ONLY_NEVER_GIT/synthetic-home",
+    "CARGO_TARGET_DIR": "<W09_WORKSPACE>/rust/target-w09-e01",
+    "CARGO_BUILD_JOBS": "8",
+    "TEST_MEM_LIMIT_MB": "8192",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "LINGXI_TEST_GUARD": "1"
+  },
+  "rss_measured_mib": null,
+  "outer_budget_seconds": 2700,
+  "actual_parent_wait_reaped": true,
+  "process_group_residue": [],
+  "outer_timeout": null,
+  "executed_binaries": [
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_ar_w09_vector_integrity-b783ce9456276b1f",
+      "sha256": "763f17641db3a4725f258b60e35bcb37f8f2dc81fe522ce9f601fb0b2b5341b4",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": null,
+      "inventory_after_sha256": "763f17641db3a4725f258b60e35bcb37f8f2dc81fe522ce9f601fb0b2b5341b4",
+      "actual_before_unknown": true
+    }
+  ],
+  "runner_sha256": "366c1b2c294878eb37cdaf4c55029673b68117afd44202b9bdf018807a655b5c",
+  "actual_test_binary_runs": null,
+  "actual_test_binary_starts": null,
+  "product_resource_directory": null,
+  "product_resource_anchor": null,
+  "runner_after_sha256": null,
+  "cargo_runner_file_sha256": null,
+  "preparation_failure": null,
+  "source_stability_basis": null,
+  "git_config_environment": null,
+  "private_excludes_sha256_before": null,
+  "private_excludes_sha256_after": null,
+  "disposition": null,
+  "cancel_reason": null,
+  "partial_actual_test_starts": null,
+  "partial_actual_test_ends": null,
+  "partial_test_result_blocks": null,
+  "nested_group_cleanup": null,
+  "nested_group_observed_gone": null,
+  "label": "close-double-error-28",
+  "record_sha256": "6e2d3680bb69576a1741a57387b46eb883aefbd12116392477f49afa1e96c32d",
+  "log_sha256": "74fdaa696fff566f1f5d1d40474852e95cef0b4560323a9d61241f0097ba1509",
+  "inputs_before_digest": "a443cd22b682168000ec06e748d8705e72d750169c041a56a8103ccbe6e6c019",
+  "inputs_after_digest": "a443cd22b682168000ec06e748d8705e72d750169c041a56a8103ccbe6e6c019",
+  "inputs_count": 4928,
+  "test_results": [
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.11
+    }
+  ],
+  "guard_armed_count": 1,
+  "complete_original_metadata": "commands/close-double-error-28/record.json retained locally",
+  "source_binding_matches_final": false,
+  "outcome_class": "ACTUAL_EXECUTION",
+  "shipping_binaries_before": {
+    "<W09_WORKSPACE>/rust/target-w09-e01/debug/lingxi-storage-inspect": "0b2db4115e73a6ae568b2519d5b2dfdb96fcc390de7382b9b2cd7b6f0e08f7ab",
+    "<W09_WORKSPACE>/rust/target-w09-e01/debug/lingxi-protocol-gen": "f2e1605947d2bedc765710661f6d7cb594e0b5c1fd1d20f473f673a6e2e0975b",
+    "<W09_WORKSPACE>/rust/target-w09-e01/debug/lingxi-service": "5342568a2ebbfc5c22d03060efadb14f22450839192e22a035bce802cf7972f5"
+  },
+  "shipping_binaries_after": {
+    "<W09_WORKSPACE>/rust/target-w09-e01/debug/lingxi-storage-inspect": "83d9238f5f75c1a1f4986e16472594fd34d8b2da7d7fe57b49be1bed3907e8fd",
+    "<W09_WORKSPACE>/rust/target-w09-e01/debug/lingxi-protocol-gen": "f2e1605947d2bedc765710661f6d7cb594e0b5c1fd1d20f473f673a6e2e0975b",
+    "<W09_WORKSPACE>/rust/target-w09-e01/debug/lingxi-service": "5342568a2ebbfc5c22d03060efadb14f22450839192e22a035bce802cf7972f5"
+  }
+}

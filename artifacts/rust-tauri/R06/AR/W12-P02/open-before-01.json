@@ -1,0 +1,13 @@
+{
+  "command": [
+    "node",
+    "--experimental-strip-types",
+    "artifacts/rust-tauri/R06/AR/W12-P02/probe-open-window-v2.mjs"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-open-before-01-x5o42a2h",
+  "start": 1791702117.2704132,
+  "end": 1791702117.3566778,
+  "exit_code": 1,
+  "log_sha256": "b8a03d35cec72dfc95c6c4735432d32a1be04104bc84bb7ffa328177cfb3f354"
+}

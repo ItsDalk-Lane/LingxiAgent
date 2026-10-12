@@ -1,0 +1,14 @@
+{
+  "ownTargetRemainingActualProcesses": [],
+  "psOutputSHA256": "d1550d32fe03d6aac430a34445664cb8277c0200c9f3087f048d612a838253be",
+  "checkedAt": 1791716853.300975,
+  "latestPythonFixturesAllHomeRemoved": true,
+  "workspaceWrapperReaped": true,
+  "workspaceWrapperHomeCleaned": true,
+  "testGuardPreserved": {
+    "seconds": 600,
+    "memory_mib": 8192
+  },
+  "oldFailedRustTemporaryHomes": "may remain local sensitive/rebuildable ephemeral; no broad sweep/delivery; not all old temp dirs claimed cleaned",
+  "noOtherAgentProcessSignalled": true
+}

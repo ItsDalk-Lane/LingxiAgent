@@ -345,7 +345,7 @@ impl MemoryTools {
             Ok(_) => {
                 return text_success(
                     "Memory is paused for this agent; proposals are not accepted right now.".into(),
-                )
+                );
             }
             Err(err) => return failed(ErrorCode::Internal, err.to_string()),
         }
@@ -491,6 +491,14 @@ impl MemoryTools {
                 );
             }
         };
+        // 安装前验证所属助手配置，不能先落盘再吞掉启用错误。
+        let agent = match self.bound_agent() {
+            Ok(agent) => agent,
+            Err(outcome) => return outcome,
+        };
+        if let Err(err) = self.memory.read_flags(&agent) {
+            return failed(ErrorCode::Internal, err.to_string());
+        }
         let source_key = format!("local_path:{}", source.to_string_lossy());
         let result = self
             .skills
@@ -502,7 +510,13 @@ impl MemoryTools {
                 if ok {
                     // onInstalled parity: add to the bound agent's enabled list
                     if let Some(name) = value.get("skillName").and_then(Value::as_str) {
-                        let _ = self.enable_for_agent(name);
+                        if let Err(err) = self.enable_for_agent(name) {
+                            // 安装已经发生时如实报告，不能伪称已启用或删除安装成果。
+                            return failed(
+                                ErrorCode::Internal,
+                                format!("Skill installed: {name}, but enabling failed: {err}"),
+                            );
+                        }
                     }
                     let mut text = format!(
                         "Skill installed: {} (enabled for this agent).",
@@ -534,7 +548,10 @@ impl MemoryTools {
                         text_success(format!(
                             "Safety review FAILED: {reason}\nExplain this risk to the user. Only after the user \
                              explicitly accepts, retry with risk_accepted=true plus risk_confirmation_token={}.",
-                            value.get("riskConfirmationToken").and_then(Value::as_str).unwrap_or("")
+                            value
+                                .get("riskConfirmationToken")
+                                .and_then(Value::as_str)
+                                .unwrap_or("")
                         ))
                     } else {
                         failed(
@@ -557,10 +574,10 @@ impl MemoryTools {
             return Ok(());
         }
         let config_path = self.memory.config_path(&self.agent_id)?;
-        let text = std::fs::read_to_string(&config_path)
+        let text = am::config::read_config_text(&config_path)
             .map_err(|e| am::MemoryError::Io(e.to_string()))?;
         let (mut enabled, workspace_disabled) =
-            lingxi_adapters::storage::agent_memory::AgentConfigPatch::read_skill_lists(&text);
+            lingxi_adapters::storage::agent_memory::AgentConfigPatch::read_skill_lists(&text)?;
         if !enabled.iter().any(|n| n == skill_name) {
             enabled.push(skill_name.to_string());
             let patched =
@@ -568,7 +585,7 @@ impl MemoryTools {
                     &text,
                     &enabled,
                     &workspace_disabled,
-                );
+                )?;
             am::atomic_write(&config_path, &patched).map_err(am::MemoryError::from)?;
         }
         Ok(())

@@ -1,0 +1,6 @@
+{"command": ["/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-binaries-g13ns4kr/new-open"], "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-new-rust-green-02-y5iegzgr", "start": 1791701435.899125}
+LINGXI_TEST_GUARD: armed (pid 76484, mem_limit=8192 MB, time_limit=600 s)
+INPUT_BEFORE home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-new-rust-green-02-y5iegzgr cache=knowledge_index.db sha256=670664faa04e32df91c09a00a6abea559935379fc046555dff9a917a2406fa01 bytes=8192 version=999 sentinel=paid-original
+cache=knowledge_index.db result=Err(KnowledgeError { code: "KNOWLEDGE_SCHEMA_NEWER", message: "knowledge schema version 999 is newer than supported 1" }) version=999 sentinel=Ok("paid-original") bytes_same=true
+INPUT_BEFORE home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-new-rust-green-02-y5iegzgr cache=knowledge_vector.db sha256=670664faa04e32df91c09a00a6abea559935379fc046555dff9a917a2406fa01 bytes=8192 version=999 sentinel=paid-original
+cache=knowledge_vector.db result=Err(KnowledgeError { code: "KNOWLEDGE_SCHEMA_NEWER", message: "knowledge schema version 999 is newer than supported 1" }) version=999 sentinel=Ok("paid-original") bytes_same=true

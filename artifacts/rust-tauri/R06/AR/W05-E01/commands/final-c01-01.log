@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/probe_dynamic.py", line 156, in <module>
+    p=argparse.ArgumentParser();p.add_argument('name');p.add_argument('case',choices=['dynamic','lifecycle','midrun']);a=p.parse_args();raise SystemExit(main(a.name,a.case))
+                                                                                                                                                         ~~~~^^^^^^^^^^^^^^^
+  File "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/probe_dynamic.py", line 151, in main
+    {'dynamic':dynamic,'lifecycle':lifecycle,'midrun':midrun}[case](h); h.result['status']='PASS'
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/probe_dynamic.py", line 79, in dynamic
+    first,sent=h.run(text='first'); assert old in sent and 'MEMORY_OLD_'+nonce in sent and 'SKILL_OLD_'+nonce in sent
+               ~~~~~^^^^^^^^^^^^^^
+  File "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/probe_dynamic.py", line 61, in run
+    assert wire_tools==snapshot_tools, 'actual wire tools must match immutable call observation'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: actual wire tools must match immutable call observation

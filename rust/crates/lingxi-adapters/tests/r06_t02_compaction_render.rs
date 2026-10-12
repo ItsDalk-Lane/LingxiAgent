@@ -77,6 +77,7 @@ fn requested_call(seq: u32) -> RequestedToolCall {
     .expect("arguments")
     .with_provider_call_id(format!("pc{seq:04}"));
     RequestedToolCall {
+        declaration_binding: snapshot().bind_target(&request.target),
         tool_call_id: ToolCallId::new(format!("tc{seq:04}")),
         provider_call_id: request.provider_call_id,
         target: request.target,

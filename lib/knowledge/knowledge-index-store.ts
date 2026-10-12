@@ -1,3 +1,4 @@
+import { openKnowledgeCacheDatabase, closeKnowledgeCacheDatabase } from "./ann-index-store.ts";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -356,6 +357,7 @@ export interface KnowledgeIndexStoreOptions {
  */
 export class KnowledgeIndexStore {
   declare db: any;
+  private closeGuard: any;
   readonly dbPath: string;
   private readonly Database: any;
   private readonly now: () => string;
@@ -372,64 +374,66 @@ export class KnowledgeIndexStore {
   }
 
   private openWithRecovery() {
-    try {
-      this.open();
-    } catch (error: any) {
-      try { this.db?.close?.(); } catch { /* 丢弃可重建缓存时保留原始处理路径。 */ }
+    try { this.open(); }
+    catch (error: unknown) {
+      try { closeKnowledgeCacheDatabase(this.db, this.closeGuard); } catch { /* 保留原错误和原件。 */ }
       this.db = null;
-      // 迁移失败不能删除仍可读的旧索引；只有确认数据库损坏才重建精确缓存文件。
-      if (error?.code !== "SQLITE_CORRUPT" && error?.code !== "SQLITE_NOTADB"
-        && error?.message !== "index_quick_check_failed") {
-        throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge search index migration or open failed");
-      }
-      for (const suffix of ["", "-wal", "-shm"]) {
-        try { fs.unlinkSync(`${this.dbPath}${suffix}`); } catch (error: any) {
-          if (error?.code !== "ENOENT") {
-            throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge search index cannot be rebuilt");
-          }
-        }
-      }
-      try {
-        this.open();
-      } catch {
-        try { this.db?.close?.(); } catch { /* 保留重建失败。 */ }
-        this.db = null;
-        throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge search index cannot be opened");
-      }
+      if (error instanceof KnowledgeError) throw error;
+      throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge search index open failed; original preserved", {
+        cause: String((error as NodeJS.ErrnoException)?.code || "migration_failed"),
+        recoveryRequired: ["SQLITE_CORRUPT", "SQLITE_NOTADB"].includes(String((error as NodeJS.ErrnoException)?.code)),
+      });
     }
   }
 
-  private open() {
-    this.db = new this.Database(this.dbPath);
-    this.db.pragma("journal_mode = WAL");
-    this.db.pragma("synchronous = NORMAL");
-    this.db.pragma("busy_timeout = 5000");
+  private assertWritableSchema() {
     const version = Number(this.db.pragma("user_version", { simple: true }));
-    if (!Number.isSafeInteger(version) || version < 0 || version > KNOWLEDGE_INDEX_SCHEMA_VERSION) {
-      throw new Error("unsupported_index_schema");
+    if (version > KNOWLEDGE_INDEX_SCHEMA_VERSION) {
+      throw new KnowledgeError("KNOWLEDGE_SCHEMA_NEWER", "Knowledge search schema is newer than this program supports");
     }
-    if (version === 0) {
+    if (!Number.isSafeInteger(version) || version < 0) {
+      throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge search schema version is invalid");
+    }
+  }
+
+  private queryFailure(error: unknown): KnowledgeError {
+    if (error instanceof KnowledgeError) return error;
+    const cause = String((error as NodeJS.ErrnoException)?.code || "query_failed");
+    return new KnowledgeError(["SQLITE_CORRUPT", "SQLITE_NOTADB"].includes(cause)
+      ? "KNOWLEDGE_INDEX_INVALID" : "KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge search index query failed", { cause });
+  }
+
+  private open() {
+    let meta: fs.Stats | undefined;
+    try { meta = fs.lstatSync(this.dbPath); }
+    catch (error: unknown) { if ((error as NodeJS.ErrnoException)?.code !== "ENOENT") throw error; }
+    if (meta) {
+      if (!meta.isFile() || meta.nlink !== 1) throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge search cache is not an exclusive regular file");
+      if (meta.size > 0) {
+        const fd = fs.openSync(this.dbPath, "r"); const header = Buffer.alloc(16);
+        try {
+          if (fs.readSync(fd, header, 0, 16, 0) !== 16 || !header.equals(Buffer.from("SQLite format 3\0"))) {
+            throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge search cache is corrupt; original and sidecars preserved", { recoveryRequired: true });
+          }
+        } finally { fs.closeSync(fd); }
+      }
+    }
+    const opened = openKnowledgeCacheDatabase(this.Database, this.dbPath, KNOWLEDGE_INDEX_SCHEMA_VERSION, db => {
+      this.db = db;
       this.db.transaction(() => {
-        this.createSchema();
-        this.db.pragma(`user_version = ${KNOWLEDGE_INDEX_SCHEMA_VERSION}`);
-      })();
-    } else if (version === 1) {
-      this.migrateV1ToV2();
-    }
-    if (version === 1 || version === 2) {
-      this.db.transaction(() => {
-        this.db.exec(CHUNK_VARIANT_METADATA_DDL);
-        this.db.pragma("user_version = 3");
-      })();
-    }
-    if (version > 0 && version < 4) {
-      this.db.transaction(() => {
-        this.db.exec(KNOWLEDGE_MULTIGRAIN_DDL);
-        this.db.pragma("user_version = 4");
-      })();
-    }
-    const check = this.db.pragma("quick_check", { simple: true });
-    if (check !== "ok") throw new Error("index_quick_check_failed");
+        this.assertWritableSchema();
+        const version = Number(this.db.pragma("user_version", { simple: true }));
+        if (version === 0) { this.createSchema(); this.db.pragma(`user_version = ${KNOWLEDGE_INDEX_SCHEMA_VERSION}`); }
+        else if (version === 1) { this.migrateV1ToV2(); }
+        if (version === 1 || version === 2) { this.db.exec(CHUNK_VARIANT_METADATA_DDL); this.db.pragma("user_version = 3"); }
+        if (version > 0 && version < 4) { this.db.exec(KNOWLEDGE_MULTIGRAIN_DDL); this.db.pragma("user_version = 4"); }
+        if (this.db.pragma("quick_check", { simple: true }) !== "ok") {
+          throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge search cache quick_check failed; original preserved", { recoveryRequired: true });
+        }
+      }).immediate();
+    });
+    this.db = opened.db;
+    this.closeGuard = opened.closeGuard;
   }
 
   private createSchema() {
@@ -450,6 +454,7 @@ export class KnowledgeIndexStore {
    */
   private migrateV1ToV2() {
     this.db.transaction(() => {
+      this.assertWritableSchema();
       const legacyIndexes = this.db.prepare(`
         SELECT parse_artifact_id, block_fingerprint, chunker_version, indexed_at
         FROM artifact_indexes
@@ -491,7 +496,7 @@ export class KnowledgeIndexStore {
       this.db.exec(`INSERT INTO knowledge_chunks_fts(knowledge_chunks_fts) VALUES('rebuild');`);
       this.db.exec(`DROP TABLE artifact_indexes;`);
       this.db.pragma("user_version = 2");
-    })();
+    }).immediate();
   }
 
   /** 按身份解析变体；不存在返回 null（missing 不等于 corrupt，由 ingestion 补齐）。 */
@@ -568,6 +573,8 @@ export class KnowledgeIndexStore {
   }
 
   writeVariantMetadata(variantId: string, metadata: KnowledgeChunkVariantMetadata): void {
+    return this.db.transaction(() => {
+      this.assertWritableSchema();
     validateVariantMetadata(metadata);
     const now = this.now();
     const result = this.db.prepare(`
@@ -584,6 +591,7 @@ export class KnowledgeIndexStore {
     `).run(metadata.firstHeadingPath === null ? null : JSON.stringify(metadata.firstHeadingPath),
       JSON.stringify(metadata.sectionKeys), now, now, requiredId(variantId, "chunkIndexVariantId"));
     if (result.changes !== 1) throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Ready variant metadata cannot be written");
+    }).immediate();
   }
 
   /** 幂等建立 building 状态的变体行；已存在（任意状态）则原样返回，不回退状态。 */
@@ -592,6 +600,8 @@ export class KnowledgeIndexStore {
     chunkProfileHash: unknown;
     blockFingerprint: unknown;
   }): KnowledgeChunkIndexVariant {
+    return this.db.transaction(() => {
+      this.assertWritableSchema();
     const artifactId = requiredId(input?.parseArtifactId, "parseArtifactId");
     const profileHash = requiredChunkProfileHash(input?.chunkProfileHash);
     const blockFingerprint = requiredId(input?.blockFingerprint, "blockFingerprint");
@@ -604,9 +614,12 @@ export class KnowledgeIndexStore {
       ) VALUES (?, ?, ?, 'building', ?, ?, ?)
     `).run(knowledgeChunkIndexVariantId(artifactId, profileHash), artifactId, profileHash, blockFingerprint, now, now);
     return this.resolveChunkIndexVariant(artifactId, profileHash)!;
+    }).immediate();
   }
 
   setChunkIndexVariantStatus(chunkIndexVariantId: unknown, status: unknown): KnowledgeChunkIndexVariant {
+    return this.db.transaction(() => {
+      this.assertWritableSchema();
     const variantId = requiredId(chunkIndexVariantId, "chunkIndexVariantId");
     const nextStatus = requiredVariantStatus(status);
     const result = this.db.prepare(`
@@ -616,6 +629,7 @@ export class KnowledgeIndexStore {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "chunkIndexVariantId is unknown");
     }
     return mapVariantRow(this.db.prepare(`SELECT * FROM chunk_index_variants WHERE id = ?`).get(variantId));
+    }).immediate();
   }
 
   /**
@@ -658,6 +672,7 @@ export class KnowledgeIndexStore {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     this.db.transaction(() => {
+      this.assertWritableSchema();
       const now = this.now();
       this.db.prepare(`
         INSERT INTO chunk_index_variants (
@@ -698,11 +713,13 @@ export class KnowledgeIndexStore {
         );
       }
       if (input.metadata) this.writeVariantMetadata(variantId, input.metadata);
-    })();
+    }).immediate();
   }
 
   /** 来源摘要完全由宿主派生；同一解析产物更新时保持创建时间和 FTS 同步。 */
   upsertSourceDocument(input: KnowledgeSourceDocumentDraft): void {
+    return this.db.transaction(() => {
+      this.assertWritableSchema();
     const artifactId = requiredId(input?.parseArtifactId, "parseArtifactId");
     if (typeof input.title !== "string" || typeof input.outlineText !== "string" || typeof input.searchText !== "string") {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge source document is invalid");
@@ -714,6 +731,7 @@ export class KnowledgeIndexStore {
       ON CONFLICT(parse_artifact_id) DO UPDATE SET title = excluded.title, outline_text = excluded.outline_text,
         search_text = excluded.search_text, updated_at = excluded.updated_at
     `).run(artifactId, input.title, input.outlineText, buildSearchDocumentText(input.searchText), now, now);
+    }).immediate();
   }
 
   /** 章节按解析产物确定；只更新同一身份，不删除其他变体仍引用的章节。 */
@@ -739,6 +757,7 @@ export class KnowledgeIndexStore {
       previousEnd = section.endBlockOrdinal;
     }
     this.db.transaction(() => {
+      this.assertWritableSchema();
       const now = this.now();
       const insert = this.db.prepare(`
         INSERT INTO knowledge_sections (id, parse_artifact_id, section_ordinal, heading_path_json,
@@ -758,7 +777,7 @@ export class KnowledgeIndexStore {
           section.startBlockOrdinal, section.endBlockOrdinal, section.text, section.tokenCount,
           buildSearchDocumentText(`${section.headingPath.join(" > ")}\n${section.text}`), now, now);
       }
-    })();
+    }).immediate();
   }
 
   getSourceDocument(parseArtifactId: string): StoredKnowledgeSourceDocument | null {
@@ -820,7 +839,7 @@ export class KnowledgeIndexStore {
           AND d.parse_artifact_id IN (SELECT value FROM json_each(?))
         ORDER BY score ASC, d.parse_artifact_id ASC LIMIT ?
       `).all(query, JSON.stringify(ids), limit).map((row: any) => ({ ...mapSourceDocument(row), score: Number(row.score) }));
-    } catch { throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge source index query failed"); }
+    } catch (error) { throw this.queryFailure(error); }
   }
 
   searchSections(input: KnowledgeGrainSearchInput): Array<StoredKnowledgeSection & { score: number }> {
@@ -835,7 +854,7 @@ export class KnowledgeIndexStore {
           AND s.parse_artifact_id IN (SELECT value FROM json_each(?))
         ORDER BY score ASC, s.parse_artifact_id ASC, s.section_ordinal ASC, s.id ASC LIMIT ?
       `).all(query, JSON.stringify(ids), limit).map((row: any) => ({ ...mapSection(row), score: Number(row.score) }));
-    } catch { throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge section index query failed"); }
+    } catch (error) { throw this.queryFailure(error); }
   }
 
   /** 删除某解析产物的全部 FTS chunk 行（源被移除/孤儿清理时调用）。
@@ -844,11 +863,12 @@ export class KnowledgeIndexStore {
   removeArtifact(parseArtifactId: unknown) {
     const artifactId = requiredId(parseArtifactId, "parseArtifactId");
     this.db.transaction(() => {
+      this.assertWritableSchema();
       this.db.prepare(`DELETE FROM knowledge_chunks WHERE parse_artifact_id = ?`).run(artifactId);
       this.db.prepare(`DELETE FROM chunk_index_variant_metadata WHERE parse_artifact_id = ?`).run(artifactId);
       this.db.prepare(`DELETE FROM knowledge_sections WHERE parse_artifact_id = ?`).run(artifactId);
       this.db.prepare(`DELETE FROM knowledge_source_documents WHERE parse_artifact_id = ?`).run(artifactId);
-    })();
+    }).immediate();
   }
 
   listArtifactChunks(parseArtifactId: unknown): KnowledgeChunkDraft[] {
@@ -962,6 +982,7 @@ export class KnowledgeIndexStore {
   removeChunkIndexVariantsByArtifact(parseArtifactId: unknown): number {
     const artifactId = requiredId(parseArtifactId, "parseArtifactId");
     return Number(this.db.transaction(() => {
+      this.assertWritableSchema();
       const variants = this.db.prepare(`
         SELECT id FROM chunk_index_variants WHERE parse_artifact_id = ?
       `).all(artifactId) as any[];
@@ -979,7 +1000,7 @@ export class KnowledgeIndexStore {
       this.db.prepare(`DELETE FROM knowledge_sections WHERE parse_artifact_id = ?`).run(artifactId);
       this.db.prepare(`DELETE FROM knowledge_source_documents WHERE parse_artifact_id = ?`).run(artifactId);
       return variants.length;
-    })());
+    }).immediate());
   }
 
   /**
@@ -1116,8 +1137,7 @@ export class KnowledgeIndexStore {
         score: Number(row.score),
       }));
     } catch (error) {
-      if (error instanceof KnowledgeError) throw error;
-      throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge search index query failed");
+      throw this.queryFailure(error);
     }
   }
 
@@ -1160,8 +1180,7 @@ export class KnowledgeIndexStore {
         score: Number(row.score),
       }));
     } catch (error) {
-      if (error instanceof KnowledgeError) throw error;
-      throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge search index query failed");
+      throw this.queryFailure(error);
     }
   }
 
@@ -1171,21 +1190,46 @@ export class KnowledgeIndexStore {
   }
 
   reset() {
-    try { this.db?.close?.(); } catch { /* 可重建缓存无需保留关闭错误。 */ }
-    this.db = null;
-    for (const suffix of ["", "-wal", "-shm"]) {
-      try { fs.unlinkSync(`${this.dbPath}${suffix}`); } catch (error: any) {
-        if (error?.code !== "ENOENT") {
-          throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge search index cannot be reset");
+    // SQLite事务阻止其它写者；serialize包含已提交WAL内容，不unlink活跃句柄。
+    // 先同步保存唯一恢复副本，备份失败则事务中不删除任何向量。
+    this.db.transaction(() => {
+      this.assertWritableSchema();
+      const version = Number(this.db.pragma("user_version", { simple: true }));
+      if (version > KNOWLEDGE_INDEX_SCHEMA_VERSION) {
+        throw new KnowledgeError("KNOWLEDGE_SCHEMA_NEWER", "Knowledge search schema is newer than this program supports");
+      }
+      const snapshot: Buffer = this.db.serialize();
+      const quarantine = `${this.dbPath}.quarantine-${crypto.randomUUID()}`;
+      fs.mkdirSync(quarantine, { mode: 0o700 });
+      const original = path.join(quarantine, "original.db");
+      const fd = fs.openSync(original, "wx", 0o600);
+      try {
+        fs.writeFileSync(fd, snapshot);
+        fs.fsyncSync(fd);
+      } finally { fs.closeSync(fd); }
+      const receipt = fs.openSync(path.join(quarantine, "recovery.json"), "wx", 0o600);
+      try {
+        fs.writeFileSync(receipt, JSON.stringify({
+        state: "snapshot_retained_reindex_required", embeddingsRegenerated: false,
+        schemaVersion: version, sha256: crypto.createHash("sha256").update(snapshot).digest("hex"),
+        }));
+        fs.fsyncSync(receipt);
+      } finally { fs.closeSync(receipt); }
+      // Unix还需同步目录项，避免清空后断电丢失备份文件名。
+      if (process.platform !== "win32") {
+        for (const directory of [quarantine, path.dirname(this.dbPath)]) {
+          const directoryFd = fs.openSync(directory, "r");
+          try { fs.fsyncSync(directoryFd); } finally { fs.closeSync(directoryFd); }
         }
       }
-    }
-    this.openWithRecovery();
+      this.db.exec("DELETE FROM knowledge_chunks; DELETE FROM chunk_index_variant_metadata; DELETE FROM knowledge_sections; DELETE FROM knowledge_source_documents; DELETE FROM chunk_index_variants;");
+    }).immediate();
   }
 
   close() {
     if (!this.db) return;
-    this.db.close();
+    closeKnowledgeCacheDatabase(this.db, this.closeGuard);
     this.db = null;
+    this.closeGuard = null;
   }
 }

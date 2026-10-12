@@ -1,0 +1,11 @@
+{
+  "command": [
+    "python3",
+    "scripts/rust-tauri/r02_registry_consistency.py"
+  ],
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r01-r02-registry-_i5cyjyr",
+  "start": 1791698762.7957718,
+  "end": 1791698762.8317199,
+  "exit_code": 1,
+  "log_sha256": "ffebe334c70f5a35f48d6643f8ce22472ea84eac418a4a90a51153dd0eecad84"
+}

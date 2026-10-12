@@ -1,0 +1,2108 @@
+{
+  "audited_base": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+  "current_status": "R06_NOT_ACCEPTED",
+  "historical_acceptance": {
+    "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+    "status": "SUPERSEDED_BY_AR_SCOPE_CHALLENGE",
+    "reason": "用户提供R06-AR-F01至F15推翻旧完整验收结论；原始历史保留"
+  },
+  "task_order": [
+    "W02",
+    "W03",
+    "W12",
+    "W01",
+    "W05",
+    "W06",
+    "W07",
+    "W08",
+    "W09",
+    "W10",
+    "W11",
+    "W13",
+    "W04",
+    "W15",
+    "W14",
+    "FINAL-R06"
+  ],
+  "closed_count": 1,
+  "open_count": 14,
+  "original_steps_status": "INCOMPLETE_PARTIAL_F08_SHARES_INDEPENDENTLY_VERIFIED",
+  "original_acceptance": [
+    {
+      "id": "R06-A01",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A02",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A03",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A04",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A05",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A06",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A07",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A08",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A09",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A10",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A11",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A12",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A13",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A14",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A15",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "R06-A16",
+      "status": "NOT_RUN"
+    }
+  ],
+  "due_leaves_status": "REGISTERED_NOT_RUN_FULL_LEAF",
+  "agents": [
+    {
+      "id": "/root/ar_w02_executor_01",
+      "role": "NEW_EXECUTOR",
+      "work_id": "R06-AR-W02",
+      "status": "INTERRUPTED_BY_PLATFORM_CONTENT_REVIEW",
+      "evidence": "artifacts/rust-tauri/R06/AR/W02-E01",
+      "reason": "This content was flagged for possible cybersecurity risk.",
+      "no_acceptance_delivered": true
+    },
+    {
+      "id": "/root/ar_scope_reconcile_01",
+      "role": "READ_ONLY_REQUIREMENT_RECONCILIATION",
+      "status": "READ_ONLY_COMPLETE_NO_ACCEPTANCE",
+      "evidence": "artifacts/rust-tauri/R06/AR/SCOPE-01"
+    },
+    {
+      "id": "/root/ar_w02_executor_02",
+      "role": "NEW_EXECUTOR_AFTER_PLATFORM_INTERRUPTION",
+      "work_id": "R06-AR-W02",
+      "status": "ENDED_READY_FOR_INDEPENDENT_REVIEW",
+      "evidence": "artifacts/rust-tauri/R06/AR/W02-E02"
+    },
+    {
+      "id": "/root/ar_w12_executor_01",
+      "role": "NEW_EXECUTOR",
+      "work_id": "R06-AR-W12",
+      "status": "ENDED_READY_FOR_INDEPENDENT_REVIEW",
+      "evidence": "artifacts/rust-tauri/R06/AR/W12-E01",
+      "parallel_basis": "W02资源恢复与W12知识缓存文件分离，Cargo共享target锁串行；禁止同写共享文件",
+      "additional_same_family_scope": [
+        "lib/knowledge/vector-index-adapter.ts",
+        "本轮专属TS测试；原knowledge-vector-index相关回归"
+      ]
+    },
+    {
+      "id": "/root/ar_w06_executor_01",
+      "role": "NEW_EXECUTOR",
+      "work_id": "R06-AR-W06",
+      "status": "ENDED_READY_FOR_INDEPENDENT_REVIEW",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-E01",
+      "parallel_basis": "配置解析与文件恢复/知识缓存产品路径分离；必要Cargo依赖由W06单独写入，独立验收固定单Task副本"
+    },
+    {
+      "id": "/root/ar_w12_reviewer_01",
+      "role": "FRESH_INDEPENDENT_REVIEWER",
+      "work_id": "R06-AR-W12",
+      "status": "ENDED_FAIL",
+      "evidence": "artifacts/rust-tauri/R06/AR/W12-R01",
+      "candidate_binding": "artifacts/rust-tauri/R06/AR/W12-CANDIDATE-01/binding.json",
+      "blockers": [
+        "W12-R01-F01",
+        "W12-R01-F02"
+      ]
+    },
+    {
+      "id": "/root/ar_w06_reviewer_01",
+      "role": "FRESH_INDEPENDENT_REVIEWER",
+      "work_id": "R06-AR-W06",
+      "status": "ENDED_FAIL",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-R01",
+      "candidate_binding": "artifacts/rust-tauri/R06/AR/W06-CANDIDATE-01/binding.json",
+      "blockers": [
+        "R06-AR-W06-R01-F01"
+      ]
+    },
+    {
+      "id": "/root/ar_w12_repair_01",
+      "role": "FRESH_REPAIR_AFTER_REVIEW_FAIL",
+      "work_id": "R06-AR-W12",
+      "status": "ENDED_READY_FOR_INDEPENDENT_REVIEW",
+      "evidence": "artifacts/rust-tauri/R06/AR/W12-P01",
+      "trigger": "W12-R01 FAIL"
+    },
+    {
+      "id": "/root/ar_w02_reviewer_01",
+      "role": "FRESH_INDEPENDENT_REVIEWER",
+      "work_id": "R06-AR-W02",
+      "status": "INTERRUPTED_BY_PLATFORM_CONTENT_REVIEW",
+      "evidence": "artifacts/rust-tauri/R06/AR/W02-R01/platform-interruption.json",
+      "candidate_binding": "artifacts/rust-tauri/R06/AR/W02-CANDIDATE-01/binding.json",
+      "no_acceptance_delivered": true,
+      "reason": "This content was flagged for possible cybersecurity risk."
+    },
+    {
+      "id": "/root/ar_w06_repair_01",
+      "role": "FRESH_REPAIR_AFTER_REVIEW_FAIL",
+      "work_id": "R06-AR-W06",
+      "status": "ENDED_READY_FOR_INDEPENDENT_REVIEW",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-P01",
+      "trigger": "W06-R01 FAIL"
+    },
+    {
+      "id": "/root/ar_w08_executor_01",
+      "role": "NEW_EXECUTOR",
+      "work_id": "R06-AR-W08",
+      "status": "ENDED_READY_FOR_INDEPENDENT_REVIEW",
+      "evidence": "artifacts/rust-tauri/R06/AR/W08-E01",
+      "parallel_basis": "仅runs/hooks结果投影，与配置/知识库修复产品分离"
+    },
+    {
+      "id": "/root/ar_w06_reviewer_02",
+      "role": "FRESH_INDEPENDENT_REVIEWER_AFTER_REPAIR",
+      "work_id": "R06-AR-W06",
+      "status": "ENDED_FAIL",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-R02",
+      "candidate_binding": "artifacts/rust-tauri/R06/AR/W06-CANDIDATE-02/binding.json",
+      "trigger": "W06-R01 FAIL -> new W06-P01 -> new W06-R02",
+      "blockers": [
+        "R06-AR-W06-R02-F01",
+        "R06-AR-W06-R02-F02"
+      ]
+    },
+    {
+      "id": "/root/ar_w12_reviewer_02",
+      "role": "FRESH_INDEPENDENT_REVIEWER_AFTER_REPAIR",
+      "work_id": "R06-AR-W12",
+      "status": "INTERRUPTED_BY_PLATFORM_CONTENT_REVIEW",
+      "evidence": "artifacts/rust-tauri/R06/AR/W12-R02/platform-interruption.json",
+      "candidate_binding": "artifacts/rust-tauri/R06/AR/W12-CANDIDATE-02/binding.json",
+      "trigger": "R01 FAIL -> new Repair P01 -> new Reviewer R02",
+      "no_acceptance_delivered": true,
+      "reason": "This content was flagged for possible cybersecurity risk."
+    },
+    {
+      "id": "/root/ar_w06_repair_02",
+      "role": "FRESH_REPAIR_AFTER_SECOND_REVIEW_FAIL",
+      "work_id": "R06-AR-W06",
+      "status": "PARTIAL_HANDOFF_SUPERSEDED_PENDING_NEW_ROOT_CAUSE",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-P02",
+      "trigger": "W06-R02 formal FAIL both F01/F02",
+      "final_candidate_status": "NOT_RUN_FINAL_FORMAT_SHA"
+    },
+    {
+      "id": "/root/ar_w08_reviewer_01",
+      "role": "FRESH_INDEPENDENT_REVIEWER",
+      "work_id": "R06-AR-W08",
+      "status": "ENDED_PASS_F08_ONLY",
+      "evidence": "artifacts/rust-tauri/R06/AR/W08-R01",
+      "candidate_binding": "artifacts/rust-tauri/R06/AR/W08-CANDIDATE-01/binding.json"
+    },
+    {
+      "id": "/root/ar_w12_repair_02",
+      "role": "FRESH_EXECUTION_REPAIR_FROM_CONFIRMED_PARTIAL_REVIEW_COUNTEREXAMPLE",
+      "work_id": "R06-AR-W12",
+      "status": "ENDED_READY_FOR_FRESH_REVIEWER_INDEPENDENT_BLOCKED",
+      "evidence": "artifacts/rust-tauri/R06/AR/W12-P02",
+      "trigger": "actual initializer-write gap; R02 interrupted NO_FINAL_VERDICT",
+      "independent_review_retry": false,
+      "scope": "仅安全合成普通产品修错；独立Review依然平台BLOCKED，不换模型/权限绕审查",
+      "candidate": "W12-CANDIDATE-05",
+      "final_binding": "artifacts/rust-tauri/R06/AR/W12-P02/supplemental-final-binding.json"
+    },
+    {
+      "id": "/root/ar_w06_root_cause_01",
+      "role": "NEW_ROOT_CAUSE",
+      "work_id": "R06-AR-W06",
+      "status": "ENDED_ROOT_CAUSE_MATRIX_READY_NOT_REVIEWER",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-RC01",
+      "trigger": "完整规格5.3，两轮同族正式FAIL，P02停止保留部分交接后补正流程"
+    },
+    {
+      "id": "/root/ar_w06_repair_03",
+      "role": "NEW_REPAIR",
+      "work_id": "R06-AR-W06",
+      "status": "ENDED_READY_FOR_INDEPENDENT_REREVIEW",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-P03",
+      "trigger": "R02 FAIL→P02 partial stopped→new RC01 matrix→new P03",
+      "candidate": "W06-CANDIDATE-03",
+      "final_binding": "artifacts/rust-tauri/R06/AR/W06-P03/binding-after-final.json",
+      "manifest_entries": 274
+    },
+    {
+      "id": "/root/ar_w01_executor_01",
+      "role": "NEW_EXECUTOR",
+      "work_id": "R06-AR-W01",
+      "status": "ENDED_READY_FOR_FIRST_FRESH_INDEPENDENT_REVIEW",
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent",
+      "evidence": "artifacts/rust-tauri/R06/AR/W01-E01",
+      "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "input_scope": "已验F08基线，仅隔离工作区产品，不含未接受W02/W06/W12源码",
+      "original_scope": "T01/T02/T03/T04全Steps/A01-A08及原叶当期份额，非只四C",
+      "evidence_current_root": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01",
+      "canonical_evidence_collection": "263_SAFE_FILES_AND_MANIFEST_FREEZE_COLLECTED_EXACT_SHA",
+      "final_manifest_sha256": "2b25cd68db5ab5a5565d23bda4ac7dd3145fb6126715f9ebb35bad883e98c494"
+    },
+    {
+      "id": "/root/ar_w03_executor_01",
+      "role": "NEW_EXECUTOR",
+      "work_id": "R06-AR-W03",
+      "status": "ERRORED_TRANSPORT_BEFORE_COMPLETED_HANDOFF",
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent",
+      "evidence": "artifacts/rust-tauri/R06/AR/W03-E01",
+      "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "parallel_basis": "isolated product workspace; common W01 interfaces integrated and reverified later",
+      "original_scope": "原T03全Steps/交付/A05A06和原到期叶，非仅四C",
+      "evidence_current_root": "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W03-E01",
+      "canonical_evidence_collection": "PENDING_FREEZE_NOT_YET_COPIED",
+      "whole06": "INCOMPLETE_NO_FINAL_RECORD_NO_PASS",
+      "interruption_receipt": "artifacts/rust-tauri/R06/AR/W03-PREP-01/executor01-transport-interruption.json",
+      "old_role_not_reused": true
+    },
+    {
+      "id": "/root/ar_w06_reviewer_03",
+      "role": "FRESH_EMPTY_HISTORY_INDEPENDENT_REVIEWER_AFTER_REPAIR",
+      "work_id": "R06-AR-W06",
+      "status": "INTERRUPTED_BY_PLATFORM_CONTENT_REVIEW",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-R03",
+      "candidate_binding": "artifacts/rust-tauri/R06/AR/W06-CANDIDATE-03/binding.json",
+      "trigger": "R02 FAIL -> partial P02 stopped -> fresh RC01 -> fresh P03 self/adversarial complete -> fresh R03",
+      "root_integrity": "artifacts/rust-tauri/R06/AR/W06-CANDIDATE-03/root-final-integrity-receipt.json",
+      "no_completed_acceptance_delivered": true,
+      "reason": "This content was flagged for possible cybersecurity risk. If this seems wrong, try rephrasing your request. If you’re doing authorized security work that requires more cyber permissive safeguards, apply for Daybreak access via https://platform.openai.com/settings/organization/status-and-access before retrying.",
+      "platform_evidence": "artifacts/rust-tauri/R06/AR/W06-R03/platform-interruption.json"
+    },
+    {
+      "id": "/root/ar_w10_executor_01",
+      "role": "NEW_EXECUTOR",
+      "work_id": "R06-AR-W10",
+      "status": "ENDED_READY_FOR_FIRST_NEW_REVIEW_F10_NOT_COMPLETED_C04_DEPENDENCY",
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent",
+      "evidence": "artifacts/rust-tauri/R06/AR/W10-E01",
+      "evidence_current_root": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W10-E01",
+      "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "canonical_evidence_collection": "749_EXACT_SAFE_COLLECTED_1432_LOCAL_ONLY_EXCLUDED",
+      "original_scope": "R06T07 full Steps/deliverables/A13A14 and due leaves; R05T01 affected identity shares remain required",
+      "parallel_basis": "isolated approved base product; no W12 unaccepted overlapping knowledge candidate or user setting copied",
+      "final_manifest": "artifacts/rust-tauri/R06/AR/W10-E01/evidence-manifest.json",
+      "root_readback": "artifacts/rust-tauri/R06/AR/W10-CANDIDATE-01/root-final-integrity-receipt.json"
+    },
+    {
+      "id": "/root/ar_w10_reviewer_01",
+      "role": "FRESH_EMPTY_HISTORY_INDEPENDENT_REVIEWER",
+      "work_id": "R06-AR-W10",
+      "status": "ENDED_INDEPENDENT_REVIEW_FAIL",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01",
+      "evidence": "artifacts/rust-tauri/R06/AR/W10-R01",
+      "candidate_binding": "artifacts/rust-tauri/R06/AR/W10-CANDIDATE-01/root-final-integrity-receipt.json",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W10_REVIEWER_01.md",
+      "trigger": "Executor frozen self/adversarial handoff, all749 SHA and five products readback; C04 still mandatory gap must actually review, no skipped first Review",
+      "role_reuse": false,
+      "verdict": "FAIL",
+      "final_integrity_receipt": "artifacts/rust-tauri/R06/AR/W10-CANDIDATE-01/reviewer01-final-integrity-receipt.json",
+      "safe_manifest_sha256": "227aefc869bf8a1140f9385276775885181c5601dd50658f854a525a32425dd4"
+    },
+    {
+      "id": "/root/ar_w09_executor_01",
+      "role": "FRESH_EMPTY_HISTORY_EXECUTOR",
+      "work_id": "R06-AR-W09",
+      "status": "ENDED_FROZEN_READY_FOR_FIRST_INDEPENDENT_REVIEW",
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w09-execution/LingxiAgent",
+      "evidence": "artifacts/rust-tauri/R06/AR/W09-E01",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W09_EXECUTOR_01.md",
+      "trigger": "First fresh W10 Reviewer actual final FAIL; F09 mandatory resumption/counting dependency on fixed unaccepted F10 five source files; later new W10 Repair and Reviewer required",
+      "role_reuse": false,
+      "whole30_root_readback": "artifacts/rust-tauri/R06/AR/W09-PREP-01/actual-workspace30-failure-readback.json",
+      "final_manifest_sha256": "84958f92310e54e279721022c3beff4af0ee129362720149059ee6f44e63bf68"
+    },
+    {
+      "id": "/root/ar_w01_reviewer_01",
+      "role": "FRESH_EMPTY_HISTORY_INDEPENDENT_REVIEWER",
+      "work_id": "R06-AR-W01",
+      "status": "ERRORED_PLATFORM_DAYBREAK_ACCESS_REQUIRED_REVIEW_INCOMPLETE",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w01-first-review-source-01",
+      "evidence": "artifacts/rust-tauri/R06/AR/W01-R01",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W01_REVIEWER_01.md",
+      "candidate_binding": "artifacts/rust-tauri/R06/AR/W01-REVIEW-PREP-01/root-final-integrity-receipt.json",
+      "trigger": "Executor formally ended; exact25 source/263safe evidence/manifest+FREEZE/readback1875pass5fail source-bound; first independent review actually required despite known gaps",
+      "role_reuse": false,
+      "verdict": "BLOCKED_NO_COMPLETED_REVIEW",
+      "interruption_receipt": "artifacts/rust-tauri/R06/AR/W01-REVIEW-PREP-01/platform-interruption-reviewer01.json"
+    },
+    {
+      "id": "/root/ar_w05_executor_01",
+      "role": "FRESH_EMPTY_HISTORY_EXECUTOR",
+      "work_id": "R06-AR-W05",
+      "status": "ENDED_FROZEN_READY_FOR_FIRST_INDEPENDENT_REVIEW",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01",
+      "evidence": "artifacts/rust-tauri/R06/AR/W05-E01",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W05_EXECUTOR_01.md",
+      "trigger": "Distinct F05 original dynamic-cache/identity/lifecycle obligation; pure acceptedbc own.git own deps, no retry or substitution for blocked W01 Reviewer",
+      "role_reuse": false,
+      "final_integrity_receipt": "artifacts/rust-tauri/R06/AR/W05-REVIEW-PREP-01/candidate-and-materials-ready.json"
+    },
+    {
+      "id": "/root/ar_w03_executor_02",
+      "role": "FRESH_EMPTY_HISTORY_EXECUTOR_AFTER_TECHNICAL_INTERRUPTION",
+      "work_id": "R06-AR-W03",
+      "status": "ENDED_FROZEN_READY_FOR_FIRST_INDEPENDENT_REVIEW",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02",
+      "evidence": "artifacts/rust-tauri/R06/AR/W03-E02",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W03_EXECUTOR_02.md",
+      "trigger": "E01 actual transport error no complete handoff/whole06 final exit; no formal Review FAIL and no platform retry",
+      "role_reuse": false,
+      "preparation": "artifacts/rust-tauri/R06/AR/W03-PREP-01/executor02-normal-clone/dispatch-ready.json",
+      "final_workspace_root_readback": "artifacts/rust-tauri/R06/AR/W03-PREP-01/executor02-final-workspace01-actual-failure-readback.json",
+      "final_integrity_receipt": "artifacts/rust-tauri/R06/AR/W03-REVIEW-PREP-01/executor02-final-freeze-actual-readback.json"
+    },
+    {
+      "id": "/root/ar_w03_reviewer_01",
+      "role": "FRESH_EMPTY_HISTORY_INDEPENDENT_REVIEWER",
+      "work_id": "R06-AR-W03",
+      "status": "ERRORED_PLATFORM_DAYBREAK_REQUIRED_REVIEW_INCOMPLETE",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-first-review-source-01",
+      "evidence": "artifacts/rust-tauri/R06/AR/W03-R01",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W03_REVIEWER_01.md",
+      "candidate_binding": "artifacts/rust-tauri/R06/AR/W03-REVIEW-PREP-01/candidate-and-materials-ready.json",
+      "role_reuse": false,
+      "trigger": "Ended frozen Executor02/37 candidate products/37 safe metadata actualSHA; 601 true execution records rehashed/30 formal commands settled FAIL; first Review actually mandatory despite known gaps.",
+      "verdict": "BLOCKED_NO_COMPLETED_REVIEW",
+      "interruption_receipt": "artifacts/rust-tauri/R06/AR/W03-REVIEW-PREP-01/reviewer01-platform-cancel-before.json",
+      "partial_actual_results": {
+        "focused": {
+          "passed": 134,
+          "failed": 0
+        },
+        "workspace": {
+          "passed": 1887,
+          "failed": 5
+        },
+        "independent_counterexample_alias": "ACTUAL_REPORTED1_PASS_PENDING_ROOT_READBACK",
+        "old_root_mutant": "ACTUAL_REPORTED2_BEHAVIOR_FAIL_PENDING_ROOT_READBACK",
+        "formal_chain": "ACTUAL_SIGNALLED_CANCEL143_49_EXECUTION_RECORDS_SOURCE_STABLE_NO_COMPLETE_STAGE",
+        "formal_review_fail_count_increment": false,
+        "recorded_process_closure": "543 recorded PIDs/two registered groups actually absent; unknown adopted exits not invented."
+      },
+      "supervised_cancel_settlement": "artifacts/rust-tauri/R06/AR/W03-REVIEW-PREP-01/reviewer01-platform-cancel-settlement.json",
+      "actual_recorded_process_closure": "artifacts/rust-tauri/R06/AR/W03-REVIEW-PREP-01/reviewer01-platform-cancel-process-closure.json"
+    },
+    {
+      "id": "/root/ar_w07_executor_01",
+      "role": "FRESH_EMPTY_HISTORY_FIRST_EXECUTOR",
+      "work_id": "R06-AR-W07",
+      "status": "ERRORED_STREAM_DISCONNECTED_NO_FINAL_FREEZE",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w07-execution-source-01",
+      "evidence": "artifacts/rust-tauri/R06/AR/W07-E01",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W07_EXECUTOR_01.md",
+      "preparation": "artifacts/rust-tauri/R06/AR/W07-PREP-01/dispatch-ready.json",
+      "role_reuse": false,
+      "trigger": "Distinct F07 first repair on pristine accepted bc after slot freed; no retry/substitute for platform-blocked W03 or other Reviewers.",
+      "previous_status": "IN_PROGRESS_NO_SELF_ACCEPTANCE",
+      "current_status_at": "2026-10-11T22:58:58.663606+00:00",
+      "completed_formal_Reviewer_FAIL_count_increment": false,
+      "transport_request_id": "d4f26465-ab76-447d-96d8-bbe867092b3f",
+      "complete_freeze_and_handoff": "NOT_DELIVERED",
+      "late_runtime_metadata": "Last read RUNNING marker/formal R02 supplemental log; actual complete end/after/closure not proved by marker."
+    },
+    {
+      "id": "/root/ar_w05_reviewer_01",
+      "role": "FRESH_EMPTY_HISTORY_FIRST_INDEPENDENT_REVIEWER",
+      "work_id": "R06-AR-W05",
+      "status": "ENDED_PARTIAL_BLOCKED_DISK_NO_COMPLETED_REVIEW",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-first-review-source-01",
+      "evidence": "artifacts/rust-tauri/R06/AR/W05-R01",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W05_REVIEWER_01.md",
+      "candidate_binding": "artifacts/rust-tauri/R06/AR/W05-REVIEW-PREP-01/candidate-and-materials-ready.json",
+      "role_reuse": false,
+      "trigger": "First Review of ended frozen Task mandatory despite known original failures; distinct first Reviewer, no platform-blocked-family retry.",
+      "previous_status": "ACTUAL_REVIEW_IN_PROGRESS_NO_VERDICT",
+      "current_status_at": "2026-10-11T22:58:58.663606+00:00",
+      "completed_formal_Reviewer_FAIL_count_increment": false,
+      "partial_actual_results": {
+        "currentFive": {
+          "pass": 4,
+          "fail": 1
+        },
+        "workspace": {
+          "pass": 1870,
+          "fail": 4
+        },
+        "formal": "PARTIAL_ERRNO28_NO_COMPLETE_RESULT",
+        "source_products_drift_reported": 0,
+        "whole_evidence_script_drift_reported": 9,
+        "full_review_complete": false,
+        "related_EX03_agent_install_zip_skill": "ACTUAL_FAIL",
+        "related_F06_flow_memory_false_and_malformed": "ACTUAL_FAIL"
+      },
+      "last_pre_loss_root_readback": {
+        "safeRows": 313,
+        "safeBytes": 513691852,
+        "safeMismatches": [],
+        "manifestSHA": "689ece53afecf0de23faf7388fb54e05442d088934d39f9705d05e795e085ab6",
+        "reportSHA": "1ba21f092ffc83e9e80cfbee4fcf9f747841ba51eb6dbac6178e4717392b176e",
+        "handoffSHA": "f93a1a33a4862a39fc7407afa1663af4a307a870f07d0298850e3103758fa8a1",
+        "note": "Actual read-only check occurred before latest user space restoration; not a current availability assertion or recovered original receipt."
+      }
+    },
+    {
+      "id": "/root/ar_w09_reviewer_01",
+      "role": "FRESH_EMPTY_HISTORY_FIRST_INDEPENDENT_REVIEWER",
+      "work_id": "R06-AR-W09",
+      "status": "ERRORED_PLATFORM_DAYBREAK_REQUIRED_REVIEW_INCOMPLETE",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w09-first-review-source-01",
+      "evidence": "artifacts/rust-tauri/R06/AR/W09-R01",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W09_REVIEWER_01.md",
+      "candidate_binding": "artifacts/rust-tauri/R06/AR/W09-REVIEW-PREP-01/candidate-and-materials-ready.json",
+      "role_reuse": false,
+      "trigger": "First Review of ended frozen Task mandatory despite known original failures; distinct first Reviewer, no platform-blocked-family retry.",
+      "previous_status": "ACTUAL_REVIEW_IN_PROGRESS_NO_VERDICT",
+      "current_status_at": "2026-10-11T22:58:58.663606+00:00",
+      "completed_formal_Reviewer_FAIL_count_increment": false,
+      "supervised_cancel_settlement": "artifacts/rust-tauri/R06/AR/W09-REVIEW-PREP-01/reviewer01-platform-cancel-settlement.json",
+      "partial_actual_results": {
+        "special_pass": 34,
+        "paid_result_usage_sink_failure": "ACTUAL_REQUIRED_COUNTEREXAMPLE_FAIL",
+        "whole_exit": -15,
+        "whole_sourceStable": true,
+        "recorded_process_windows": 638,
+        "windows_not_test_count": true,
+        "formal_chain": "NOT_RUN",
+        "full_review_complete": false
+      },
+      "retry": false
+    },
+    {
+      "id": "/root/r06_recovery_inventory_01",
+      "role": "FRESH_READ_ONLY_RECOVERY_INVENTORY",
+      "status": "ENDED_READ_ONLY_INVENTORY_NO_ACCEPTANCE",
+      "dispatch": "Missing known R06 isolated checkouts after user space restoration; no source modifications/no behavior tests.",
+      "report": "artifacts/rust-tauri/R06/AR/ENTRY-01/recovery-inventory-01.json"
+    },
+    {
+      "id": "/root/ar_w04_executor_01",
+      "role": "FRESH_EMPTY_HISTORY_FIRST_EXECUTOR",
+      "work_id": "R06-AR-W04",
+      "status": "ERRORED_TRANSPORT_NO_FINAL_SAFE_HANDOFF_OR_ACTOR_END",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W04_EXECUTOR_01.md",
+      "workspace": "/private/tmp/lingxi-r06-w04-executor-01",
+      "role_reuse": false,
+      "role_reusable": false,
+      "transport_interruption_observation": "R06-W04-EXECUTOR01-TRANSPORT-INTERRUPTION-01",
+      "formal_chain_final_exit": "MISSING_STILL_RUNNING"
+    },
+    {
+      "id": "/root/ar_w15_executor_01",
+      "role": "FRESH_EMPTY_HISTORY_FIRST_EXECUTOR",
+      "work_id": "R06-AR-W15",
+      "status": "ENDED_READY_FOR_INDEPENDENT_REVIEW_ONLY",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_EXECUTOR_01.md",
+      "workspace": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/own.git",
+      "role_reuse": false,
+      "end": "artifacts/rust-tauri/R06/AR/W15-EXECUTOR-01/END.json",
+      "report": "artifacts/rust-tauri/R06/AR/W15-EXECUTOR-01/HANDOFF.md",
+      "freeze_and_transfer": "artifacts/rust-tauri/R06/AR/W15-REVIEW-PREP-01/exact-frozen-candidate-transfer.json"
+    },
+    {
+      "id": "/root/ar_w11_executor_01",
+      "role": "FRESH_EMPTY_HISTORY_FIRST_EXECUTOR",
+      "work_id": "R06-AR-W11",
+      "status": "IN_PROGRESS_NO_SELF_ACCEPTANCE",
+      "workspace": "/private/tmp/lingxi-r06-w11-executor-01",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W11_EXECUTOR_01.md",
+      "preparation": "artifacts/rust-tauri/R06/AR/W11-PREP-01/post-space-exact-dependency-ready.json",
+      "role_reuse": false,
+      "dependencies": "13 exact frozen recovered W09 union F10 unaccepted source bytes; full tests/review not inherited"
+    },
+    {
+      "id": "/root/ar_w15_reviewer_01",
+      "role": "FRESH_EMPTY_HISTORY_FIRST_INDEPENDENT_REVIEWER",
+      "work_id": "R06-AR-W15",
+      "status": "ENDED_COMPLETE_INDEPENDENT_FAIL",
+      "workspace": "/private/tmp/lingxi-r06-w15-reviewer-01",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_REVIEWER_01.md",
+      "role_reuse": false,
+      "exact_candidate_receipt": "artifacts/rust-tauri/R06/AR/W15-REVIEW-PREP-01/exact-frozen-candidate-transfer.json",
+      "report": "artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/REPORT.md",
+      "end": "artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/END.json",
+      "root_integrity_receipt": "artifacts/rust-tauri/R06/AR/W15-REPAIR-PREP-01/first-review-final-integrity-and-transfer.json",
+      "reusable": false
+    },
+    {
+      "id": "/root/ar_w15_repair_01",
+      "role": "FRESH_EMPTY_HISTORY_FIRST_REPAIR_AFTER_COMPLETE_INDEPENDENT_FAIL",
+      "work_id": "R06-AR-W15",
+      "status": "ERRORED_TRANSPORT_PARTIAL_NO_FINAL_HANDOFF",
+      "workspace": "/private/tmp/lingxi-r06-w15-repair-01",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_REPAIR_01.md",
+      "dispatch_sha256": "42121362f8869e667a36e738b4ff6ad351c42568e95e1a40e3d05e28fa4a7b45",
+      "role_reuse": false,
+      "predecessor": "/root/ar_w15_reviewer_01",
+      "predecessor_completed_verdict": "FAIL",
+      "predecessor_end": "artifacts/rust-tauri/R06/AR/W15-REVIEWER-01/END.json",
+      "exact_source_transfer": "artifacts/rust-tauri/R06/AR/W15-REPAIR-PREP-01/first-review-final-integrity-and-transfer.json",
+      "reusable": false,
+      "transport_interruption_receipt": "artifacts/rust-tauri/R06/AR/W15-REPAIR-PREP-02/transport-interruption-exact-partial-recovery.json",
+      "completed_review_verdict": "NONE"
+    },
+    {
+      "id": "/root/ar_w15_repair_02",
+      "role": "ACTUALLY_CREATED_FRESH_EMPTY_HISTORY_REPAIR_AFTER_TRANSPORT_INTERRUPTION",
+      "work_id": "R06-AR-W15",
+      "status": "IN_PROGRESS_NO_SELF_ACCEPTANCE",
+      "workspace": "/private/tmp/lingxi-r06-w15-repair-02",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_REPAIR_02.md",
+      "role_reuse": false,
+      "predecessor": "/root/ar_w15_repair_01",
+      "formal_completed_FAIL_count": 1
+    },
+    {
+      "id": "/root/ar_w07_executor_02",
+      "role": "ACTUALLY_CREATED_FRESH_EMPTY_HISTORY_EXECUTOR02",
+      "work_id": "R06-AR-W07",
+      "status": "IN_PROGRESS_NO_SELF_ACCEPTANCE",
+      "workspace": "/private/tmp/lingxi-r06-w07-executor-02",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W07_EXECUTOR_02.md",
+      "predecessor": "/root/ar_w07_executor_01",
+      "role_reuse": false
+    }
+  ],
+  "entry_evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01",
+  "stage_gate": "NOT_RUN",
+  "upstream_gates": "NOT_RUN",
+  "entry_checks": [
+    {
+      "command": "python3 scripts/rust-tauri/r02_registry_consistency.py",
+      "status": "FAIL",
+      "exit_code": 1,
+      "evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01/registry-baseline-result.json"
+    },
+    {
+      "command": "cargo fmt --manifest-path rust/Cargo.toml --all -- --check",
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "开工未改产品版本2e1933d8；仅基线格式检查，不替代Task验收"
+    },
+    {
+      "command": "git ls-remote origin refs/heads/codex/rust-tauri-migration",
+      "status": "MATCHED",
+      "remote_head": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d"
+    },
+    {
+      "command": "existing lingxi-service --bind 127.0.0.1:0 with synthetic LINGXI_HOME",
+      "status": "PASS",
+      "scope": "仅ENTRY隔离生效与优雅退出，不是候选行为测试",
+      "evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01/isolation-result.json"
+    },
+    {
+      "id": "outside_build_product_dir_control",
+      "status": "ACTUAL_ONE_ORIGINAL_CASE_POSITIVE_ONLY_FULL_FORMAL_PENDING",
+      "evidence": "artifacts/rust-tauri/R06/AR/W03-PREP-01/external-target-product-dir-positive-readback.json",
+      "source_changed": false,
+      "old_failed_window_preserved": true,
+      "not_task_or_stage_PASS": true
+    }
+  ],
+  "original_obligations_register": "docs/rust-tauri/R06/repair-current/AR_ORIGINAL_OBLIGATIONS.json",
+  "original_obligation_counts": {
+    "original_tasks": 8,
+    "original_steps": 37,
+    "original_deliverables": 24,
+    "original_base_acceptances": 16,
+    "ar_issues": 15,
+    "ar_base_checks": 60,
+    "r00_unique_r06_features": 281,
+    "current_leaf_map_unique_features": 281,
+    "current_leaf_map_memberships": 376,
+    "leaf_assertions": 687,
+    "old_review_documents": 14,
+    "old_review_extracted_items": 74,
+    "inherited_upstream_share_rows": 90,
+    "extra_root_clusters": 12,
+    "obligation_records": 1234,
+    "agent_avatar_r06_only_scope_conflict_leaves": 28
+  },
+  "extra_obligations_status": "12根因簇待生产实验/范围裁决，未减少15F或60C",
+  "spec_gaps": [
+    {
+      "id": "SPEC_GAP-2026-10-08-EXECUTION-PROMPT",
+      "requested_source": "2026-10-08 人类实际发出的原R06执行提示词",
+      "status": "MISSING",
+      "located_alternatives": [
+        "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/92_逐阶段执行提示词.md",
+        "docs/rust-tauri/R06/R06_PROGRESS.json"
+      ],
+      "note": "已定位9月23日R06可复制模板和10月8日台账，但没有找到带日期且可证明为实际原发指令的独立捕获；二者不能冒充原发提示词。",
+      "search_scope": [
+        "仓库含ignored原任务书/任务专属资料",
+        "Downloads中Lingxi任务包与相关文本/HTML",
+        "Desktop/Code已授权任务资料文件名与相关内容；排除缓存/构建/无关个人内容"
+      ],
+      "latest_user_answer": "没看懂你这说的什么意思",
+      "clarification": "Explained original supplementary instruction search; user not required to locate or adjudicate. Continue existing full scope; missing source not fabricated or waived."
+    }
+  ],
+  "extra_work_order": [
+    "R06-EX-W01",
+    "R06-EX-W02",
+    "R06-EX-W03",
+    "R06-EX-W04",
+    "R06-EX-W05",
+    "R06-EX-W06",
+    "R06-EX-W07",
+    "R06-EX-W08",
+    "R06-EX-W09",
+    "R06-EX-W10",
+    "R06-EX-W11",
+    "R06-EX-W12"
+  ],
+  "extra_tasks": [
+    {
+      "work_id": "R06-EX-W01",
+      "obligation_id": "R06-EX-01",
+      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
+      "independent_review": "NOT_RUN"
+    },
+    {
+      "work_id": "R06-EX-W02",
+      "obligation_id": "R06-EX-02",
+      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
+      "independent_review": "NOT_RUN"
+    },
+    {
+      "work_id": "R06-EX-W03",
+      "obligation_id": "R06-EX-03",
+      "status": "ACTUAL_ORIGINAL_SERVICE_INSTALL_GAPS_RECORDED_FULL_FRESH_EX_TASK_REQUIRED",
+      "independent_review": "NO_EX03_TASK_REVIEW_W05_REVIEW_PARTIAL_ONLY",
+      "runtime_evidence": [
+        "artifacts/rust-tauri/R06/AR/W05-REVIEW-PREP-01/ex03-original-install-observed-red-01.json"
+      ]
+    },
+    {
+      "work_id": "R06-EX-W04",
+      "obligation_id": "R06-EX-04",
+      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
+      "independent_review": "NOT_RUN"
+    },
+    {
+      "work_id": "R06-EX-W05",
+      "obligation_id": "R06-EX-05",
+      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
+      "independent_review": "NOT_RUN"
+    },
+    {
+      "work_id": "R06-EX-W06",
+      "obligation_id": "R06-EX-06",
+      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
+      "independent_review": "NOT_RUN"
+    },
+    {
+      "work_id": "R06-EX-W07",
+      "obligation_id": "R06-EX-07",
+      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
+      "independent_review": "NOT_RUN"
+    },
+    {
+      "work_id": "R06-EX-W08",
+      "obligation_id": "R06-EX-08",
+      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
+      "independent_review": "NOT_RUN"
+    },
+    {
+      "work_id": "R06-EX-W09",
+      "obligation_id": "R06-EX-09",
+      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
+      "independent_review": "NOT_RUN"
+    },
+    {
+      "work_id": "R06-EX-W10",
+      "obligation_id": "R06-EX-10",
+      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
+      "independent_review": "NOT_RUN"
+    },
+    {
+      "work_id": "R06-EX-W11",
+      "obligation_id": "R06-EX-11",
+      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
+      "independent_review": "NOT_RUN"
+    },
+    {
+      "work_id": "R06-EX-W12",
+      "obligation_id": "R06-EX-12",
+      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
+      "independent_review": "NOT_RUN"
+    }
+  ],
+  "independent_review_workspace": {
+    "operation_id": "1f2d24a8-a9aa-48b7-a23f-97c9fdd39124",
+    "status": "F06_CANDIDATE_BOUND_FINAL_EXECUTOR_CHECK",
+    "purpose": "只为独立验收固定单项候选，避免并行执行者改动影响验收输入；不复用审查代理，不复制用户已有文件",
+    "base": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+    "path": "/Users/study_superior/.codex/worktrees/r06-independent-review/LingxiAgent",
+    "candidate": "R06-AR-W06",
+    "product_patch": "15_EXACT_HASHED_FILES"
+  },
+  "count_scope": "15命名F完整各自修复份额：F08独立PASS且远端核验已交付1；不等于原Steps/16A/281叶/12EX阶段完成",
+  "extra_open_count": 12,
+  "extra_closed_count": 0,
+  "stage_release_formula_status": "NOT_SATISFIED",
+  "independent_review_workspaces": [
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w12-review/LingxiAgent",
+      "candidate": "W12-CANDIDATE-01",
+      "binding": "artifacts/rust-tauri/R06/AR/W12-CANDIDATE-01/binding.json",
+      "status": "ENDED_FAIL_PRESERVED"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-independent-review/LingxiAgent",
+      "candidate": "W06-CANDIDATE-01",
+      "binding": "artifacts/rust-tauri/R06/AR/W06-CANDIDATE-01/binding.json",
+      "status": "ENDED_FAIL_PRESERVED"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w02-review/LingxiAgent",
+      "candidate": "W02-CANDIDATE-01",
+      "purpose": "W02固定候选独立Reviewer",
+      "status": "BLOCKED_PLATFORM_INTERRUPTION_NO_FINAL_VERDICT",
+      "binding": "artifacts/rust-tauri/R06/AR/W02-CANDIDATE-01/binding.json"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+      "candidate": "W12-CANDIDATE-02",
+      "purpose": "W12 FAIL后的新Repair固定候选自检及全新ReviewerR02",
+      "status": "BLOCKED_PLATFORM_INTERRUPTION_NO_FINAL_VERDICT",
+      "binding": "artifacts/rust-tauri/R06/AR/W12-CANDIDATE-02/binding.json"
+    },
+    {
+      "path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "candidate": "W06-CANDIDATE-02",
+      "purpose": "W06新Repair/ReviewerR02固定候选备用",
+      "status": "ENDED_FAIL_PRESERVED",
+      "binding": "artifacts/rust-tauri/R06/AR/W06-CANDIDATE-02/binding.json"
+    },
+    {
+      "work_id": "R06-AR-W01",
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w02-baseline/LingxiAgent",
+      "status": "PREPARED_REUSED_UNUSED_CLEAN_ATTACHMENT_CANDIDATE_NOT_COPIED",
+      "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "preparation": "artifacts/rust-tauri/R06/AR/W01-REVIEW-PREP-01/preparation.json",
+      "reviewer": "NOT_CREATED"
+    },
+    {
+      "work_id": "R06-AR-W06",
+      "path": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "candidate": "W06-CANDIDATE-03",
+      "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "status": "BLOCKED_PLATFORM_INTERRUPTION_PARTIAL_FAIL_REPORT_NO_COMPLETED_HANDOFF",
+      "binding": "artifacts/rust-tauri/R06/AR/W06-CANDIDATE-03/binding.json"
+    },
+    {
+      "work_id": "R06-AR-W12",
+      "path": "/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent",
+      "candidate": "W12-CANDIDATE-05",
+      "binding": "artifacts/rust-tauri/R06/AR/W12-CANDIDATE-05/binding.json",
+      "status": "SCOPED_SELF_CHECK_COMPLETE_INDEPENDENT_REVIEW_BLOCKED"
+    },
+    {
+      "at": "2026-10-11T09:04:47.097858+00:00",
+      "role": "ROOT_PREPARATION_NOT_REVIEWER",
+      "status": "PREPARED_EMPTY_PRODUCT_CANDIDATE_NOT_COPIED",
+      "work_id": "R06-AR-W03",
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w03-review1/LingxiAgent",
+      "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "reviewer": "NOT_CREATED",
+      "cargo_lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+      "tracked_diff_empty": true,
+      "protected_user_file_not_copied": true,
+      "target": "must own non-symlink; candidate freeze not happened",
+      "current_executor": "IN_PROGRESS disconnect regression repair; no READY"
+    }
+  ],
+  "candidate_test_build_isolation": {
+    "status": "REQUIRED",
+    "reason": "不同候选测试启动service的binary不能被并行构建替换",
+    "targets": "各独立worktree自有rust/target，实际binary摘要绑定",
+    "earlier_shared_target_logs": "保留为执行线索，不替代最终固定候选亲验"
+  },
+  "external_blockers": [
+    {
+      "id": "PLATFORM-W02-INDEPENDENT-REVIEW",
+      "work_id": "R06-AR-W02",
+      "status": "BLOCKED_PORTION_ONLY",
+      "reason": "独立对抗验收被平台自动内容审查中止，未得到完整裁决",
+      "required_external_condition": "平台允许该授权验收或所提示Daybreak访问实际可用；用户文本回复不等于开通",
+      "user_question": "已异步询问实际访问条件",
+      "continue_scope": "其它独立R06修复/正常验证，不重试受阻操作绕过审查",
+      "daybreak_access": "LATEST_ADVISORY_UNKNOWN_NOT_CONFIRMED_ENABLED",
+      "latest_user_answer": "我不知道是否启用了",
+      "retry_status": "NOT_RETRIED_ACTUAL_PLATFORM_REQUIRED_ACCESS_UNCONFIRMED",
+      "access_check_evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01/daybreak-access-20261011T080716Z.json",
+      "daybreak_access_history": [
+        {
+          "time_utc": "2026-10-11T06:47:24Z",
+          "status": "not_granted",
+          "evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01/daybreak-access-20261011T064724Z.json"
+        },
+        {
+          "time_utc": "2026-10-11T08:07:16.987Z",
+          "status": "unknown",
+          "evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01/daybreak-access-20261011T080716Z.json"
+        }
+      ]
+    },
+    {
+      "id": "PLATFORM-W12-INDEPENDENT-REVIEW",
+      "work_id": "R06-AR-W12",
+      "status": "BLOCKED_PORTION_ONLY",
+      "action": "第二轮全新独立Review未完成",
+      "reason": "This content was flagged for possible cybersecurity risk.",
+      "evidence": "artifacts/rust-tauri/R06/AR/W12-R02/platform-interruption.json",
+      "daybreak_access": "LATEST_ADVISORY_UNKNOWN_NOT_CONFIRMED_ENABLED",
+      "retry_status": "NOT_RETRIED_ACTUAL_PLATFORM_REQUIRED_ACCESS_UNCONFIRMED",
+      "other_safe_R06_work": "CONTINUE",
+      "daybreak_access_history": [
+        {
+          "time_utc": "2026-10-11T06:47:24Z",
+          "status": "not_granted",
+          "evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01/daybreak-access-20261011T064724Z.json"
+        },
+        {
+          "time_utc": "2026-10-11T08:07:16.987Z",
+          "status": "unknown",
+          "evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01/daybreak-access-20261011T080716Z.json"
+        }
+      ],
+      "access_check_evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01/daybreak-access-20261011T080716Z.json"
+    },
+    {
+      "id": "PLATFORM-W06-INDEPENDENT-REVIEW",
+      "work_id": "R06-AR-W06",
+      "status": "BLOCKED_PORTION_ONLY",
+      "action": "third fresh independent Reviewer interrupted before completed final binding/manifest/handoff",
+      "reason": "This content was flagged for possible cybersecurity risk. If this seems wrong, try rephrasing your request. If you’re doing authorized security work that requires more cyber permissive safeguards, apply for Daybreak access via https://platform.openai.com/settings/organization/status-and-access before retrying.",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-R03/platform-interruption.json",
+      "daybreak_access": "LATEST_ADVISORY_UNKNOWN_NOT_CONFIRMED_ENABLED",
+      "retry_status": "NOT_RETRIED_ACTUAL_PLATFORM_REQUIRED_ACCESS_UNCONFIRMED",
+      "access_check_evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01/daybreak-access-20261011T080716Z.json",
+      "other_safe_R06_work": "CONTINUE"
+    },
+    {
+      "id": "PLATFORM-W09-INDEPENDENT-REVIEW",
+      "work_id": "R06-AR-W09",
+      "status": "BLOCKED_PORTION_ONLY",
+      "action": "First fresh independent Reviewer interrupted before completed verdict/report/manifest",
+      "reason": "This content was flagged for possible cybersecurity risk. If this seems wrong, try rephrasing your request. If you’re doing authorized security work that requires more cyber permissive safeguards, apply for Daybreak access via https://platform.openai.com/settings/organization/status-and-access before retrying.",
+      "daybreak_access": "UNKNOWN_NOT_CONFIRMED_ENABLED",
+      "retry_status": "NOT_RETRIED",
+      "evidence": "artifacts/rust-tauri/R06/AR/W09-REVIEW-PREP-01/reviewer01-platform-cancel-settlement.json",
+      "completed_formal_Reviewer_FAIL_count_increment": false
+    }
+  ],
+  "last_control_update": "2026-10-11T13:48:15.440065+00:00",
+  "pending_worktree_operations": [
+    {
+      "operation_id": "538edd73-e70d-4dd7-93d3-230f182d2ca9",
+      "name": "r06-w06-review3",
+      "ref": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "purpose": "保持前两轮候选/失败证据不可变；为后续新修复候选准备独立target",
+      "status": "COMPLETED_INPUTS_ONLY_NO_PRODUCT_COPIED",
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "current_status": "COMPLETED_FIXED_P03_PRODUCTS15_CANDIDATE03_REVIEW_INTERRUPTED",
+      "prepared_status_at_creation": "COMPLETED_INPUTS_ONLY_NO_PRODUCT_COPIED"
+    },
+    {
+      "operation_id": "2c6ff3ef-6691-45f0-92f3-777c0f38d635",
+      "name": "r06-w12-review3",
+      "ref": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "status": "COMPLETED_INPUTS_ONLY_NO_PRODUCT_COPIED",
+      "purpose": "独立第二审阅已实证初始化附带写窗口，保前两候选 immutable，为未来修复候选隔离target",
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent",
+      "current_status": "COMPLETED_FIXED_P02_PRODUCTS11_CANDIDATE05_REVIEW_BLOCKED",
+      "prepared_status_at_creation": "COMPLETED_INPUTS_ONLY_NO_PRODUCT_COPIED"
+    },
+    {
+      "operation_id": "c2660547-583b-4d11-87ed-3ba888597df8",
+      "name": "r06-w01-execution",
+      "status": "COMPLETED",
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent"
+    }
+  ],
+  "process_corrections": [
+    {
+      "work_id": "R06-AR-W06",
+      "basis": "完整规格§5.3 连续两轮同族FAIL→NEW ROOT-CAUSE全路径矩阵→NEW Repair",
+      "reason": "总控先派P02漏ROOT-CAUSE步骤，现纠正；P02保存部分交接后退出，不签独立接受",
+      "status": "NEW_RC01_COMPLETED_NEW_P03_RUNNING_NO_ROLE_REUSE",
+      "preserve": "P02全部源码与失败历史保留，后续另派P03，不能复用执行者/Reviewer",
+      "current_status": "RC01_COMPLETE_P03_COMPLETE_R03_PLATFORM_INTERRUPTED_PARTIAL_FAIL",
+      "current_evidence": "artifacts/rust-tauri/R06/AR/W06-R03/platform-interruption.json",
+      "current_at": "2026-10-11T10:31:09.442023+00:00"
+    },
+    {
+      "id": "R06-EXECUTION-CONVERGENCE-01",
+      "at": "2026-10-12T03:07:47.601718+00:00",
+      "status": "CONTROL_ONLY_NO_NEW_ACCEPTANCE_NO_SOURCE_OVERLAY",
+      "reuse_existing_matrix_register_handoffs": true,
+      "already_delivered": [
+        "R06-AR-F08 limited original independently accepted repair share only"
+      ],
+      "frozen_candidates_independent_review_blocked": [
+        "W01",
+        "W02",
+        "W03",
+        "W06",
+        "W09",
+        "W12"
+      ],
+      "review_fail_needs_dependency_repair": [
+        "W10"
+      ],
+      "active_own_source_or_ordered_checks_not_final_handoff": [
+        "W04-E01",
+        "W11-E01",
+        "W15-REPAIR-02"
+      ],
+      "fresh_review_workspaces_prepared_no_actors": [
+        "W04-REVIEWER-01",
+        "W11-REVIEWER-01",
+        "W15-REVIEWER-02"
+      ],
+      "no_other_candidate_promoted_to_complete_or_PASS": true,
+      "same_candidate_reuse_rule": "同角色、源码/依赖/环境/条件均未变且已有效完成的检查，不因整理、等待或更新台账重复；原明确顺序和缺失必跑窗口仍实际补齐。执行者结果不得替代新独立Reviewer亲跑。",
+      "order": "第一层逐项完成→第二层对抗→关联回归；EARLY窗口保留，不倒填为有序最终检查。",
+      "shared_ownership": [
+        {
+          "family": "原精确事件消费者/真实quota入队前置/严格migration登记和R06正式门禁图",
+          "planned_single_fresh_owner": "W14 new Executor, not created",
+          "scope_basis": "existing R06-AR-W14_EXECUTOR_01 dispatch and F14/original affected upstream contract",
+          "preconditions": "真实最终共享候选已由单独新Integration执行者完成必要整合，最终migration SQL与消费契约确定；不假定未冻结源。",
+          "parallel_actors_instruction": "W04/W11/W15保留真实失败并交接，不各自改同一原消费者或registry，不弱化原断言。"
+        },
+        {
+          "family": "当前隔离候选同路径的必要语义整合",
+          "planned_single_fresh_owner": "fresh Integration Executor, not created",
+          "scope": "精确冻结候选间必要共享路径整合；不是一个长期代理修完整阶段；root只做字节搬运/控制。",
+          "independent_review": "后续全新独立Reviewer核对实际组合的受影响契约；不得替代六类平台受阻验收或宣称解除BLOCKED。",
+          "observed_W04_W11_tracked_path_overlap": [
+            "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+            "rust/crates/lingxi-service/src/lib.rs",
+            "rust/crates/lingxi-service/src/runs.rs"
+          ],
+          "observation_limit": "仅git diff已跟踪路径交集；17/15数量不是完整候选清单，未跟踪新增路径和最终依赖按各自freeze核对。"
+        }
+      ],
+      "build_budget": "当前大型构建窗口沿原角色顺序完成；先核对空间/环境。仅已退出、明确本轮且可重建缓存可按授权/审批处理；保留源码、实际验收程序、日志、工作副本、证据与用户文件。",
+      "blocked_review_retry": "NONE; no rephrasing/renaming/model switch/access change",
+      "original_failures_missing_partial_results": "PRESERVED; incomplete exit remains NOT_RUN/INCOMPLETE, not PASS",
+      "original_obligations_sha256": "db4ceda76ca3911b9e4001934bd49f6d756c800634d3fe1da481730907876fae",
+      "protected_settings_sha256": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3",
+      "commit_push": "NONE",
+      "stage": "NOT_RUN",
+      "R07_started": false
+    }
+  ],
+  "candidate_snapshot_register": [
+    {
+      "work_id": "R06-AR-W12",
+      "snapshot": "W12-CANDIDATE-03",
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent",
+      "binding": "artifacts/rust-tauri/R06/AR/W12-CANDIDATE-03/binding.json",
+      "owned_count": 11,
+      "root_aggregate": "2a58d62e46b93e6a89d55d77c525a767700ad841da6c0085642a057e41597007",
+      "status": "STALE_PREPARATION_FAILURE_NO_BUSINESS_RESULT_SUPERSEDED_BY_04",
+      "independent_review": "BLOCKED_ACTUAL_PLATFORM_INTERRUPTION_NO_FINAL_VERDICT",
+      "lock": "原2e锁，自有target，未含W06组合依赖",
+      "preserved_patch": "artifacts/rust-tauri/R06/AR/W12-CANDIDATE-03/candidate-before-supersession.diff",
+      "current_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING"
+    },
+    {
+      "work_id": "R06-AR-W12",
+      "snapshot": "W12-CANDIDATE-04",
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent",
+      "binding": "artifacts/rust-tauri/R06/AR/W12-CANDIDATE-04/binding.json",
+      "owned_count": 11,
+      "root_aggregate": "d16fe662dfa5b575e1d23759659ed20b7a8ae83cbb85a9ec4cde303c86439004",
+      "status": "STALE_TEST_WARNING_SUPERSEDED_BY_05",
+      "independent_review": "BLOCKED_ACTUAL_PLATFORM_INTERRUPTION_NO_FINAL_VERDICT",
+      "lock": "原2e锁，自有target已有准备编译缓存，不含W06组合依赖",
+      "current_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING"
+    },
+    {
+      "work_id": "R06-AR-W12",
+      "snapshot": "W12-CANDIDATE-05",
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent",
+      "binding": "artifacts/rust-tauri/R06/AR/W12-CANDIDATE-05/binding.json",
+      "owned_count": 11,
+      "root_aggregate": "c86ab7fa171b5ae5b6c40a9715a3268d3ec1df1ab008b62dae7a095645d90d08",
+      "status": "SCOPED_SELF_CHECK_COMPLETE_INDEPENDENT_BLOCKED",
+      "independent_review": "BLOCKED_ACTUAL_PLATFORM_INTERRUPTION_NO_FINAL_VERDICT",
+      "lock": "原2e锁，自有target，不含主仓W06依赖组合",
+      "final_binding": "artifacts/rust-tauri/R06/AR/W12-P02/supplemental-final-binding.json",
+      "current_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+      "source_availability_readback": {
+        "at": "2026-10-12T03:15:02.606704+00:00",
+        "status": "EXACT_FROZEN_SOURCE_BYTES_AVAILABLE_NOT_COMPLETE_WORKSPACE_NOT_ACCEPTED",
+        "source_root": "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "verified_files": 11,
+        "binding": "artifacts/rust-tauri/R06/AR/W12-CANDIDATE-05/binding.json",
+        "binding_sha256": "8c696533389a3a2c91cab6539a5abd55e2bdf42c82ebc690094464f7ad88a50e",
+        "old_workspace_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+        "old_workspace_restored": false,
+        "historical_missing_runtime_safe_evidence_reconstructed": false,
+        "main_mixed_product_state_is_not_isolated_candidate": true,
+        "acceptance": "NONE",
+        "independent_block_or_old_FAIL_not_waived": true
+      }
+    },
+    {
+      "work_id": "R06-AR-W06",
+      "snapshot": "W06-CANDIDATE-03",
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent",
+      "binding": "artifacts/rust-tauri/R06/AR/W06-CANDIDATE-03/binding.json",
+      "owned_count": 15,
+      "root_aggregate": "ff5e2a83231ae6f6f306a7558d9c801fffdb66667d47da7e9fff986d1aa51e35",
+      "status": "FROZEN_SELF_CHECK_COMPLETE_INDEPENDENT_R03_INTERRUPTED_PARTIAL_RUNTIME_FAIL",
+      "independent_review": "BLOCKED_ACTUAL_PLATFORM_INTERRUPTION_NO_COMPLETED_FINAL_HANDOFF",
+      "lock": "冻结3693ac…；原package无移除/升级，新增10依赖package；自有target",
+      "prior_preparation_status": "FROZEN_FOR_P03_FINAL_SELF_CHECK_THEN_FRESH_REVIEWER",
+      "current_evidence": "artifacts/rust-tauri/R06/AR/W06-R03/platform-interruption.json",
+      "current_at": "2026-10-11T10:31:09.442023+00:00",
+      "current_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+      "source_availability_readback": {
+        "at": "2026-10-12T03:15:02.606704+00:00",
+        "status": "EXACT_FROZEN_SOURCE_BYTES_AVAILABLE_NOT_COMPLETE_WORKSPACE_NOT_ACCEPTED",
+        "source_root": "/Users/study_superior/Desktop/Code/LingxiAgent",
+        "verified_files": 15,
+        "binding": "artifacts/rust-tauri/R06/AR/W06-CANDIDATE-03/binding.json",
+        "binding_sha256": "5c08edb8483fb3c54113e95df3f5cb9f1b0b151852a53cd59a18c2f89b624fe5",
+        "old_workspace_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+        "old_workspace_restored": false,
+        "historical_missing_runtime_safe_evidence_reconstructed": false,
+        "main_mixed_product_state_is_not_isolated_candidate": true,
+        "acceptance": "NONE",
+        "independent_block_or_old_FAIL_not_waived": true
+      }
+    },
+    {
+      "at": "2026-10-11T15:09:22.630688+00:00",
+      "work_id": "R06-AR-W05",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-first-review-source-01",
+      "binding": "artifacts/rust-tauri/R06/AR/W05-REVIEW-PREP-01/candidate-and-materials-ready.json",
+      "status": "FROZEN_CANDIDATE_NOT_ACCEPTED_FIRST_REVIEW_ACTIVE",
+      "main_product_overlay": false,
+      "current_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+      "source_availability_readback": {
+        "at": "2026-10-12T03:15:02.606704+00:00",
+        "status": "EXACT_FROZEN_SOURCE_BYTES_AVAILABLE_NOT_COMPLETE_WORKSPACE_NOT_ACCEPTED",
+        "source_root": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W05-CANDIDATE-RECOVERY-01/frozen-source",
+        "verified_files": 10,
+        "binding": "artifacts/rust-tauri/R06/AR/W05-CANDIDATE-RECOVERY-01/manifest.json",
+        "binding_sha256": "d470d03f4a009f8a72ddb7551278a36535e032313724f5ebc365ebd2e4c35922",
+        "old_workspace_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+        "old_workspace_restored": false,
+        "historical_missing_runtime_safe_evidence_reconstructed": false,
+        "main_mixed_product_state_is_not_isolated_candidate": false,
+        "acceptance": "NONE",
+        "independent_block_or_old_FAIL_not_waived": true
+      }
+    },
+    {
+      "at": "2026-10-11T15:09:22.630688+00:00",
+      "work_id": "R06-AR-W09",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w09-first-review-source-01",
+      "binding": "artifacts/rust-tauri/R06/AR/W09-REVIEW-PREP-01/candidate-and-materials-ready.json",
+      "status": "FROZEN_CANDIDATE_NOT_ACCEPTED_FIRST_REVIEW_ACTIVE",
+      "main_product_overlay": false,
+      "current_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+      "source_availability_readback": {
+        "at": "2026-10-12T03:15:02.606704+00:00",
+        "status": "EXACT_FROZEN_SOURCE_BYTES_AVAILABLE_NOT_COMPLETE_WORKSPACE_NOT_ACCEPTED",
+        "source_root": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-CANDIDATE-RECOVERY-01/frozen-source",
+        "verified_files": 13,
+        "binding": "artifacts/rust-tauri/R06/AR/W09-CANDIDATE-RECOVERY-01/manifest.json",
+        "binding_sha256": "834f3f0c638a2d92f7acba53356d5ff38a383a2970db1cf206077589e0360359",
+        "old_workspace_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+        "old_workspace_restored": false,
+        "historical_missing_runtime_safe_evidence_reconstructed": false,
+        "main_mixed_product_state_is_not_isolated_candidate": false,
+        "acceptance": "NONE",
+        "independent_block_or_old_FAIL_not_waived": true
+      }
+    }
+  ],
+  "last_delivery": {
+    "finding": "F08",
+    "commit": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+    "remote_verified_same_at_receipt": true,
+    "receipt": "artifacts/rust-tauri/R06/AR/W08-DELIVERY-01/delivery-receipt.json"
+  },
+  "last_updated_utc": "2026-10-12T03:51:58.134611+00:00",
+  "control_corrections": [
+    {
+      "at": "2026-10-11T09:48:29.816963+00:00",
+      "id": "AGGREGATE_STAGE_TIME_BUDGET",
+      "evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01/aggregate-time-budget-correction.json",
+      "old_status_unchanged": "outer interrupted executions not product PASS, no final manifest completion",
+      "future_bound": "workspace2400 plus bounded overhead; formal stage sum original commands19800 plus bounded overhead; per-binary600/8192 unchanged",
+      "authorization": "Routine task execution configuration correction within full formal-gate scope; no map/guard/required-case changes"
+    },
+    {
+      "at": "2026-10-11T10:01:52.328463+00:00",
+      "id": "LOCAL_OWNER_ORIGINAL_ACCESS_RULE",
+      "evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01/local-owner-original-contract-correction.json",
+      "prior_approval_revoked": true,
+      "affected_tasks": [
+        "R06-AR-W01",
+        "R06-AR-W03"
+      ],
+      "status": "F01_CURRENT_SOURCE_FIX_AND_FRESH_SELF_CHECK_REQUIRED_NO_ACCEPTANCE"
+    },
+    {
+      "at": "2026-10-11T11:50:49.819253+00:00",
+      "source": "artifacts/rust-tauri/R06/AR/ENTRY-01/tool-declaration-snapshot-contract-correction.json",
+      "status": "SOURCE_CONTRACT_CORRECTED_NO_RUNTIME_ACCEPTANCE"
+    },
+    {
+      "at": "2026-10-11T12:06:00.346394+00:00",
+      "source": "artifacts/rust-tauri/R06/AR/ENTRY-01/w03-snapshot-case-count-correction.json",
+      "status": "QUANTITY_CORRECTED_NO_SCOPE_REDUCTION_OR_NEW_CONTRACT"
+    },
+    {
+      "at": "2026-10-11T12:27:29.579570+00:00",
+      "id": "W03-E02-FOCUSED-COUNT",
+      "source": "artifacts/rust-tauri/R06/AR/W03-PREP-01/focused-count-arithmetic-correction.json",
+      "previous_reported_count": 141,
+      "actual_count": 121,
+      "action": "Append correction preserving earlier report/window; final new134 reported not yet independently accepted."
+    },
+    {
+      "at": "2026-10-11T15:01:32.363217+00:00",
+      "id": "ENDED_W03_R01_GENERATED_STATIC_CACHE_ONLY",
+      "receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w03-reviewer-owned-static-cache-cleanup-01-receipt.json",
+      "deleted_nonruntime_generated_files": 7789,
+      "protected_X_OK_programs_or_locks_SHA_unchanged": 528,
+      "candidate_products_SHA_unchanged": 37,
+      "blocked_reviewer_not_retried": true,
+      "behavior_acceptance": false
+    },
+    {
+      "at": "2026-10-11T15:13:06.089705+00:00",
+      "id": "ENDED_W05_E01_GENERATED_STATIC_CACHE_ONLY",
+      "receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w05-executor-owned-static-cache-cleanup-01-receipt.json",
+      "deleted_non_executable_generated_files": 160727,
+      "deleted_logical_bytes": 35412916558,
+      "protected_actual_programs_SHA_unchanged": 301,
+      "all_X_OK_files_SHA_unchanged": 1234,
+      "products_SHA_unchanged": 10,
+      "source_target_overlap": 0,
+      "actual_free_after_bytes": 33735856128,
+      "concurrent_free_change_not_exclusive_release": true,
+      "no_Task_or_Reviewer_acceptance": true
+    },
+    {
+      "at": "2026-10-12T00:26:37.920658+00:00",
+      "id": "R06-CONTROL-AVAILABILITY-RECONCILIATION-02",
+      "receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/control-availability-reconciliation-02.json",
+      "status": "CONTROL_ONLY_NO_SOURCE_OR_ACCEPTANCE_CHANGE"
+    }
+  ],
+  "prepared_workspaces": [
+    {
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w09-execution/LingxiAgent",
+      "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "prepared_at": "2026-10-11T09:51:44.028797+00:00",
+      "purpose": "unused clean bc workspace initially F09 preparation; reserve first new W10 Reviewer on exact frozen W10 candidate, then fresh F09 Executor may reuse physical checkout only after Reviewer ends, all old FAIL/source windows preserved",
+      "products_copied": true,
+      "agent_created": true,
+      "evidence": "artifacts/rust-tauri/R06/AR/W09-PREP-01/preparation.json",
+      "exact_frozen_products": 5,
+      "binding": "artifacts/rust-tauri/R06/AR/W10-CANDIDATE-01/partial-binding.json",
+      "evidence_copied": false,
+      "status": "FRESH_W09_EXECUTOR_IN_PROGRESS_NO_PASS",
+      "current_purpose": "Fresh F09 Executor active on exact fixed unaccepted F10 dependency after first independent final FAIL",
+      "own_dependency_directory": true,
+      "current_binding": "artifacts/rust-tauri/R06/AR/W09-PREP-01/dispatch-ready-inputs.json",
+      "current_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+      "prior_preparation_not_current_ready": true
+    },
+    {
+      "work_id": "R06-AR-W03",
+      "role": "NEW_EXECUTOR_02",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02",
+      "own_git": true,
+      "own_dependencies": true,
+      "source_count": 36,
+      "receipt": "artifacts/rust-tauri/R06/AR/W03-PREP-01/executor02-normal-clone/dispatch-ready.json",
+      "tests": "NOT_RUN_BY_ROOT_PREPARATION",
+      "current_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+      "prior_preparation_not_current_ready": true
+    },
+    {
+      "work_id": "R06-AR-W09",
+      "role": "FIRST_FRESH_REVIEWER_NOT_CREATED",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w09-first-review-source-01",
+      "own_git": true,
+      "own_dependencies": true,
+      "candidate_copied": true,
+      "receipt": "artifacts/rust-tauri/R06/AR/W09-REVIEW-PREP-01/pristine-ready.json",
+      "tests": "NOT_RUN",
+      "input_materials_copied": true,
+      "reviewer_created": true,
+      "current_actor": "/root/ar_w09_reviewer_01",
+      "current_status": "ACTUAL_FIRST_REVIEW_IN_PROGRESS_NO_VERDICT",
+      "current_receipt": "artifacts/rust-tauri/R06/AR/W09-REVIEW-PREP-01/candidate-and-materials-ready.json",
+      "current_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+      "prior_preparation_not_current_ready": true
+    },
+    {
+      "work_id": "R06-AR-W13",
+      "role": "FUTURE_FRESH_EXECUTOR_NOT_CREATED",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w13-execution-source-01",
+      "own_git": true,
+      "own_dependencies": true,
+      "candidate_copied": false,
+      "receipt": "artifacts/rust-tauri/R06/AR/W13-PREP-01/pristine-ready.json",
+      "inputs": 172,
+      "tests": "NOT_RUN",
+      "current_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+      "prior_preparation_not_current_ready": true
+    },
+    {
+      "at": "2026-10-11T13:40:41.972776+00:00",
+      "work_id": "R06-AR-W03",
+      "role": "FUTURE_FIRST_REVIEWER_PREPARATION_ONLY",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-first-review-source-01",
+      "HEAD": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "origin": "https://github.com/ItsDalk-Lane/LingxiAgent.git",
+      "own_git_directory": true,
+      "own_node_dependencies": true,
+      "dependency_package_lock_sha256": "2080ceedcb622c779ab7b757aa281828b3bcfd97d839c4d793641c2bac85e528",
+      "tracked_package_lock_sha256": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+      "tracked_product_pristine": true,
+      "initial_user_vscode_not_copied": true,
+      "candidate_copied": true,
+      "input_materials_copied": true,
+      "reviewer_created": true,
+      "tests": "NOT_RUN",
+      "status": "PRISTINE_BASE_READY_PENDING_EXECUTOR_FREEZE_NO_ACCEPTANCE",
+      "free_bytes": 21373132800,
+      "current_role": "FIRST_FRESH_REVIEWER_ACTUALLY_RUNNING",
+      "current_candidate_count": 37,
+      "current_receipt": "artifacts/rust-tauri/R06/AR/W03-REVIEW-PREP-01/candidate-and-materials-ready.json",
+      "current_actor": "/root/ar_w03_reviewer_01",
+      "current_status": "ERRORED_PLATFORM_DAYBREAK_REQUIRED_REVIEW_INCOMPLETE",
+      "current_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+      "prior_preparation_not_current_ready": true
+    },
+    {
+      "at": "2026-10-11T14:15:30.953638+00:00",
+      "work_id": "R06-AR-W07",
+      "role": "PRISTINE_FUTURE_EXECUTOR_PREPARATION_ONLY",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w07-execution-source-01",
+      "HEAD": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "own_git_directory": true,
+      "own_node_dependencies": true,
+      "dependency_package_lock_sha256": "2080ceedcb622c779ab7b757aa281828b3bcfd97d839c4d793641c2bac85e528",
+      "tracked_package_lock_sha256": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+      "tracked_product_pristine": true,
+      "initial_user_vscode_not_copied": true,
+      "input_count": 160,
+      "unaccepted_candidate_overlay": false,
+      "agent_created": true,
+      "tests": "NOT_RUN",
+      "status": "PREPARED_NOT_EXECUTED",
+      "free_bytes": 49527615488,
+      "receipt": "artifacts/rust-tauri/R06/AR/W07-PREP-01/pristine-ready.json",
+      "must_refresh_mutable_materials_before_dispatch": true,
+      "current_actor": "/root/ar_w07_executor_01",
+      "current_status": "FIRST_EXECUTOR_ACTIVE_PRISTINE_START",
+      "current_receipt": "artifacts/rust-tauri/R06/AR/W07-PREP-01/dispatch-ready.json",
+      "current_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+      "prior_preparation_not_current_ready": true
+    },
+    {
+      "at": "2026-10-11T14:19:38.680283+00:00",
+      "work_id": "R06-AR-W05",
+      "role": "FUTURE_FIRST_REVIEWER_PREPARATION_ONLY",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-first-review-source-01",
+      "HEAD": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "origin": "https://github.com/ItsDalk-Lane/LingxiAgent.git",
+      "own_git_directory": true,
+      "own_node_dependencies": true,
+      "dependency_package_lock_sha256": "2080ceedcb622c779ab7b757aa281828b3bcfd97d839c4d793641c2bac85e528",
+      "tracked_package_lock_sha256": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+      "tracked_product_pristine": true,
+      "initial_user_vscode_not_copied": true,
+      "candidate_copied": true,
+      "input_materials_copied": true,
+      "reviewer_created": true,
+      "tests": "NOT_RUN",
+      "status": "PRISTINE_BASE_READY_PENDING_EXECUTOR_FREEZE_NO_ACCEPTANCE",
+      "free_bytes": 30937776128,
+      "receipt": "artifacts/rust-tauri/R06/AR/W05-REVIEW-PREP-01/pristine-ready.json",
+      "current_actor": "/root/ar_w05_reviewer_01",
+      "current_status": "ACTUAL_FIRST_REVIEW_IN_PROGRESS_NO_VERDICT",
+      "current_receipt": "artifacts/rust-tauri/R06/AR/W05-REVIEW-PREP-01/candidate-and-materials-ready.json",
+      "current_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+      "prior_preparation_not_current_ready": true
+    },
+    {
+      "at": "2026-10-11T15:00:54.935297+00:00",
+      "work_id": "R06-AR-W11",
+      "role": "FUTURE_FRESH_EXECUTOR_PREPARATION_ONLY",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w11-execution-source-01",
+      "HEAD": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "own_git_directory": true,
+      "own_node_dependencies": true,
+      "dependency_package_lock_sha256": "2080ceedcb622c779ab7b757aa281828b3bcfd97d839c4d793641c2bac85e528",
+      "tracked_package_lock_sha256": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+      "tracked_product_pristine": true,
+      "initial_user_vscode_not_copied": true,
+      "candidate_copied": false,
+      "input_materials_copied": false,
+      "agent_created": false,
+      "tests": "NOT_RUN",
+      "status": "PRISTINE_BASE_READY_PENDING_W09_FREEZE_DEPENDENCY_AND_AVAILABLE_SLOT",
+      "free_bytes": 21137022976,
+      "receipt": "artifacts/rust-tauri/R06/AR/W11-PREP-01/pristine-ready.json",
+      "current_availability": "MISSING_AFTER_SPACE_RESTORATION_RECOVERY_PENDING",
+      "prior_preparation_not_current_ready": true
+    }
+  ],
+  "current_execution_readback": {
+    "at": "2026-10-11T11:22:20.331409+00:00",
+    "W01": "Fresh independent Reviewer actual platform Daybreak stop; partial registry/fmt/compile/f01 records preserved/readback, no final report/manifest/verdict; no retry or role reuse. Full Task remains BLOCKED independent review.",
+    "W03": "Transport error ended Executor01; whole06 onlystart/partiallogs no finalexit, cannotPASS. Root verified36 current source SHA unchanged versus draft, no related live process; new empty-history Executor02 own.git preparation to finish full fresh two-layer checks/freeze before first Reviewer.",
+    "W10": "Formal first fresh Reviewer final FAIL; C01/C02/C03 limited PASS, C04 actual running restart409 FAIL. 60 affected old cases and extra identity counterexample pass; all7 findings preserved; full R05/R04/R03 NOT_RUN by Reviewer; root hashes98 safe files/five sources/actual binaries verified.",
+    "root_receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/current-safe-execution-readback-02.json",
+    "closed_count": 1,
+    "open_count": 14,
+    "blocked_reviews": [
+      "W01",
+      "W02",
+      "W06",
+      "W12"
+    ],
+    "verification_level": "Actual root Git/user/disk checks; agent-reported execution summaries awaiting frozen manifest readback, no new PASS",
+    "W09": "Root actual whole42 149 result blocks/1897 passed/6 failed/4 targets; exit101; 142 actual binary start/end SHA stable/guard ON/wait reaped/zero residue. Original shutdown7 green. Formal pending/running per live actor, no acceptance.",
+    "W05": "Root actual final whole 146 result blocks/1868 passed/4 assertion failed plus spill abnormal no result; exit101. Current F05 all04 actual 4/1 exit101; formal running, no acceptance."
+  },
+  "standalone_git_preparations": [
+    {
+      "at": "2026-10-11T10:31:09.442023+00:00",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01",
+      "HEAD": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "own_git_directory": true,
+      "settings_copied": false,
+      "unaccepted_products_copied": true,
+      "purpose": "future unchanged legacy gate requires own Git directory; normal independent clone pristine preparation, not gate execution or acceptance",
+      "receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/ordinary-clone-preparation-01/checkout-receipt.json",
+      "agent_created": false,
+      "stage_run": false,
+      "initial_pristine_receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/ordinary-clone-preparation-01/checkout-receipt.json",
+      "current_status": "FIRST_W10_REVIEWER_ENDED_ACTUAL_FAIL",
+      "exact_owned_count": 5,
+      "other_unaccepted_task_products_copied": false,
+      "own_dependency_directory": true,
+      "current_binding": "artifacts/rust-tauri/R06/AR/W10-CANDIDATE-01/ordinary-clone-review-preparation.json",
+      "current_at": "2026-10-11T10:38:59.822394+00:00",
+      "reviewer_created": true,
+      "final_executor_evidence_copied": true,
+      "agent_id": "/root/ar_w10_reviewer_01",
+      "verdict": "FAIL",
+      "latest_actor_status": "ENDED_INDEPENDENT_REVIEW_FAIL",
+      "status_readback_at": "2026-10-12T00:26:37.920658+00:00",
+      "workspace_current_availability": "DELETED_CONFIRMED_BY_USER",
+      "old_runtime_claims_reusable": false
+    },
+    {
+      "at": "2026-10-11T11:22:20.331409+00:00",
+      "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w01-first-review-source-01",
+      "HEAD": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "own_git_directory": true,
+      "purpose": "First fresh W01 Task Reviewer, not Stage Reviewer; original unchanged legacy gate requires .git directory",
+      "current_status": "FIRST_W01_REVIEWER_RUNNING_NO_VERDICT",
+      "exact_owned_count": 25,
+      "other_unaccepted_task_products_copied": false,
+      "own_dependency_directory": true,
+      "settings_copied": false,
+      "reviewer_created": true,
+      "agent_id": "/root/ar_w01_reviewer_01",
+      "binding": "artifacts/rust-tauri/R06/AR/W01-REVIEW-PREP-01/root-final-integrity-receipt.json",
+      "latest_actor_status": "ERRORED_PLATFORM_DAYBREAK_ACCESS_REQUIRED_REVIEW_INCOMPLETE",
+      "status_readback_at": "2026-10-12T00:26:37.920658+00:00",
+      "workspace_current_availability": "DELETED_CONFIRMED_BY_USER",
+      "old_runtime_claims_reusable": false
+    },
+    {
+      "work_id": "R06-AR-W13",
+      "workspace": "/private/tmp/lingxi-r06-w13-executor-01",
+      "receipt": "artifacts/rust-tauri/R06/AR/W13-PREP-01/own-clone-prepared-not-dispatched.json",
+      "materials": 188,
+      "actor": "NOT_CREATED_YET"
+    },
+    {
+      "work_id": "R06-AR-W14",
+      "workspace": "/private/tmp/lingxi-r06-w14-executor-01",
+      "receipt": "artifacts/rust-tauri/R06/AR/W14-PREP-01/own-clone-prepared-not-dispatched.json",
+      "materials": 183,
+      "actor": "NOT_CREATED_YET"
+    },
+    {
+      "work_id": "R06-EX-W12",
+      "workspace": "/private/tmp/lingxi-r06-ex12-executor-01",
+      "receipt": "artifacts/rust-tauri/R06/AR/EX12-PREP-01/own-clone-prepared-not-dispatched.json",
+      "materials": 608,
+      "actor": "NOT_CREATED_YET"
+    },
+    {
+      "work_id": "R06-EX-W03",
+      "workspace": "/private/tmp/lingxi-r06-ex03-executor-01",
+      "receipt": "artifacts/rust-tauri/R06/AR/EX03-PREP-01/own-clone-prepared-not-dispatched.json",
+      "materials": 221,
+      "actor": "NOT_CREATED"
+    },
+    {
+      "work_id": "R06-AR-W15-REVIEW-02",
+      "workspace": "/private/tmp/lingxi-r06-w15-reviewer-02",
+      "receipt": "artifacts/rust-tauri/R06/AR/W15-REVIEW-PREP-02/own-clone-prepared-pending-final-repair.json",
+      "actor": "NOT_CREATED",
+      "materials": 574
+    }
+  ],
+  "latest_task_upstream_execution": {
+    "work_id": "R06-AR-W10",
+    "role": "EXECUTOR_NOT_STAGE_REVIEWER",
+    "R05": "ACTUAL_FAIL",
+    "R04": "ACTUAL_FAIL",
+    "R03": "ACTUAL_FAIL",
+    "R02_legs": "PARTIAL_ACTUAL_PASSES_AND_REGISTRY_FAIL_AND_LEGACY_PREPARATION_BLOCKED",
+    "evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01/w10-formal-layer-result-readback.json",
+    "full_final_stage_gate": "NOT_RUN",
+    "final_stage_upstream_verdict": "NOT_RUN",
+    "W09_formal59": {
+      "at": "2026-10-11T14:54:08.321856+00:00",
+      "receipt": "artifacts/rust-tauri/R06/AR/W09-PREP-01/formal59-full-chain-actual-readback.json",
+      "exit_code": 1,
+      "stages": {
+        "R05": "FAIL",
+        "R04": "FAIL",
+        "R03": "FAIL"
+      },
+      "actual_commands": 30,
+      "source_stable": true,
+      "outer_binary_records": 1,
+      "full_nested_binding": "PENDING_FINAL_EXECUTOR_MANIFEST",
+      "task_review": "NOT_RUN",
+      "stage_review": "NOT_RUN"
+    }
+  },
+  "access_status_readbacks": [
+    {
+      "at": "2026-10-11T11:24:25.796701+00:00",
+      "status": "UNKNOWN_NOT_CONFIRMED_ENABLED",
+      "receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/official-daybreak-access-page-readonly-01.json",
+      "not_a_permission_grant": true,
+      "actual_platform_stops_unchanged": true
+    }
+  ],
+  "platform_interruptions": [
+    {
+      "at": "2026-10-11T11:27:08.657339+00:00",
+      "work_id": "R06-AR-W01",
+      "agent": "/root/ar_w01_reviewer_01",
+      "status": "BLOCKED_NO_COMPLETED_REVIEW",
+      "receipt": "artifacts/rust-tauri/R06/AR/W01-REVIEW-PREP-01/platform-interruption-reviewer01.json"
+    }
+  ],
+  "control_observations": [
+    {
+      "at": "2026-10-11T12:19:52.888051+00:00",
+      "role": "ROOT_RECORDED_AGENT_PROGRESS_NOT_INDEPENDENT_REVIEW",
+      "status": "IN_PROGRESS_NO_NEW_ACCEPTANCE",
+      "facts": {
+        "W09": "Executor reports workspace-final-15 actual exit101/1137.51s/17failed targets inputs stable; no root final manifest verification yet; owner drop/bind-fail physical exit and confirmed-or-possibly-sent counting fixes ongoing.",
+        "W05": "Own-clone precise local cache exclusion authorized only; no stage scope/ignore changes. Current cases/gates still need final current binding.",
+        "W03": "Focused141 reported green, whole01 ongoing. Subsequent test/runner evidence recording edits must rerun final current focused/whole/gates; no inherited PASS."
+      }
+    },
+    {
+      "at": "2026-10-11T12:39:13.550718+00:00",
+      "id": "R06-AR-F07-OBS-LIVE-CATALOG-HISTORY",
+      "role": "ROOT_REGISTERED_EXECUTOR_ACTUAL_REPORT_NOT_INDEPENDENT_REVIEW",
+      "reported_by": "/root/ar_w05_executor_01",
+      "status": "OPEN_ACTUAL_EXECUTOR_FAILURE_FINAL_SAFE_RECORD_BINDING_PENDING",
+      "fact": "Executor actual first HTTP wire declared read; live registry disabled it before invocation, Gateway correctly refused forbidden/no dispatch and persisted ToolCallCompleted; current send-time registry no longer declared read, adapter could not encode historical read pair, call2 local provider_error with no second HTTP wire.",
+      "contract": "Current catalog permission/definition is refreshed per send; authoritative earlier call/result identity still needs exact historical wire-name binding. Never redeclare disabled read, permit blind invocation, discard tool pair, guess target, or restore globally frozen tools to hide failure.",
+      "same_family_owner": "F07 tool discovery/declaration/lifecycle and F01 canonical history/protocol binding integration",
+      "scope": "Current R06 required same-family interop gap; not a new R07 waiver",
+      "runtime_evidence": "Final W05 safe manifest/finding record paths pending; root has not independently reproduced",
+      "required": "Fresh F07 Executor reproduce old valid failure plus positive controls through actual model wire and Gateway, all affected protocols/history paths; current source-bound independent Reviewer actual check. F05 legal description/generation two-call positive does not close this disable negative."
+    },
+    {
+      "at": "2026-10-11T13:48:15.440065+00:00",
+      "id": "FORMAL56_PARTIAL_CANCEL_SUPERVISION_OBSERVATION",
+      "evidence": "artifacts/rust-tauri/R06/AR/W09-PREP-01/formal56-cancelled-partial-actual-readback.json",
+      "status": "ACTUAL_PARTIAL_CANCEL_NOT_FULL_GATE_PASS",
+      "scope": "Current W09 preparation and F14 supervision check; production root cause not established",
+      "later_nodes": "NOT_RUN",
+      "adopted_cargo_exit": "UNKNOWN"
+    },
+    {
+      "at": "2026-10-11T14:20:34.702796+00:00",
+      "role": "ROOT_PARTIAL_LAYER_READBACK_NOT_REVIEWER",
+      "work_id": "R06-AR-W05",
+      "status": "R03_ACTUAL_FAIL_12_PASS3_FAIL_OUTER_PENDING",
+      "evidence": "artifacts/rust-tauri/R06/AR/W05-PREP-01/formal-final01-r03-actual-settlement-readback.json",
+      "no_acceptance": true
+    },
+    {
+      "at": "2026-10-11T14:54:08.321856+00:00",
+      "id": "W09_SHIPPING_SUPPLEMENT_OS_HOME_DEVIATION",
+      "status": "OPEN_NEW_CORRECTED_RUNS_IN_PROGRESS",
+      "receipt": "artifacts/rust-tauri/R06/AR/W09-PREP-01/shipping-supplement-original-home-deviation-readback.json",
+      "formal59_not_rewritten": true
+    },
+    {
+      "at": "2026-10-11T15:01:32.363217+00:00",
+      "id": "W09_CORRECTED_HOME_AND_EXTERNAL_GUARD_SUPPLEMENT",
+      "status": "ACTUAL_NEW_EXECUTIONS_RECORDED_PENDING_INDEPENDENT_REVIEW",
+      "receipt": "artifacts/rust-tauri/R06/AR/W09-PREP-01/corrected-home-shipping-and-mutation-guard-supplement-actual-readback.json",
+      "shipping_original_scripts_actual_exit": [
+        0,
+        0,
+        0
+      ],
+      "original_seed_mutation_expected_exit": [
+        101,
+        101,
+        101
+      ],
+      "OS_HOME": "INHERITED",
+      "per_PID_guard": "600sec/8192MiB",
+      "original_formal_result": "FAIL_UNCHANGED",
+      "original_missing_guard_or_home_deviation": "PRESERVED_NOT_RETROFILLED"
+    },
+    {
+      "id": "R06-AR-F09-OBS-PAID-RESULT-USAGE-FAILURE-01",
+      "at": "2026-10-11T15:17:57.981743+00:00",
+      "receipt": "artifacts/rust-tauri/R06/AR/W09-REVIEW-PREP-01/paid-result-usage-failure-actual-counterexample-01.json",
+      "status": "OPEN_ACTUAL_COUNTEREXAMPLE_REVIEW_STILL_IN_PROGRESS",
+      "formal_Review_FAIL_count_increment": false
+    },
+    {
+      "id": "R06-EX03-OBS-PACKAGE-AGENT-INSTALL-01",
+      "at": "2026-10-11T15:22:59.136793+00:00",
+      "receipt": "artifacts/rust-tauri/R06/AR/W05-REVIEW-PREP-01/ex03-original-install-observed-red-01.json",
+      "status": "OPEN_ACTUAL_ORIGINAL_OBLIGATION_RED_NO_EX03_TASK_REVIEW_OR_STAGE_ACCEPTANCE"
+    },
+    {
+      "id": "R06-POST-SPACE-WORKSPACE-AVAILABILITY-01",
+      "at": "2026-10-11T22:58:58.663606+00:00",
+      "status": "OPEN_READ_ONLY_RECOVERY_IN_PROGRESS",
+      "user_space_answer": "已腾出",
+      "actual_free_bytes": 446464000000,
+      "missing_roots": [
+        "/Users/study_superior/.codex/r06-isolated-checkouts",
+        "/Users/study_superior/.codex/worktrees"
+      ],
+      "cause": "UNKNOWN_PENDING_USER_REPLY_AND_RECOVERY_INVENTORY",
+      "main_protected_settingsSHA": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3",
+      "actual_owned_process_readback": "artifacts/rust-tauri/R06/AR/ENTRY-01/post-space-restoration-owned-processes.json",
+      "previous_failed_cleanup": "NOT_EXECUTED_APPROVAL_INITIALIZATION_ERRNO28",
+      "current_available_source_is_not_automatically_same_candidate": true,
+      "historical_PASS_or_FAIL_not_erased": true,
+      "missing_runtime_or_source_not_fabricated": true,
+      "no_R07": true
+    },
+    {
+      "at": "2026-10-11T23:04:22.370886+00:00",
+      "id": "R06-EXACT-FROZEN-SOURCE-RECOVERY-01",
+      "status": "SOURCE_BYTES_RECOVERED_NOT_ACCEPTED",
+      "W05_owned": 10,
+      "W09_owned": 13,
+      "receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/exact-mutant-byte-recovery-01.json",
+      "reviewer_original_safe_evidence_missing": "W05 final313 and W09 partial safe at deleted candidate paths; runtime residual evidence inventory ongoing",
+      "W07_complete_source": "NOT_FOUND",
+      "no_original_runtime_reconstruction": true
+    },
+    {
+      "at": "2026-10-11T23:10:06.743707+00:00",
+      "id": "R06-USER-CONFIRMED-WORKSPACE-DELETION-01",
+      "user_answer": "已经彻底删除",
+      "classification": "NO_FURTHER_TRASH_OR_MOVED_LOCATION_SEARCH",
+      "W05_source": "10/10 exact recovered source bytes stored; not accepted",
+      "W09_source": "13/13 exact recovered source bytes stored; not accepted",
+      "W07_source": "six intermediate backups only; new executor reconstruction required",
+      "missing_original_runtime_evidence": "NOT_RECONSTRUCTED_NOT_PASS",
+      "receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/exact-mutant-byte-recovery-01.json",
+      "no_user_blame_or_additional_authorization_needed_for_safe_recovery": true
+    },
+    {
+      "at": "2026-10-11T23:15:15.882544+00:00",
+      "id": "R06-W03-EXACT-FROZEN-SOURCE-RECOVERY-01",
+      "status": "37_SOURCE_BYTES_RECOVERED_NOT_ACCEPTED",
+      "manifest": "artifacts/rust-tauri/R06/AR/W03-CANDIDATE-RECOVERY-01/manifest.json",
+      "source_inventory": "artifacts/rust-tauri/R06/AR/ENTRY-01/w03-source-byte-inventory-01.json",
+      "one_mutant_reversal_exactSHA": "artifacts/rust-tauri/R06/AR/ENTRY-01/w03-mutant-exact-byte-recovery-02.json",
+      "prior_failed_helper_and_in_memory_variants_preserved": true,
+      "no_platform_Review_retry": true
+    },
+    {
+      "at": "2026-10-11T23:23:52.305531+00:00",
+      "id": "R06-CURRENT-EXECUTOR-OLD-BEHAVIOR-READBACK-02",
+      "receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/current-executor-old-behavior-readback-02.json",
+      "status": "ACTUAL_OLD_BEHAVIOR_READBACK_NO_NEW_ACCEPTANCE",
+      "w15_tokens_by_outcome": {
+        "failed": {
+          "calls": 2,
+          "input_tokens": 60,
+          "output_tokens": 22
+        },
+        "succeeded": {
+          "calls": 1,
+          "input_tokens": 40,
+          "output_tokens": 17
+        }
+      },
+      "w11_actual_paid_duplicate": true,
+      "w04_root_expected_corrected": true
+    },
+    {
+      "at": "2026-10-11T23:29:19.499382+00:00",
+      "id": "R06-W01-EXACT-FROZEN-PATCH-RECOVERY-01",
+      "status": "25_SOURCE_BYTES_RECOVERED_NOT_ACCEPTED",
+      "manifest": "artifacts/rust-tauri/R06/AR/W01-CANDIDATE-RECOVERY-01/manifest.json",
+      "manifest_sha256": "930fa251223fc0a3ff6a37132c22288cef0c8f4f41efea42c2a5db8898f0c4ae",
+      "original_patch_sha256": "bc3f84f761a13d9c65abbe88f943537a4299e897beff793fec95acb4b390b39c",
+      "method": "exact immutable base Git objects plus original SHA-bound patch; every full final file SHA matches frozen executor record",
+      "runtime_evidence_not_reconstructed": true,
+      "Daybreak_blocked_Review_not_retried": true,
+      "main_products_unchanged": true
+    },
+    {
+      "at": "2026-10-11T23:43:07.634844+00:00",
+      "id": "R06-F08-AFFECTED-R03-STRICT-EVENT-OBSERVATION-01",
+      "status": "OPEN_AFFECTED_UPSTREAM_CONSUMER_RECONCILIATION_REQUIRED",
+      "current_committed_head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "only_commit_since_audited_base": [
+        "bc2ce51fd005ea75b9949156974e15d2761eb734"
+      ],
+      "reported_by": [
+        "/root/ar_w04_executor_01",
+        "/root/ar_w15_executor_01"
+      ],
+      "historical_F08_repair_share_PASS": "PRESERVED_EXACT_ORIGINAL_SCOPE_NOT_EXTENDED",
+      "original_R03_required_share_status": "FAIL_REPORTED_PENDING_FROZEN_ACTUAL_RECORD_AND_FRESH_REVIEW",
+      "task_closed_count_not_reinterpreted_as_all_original_scope_pass": true,
+      "stage_acceptance": false,
+      "R07_started": false,
+      "receipt": "artifacts/rust-tauri/R06/AR/W14-PREP-01/f08-affected-r03-original-consumer-observation.json"
+    },
+    {
+      "id": "R06-W15-ACTUAL-WORKSPACE-REGRESSION-READBACK-02",
+      "at": "2026-10-11T23:54:30.513967+00:00",
+      "receipt": "artifacts/rust-tauri/R06/AR/W15-REVIEW-PREP-01/actual-regression-readback-02.json",
+      "status": "ACTUAL_AUTHOR_REGRESSION_FAIL_READ_BACK_NO_ACCEPTANCE",
+      "failed": 7,
+      "passed": 1865,
+      "measurement_gap_pending": true
+    },
+    {
+      "at": "2026-10-12T00:04:52.008706+00:00",
+      "id": "R06-W15-FIRST-FRESH-INDEPENDENT-REVIEWER-DISPATCHED",
+      "status": "REVIEW_IN_PROGRESS_NO_ACCEPTANCE",
+      "author_ended": true,
+      "safe_manifest": "544dc9bfb0e5cbe0a65b431a207a3114d4dd2705e7307fb20b01ca458cc3d5df",
+      "guard_and_executable_gaps_retained": true,
+      "formal_stage": "NOT_RUN"
+    },
+    {
+      "at": "2026-10-12T00:17:31.533981+00:00",
+      "id": "R06-W15-PARTIAL-INDEPENDENT-ACTUAL-COUNTEREXAMPLE-READBACK-01",
+      "receipt": "artifacts/rust-tauri/R06/AR/W15-REVIEW-PREP-01/partial-independent-counterexample-readback-01.json",
+      "status": "PARTIAL_INDEPENDENT_ACTUAL_FINDINGS_NOT_FULL_REVIEW_VERDICT",
+      "new_bad_report_cases": 7,
+      "remote_head_actual_readback": "bc2ce51fd005ea75b9949156974e15d2761eb734"
+    },
+    {
+      "at": "2026-10-12T00:25:50.348947+00:00",
+      "id": "R06-W15-PARTIAL-INDEPENDENT-ACTUAL-COUNTEREXAMPLE-READBACK-02",
+      "receipt": "artifacts/rust-tauri/R06/AR/W15-REVIEW-PREP-01/partial-independent-counterexample-readback-02.json",
+      "status": "PARTIAL_INDEPENDENT_ACTUAL_FINDINGS_NOT_FULL_REVIEW_VERDICT",
+      "new_bad_report_cases": 10,
+      "remote_head_actual_readback": "bc2ce51fd005ea75b9949156974e15d2761eb734"
+    },
+    {
+      "at": "2026-10-12T00:30:18.903325+00:00",
+      "id": "R06-W11-ACTUAL-NATIVE-LIFETIME-READBACK-01",
+      "receipt": "artifacts/rust-tauri/R06/AR/W11-PREP-01/actual-native-lifetime-readback-01.json",
+      "status": "ACTUAL_LOCAL_WINDOW_ONLY_NO_INDEPENDENT_PASS"
+    },
+    {
+      "at": "2026-10-12T00:31:48.931469+00:00",
+      "id": "R06-W04-ACTUAL-INTERRUPTED-WORKSPACE-READBACK-01",
+      "receipt": "artifacts/rust-tauri/R06/AR/W04-PREP-01/actual-interrupted-workspace-readback-01.json",
+      "status": "ACTUAL_GUARD_TERMINATED_INCOMPLETE_NOT_PASS"
+    },
+    {
+      "at": "2026-10-12T00:37:07.347230+00:00",
+      "id": "R06-W15-FIRST-COMPLETE-INDEPENDENT-FAIL-ROOT-INTEGRITY-01",
+      "receipt": "artifacts/rust-tauri/R06/AR/W15-REPAIR-PREP-01/first-review-final-integrity-and-transfer.json",
+      "status": "FIRST_COMPLETE_INDEPENDENT_FAIL",
+      "formal_completed_FAIL_count": 1
+    },
+    {
+      "at": "2026-10-12T01:07:21.188551+00:00",
+      "id": "R06-W04-V2-COMPLETE-WORKSPACE-ACTUAL-FAIL-01",
+      "receipt": "artifacts/rust-tauri/R06/AR/W04-PREP-01/actual-complete-v2-workspace-readback-01.json",
+      "status": "ACTUAL_COMPLETE_RUNTIME_FAIL_NO_ACCEPTANCE",
+      "actual_exit": 101,
+      "actual_failed_test_lines": 9,
+      "stage": "NOT_RUN"
+    },
+    {
+      "id": "R06-CONTROL-AVAILABILITY-AND-EXTRA-INTEGRITY-03",
+      "at": "2026-10-12T01:11:55.936151+00:00",
+      "receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/control-availability-and-extra-integrity-03.json",
+      "status": "CONTROL_ONLY_NO_NEW_ACCEPTANCE"
+    },
+    {
+      "at": "2026-10-12T01:22:14.278011+00:00",
+      "id": "R06-W04-SHIPPING-V2-OWNERSHIP-RED-01",
+      "receipt": "artifacts/rust-tauri/R06/AR/W04-PREP-01/actual-shipping-ownership-counterexamples-readback-01.json",
+      "status": "ACTUAL_LOCAL_COUNTEREXAMPLES_NOT_INDEPENDENT_VERDICT"
+    },
+    {
+      "at": "2026-10-12T02:13:11.482018+00:00",
+      "id": "R06-W15-REPAIR01-TRANSPORT-INTERRUPTION",
+      "receipt": "artifacts/rust-tauri/R06/AR/W15-REPAIR-PREP-02/transport-interruption-exact-partial-recovery.json",
+      "status": "ERRORED_TRANSPORT_PARTIAL_NO_FINAL_HANDOFF",
+      "formal_completed_FAIL_count": 1
+    },
+    {
+      "id": "R06-URL-LEGAL-SUCCESS-ANTECEDENT-CORRECTION-01",
+      "at": "2026-10-12T03:35:10.953862+00:00",
+      "role": "ROOT_SOURCE_READBACK_AND_EXPERIMENT_PRECONDITION_CORRECTION_NOT_REVIEWER",
+      "original_source": "lib/resource-io/providers/url-provider.ts",
+      "source_sha256": "cbd9d04da3fdd03c661c774abf976a98a50b0df7c12cc074238d41f170270fef",
+      "source_facts": [
+        "URL stat/read/materialize capabilities true",
+        "localhost/.localhost and private resolved addresses rejected with blocked_private_url/403",
+        "no allowPrivateUrls runtime option in original Options"
+      ],
+      "current_experiment": "/private/tmp/lingxi-r06-w04-evidence-01/logs/original-url-success-current-v4-fail-01-result.json",
+      "runtime_result_source": "ACTOR_REPORTED_DIRECT_200_FORMAL_400_NOT_INDEPENDENT_RUNTIME_BY_ROOT",
+      "assessment": "INVALID_OR_UNPROVEN_FOR_LEGAL_URL_SUCCESS_POSITIVE: direct loopback fetch success is not ResourceIO original safe-URL authorization",
+      "unsupported_provider_original_fact": "PRESERVED, not recast as private URL success regression",
+      "generic_EX10_boundary": "url/session_file unsupported operation rejection remains expected; supported public URL operations need specific original contract and valid controlled positive",
+      "mount_and_other_current_requirements": "OPEN_UNCHANGED_NO_R07_WAIVER",
+      "first_Reviewer_and_other_old_results": "ORIGINALS_PRESERVED; later new Reviewer must adjudicate precise precondition, not erase all findings",
+      "private_URL_permission_relaxation": "NONE",
+      "new_business_test_or_acceptance": "NONE",
+      "R07_started": false
+    },
+    {
+      "id": "R06-W04-EXECUTOR01-TRANSPORT-INTERRUPTION-01",
+      "at": "2026-10-12T03:46:16.150237+00:00",
+      "actor": "/root/ar_w04_executor_01",
+      "status": "ERRORED_TRANSPORT_NO_FINAL_SAFE_HANDOFF_OR_ACTOR_END",
+      "platform_cause": "remote compact502 / CC Switch local proxy upstream connection failed",
+      "cybersecurity_review_interruption": false,
+      "role_reuse": false,
+      "frozen_candidate": {
+        "local_manifest": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/manifest.json",
+        "manifest_sha256": "58c0a6c79730a727cd1ef33e93b499427f1ad26a134267b32c3ac99b54d40929",
+        "verified_current_and_saved_files": 19,
+        "snapshot_not_published_as_final_actor_handoff": true
+      },
+      "actually_completed_workspace": {
+        "receipt": "/private/tmp/lingxi-r06-w04-evidence-01/logs/final-workspace-regression-v4-01.json",
+        "exit_code": 101,
+        "source_equal": true
+      },
+      "formal_chain": {
+        "status": "STILL_RUNNING_NO_FINAL_EXIT_NOT_PASS",
+        "root_PID": 6766,
+        "actual_birth": "Mon Oct 12 11:07:18 2026",
+        "live_observation": 1791776770.571189,
+        "actual_OS_readback": "ROOT approved read-only ps: guard6736→xtask6766→42368→52078→R02 A16; different PGIDs preserved",
+        "guard_breach_at_readback": null,
+        "root_Popen_wait": "NOT_PERFORMED_BY_ROOT",
+        "original_session_poll": "write_stdin30793 Unknown process id, not interpreted as physical exit"
+      },
+      "final_safe_manifest": "NOT_CREATED",
+      "final_actor_END": "NOT_CREATED",
+      "author_draft": "REPORT_V4_DRAFT.md preserved as draft, not completed handoff",
+      "next": "Preserve original controlled window; collect only actual terminal records. Root may mechanically verify exact bytes and build honest recovery handoff; cannot invent actor END or missing results. New independent Reviewer only after required execution records actually complete. Fresh Repair required if execution obligations or product work are genuinely still missing; old role never resumed.",
+      "formal_Reviewer_FAIL_count_increment": false,
+      "main_product_overlay": "NONE",
+      "acceptance": "NONE",
+      "stage": "NOT_RUN",
+      "R07_started": false
+    }
+  ],
+  "prepared_dispatches": [
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W04_EXECUTOR_01.md",
+      "status": "PREPARED_NOT_DISPATCHED",
+      "at": "2026-10-11T12:28:36.863333+00:00",
+      "no_new_actor": true,
+      "no_runtime_result": true,
+      "latest_dispatch_status": "DISPATCHED_ROLE_ALREADY_CREATED",
+      "latest_actor_status": "IN_PROGRESS_ACTUAL_OWN_CLONE_CONFIRMED",
+      "actual_actor": "/root/ar_w04_executor_01",
+      "latest_status_at": "2026-10-12T00:26:37.920658+00:00"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W13_EXECUTOR_01.md",
+      "status": "PREPARED_NOT_DISPATCHED",
+      "at": "2026-10-11T12:28:36.863333+00:00",
+      "no_new_actor": true,
+      "no_runtime_result": true
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W09_REVIEWER_01.md",
+      "status": "PREPARED_NOT_DISPATCHED",
+      "at": "2026-10-11T12:28:36.863333+00:00",
+      "no_new_actor": true,
+      "no_runtime_result": true,
+      "latest_dispatch_status": "DISPATCHED_ROLE_ALREADY_CREATED",
+      "latest_actor_status": "ERRORED_PLATFORM_DAYBREAK_REQUIRED_REVIEW_INCOMPLETE",
+      "actual_actor": "/root/ar_w09_reviewer_01",
+      "latest_status_at": "2026-10-12T00:26:37.920658+00:00"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_EXECUTOR_01.md",
+      "status": "PREPARED_NOT_DISPATCHED",
+      "at": "2026-10-11T12:50:14.615388+00:00",
+      "no_new_actor": true,
+      "no_runtime_result": true,
+      "latest_dispatch_status": "DISPATCHED_ROLE_ALREADY_CREATED",
+      "latest_actor_status": "ENDED_READY_FOR_INDEPENDENT_REVIEW_ONLY",
+      "actual_actor": "/root/ar_w15_executor_01",
+      "latest_status_at": "2026-10-12T00:26:37.920658+00:00"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W14_EXECUTOR_01.md",
+      "status": "PREPARED_NOT_DISPATCHED",
+      "at": "2026-10-11T12:51:18.728479+00:00",
+      "no_new_actor": true,
+      "no_runtime_result": true
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W05_REVIEWER_01.md",
+      "status": "PREPARED_NOT_DISPATCHED",
+      "at": "2026-10-11T13:20:58.018703+00:00",
+      "no_new_actor": true,
+      "no_runtime_result": true,
+      "latest_dispatch_status": "DISPATCHED_ROLE_ALREADY_CREATED",
+      "latest_actor_status": "ENDED_PARTIAL_BLOCKED_DISK_NO_COMPLETED_REVIEW",
+      "actual_actor": "/root/ar_w05_reviewer_01",
+      "latest_status_at": "2026-10-12T00:26:37.920658+00:00"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W03_REVIEWER_01.md",
+      "status": "PREPARED_NOT_DISPATCHED",
+      "at": "2026-10-11T13:33:39.844971+00:00",
+      "no_new_actor": true,
+      "no_runtime_result": true,
+      "latest_dispatch_status": "DISPATCHED_ROLE_ALREADY_CREATED",
+      "latest_actor_status": "ERRORED_PLATFORM_DAYBREAK_REQUIRED_REVIEW_INCOMPLETE",
+      "actual_actor": "/root/ar_w03_reviewer_01",
+      "latest_status_at": "2026-10-12T00:26:37.920658+00:00"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-STAGE_REVIEWER_TEMPLATE.md",
+      "status": "PREPARED_NOT_DISPATCHED_REQUIRES_ALL_TASKS_VALID_PASS",
+      "at": "2026-10-11T13:36:02.673510+00:00",
+      "no_new_actor": true,
+      "no_runtime_result": true
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W07_EXECUTOR_02.md",
+      "status": "PREPARED_NOT_DISPATCHED_SOURCE_REBUILD_AFTER_USER_DELETION",
+      "at": "2026-10-11T23:24:36.338322+00:00",
+      "workspace": "/private/tmp/lingxi-r06-w07-executor-02",
+      "no_new_actor": true,
+      "tests": "NOT_RUN",
+      "receipt": "artifacts/rust-tauri/R06/AR/W07-PREP-01/executor02-workspace-preparation.json",
+      "latest_dispatch_status": "ACTUALLY_DISPATCHED_FRESH_EXECUTOR02",
+      "actual_actor": "/root/ar_w07_executor_02",
+      "latest_status_at": "2026-10-12T03:49:52.620583+00:00"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_REVIEWER_01.md",
+      "status": "PREPARED_NOT_DISPATCHED_PENDING_EXECUTOR_FREEZE_END",
+      "workspace": "/private/tmp/lingxi-r06-w15-reviewer-01",
+      "at": "2026-10-11T23:54:30.513967+00:00",
+      "actor": "NOT_CREATED_YET",
+      "tests": "NOT_RUN",
+      "latest_dispatch_status": "DISPATCHED_ROLE_ALREADY_CREATED",
+      "latest_actor_status": "ENDED_FAIL",
+      "actual_actor": "/root/ar_w15_reviewer_01",
+      "latest_status_at": "2026-10-12T00:26:37.920658+00:00",
+      "latest_status_evidence": "artifacts/rust-tauri/R06/AR/W15-REPAIR-PREP-01/first-review-final-integrity-and-transfer.json"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_REPAIR_01.md",
+      "workspace": "/private/tmp/lingxi-r06-w15-repair-01",
+      "status": "PREPARED_NOT_DISPATCHED_REQUIRES_COMPLETE_FIRST_INDEPENDENT_FAIL_AND_END",
+      "at": "2026-10-12T00:29:16.368607+00:00",
+      "actor": "NOT_CREATED_YET",
+      "tests": "NOT_RUN",
+      "receipt": "artifacts/rust-tauri/R06/AR/W15-REPAIR-PREP-01/own-clone-prepared-pending-final-review.json",
+      "latest_dispatch_status": "DISPATCHED_FRESH_REPAIR_AFTER_COMPLETE_FAIL",
+      "actual_actor": "/root/ar_w15_repair_01",
+      "latest_status_at": "2026-10-12T00:38:49.246734+00:00"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W12_EXECUTOR_01.md",
+      "status": "PREPARED_NOT_DISPATCHED_REQUIRES_OWN_WORKSPACE_AND_EXACT_FINAL_W15_SCOPE_PACKET",
+      "at": "2026-10-12T00:40:41.263173+00:00",
+      "actor": "NOT_CREATED_YET",
+      "tests": "NOT_RUN",
+      "full_original_assertions": 70,
+      "leaves": 28,
+      "original_UI_later_scope": "R08/R09_OWN_CLAUSES_ONLY_NO_SERVICE_WAIVER"
+    },
+    {
+      "at": "2026-10-12T01:08:51.805629+00:00",
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W03_EXECUTOR_01.md",
+      "receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/extra-template-applicability-and-ex03-dispatch-prepared-01.json",
+      "status": "PREPARED_NO_ROLE_NO_WORKSPACE_NO_RUNTIME_ACCEPTANCE",
+      "actor": "NOT_CREATED",
+      "tests": "NOT_RUN",
+      "latest_preparation_status": "OWN_CLONE_READY_NO_ACTOR_NO_ACCEPTANCE",
+      "workspace": "/private/tmp/lingxi-r06-ex03-executor-01",
+      "workspace_receipt": "artifacts/rust-tauri/R06/AR/EX03-PREP-01/own-clone-prepared-not-dispatched.json"
+    },
+    {
+      "at": "2026-10-12T01:19:53.008943+00:00",
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_REVIEWER_02.md",
+      "status": "PREPARED_NOT_DISPATCHED_WAIT_REPAIR_FREEZE_AND_END",
+      "actor": "NOT_CREATED",
+      "workspace": "/private/tmp/lingxi-r06-w15-reviewer-02",
+      "receipt": "artifacts/rust-tauri/R06/AR/W15-REVIEW-PREP-02/own-clone-prepared-pending-final-repair.json",
+      "tests": "NOT_RUN"
+    },
+    {
+      "at": "2026-10-12T02:13:11.482018+00:00",
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_REPAIR_02.md",
+      "status": "PREPARED_FRESH_REPAIR_AFTER_TRANSPORT_NO_ACTOR",
+      "workspace": "/private/tmp/lingxi-r06-w15-repair-02",
+      "receipt": "artifacts/rust-tauri/R06/AR/W15-REPAIR-PREP-02/transport-interruption-exact-partial-recovery.json",
+      "tests": "NOT_RUN",
+      "latest_dispatch_status": "ACTUALLY_DISPATCHED_FRESH_REPAIR02",
+      "actual_actor": "/root/ar_w15_repair_02",
+      "latest_status_at": "2026-10-12T02:15:05.184288+00:00"
+    },
+    {
+      "at": "2026-10-12T02:22:02.409603+00:00",
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W04_EXECUTOR_01.md",
+      "status": "PREPARED_SOURCE_ONLY_NO_ACTOR_NO_WORKSPACE",
+      "actor": "NOT_CREATED",
+      "receipt": "artifacts/rust-tauri/R06/AR/EX04-PREP-01/source-only-concrete-dispatch-preparation.json",
+      "tests": "NOT_RUN"
+    },
+    {
+      "at": "2026-10-12T02:28:36.823068+00:00",
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W04_REVIEWER_01.md",
+      "status": "PREPARED_NO_ACTOR_WAIT_EXECUTOR_FREEZE_END",
+      "actor": "NOT_CREATED",
+      "workspace": "/private/tmp/lingxi-r06-w04-reviewer-01",
+      "receipt": "artifacts/rust-tauri/R06/AR/W04-REVIEW-PREP-01/own-clone-prepared-pending-final-executor.json",
+      "tests": "NOT_RUN",
+      "latest_status": "FROZEN19_BYTES_PREPARED_NO_REVIEW_WAIT_ACTUAL_FORMAL_EXIT_AND_HONEST_HANDOFF",
+      "latest_candidate_recovery": "artifacts/rust-tauri/R06/AR/W04-CANDIDATE-RECOVERY-01/source-recovery-manifest.json",
+      "latest_status_at": "2026-10-12T03:51:58.134611+00:00"
+    },
+    {
+      "at": "2026-10-12T02:38:58.241254+00:00",
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W11_REVIEWER_01.md",
+      "status": "PREPARED_NO_ACTOR_WAIT_EXECUTOR_FREEZE_END",
+      "actor": "NOT_CREATED",
+      "workspace": "/private/tmp/lingxi-r06-w11-reviewer-01",
+      "receipt": "artifacts/rust-tauri/R06/AR/W11-REVIEW-PREP-01/own-clone-prepared-pending-final-executor.json",
+      "tests": "NOT_RUN"
+    },
+    {
+      "at": "2026-10-12T03:24:37.232936+00:00",
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-SHARED_INTEGRATION_EXECUTOR_01.md",
+      "work_id": "R06-AR-SHARED-INTEGRATION-01",
+      "status": "PREPARED_NOT_DISPATCHED_WAIT_W04_W11_FINAL_FREEZE_AND_END",
+      "actor": "NOT_CREATED",
+      "workspace": "NOT_CREATED",
+      "tests": "NOT_RUN",
+      "receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/shared-source-integration-preparation-01.json",
+      "acceptance": "NONE"
+    },
+    {
+      "at": "2026-10-12T03:39:04.751703+00:00",
+      "work_id": "R06-EX-W10",
+      "actor": "NOT_CREATED",
+      "status": "CONCRETE_PREPARATION_NOT_DISPATCHED_WAIT_W04_FINAL_INPUT",
+      "original_leaves": 19,
+      "original_assertions": 53,
+      "spec_sha256": "74b0f3a62a816e70831cc2297e2e5f0801596ca1610f31388dfc858e9596748a",
+      "original_register_sha256": "db4ceda76ca3911b9e4001934bd49f6d756c800634d3fe1da481730907876fae",
+      "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W10_EXECUTOR_01.md",
+      "dispatch_sha256": "6274fc92d221f774bab14ced0e332c41eb9570cb72a4a7849cfed123dee710b4",
+      "source_facts_not_runtime_PASS": true,
+      "workspace": "NOT_CREATED",
+      "product_overlay": "NONE",
+      "tests": "NOT_RUN",
+      "acceptance": "NONE",
+      "R07_started": false
+    }
+  ],
+  "latest_user_execution_scope": {
+    "atUtc": "2026-10-12T05:04:41.207301+00:00",
+    "request": "先直接修复原15个问题，不检查其他问题，不做其他验收",
+    "mode": "DIRECT_F01_F15_IMPLEMENTATION_ONLY",
+    "receipt": "artifacts/rust-tauri/R06/direct-repair-20261012/DIRECT_REPAIR_RECEIPT.json",
+    "preserveExistingResults": true,
+    "formalAcceptance": "NOT_RUN_PER_CURRENT_USER_SCOPE",
+    "otherIssueInvestigation": "NOT_RUN",
+    "commit": "NOT_DONE",
+    "push": "NOT_DONE",
+    "note": "本轮实现与必要衔接确认单独记录。原FAIL/PASS、独立审查和阶段放行状态保留；旧执行流水不是当前正在运行的任务。",
+    "implementationStatus": "F01_F15_SOURCE_REPAIRS_INTEGRATED_NOT_FORMAL_ACCEPTANCE"
+  }
+}

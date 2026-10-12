@@ -1,0 +1,57 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "zhipu",
+  "case": "tools-strict-stripped-and-max-tokens-renamed",
+  "model": {
+    "provider": "zhipu",
+    "id": "glm-4.7",
+    "baseUrl": "https://open.bigmodel.cn/api/paas/v4",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "glm-4.7",
+    "messages": [],
+    "max_completion_tokens": 1024,
+    "tools": [
+      {
+        "type": "function",
+        "strict": true,
+        "function": {
+          "name": "f",
+          "strict": true,
+          "parameters": {
+            "type": "object"
+          }
+        }
+      }
+    ]
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": "zhipu",
+    "reasoningProfile": "zhipu-openai",
+    "matched": "zhipu",
+    "result": {
+      "model": "glm-4.7",
+      "messages": [],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "f",
+            "parameters": {
+              "type": "object"
+            }
+          }
+        }
+      ],
+      "max_tokens": 1024,
+      "thinking": {
+        "type": "enabled"
+      }
+    }
+  }
+}

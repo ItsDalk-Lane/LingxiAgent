@@ -1,0 +1,136 @@
+[
+  {
+    "name": "上下文编译器与短提示词",
+    "goal": "发给模型的文本与观测详情来自同一份构建结果。",
+    "steps": [
+      "从core/agent.ts及现役prompt测试提取系统约束、人格、工具目录、记忆、技能、资源、会话历史等实际组成，保留顺序与作用域。",
+      "建立ContextArtifact：每段有来源、可见范围、优先级、token预算与脱敏标记；最终请求直接由artifact渲染。",
+      "静态提示前缀稳定，动态内容与工具目录按原规则载入；不可把全部工具说明重新塞回常驻提示词。",
+      "保留中英文及现役语言策略，子代理上下文按权限裁剪；源材料里的指令不提升为系统指令。",
+      "冻结迁移前后模板差异，只允许修复契约所必需的改动，并纳入行为评测。"
+    ],
+    "deliverables": [
+      "ContextCompiler",
+      "ContextArtifact",
+      "提示词差异报告"
+    ],
+    "acceptance": [
+      {
+        "name": "观测和实际请求同源",
+        "given": "构建含人格/记忆/技能/工具目录的任务",
+        "when": "比较发给模型的内容与观测展开",
+        "then": "除明示脱敏外一致，无另一套重建prompt",
+        "evidence": "请求和artifact摘要",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "status": "NOT_STARTED",
+        "id": "R06-A01",
+        "stage_id": "R06",
+        "task_id": "R06-T01",
+        "requirement": "REQUIRED",
+        "activation_condition": "本阶段范围内必须验证；环境不足为BLOCKED，不改写为通过。"
+      },
+      {
+        "name": "提示词长度不暗增",
+        "given": "相同Agent配置和工具集",
+        "when": "测量新旧静态提示及总上下文",
+        "then": "不超过冻结预算；新增冗余段使测试失败",
+        "evidence": "token与段来源对照",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "status": "NOT_STARTED",
+        "id": "R06-A02",
+        "stage_id": "R06",
+        "task_id": "R06-T01",
+        "requirement": "REQUIRED",
+        "activation_condition": "本阶段范围内必须验证；环境不足为BLOCKED，不改写为通过。"
+      }
+    ],
+    "avoid": "不得以占位实现、跳过断言或仅更新完成状态替代真实实现。",
+    "id": "R06-T01",
+    "stage_id": "R06",
+    "status": "NOT_STARTED",
+    "depends_on": [],
+    "sources": [
+      "S05",
+      "S07",
+      "S09",
+      "S12",
+      "S13",
+      "S15",
+      "S16",
+      "S22",
+      "S23"
+    ],
+    "acceptance_ids": [
+      "R06-A01",
+      "R06-A02"
+    ]
+  },
+  {
+    "name": "人格、记忆与技能系统",
+    "goal": "保留当前能力与审核边界，不让扩展接管内核。",
+    "steps": [
+      "迁移现役记忆事实/摘要/信条/梦境等实际流程的数据访问与调度调用；业务状态和模型调用由Rust负责。",
+      "按Agent隔离记忆查询与写入；现役知识内容/外装技能材料均按来源和权限进入上下文。",
+      "迁移Skills发现、安装/审核、启停、同步、技能包和人格文件加载，保留白名单、工作区边界与用户覆盖顺序。",
+      "Pi extensions实际使用的hooks逐项迁入Rust扩展ports或受控worker；不能让扩展重新调用旧Agent loop。",
+      "安全检查不是保证技能无恶意；执行脚本仍受R04授权和沙盒。"
+    ],
+    "deliverables": [
+      "MemoryService",
+      "SkillService",
+      "PI_REPLACEMENT_MATRIX更新"
+    ],
+    "acceptance": [
+      {
+        "name": "Agent记忆不串用",
+        "given": "AgentA/B有不同事实与权限",
+        "when": "分别询问及写入记忆",
+        "then": "只读取/修改所属范围，子代理不扩大可见性",
+        "evidence": "隔离测试",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "status": "NOT_STARTED",
+        "id": "R06-A11",
+        "stage_id": "R06",
+        "task_id": "R06-T06",
+        "requirement": "REQUIRED",
+        "activation_condition": "本阶段范围内必须验证；环境不足为BLOCKED，不改写为通过。"
+      },
+      {
+        "name": "技能审核和执行边界仍有效",
+        "given": "技能包含越权文件命令",
+        "when": "安装/启用后请求执行",
+        "then": "保持原审核行为且工具层仍拒绝越权",
+        "evidence": "安装与执行双层证据",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "status": "NOT_STARTED",
+        "id": "R06-A12",
+        "stage_id": "R06",
+        "task_id": "R06-T06",
+        "requirement": "REQUIRED",
+        "activation_condition": "本阶段范围内必须验证；环境不足为BLOCKED，不改写为通过。"
+      }
+    ],
+    "avoid": "不得以占位实现、跳过断言或仅更新完成状态替代真实实现。",
+    "id": "R06-T06",
+    "stage_id": "R06",
+    "status": "NOT_STARTED",
+    "depends_on": [
+      "R06-T05"
+    ],
+    "sources": [
+      "S05",
+      "S07",
+      "S09",
+      "S12",
+      "S13",
+      "S15",
+      "S16",
+      "S22",
+      "S23"
+    ],
+    "acceptance_ids": [
+      "R06-A11",
+      "R06-A12"
+    ]
+  }
+]

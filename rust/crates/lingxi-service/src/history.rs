@@ -12,8 +12,8 @@
 //!   绝不静默当作首页。
 //! - `all=1`：服务端逐页遍历到底后一次返回（与客户端逐页前插装配逐项
 //!   一致——同一分页路径，`export_equals_paged_concat` 锁定）。
-//! - ETag `"r{headRevision}"`：无游标请求携带匹配 If-None-Match → 304；
-//!   分支头推进（revision 变化）即失效。条件判定先于消息读取（O(1) 头读）。
+//! - ETag `"r{headRevision}-e{eventRevision}"`：无游标请求携带匹配 If-None-Match → 304；
+//!   分支头或真实审计事件推进即失效。条件判定先于消息读取（索引定位）。
 //! - 归属闸与会话读相同：未知会话 404、跨主体 403（先于一切参数后的
 //!   实体读取；ETag 判定也在闸后，不向无权限者泄露存在性）。
 
@@ -35,7 +35,7 @@ use lingxi_protocol::history::{
 };
 use lingxi_protocol::Cursor;
 
-use crate::history_projection::{project_history, ProjectionInput};
+use crate::history_projection::{project_history_with_audits, ProjectionInput};
 use crate::sessions;
 use crate::ws::parse_query_pairs;
 use crate::{EndpointError, Principal, ServiceState};
@@ -66,7 +66,11 @@ pub async fn session_history_route(
         Ok(revision) => revision,
         Err(err) => return storage_error_response(&err),
     };
-    let etag = etag_of(head_revision);
+    let event_revision = match cms::read_history_event_revision(&db, &session_id).await {
+        Ok(revision) => revision,
+        Err(err) => return storage_error_response(&err),
+    };
+    let etag = etag_of(head_revision, event_revision);
     if params.before.is_none() && if_none_match_matches(&headers, &etag) {
         return not_modified_response(&etag);
     }
@@ -76,7 +80,7 @@ pub async fn session_history_route(
                 Ok(full) => full,
                 Err(err) => return storage_error_response(&err),
             };
-        let items = match project_items(&db, &session_id, &messages).await {
+        let items = match project_items(&db, &session_id, &messages, true).await {
             Ok(items) => items,
             Err(err) => return storage_error_response(&err),
         };
@@ -84,6 +88,7 @@ pub async fn session_history_route(
             session_id,
             head_revision,
             items,
+            &etag,
             HistoryPageMeta {
                 // 全量入口：页元信息如实标记无后续页；limit 报告内部分页大小。
                 limit: MAX_HISTORY_LIMIT,
@@ -97,7 +102,7 @@ pub async fn session_history_route(
         Err(err) => return storage_error_response(&err),
     };
     let head_revision = page.head_revision;
-    let items = match project_items(&db, &session_id, &page.messages).await {
+    let items = match project_items(&db, &session_id, &page.messages, !page.has_more).await {
         Ok(items) => items,
         Err(err) => return storage_error_response(&err),
     };
@@ -105,6 +110,7 @@ pub async fn session_history_route(
         session_id,
         head_revision,
         items,
+        &etag,
         HistoryPageMeta {
             limit: params.limit,
             has_more: page.has_more,
@@ -135,7 +141,11 @@ pub async fn session_export_route(
         Ok(revision) => revision,
         Err(err) => return storage_error_response(&err),
     };
-    let etag = etag_of(head_revision);
+    let event_revision = match cms::read_history_event_revision(&db, &session_id).await {
+        Ok(revision) => revision,
+        Err(err) => return storage_error_response(&err),
+    };
+    let etag = etag_of(head_revision, event_revision);
     if if_none_match_matches(&headers, &etag) {
         return not_modified_response(&etag);
     }
@@ -144,7 +154,7 @@ pub async fn session_export_route(
             Ok(full) => full,
             Err(err) => return storage_error_response(&err),
         };
-    let items = match project_items(&db, &session_id, &messages).await {
+    let items = match project_items(&db, &session_id, &messages, true).await {
         Ok(items) => items,
         Err(err) => return storage_error_response(&err),
     };
@@ -155,7 +165,7 @@ pub async fn session_export_route(
         items,
     };
     let mut response = (StatusCode::OK, Json(body)).into_response();
-    set_etag(&mut response, &etag_of(head_revision));
+    set_etag(&mut response, &etag);
     response
 }
 
@@ -247,6 +257,7 @@ async fn project_items(
     db: &Arc<RunDatabase>,
     session_id: &str,
     messages: &[MessageRow],
+    reached_root: bool,
 ) -> Result<Vec<HistoryItem>, StorageError> {
     // 候选 run：页内 id 约定（user: 前缀 / -final 后缀）+ run_id 列。
     let mut candidates: Vec<String> = Vec::new();
@@ -266,6 +277,16 @@ async fn project_items(
         if let Some(run_id) = &message.run_id {
             push(run_id);
         }
+    }
+    // 根重置标记隔开旧空根；有锚的运行只在该锚所在页出现一次。
+    let include_empty_root = reached_root
+        && !messages.first().is_some_and(|m| {
+            m.entry_type == "hana-session-branch-reset" && m.parent_message_id.is_none()
+        });
+    let audit_anchors =
+        cms::read_unmessaged_terminal_anchors(db, session_id, messages, include_empty_root).await?;
+    for (run_id, _) in &audit_anchors {
+        push(run_id);
     }
     let existing_runs: HashSet<String> = cms::read_existing_run_ids(db, session_id, &candidates)
         .await?
@@ -290,19 +311,22 @@ async fn project_items(
             .into_iter()
             .filter_map(|id| id.strip_prefix("user:").map(str::to_string))
             .collect();
-    Ok(project_history(&ProjectionInput {
-        messages,
-        events: &events,
-        existing_runs: &existing_runs,
-        lineage: &lineage,
-        user_anchors_on_branch: &user_anchors_on_branch,
-    }))
+    Ok(project_history_with_audits(
+        &ProjectionInput {
+            messages,
+            events: &events,
+            existing_runs: &existing_runs,
+            lineage: &lineage,
+            user_anchors_on_branch: &user_anchors_on_branch,
+        },
+        &audit_anchors,
+    ))
 }
 
 // ── 响应构造 ──
 
-fn etag_of(head_revision: u64) -> String {
-    format!("\"r{head_revision}\"")
+fn etag_of(head_revision: u64, event_revision: u64) -> String {
+    format!("\"r{head_revision}-e{event_revision}\"")
 }
 
 fn if_none_match_matches(headers: &HeaderMap, etag: &str) -> bool {
@@ -333,6 +357,7 @@ fn page_response(
     session_id: String,
     head_revision: u64,
     items: Vec<HistoryItem>,
+    etag: &str,
     page: HistoryPageMeta,
 ) -> Response {
     let body = HistoryPage {
@@ -343,7 +368,7 @@ fn page_response(
         page,
     };
     let mut response = (StatusCode::OK, Json(body)).into_response();
-    set_etag(&mut response, &etag_of(head_revision));
+    set_etag(&mut response, etag);
     response
 }
 

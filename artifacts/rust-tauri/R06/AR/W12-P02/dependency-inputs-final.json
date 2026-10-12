@@ -1,0 +1,22 @@
+{
+  "files": [
+    {
+      "path": "rust/Cargo.lock",
+      "sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+      "bytes": 78474
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+      "bytes": 657207
+    },
+    {
+      "path": "package.json",
+      "sha256": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+      "bytes": 12971
+    }
+  ],
+  "record_time": "after final tests before final probes; immutable base files not modified by this task",
+  "rust_toolchain": "cargo1.98.1",
+  "node": "v24.16.0"
+}

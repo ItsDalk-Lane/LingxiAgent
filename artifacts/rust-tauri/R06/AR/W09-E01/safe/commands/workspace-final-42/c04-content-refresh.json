@@ -1,0 +1,242 @@
+{
+  "after": [
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_d2514d78cc4596f82631d1711fc3de41",
+      "ordinal": 0,
+      "vector_index_variant_id": "viv_5657399e9802ce0789641019b9731213"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_63d6b548afcfaf63746555f02130805a",
+      "ordinal": 0,
+      "vector_index_variant_id": "viv_ec357915e9a8a9243c98d3586de1a206"
+    }
+  ],
+  "before": [
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_63d6b548afcfaf63746555f02130805a",
+      "ordinal": 0,
+      "vector_index_variant_id": "viv_ec357915e9a8a9243c98d3586de1a206"
+    }
+  ],
+  "done": {
+    "artifactId": "kpa_668aef68d62b2fdbea92d956",
+    "attempt": 1,
+    "cancelledAt": null,
+    "chunkerConfigId": "8b93f0aa4fa689af",
+    "createdAt": "2026-10-11T13:26:52.527Z",
+    "embeddingStats": {
+      "abandonedStaleVariantId": null,
+      "actualWrittenChunkCount": 1,
+      "attempt": 1,
+      "callAttemptCount": 1,
+      "checkpointVariantId": "viv_5657399e9802ce0789641019b9731213",
+      "chunksNewlyEmbedded": 1,
+      "chunksResumedFromCheckpoint": 0,
+      "chunksReusedFromReadyVariant": 0,
+      "confirmedResponseRequestCount": 1,
+      "failedCallCount": 0,
+      "failedRequestCount": 0,
+      "failedTransportAttemptCount": 0,
+      "knownNotSentAttemptCount": 0,
+      "model": {
+        "dimensions": 2,
+        "key": "ff24569a5f0fe4606f696a0629273e946b6e971e879a10882f2df74036a5e75d",
+        "modelId": "model-a",
+        "parameterFingerprint": "fe5686c3de6e682798e42e57492fdd9863b28dbb422892b8cee32df1a7ad1416",
+        "protocol": "openai-embeddings",
+        "provider": "embed"
+      },
+      "pendingCallIntentCount": 0,
+      "pendingRequestCount": 0,
+      "plannedChunkCount": 1,
+      "previousKnownNotSentAttemptCount": 0,
+      "previousRequestCount": 0,
+      "previousTransportAttemptCount": 0,
+      "requestCount": 1,
+      "requestCountSemantics": "confirmed_or_possibly_sent_excluding_known_not_sent",
+      "resetStaleVectors": false,
+      "successfulRequestCount": 1,
+      "transportAttemptCount": 1,
+      "unknownRequestsFromPreviousAttempt": 0,
+      "unknownSentRequestCount": 0
+    },
+    "error": null,
+    "id": "kjob_791736ae58bf38aa99ba83a2",
+    "notebookId": "knb_1faff7d45310415c487106d8",
+    "phase": "done",
+    "progressDone": 1,
+    "progressTotal": 1,
+    "sourceId": "ksrc_5111beafe5719ca876d263ea",
+    "status": "done",
+    "updatedAt": "2026-10-11T13:26:52.553Z"
+  },
+  "first": {
+    "artifactId": "kpa_b1744bcbeb60fddcd512d1c9",
+    "attempt": 1,
+    "cancelledAt": null,
+    "chunkerConfigId": "8b93f0aa4fa689af",
+    "createdAt": "2026-10-11T13:26:52.465Z",
+    "embeddingStats": {
+      "abandonedStaleVariantId": null,
+      "actualWrittenChunkCount": 1,
+      "attempt": 1,
+      "callAttemptCount": 1,
+      "checkpointVariantId": "viv_ec357915e9a8a9243c98d3586de1a206",
+      "chunksNewlyEmbedded": 1,
+      "chunksResumedFromCheckpoint": 0,
+      "chunksReusedFromReadyVariant": 0,
+      "confirmedResponseRequestCount": 1,
+      "failedCallCount": 0,
+      "failedRequestCount": 0,
+      "failedTransportAttemptCount": 0,
+      "knownNotSentAttemptCount": 0,
+      "model": {
+        "dimensions": 2,
+        "key": "ff24569a5f0fe4606f696a0629273e946b6e971e879a10882f2df74036a5e75d",
+        "modelId": "model-a",
+        "parameterFingerprint": "fe5686c3de6e682798e42e57492fdd9863b28dbb422892b8cee32df1a7ad1416",
+        "protocol": "openai-embeddings",
+        "provider": "embed"
+      },
+      "pendingCallIntentCount": 0,
+      "pendingRequestCount": 0,
+      "plannedChunkCount": 1,
+      "previousKnownNotSentAttemptCount": 0,
+      "previousRequestCount": 0,
+      "previousTransportAttemptCount": 0,
+      "requestCount": 1,
+      "requestCountSemantics": "confirmed_or_possibly_sent_excluding_known_not_sent",
+      "resetStaleVectors": false,
+      "successfulRequestCount": 1,
+      "transportAttemptCount": 1,
+      "unknownRequestsFromPreviousAttempt": 0,
+      "unknownSentRequestCount": 0
+    },
+    "error": null,
+    "id": "kjob_abf25932ae02836a1f54da24",
+    "notebookId": "knb_1faff7d45310415c487106d8",
+    "phase": "done",
+    "progressDone": 1,
+    "progressTotal": 1,
+    "sourceId": "ksrc_99274b9ac62ef88636d6c42d",
+    "status": "done",
+    "updatedAt": "2026-10-11T13:26:52.472Z"
+  },
+  "ledger": [
+    {
+      "input_tokens": 5,
+      "model": "model-a",
+      "model_call_id": "op-embedding-1791725212470-0",
+      "outcome": "succeeded",
+      "provider": "embed",
+      "transport_attempts": 1,
+      "usage_state": "partial"
+    },
+    {
+      "input_tokens": 5,
+      "model": "model-a",
+      "model_call_id": "op-embedding-1791725212546-1",
+      "outcome": "succeeded",
+      "provider": "embed",
+      "transport_attempts": 1,
+      "usage_state": "partial"
+    }
+  ],
+  "refreshed": {
+    "changed": true,
+    "membership": {
+      "addedAt": "2026-10-11T13:26:52.513Z",
+      "displayOrder": null,
+      "folderNode": null,
+      "notebookId": "knb_1faff7d45310415c487106d8",
+      "relativePath": null,
+      "removedAt": null,
+      "sourceId": "ksrc_5111beafe5719ca876d263ea"
+    },
+    "parseArtifact": {
+      "completedAt": "2026-10-11T13:26:52.526Z",
+      "contentSnapshotId": "ksnap_c964dd3279dd2929bce7c8d8",
+      "createdAt": "2026-10-11T13:26:52.514Z",
+      "fidelity": "citation_grade",
+      "id": "kpa_668aef68d62b2fdbea92d956",
+      "parserConfigHash": "3111a4c277a3566280035517a2c817819b48a646c84517bc3b3cdf50cc57d13c",
+      "parserId": "lingxi-citation",
+      "parserVersion": "1",
+      "processingArtifactId": null,
+      "status": "ready",
+      "warnings": []
+    },
+    "snapshot": {
+      "byteSize": 58,
+      "capturedAt": "2026-10-11T13:26:52.503Z",
+      "id": "ksnap_c964dd3279dd2929bce7c8d8",
+      "mimeType": "text/plain",
+      "sha256": "248b2b2ece523bb2f970936e445b488fe3822668d1323a0dc76b6fce1e84f3d4",
+      "sourceId": "ksrc_5111beafe5719ca876d263ea"
+    },
+    "source": {
+      "createdAt": "2026-10-11T13:26:52.503Z",
+      "deletedAt": null,
+      "displayName": "合成文件",
+      "id": "ksrc_5111beafe5719ca876d263ea",
+      "originMetadata": {
+        "fileName": "W09-generated-content.txt",
+        "importedFrom": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/workspace-final-42/LOCAL_ONLY_NEVER_GIT/synthetic-home/W09-generated-content.txt",
+        "kind": "file"
+      },
+      "orphanedAt": null,
+      "sourceType": "file",
+      "studioId": "studio_ijayPn-jgpYkoE-4UAyvRg"
+    }
+  },
+  "unchanged": {
+    "changed": false,
+    "snapshot": {
+      "byteSize": 49,
+      "capturedAt": "2026-10-11T13:26:52.459Z",
+      "id": "ksnap_b786e873c80a35b3b78facc3",
+      "mimeType": "text/plain",
+      "sha256": "70d5ac85664b8bcf51f631e74d5faae4f07363be93d7d730bc21940eeb457cc7",
+      "sourceId": "ksrc_99274b9ac62ef88636d6c42d"
+    },
+    "source": {
+      "createdAt": "2026-10-11T13:26:52.459Z",
+      "deletedAt": null,
+      "displayName": "合成文件",
+      "id": "ksrc_99274b9ac62ef88636d6c42d",
+      "originMetadata": {
+        "fileName": "W09-generated-content.txt",
+        "importedFrom": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/workspace-final-42/LOCAL_ONLY_NEVER_GIT/synthetic-home/W09-generated-content.txt",
+        "kind": "file"
+      },
+      "orphanedAt": null,
+      "sourceType": "file",
+      "studioId": "studio_ijayPn-jgpYkoE-4UAyvRg"
+    }
+  },
+  "wire": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "Chapter 1 合成章节\n\n第一版独立资料。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:50283"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "Chapter 1 合成章节\n\n第二版不同的合成资料。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:50283"
+    }
+  ]
+}

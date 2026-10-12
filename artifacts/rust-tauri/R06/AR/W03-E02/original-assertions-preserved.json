@@ -1,0 +1,20 @@
+[
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+    "old_assertion_count": 209,
+    "current_assertion_count": 209,
+    "original_assertions_in_original_order_identical": true,
+    "old_source_sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+    "current_source_sha256": "982d6ebdc29e4af0abfac14fdd5ea6f810b510f803504c3f5dc18b435d0a8d0c",
+    "normalization": "仅忽略空白，保留原断言/字符串/次序；辅助机械检查不替代人工语义复核"
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+    "old_assertion_count": 153,
+    "current_assertion_count": 153,
+    "original_assertions_in_original_order_identical": true,
+    "old_source_sha256": "ddee34a73c75cdf619c2a7139ab744c00993bd4352ae62081378cc40dba835a1",
+    "current_source_sha256": "87046e760557165216169bc9d558553b587d8270cff43137dcc7549c700d8ae1",
+    "normalization": "仅忽略空白，保留原断言/字符串/次序；辅助机械检查不替代人工语义复核"
+  }
+]

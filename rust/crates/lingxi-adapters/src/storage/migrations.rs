@@ -563,6 +563,39 @@ CREATE INDEX idx_file_history_ws_path
 /// The full ordered migration list. Appending a migration is a deliberate,
 /// reviewed act; editing an existing entry changes its fingerprint and is
 /// rejected on every already-migrated database.
+pub const V10_NAME: &str = "session_operation_receipts";
+pub const V10_SQL: &str = r#"
+CREATE TABLE session_operations (
+ operation_id TEXT PRIMARY KEY NOT NULL,
+ session_id TEXT NOT NULL,
+ owner_kind TEXT NOT NULL,
+ owner_subject TEXT NOT NULL,
+ request_id TEXT,
+ operation_kind TEXT NOT NULL,
+ input_digest TEXT NOT NULL,
+ state TEXT NOT NULL CHECK(state IN ('prepared','completed')),
+ file_effects INTEGER NOT NULL CHECK(file_effects IN (0,1)),
+ snapshot_json TEXT NOT NULL,
+ receipt_json TEXT,
+ created_at_unix_ms INTEGER NOT NULL,
+ completed_at_unix_ms INTEGER,
+ UNIQUE(session_id,owner_kind,owner_subject,request_id)
+);
+CREATE INDEX session_operations_pending ON session_operations(session_id,state,file_effects);
+"#;
+
+/// 无消息运行的真实分支锚；只追加版本，不回填无法证明归属的旧运行。
+pub const V11_NAME: &str = "r06_ar_f04_run_history_anchors";
+pub const V11_SQL: &str = r#"
+CREATE TABLE run_history_anchors (
+    run_id TEXT PRIMARY KEY REFERENCES runs(run_id) ON DELETE CASCADE,
+    session_id TEXT NOT NULL REFERENCES sessions(session_id),
+    anchor_message_id TEXT,
+    FOREIGN KEY(session_id, anchor_message_id) REFERENCES messages(session_id, message_id)
+);
+CREATE INDEX idx_run_history_anchors_page ON run_history_anchors(session_id, anchor_message_id);
+"#;
+
 pub const MIGRATIONS: &[Migration] = &[
     Migration {
         version: 1,
@@ -608,6 +641,16 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 9,
         name: V9_NAME,
         sql: V9_SQL,
+    },
+    Migration {
+        version: 10,
+        name: V10_NAME,
+        sql: V10_SQL,
+    },
+    Migration {
+        version: 11,
+        name: V11_NAME,
+        sql: V11_SQL,
     },
 ];
 

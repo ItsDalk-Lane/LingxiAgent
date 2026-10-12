@@ -1,0 +1,107 @@
+[
+  {
+    "path": "rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs",
+    "original_names": [
+      "fixture",
+      "positive_normal_cache_open_and_reopen",
+      "c01_future_schema_preserves_sentinel_in_both_caches",
+      "open_cache",
+      "snapshot",
+      "c01_future_wal_live_writer_preserves_all_bytes",
+      "c02_sqlite_exclusive_lock_refuses_without_removal",
+      "c02_permission_errors_preserve_cache",
+      "c02_io_child",
+      "c02_actual_io_limit_preserves_original",
+      "quarantine_originals",
+      "c03_owned_corruption_quarantines_only_one_cache_and_preserves_sources_and_vectors",
+      "c03_unknown_corruption_and_wal_never_auto_rebuild",
+      "c04_active_production_store_blocks_corruption_quarantine",
+      "adversarial_symlink_and_hardlink_never_touch_external_target",
+      "reset_and_delete_artifact_keep_live_inode_and_other_source_index",
+      "future_crash_child",
+      "c01_crashed_future_wal_is_not_checkpointed_by_rejection",
+      "c03_rebuild_io_failure_keeps_quarantined_original",
+      "positive_system_temp_alias_root_is_supported_without_dropping_nofollow",
+      "c04_existing_old_handles_cannot_write_after_schema_upgrade",
+      "guard_holder_child",
+      "c04_other_process_production_handle_prevents_quarantine"
+    ],
+    "missing_original_names": [],
+    "assertion_count": 78
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs",
+    "original_names": [
+      "world",
+      "deletion_of_a_keeps_b_and_removes_all_a_versions",
+      "deletion_cache_error_is_reported_and_source_original_remains"
+    ],
+    "missing_original_names": [],
+    "assertion_count": 29
+  },
+  {
+    "path": "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+    "original_names": [
+      "positive normal vector open and reopen",
+      "future schema keeps paid sentinel and version",
+      "future live WAL writer keeps every database file",
+      "unknown damaged cache and sidecars are retained for offline recovery",
+      "rebuild stores a consistent full original before changing live tables",
+      "active other writer prevents rebuild and keeps paid vectors",
+      "snapshot persistence failure cannot clear the original tables",
+      "crashed future WAL remains uncheckpointed when an old opener refuses",
+      "existing old vector handle refuses future schema writes"
+    ],
+    "missing_original_names": [],
+    "assertion_count": 68
+  },
+  {
+    "path": "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+    "original_names": [
+      "positive fulltext open and reopen",
+      "reset keeps live inode and durable recovery copy",
+      "future live WAL and old handle refuse writes without deleting originals",
+      "unknown corrupt file and WAL stay intact",
+      "writer lock and backup permission failure do not reset cache",
+      "crashed future WAL remains uncheckpointed when an old opener refuses"
+    ],
+    "missing_original_names": [],
+    "assertion_count": 26
+  },
+  {
+    "path": "tests/r06-ar-f12-ann-cache-preservation.test.ts",
+    "original_names": [
+      "positive normal ANN opens and reopens",
+      "future ANN sentinel is retained with observable portable fallback",
+      "future live ANN writer and old handle cannot be reset by fallback",
+      "unknown corrupt ANN catalog and sidecars stay intact during fallback"
+    ],
+    "missing_original_names": [],
+    "assertion_count": 14
+  },
+  {
+    "path": "tests/knowledge-lifecycle.test.ts",
+    "base_equal": true,
+    "sha256": "ea677ffb63ed174c8b4871dc9eda39023de316211e3c63b853c7b07b4e71d9c1"
+  },
+  {
+    "path": "tests/knowledge-ingestion.test.ts",
+    "base_equal": true,
+    "sha256": "16137894b1950720f7b5ac333e64f768d6e698cda4f962773a5dea0520f6feee"
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_t07_knowledge.rs",
+    "base_equal": true,
+    "sha256": "129be0323e830bd69792bacaea3b8f91f4014404ea586862028e20dadc4cc079"
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_t07_knowledge_tools.rs",
+    "base_equal": true,
+    "sha256": "6849a8be8bf3adc1c7531d5a24df0c1df8c9f85a34dc6c12bb39b4945ca5ccb9"
+  },
+  {
+    "path": "rust/crates/lingxi-adapters/tests/knowledge_store_r06t07.rs",
+    "base_equal": true,
+    "sha256": "fe0a2a07249be3ca5a6d284ab02078cbfb560a8a702bb2f336e3704a29d10640"
+  }
+]

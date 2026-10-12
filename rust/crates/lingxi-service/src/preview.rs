@@ -896,6 +896,14 @@ pub async fn serve_preview_asset_route(
     let Some(asset) = state.preview().serve_asset(&id, &token, &rel) else {
         return StatusCode::NOT_FOUND.into_response();
     };
+    // 预览素材与通用文件能力遵守同一恢复副本/内部见证封锁边界。
+    if state
+        .resource_io()
+        .file_safety()
+        .is_protected(&asset.real_path)
+    {
+        return StatusCode::NOT_FOUND.into_response();
+    }
     let bytes = match std::fs::read(&asset.real_path) {
         Ok(bytes) => bytes,
         Err(_) => return StatusCode::NOT_FOUND.into_response(),

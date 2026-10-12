@@ -1,0 +1,24 @@
+   Compiling lingxi-adapters v0.0.0 (<W09_WORKSPACE>/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.71s
+     Running tests/r05_t05_timeouts.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t05_timeouts-505d9a1753d93404)
+W09_ACTUAL_TEST_BINARY_START {"binary": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t05_timeouts-505d9a1753d93404", "argv": ["/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t05_timeouts-505d9a1753d93404", "--test-threads=2"], "wrapper_pid": 61392, "process_group": 57282, "before_sha256": "bf06ec33f918f38ce0a1f153715a2951105b0632a8edabc9a409c95caaeef18b", "before_at": "2026-10-11T13:53:18.580575+00:00", "guard_env": {"LINGXI_TEST_GUARD": "1", "TEST_TIME_LIMIT_SEC": "600", "TEST_MEM_LIMIT_MB": "8192"}, "product_dir": "<W09_WORKSPACE>/lib", "shipping_inventory_before": {"path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service", "sha256": "52b3947e119f13eb43bd19bbcd43b012a2f94c6649bc2ef42c74047fca8f108f"}, "case_receipts": null, "actual_graph_sink": null, "actual_graph_evidence_root": null, "effective_case_env": {"W09_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/case-formal-r05-final-59", "W10_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/w10-formal-r05-final-59"}}
+LINGXI_TEST_GUARD: armed (pid 61393, mem_limit=8192 MB, time_limit=600 s)
+
+running 13 tests
+test connect_refusal_is_retryable_upstream ... ok
+test connect_refusal_is_the_expected_underlying_kind ... ok
+test accepted_then_dropped_is_terminal_and_never_resent ... ok
+test deadline_hit_inside_first_byte_wait_is_non_retryable_budget ... ok
+test deadline_hit_mid_stream_abandons_the_read_without_rewind ... ok
+test http_429_delay_seconds_hint_lands_in_details ... ok
+test http_429_garbage_hint_is_ignored_never_trusted ... ok
+test http_429_http_date_hint_lands_in_details ... ok
+test http_5xx_is_bounded_retryable_without_a_fabricated_hint ... ok
+test mid_stream_transport_break_is_terminal_and_never_resent ... ok
+test pre_send_budget_exhaustion_sends_nothing_and_is_not_retryable ... ok
+test retry_after_parsing_pins_the_rfc_9110_forms ... ok
+test first_byte_window_hit_is_terminal_no_blind_resend ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.71s
+
+W09_ACTUAL_TEST_BINARY_END {"binary": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t05_timeouts-505d9a1753d93404", "argv": ["/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t05_timeouts-505d9a1753d93404", "--test-threads=2"], "wrapper_pid": 61392, "process_group": 57282, "before_sha256": "bf06ec33f918f38ce0a1f153715a2951105b0632a8edabc9a409c95caaeef18b", "before_at": "2026-10-11T13:53:18.580575+00:00", "guard_env": {"LINGXI_TEST_GUARD": "1", "TEST_TIME_LIMIT_SEC": "600", "TEST_MEM_LIMIT_MB": "8192"}, "product_dir": "<W09_WORKSPACE>/lib", "shipping_inventory_before": {"path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service", "sha256": "52b3947e119f13eb43bd19bbcd43b012a2f94c6649bc2ef42c74047fca8f108f"}, "case_receipts": null, "actual_graph_sink": null, "actual_graph_evidence_root": null, "effective_case_env": {"W09_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/case-formal-r05-final-59", "W10_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/w10-formal-r05-final-59"}, "actual_child_pid": 61393, "exit_code": 0, "actual_wait_reaped": true, "elapsed_seconds": 1.2335292079951614, "after_sha256": "bf06ec33f918f38ce0a1f153715a2951105b0632a8edabc9a409c95caaeef18b", "after_at": "2026-10-11T13:53:19.864797+00:00", "shipping_inventory_after": {"path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service", "sha256": "52b3947e119f13eb43bd19bbcd43b012a2f94c6649bc2ef42c74047fca8f108f"}, "binary_stable": true}

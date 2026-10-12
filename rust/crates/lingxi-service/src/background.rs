@@ -256,6 +256,44 @@ pub fn spawn_background_drive(
     now_ms: u64,
     lease: SessionLease,
 ) -> Result<(), BackgroundSpawnRejected> {
+    spawn_background_drive_with_started(
+        supervisor,
+        storage,
+        events,
+        registry,
+        principal,
+        session_id,
+        agent_id,
+        run_id,
+        input,
+        authorization,
+        binding,
+        now_ms,
+        lease,
+    )
+    .map(|_notice| ())
+}
+
+/// 正式会话提交等待真落库确认；原公开低层spawn接口仍只确认派发。
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn spawn_background_drive_with_started(
+    supervisor: &Arc<RunSupervisor>,
+    storage: &Arc<RunDatabase>,
+    events: &Arc<EventService>,
+    registry: &Arc<BackgroundDriveRegistry>,
+    principal: KernelPrincipal,
+    session_id: String,
+    agent_id: String,
+    run_id: String,
+    input: String,
+    authorization: DriveAuthorization,
+    binding: Option<crate::dedup::AdmissionBinding>,
+    now_ms: u64,
+    lease: SessionLease,
+) -> Result<
+    tokio::sync::oneshot::Receiver<Result<(), crate::runs::DriveError>>,
+    BackgroundSpawnRejected,
+> {
     // Finished entries are reclaimed (BOTH registries — R03 repair
     // G01/F02) before the cap is consulted.
     registry.reclaim_finished();
@@ -284,6 +322,7 @@ pub fn spawn_background_drive(
     // spawn-failure window after `binding` itself has moved into the
     // task below (provably-not-dispatched failures only).
     let retractor = binding.as_ref().map(|b| b.retractor());
+    let (started_tx, started_rx) = tokio::sync::oneshot::channel();
     let handle = supervisor
         .task_supervisor()
         .spawn_detached(format!("background_drive:{run_id}"), async move {
@@ -294,6 +333,7 @@ pub fn spawn_background_drive(
             // until its durable start; `drive_run` commits the binding
             // the moment `record_run_started` commits.
             let binding = binding;
+            let mut started_notice = Some(started_tx);
             // R03 repair G06/F07: the background drive drains the SAME
             // authorized steering channel the foreground drive uses —
             // `_lease.steering_inbox()` is the very inbox `steer_for`
@@ -303,24 +343,40 @@ pub fn spawn_background_drive(
             // to the session slot). Passing `None` here (the bug) meant
             // accepted steering was never consumed by anyone and could
             // only linger into the session's next run.
-            let finish = drive_supervisor
-                .drive_run(
-                    drive_storage.as_ref(),
-                    drive_events.as_ref(),
-                    &principal,
+            let retained = drive_supervisor
+                .task_supervisor()
+                .retain_authorized_run_permit(
+                    &drive_run_id,
                     &drive_session,
                     &agent_id,
-                    &drive_run_id,
-                    &input,
-                    1,
-                    now_ms,
-                    Some(_lease.steering_inbox()),
-                    None,
-                    authorization,
-                    binding.as_ref(),
-                    &drive_session,
-                )
-                .await;
+                    &principal,
+                    &authorization,
+                    _lease.retained_permit(),
+                );
+            let finish = match retained {
+                Err(error) => Err(crate::runs::DriveError::Storage(error)),
+                Ok(_retained) => {
+                    drive_supervisor
+                        .drive_run_with_started(
+                            drive_storage.as_ref(),
+                            drive_events.as_ref(),
+                            &principal,
+                            &drive_session,
+                            &agent_id,
+                            &drive_run_id,
+                            &input,
+                            1,
+                            now_ms,
+                            Some(_lease.steering_inbox()),
+                            None,
+                            authorization,
+                            binding.as_ref(),
+                            &drive_session,
+                            &mut started_notice,
+                        )
+                        .await
+                }
+            };
             match finish {
                 Ok(finish) => {
                     tracing::info!(
@@ -356,6 +412,10 @@ pub fn spawn_background_drive(
                             }
                         }
                     }
+                    // 未启动错误先完成原真实存储补偿，再向提交者明确报告。
+                    if let Some(notice) = started_notice.take() {
+                        let _ = notice.send(Err(err));
+                    }
                 }
             }
         })
@@ -373,5 +433,5 @@ pub fn spawn_background_drive(
         .lock()
         .unwrap_or_else(|poisoned| poisoned.into_inner())
         .insert(run_id.clone(), BackgroundDrive { run_id, handle });
-    Ok(())
+    Ok(started_rx)
 }

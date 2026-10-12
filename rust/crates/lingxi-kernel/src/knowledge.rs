@@ -136,6 +136,8 @@ pub struct EmbeddingModelIdentity {
     pub model_id: String,
     pub protocol: String,
     pub dimensions: u32,
+    /// 未发送的配置身份也可提供该指纹，但 dimensions=0 明确表示维度尚未实测。
+    pub parameter_fingerprint: String,
 }
 
 impl EmbeddingModelIdentity {
@@ -146,7 +148,30 @@ impl EmbeddingModelIdentity {
             model_id: model_id.to_string(),
             protocol: protocol.to_string(),
             dimensions,
+            parameter_fingerprint: String::new(),
         }
+    }
+
+    /// 新生产身份含端点及语义参数，旧 key 不自动冒认兼容，保留旧变体待重建。
+    pub fn with_parameters(
+        provider: &str,
+        model_id: &str,
+        protocol: &str,
+        dimensions: u32,
+        parameter_fingerprint: String,
+    ) -> Self {
+        let mut identity = Self::new(provider, model_id, protocol, dimensions);
+        let descriptor = serde_json::json!([
+            "lingxi.embedding-identity.v2",
+            provider,
+            model_id,
+            protocol,
+            dimensions,
+            parameter_fingerprint
+        ]);
+        identity.key = sha256_hex(descriptor.to_string().as_bytes());
+        identity.parameter_fingerprint = parameter_fingerprint;
+        identity
     }
 }
 

@@ -1,0 +1,107 @@
+{
+  "argv": [
+    "git",
+    "ls-remote",
+    "https://github.com/ItsDalk-Lane/LingxiAgent.git",
+    "refs/heads/codex/rust-tauri-migration"
+  ],
+  "cwd": "/private/tmp/lingxi-r06-w15-reviewer-01",
+  "started": "2026-10-12T00:19:03.985327+00:00",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "effective_env": {
+    "HOME": "/Users/study_superior",
+    "LINGXI_HOME": "/private/tmp/lingxi-w15-r01-runtime/home",
+    "TMPDIR": "/private/tmp/lingxi-w15-r01-runtime/tmp",
+    "LINGXI_PRODUCT_DIR": "/private/tmp/lingxi-r06-w15-reviewer-01/lib",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-w15-r01-runtime/target",
+    "CARGO_INCREMENTAL": "0",
+    "LINGXI_TEST_GUARD": "1",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "TEST_MEM_LIMIT_MB": "8192"
+  },
+  "guard": {
+    "business_seconds": 600,
+    "rss_mib": 8192,
+    "controller_seconds": 2700,
+    "sampling_interval_seconds": 0.05
+  },
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "source_before": "76b576ae8cf26174813b3439436a2a5d1aff65f42743af9e305e05ec5b6eebff",
+  "processes": [
+    {
+      "pid": 31640,
+      "ppid": 31419,
+      "argv": "git ls-remote https://github.com/ItsDalk-Lane/LingxiAgent.git refs/heads/codex/rust-tauri-migration",
+      "actual_executable": "/opt/homebrew/Cellar/git/2.53.0/bin/git",
+      "executable_sha256_first_observed": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537",
+      "first_seen_elapsed": 0.33381275000283495,
+      "last_seen_elapsed": 1.223653374996502,
+      "peak_sampled_rss_bytes": 8192000,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_at_final_table",
+        "elapsed": 1.32196579198353
+      },
+      "wait_reap": "Popen.wait executed",
+      "executable_sha256_after": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537",
+      "present_after": false,
+      "exit_code": 0
+    },
+    {
+      "pid": 31642,
+      "ppid": 31640,
+      "argv": "/opt/homebrew/opt/git/libexec/git-core/git remote-https https://github.com/ItsDalk-Lane/LingxiAgent.git https://github.com/ItsDalk-Lane/LingxiAgent.git",
+      "actual_executable": "/opt/homebrew/Cellar/git/2.53.0/bin/git",
+      "executable_sha256_first_observed": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537",
+      "first_seen_elapsed": 0.4299785420007538,
+      "last_seen_elapsed": 1.223653374996502,
+      "peak_sampled_rss_bytes": 7815168,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_at_final_table",
+        "elapsed": 1.3234727499948349
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537",
+      "present_after": false
+    },
+    {
+      "pid": 31643,
+      "ppid": 31642,
+      "argv": "/opt/homebrew/opt/git/libexec/git-core/git-remote-https https://github.com/ItsDalk-Lane/LingxiAgent.git https://github.com/ItsDalk-Lane/LingxiAgent.git",
+      "actual_executable": "/opt/homebrew/Cellar/git/2.53.0/libexec/git-core/git-remote-http",
+      "executable_sha256_first_observed": "7539da94c8dfa9a6e56bf38c62a5fc27ad82ba2116f7a0508bff0f0a2dbfdbc0",
+      "first_seen_elapsed": 0.4299785420007538,
+      "last_seen_elapsed": 1.223653374996502,
+      "peak_sampled_rss_bytes": 11321344,
+      "controller": false,
+      "limit_seconds": 600,
+      "exit_observation": {
+        "kind": "absent_at_final_table",
+        "elapsed": 1.3244501249864697
+      },
+      "wait_reap": "direct parent only; descendants not independently waitable",
+      "executable_sha256_after": "7539da94c8dfa9a6e56bf38c62a5fc27ad82ba2116f7a0508bff0f0a2dbfdbc0",
+      "present_after": false
+    }
+  ],
+  "launch_binary_before": {
+    "git": null,
+    "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0"
+  },
+  "controller_pid": 31640,
+  "ended": "2026-10-12T00:19:05.309787+00:00",
+  "elapsed_seconds": 1.3244829999748617,
+  "exit_code": 0,
+  "guard_breaches": [],
+  "source_after": "76b576ae8cf26174813b3439436a2a5d1aff65f42743af9e305e05ec5b6eebff",
+  "unsampled_process_metrics": "null/unknown; inventory cannot replace execution measurement",
+  "owned_survivors": [],
+  "supervisor_sha256": "5166fb9fed7854ad3515b5138ec981db8661eb0d35e93c37379353ce2380ae63",
+  "launch_binary_after": {
+    "git": null,
+    "/private/tmp/lingxi-w15-r01-runtime/target/debug/lingxi-service": "51c32c7d76d7c05616184c4c097d5bb58f2417d4128984e79e083f3ac6a2abf0"
+  }
+}

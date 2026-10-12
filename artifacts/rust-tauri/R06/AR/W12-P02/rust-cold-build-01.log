@@ -1,0 +1,226 @@
+{"argv": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-adapters", "--test", "knowledge_store_r06t07", "--test", "r06_ar_f12_cache_preservation", "-p", "lingxi-service", "--test", "r06_ar_f12_cache_consumers", "--test", "r06_t07_knowledge", "--test", "r06_t07_knowledge_tools", "--no-run"], "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-rust-cold-build-01-acz29k5x", "start_utc": "2026-10-11T07:10:30.963955+00:00", "candidate": {"owned": [{"path": "rust/crates/lingxi-adapters/src/storage/knowledge.rs", "sha256": "7ae7e5695cb17876dae58fbc8f9de1484e48ea88033e2cc7d9910ba45392bb73"}, {"path": "rust/crates/lingxi-service/src/knowledge.rs", "sha256": "3f98131c88c8c1c1945a87752f1702d2cfb75ffdf2454e0d88d4554edbd3c370"}, {"path": "lib/knowledge/vector-index-adapter.ts", "sha256": "33bfb74fb7b6450bebf972ede91a8d3442ce7f8baf629813bcd49c6eb65525c7"}, {"path": "lib/knowledge/knowledge-index-store.ts", "sha256": "81322defc4c3f5693efefd87939e7e4068d1d27b81d68da43699f2d534dc43e2"}, {"path": "lib/knowledge/ann-index-store.ts", "sha256": "9297282eb1609a850aadec2bd8044351897791bf22c8fe80ce4580d27a547ac9"}, {"path": "lib/knowledge/vector-search-backend-factory.ts", "sha256": "54aeefa97965fe574859085616cc74070405489cce5557c2f29abb406fb2d74d"}, {"path": "rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs", "sha256": "618b3247949820f4e0cd6dae66b5cc68723ee77c1f6e1a7d27981cd221bb2d93"}, {"path": "rust/crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs", "sha256": "bd4b3d7b711e20aac3e56e4ca87b632bb804e4f265eedd0bfd2be218ad0e17e0"}, {"path": "tests/r06-ar-f12-vector-cache-preservation.test.ts", "sha256": "5eb1a93524ce4eabf542229f7c68e960b37b8062f908eaf29596721b8908b773"}, {"path": "tests/r06-ar-f12-fulltext-cache-preservation.test.ts", "sha256": "9973a3161d4d4bf7cf7ed4f079fdd45b22b1616be69d7408c1054f2bebbd6f59"}, {"path": "tests/r06-ar-f12-ann-cache-preservation.test.ts", "sha256": "9eab3eb62a547a9753557b735305a7c411744755dc033a3e95bbc7396faa35e7"}], "aggregate": "8595784e870bc8b05b7a97a0ada3a864adbdb3d63b5863f1c2f845f78858c63d", "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4"}, "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O", "target": "/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent/rust/target", "guard": "8192MiB/600s+parent600s", "executable": "/Users/study_superior/.cargo/bin/cargo", "executable_sha256": "ec1b9233e7f72990ecd8e62063fa7f6c3dfc2bec8e97f88bff165f9100ac696a", "mock_boundary": "Only loopback embedding provider responses; actual SQLite/storage/worker/gateway/messages"}
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.26
+   Compiling libc v0.2.189
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.13
+   Compiling pin-project-lite v0.2.17
+   Compiling memchr v2.8.3
+   Compiling futures-core v0.3.34
+   Compiling itoa v1.0.18
+   Compiling serde_core v1.0.229
+   Compiling core-foundation-sys v0.8.7
+   Compiling once_cell v1.21.4
+   Compiling bytes v1.12.1
+   Compiling cfg-if v1.0.5
+   Compiling log v0.4.34
+   Compiling pkg-config v0.3.34
+   Compiling stable_deref_trait v1.2.1
+   Compiling futures-sink v0.3.34
+   Compiling typenum v1.20.1
+   Compiling tracing-core v0.1.36
+   Compiling slab v0.4.12
+   Compiling dunce v1.0.5
+   Compiling fs_extra v1.3.0
+   Compiling smallvec v1.16.1
+   Compiling futures-channel v0.3.34
+   Compiling foldhash v0.2.0
+   Compiling http v1.5.0
+   Compiling futures-io v0.3.34
+   Compiling futures-task v0.3.34
+   Compiling hybrid-array v0.4.15
+   Compiling hashbrown v0.17.1
+   Compiling serde v1.0.229
+   Compiling zmij v1.0.23
+   Compiling jobserver v0.1.35
+   Compiling errno v0.3.14
+   Compiling cc v1.4.7
+   Compiling signal-hook-registry v1.4.8
+   Compiling mio v1.2.3
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling socket2 v0.6.5
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling litemap v0.8.3
+   Compiling cmov v0.5.4
+   Compiling cmake v0.1.58
+   Compiling bitflags v2.13.2
+   Compiling aws-lc-rs v1.18.1
+   Compiling writeable v0.6.4
+   Compiling zeroize v1.9.0
+   Compiling ctutils v0.4.2
+   Compiling http-body v1.1.0
+   Compiling autocfg v1.5.1
+   Compiling untrusted v0.9.0
+   Compiling base64 v0.23.1
+   Compiling utf8_iter v1.0.4
+   Compiling aws-lc-sys v0.45.0
+   Compiling icu_properties_data v2.3.0
+   Compiling serde_json v1.0.151
+   Compiling percent-encoding v2.3.2
+   Compiling icu_normalizer_data v2.3.0
+   Compiling equivalent v1.0.2
+   Compiling const-oid v0.10.2
+   Compiling indexmap v2.14.2
+   Compiling digest v0.11.3
+   Compiling num-traits v0.2.19
+   Compiling rustls-pki-types v1.15.1
+   Compiling system-configuration-sys v0.6.0
+   Compiling httparse v1.10.1
+   Compiling tower-service v0.3.3
+   Compiling synstructure v0.14.0
+   Compiling try-lock v0.2.5
+   Compiling ref-cast v1.0.27
+   Compiling rustversion v1.0.23
+   Compiling fnv v1.0.7
+   Compiling rustls v0.23.45
+   Compiling atomic-waker v1.1.2
+   Compiling want v0.3.1
+   Compiling serde_derive_internals v0.30.0
+   Compiling form_urlencoded v1.2.2
+   Compiling tracing-attributes v0.1.31
+   Compiling core-foundation v0.9.4
+   Compiling cpufeatures v0.3.1
+   Compiling iana-time-zone v0.1.65
+   Compiling sync_wrapper v1.0.2
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling tokio-macros v2.7.2
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling futures-macro v0.3.34
+   Compiling tokio v1.53.1
+   Compiling serde_derive v1.0.229
+   Compiling tracing v0.1.44
+   Compiling ref-cast-impl v1.0.27
+   Compiling tower-layer v0.3.3
+   Compiling zerofrom v0.1.8
+   Compiling httpdate v1.0.3
+   Compiling futures-util v0.3.34
+   Compiling subtle v2.6.1
+   Compiling schemars_derive v1.2.2
+   Compiling yoke v0.8.3
+   Compiling system-configuration v0.7.0
+   Compiling vcpkg v0.2.15
+   Compiling dyn-clone v1.0.20
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling dtor-proc-macro v0.0.6
+   Compiling ipnet v2.12.2
+   Compiling dtor v0.3.0
+   Compiling libsqlite3-sys v0.38.2
+   Compiling encoding_rs v0.8.42
+   Compiling sha2 v0.11.0
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling icu_locale_core v2.3.0
+   Compiling icu_collections v2.3.0
+   Compiling http-body-util v0.1.5
+   Compiling core-foundation v0.10.1
+   Compiling security-framework-sys v2.17.0
+   Compiling ctor-proc-macro v0.0.7
+   Compiling ryu v1.0.23
+   Compiling mime v0.3.17
+   Compiling chrono v0.4.45
+   Compiling tokio-util v0.7.19
+   Compiling tower v0.5.3
+   Compiling icu_provider v2.3.1
+   Compiling ctor v0.8.0
+   Compiling icu_properties v2.3.0
+   Compiling icu_normalizer v2.3.0
+   Compiling h2 v0.4.19
+   Compiling serde_urlencoded v0.7.1
+   Compiling security-framework v3.7.0
+   Compiling schemars v1.2.2
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling sha1 v0.11.0
+   Compiling getrandom v0.2.17
+   Compiling scopeguard v1.2.0
+   Compiling simdutf8 v0.1.5
+   Compiling multiversion_no_op v1.0.0
+   Compiling tower-http v0.6.11
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-test-guard v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent/rust/crates/lingxi-test-guard)
+   Compiling hashlink v0.12.2
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling fallible-iterator v0.3.0
+   Compiling aho-corasick v1.1.5
+   Compiling hyper v1.11.1
+   Compiling getrandom v0.4.3
+   Compiling regex-syntax v0.8.11
+   Compiling hyper-util v0.1.21
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling regex-automata v0.4.18
+   Compiling rusqlite v0.40.2
+   Compiling inout v0.2.2
+   Compiling thiserror v2.0.21
+   Compiling cipher v0.5.2
+   Compiling futures-executor v0.3.34
+   Compiling thiserror-impl v2.0.21
+   Compiling hmac v0.13.0
+   Compiling rmcp v3.4.1
+   Compiling lazy_static v1.5.0
+   Compiling sharded-slab v0.1.7
+   Compiling pbkdf2 v0.13.0
+   Compiling futures v0.3.34
+   Compiling salsa20 v0.11.0
+   Compiling uuid v1.26.1
+   Compiling axum-core v0.5.6
+   Compiling tokio-stream v0.1.19
+   Compiling matchers v0.2.0
+   Compiling serde_path_to_error v0.1.20
+   Compiling tracing-log v0.2.0
+   Compiling thread_local v1.1.10
+   Compiling pastey v0.2.3
+   Compiling matchit v0.8.4
+   Compiling nu-ansi-term v0.50.3
+   Compiling tracing-subscriber v0.3.23
+   Compiling regex v1.13.1
+   Compiling scrypt v0.12.0
+   Compiling axum v0.8.9
+   Compiling ring v0.17.14
+   Compiling if-addrs v0.15.0
+   Compiling powerfmt v0.2.0
+   Compiling qrcodegen v1.8.0
+   Compiling num-conv v0.2.2
+   Compiling deranged v0.5.8
+   Compiling time-core v0.1.9
+   Compiling pem v4.0.0
+   Compiling time v0.3.55
+   Compiling yasna v0.6.0
+   Compiling rcgen v0.14.10
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-rustls v0.26.5
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.13.5
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent/rust/crates/lingxi-service)
+error[E0277]: the trait bound `Array<u8, UInt<UInt<UInt<UInt<..., ...>, ...>, ...>, ...>>: LowerHex` is not satisfied
+  --> crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:90:75
+   |
+90 |         "suffix": suffix, "bytes": bytes.len(), "sha256": format!("{:x}", sha2::Sha256::digest(bytes)),
+   |                                                                    ----   ^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `LowerHex` is not implemented for `Array<u8, UInt<UInt<UInt<UInt<UInt<..., ...>, ...>, ...>, ...>, ...>>`
+   |                                                                    |
+   |                                                                    required by this formatting parameter
+   |
+   = help: the following other types implement trait `LowerHex`:
+             &T
+             &mut T
+             OpenFlags
+             PrepFlags
+             Saturating<T>
+             Wrapping<T>
+             bytes::bytes::Bytes
+             bytes::bytes_mut::BytesMut
+           and 32 others
+   = note: the full name for the type has been written to '/Users/study_superior/.codex/worktrees/r06-w12-review3/LingxiAgent/rust/target/debug/deps/r06_ar_f12_cache_preservation-0adeb7f2ac6b53e6.long-type-14891708676919090590.txt'
+   = note: consider using `--verbose` to print the full type name to the console
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `lingxi-adapters` (test "r06_ar_f12_cache_preservation") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

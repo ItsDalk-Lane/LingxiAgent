@@ -1,0 +1,37 @@
+[
+  {
+    "issue": "F01",
+    "suite": "r06_ar_f01_history",
+    "test": "f01_c01_real_authenticated_history_and_isolation",
+    "exitCode": 0,
+    "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-repair-20261012/direct-probes/F01-final/check.log"
+  },
+  {
+    "issue": "F05",
+    "suite": "r06_ar_f05_cache",
+    "test": "c01_actual_calls_keep_system_frozen_and_tools_live_after_description_update",
+    "exitCode": 0,
+    "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-repair-20261012/direct-probes/F05-final/check.log"
+  },
+  {
+    "issue": "F11",
+    "suite": "r06_ar_w11_embedding_lifecycle",
+    "test": "c03_actual_driver_embedding_network_deadline_is_not_renewed",
+    "exitCode": 0,
+    "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-repair-20261012/direct-probes/F11-final/check.log"
+  },
+  {
+    "issue": "F12",
+    "suite": "r06_ar_f12_cache_preservation",
+    "test": "c01_future_schema_preserves_sentinel_in_both_caches",
+    "exitCode": 0,
+    "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-repair-20261012/direct-probes/F12-final/check.log"
+  },
+  {
+    "issue": "F13",
+    "suite": "r06_ar_f13_submission",
+    "test": "real_submission_freezes_selected_sources_and_rejects_old_or_foreign_scope",
+    "exitCode": 0,
+    "log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-repair-20261012/direct-probes/F13-final/check.log"
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "status": "READY_FOR_INDEPENDENT_REVIEW",
+  "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "frozenAt": 1791717072.677239,
+  "sourceSetSHA256": "c496d9fa91acc50ac552ec4608f2d1f275d375b3280a5153dfe0dfb62cab9db9",
+  "candidateSHA256": "3f42526a7bc1b6100271f071360253a8fe4f27c523c8e4dc0477bdde09fc1a84",
+  "manifestSHA256": "2b25cd68db5ab5a5565d23bda4ac7dd3145fb6126715f9ebb35bad883e98c494",
+  "resultsSHA256": "487c38ece3dd0551d6fc4a2874d5a954f6099387a490db0e592630dc999c4d96",
+  "reportSHA256": "076fcfb381e4469e80149912876673b0e0b79a7693e533eb1863219557fa70fc",
+  "actualServiceBinarySHA256": "1fbf11908706428b6b133d5ad0cfa191bd498b7c351e9e0d1332f81a632fc7c5",
+  "wholeWorkspace": "1875 PASS/5 known purebc FAIL; no wholeStage PASS",
+  "independentReview": "NOT_RUN; new Reviewer required",
+  "gitMutation": "none staged/committed/pushed/reset/cleaned",
+  "handoffSHA256": "3494123e9c24bf6240b0a47f3e2834c798ae67d15b90bb0ca34188bb97eca8ad"
+}

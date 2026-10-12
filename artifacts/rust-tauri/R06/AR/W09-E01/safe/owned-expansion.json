@@ -1,0 +1,69 @@
+{
+  "status": "OWNED_EXPANSION_BEFORE_PRODUCT_EDITS",
+  "files": [
+    {
+      "path": "rust/crates/lingxi-service/src/knowledge.rs",
+      "before": "0d9fd6679e7681b42bde359657b7a78bd9bc4862c01da2f5c96a1d3f7e439cef"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/knowledge.rs",
+      "before": "9ff5675821ab54ca41592c8d6cf211b77263d9b55f9f8cf45c17801863ab4d1d"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "before": "abb05a164499956657395906134d20beafbb277547e794d277ed26c3986ef82c"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_w09_embedding_batches.rs",
+      "before": "f0d5bb6359b5fc84ae48eeae6714e7e1f48d69dc8e945e2b15aa6eccf0217573"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r06_ar_w09_vector_integrity.rs",
+      "before": null
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/dispatch.rs",
+      "before": "877badc332ed687c59f183e0fe2097d4f19daef37858b3d61889791bcc74fef1"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/operations/mod.rs",
+      "before": "2cc0e91acbb8a189959c1013afafe9d4bfc09fbd101258b07b39b16bec248320"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/operations.rs",
+      "before": "da58f7822cc80e05af0893995e3ade915c8901967ae718bb74d8f979590167ce"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs",
+      "before": "0d37fb59194f41ec3d3af867c65e8259ca2b7a7be862f22219e5b14e29d35bed"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/knowledge_store_r06t07.rs",
+      "before": "fe0a2a07249be3ca5a6d284ab02078cbfb560a8a702bb2f336e3704a29d10640",
+      "why": "严格条件写前补实际领取，仅增强job id/status/attempt；保留原pending1与cancel2等全部断言",
+      "parent_authorization": "current parent confirmed necessary regression fixture adaptation"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+      "before": "23bd653b051f2f4b9b638b4cae23a9cfeb19f68fe25a72151d25f4fb225aff17",
+      "why": "原storage.close模拟进程终止合同：DB关联knowledge必须stop并join；weak回调无cycle，concurrent/idempotent/cancelled close保真实drain/checkpoint/join",
+      "parent_authorization": "parent explicit necessary owned extension before product mutation"
+    }
+  ],
+  "why": {
+    "knowledge.rs": "实际批次发送/ready检查/兼容已实测身份/缺口恢复/可靠worker生命周期",
+    "storage/knowledge.rs": "单写者持有期间恢复running；原子claim；真实计划集合完整性；有效向量checkpoint；progress/stats/取消条件写",
+    "lib.rs": "启动恢复失败必须传播，不能吞错假READY；最后ServiceState owner消失时停止知识worker，bind失败必须完成join再返回"
+  },
+  "affected": [
+    "F09-C01-C04",
+    "F10-C01-C04 STALE未接受",
+    "F11独立job取消/未知结算 OPEN",
+    "F12缓存open分类 OPEN",
+    "R06-T07五Steps三交付A13/A14及24叶相关份额",
+    "R05 operation gateway/usage/deadline",
+    "R02/R03/R04/R05正式门禁 STALE",
+    "R02 RunDatabase.close resource ownership and all R03/R04/R05 close consumers STALE"
+  ],
+  "excluded": "不复制W12/锁；kernel和embedding协议冻结保留；W10原安全语义保留增强，首批次数/恢复缺陷预期适配，F10所有旧结果STALE未接受"
+}

@@ -1,0 +1,2198 @@
+{
+  "schema": "R06-AR-W12-P01-REPAIR-v1",
+  "work_id": "R06-AR-W12",
+  "finding_id": "R06-AR-F12",
+  "status": "READY_FOR_INDEPENDENT_REVIEW",
+  "handoff_status": "READY_FOR_FRESH_REVIEWER",
+  "independent_review": "NOT_RUN",
+  "whole_R06_T07": "NOT_ACCEPTED",
+  "whole_R06": "NOT_ACCEPTED",
+  "audited_base": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+  "main_head_at_delivery": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+  "main_branch": "codex/rust-tauri-migration",
+  "candidate": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/knowledge.rs",
+      "sha256": "a123a9e0b11e0a95f630c18f8e002c36889905364361eaa34e89bad22506db01",
+      "bytes": 121999,
+      "base_sha256": "9ff5675821ab54ca41592c8d6cf211b77263d9b55f9f8cf45c17801863ab4d1d",
+      "verified_main_and_isolated": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/knowledge.rs",
+      "sha256": "3f98131c88c8c1c1945a87752f1702d2cfb75ffdf2454e0d88d4554edbd3c370",
+      "bytes": 125213,
+      "base_sha256": "d9294730241e08c8e2da443cf7fab84e14124fcdc253b3f74a80ffd55b96dc90",
+      "verified_main_and_isolated": true
+    },
+    {
+      "path": "lib/knowledge/vector-index-adapter.ts",
+      "sha256": "4c74ef0a579de04195ac1b7612b398f5dc8d558c17eac83051b6f55b488b8877",
+      "bytes": 55844,
+      "base_sha256": "d0eb6fd3bbb797b461e8448f5dea048fea7ef7e1d2ab5a58f7533f980fb0f655",
+      "verified_main_and_isolated": true
+    },
+    {
+      "path": "lib/knowledge/knowledge-index-store.ts",
+      "sha256": "eca060010a31ffb6acac5e349fd6a8a72875c59db673bc797ce04e7ddb0862d6",
+      "bytes": 59220,
+      "base_sha256": "eb8f98b3143dd3f4f73f0148dc142903bf1340a0d5bd9144a2943fca68371bd0",
+      "verified_main_and_isolated": true
+    },
+    {
+      "path": "lib/knowledge/ann-index-store.ts",
+      "sha256": "d18aace5c86d100e37e2f5932eb184044daabc4dec503800ec43a37264848404",
+      "bytes": 7816,
+      "base_sha256": "f28c2697092034acf2f0b16a5b617dca6958a5d1ee146623188ddddc154c63c9",
+      "verified_main_and_isolated": true
+    },
+    {
+      "path": "lib/knowledge/vector-search-backend-factory.ts",
+      "sha256": "54aeefa97965fe574859085616cc74070405489cce5557c2f29abb406fb2d74d",
+      "bytes": 1535,
+      "base_sha256": "eb98fd47e11125c169b1f3a43a492c3dfd4c82b931161c4a7d79de4e74eedce4",
+      "verified_main_and_isolated": true
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs",
+      "sha256": "f9790bf638769199b40af3b540cb34d2fa897c28e91b4cec0af91f9b09fe4b9b",
+      "bytes": 23546,
+      "base_sha256": null,
+      "verified_main_and_isolated": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs",
+      "sha256": "bd4b3d7b711e20aac3e56e4ca87b632bb804e4f265eedd0bfd2be218ad0e17e0",
+      "bytes": 15557,
+      "base_sha256": null,
+      "verified_main_and_isolated": true
+    },
+    {
+      "path": "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+      "sha256": "5eb1a93524ce4eabf542229f7c68e960b37b8062f908eaf29596721b8908b773",
+      "bytes": 13856,
+      "base_sha256": null,
+      "verified_main_and_isolated": true
+    },
+    {
+      "path": "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+      "sha256": "9973a3161d4d4bf7cf7ed4f079fdd45b22b1616be69d7408c1054f2bebbd6f59",
+      "bytes": 5438,
+      "base_sha256": null,
+      "verified_main_and_isolated": true
+    },
+    {
+      "path": "tests/r06-ar-f12-ann-cache-preservation.test.ts",
+      "sha256": "9b0b9219934632ff24af69e3a759ea7c35feffad5747a2114a066983f23ac791",
+      "bytes": 4141,
+      "base_sha256": null,
+      "verified_main_and_isolated": true
+    }
+  ],
+  "candidate_aggregate_sha256": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+  "candidate_aggregate_algorithm": "sha256 of sorted(path + NUL + sha256 + LF)",
+  "candidate_workspace": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+  "candidate_manifest": "candidate-frozen-02.json",
+  "environment": {
+    "cargo": {
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+      "stderr": ""
+    },
+    "node": {
+      "command": [
+        "node",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "v24.16.0",
+      "stderr": ""
+    },
+    "npm": {
+      "command": [
+        "npm",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "11.13.0",
+      "stderr": ""
+    },
+    "head": {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stdout": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "stderr": ""
+    },
+    "branch": {
+      "command": [
+        "git",
+        "branch",
+        "--show-current"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+    "locked_cargo_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+    "guard": {
+      "TEST_MEM_LIMIT_MB": "8192",
+      "TEST_TIME_LIMIT_SEC": "600",
+      "TEST_GUARD_VERBOSE": "1",
+      "parent_supervision": "subprocess.run(timeout=600), no detach/setsid",
+      "guard_verified_in_logs": true
+    }
+  },
+  "timestamp_utc": "2026-10-11T06:32:32.101082+00:00",
+  "self_check": [
+    {
+      "id": "R06-AR-F12-C01",
+      "expected": "两缓存/TS三库future schema999及哨兵、live/crashed WAL拒绝保留",
+      "actual": "Rust两个缓存与TS全文/向量/ANN真实拒绝999；DB/WAL字节不变，崩溃SHM按易失索引核存在/长度；旧open根因旧红新绿仍成立。",
+      "status": "SELF_CHECK_PASS_LOCAL_SYNTHETIC_SCOPE",
+      "commands": [
+        "rust-final-02",
+        "ts-final-02",
+        "green-status-01",
+        "green-query-01",
+        "old-open-ts-green-01"
+      ],
+      "candidate_sha": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+      "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+      "fixture_hashes": {
+        "rust-final-02": "b8f3d3de4b0e1a93ab02a3bba8719a4ab36e8aa19509a0655ef879bd5a2a6f35",
+        "ts-final-02": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "green-status-01": "f4b7d92ea4e601bcb7ac22ddab0337a5638653034ef044e0ded97d7c9c393034",
+        "green-query-01": "5012e76eb2153ac983e3afce4026f0633ecfb4a92676eb3f1ab84e454ae4cb6b"
+      },
+      "fixture_hash_note": "后运行夹具快照，不冒充输入前字节；操作前后数据保护由绑定测试内实际断言，TS专属afterEach已清理。",
+      "mock_boundary": "只有外部响应使用loopback；存储、服务worker、SQL、网关、查询、引用组装真实执行；调度钩子仅安排真实第二连接操作。",
+      "independent_review": "NOT_RUN_FRESH_REVIEWER_REQUIRED"
+    },
+    {
+      "id": "R06-AR-F12-C02",
+      "expected": "权限、锁、I/O失败不删除、不伪造成功；搜索合法最佳努力合同保留",
+      "actual": "真实chmod、SQLite排他/写锁、独立child RLIMIT_FSIZE分类保原件。检索usage真实BUSY/READONLY/FULL允许带日志最佳努力，非I/O约束错误必须抛；解除失败后正常刷新，paid行保留。",
+      "status": "SELF_CHECK_PASS_LOCAL_SYNTHETIC_SCOPE",
+      "commands": [
+        "rust-final-02",
+        "ts-final-02",
+        "green-status-01",
+        "green-query-01",
+        "old-open-ts-green-01"
+      ],
+      "candidate_sha": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+      "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+      "fixture_hashes": {
+        "rust-final-02": "b8f3d3de4b0e1a93ab02a3bba8719a4ab36e8aa19509a0655ef879bd5a2a6f35",
+        "ts-final-02": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "green-status-01": "f4b7d92ea4e601bcb7ac22ddab0337a5638653034ef044e0ded97d7c9c393034",
+        "green-query-01": "5012e76eb2153ac983e3afce4026f0633ecfb4a92676eb3f1ab84e454ae4cb6b"
+      },
+      "fixture_hash_note": "后运行夹具快照，不冒充输入前字节；操作前后数据保护由绑定测试内实际断言，TS专属afterEach已清理。",
+      "mock_boundary": "只有外部响应使用loopback；存储、服务worker、SQL、网关、查询、引用组装真实执行；调度钩子仅安排真实第二连接操作。",
+      "independent_review": "NOT_RUN_FRESH_REVIEWER_REQUIRED"
+    },
+    {
+      "id": "R06-AR-F12-C03",
+      "expected": "自有且静止的确证损坏限定隔离；保原文、另一缓存和唯一恢复副本",
+      "actual": "自有无sidecar、独占guard且确认损坏才隔离；unknown/链接/sidecar拒绝。恢复I/O失败隔离副本保留；TS显式reset/rebuild同事务同步副本后清派生表，事实/原文不删且不自动embedding。",
+      "status": "SELF_CHECK_PASS_LOCAL_SYNTHETIC_SCOPE",
+      "commands": [
+        "rust-final-02",
+        "ts-final-02",
+        "green-status-01",
+        "green-query-01",
+        "old-open-ts-green-01"
+      ],
+      "candidate_sha": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+      "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+      "fixture_hashes": {
+        "rust-final-02": "b8f3d3de4b0e1a93ab02a3bba8719a4ab36e8aa19509a0655ef879bd5a2a6f35",
+        "ts-final-02": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "green-status-01": "f4b7d92ea4e601bcb7ac22ddab0337a5638653034ef044e0ded97d7c9c393034",
+        "green-query-01": "5012e76eb2153ac983e3afce4026f0633ecfb4a92676eb3f1ab84e454ae4cb6b"
+      },
+      "fixture_hash_note": "后运行夹具快照，不冒充输入前字节；操作前后数据保护由绑定测试内实际断言，TS专属afterEach已清理。",
+      "mock_boundary": "只有外部响应使用loopback；存储、服务worker、SQL、网关、查询、引用组装真实执行；调度钩子仅安排真实第二连接操作。",
+      "independent_review": "NOT_RUN_FRESH_REVIEWER_REQUIRED"
+    },
+    {
+      "id": "R06-AR-F12-C04",
+      "expected": "旧句柄所有缓存写入口、隐藏刷新及失败收尾拒绝future写；并发与重启不删活跃库",
+      "actual": "新增Rust status及replace断言覆盖所有公开缓存写；真实worker future index失败保building+错误码持久化；向量首64行后升级999，后批拒写保building和paid行；provider失败的cleanup拒写明确记录。TS升级发生在锁前抛SCHEMA_NEWER并保时间，锁后第二连接升级SQLITE_BUSY且version3正常更新；正常保留期/重开/原fallback回归均绿。",
+      "status": "SELF_CHECK_PASS_LOCAL_SYNTHETIC_SCOPE",
+      "commands": [
+        "rust-final-02",
+        "ts-final-02",
+        "green-status-01",
+        "green-query-01",
+        "old-open-ts-green-01"
+      ],
+      "candidate_sha": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+      "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+      "fixture_hashes": {
+        "rust-final-02": "b8f3d3de4b0e1a93ab02a3bba8719a4ab36e8aa19509a0655ef879bd5a2a6f35",
+        "ts-final-02": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "green-status-01": "f4b7d92ea4e601bcb7ac22ddab0337a5638653034ef044e0ded97d7c9c393034",
+        "green-query-01": "5012e76eb2153ac983e3afce4026f0633ecfb4a92676eb3f1ab84e454ae4cb6b"
+      },
+      "fixture_hash_note": "后运行夹具快照，不冒充输入前字节；操作前后数据保护由绑定测试内实际断言，TS专属afterEach已清理。",
+      "mock_boundary": "只有外部响应使用loopback；存储、服务worker、SQL、网关、查询、引用组装真实执行；调度钩子仅安排真实第二连接操作。",
+      "independent_review": "NOT_RUN_FRESH_REVIEWER_REQUIRED"
+    }
+  ],
+  "adversarial_self_check": {
+    "status": "PASS_LOCAL_SYNTHETIC_F12_SCOPE",
+    "two_review_failures_personally_reproduced": true,
+    "red_to_green": [
+      {
+        "finding": "W12-R01-F01",
+        "old": "red-status-01",
+        "new": "green-status-01",
+        "actual_old": "Ok; building→failed;schema999",
+        "actual_new": "SCHEMA_NEWER;building→building;schema999"
+      },
+      {
+        "finding": "W12-R01-F02",
+        "old": "red-query-01",
+        "new": "green-query-01 / ts-final-02",
+        "actual_old": "时间2020→2040;schema999;normal hit",
+        "actual_new": "升级在锁前schema拒绝并保时间；在检查后真实升级被SQLITE_BUSY挡，schema3才正常刷新"
+      }
+    ],
+    "additional_consumer_family": [
+      "真实摄入future全文状态/原文/失败码重开保护",
+      "真实向量首批64paid行后的future后批拒写",
+      "真实provider失败+cleanup版本拒绝分别保存",
+      "真实lock/readonly/FULL最佳努力及非I/O错误不得正常返回"
+    ],
+    "original_open_root_cause_controls": [
+      "old-open-rust-red-01:两个实际2e缓存删除sentinel并降为1",
+      "old-open-ts-red-01:gitshow2e实际TS三库future保护失败",
+      "old-open-ts-green-01:最终固定候选三个库拒绝/字节版本保留、reset同inode",
+      "rust-final-02:C01两个最终缓存拒绝/DB/WAL保留"
+    ]
+  },
+  "family_matrix": [
+    {
+      "family": "Rust全文缓存",
+      "public_writes": [
+        "open(initialization)",
+        "ensure_chunk_index_variant",
+        "set_variant_status",
+        "replace_artifact_chunks",
+        "reset",
+        "remove_artifact"
+      ],
+      "gate": "即时cache_write事务内版本检查；初始化即时事务+future只读预检",
+      "new_repair": "set_variant_status补闸口，其余原闸口保留",
+      "evidence": "rust-final-02 / green-status-01"
+    },
+    {
+      "family": "Rust向量缓存",
+      "public_writes": [
+        "open(initialization)",
+        "begin_variant_build",
+        "upsert_batch",
+        "complete_build",
+        "fail_build",
+        "remove_artifact"
+      ],
+      "gate": "每次cache_write即时事务内检查",
+      "new_repair": "存储方法原已保护；service所有对应失败收尾统一记录类别/cleanup拒写",
+      "evidence": "rust-final-02 专属C04及两真实loopback消费者"
+    },
+    {
+      "family": "TS portable",
+      "public_writes": [
+        "buildOrReplaceArtifact",
+        "removeArtifact",
+        "removeVariant",
+        "removeArtifactModel",
+        "touchVectorVariants",
+        "setVariantStatus",
+        "beginVectorVariantBuild",
+        "upsertChunkVectorBatch",
+        "completeVectorVariantBuild",
+        "failVectorVariantBuild",
+        "search(last_used_at)",
+        "rebuild",
+        "private migrations/addVariantLastUsedAt"
+      ],
+      "gate": "所有记录写事务immediate内assertWritableSchema；fail委托status",
+      "new_repair": "search隐藏刷新补即时门并精确区分合法I/O最佳努力、schema/损坏/约束错误",
+      "evidence": "ts-final-02 / green-query-01"
+    },
+    {
+      "family": "TS全文",
+      "public_writes": [
+        "writeVariantMetadata",
+        "ensureChunkIndexVariant",
+        "setChunkIndexVariantStatus",
+        "replaceArtifactChunks",
+        "upsertSourceDocument",
+        "upsertSections",
+        "removeArtifact",
+        "removeChunkIndexVariantsByArtifact",
+        "reset",
+        "schema/migration"
+      ],
+      "gate": "现有即时事务内版本门；reset先同步恢复副本",
+      "new_repair": "保留原修复；所有列出公开写与nested委托复核",
+      "evidence": "ts-final-02"
+    },
+    {
+      "family": "TS ANN/catalog/factory",
+      "public_writes": [
+        "constructor(initialization)",
+        "begin",
+        "markReady",
+        "markFailed"
+      ],
+      "gate": "即时事务检查；factory失败保原catalog并明确portable fallback",
+      "new_repair": "保留原安全fallback，未取消graph/retention功能",
+      "evidence": "ts-final-02"
+    },
+    {
+      "family": "真实消费者",
+      "paths": [
+        "KnowledgeService.process_job全文replace失败",
+        "向量begin/upsert两批/complete失败",
+        "provider错误时fail_build收尾",
+        "delete_source",
+        "knowledge-query-service INDEX_INVALID自愈/FTS显式降级",
+        "usearch touch失败→portable search"
+      ],
+      "gate": "生产写都委托受保护原语；Rust错误与收尾分别记录；TS query语义拒绝可明确降级非正常向量命中",
+      "evidence": "family-scan-final.json / rust-final-02 / ts-final-02"
+    },
+    {
+      "family": "事实/生命周期范围边界",
+      "paths": [
+        "Rust KnowledgeFactStore.purge_source文件remove错误",
+        "TS knowledge-store初始化及事实业务写",
+        "TS knowledge-manager显式purgeSource",
+        "ANN graph临时文件清理"
+      ],
+      "status": "SOURCE_REVIEWED_NOT_F12_CLOSED",
+      "note": "没有缓存open错误无差别删除。事实库业务旧writer/EX08生命周期全行为不是两缓存修复关闭范围；EX08/F11保留，不扩写他人文件。"
+    }
+  ],
+  "original_requirements": [
+    {
+      "id": "T07-Step1",
+      "expected": "实测导入、分块、embedding、索引、检索、读取、引用、删除、配置；R00为范围",
+      "actual": "原adapter9/服务11/工具6、当前专属6真实消费者及TS家族118亲跑；导入/分块/embedding/索引/检索/读取/引用/删除/配置相关场景通过，完整组合与所有原拒绝分支未全重验。",
+      "status": "RELATED_REGRESSION_PASS_NOT_WHOLE_T07_ACCEPTANCE",
+      "remaining": "F09/F10/F11/F13/EX08",
+      "evidence": [
+        "rust-final-02.log",
+        "ts-final-02.log"
+      ]
+    },
+    {
+      "id": "T07-Step2",
+      "expected": "保留本地向量及来源作用域，不恢复研究引擎",
+      "actual": "原A13 scope/引用与新库research表不存在实测；portable/ANN本地检索及fallback回归通过。",
+      "status": "RELATED_REGRESSION_PASS_NOT_WHOLE_T07_ACCEPTANCE",
+      "remaining": "真实聊天自动scope归F13；research旧残留归R08",
+      "evidence": [
+        "rust-final-02.log",
+        "ts-final-02.log"
+      ]
+    },
+    {
+      "id": "T07-Step3",
+      "expected": "模型/维度/版本/索引参数、不兼容检测可重建",
+      "actual": "原A14真实HTTP+loopback dim2→dim3→rebuild/hybrid恢复及模型设置变体回归通过；动态身份F10开放。",
+      "status": "RELATED_REGRESSION_PASS_NOT_WHOLE_T07_ACCEPTANCE",
+      "remaining": "动态身份完整契约F10不由本项关闭",
+      "evidence": [
+        "rust-final-02.log",
+        "ts-final-02.log"
+      ]
+    },
+    {
+      "id": "T07-Step4",
+      "expected": "fallback、持久化、取消、重启、schema兼容；源文/引用保护",
+      "actual": "四C完整亲验；两个Review1漏写点及向量错误收尾同族补齐。fallback/持久化/重启/retention/cancel相关原回归通过，Rust完整F11取消归属/EX08仍开放。",
+      "status": "F12_SCOPE_SELF_CHECK_PASS_OTHER_T07_OBLIGATIONS_OPEN",
+      "remaining": "F11取消/usage/迟到写；EX08生命周期与purge文件错误；其它原拒绝矩阵。",
+      "evidence": [
+        "rust-final-02.log",
+        "ts-final-02.log"
+      ]
+    },
+    {
+      "id": "T07-Step5",
+      "expected": "生产可达但范围冲突先登记，不自行恢复或删除，未决阻断完整验收",
+      "actual": "两项Review1失败及同族追加在本轮修复；F09-F11/F13/EX08/F14、真实迁移/目标OS明确保留，不恢复研究引擎、不改到期归属。",
+      "status": "UNRESOLVED_SCOPE_RECORDED",
+      "evidence": [
+        "rust-final-02.log",
+        "ts-final-02.log"
+      ]
+    },
+    {
+      "id": "DELIVERY-KnowledgeService",
+      "status": "RELATED_REGRESSION_PASS_NOT_WHOLE_T07_ACCEPTANCE",
+      "actual": "限定删除原2消费者保留，新增全文正常/未来失败及向量未来拒写/收尾拒绝4真实worker，相关服务回归通过。",
+      "evidence": [
+        "rust-final-02.log",
+        "ts-final-02.log"
+      ]
+    },
+    {
+      "id": "DELIVERY-索引兼容矩阵",
+      "status": "F12_COMPATIBILITY_MATRIX_SELF_CHECK_PASS",
+      "actual": "报告列open、保原件、受控恢复、长期旧句柄、全部缓存写方法、查询隐藏写与错误收尾矩阵；须全新独立复核。",
+      "evidence": [
+        "rust-final-02.log",
+        "ts-final-02.log"
+      ]
+    },
+    {
+      "id": "DELIVERY-引用与迁移测试",
+      "status": "RELATED_REGRESSION_PASS_NOT_WHOLE_T07_ACCEPTANCE",
+      "actual": "A13/A14及原TS迁移/variant/metadata相关回归通过；真实用户旧资料迁移NOT_RUN。",
+      "evidence": [
+        "rust-final-02.log",
+        "ts-final-02.log"
+      ]
+    },
+    {
+      "id": "A13",
+      "status": "RELATED_REGRESSION_PASS_NOT_WHOLE_T07_ACCEPTANCE",
+      "actual": "6原网关工具真实测试：scope允许来源、引用可HTTP定位真实原文、非可信来源不提权；真实聊天自动scope仍F13。",
+      "evidence": [
+        "rust-final-02.log",
+        "ts-final-02.log"
+      ]
+    },
+    {
+      "id": "A14",
+      "status": "RELATED_REGRESSION_PASS_NOT_WHOLE_T07_ACCEPTANCE",
+      "actual": "原服务A14亲跑通过（60.88s服务套件）；维度变化显式FTS降级，rebuild后恢复，未冒充动态身份F10验收。",
+      "evidence": [
+        "rust-final-02.log",
+        "ts-final-02.log"
+      ]
+    }
+  ],
+  "r00_leaves": [
+    {
+      "feature_id": "F-D08-C-RESEARCH-LEDGER",
+      "domain_id": "D08",
+      "classification": "兼容残留",
+      "stage_ids": [
+        "R06",
+        "R08"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14",
+        "R08-A07",
+        "R08-A08"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": null,
+      "acceptance_assertions": null,
+      "t07_status": "share",
+      "t07_anchor": "兼容残留：新库零 research/analysis/coverage 表（adapters knowledge.rs FACTS_SCHEMA_SQL 无此类；负向断言 r06_t07_knowledge::research_engine_tables_are_not_restored + knowledge_store_r06t07::research_engine_tables_are_absent_from_the_new_store）；R08 只读接管旧表",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "只证新库不恢复研究表；R08旧research兼容残留仍按原范围。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "research_engine_tables_are_not_restored",
+        "research_engine_tables_are_absent_from_the_new_store"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-DELETE-01E1E3",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-01E1E3CF7FA8",
+      "acceptance_assertions": [
+        "执行“删除知识笔记本”后核对：删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs notebook_delete_route → KnowledgeService::delete_notebook → facts.delete_notebook（软删 + membership 移除）；404/错误映射 knowledge_error_status",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "notebook_crud_settings_and_ingestion_summary"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-IMPORT-3D9932",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-3D99324D55C7",
+      "acceptance_assertions": [
+        "执行“导入目录到知识笔记本”后核对：登记来源并启动受控入库；返回导入状态或权限、解析错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs notebook_import_directory_route → import_directory（递归/sha 去重/逐源 parse+入队/部分失败显式留痕）；local 闸同 file（auth LocalOnly 承担）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "file_import_security_rules",
+        "import_pasted_text_parses_chunks_and_ingests_with_stub_embeddings"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-PATCH-763C55",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-763C552CB7DE",
+      "acceptance_assertions": [
+        "执行“重命名知识笔记本”后核对：名称写入知识库并返回更新后的笔记本；失败时不报告成功",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs notebook_rename_route → rename_notebook（名称校验 1..=256；失败不报成功）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "notebook_crud_settings_and_ingestion_summary"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-READ-E84EEE",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-E84EEED44AC1",
+      "acceptance_assertions": [
+        "执行“查看知识笔记本”后核对：返回当前笔记本资料；失败时返回具体错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs notebook_get_route → get_notebook（404 KNOWLEDGE_NOT_FOUND）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "notebook_crud_settings_and_ingestion_summary"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-SOURCE-210C79",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-210C7965364E",
+      "acceptance_assertions": [
+        "执行“添加笔记本来源”后核对：登记新来源并返回入库任务或明确错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs notebook_sources_import_route（file/pasted_text 全保真；web_snapshot 显式 422→D10；parse 失败保底入队 L407-416 对应）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "import_pasted_text_parses_chunks_and_ingests_with_stub_embeddings"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-SOURCE-B0386D",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-B0386DC9DED9",
+      "acceptance_assertions": [
+        "执行“查看笔记本来源”后核对：返回当前来源列表，不导入新资料",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs notebook_sources_list_route（source/snapshot/membership/parseArtifact 四元组；storagePath/semanticArtifactPath 不出域）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "notebook_crud_settings_and_ingestion_summary"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-POST-66C538",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-66C538ED4733",
+      "acceptance_assertions": [
+        "执行“创建知识笔记本”后核对：校验名称并写入当前工作空间知识库，返回新笔记本或错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs notebooks_create_route（body 精确键校验 + 名称校验 + 201）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "notebook_crud_settings_and_ingestion_summary"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-READ-BB1F5E",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-BB1F5E0DE88E",
+      "acceptance_assertions": [
+        "执行“查看知识笔记本列表”后核对：返回当前工作空间的笔记本、有效分块配置和导入摘要",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs notebooks_list_route（config + chunkTargetCharsEffective + sourceCount + ingestion 就绪汇总 done/pendingEmbedding/processing/failed/untracked）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "notebook_crud_settings_and_ingestion_summary"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-CITATIONS-CI-E2AF86",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-E2AF86A962D0",
+      "acceptance_assertions": [
+        "成功：执行“定位引用证据”后，返回引用、原文块、源与快照及 viewer URL/位置",
+        "拒绝/边界：缺 headingPath 时从章节 metadata 补齐；引用不可见/不存在错误；不应错误扩大写入或披露范围"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs citation_resolve_route → resolve_citation（headingPath 从章节 metadata 补齐；viewer.contentUrl+locator；404/越 studio 不披露）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "citation_resolution_returns_block_snapshot_source_and_viewer",
+        "a13_citation_markdown_resolves_to_actual_text"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-INGESTION-RE-76E2F5",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-76E2F5AAF035",
+      "acceptance_assertions": [
+        "成功：执行“查看摄入任务”后，返回指定 studio 的 jobs/counts 和不可达源文件状态",
+        "拒绝/边界：query.notebookId/sourceId 可筛选；studio 身份隔离；不应错误扩大写入或披露范围"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs ingestion_list_route（jobs+counts 按 notebookId/sourceId 筛选；unreachableSources 恒空→D14）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "notebook_crud_settings_and_ingestion_summary",
+        "ingestion_without_model_lands_pending_embedding_then_completes_after_reboot"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-8A6247",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-8A62470CC75D",
+      "acceptance_assertions": [
+        "成功：执行“重试知识源摄入”后，失败任务重新入队并唤醒；无任务兜底新建任务",
+        "拒绝/边界：最新任务非 failed 返回 409；已删源不可重试；不应错误扩大写入或披露范围"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs source_reingest_route → reingest_source（无 job 兜底入队 / failed 重试 / 非 failed 409 KNOWLEDGE_CONFLICT）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "reingest_membership_and_delete_semantics"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-C12CD3",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-C12CD37BA4A3",
+      "acceptance_assertions": [
+        "成功：执行“从笔记本移除源引用”后，移除该 notebook 对源的 membership，返回 membership；不等同删除源物理文件",
+        "拒绝/边界：studio/notebook/source 约束；失败不应删除共享源；不应错误扩大写入或披露范围"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs source_membership_delete_route → remove_source_from_notebook（membership removedAt；源行不删；零活跃 orphan 标记）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "reingest_membership_and_delete_semantics"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-DB95BA",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-DB95BAC2A204",
+      "acceptance_assertions": [
+        "成功：执行“刷新本地文件知识源”后，重新抓取文件形成最新快照/解析物，返回 changed；变化后重建摄入",
+        "拒绝/边界：仅 local owner；文件未变 changed=false；不可访问报错；不应错误扩大写入或披露范围"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs source_refresh_route → refresh_file_source（sha 相同 changed=false；变化新快照+重建摄入；importedFrom 锚定）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "仅亲跑相关本地导入安全；refresh changed/unchanged完整叶本轮NOT_RUN。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "file_import_security_rules"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-F49D5F",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-F49D5F80D234",
+      "acceptance_assertions": [
+        "成功：执行“修改笔记本摄入与模型设置”后，更新笔记本 config；分块或嵌入模型变化触发全量重建",
+        "拒绝/边界：body 经 validateSettingsBody；数值范围/模型引用由 store 校验；不应错误扩大写入或披露范围"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs notebook_settings_route → update_notebook_settings（validateSettingsBody 键白名单/数值范围/模型引用形状；embedding/chunk 变化触发全量重建 R9）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "settings_change_triggers_rebuild_and_variants_coexist",
+        "a14_switching_to_incompatible_embedding_dimension_refuses_vector_channel_until_rebuild"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-PARSE-ARTIFA-251147",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-251147E586B2",
+      "acceptance_assertions": [
+        "成功：执行“查看分块卡片”后，返回 chunkerConfigId 与有序 chunks",
+        "拒绝/边界：studio 身份限定；id 不存在错误；不应错误扩大写入或披露范围"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs artifact_chunks_route → list_artifact_chunk_cards（冻结契约 {chunkerConfigId, chunks ordinal 1-based}）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "import_pasted_text_parses_chunks_and_ingests_with_stub_embeddings"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-PARSE-ARTIFA-618978",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-6189780D7F52",
+      "acceptance_assertions": [
+        "成功：执行“查看解析块”后，返回解析产物的 blocks",
+        "拒绝/边界：studio 身份限定；id 不存在错误；不应错误扩大写入或披露范围"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs artifact_blocks_route → list_artifact_blocks（studio 归属复核；404）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "citation_resolution_returns_block_snapshot_source_and_viewer"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-SNAPSHOTS-SN-23AB8E",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-23AB8E0A2493",
+      "acceptance_assertions": [
+        "成功：执行“读取冻结原文”后，返回原文快照字节与安全响应头，HTML 以 text/plain 呈现",
+        "拒绝/边界：studio 隔离；HTML 禁止执行脚本，CSP sandbox/nosniff；不应错误扩大写入或披露范围"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs snapshot_content_route（HTML→text/plain + CSP sandbox/nosniff/ETag=sha256；studio 隔离 404）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "snapshot_content_serves_bytes_with_security_headers"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-SOURCES-ID-D-928337",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": null,
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-9283371CDAD8",
+      "acceptance_assertions": [
+        "成功：执行“永久删除知识源”后，取消活跃摄入、清理索引变体及物理痕迹，返回 cancelledJobs/purge",
+        "拒绝/边界：活跃 turn 冻结引用时 409；delete wins 阻止并发 reingest；不应错误扩大写入或披露范围"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledge.rs source_delete_route → delete_source（活跃 turn 冻结 409；delete wins 取消 job + 变体/快照 purge；并发 reingest 拒绝）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "deletion_of_a_keeps_b_and_removes_all_a_versions",
+        "deletion_cache_error_is_reported_and_source_original_remains",
+        "source_delete_is_blocked_while_turn_scope_freezes_it"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-TOOL-TOOL-KNOWLEDGE-GREP-269958",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": "INDEPENDENT",
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-269958F82F8A",
+      "acceptance_assertions": [
+        "片段可回到同一来源",
+        "跨studio不可读",
+        "无匹配为空；越权studio/source或无效过滤拒绝。"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledgetools.rs knowledge_grep → KnowledgeService::grep_scope（literal/受限 regex；provenance；空显式；越权 KNOWLEDGE_SCOPE_VIOLATION）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "knowledge_read_pagination_and_grep_outline",
+        "scope_violations_are_loud_not_fallback"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-TOOL-TOOL-KNOWLEDGE-MANAGE-1AA3F1",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": "INDEPENDENT",
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-1AA3F1311F8A",
+      "acceptance_assertions": [
+        "每动作核实际来源或队列状态",
+        "remove不直接删共享源",
+        "越权/拒绝不改库",
+        "无批准、跨studio ID、无效action/kind/路径报错，不变更他人库；后台索引失败要单列状态。"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledgetools.rs knowledge_manage（add/remove/refresh/reindex 真实委托；remove ≠ 删源；未知 action schema 枚举 prepare 层拒绝；后台失败单列 failed job）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "knowledge_manage_actions_and_gates"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-TOOL-TOOL-KNOWLEDGE-OUTLINE-5F5365",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": "INDEPENDENT",
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-5F5365322CFF",
+      "acceptance_assertions": [
+        "章节定位可用于knowledge_read",
+        "跨来源隔离",
+        "无来源或越权返回错误；空文档只返回空大纲。"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledgetools.rs knowledge_outline → outline_scope（章节 sectionId 可交 read；scope 隔离；空/无来源显式）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "knowledge_read_pagination_and_grep_outline"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-TOOL-TOOL-KNOWLEDGE-READ-FBD4D4",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": "INDEPENDENT",
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-FBD4D4D29679",
+      "acceptance_assertions": [
+        "引用指向实际快照",
+        "同轮刷新仍读旧冻结版",
+        "来源不存在、超出scope或分页越界不泄漏其他来源。"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledgetools.rs knowledge_read → read_citation_page（冻结锚定/分页 offset/越界显式/引用程序签发；引用指向实际快照——A13 citation 链测试）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "a13_citation_markdown_resolves_to_actual_text",
+        "knowledge_read_pagination_and_grep_outline"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    },
+    {
+      "feature_id": "F-D08-TOOL-TOOL-KNOWLEDGE-SEARCH-062844",
+      "domain_id": "D08",
+      "classification": "保留",
+      "stage_ids": [
+        "R06"
+      ],
+      "acceptance_ids": [
+        "R06-A13",
+        "R06-A14"
+      ],
+      "identity_decision": "INDEPENDENT",
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-062844EDA014",
+      "acceptance_assertions": [
+        "命中来源和引用可核",
+        "无能力不伪造命中",
+        "无索引/模型能力或无结果显式说明；跨studio来源不出现。"
+      ],
+      "t07_status": "implemented",
+      "t07_anchor": "knowledgetools.rs knowledge_search → search_in_scope（hybrid/fts；来源隔离 A13；无能力不伪造——pending_embedding/VECTOR_NOT_READY 显式降级；跨 notebook 不出现）",
+      "evidence": "rust-final-02.log / ts-final-02.log",
+      "current_status": "RELATED_SCENARIOS_PASS_NOT_WHOLE_LEAF_ACCEPTANCE",
+      "remaining": "完整原拒绝/错误矩阵未全重验；F09/F10/F11/F13/EX08保持开放，不能用F12关闭。",
+      "original_source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "self_execution": [
+        "a13_search_within_scope_returns_only_allowed_sources",
+        "a14_switching_to_incompatible_embedding_dimension_refuses_vector_channel_until_rebuild"
+      ],
+      "f12_share": "原件保护/缓存拒写及关联消费者的本项份额；不代表完整原叶通过"
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "-p",
+        "lingxi-adapters",
+        "--test",
+        "knowledge_store_r06t07",
+        "--test",
+        "r06_ar_f12_cache_preservation",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-adapters-final-01-22ptzmfn",
+      "start": 1791699730.477102,
+      "end": 1791699765.64967,
+      "exit_code": 0,
+      "log_sha256": "f1e2a6ae73a6e3cd012ea2b97003d3405d01a8f8924c591392355820b04aef0e",
+      "name": "adapters-final-01",
+      "start_time_utc": "2026-10-11T06:22:10.477102+00:00",
+      "end_time_utc": "2026-10-11T06:22:45.649670+00:00",
+      "candidate_aggregate": null,
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PRELIMINARY_OR_FORMAT01_SUPERSEDED"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "clippy",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "-p",
+        "lingxi-adapters",
+        "-p",
+        "lingxi-service",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-clippy-final-01-2a8r4niq",
+      "start": 1791700066.2685592,
+      "end": 1791700095.3092842,
+      "exit_code": 0,
+      "log_sha256": "bfe5ecce7caf8df265754570cb775b550158596af38d9cecddcf895e4aaf4734",
+      "name": "clippy-final-01",
+      "start_time_utc": "2026-10-11T06:27:46.268559+00:00",
+      "end_time_utc": "2026-10-11T06:28:15.309284+00:00",
+      "candidate_aggregate": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PASS_FINAL_CANDIDATE"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "--",
+        "rust/crates/lingxi-adapters/src/storage/knowledge.rs",
+        "rust/crates/lingxi-service/src/knowledge.rs",
+        "lib/knowledge/vector-index-adapter.ts",
+        "lib/knowledge/knowledge-index-store.ts",
+        "lib/knowledge/ann-index-store.ts",
+        "lib/knowledge/vector-search-backend-factory.ts"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-diff-final-01-hxp4zfwa",
+      "start": 1791700149.9933062,
+      "end": 1791700150.015218,
+      "exit_code": 0,
+      "log_sha256": "95b3a5c3471d929a5fb696b6106be775411e1cad0c35162eda1d9eaf28637a60",
+      "name": "diff-final-01",
+      "start_time_utc": "2026-10-11T06:29:09.993306+00:00",
+      "end_time_utc": "2026-10-11T06:29:10.015218+00:00",
+      "candidate_aggregate": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PASS_FINAL_CANDIDATE"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "fmt",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-fmt-final-01-9j50sfel",
+      "start": 1791699753.9926589,
+      "end": 1791699755.586029,
+      "exit_code": 1,
+      "log_sha256": "dfaba692d858ef174e4fd4798865baa31c19a4ba8f5c3b68ff9faf1f8fa42b4c",
+      "name": "fmt-final-01",
+      "start_time_utc": "2026-10-11T06:22:33.992659+00:00",
+      "end_time_utc": "2026-10-11T06:22:35.586029+00:00",
+      "candidate_aggregate": null,
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "FORMAT_EDITION_ERROR_FIXED_2021"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "fmt",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-fmt-final-02-2m_eny_a",
+      "start": 1791699870.016596,
+      "end": 1791699871.580231,
+      "exit_code": 0,
+      "log_sha256": "75c205370396261b897d9e37b526036d972c9c5cc770e78d9d7bde0654ebeebb",
+      "name": "fmt-final-02",
+      "start_time_utc": "2026-10-11T06:24:30.016596+00:00",
+      "end_time_utc": "2026-10-11T06:24:31.580231+00:00",
+      "candidate_aggregate": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PASS_FINAL_CANDIDATE"
+    },
+    {
+      "command": [
+        "node",
+        "artifacts/rust-tauri/R06/AR/W12-P01/query-window-green.mjs"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-green-query-01-nicc3nk6",
+      "start": 1791700005.7953222,
+      "end": 1791700005.923771,
+      "exit_code": 0,
+      "log_sha256": "cadc74fe3826418c7e4676821685e5f0a75455ba888a8c23c74109a98bedbc50",
+      "name": "green-query-01",
+      "start_time_utc": "2026-10-11T06:26:45.795322+00:00",
+      "end_time_utc": "2026-10-11T06:26:45.923771+00:00",
+      "candidate_aggregate": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+      "test_count": 2,
+      "fixture_hash": "5012e76eb2153ac983e3afce4026f0633ecfb4a92676eb3f1ab84e454ae4cb6b",
+      "fixture_hash_kind": "AFTER_EXECUTION_RETAINED_SYNTHETIC_FILES",
+      "status": "PASS_FINAL_CANDIDATE"
+    },
+    {
+      "command": [
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-green-probe-whie9hqi/status"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-green-status-01-pt3ppw7k",
+      "start": 1791699980.5405262,
+      "end": 1791699980.886776,
+      "exit_code": 0,
+      "log_sha256": "cdf1771f1757fefb53699c8ff78c25b2ce44b76e43ef43231116ba87c5ca8a13",
+      "name": "green-status-01",
+      "start_time_utc": "2026-10-11T06:26:20.540526+00:00",
+      "end_time_utc": "2026-10-11T06:26:20.886776+00:00",
+      "candidate_aggregate": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+      "test_count": 1,
+      "fixture_hash": "f4b7d92ea4e601bcb7ac22ddab0337a5638653034ef044e0ded97d7c9c393034",
+      "fixture_hash_kind": "AFTER_EXECUTION_RETAINED_SYNTHETIC_FILES",
+      "status": "PASS_FINAL_CANDIDATE"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/rustc",
+        "--edition=2021",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W12-P01/counter-old-status.rs",
+        "-L",
+        "dependency=/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent/rust/target/debug/deps",
+        "-o",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-green-probe-whie9hqi/status",
+        "--extern",
+        "lingxi_adapters=/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent/rust/target/debug/deps/liblingxi_adapters-d9475a2a244a855f.rlib",
+        "--extern",
+        "rusqlite=/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent/rust/target/debug/deps/librusqlite-a800f3cd28c2371e.rlib",
+        "--extern",
+        "lingxi_test_guard=/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent/rust/target/debug/deps/liblingxi_test_guard-f783bfb6840c426c.rlib"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-green-status-compile-01-8z5he5kk",
+      "start": 1791699980.261951,
+      "end": 1791699980.5001888,
+      "exit_code": 0,
+      "log_sha256": "c342084bcecc4eea6e4370e8eba866fe21b0797eb6418c62d90c0b7da0a2dcd6",
+      "name": "green-status-compile-01",
+      "start_time_utc": "2026-10-11T06:26:20.261951+00:00",
+      "end_time_utc": "2026-10-11T06:26:20.500189+00:00",
+      "candidate_aggregate": null,
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PRELIMINARY_OR_FORMAT01_SUPERSEDED"
+    },
+    {
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/knowledge-lifecycle.test.ts",
+        "--maxWorkers=1",
+        "--reporter=verbose"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-lifecycle-diagnose-01-tkbxwdfm",
+      "start": 1791699823.498661,
+      "end": 1791699826.458276,
+      "exit_code": 0,
+      "log_sha256": "6fc58f736b9aaa82783d1196bfcf61b84b4c953f81fe5c234d0634d032e540f0",
+      "name": "lifecycle-diagnose-01",
+      "start_time_utc": "2026-10-11T06:23:43.498661+00:00",
+      "end_time_utc": "2026-10-11T06:23:46.458276+00:00",
+      "candidate_aggregate": null,
+      "test_count": 16,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PRELIMINARY_OR_FORMAT01_SUPERSEDED"
+    },
+    {
+      "command": [
+        "npx",
+        "eslint",
+        "lib/knowledge/vector-index-adapter.ts",
+        "lib/knowledge/knowledge-index-store.ts",
+        "lib/knowledge/ann-index-store.ts",
+        "lib/knowledge/vector-search-backend-factory.ts",
+        "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+        "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+        "tests/r06-ar-f12-ann-cache-preservation.test.ts"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-lint-final-01-fu5mpb74",
+      "start": 1791699913.079363,
+      "end": 1791699914.296478,
+      "exit_code": 0,
+      "log_sha256": "bf66db39cce266ab156acc940089fe960e30f96167d3c7a0897a648186469824",
+      "name": "lint-final-01",
+      "start_time_utc": "2026-10-11T06:25:13.079363+00:00",
+      "end_time_utc": "2026-10-11T06:25:14.296478+00:00",
+      "candidate_aggregate": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PASS_FINAL_CANDIDATE"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.codex/worktrees/r06-w12-review/LingxiAgent/rust/target/debug/deps/r06_ar_f12_cache_preservation-12406c3bb45b46a5",
+        "--exact",
+        "positive_normal_cache_open_and_reopen",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-normal-before-01-3_xgh0_s",
+      "start": 1791699324.0185962,
+      "end": 1791699324.1100779,
+      "exit_code": 0,
+      "log_sha256": "e86361c0f269d016d684fbc79bc170de6479f2301485b76085f5a7b2a4fba38c",
+      "name": "normal-before-01",
+      "start_time_utc": "2026-10-11T06:15:24.018596+00:00",
+      "end_time_utc": "2026-10-11T06:15:24.110078+00:00",
+      "candidate_aggregate": null,
+      "test_count": 1,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PRELIMINARY_OR_FORMAT01_SUPERSEDED"
+    },
+    {
+      "command": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W12-R01/old-rust"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-old-open-rust-red-01-4ow0g1t7",
+      "start": 1791699898.15427,
+      "end": 1791699898.197088,
+      "exit_code": 101,
+      "log_sha256": "43ebebac7e74a7fd0118f24ece44109b6b31a9ccd5776372194e081bb9e7d313",
+      "name": "old-open-rust-red-01",
+      "start_time_utc": "2026-10-11T06:24:58.154270+00:00",
+      "end_time_utc": "2026-10-11T06:24:58.197088+00:00",
+      "candidate_aggregate": null,
+      "test_count": 1,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "EXPECTED_BEHAVIOR_CONTRACT_RED"
+    },
+    {
+      "command": [
+        "node",
+        "artifacts/rust-tauri/R06/AR/W12-P01/old-open-control.mjs"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-old-open-ts-green-01-sr2181u6",
+      "start": 1791699898.155669,
+      "end": 1791699898.284729,
+      "exit_code": 0,
+      "log_sha256": "326eeb7aab967608bf4164da173137bf6f032ef107f4ee3d320c4abe568accc6",
+      "name": "old-open-ts-green-01",
+      "start_time_utc": "2026-10-11T06:24:58.155669+00:00",
+      "end_time_utc": "2026-10-11T06:24:58.284729+00:00",
+      "candidate_aggregate": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+      "test_count": 1,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PASS_FINAL_CANDIDATE"
+    },
+    {
+      "command": [
+        "node",
+        "artifacts/rust-tauri/R06/AR/W12-P01/old-open-control.mjs"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-old-open-ts-red-01-5rnpsp03",
+      "start": 1791699888.940585,
+      "end": 1791699889.064641,
+      "exit_code": 1,
+      "log_sha256": "d9e9caefd2bd981315dc8a1ee2ef348b90bcf561f04d29472254df87e2bf7ef8",
+      "name": "old-open-ts-red-01",
+      "start_time_utc": "2026-10-11T06:24:48.940585+00:00",
+      "end_time_utc": "2026-10-11T06:24:49.064641+00:00",
+      "candidate_aggregate": null,
+      "test_count": 1,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "EXPECTED_BEHAVIOR_CONTRACT_RED"
+    },
+    {
+      "command": [
+        "node",
+        "artifacts/rust-tauri/R06/AR/W12-P01/counter-query-race.mjs"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-red-query-01-a9aifc0e",
+      "start": 1791699143.8897579,
+      "end": 1791699143.980843,
+      "exit_code": 1,
+      "log_sha256": "acf09d4d022c416cca626749c995561cbe9089c59c88c6f20a9d8b2f3d4bf049",
+      "name": "red-query-01",
+      "start_time_utc": "2026-10-11T06:12:23.889758+00:00",
+      "end_time_utc": "2026-10-11T06:12:23.980843+00:00",
+      "candidate_aggregate": null,
+      "test_count": 1,
+      "fixture_hash": "fc8b2da06322111ad8fe3c227afab9ae88b5283ea01cf55bd227a26cb850d730",
+      "fixture_hash_kind": "AFTER_EXECUTION_RETAINED_SYNTHETIC_FILES",
+      "status": "EXPECTED_BEHAVIOR_CONTRACT_RED"
+    },
+    {
+      "command": [
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-probe-gni2k67f/counter-old-status"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-red-status-01-gy81k6fh",
+      "start": 1791699153.824955,
+      "end": 1791699154.3354812,
+      "exit_code": 101,
+      "log_sha256": "2174c98e8f451a9c582d77d41cbe70c8f504480e816f7a99fab174b5b4ef58b2",
+      "name": "red-status-01",
+      "start_time_utc": "2026-10-11T06:12:33.824955+00:00",
+      "end_time_utc": "2026-10-11T06:12:34.335481+00:00",
+      "candidate_aggregate": null,
+      "test_count": 1,
+      "fixture_hash": "ae81fb8fd6be0ede3e24612b95fbef34c28e7c63334852c95c3c83da2b9af878",
+      "fixture_hash_kind": "AFTER_EXECUTION_RETAINED_SYNTHETIC_FILES",
+      "status": "EXPECTED_BEHAVIOR_CONTRACT_RED"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/rustc",
+        "--edition=2024",
+        "artifacts/rust-tauri/R06/AR/W12-P01/counter-old-status.rs",
+        "-L",
+        "dependency=/Users/study_superior/.codex/worktrees/r06-w12-review/LingxiAgent/rust/target/debug/deps",
+        "-o",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-probe-gni2k67f/counter-old-status",
+        "--extern",
+        "lingxi_adapters=/Users/study_superior/.codex/worktrees/r06-w12-review/LingxiAgent/rust/target/debug/deps/liblingxi_adapters-8728dbcc3927ad07.rlib",
+        "--extern",
+        "rusqlite=/Users/study_superior/.codex/worktrees/r06-w12-review/LingxiAgent/rust/target/debug/deps/librusqlite-a800f3cd28c2371e.rlib",
+        "--extern",
+        "lingxi_test_guard=/Users/study_superior/.codex/worktrees/r06-w12-review/LingxiAgent/rust/target/debug/deps/liblingxi_test_guard-f783bfb6840c426c.rlib"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-red-status-compile-01-oxl05bxl",
+      "start": 1791699153.2025821,
+      "end": 1791699153.7900531,
+      "exit_code": 0,
+      "log_sha256": "4e6ddedc29de95ca7bd59764d804fd6d504d4cd06b0b827161e03aec3888089d",
+      "name": "red-status-compile-01",
+      "start_time_utc": "2026-10-11T06:12:33.202582+00:00",
+      "end_time_utc": "2026-10-11T06:12:33.790053+00:00",
+      "candidate_aggregate": null,
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PRELIMINARY_OR_FORMAT01_SUPERSEDED"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/rust-tauri/r02_registry_consistency.py"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-registry-01-twfuceod",
+      "start": 1791699643.350239,
+      "end": 1791699643.399331,
+      "exit_code": 1,
+      "log_sha256": "9f6b8f7e902a7e01b5e4ad2ae15f569c29dba75b62c51631eda82e0e9c8d0d0d",
+      "name": "registry-01",
+      "start_time_utc": "2026-10-11T06:20:43.350239+00:00",
+      "end_time_utc": "2026-10-11T06:20:43.399331+00:00",
+      "candidate_aggregate": null,
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "EXISTING_OTHER_TASK_F14_FAIL"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "-p",
+        "lingxi-adapters",
+        "--test",
+        "knowledge_store_r06t07",
+        "--test",
+        "r06_ar_f12_cache_preservation",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f12_cache_consumers",
+        "--test",
+        "r06_t07_knowledge",
+        "--test",
+        "r06_t07_knowledge_tools",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-rust-final-02-z4o1_nzg",
+      "start": 1791699870.016596,
+      "end": 1791700056.387254,
+      "exit_code": 0,
+      "log_sha256": "cd335e530b0a6bb642f13f7ec03e5015dd93250586167868f311d942af0b75bb",
+      "name": "rust-final-02",
+      "start_time_utc": "2026-10-11T06:24:30.016596+00:00",
+      "end_time_utc": "2026-10-11T06:27:36.387254+00:00",
+      "candidate_aggregate": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+      "test_count": 51,
+      "fixture_hash": "b8f3d3de4b0e1a93ab02a3bba8719a4ab36e8aa19509a0655ef879bd5a2a6f35",
+      "fixture_hash_kind": "AFTER_EXECUTION_RETAINED_SYNTHETIC_FILES",
+      "status": "PASS_FINAL_CANDIDATE",
+      "test_suites": [
+        {
+          "name": "knowledge_store_r06t07",
+          "top_level_passed": 9,
+          "failed": 0
+        },
+        {
+          "name": "r06_ar_f12_cache_preservation",
+          "top_level_passed": 19,
+          "failed": 0
+        },
+        {
+          "name": "r06_ar_f12_cache_consumers",
+          "top_level_passed": 6,
+          "failed": 0
+        },
+        {
+          "name": "r06_t07_knowledge",
+          "top_level_passed": 11,
+          "failed": 0
+        },
+        {
+          "name": "r06_t07_knowledge_tools",
+          "top_level_passed": 6,
+          "failed": 0
+        }
+      ],
+      "child_helper_count_note": "19注册包括3个仅环境启用的helper；16父场景及真实child执行。子进程额外结果不重复加顶层数量。"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "-p",
+        "lingxi-adapters",
+        "--test",
+        "r06_ar_f12_cache_preservation",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f12_cache_consumers",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-rust-new-01-gvovt_ql",
+      "start": 1791699272.347733,
+      "end": 1791699432.850013,
+      "exit_code": 0,
+      "log_sha256": "97c9594344ccfb7044587470eeef713efada1999d36635e9dcc278a5e1f4967e",
+      "name": "rust-new-01",
+      "start_time_utc": "2026-10-11T06:14:32.347733+00:00",
+      "end_time_utc": "2026-10-11T06:17:12.850013+00:00",
+      "candidate_aggregate": null,
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PRELIMINARY_OR_FORMAT01_SUPERSEDED"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f12_cache_consumers",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-rust-new-02-8cwrxpt6",
+      "start": 1791699502.9947782,
+      "end": 1791699522.3705542,
+      "exit_code": 101,
+      "log_sha256": "6b242b7882d7891670231b567798e970a11e4f4022612b23b34381f2be3b22c2",
+      "name": "rust-new-02",
+      "start_time_utc": "2026-10-11T06:18:22.994778+00:00",
+      "end_time_utc": "2026-10-11T06:18:42.370554+00:00",
+      "candidate_aggregate": null,
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "TEST_FIXTURE_QUERY_ERROR_FIXED_WITHOUT_WEAKENING_ASSERTIONS"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f12_cache_consumers",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-rust-new-03-gkw8oqwe",
+      "start": 1791699547.326546,
+      "end": 1791699554.912456,
+      "exit_code": 101,
+      "log_sha256": "b5837a2c1e730695d2254cfac13f158cd84a25d35601f7b15489a02b0a066598",
+      "name": "rust-new-03",
+      "start_time_utc": "2026-10-11T06:19:07.326546+00:00",
+      "end_time_utc": "2026-10-11T06:19:14.912456+00:00",
+      "candidate_aggregate": null,
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "TEST_FIXTURE_QUERY_ERROR_FIXED_WITHOUT_WEAKENING_ASSERTIONS"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f12_cache_consumers",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-rust-new-04-_dfubwwo",
+      "start": 1791699573.574451,
+      "end": 1791699580.929616,
+      "exit_code": 0,
+      "log_sha256": "673c10f8f663a9443b762b1456dedb137f22895f3d9c00dd14da4b95fee18378",
+      "name": "rust-new-04",
+      "start_time_utc": "2026-10-11T06:19:33.574451+00:00",
+      "end_time_utc": "2026-10-11T06:19:40.929616+00:00",
+      "candidate_aggregate": null,
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PRELIMINARY_OR_FORMAT01_SUPERSEDED"
+    },
+    {
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+        "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+        "tests/r06-ar-f12-ann-cache-preservation.test.ts",
+        "tests/knowledge-index-metadata-migration.test.ts",
+        "tests/knowledge-section-index.test.ts",
+        "tests/knowledge-query-index-separation.test.ts",
+        "tests/knowledge-query-config-alignment.test.ts",
+        "tests/knowledge-vector-index.test.ts",
+        "tests/knowledge-vector-backend-parity.test.ts",
+        "tests/knowledge-vector-backend-fallback.test.ts",
+        "tests/knowledge-vector-shutdown.test.ts",
+        "tests/knowledge-ann-crash-recovery.test.ts",
+        "tests/knowledge-ann-rebuild.test.ts",
+        "tests/knowledge-index-metadata-backfill.test.ts",
+        "tests/knowledge-index-variants.test.ts",
+        "tests/knowledge-ann-index-store.test.ts",
+        "tests/knowledge-ingestion.test.ts",
+        "tests/knowledge-lifecycle.test.ts",
+        "--maxWorkers=1"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-ts-family-01-a_5tf41o",
+      "start": 1791699333.364367,
+      "end": 1791699366.170411,
+      "exit_code": 0,
+      "log_sha256": "ef7b546234fdd984b10f56ebff3526b8683e61a373f1e3a097c51ee1351df39a",
+      "name": "ts-family-01",
+      "start_time_utc": "2026-10-11T06:15:33.364367+00:00",
+      "end_time_utc": "2026-10-11T06:16:06.170411+00:00",
+      "candidate_aggregate": null,
+      "test_count": 117,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PRELIMINARY_OR_FORMAT01_SUPERSEDED"
+    },
+    {
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+        "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+        "tests/r06-ar-f12-ann-cache-preservation.test.ts",
+        "tests/knowledge-index-metadata-migration.test.ts",
+        "tests/knowledge-section-index.test.ts",
+        "tests/knowledge-query-index-separation.test.ts",
+        "tests/knowledge-query-config-alignment.test.ts",
+        "tests/knowledge-vector-index.test.ts",
+        "tests/knowledge-vector-backend-parity.test.ts",
+        "tests/knowledge-vector-backend-fallback.test.ts",
+        "tests/knowledge-vector-shutdown.test.ts",
+        "tests/knowledge-ann-crash-recovery.test.ts",
+        "tests/knowledge-ann-rebuild.test.ts",
+        "tests/knowledge-index-metadata-backfill.test.ts",
+        "tests/knowledge-index-variants.test.ts",
+        "tests/knowledge-ann-index-store.test.ts",
+        "tests/knowledge-ingestion.test.ts",
+        "tests/knowledge-lifecycle.test.ts",
+        "--maxWorkers=1"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-ts-final-01-vpf4rje4",
+      "start": 1791699730.4810638,
+      "end": 1791699763.7068212,
+      "exit_code": 1,
+      "log_sha256": "5503a20fd959ab8e294ebf34737052a5a208306d2a8bb54279b9b7bd5e351c1a",
+      "name": "ts-final-01",
+      "start_time_utc": "2026-10-11T06:22:10.481064+00:00",
+      "end_time_utc": "2026-10-11T06:22:43.706821+00:00",
+      "candidate_aggregate": null,
+      "test_count": 118,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "REAL_TIMEOUT_FAIL_PRESERVED_SUPERSEDED_BY_WHOLE_SUITE_TS_FINAL_02"
+    },
+    {
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+        "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+        "tests/r06-ar-f12-ann-cache-preservation.test.ts",
+        "tests/knowledge-index-metadata-migration.test.ts",
+        "tests/knowledge-section-index.test.ts",
+        "tests/knowledge-query-index-separation.test.ts",
+        "tests/knowledge-query-config-alignment.test.ts",
+        "tests/knowledge-vector-index.test.ts",
+        "tests/knowledge-vector-backend-parity.test.ts",
+        "tests/knowledge-vector-backend-fallback.test.ts",
+        "tests/knowledge-vector-shutdown.test.ts",
+        "tests/knowledge-ann-crash-recovery.test.ts",
+        "tests/knowledge-ann-rebuild.test.ts",
+        "tests/knowledge-index-metadata-backfill.test.ts",
+        "tests/knowledge-index-variants.test.ts",
+        "tests/knowledge-ann-index-store.test.ts",
+        "tests/knowledge-ingestion.test.ts",
+        "tests/knowledge-lifecycle.test.ts",
+        "--maxWorkers=1"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-ts-final-02-06x1x94p",
+      "start": 1791700038.741003,
+      "end": 1791700067.588032,
+      "exit_code": 0,
+      "log_sha256": "c0207833e8d6a9c875a227fd02df876c1b92da1c249af61585a2aae570c967e0",
+      "name": "ts-final-02",
+      "start_time_utc": "2026-10-11T06:27:18.741003+00:00",
+      "end_time_utc": "2026-10-11T06:27:47.588032+00:00",
+      "candidate_aggregate": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+      "test_count": 118,
+      "fixture_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "fixture_hash_kind": "AFTER_EXECUTION_RETAINED_SYNTHETIC_FILES",
+      "status": "PASS_FINAL_CANDIDATE"
+    },
+    {
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+        "--maxWorkers=1"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-ts-new-01-fwsuwh7x",
+      "start": 1791699262.2311091,
+      "end": 1791699265.133307,
+      "exit_code": 1,
+      "log_sha256": "2bfa148b1a2547f6589c05c8567f148b28562c4af43e7aacd037c082021f13b3",
+      "name": "ts-new-01",
+      "start_time_utc": "2026-10-11T06:14:22.231109+00:00",
+      "end_time_utc": "2026-10-11T06:14:25.133307+00:00",
+      "candidate_aggregate": null,
+      "test_count": 14,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "TEST_INSTRUMENTATION_ERROR_FIXED_READONLY_PROPERTY"
+    },
+    {
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+        "--maxWorkers=1"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-ts-new-02-9u5vj6k6",
+      "start": 1791699281.928391,
+      "end": 1791699286.9754229,
+      "exit_code": 0,
+      "log_sha256": "669642e315c5357518fb6a9d975feab908723a89b8d4a195f167ca00d92c1fd8",
+      "name": "ts-new-02",
+      "start_time_utc": "2026-10-11T06:14:41.928391+00:00",
+      "end_time_utc": "2026-10-11T06:14:46.975423+00:00",
+      "candidate_aggregate": null,
+      "test_count": 14,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PRELIMINARY_OR_FORMAT01_SUPERSEDED"
+    },
+    {
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+        "--maxWorkers=1"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-ts-new-03-8l8fqjea",
+      "start": 1791699410.5156229,
+      "end": 1791699415.125216,
+      "exit_code": 0,
+      "log_sha256": "7b28af22f15858e612873940e9339c2634a7955c80371aa11c847fbdc594ff62",
+      "name": "ts-new-03",
+      "start_time_utc": "2026-10-11T06:16:50.515623+00:00",
+      "end_time_utc": "2026-10-11T06:16:55.125216+00:00",
+      "candidate_aggregate": null,
+      "test_count": 15,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PRELIMINARY_OR_FORMAT01_SUPERSEDED"
+    },
+    {
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+        "--maxWorkers=1"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-ts-new-04-opt1qxf2",
+      "start": 1791699527.842825,
+      "end": 1791699535.258959,
+      "exit_code": 0,
+      "log_sha256": "908ac41f750447ac090eaf65487218519ffdca52ec6b03726d451cce6a0e811a",
+      "name": "ts-new-04",
+      "start_time_utc": "2026-10-11T06:18:47.842825+00:00",
+      "end_time_utc": "2026-10-11T06:18:55.258959+00:00",
+      "candidate_aggregate": null,
+      "test_count": 15,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PRELIMINARY_OR_FORMAT01_SUPERSEDED"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-typecheck-01-mk4irxcd",
+      "start": 1791699333.3643699,
+      "end": 1791699359.793452,
+      "exit_code": 0,
+      "log_sha256": "db55e77f64d1824e4a3ac6b02602f4034dc20b4af424b00ea0c9888a1f2f218d",
+      "name": "typecheck-01",
+      "start_time_utc": "2026-10-11T06:15:33.364370+00:00",
+      "end_time_utc": "2026-10-11T06:15:59.793452+00:00",
+      "candidate_aggregate": null,
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PRELIMINARY_OR_FORMAT01_SUPERSEDED"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-typecheck-final-01-hh7ek6r2",
+      "start": 1791699730.477103,
+      "end": 1791699757.5364249,
+      "exit_code": 0,
+      "log_sha256": "7d2051a3ea83273697b04915b45ac6f1722aad7ff9be8cabdb033b017e68c18a",
+      "name": "typecheck-final-01",
+      "start_time_utc": "2026-10-11T06:22:10.477103+00:00",
+      "end_time_utc": "2026-10-11T06:22:37.536425+00:00",
+      "candidate_aggregate": null,
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PRELIMINARY_OR_FORMAT01_SUPERSEDED"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+      "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-typecheck-final-02-4_nj0671",
+      "start": 1791700079.006277,
+      "end": 1791700107.471814,
+      "exit_code": 0,
+      "log_sha256": "0a1c35aef4a4c903b7b0099dea7151f9f5cb8d7c238ffb1dc0b0219e8c086ae1",
+      "name": "typecheck-final-02",
+      "start_time_utc": "2026-10-11T06:27:59.006277+00:00",
+      "end_time_utc": "2026-10-11T06:28:27.471814+00:00",
+      "candidate_aggregate": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+      "test_count": null,
+      "fixture_hash": null,
+      "fixture_hash_kind": null,
+      "status": "PASS_FINAL_CANDIDATE"
+    }
+  ],
+  "rust_executables": [
+    {
+      "test_suite": "knowledge_store_r06t07",
+      "path": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent/rust/target/debug/deps/knowledge_store_r06t07-0cbb88bd577147fb",
+      "sha256": "8e3fb98e19436cfa2a4c854f0548fd0382b2818fdab491b8580edcf196625331",
+      "bytes": 7037864
+    },
+    {
+      "test_suite": "r06_ar_f12_cache_preservation",
+      "path": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent/rust/target/debug/deps/r06_ar_f12_cache_preservation-0adeb7f2ac6b53e6",
+      "sha256": "e241f6825088973e6c6bc188b4c054301a9521b6294c06b3349e3149fad80532",
+      "bytes": 6541744
+    },
+    {
+      "test_suite": "r06_ar_f12_cache_consumers",
+      "path": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent/rust/target/debug/deps/r06_ar_f12_cache_consumers-b74a500b19beb910",
+      "sha256": "ff480e325c2e2f867dbde6158a8193ad02857d63bf4035f959ff228c6193507b",
+      "bytes": 18195176
+    },
+    {
+      "test_suite": "r06_t07_knowledge",
+      "path": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent/rust/target/debug/deps/r06_t07_knowledge-7ae0f9c2623b291a",
+      "sha256": "9651e6d21d0f643df254573c9bcf03bea37bb6f435438b5e17e75123f1d27cc5",
+      "bytes": 84889200
+    },
+    {
+      "test_suite": "r06_t07_knowledge_tools",
+      "path": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent/rust/target/debug/deps/r06_t07_knowledge_tools-98f7b4f145bdffc7",
+      "sha256": "ce1ada18366c8b7e8ad789aedd2c0cad32d5f97374f7e0a3b11d39793c0c7edc",
+      "bytes": 84826232
+    }
+  ],
+  "test_preservation": "test-preservation.json:旧名称零删除；adapter74→78/service11→29/vector37→68断言计数，仅新增；全文26与ANN14保持。该统计只是辅助，不能替代语义测试。",
+  "added_product_files": [],
+  "added_test_files": [],
+  "added_tests_in_existing_files": {
+    "rust/crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs": 4,
+    "tests/r06-ar-f12-vector-cache-preservation.test.ts": 6,
+    "rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs": "原19登记不减，旧句柄例加status/replace断言"
+  },
+  "historical_failures": [
+    "ts-new-01真实调度包装只读属性赋值错误，修包装后不改SQL/断言；日志保留",
+    "rust-new-02/03新测试SQL误读列名及时间夹具碰撞，真实schema核对/独立AtomicUsize后保留64paid断言和原2消费者断言",
+    "fmt-final-01错误edition2024，只有owned四Rust文件按工作区2021重排；旧freeze和binding保留",
+    "ts-final-01完整18suite真实1生命周期4秒等待超时；未改该测试/源码/超时。单套16诊断绿后完整18suite118 final02绿，旧整套红保留。",
+    "最初main并行候选早期绿不作最终证据，format01隔离早期绿亦SUPERSEDED。",
+    "registry-01实际F14失败9 migration vs7 registry/v8v9缺项，未修改"
+  ],
+  "impact": {
+    "STALE": [
+      "W12-E01及W12-R01旧11候选结论不适用于当前hash",
+      "format01四C/早期main成绩不作为当前最终通过",
+      "先前知识service consumers/A13/A14对应hash证据随此次变化过期，已在final02限定份额亲重验",
+      "后续F09/F10/F11/F13/EX08改相同写链将使当前相应C/消费者/引用回归STALE，需重跑"
+    ],
+    "unmodified_W02_W06": "未写其owned/Cargo/lib/migrations；最终候选固定base+精确11，未借本结果关闭它们",
+    "R02_R05": "没有修改核心状态机、凭证、网关或迁移。A13/A14经真实R04/R05调用，但未执行全正式前序闭包。"
+  },
+  "remaining_scope": [
+    "F09批次/费用/进度与真正续嵌",
+    "F10动态embedding身份与同维度换模型",
+    "F11取消/归属/usage/迟到写",
+    "F13真实聊天自动scope",
+    "EX08删除生命周期、事实purge文件错误及跨库原子性",
+    "F14正式门禁/迁移登记",
+    "全部R00完整拒绝矩阵/refresh changed-unchanged等完整原叶"
+  ],
+  "not_run": [
+    "全新独立ReviewerR02",
+    "Windows/Linux原生",
+    "真实供应商/付费/外发",
+    "真实用户数据与旧资料迁移",
+    "物理断电",
+    "全部R02-R05正式闭包",
+    "R06正式完整门禁"
+  ],
+  "data_boundary": {
+    "only_synthetic_homes": true,
+    "only_loopback_external_responses": true,
+    "storage_mock": false,
+    "real_user_data": false,
+    "git_write": false,
+    "settings_write": false,
+    "settings_sha256": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3",
+    "new_product_files": false
+  },
+  "cleanup": "实际命令/HTTP替身与child已终止或已等待；无detach/setsid/隐藏后台。探针binary仅临时目录SHA绑定，证据不复制整源/.git/buildcache。",
+  "delivery_binding_check": "delivery-binding-check.json",
+  "binary_hash_capture_note": "final-binding为完整实际运行结束后hash；本记录在交接前再次核同五个binary无变化。没有宣称在Cargo编译后、首次执行前自动抓到hash。",
+  "repair_dispatch_status": "READY_FOR_INDEPENDENT_REREVIEW"
+}

@@ -1,0 +1,14 @@
+
+running 1 test
+test c02_failed_checkpoint_resumes_only_gaps ... 2026-10-12T05:45:34.976136Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_8c4c205a814b46b8135f1015 error=KNOWLEDGE_MODEL_UNAVAILABLE: provider returned HTTP 400 Bad Request: {"data":null,"error":{"message":"W09 external injected failure"}}
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f09-f13/F09/home/lingxi-r06-ar-w09-failed-2-85735-1791783934703278000 previousInstanceId=e546c76c863d87c402a8cb99740be363 previousPid=85737 previousStartNonce=2ee3084d2b76cd04 previousStartedAtUnixMs=1791783934710 handshakeMismatches=none
+2026-10-12T05:45:35.030914Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/Users/[user][token][user]/lingxi-service/instance.stale.json
+W09 c02-failed-2: 原始请求与数据库收据已写入独立证据
+2026-10-12T05:45:35.711502Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_f52bf8863fd7f8c34a533ed1 error=KNOWLEDGE_MODEL_UNAVAILABLE: provider returned HTTP 400 Bad Request: {"data":null,"error":{"message":"W09 external injected failure"}}
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f09-f13/F09/home/lingxi-r06-ar-w09-failed-3-85735-1791783935413299000 previousInstanceId=b8c578595b28e52f998ef6092bf7cf40 previousPid=85751 previousStartNonce=7f7c6c3ca9553b4c previousStartedAtUnixMs=1791783935422 handshakeMismatches=none
+2026-10-12T05:45:35.861824Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/Users/[user][token][user]/lingxi-service/instance.stale.json
+W09 c02-failed-3: 原始请求与数据库收据已写入独立证据
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 15 filtered out; finished in 1.41s
+

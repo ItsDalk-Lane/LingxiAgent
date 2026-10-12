@@ -1,0 +1,17 @@
+{
+  "cwd": "/Users/study_superior/.codex/worktrees/r06-w10-execution",
+  "argv": [
+    "python3",
+    "scripts/rust-tauri/r02_registry_consistency.py"
+  ],
+  "start": "2026-10-11T08:59:04.919639+00:00",
+  "source_before": {},
+  "environment": {
+    "LINGXI_HOME": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W10-E01/commands/registry-baseline/synthetic-home",
+    "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w10-execution/rust/target",
+    "TEST_MEM_LIMIT_MB": "8192",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "LINGXI_TEST_GUARD": "1"
+  },
+  "memory_measured_mb": null
+}

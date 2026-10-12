@@ -207,7 +207,10 @@ pub fn estimate_exchange_item_tokens(item: &ExchangeItem) -> u64 {
             }
             tokens
         }
-        ExchangeItem::CompactionInstruction { text } => u64::from(estimate_text_tokens(text)),
+        ExchangeItem::CompactionInstruction { text } | ExchangeItem::UserTurn { text } => {
+            u64::from(estimate_text_tokens(text))
+        }
+        ExchangeItem::CurrentSubmission => 0,
     }
 }
 
@@ -580,7 +583,10 @@ pub fn plan_compaction(
                 }
                 *answered_calls.entry(tool_call_id.as_str()).or_insert(0) += 1;
             }
-            ExchangeItem::AssistantTurn { .. } | ExchangeItem::CompactionSummary { .. } => {}
+            ExchangeItem::AssistantTurn { .. }
+            | ExchangeItem::CompactionSummary { .. }
+            | ExchangeItem::UserTurn { .. }
+            | ExchangeItem::CurrentSubmission => {}
             ExchangeItem::CompactionInstruction { .. } => {
                 return Err(CompactionPlanError::UnprovableToolPairs {
                     detail: "a compaction instruction item must never enter a live exchange"
@@ -610,7 +616,10 @@ pub fn plan_compaction(
     let valid_cut = |index: usize| -> bool {
         matches!(
             exchange[index],
-            ExchangeItem::AssistantTurn { .. } | ExchangeItem::CompactionSummary { .. }
+            ExchangeItem::AssistantTurn { .. }
+                | ExchangeItem::CompactionSummary { .. }
+                | ExchangeItem::UserTurn { .. }
+                | ExchangeItem::CurrentSubmission
         ) && index > 0
     };
 
@@ -657,7 +666,12 @@ pub fn plan_compaction(
     // 组必须整体保留；(c) 保留区无孤儿 tool result（owner 同区）。三个
     // 条件在 [1, crossing] 上从后向前取第一个全满足的候选；一个都没有 =
     // 没有安全切点（Ok(None)，宁可不压，绝不制造孤立 result）。
-    let pending_bound = earliest_pending.unwrap_or(usize::MAX);
+    // 当前目标不能被摘要移走，输入位置必须仍在保留后缀。
+    let current_bound = exchange
+        .iter()
+        .position(|item| matches!(item, ExchangeItem::CurrentSubmission))
+        .unwrap_or(usize::MAX);
+    let pending_bound = earliest_pending.unwrap_or(usize::MAX).min(current_bound);
     let cut = (1..=crossing).rev().find(|index| {
         *index <= pending_bound && valid_cut(*index) && retained_has_no_orphans(*index)
     });

@@ -1,0 +1,120 @@
+{
+  "argv": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-typecheck-main-01-jz8j6klr",
+  "start_utc": "2026-10-11T07:08:05.509058+00:00",
+  "candidate": {
+    "owned": [
+      {
+        "path": "rust/crates/lingxi-adapters/src/storage/knowledge.rs",
+        "sha256": "7ae7e5695cb17876dae58fbc8f9de1484e48ea88033e2cc7d9910ba45392bb73"
+      },
+      {
+        "path": "rust/crates/lingxi-service/src/knowledge.rs",
+        "sha256": "3f98131c88c8c1c1945a87752f1702d2cfb75ffdf2454e0d88d4554edbd3c370"
+      },
+      {
+        "path": "lib/knowledge/vector-index-adapter.ts",
+        "sha256": "33bfb74fb7b6450bebf972ede91a8d3442ce7f8baf629813bcd49c6eb65525c7"
+      },
+      {
+        "path": "lib/knowledge/knowledge-index-store.ts",
+        "sha256": "81322defc4c3f5693efefd87939e7e4068d1d27b81d68da43699f2d534dc43e2"
+      },
+      {
+        "path": "lib/knowledge/ann-index-store.ts",
+        "sha256": "9297282eb1609a850aadec2bd8044351897791bf22c8fe80ce4580d27a547ac9"
+      },
+      {
+        "path": "lib/knowledge/vector-search-backend-factory.ts",
+        "sha256": "54aeefa97965fe574859085616cc74070405489cce5557c2f29abb406fb2d74d"
+      },
+      {
+        "path": "rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs",
+        "sha256": "3217e11067c0ee833ad8e47c9b53916ed44594c279ce7bc8e24cedba466c5bbd"
+      },
+      {
+        "path": "rust/crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs",
+        "sha256": "bd4b3d7b711e20aac3e56e4ca87b632bb804e4f265eedd0bfd2be218ad0e17e0"
+      },
+      {
+        "path": "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+        "sha256": "5eb1a93524ce4eabf542229f7c68e960b37b8062f908eaf29596721b8908b773"
+      },
+      {
+        "path": "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+        "sha256": "9973a3161d4d4bf7cf7ed4f079fdd45b22b1616be69d7408c1054f2bebbd6f59"
+      },
+      {
+        "path": "tests/r06-ar-f12-ann-cache-preservation.test.ts",
+        "sha256": "9eab3eb62a547a9753557b735305a7c411744755dc033a3e95bbc7396faa35e7"
+      }
+    ],
+    "aggregate": "3fad8810e2e31e7f4f884775d26ab01224638815f8d49709adb36446441eb030",
+    "lock_sha256": "bd7c0082ca055cec4b0b3cdedb78a186a39270d0cef3b83651065bd9b2e3f3c1"
+  },
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "target": null,
+  "guard": "8192MiB/600s+parent600s",
+  "executable": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/npm",
+  "executable_sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+  "mock_boundary": "Only loopback embedding provider responses; actual SQLite/storage/worker/gateway/messages",
+  "end_utc": "2026-10-11T07:08:29.725413+00:00",
+  "exit_code": 0,
+  "log_sha256": "6525c05b419c2b9cd6f6ea24e3adc47a46fb1a10debf2bdab86d1279cf6979a3",
+  "candidate_after": {
+    "owned": [
+      {
+        "path": "rust/crates/lingxi-adapters/src/storage/knowledge.rs",
+        "sha256": "7ae7e5695cb17876dae58fbc8f9de1484e48ea88033e2cc7d9910ba45392bb73"
+      },
+      {
+        "path": "rust/crates/lingxi-service/src/knowledge.rs",
+        "sha256": "3f98131c88c8c1c1945a87752f1702d2cfb75ffdf2454e0d88d4554edbd3c370"
+      },
+      {
+        "path": "lib/knowledge/vector-index-adapter.ts",
+        "sha256": "33bfb74fb7b6450bebf972ede91a8d3442ce7f8baf629813bcd49c6eb65525c7"
+      },
+      {
+        "path": "lib/knowledge/knowledge-index-store.ts",
+        "sha256": "81322defc4c3f5693efefd87939e7e4068d1d27b81d68da43699f2d534dc43e2"
+      },
+      {
+        "path": "lib/knowledge/ann-index-store.ts",
+        "sha256": "9297282eb1609a850aadec2bd8044351897791bf22c8fe80ce4580d27a547ac9"
+      },
+      {
+        "path": "lib/knowledge/vector-search-backend-factory.ts",
+        "sha256": "54aeefa97965fe574859085616cc74070405489cce5557c2f29abb406fb2d74d"
+      },
+      {
+        "path": "rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs",
+        "sha256": "3217e11067c0ee833ad8e47c9b53916ed44594c279ce7bc8e24cedba466c5bbd"
+      },
+      {
+        "path": "rust/crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs",
+        "sha256": "bd4b3d7b711e20aac3e56e4ca87b632bb804e4f265eedd0bfd2be218ad0e17e0"
+      },
+      {
+        "path": "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+        "sha256": "5eb1a93524ce4eabf542229f7c68e960b37b8062f908eaf29596721b8908b773"
+      },
+      {
+        "path": "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+        "sha256": "9973a3161d4d4bf7cf7ed4f079fdd45b22b1616be69d7408c1054f2bebbd6f59"
+      },
+      {
+        "path": "tests/r06-ar-f12-ann-cache-preservation.test.ts",
+        "sha256": "9eab3eb62a547a9753557b735305a7c411744755dc033a3e95bbc7396faa35e7"
+      }
+    ],
+    "aggregate": "3fad8810e2e31e7f4f884775d26ab01224638815f8d49709adb36446441eb030",
+    "lock_sha256": "bd7c0082ca055cec4b0b3cdedb78a186a39270d0cef3b83651065bd9b2e3f3c1"
+  },
+  "home_files": []
+}

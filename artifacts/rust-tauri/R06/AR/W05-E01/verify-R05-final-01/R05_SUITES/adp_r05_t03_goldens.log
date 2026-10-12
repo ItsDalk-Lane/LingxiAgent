@@ -1,0 +1,12 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.12s
+     Running tests/r05_t03_goldens.rs (rust/target-w05-e01/debug/deps/r05_t03_goldens-d3df2f6a13b8d061)
+LINGXI_TEST_GUARD: armed (pid 7669, mem_limit=8192 MB, time_limit=600 s)
+
+running 3 tests
+test forward_and_roundtrip_goldens_render_and_parse_exactly ... ok
+test the_golden_set_covers_five_families_times_three_cases ... ok
+test error_goldens_classify_and_transport_exactly ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

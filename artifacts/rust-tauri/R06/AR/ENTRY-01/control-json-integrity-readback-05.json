@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-11T13:10:13.876574+00:00",
+  "role": "ROOT_CONTROL_AND_USER_FILE_INTEGRITY_ONLY",
+  "strict_unique_json_parsed": [
+    "AR_PROGRESS.json",
+    "AR_ISSUE_MATRIX.json",
+    "AR_ORIGINAL_OBLIGATIONS.json"
+  ],
+  "issue_count": 15,
+  "required_base_check_count": 60,
+  "unique_actor_count": 27,
+  "closed_count": 1,
+  "open_count": 14,
+  "current_status": "R06_NOT_ACCEPTED",
+  "actual_HEAD": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "index": [],
+  "initial_user_settings_sha256": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3",
+  "freeGiB": 18.84,
+  "behavior_tests": "NOT_RUN_BY_CONTROL_INTEGRITY",
+  "scope": "Only structure/counts/current protection readback; not all affected source or behavior acceptance"
+}

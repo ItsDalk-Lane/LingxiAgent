@@ -1,0 +1,39 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "openrouter",
+  "case": "low-level-maps-low-and-reasoning-is-normalized",
+  "model": {
+    "provider": "openrouter",
+    "id": "anthropic/claude-opus-5",
+    "baseUrl": "https://openrouter.ai/api/v1",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "anthropic/claude-opus-5",
+    "messages": [],
+    "reasoning": {
+      "effort": "low",
+      "max_tokens": 1000,
+      "exclude": true
+    }
+  },
+  "options": {
+    "mode": "chat",
+    "reasoningLevel": "low"
+  },
+  "expected": {
+    "thinkingFormat": "openrouter",
+    "reasoningProfile": "openrouter-anthropic-adaptive",
+    "matched": "openrouter",
+    "result": {
+      "model": "anthropic/claude-opus-5",
+      "messages": [],
+      "reasoning": {
+        "exclude": true,
+        "enabled": true
+      },
+      "verbosity": "low"
+    }
+  }
+}

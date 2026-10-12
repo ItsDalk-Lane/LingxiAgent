@@ -1,0 +1,423 @@
+[
+  {
+    "id": "W15-R01-F01",
+    "title": "完整原范围仍未满足",
+    "violatedOriginalClauses": [
+      "F15-C01",
+      "R06-T01—T08及1234原义务",
+      "281叶/376成员/687断言",
+      "90前序份额",
+      "12 EX",
+      "原14份Review/74未决条款"
+    ],
+    "sourceLocations": [
+      "docs/rust-tauri/R06/repair-current/AR_ORIGINAL_OBLIGATIONS.json",
+      "scripts/rust-tauri/r06_evaluation_audit.py:163"
+    ],
+    "reproductionEvidence": [
+      "ORIGINAL_SCOPE_REVIEW.json",
+      "EXTRA_SCOPE_SOURCE_REVIEW.json",
+      "ORIGINAL_28_CLAUSE_DECISIONS.json"
+    ],
+    "expected": "逐条满足当前服务到期原断言；合法后期必须有原依据；所有原Step/交付/A均有实际满足证据。",
+    "actual": "本候选只有两份评测/核验代码；原到期缺口、额外根簇及原前序未决仍在。全部标OPEN是诚实登记，但不是完整Task完成。",
+    "rootCause": "候选实现范围只有评测记录和拒绝部分虚报，完整原业务未修复/未验收。",
+    "allRelatedPathsAndVariants": [
+      "R06-T01",
+      "R06-T02",
+      "R06-T03",
+      "R06-T04",
+      "R06-T05",
+      "R06-T06",
+      "R06-T07",
+      "R06-T08",
+      "R06-EX-01",
+      "R06-EX-02",
+      "R06-EX-03",
+      "R06-EX-04",
+      "R06-EX-05",
+      "R06-EX-06",
+      "R06-EX-07",
+      "R06-EX-08",
+      "R06-EX-09",
+      "R06-EX-10",
+      "R06-EX-11",
+      "R06-EX-12"
+    ],
+    "requiredRepair": "按完整原范围修复当前服务契约；保留明确后期份额；每个业务原成功、拒绝、副作用有真实证据。",
+    "requiredReruns": [
+      "C01",
+      "C03",
+      "C04",
+      "原8Tasks37Steps24交付16A",
+      "281叶687断言",
+      "90上游份额",
+      "全部12 EX"
+    ],
+    "evidenceLevel": "FULL_ORIGINAL_SOURCE_RECONCILIATION_PLUS_SCOPED_ACTUAL_PROBES",
+    "status": "FAIL"
+  },
+  {
+    "id": "W15-R01-F02",
+    "title": "实际行为失败仍可被四维通过接受",
+    "violatedOriginalClauses": [
+      "F15-C03",
+      "R06-T08-S01/S04",
+      "R06-A15"
+    ],
+    "sourceLocations": [
+      "scripts/rust-tauri/r06_evaluation_audit.py:40",
+      "scripts/rust-tauri/r06_evaluation_audit.py:89"
+    ],
+    "reproductionEvidence": [
+      "windows/independent-sql-wire-mutations-03/mutants/own-be01-file-false-with-pass",
+      "windows/independent-sql-wire-mutations-03/mutants/own-be03-rejection-effect-false"
+    ],
+    "expected": "所有BE的四维评分必须绑定各自实际效果，工具/格式合格不能代替参数语义及任务完成。",
+    "actual": "BE01 fileBytesMatch=false仍评分pass；BE03 nestedEditApplied=false且unknownParamDispatched=true仍评分pass，候选audit均exit0，恢复原件exit0。",
+    "rootCause": "除BE10特例外，只校验布尔和AND，不重算每个BE的语义事实。",
+    "allRelatedPathsAndVariants": [
+      "BE01—BE09 score/observedBehavior/实际文件/实际派发",
+      "BE10负控规则已拒绝，但不能替代同族正例",
+      "rust/crates/lingxi-service/tests/r06_t08_behavior_eval.rs"
+    ],
+    "requiredRepair": "对每BE独立校验原任务语义、准确参数/目标和实际副作用；虚假正评分必须非零点名，不能删负控。",
+    "requiredReruns": [
+      "C02",
+      "C03",
+      "全部BE01—10",
+      "R06-A15/A16",
+      "受影响工具/文件/拒绝原回归"
+    ],
+    "evidenceLevel": "ACTUAL_REPRODUCTION_PLUS_SOURCE",
+    "status": "FAIL"
+  },
+  {
+    "id": "W15-R01-F03",
+    "title": "调用预算和费用覆盖元数据可以伪造",
+    "violatedOriginalClauses": [
+      "F15-C02/C03",
+      "R06-T08-S02"
+    ],
+    "sourceLocations": [
+      "scripts/rust-tauri/r06_evaluation_audit.py:45",
+      "scripts/rust-tauri/r06_evaluation_audit.py:71",
+      "scripts/rust-tauri/r06_evaluation_audit.py:78"
+    ],
+    "reproductionEvidence": [
+      "windows/independent-sql-wire-mutations-03/REVIEW.json"
+    ],
+    "expected": "期望调用数有固定独立依据，所有coverage字段、状态、行数、已知/缺失和outcome键集合都从完整同窗SQL/响应重算。",
+    "actual": "expectedCalls=999掩盖extra；全局rowCount999/NOT_MEASURED、失败outcome knownRows/missingRows999、额外invented_success999均exit0。原SQL实测总值正确，检测器不能防此同族虚报。",
+    "rootCause": "预算直接信报告；全局coverage漏rowCount/status；outcome只核部分字段且不拒额外键。",
+    "allRelatedPathsAndVariants": [
+      "每个BE的input/outputCoverage",
+      "byLedgerOutcome所有成功/失败/取消组",
+      "MEASURED/NOT_MEASURED/PARTIAL/真实0",
+      "BE06/08未测保留null"
+    ],
+    "requiredRepair": "固定预算来源并完整校验各层coverage和精确键集合；未知不记0，失败任务费用保留。",
+    "requiredReruns": [
+      "C02",
+      "C03",
+      "全BE费用SQL-wire",
+      "真实0/缺测/部分覆盖控制",
+      "BE04成功/失败独立汇总"
+    ],
+    "evidenceLevel": "ACTUAL_REPRODUCTION_PLUS_SOURCE",
+    "status": "FAIL"
+  },
+  {
+    "id": "W15-R01-F04",
+    "title": "三腿身份没有校验会话",
+    "violatedOriginalClauses": [
+      "F15-C02/C03",
+      "BE04三腿原身份要求"
+    ],
+    "sourceLocations": [
+      "scripts/rust-tauri/r06_evaluation_audit.py:108",
+      "scripts/rust-tauri/r06_evaluation_audit.py:111"
+    ],
+    "reproductionEvidence": [
+      "windows/independent-sql-wire-mutations-03/mutants/own-be04-session-forgery",
+      "windows/independent-real-home-collision-02/collision.json"
+    ],
+    "expected": "home/run/session/providerEndpoint及实际服务PID与SQL/请求一致，不因重号Run跨世界串证。",
+    "actual": "BE04B accepted.sessionId伪造为另会话，候选exit0。独立两个生产home真实首轮同号Run，完整各自SQL和请求已保存；不同home仍各40/17正确。",
+    "rootCause": "注释宣称会话绑定，实际未比sessionId与完整SQL/session/请求。",
+    "allRelatedPathsAndVariants": [
+      "BE04A/B/C",
+      "所有run_accepted和usage_sql_readback/provider_exchange",
+      "不同home同号Run"
+    ],
+    "requiredRepair": "对三腿和通用accepted/SQL/wire同时验证复合身份，加入真实跨home重号及单字段错误会话反例。",
+    "requiredReruns": [
+      "C02",
+      "C03",
+      "BE04",
+      "跨home实际正控+错误绑定负控"
+    ],
+    "evidenceLevel": "ACTUAL_REPRODUCTION_PLUS_SOURCE",
+    "status": "FAIL"
+  },
+  {
+    "id": "W15-R01-F05",
+    "title": "手工份额和替身可被改称完整业务或真实模型对照",
+    "violatedOriginalClauses": [
+      "F15-C01/C03/C04",
+      "R06-T08-S01/S02/S03"
+    ],
+    "sourceLocations": [
+      "scripts/rust-tauri/r06_evaluation_audit.py:46",
+      "scripts/rust-tauri/r06_evaluation_audit.py:130",
+      "rust/crates/lingxi-service/tests/r06_t08_behavior_eval.rs"
+    ],
+    "reproductionEvidence": [
+      "windows/independent-sql-wire-mutations-03/mutants/own-be07-full-chat-claim",
+      "windows/independent-sql-wire-mutations-03/mutants/own-comparison-mode-live-with-false-flags"
+    ],
+    "expected": "BE07手工scope仅局部机制；替身不冒称LIVE；旧引擎对照必须亲跑才能声明。",
+    "actual": "BE07改FULL_CHAT_SELECTION_PASS及BE01comparisonMode=REAL_LIVE_PROVIDER_VERIFIED均exit0，原boolean仍false。BE02原常驻目录份额不能证明发现→描述→调用；旧引擎实际对照NOT_RUN。",
+    "rootCause": "只检查两个boolean及BE02字符串，无完整语义级别/比较口径一致性。",
+    "allRelatedPathsAndVariants": [
+      "BE02目录发现描述调用",
+      "BE07聊天来源自动scope",
+      "所有BE comparisonMode/incumbentAnchor/LIVE标签"
+    ],
+    "requiredRepair": "口径由独立运行事实推导，拒绝标签与flags矛盾，完整BE02/07业务按原要求建立真实链路。",
+    "requiredReruns": [
+      "C01",
+      "C02",
+      "C03",
+      "C04",
+      "R06-T08全部Step",
+      "R10授权LIVE后期只按原依据"
+    ],
+    "evidenceLevel": "ACTUAL_REPRODUCTION_PLUS_SOURCE",
+    "status": "FAIL"
+  },
+  {
+    "id": "W15-R01-F06",
+    "title": "删除全部候选绑定仍通过",
+    "violatedOriginalClauses": [
+      "F15-C03/C04",
+      "候选/原义务/真实执行绑定"
+    ],
+    "sourceLocations": [
+      "scripts/rust-tauri/r06_evaluation_audit.py:184"
+    ],
+    "reproductionEvidence": [
+      "windows/independent-sql-wire-mutations-03/mutants/own-candidate-bindings-deleted"
+    ],
+    "expected": "候选清单必须包含独立冻结要求的完整键集合和精确字节，缺项要拒绝。",
+    "actual": "candidate_sources={}，核验循环零次，exit0；本Reviewer自己4059源持续不变。",
+    "rootCause": "只遍历自报map，没有必需键集合。",
+    "allRelatedPathsAndVariants": [
+      "candidate_sources缺项/空map",
+      "源码、原输入、锁文件、真实执行bin绑定",
+      "audit入口scope/obligations成对必需"
+    ],
+    "requiredRepair": "由独立冻结输入指定必需candidate/source范围，拒绝缺项、额外未知或旧source；真实执行前后身份持续绑定。",
+    "requiredReruns": [
+      "C03",
+      "C04",
+      "冻结4059源/输入/锁/执行bin",
+      "恢复正控"
+    ],
+    "evidenceLevel": "ACTUAL_REPRODUCTION_PLUS_SOURCE",
+    "status": "FAIL"
+  },
+  {
+    "id": "W15-R01-F07",
+    "title": "到期管理与头像语义仍缺失",
+    "violatedOriginalClauses": [
+      "F15-C01",
+      "原R00仅R06的28条",
+      "R06-T01/T06原人格范围",
+      "R07-T08不能豁免原到期"
+    ],
+    "sourceLocations": [
+      "rust/crates/lingxi-service/src/lib.rs:5841",
+      "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R06_上下文、会话语义、记忆与知识库.md:249",
+      "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07_外围能力、后台自动化与多入口接入.md:337"
+    ],
+    "reproductionEvidence": [
+      "ORIGINAL_28_CLAUSE_DECISIONS.json",
+      "windows/original-scope28-runtime/scope28-observations.json"
+    ],
+    "expected": "当前到期服务成功、失败及副作用满足原28条；界面后期按自身原任务保留。",
+    "actual": "10个原到期接口返回404/405，头像GET缺ETag且条件请求200；其他保存/读取仅局部，广播/刷新/隔离/秘密遮盖等未作完整验收。",
+    "rootCause": "当前服务路由/能力未完成；不能把R07泛化管理步骤当R00明确到期的延期。",
+    "allRelatedPathsAndVariants": [
+      "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-DELETE-517E69",
+      "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-DELETE-WITH-ORPHAN-SKILLS-3516A7",
+      "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+      "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ORDER-PUT-8D4356",
+      "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-POST-9CC1B1",
+      "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-PRIMARY-PUT-C0ADBA",
+      "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-READ-26AE36",
+      "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-SWITCH-POST-8B48FD",
+      "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AVATAR-AVATAR-ROLE-AGENT-4A56F2",
+      "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AVATAR-AVATAR-ROLE-AGENT-7570BE",
+      "avatar ETag/304",
+      "所有28原断言见逐叶来源裁决"
+    ],
+    "requiredRepair": "补齐当前服务到期契约；保留完整UI合法后期，禁止改R00期限或省断言。",
+    "requiredReruns": [
+      "C01",
+      "全部28原成功/拒绝/副作用",
+      "相关T01/T06及90前序份额"
+    ],
+    "evidenceLevel": "ACTUAL_REPRODUCTION_PLUS_SOURCE",
+    "status": "FAIL"
+  },
+  {
+    "id": "W15-R01-F08",
+    "title": "人格和记忆改动未进入同会话下一真实请求",
+    "violatedOriginalClauses": [
+      "F15-C01",
+      "R06-T01-S01/S02",
+      "R06-T06",
+      "EX12",
+      "原F05"
+    ],
+    "sourceLocations": [
+      "rust/crates/lingxi-service/src/context_compiler.rs:862",
+      "rust/crates/lingxi-service/src/persona.rs:111",
+      "rust/crates/lingxi-service/src/memory.rs:1191"
+    ],
+    "reproductionEvidence": [
+      "windows/original-persona-next-run/persona-next-run-observations.json"
+    ],
+    "expected": "真实修改后按原策略影响下一run请求，保存/get回声不代替请求生效。",
+    "actual": "PUT新identity/AGENTS和PATCHmemory=false成功，get读新；同session下一wire SYSTEM仍原hash且旧identity/AGENTS/记忆；新session才新hash、新identity/AGENTS且记忆去除。所有3run完成且SQL保存。",
+    "rootCause": "compiled_for_run缓存键只有session+for_subagent，缓存命中绕过材料重取，没有材料version/invalidation。",
+    "allRelatedPathsAndVariants": [
+      "人格identity/AGENTS",
+      "记忆开关/动态材料",
+      "Skills/工具配置/Agent变更缓存同族需独立检查",
+      "PublicAGENTS主prompt未出现，不冒称该面必须加载"
+    ],
+    "requiredRepair": "按原材料作用域/version策略刷新下一run并保持观测与请求同源，测所有相关修改正反面。",
+    "requiredReruns": [
+      "C01",
+      "C02受影响BE",
+      "T01/T06",
+      "EX12",
+      "28动态材料断言"
+    ],
+    "evidenceLevel": "ACTUAL_REPRODUCTION_PLUS_SOURCE",
+    "status": "FAIL"
+  },
+  {
+    "id": "W15-R01-F09",
+    "title": "资源URL成功面未实现，mount前置份额仍缺",
+    "violatedOriginalClauses": [
+      "F15-C01",
+      "R06-T05",
+      "EX10",
+      "原R04交接ResourceIO份额"
+    ],
+    "sourceLocations": [
+      "rust/crates/lingxi-service/src/resourceio.rs:35",
+      "rust/crates/lingxi-service/src/resources.rs"
+    ],
+    "reproductionEvidence": [
+      "windows/original-resource-precondition/resource-production-observations.json",
+      "EXTRA_SCOPE_SOURCE_REVIEW.json"
+    ],
+    "expected": "可用资源provider的正式stat/read成功，不以unsupported拒绝充当原成功面。",
+    "actual": "实际local-file stat/read200且字节正确；可用loopbackURL直读200，正式URL stat/read400 unsupported。mount正式stat/read400但本探针未建立有效注册正控，只列源缺席/前置未满足，不冒称完整mount验收。",
+    "rootCause": "源明确mount/url provider缺席并统一拒绝，原现役/交接成功职责仍在。",
+    "allRelatedPathsAndVariants": [
+      "URL stat/read及原资源成功/拒绝/观测",
+      "mount provider注册与正式read/materialize份额",
+      "ResourceIO共享路径"
+    ],
+    "requiredRepair": "补足到期provider/前置并分别实际跑成功和拒绝；外部真实供应商后期按原任务保留，不以路径回退静默降级。",
+    "requiredReruns": [
+      "C01",
+      "R06-T05",
+      "EX10",
+      "R04原ResourceIO成功/拒绝份额",
+      "R05费用/权限受影响份额"
+    ],
+    "evidenceLevel": "ACTUAL_REPRODUCTION_PLUS_SOURCE",
+    "status": "FAIL"
+  },
+  {
+    "id": "W15-R01-F10",
+    "title": "独立完整原回归存在8个失败",
+    "violatedOriginalClauses": [
+      "F15受影响前序回归",
+      "原R03/R04取消/隔离/终态契约"
+    ],
+    "sourceLocations": [
+      "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs:387",
+      "rust/crates/lingxi-service/tests/cancellation_tree.rs:226",
+      "rust/crates/lingxi-service/tests/cancellation_tree.rs:1779",
+      "rust/crates/lingxi-service/tests/r04_t06_sandbox.rs:553",
+      "rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs:1727",
+      "rust/crates/lingxi-service/tests/run_lifecycle.rs:442",
+      "rust/crates/lingxi-service/tests/subagent_closeout.rs:297",
+      "rust/crates/lingxi-service/tests/subagent_closeout.rs:375"
+    ],
+    "reproductionEvidence": [
+      "ORIGINAL_REGRESSION_RESULTS.json",
+      "windows/original-workspace-no-fail-fast/stdout.log",
+      "windows/original-workspace-no-fail-fast/stderr.log"
+    ],
+    "expected": "原断言不松动；所有应跑受影响回归真实通过。",
+    "actual": "8失败/6targets；2个越界写入未拒绝，3个事件序列多tool_result_model_projection，3个父子取消/收尾排队状态失败。",
+    "rootCause": "原候选既有运行契约或原精确事件契约与当前实现不一致；未作修复，非外部BLOCKED豁免。",
+    "allRelatedPathsAndVariants": [
+      "cancel_link_inheritance",
+      "cancellation_tree",
+      "r04_t06_sandbox",
+      "r04_t07_mcp_and_workers",
+      "run_lifecycle",
+      "subagent_closeout"
+    ],
+    "requiredRepair": "逐项裁决并修复原契约，保留原测试；精确事件差异需原依据和完整影响，不能删/松断言。",
+    "requiredReruns": [
+      "全部6targets原电池",
+      "workspace --no-fail-fast",
+      "C01/C04",
+      "正式StageReviewer另派后R06及R05→R04→R03→R02"
+    ],
+    "evidenceLevel": "ACTUAL_REPRODUCTION_PLUS_SOURCE",
+    "status": "FAIL"
+  },
+  {
+    "id": "W15-R01-F11",
+    "title": "迁移源与原注册表不一致",
+    "violatedOriginalClauses": [
+      "F15-C01/C04",
+      "F14 registry原前置"
+    ],
+    "sourceLocations": [
+      "scripts/rust-tauri/r02_registry_consistency.py",
+      "docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json"
+    ],
+    "reproductionEvidence": [
+      "windows/original-registry/stdout.log",
+      "windows/original-registry/stderr.log"
+    ],
+    "expected": "源迁移与注册原前置精确一致，不删注册断言。",
+    "actual": "亲跑registry exit1：源9项、注册7项，缺v8/v9。",
+    "rootCause": "新增迁移尚未完成原注册交接。",
+    "allRelatedPathsAndVariants": [
+      "v8/v9迁移",
+      "R02registry前置",
+      "R06正式stage map和下游handoff未提供正式结果"
+    ],
+    "requiredRepair": "完整满足注册与交接原义务；正式阶段验收另派，不把check-contracts通过等同stage通过。",
+    "requiredReruns": [
+      "原registry",
+      "C01/C04",
+      "正式原阶段序链"
+    ],
+    "evidenceLevel": "ACTUAL_ORIGINAL_CHECK_PLUS_SOURCE",
+    "status": "FAIL"
+  }
+]

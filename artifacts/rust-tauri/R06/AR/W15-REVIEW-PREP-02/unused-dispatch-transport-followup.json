@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-12T02:30:32.045643+00:00",
+  "role": "ROOT_UNUSED_DISPATCH_METADATA_CORRECTION",
+  "dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W15_REVIEWER_02.md",
+  "old_dispatch_sha256": "1ba61418dcd1dfd9fd47c8009e877635c3f42cc3e9259d300efeefd3eeccba4f",
+  "new_dispatch_sha256": "2386125a61d641e1c4a763a27d6e7d8df151c707ff2f1b9b7acba124cf8eed12",
+  "old_preparation_snapshot_archive": "artifacts/rust-tauri/R06/AR/W15-REVIEW-PREP-02/unused-dispatch-before-transport-followup.md",
+  "current_predecessor": "/root/ar_w15_repair_02",
+  "reviewer": "NOT_CREATED",
+  "new_source_or_test_overlay": false,
+  "actual_review": "NOT_RUN",
+  "completed_formal_FAIL_count": 1,
+  "stage": "NOT_RUN",
+  "R07_started": false
+}

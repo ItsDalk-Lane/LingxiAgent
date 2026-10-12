@@ -1,0 +1,11 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.27s
+     Running tests/r06_ar_f01_history.rs (rust/target/debug/deps/r06_ar_f01_history-369cc4500f952c90)
+LINGXI_TEST_GUARD: armed (pid 49723, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+{"case": "uncertain", "status": "PASS", "checks": ["actual tool side effect +1/crash/recovery: old requestId refused; fresh accepted; explicit Unknown model diagnostic/no completion receipt/no old tool execution; parked process exited"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/uncertain-F01-a15828c105f8bc639ec7e52e89a7f8f9-evidence.json"}
+
+test f01_unknown_outcome_actual_crash_wire_diagnostic ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 2.41s
+

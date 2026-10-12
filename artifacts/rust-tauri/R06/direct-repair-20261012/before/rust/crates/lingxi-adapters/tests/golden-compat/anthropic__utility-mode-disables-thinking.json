@@ -1,0 +1,37 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "anthropic",
+  "case": "utility-mode-disables-thinking",
+  "model": {
+    "provider": "anthropic",
+    "id": "claude-sonnet-5",
+    "baseUrl": "https://api.anthropic.com",
+    "api": "anthropic-messages"
+  },
+  "payload": {
+    "model": "claude-sonnet-5",
+    "messages": [],
+    "thinking": {
+      "type": "enabled"
+    },
+    "output_config": {
+      "effort": "high"
+    },
+    "reasoning_effort": "high"
+  },
+  "options": {
+    "mode": "utility"
+  },
+  "expected": {
+    "thinkingFormat": "anthropic",
+    "reasoningProfile": null,
+    "matched": "anthropic",
+    "result": {
+      "model": "claude-sonnet-5",
+      "messages": [],
+      "thinking": {
+        "type": "disabled"
+      }
+    }
+  }
+}

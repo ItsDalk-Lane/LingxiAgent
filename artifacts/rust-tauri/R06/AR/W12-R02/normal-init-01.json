@@ -1,0 +1,24 @@
+{
+  "command": [
+    "node",
+    "--experimental-strip-types",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W12-R02/probe-normal-init.mjs"
+  ],
+  "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-normal-init-01-bcu3cwak",
+  "start": 1791701334.7472079,
+  "end": 1791701334.836746,
+  "exit_code": 0,
+  "log_sha256": "65bb825364e82465318465c778f510a97b0cbc3e97aaca5d9abd9fcf28a20000",
+  "home_files": [
+    "ann.db",
+    "fulltext.db",
+    "vector.db",
+    "fulltext.db-shm",
+    "ann.db-shm",
+    "vector.db-wal",
+    "fulltext.db-wal",
+    "vector.db-shm",
+    "ann.db-wal"
+  ]
+}

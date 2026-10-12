@@ -1,0 +1,41 @@
+    Checking dtor v0.3.0
+   Compiling ring v0.17.14
+    Checking time-core v0.1.9
+    Checking deranged v0.5.8
+    Checking ctor v0.8.0
+    Checking powerfmt v0.2.0
+    Checking lingxi-test-guard v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-test-guard)
+    Checking num-conv v0.2.2
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking pem v4.0.0
+    Checking xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
+    Checking time v0.3.55
+    Checking yasna v0.6.0
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+error[E0425]: cannot find value `request` in this scope
+    --> crates/lingxi-adapters/src/models/anthropic_messages.rs:1603:63
+     |
+1603 |                 declaration_binding: input.tools.bind_target(&request.target),
+     |                                                               ^^^^^^^
+     |
+help: a local variable with a similar name exists
+     |
+1603 |                 declaration_binding: input.tools.bind_target(&requests.target),
+     |                                                                      +
+
+error[E0425]: cannot find value `request` in this scope
+    --> crates/lingxi-adapters/src/models/google_generative_ai.rs:1460:63
+     |
+1460 |                 declaration_binding: input.tools.bind_target(&request.target),
+     |                                                               ^^^^^^^
+     |
+help: a local variable with a similar name exists
+     |
+1460 |                 declaration_binding: input.tools.bind_target(&requests.target),
+     |                                                                      +
+
+    Checking rcgen v0.14.10
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `lingxi-adapters` (lib test) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

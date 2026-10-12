@@ -1,0 +1,11 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.37s
+  Executable tests/r06_ar_f01_history.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f01_history-6406a71bc3d7e3c1)
+  Executable tests/r06_ar_f02_file_restore.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f02_file_restore-5bd58e77c24caa47)
+  Executable tests/r06_ar_f03_operations.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f03_operations-e105ff127ca409f5)
+  Executable tests/r06_ar_f04_lifecycle.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f04_lifecycle-a66288ed3134b9a4)
+  Executable tests/r06_ar_f05_cache.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f05_cache-5dfa2c062357e0c4)
+  Executable tests/r06_ar_f06_config.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f06_config-c702cd77027f5f82)
+  Executable tests/r06_ar_f07_catalog.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f07_catalog-68184434dffc6eec)
+  Executable tests/r06_ar_w09_embedding_batches.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_w09_embedding_batches-913ec600a6d0e4df)
+  Executable tests/r06_ar_w10_embedding_identity.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_w10_embedding_identity-6a63c228ad239e4b)

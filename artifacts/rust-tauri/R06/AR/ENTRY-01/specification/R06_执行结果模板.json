@@ -1,0 +1,29 @@
+{
+  "finding_id": "R06-AR-F01",
+  "check_id": "R06-AR-F01-C01",
+  "status": "NOT_RUN",
+  "candidate_sha": null,
+  "working_tree_digest": null,
+  "platform": null,
+  "toolchain": null,
+  "command": null,
+  "exit_code": null,
+  "expected": null,
+  "observed": null,
+  "self_check": {
+    "status": "NOT_RUN",
+    "evidence": []
+  },
+  "adversarial_self_check": {
+    "status": "NOT_RUN",
+    "evidence": []
+  },
+  "independent_review": {
+    "status": "NOT_RUN",
+    "agent_id": null,
+    "round": 0,
+    "evidence": []
+  },
+  "commit": null,
+  "push_confirmed": false
+}

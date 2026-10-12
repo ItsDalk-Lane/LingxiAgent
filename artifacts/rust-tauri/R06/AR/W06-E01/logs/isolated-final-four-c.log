@@ -1,0 +1,18 @@
+{"command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-service", "--test", "r06_ar_f06_config", "--test", "r06_ar_f06_binary", "-p", "lingxi-adapters", "--test", "r06_ar_f06_config_preservation", "--", "--nocapture"], "start": 1791698205.919184, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-isolated-final-four-c-ueiezt2s", "guard": "8192MB/600s"}
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/.codex/worktrees/r06-independent-review/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-test-guard v0.0.0 (/Users/study_superior/.codex/worktrees/r06-independent-review/LingxiAgent/rust/crates/lingxi-test-guard)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/.codex/worktrees/r06-independent-review/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/.codex/worktrees/r06-independent-review/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/.codex/worktrees/r06-independent-review/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 13s
+     Running tests/r06_ar_f06_config_preservation.rs (/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r06_ar_f06_config_preservation-c5e6e56505ae8234)
+LINGXI_TEST_GUARD: armed (pid 37167, mem_limit=8192 MB, time_limit=600 s)
+
+running 3 tests
+test c03_aliases_and_merge_keys_follow_standard_yaml_semantics ... ok
+test c04_updates_preserve_all_unknown_nested_values_and_escaped_lists ... ok
+test c03_duplicate_sensitive_keys_and_nested_keys_fail_before_writing ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r06_ar_f06_binary.rs (/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r06_ar_f06_binary-3e12bece9eefbeaf)

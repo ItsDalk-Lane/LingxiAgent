@@ -61,6 +61,7 @@ const currentSnapshot = {
   weekDays: [{ date: '2026-08-07', body: 'week current' }],
   longterm: '- longterm current',
 };
+const currentHash = 'a'.repeat(64);
 
 function revisionBefore(revisionId: string) {
   return {
@@ -84,6 +85,7 @@ describe('DreamRevisionBrowser', () => {
         before: revisionBefore(revisionId),
       },
       current: structuredClone(currentSnapshot),
+      currentHash,
     }));
     vi.mocked(restoreDream).mockResolvedValue({ ok: true });
   });
@@ -138,7 +140,7 @@ describe('DreamRevisionBrowser', () => {
     // D：第二次明确确认才调用 restore
     fireEvent.click(revisionButton('settings.memory.dream.revisions.confirmRestore'));
     await waitFor(() => expect(restoreDream).toHaveBeenCalledTimes(1));
-    expect(restoreDream).toHaveBeenCalledWith('hana', 'rev-2');
+    expect(restoreDream).toHaveBeenCalledWith('hana', 'rev-2', currentHash);
   });
 
   it('E: shows a no-difference state and disables restore when current equals the revision', async () => {
@@ -148,6 +150,7 @@ describe('DreamRevisionBrowser', () => {
         before: structuredClone(currentSnapshot),
       },
       current: structuredClone(currentSnapshot),
+      currentHash,
     }));
     render(<DreamRevisionBrowser agentId="hana" open onClose={vi.fn()} />);
 
@@ -175,6 +178,20 @@ describe('DreamRevisionBrowser', () => {
     const restoreOrder = vi.mocked(restoreDream).mock.invocationCallOrder[0];
     const revisionCalls = vi.mocked(loadDreamRevision).mock.invocationCallOrder;
     expect(revisionCalls[revisionCalls.length - 1]).toBeGreaterThan(restoreOrder);
+  });
+
+  it('确认前重新读取后使用同一份详情的条件，防止覆盖确认后新增内容', async () => {
+    render(<DreamRevisionBrowser agentId="hana" open onClose={vi.fn()} />);
+    expect(await screen.findByText('+ - facts rev-2')).toBeInTheDocument();
+    const confirmedHash = 'b'.repeat(64);
+    vi.mocked(loadDreamRevision).mockResolvedValueOnce({
+      revision: { ...summaries[0], before: revisionBefore('rev-2') },
+      current: structuredClone(currentSnapshot),
+      currentHash: confirmedHash,
+    });
+    fireEvent.click(revisionButton('settings.memory.dream.revisions.restoreThis'));
+    fireEvent.click(await screen.findByText('settings.memory.dream.revisions.confirmRestore'));
+    await waitFor(() => expect(restoreDream).toHaveBeenCalledWith('hana', 'rev-2', confirmedHash));
   });
 
   it('shows a localized restore error instead of the backend English detail', async () => {

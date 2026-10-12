@@ -1,0 +1,4 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.22s
+     Running tests/subagent_permission_inheritance.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/subagent_permission_inheritance-c300aff3c745ca59)
+error: test failed, to rerun pass `-p lingxi-service --test subagent_permission_inheritance`

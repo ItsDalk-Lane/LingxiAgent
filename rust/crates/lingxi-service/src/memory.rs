@@ -18,21 +18,20 @@
 
 use std::path::{Path, PathBuf};
 
+use axum::Json;
 use axum::extract::{Path as AxumPath, RawQuery, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use axum::Json;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use lingxi_adapters::storage::agent_memory as am;
 use lingxi_adapters::storage::agent_memory::{
-    resolve_agent_roots, validate_agent_id, AgentConfigFlags, AgentConfigPatch,
-    CompiledMemoryStore, ContextNotesStore, DreamRevisionStore, ExperienceStore, FactStore,
-    MemoryError, TenetsStore,
+    AgentConfigFlags, AgentConfigPatch, CompiledMemoryStore, ContextNotesStore, DreamRevisionStore,
+    ExperienceStore, FactStore, MemoryError, TenetsStore, resolve_agent_roots, validate_agent_id,
 };
 
-use crate::context_compiler::{scan_agent_config, scan_preferences};
 use crate::ServiceState;
+use crate::context_compiler::scan_preferences;
 
 pub struct MemoryService {
     home: PathBuf,
@@ -58,10 +57,10 @@ impl MemoryService {
 
     /// Locale chain (persona-source.ts:124-130 + agent.ts resolveLocale):
     /// agent config locale → global prefs locale → "en".
-    pub fn locale_is_zh(&self, agent_dir: &Path) -> bool {
-        let config_locale = std::fs::read_to_string(agent_dir.join("config.yaml"))
-            .ok()
-            .and_then(|text| scan_agent_config(&text).locale);
+    pub fn locale_is_zh(&self, agent_dir: &Path) -> Result<bool, MemoryError> {
+        let config_locale = am::config::read_agent_config(&agent_dir.join("config.yaml"))?
+            .scan()?
+            .locale;
         let prefs_locale = scan_preferences(
             am::read_json_file(&self.user_dir().join("preferences.json")).as_ref(),
         )
@@ -70,7 +69,7 @@ impl MemoryService {
             .filter(|l| !l.trim().is_empty())
             .or(prefs_locale.filter(|l| !l.trim().is_empty()))
             .unwrap_or_else(|| "en".to_string());
-        locale.starts_with("zh")
+        Ok(locale.starts_with("zh"))
     }
 
     pub fn roots(&self, agent_id: &str) -> Result<am::AgentMemoryRoots, MemoryError> {
@@ -89,7 +88,7 @@ impl MemoryService {
 
     pub fn compiled_store(&self, agent_id: &str) -> Result<CompiledMemoryStore, MemoryError> {
         let roots = self.roots(agent_id)?;
-        let is_zh = self.locale_is_zh(&roots.agent_dir);
+        let is_zh = self.locale_is_zh(&roots.agent_dir)?;
         Ok(CompiledMemoryStore::new(&roots.memory_dir, is_zh))
     }
 
@@ -116,8 +115,7 @@ impl MemoryService {
     /// workspace_context policy).
     pub fn read_flags(&self, agent_id: &str) -> Result<AgentConfigFlags, MemoryError> {
         let path = self.config_path(agent_id)?;
-        let text = std::fs::read_to_string(&path).map_err(|e| MemoryError::Io(e.to_string()))?;
-        Ok(AgentConfigPatch::read_flags(&text))
+        am::config::read_agent_config(&path)?.flags()
     }
 
     pub fn patch_flags(
@@ -521,11 +519,7 @@ pub async fn memories_compiled_delete_route(
         Ok(store) => store,
         Err(err) => return error_response(&err),
     };
-    let result = (|| -> Result<(), MemoryError> {
-        compiled.write_reset_marker()?;
-        compiled.clear_artifacts()?;
-        Ok(())
-    })();
+    let result = compiled.reset_and_clear();
     match result {
         Ok(()) => Json(json!({ "ok": true })).into_response(),
         Err(err) => error_response(&err),
@@ -545,11 +539,8 @@ pub async fn memories_delete_route(
     let service = state.memory();
     let result = (|| -> Result<(), MemoryError> {
         let compiled = service.compiled_store(&agent_id)?;
-        compiled.write_reset_marker()?;
         let store = service.fact_store(&agent_id)?;
-        store.clear_all()?;
-        compiled.clear_artifacts()?;
-        Ok(())
+        compiled.reset_and_clear_all_facts(&store)
     })();
     match result {
         Ok(()) => Json(json!({ "ok": true })).into_response(),
@@ -801,6 +792,10 @@ pub async fn dream_revision_detail_route(
                 "agentId": agent_id,
                 "revision": revision,
                 "current": current,
+                "currentHash": match am::dream_snapshot_hash(&current) {
+                    Ok(hash) => hash,
+                    Err(err) => return dream_error_response(err, "dream_unavailable"),
+                },
             }))
             .into_response()
         }
@@ -811,11 +806,22 @@ pub async fn dream_revision_detail_route(
 fn dream_error_response(err: MemoryError, fallback: &str) -> Response {
     let code = match &err {
         MemoryError::NotFound(_) => "dream_revision_not_found",
+        MemoryError::Conflict { code, .. }
+            if matches!(
+                code.as_str(),
+                "dream_memory_changed" | "dream_memory_busy" | "dream_already_running"
+            ) =>
+        {
+            code.as_str()
+        }
         _ => fallback,
     };
     let status = match code {
         "dream_revision_not_found" => StatusCode::NOT_FOUND,
         "dream_unavailable" => StatusCode::SERVICE_UNAVAILABLE,
+        "dream_memory_changed" | "dream_memory_busy" | "dream_already_running" => {
+            StatusCode::CONFLICT
+        }
         _ => StatusCode::INTERNAL_SERVER_ERROR,
     };
     (
@@ -830,15 +836,46 @@ pub async fn dream_revision_restore_route(
     State(state): State<ServiceState>,
     AxumPath(revision_id): AxumPath<String>,
     RawQuery(query): RawQuery,
+    body: axum::body::Bytes,
 ) -> Response {
     let agent_id = match agent_id_from_query(query.as_deref()) {
         Ok(id) => id,
         Err(resp) => return resp,
     };
+    let payload = if body.is_empty() {
+        json!({})
+    } else {
+        match body_json(&body) {
+            Ok(value) => value,
+            Err(response) => return response,
+        }
+    };
+    if !payload.is_object() {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({"error":"restore body must be an object"})),
+        )
+            .into_response();
+    }
+    let expected = match payload.get("expectedCurrentHash") {
+        None => None,
+        Some(Value::String(hash))
+            if hash.len() == 64 && hash.bytes().all(|byte| byte.is_ascii_hexdigit()) =>
+        {
+            Some(hash.to_ascii_lowercase())
+        }
+        _ => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(json!({"error":"expectedCurrentHash must be a SHA-256 digest"})),
+            )
+                .into_response();
+        }
+    };
     match state
         .memory()
         .dream_store(&agent_id)
-        .and_then(|store| store.restore(&revision_id))
+        .and_then(|store| store.restore_if_current(&revision_id, expected.as_deref()))
     {
         Ok(mut result) => {
             if let Some(obj) = result.as_object_mut() {
@@ -1148,7 +1185,10 @@ pub async fn experience_feedback_route(
         .take(128)
         .collect();
     let service = state.memory();
-    let flags = service.read_flags(&agent_id).unwrap_or_default();
+    let flags = match service.read_flags(&agent_id) {
+        Ok(flags) => flags,
+        Err(err) => return error_response(&err),
+    };
     let date = &am::now_iso()[..10];
     let category = if rating == "up" {
         "用户认可的做法"

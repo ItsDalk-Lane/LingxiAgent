@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-a4f08e303f9d7fb0)
+LINGXI_TEST_GUARD: armed (pid 43887, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+test exectools::tests::truncate_head_tail_single_huge_ascii_line_keeps_head_and_tail ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 386 filtered out; finished in 0.00s
+

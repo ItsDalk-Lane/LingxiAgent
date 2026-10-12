@@ -1,0 +1,110 @@
+{
+  "binding": {
+    "kind": "rust_unit_test",
+    "package": "xtask",
+    "suite": "xtask",
+    "test": "stage_map::map_tests::r06_registered_map_executes_checks_without_releasing_unproved_obligations",
+    "timeoutSecs": 900,
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "xtask",
+      "--bin",
+      "xtask",
+      "stage_map::map_tests::r06_registered_map_executes_checks_without_releasing_unproved_obligations",
+      "--",
+      "--exact",
+      "--show-output"
+    ]
+  },
+  "argv": [
+    "rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "xtask",
+    "--bin",
+    "xtask",
+    "stage_map::map_tests::r06_registered_map_executes_checks_without_releasing_unproved_obligations",
+    "--",
+    "--exact",
+    "--show-output"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "sourceBeforeSha256": "8d1240ecf9d1e386231ebe5c9688d1eb5cf9abb1f797651b541c6e242d4f6b51",
+  "exitCode": 0,
+  "timedOut": false,
+  "stdout": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/stage-map-contract/command-001/stdout.log",
+  "stderr": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/stage-map-contract/command-001/stderr.log",
+  "timeoutSecs": 900,
+  "syntheticEnvironment": {
+    "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/stage-map-contract/command-001/runtime/home",
+    "TMPDIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/stage-map-contract/command-001/runtime/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib",
+    "W01_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/stage-map-contract/command-001/raw/w01_evidence",
+    "W09_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/stage-map-contract/command-001/raw/w09_evidence",
+    "W10_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/stage-map-contract/command-001/raw/w10_evidence",
+    "W11_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/stage-map-contract/command-001/raw/w11_evidence",
+    "LINGXI_W03_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/stage-map-contract/command-001/raw/lingxi_w03_evidence",
+    "LINGXI_F05_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/stage-map-contract/command-001/raw/lingxi_f05_evidence",
+    "LINGXI_F08_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/stage-map-contract/command-001/raw/lingxi_f08_evidence",
+    "R06_T08_RAW_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/stage-map-contract/command-001/raw/t08",
+    "R06_T08_EVAL_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/stage-map-contract/command-001/raw/t08-evaluations.jsonl"
+  },
+  "actualArgv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "xtask",
+    "--bin",
+    "xtask",
+    "stage_map::map_tests::r06_registered_map_executes_checks_without_releasing_unproved_obligations",
+    "--",
+    "--exact",
+    "--show-output"
+  ],
+  "pid": 28144,
+  "elapsedSecs": 1.63,
+  "outputCheck": {
+    "valid": true,
+    "expectedTest": "stage_map::map_tests::r06_registered_map_executes_checks_without_releasing_unproved_obligations",
+    "runningCounts": [
+      "1"
+    ],
+    "resultSummaries": [
+      [
+        "ok",
+        "1",
+        "0",
+        "0"
+      ]
+    ],
+    "passedTestNames": [
+      "stage_map::map_tests::r06_registered_map_executes_checks_without_releasing_unproved_obligations"
+    ],
+    "reason": ""
+  },
+  "stdoutSha256": "92a1f97808038861f79420155bec0209c4e6a419276f574f26c5134f4f7df8b7",
+  "stderrSha256": "782193c98c8165ffa9a9c4ea64f898916bf4e2901d965d70d3404ba1e90489fe",
+  "sourceAfterSha256": "8d1240ecf9d1e386231ebe5c9688d1eb5cf9abb1f797651b541c6e242d4f6b51",
+  "sourceStable": true,
+  "localPassed": true
+}

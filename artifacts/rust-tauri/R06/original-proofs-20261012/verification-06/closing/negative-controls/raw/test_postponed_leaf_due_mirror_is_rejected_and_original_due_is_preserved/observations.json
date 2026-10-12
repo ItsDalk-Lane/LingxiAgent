@@ -1,0 +1,34 @@
+[
+  {
+    "label": "forged-postponed-due",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-r2r756qn/scripts/rust-tauri/r06_stage_inputs.py",
+      "--root",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-r2r756qn",
+      "--check",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-r2r756qn/artifacts/01-forged-postponed-due"
+    ],
+    "exitCode": 1,
+    "stdout": "R06 输入拒绝：R06 图或镜像输入与原义务/当前具体测试不一致；先重新生成，不得沿用旧证据\n",
+    "stderr": ""
+  },
+  {
+    "label": "restored-positive",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-r2r756qn/scripts/rust-tauri/r06_stage_inputs.py",
+      "--root",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-r2r756qn",
+      "--check",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-r2r756qn/artifacts/02-restored-positive"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

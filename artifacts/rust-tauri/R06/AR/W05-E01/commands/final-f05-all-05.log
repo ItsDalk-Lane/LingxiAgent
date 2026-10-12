@@ -1,0 +1,20 @@
+LINGXI_TEST_GUARD: armed (pid 27661, mem_limit=8192 MB, time_limit=600 s)
+
+running 5 tests
+test c04_actual_acquisition_publish_barrier_never_sends_mixed_material ... ok
+test c02_actor_owner_and_reader_remain_distinct_on_the_same_session ... ok
+test c02_real_runtime_other_agent_child_has_its_own_persona ... ok
+test c01_actual_calls_keep_system_frozen_and_tools_live_after_description_update ... ok
+
+thread 'c01_actual_calls_keep_system_frozen_and_tools_live_after_revocation' (7674191) panicked at crates/lingxi-service/tests/r06_ar_f05_cache.rs:572:6:
+called `Result::unwrap()` on an `Err` value: Elapsed(())
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test c01_actual_calls_keep_system_frozen_and_tools_live_after_revocation ... FAILED
+
+failures:
+
+failures:
+    c01_actual_calls_keep_system_frozen_and_tools_live_after_revocation
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 30.28s
+

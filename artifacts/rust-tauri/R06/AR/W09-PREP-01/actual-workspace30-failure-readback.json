@@ -1,0 +1,46 @@
+{
+  "at": "2026-10-11T13:09:12.261444+00:00",
+  "role": "ROOT_ACTUAL_RECORD_READBACK_NOT_INDEPENDENT_REVIEW",
+  "metadata": "/Users/study_superior/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/workspace-final-30/record.json",
+  "metadata_sha256": "06091289582e22f8b22d9365b494b9bf1589d8513607f34abb75f45788ce43a8",
+  "log": "/Users/study_superior/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/workspace-final-30/output.log",
+  "log_sha256": "b84aaad7fa0e197e647258e2bbd587861ff45a6d16971fea47e8dbc5db9191ca",
+  "exit": 101,
+  "duration_seconds": 1133.9360300409899,
+  "result_blocks": 149,
+  "passed": 1895,
+  "failed": 6,
+  "ignored": 0,
+  "filtered": 0,
+  "failed_targets": [
+    "-p lingxi-service --test cancel_link_inheritance",
+    "-p lingxi-service --test cancellation_tree",
+    "-p lingxi-service --test run_lifecycle",
+    "-p lingxi-service --test shutdown_coordinator",
+    "-p lingxi-service --test subagent_closeout"
+  ],
+  "failed_names": [
+    "subagent_timeout_settles_a_parked_quota_wait",
+    "approval_wait_round_trips_approve_and_reject_legs",
+    "panicking_tool_child_is_supervised_and_the_run_settles_loudly",
+    "r03_a01_three_model_calls_produce_exactly_one_task_terminal",
+    "storage_close_failure_maps_to_exit_five",
+    "parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls"
+  ],
+  "guard_environment": {
+    "TEST_MEM_LIMIT_MB": "8192",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "LINGXI_TEST_GUARD": "1"
+  },
+  "source_stable": true,
+  "parent_reaped": true,
+  "owned_residue": [],
+  "rss_measured_mib": null,
+  "executed_binary_paths": 142,
+  "cargo_before_inventory_changed_after_count": 123,
+  "actual_before_for_relinked_bins": "NOT_RECORDED_PER_EXECUTION; 123 pre-Cargo cached hashes differ from post-Cargo inventories. Relink is normal, no retroactive actual-before proof.",
+  "exact_per_execution_before_after_binding": "INCOMPLETE_OLD_WINDOW_NOT_FINAL_ACCEPTANCE",
+  "new_mandatory_failure": "Original shutdown_coordinator storage_close_failure_maps_to_exit_five fails; bareDB repeated close must retain QueueClosed/exit5. Resource hook enhancement cannot make all DB closes silently idempotent.",
+  "status": "ACTUAL_FULL_WORKSPACE_FAIL_WITH_BINARY_BINDING_LIMITATION",
+  "next": "Fresh current source compatibility repair and final actually bound whole/formal commands still required"
+}

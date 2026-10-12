@@ -250,11 +250,56 @@ impl OperationDispatcher {
         deadline_unix_ms: Option<u64>,
         auth: &ApplicableAuth,
     ) -> Result<(serde_json::Value, reqwest::header::HeaderMap), (ProtocolError, bool)> {
-        let response = dispatch::send_with_timeouts(
+        self.execute_json_observed(plan, deadline_unix_ms, auth, None)
+            .await
+    }
+
+    /// 嵌入恢复计数使用同一物理发送路径；普通操作保留原入口。
+    pub async fn execute_json_observed(
+        &self,
+        plan: &OperationRequestPlan,
+        deadline_unix_ms: Option<u64>,
+        auth: &ApplicableAuth,
+        observer: Option<dispatch::SendObserver<'_>>,
+    ) -> Result<(serde_json::Value, reqwest::header::HeaderMap), (ProtocolError, bool)> {
+        let response = dispatch::send_with_timeouts_observed(
             self.build_request(plan)?,
             &self.timeouts,
             deadline_unix_ms,
             auth,
+            observer,
+        )
+        .await?;
+        let headers = response.headers().clone();
+        let bytes =
+            read_body_bounded(response, OPERATION_JSON_BODY_MAX_BYTES, deadline_unix_ms).await?;
+        let value = serde_json::from_slice(&bytes).map_err(|err| {
+            (
+                ProtocolError::new(
+                    ErrorCode::InvalidMessage,
+                    format!("operation response is not valid JSON: {err}"),
+                    false,
+                ),
+                false,
+            )
+        })?;
+        Ok((value, headers))
+    }
+
+    /// 持久化意图的异步观察器仍走同一发送、期限、限流和响应解析。
+    pub async fn execute_json_async_observed(
+        &self,
+        plan: &OperationRequestPlan,
+        deadline_unix_ms: Option<u64>,
+        auth: &ApplicableAuth,
+        observer: &dyn dispatch::AsyncSendObserver,
+    ) -> Result<(serde_json::Value, reqwest::header::HeaderMap), (ProtocolError, bool)> {
+        let response = dispatch::send_with_timeouts_async_observed(
+            self.build_request(plan)?,
+            &self.timeouts,
+            deadline_unix_ms,
+            auth,
+            observer,
         )
         .await?;
         let headers = response.headers().clone();

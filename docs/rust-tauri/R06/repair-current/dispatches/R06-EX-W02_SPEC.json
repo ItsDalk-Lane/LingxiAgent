@@ -1,0 +1,672 @@
+{
+  "id": "R06-EX-02",
+  "title": "压缩恢复材料与既有技能召回接线",
+  "original_requirements": [
+    {
+      "id": "R06-T02-S01",
+      "clause": "迁移现役compaction触发、手动压缩、摘要上下文、缓存保留与错误恢复语义；不要仅按字符数切断聊天。"
+    },
+    {
+      "id": "R06-T02-S03",
+      "clause": "工具调用与结果成对保留，待完成调用、批准和当前目标不被压掉；压缩摘要不是可信新系统指令。"
+    },
+    {
+      "id": "R06-T04-S02",
+      "clause": "实时/历史分页/重连/导出/不同客户端共享语义投影，前端不独立解析模型结束或补造最终答案。"
+    },
+    {
+      "id": "R06-T06-S04",
+      "clause": "Pi extensions实际使用的hooks逐项迁入Rust扩展ports或受控worker；不能让扩展重新调用旧Agent loop。"
+    }
+  ],
+  "r00_feature_ids": [
+    "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+    "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-FEED-245D72",
+    "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-PUT-DCF083",
+    "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-FRESH-COMPACT-D62A81",
+    "F-D01-SLASH_COMMAND-SLASH-COMMAND-COMPACT-0FE8BE",
+    "F-D01-SLASH_COMMAND-SLASH-COMMAND-FRESH-COMPACT-5A6E0D",
+    "F-D07-TOOL-TOOL-RECALL-EXPERIENCE-7D05B1",
+    "F-D07-TOOL-TOOL-RECORD-EXPERIENCE-A17D74",
+    "F-D01-WS_IN-WS-IN-COMPACT-421EEA"
+  ],
+  "reported_gap": "T02差异#6列 skill-recall/history-recovery 等未接，不能只用fileOps enrichment冒充完整原恢复上下文。",
+  "deadline": "R06 阶段验收前：这里只要求当前核心/服务份额",
+  "status": "NOT_RUN",
+  "evidence_level": "SOURCE_ONLY",
+  "runtime_evidence": [],
+  "coverage_by_existing_f": "R06-AR-F15要求完整性，但F01-F14的具体修复不自动涵盖此行为；保留为extra，不改原F编号",
+  "production_paths": [
+    "rust/crates/lingxi-service/src/compaction.rs",
+    "rust/crates/lingxi-service/src/runs.rs"
+  ],
+  "proposed_real_checks": [
+    "含待批工具/技能/恢复信息的长会话真实压缩后下一Run保留原必要材料，不提升摘要权限",
+    "模型失败不覆写原历史，恢复后继续同目标，记录实际线体而非手造上下文"
+  ],
+  "legal_later_basis": [
+    {
+      "task_id": "R07-T07",
+      "original_goal": "保留用户已采纳的工作方式。",
+      "original_steps": [
+        "按R00叶子清单迁移书桌文件树、监听、便笺、todo、checkpoint、workflow/goal/loop等真实注册功能。",
+        "文件操作全部走ResourceService/授权边界，监听事件是提示而非权限；工作流动作复用Supervisor和工具网关。",
+        "对长期监听/终端/loop定义作用域与回收，Agent删除、目录撤权、服务退出时停止相关资源。",
+        "现役实验功能保持默认状态，不因为重写顺手开启；已撤回功能不因名字相近被恢复。"
+      ]
+    },
+    {
+      "task_id": "R08-T04",
+      "original_goal": "转换数据时不丢身份、附件或不可解释内容。",
+      "original_steps": [
+        "按STORES清单读取旧JSONL、session manifest、文件sidecar、观测、配置、记忆、知识和插件数据，逐类确定复制/只读复用/转换策略。",
+        "转换到新运行/消息库时保留稳定ID/父子关系/trace与引用映射；缺失Run边界标legacy_unknown，不按单个assistant消息发明用户任务。",
+        "保留原始记录及不理解的字段；原始文件不可覆盖，必要协议签名/opaque块保留给后续模型使用但不直接展示。",
+        "导入支持批处理、进度、暂停/失败恢复、幂等重跑和checksum；遇损坏尾行/坏附件分别报告，不自动丢弃整会话。",
+        "历史同一数据集只选择一个权威读取路径，导入成功后不同时读取旧新记录导致重复。"
+      ]
+    }
+  ],
+  "current_vs_later": "工作台计划文件外层与全量迁移演练后续；当前已存在Run/压缩恢复所需材料当期必需。",
+  "suggested_work_unit": {
+    "id": "R06-EX-W02",
+    "scope": "压缩恢复材料与既有技能召回接线",
+    "agent_policy": "一次性边界明确的工作单，主代理整合；不创建长期代理",
+    "prerequisites": [
+      "先核对原生产调用链与有效配置，再以当前真实服务/模型替身验证；不得mock被验收核心"
+    ],
+    "review_required": "全新审查者在实际候选上独立实验，资料核对不签关闭"
+  },
+  "r00_original_assertions": [
+    {
+      "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "成功：执行“读取助手经验”后，经验开启时合并 experience 分类文档；无文件给空正文，暂停则 403",
+        "拒绝/边界：experience.enabled 为 false 时拒绝；空文档返回空字符串；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-C8380CD5D08B",
+        "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户读取助手经验",
+        "then": "经验开启时合并 experience 分类文档；无文件给空正文，暂停则 403",
+        "assertions": [
+          "成功：执行“读取助手经验”后，经验开启时合并 experience 分类文档；无文件给空正文，暂停则 403",
+          "拒绝/边界：experience.enabled 为 false 时拒绝；空文档返回空字符串；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-FEED-245D72",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "成功：执行“对消息做赞/踩反馈”后，写入经验分类记录；返回 added/duplicate 与 experienceEnabled，暂停经验也允许显式反馈",
+        "拒绝/边界：rating=up/down 进不同分类；重复不新增；excerpt 必填并截断；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-245D72DD4CEA",
+        "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-FEED-245D72",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户对消息做赞/踩反馈",
+        "then": "写入经验分类记录；返回 added/duplicate 与 experienceEnabled，暂停经验也允许显式反馈",
+        "assertions": [
+          "成功：执行“对消息做赞/踩反馈”后，写入经验分类记录；返回 added/duplicate 与 experienceEnabled，暂停经验也允许显式反馈",
+          "拒绝/边界：rating=up/down 进不同分类；重复不新增；excerpt 必填并截断；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-PUT-DCF083",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "成功：执行“整体更新经验分类文档”后，按 # 标题同步 experience 分类及索引并刷新助手；空内容会清空分类",
+        "拒绝/边界：经验暂停 403；content 为字符串；非法分类 400；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-DCF0836C3A16",
+        "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-PUT-DCF083",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户整体更新经验分类文档",
+        "then": "按 # 标题同步 experience 分类及索引并刷新助手；空内容会清空分类",
+        "assertions": [
+          "成功：执行“整体更新经验分类文档”后，按 # 标题同步 experience 分类及索引并刷新助手；空内容会清空分类",
+          "拒绝/边界：经验暂停 403；content 为字符串；非法分类 400；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-FRESH-COMPACT-D62A81",
+      "task_ids": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“刷新能力并压缩会话”后核对：压缩旧上下文后按当前 Agent 配置重建提示词和工具快照",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-D62A81C2AEB2",
+        "feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-FRESH-COMPACT-D62A81",
+        "task_ids": [
+          "R06-T03",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户刷新能力并压缩会话",
+        "then": "压缩旧上下文后按当前 Agent 配置重建提示词和工具快照",
+        "assertions": [
+          "给定目标与相应权限，执行“刷新能力并压缩会话”后核对：压缩旧上下文后按当前 Agent 配置重建提示词和工具快照",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R08-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R08-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T03",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "execution_owner": "Rust Session/Storage",
+        "execution_stage_ids": [
+          "R06",
+          "R08"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D01-SLASH_COMMAND-SLASH-COMMAND-COMPACT-0FE8BE",
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "assertions": [
+        "先回复正在压缩，再返回 token 前后数或完成说明",
+        "失败回传压缩失败；接管态目标为被接管桌面会话"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-0FE8BED686E2",
+        "feature_id": "F-D01-SLASH_COMMAND-SLASH-COMMAND-COMPACT-0FE8BE",
+        "task_ids": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "发送 /compact",
+        "then": "先回复正在压缩，再返回 token 前后数或完成说明",
+        "assertions": [
+          "先回复正在压缩，再返回 token 前后数或完成说明",
+          "失败回传压缩失败；接管态目标为被接管桌面会话"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R03-A01",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R03-A02",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R06-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R06-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R08-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R08-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "execution_owner": "Rust Run/Session＋React",
+        "execution_stage_ids": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D01-SLASH_COMMAND-SLASH-COMMAND-FRESH-COMPACT-5A6E0D",
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "assertions": [
+        "刷新提示词和记忆后压缩，回传 token 变化或原因",
+        "接管态拒绝；失败明确回报且原始历史保留"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-5A6E0D526903",
+        "feature_id": "F-D01-SLASH_COMMAND-SLASH-COMMAND-FRESH-COMPACT-5A6E0D",
+        "task_ids": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "发送 /fresh-compact",
+        "then": "刷新提示词和记忆后压缩，回传 token 变化或原因",
+        "assertions": [
+          "刷新提示词和记忆后压缩，回传 token 变化或原因",
+          "接管态拒绝；失败明确回报且原始历史保留"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R03-A01",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R03-A02",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R06-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R06-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R08-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R08-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "execution_owner": "Rust Run/Session＋React",
+        "execution_stage_ids": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D07-TOOL-TOOL-RECALL-EXPERIENCE-7D05B1",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "命中来自当前Agent",
+        "无写入",
+        "无记录/跨Agent时为空，不泄露其他Agent经验。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-7D05B144AE21",
+        "feature_id": "F-D07-TOOL-TOOL-RECALL-EXPERIENCE-7D05B1",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "当前会话具备调用 recall_experience 的权限，且准备有效对象与无效/拒绝样本",
+        "when": "分别调用 recall_experience 的主要分支，并从会话、文件/状态或外部结果读回",
+        "then": "返回匹配经验及路径，不改记忆文件。",
+        "assertions": [
+          "命中来自当前Agent",
+          "无写入",
+          "无记录/跨Agent时为空，不泄露其他Agent经验。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "检验“Agent记忆不串用”的横向边界，可与本入口的检索Agent经验文档共同执行；仍未逐项断言该结果。"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧场景检验“技能审核和执行边界仍有效”，未操作或核对本入口的检索Agent经验文档。"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D07-TOOL-TOOL-RECORD-EXPERIENCE-A17D74",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "写后可召回",
+        "Agent之间隔离",
+        "无效类别/写入失败/跨Agent拒绝，不破坏旧经验。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-A17D742E55B7",
+        "feature_id": "F-D07-TOOL-TOOL-RECORD-EXPERIENCE-A17D74",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "当前会话具备调用 record_experience 的权限，且准备有效对象与无效/拒绝样本",
+        "when": "分别调用 record_experience 的主要分支，并从会话、文件/状态或外部结果读回",
+        "then": "经验文档和索引出现新内容，后续recall可读。",
+        "assertions": [
+          "写后可召回",
+          "Agent之间隔离",
+          "无效类别/写入失败/跨Agent拒绝，不破坏旧经验。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "检验“Agent记忆不串用”的横向边界，可与本入口的写入或更新Agent经验共同执行；仍未逐项断言该结果。"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧场景检验“技能审核和执行边界仍有效”，未操作或核对本入口的写入或更新Agent经验。"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D01-WS_IN-WS-IN-COMPACT-421EEA",
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "assertions": [
+        "先回 compaction_accepted，再按实际结果回 succeeded/noop/failed",
+        "未知 method、实验关闭、会话不存在/正在流式时明确失败，不能改历史"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-421EEA1AC8D5",
+        "feature_id": "F-D01-WS_IN-WS-IN-COMPACT-421EEA",
+        "task_ids": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在界面请求压缩上下文",
+        "then": "先回 compaction_accepted，再按实际结果回 succeeded/noop/failed",
+        "assertions": [
+          "先回 compaction_accepted，再按实际结果回 succeeded/noop/failed",
+          "未知 method、实验关闭、会话不存在/正在流式时明确失败，不能改历史"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R03-A01",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R03-A02",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R06-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R06-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R08-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R08-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "execution_owner": "Rust Run/Session＋React",
+        "execution_stage_ids": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    }
+  ],
+  "report_sources": [
+    "docs/rust-tauri/R06/R06-T02_REPORT.md",
+    "docs/rust-tauri/R06/R06-T04_REPORT.md",
+    "docs/rust-tauri/R06/R06-T06_REPORT.md"
+  ],
+  "triage": "原义务需真实实验与范围核对，未确证当前Bug；不得因本清单推定修复完成/无需验证",
+  "legacy_comparison_excerpt": []
+}

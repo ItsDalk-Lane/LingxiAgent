@@ -61,6 +61,7 @@ export type DreamRevisionDetail = Omit<DreamRevisionSummary, 'bodyChars' | 'sect
 export type DreamRevisionDetailPayload = {
   revision: DreamRevisionDetail;
   current: DreamSectionsSnapshot;
+  currentHash: string;
 };
 
 /** 四段全等判断：决定 UI 展示"当前记忆与此版本相同"并禁用恢复按钮。 */
@@ -116,10 +117,18 @@ export async function loadDreamRevision(agentId: string, revisionId: string, sig
   return data;
 }
 
-export async function restoreDream(agentId: string, revisionId: string) {
+export async function restoreDream(agentId: string, revisionId: string, expectedCurrentHash: string) {
+  if (!/^[a-f0-9]{64}$/i.test(expectedCurrentHash)) {
+    throw errorWithCode('无法确认当前记忆版本，请重新读取后再恢复', 'dream_restore_failed');
+  }
   const response = await lingxiFetch(
     `/api/memories/dream/revisions/${encodeURIComponent(revisionId)}/restore?agentId=${encodeURIComponent(agentId)}`,
-    { method: 'POST', timeout: 30_000 },
+    {
+      method: 'POST',
+      timeout: 30_000,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ expectedCurrentHash }),
+    },
   );
   return responseJson<{ ok: true }>(response);
 }

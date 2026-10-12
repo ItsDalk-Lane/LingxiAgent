@@ -1,0 +1,59 @@
+{
+  "at": "2026-10-12T02:16:14.967951+00:00",
+  "role": "ROOT_READ_ONLY_ACTUAL_AUTHOR_WINDOW_NOT_INDEPENDENT_REVIEW",
+  "record_sha256": {
+    "expired-owned-blob-old-red-01.json": "b9ddd457c23a6b3c7c273db8ebb0320a5e053057c63d0f26a149edd2b0e577a8",
+    "expired-owned-blob-old-red-01-result.json": "d46e147cb25ee9195bc7b848c2e85be5d27991018551a04f1ed759ad816d7771",
+    "expired-owned-blob-old-red-01.log": "cc4810dd100ae28699755c587723d309eff5d28d3dc0bbadb8dc6a39cc3cfa29"
+  },
+  "original_records_changed": false,
+  "actual_outer_exit": 1,
+  "source_bound_paths": 290,
+  "source_stable_within_actual_subset": true,
+  "full_non_rust_source_binding": "NOT_INFERRED_FROM_THIS_SUBSET",
+  "actual_normal_positive": {
+    "first_upload_status": 201,
+    "bytes": 8
+  },
+  "synthetic_fixture": "Only stopped synthetic session activity timestamp changed to 1 to establish the original 72h cold precondition; no file status/ref/bytes or service cleanup outcome fabricated.",
+  "actual_production_cleanup": {
+    "metadata_status": "expired",
+    "original_payload_exists": false
+  },
+  "actual_same_content_reupload": {
+    "status": 500,
+    "cause": "UNIQUE_OWNER_SOURCE_KEY",
+    "remaining_rows": 1,
+    "remaining_managed_files": 0
+  },
+  "model_calls": 0,
+  "services": [
+    {
+      "pid": 39601,
+      "exit_from_actor_program_wait_record": 0,
+      "actual_binary_before_sha256": "c80a563e40b686dd658ff34de8c25864be303d827af621d5680c84a3086e1665",
+      "actual_binary_after_sha256": "c80a563e40b686dd658ff34de8c25864be303d827af621d5680c84a3086e1665",
+      "guard_enabled": true,
+      "guard_breaches": []
+    },
+    {
+      "pid": 39640,
+      "exit_from_actor_program_wait_record": 0,
+      "actual_binary_before_sha256": "c80a563e40b686dd658ff34de8c25864be303d827af621d5680c84a3086e1665",
+      "actual_binary_after_sha256": "c80a563e40b686dd658ff34de8c25864be303d827af621d5680c84a3086e1665",
+      "guard_enabled": true,
+      "guard_breaches": []
+    }
+  ],
+  "root_independent_wait": "NOT_PERFORMED_RECORD_READBACK_ONLY",
+  "binding": "V2_HISTORICAL_OLD_RED_NOT_FINAL_V3",
+  "finding_status": "OPEN_OWNED_BLOB_RESTORE_SAME_FAMILY",
+  "scope": "F04/T03/T05/EX10_OWNED_CACHE_COLD_EXPIRY_AND_LEGAL_REUPLOAD",
+  "readback_limitations": [
+    "Prior locator printed large source maps and truncated; all maps compared in-memory in this receipt.",
+    "Prior locator expected guard dict but actual external_business_guard is bool; locator failed read-only, did not alter evidence."
+  ],
+  "acceptance": "NONE",
+  "stage": "NOT_RUN",
+  "R07_started": false
+}

@@ -1,0 +1,79 @@
+   Compiling lingxi-service v0.0.0 (<W09_WORKSPACE>/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.81s
+     Running tests/r06_ar_w10_embedding_identity.rs (rust/target-w09-e01/debug/deps/r06_ar_w10_embedding_identity-a492dffe06646973)
+LINGXI_TEST_GUARD: armed (pid 66746, mem_limit=8192 MB, time_limit=600 s)
+
+running 9 tests
+test c01_resolved_route_is_immutable_across_pre_send_reload ... 
+thread 'c01_resolved_route_is_immutable_across_pre_send_reload' (5261247) panicked at crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs:232:13:
+job never reached failed: {"counts":{"done":1,"failed":0,"pending_embedding":0,"queued":0,"running":0},"jobs":[{"artifactId":"kpa_9498542bf61bf26d02ab385b","attempt":1,"cancelledAt":null,"chunkerConfigId":"8b93f0aa4fa689af","createdAt":"2026-10-11T11:43:12.277Z","embeddingStats":{"actualWrittenChunkCount":1,"attempt":1,"callAttemptCount":1,"chunksNewlyEmbedded":1,"chunksResumedFromCheckpoint":0,"chunksReusedFromReadyVariant":0,"failedRequestCount":0,"model":{"dimensions":2,"key":"47f10995aa4126c06f172b5a78f2afaec12b845ff933a2042300404adddc7f4e","modelId":"model-a","parameterFingerprint":"a403c5a9dfacd801482c0a3668117b82ab91ed4e35bdd27905c684d40b9175d0","protocol":"openai-embeddings","provider":"embed"},"pendingCallIntentCount":0,"pendingRequestCount":0,"plannedChunkCount":1,"previousRequestCount":0,"requestCount":1,"resetStaleVectors":false,"successfulRequestCount":1,"unknownRequestsFromPreviousAttempt":0},"error":null,"id":"kjob_78f3973bb254e3eebd349bb9","notebookId":"knb_d642b024025e6c5665e4fb31","phase":"done","progressDone":1,"progressTotal":1,"sourceId":"ksrc_91cb791489e71653572dc610","status":"done","updatedAt":"2026-10-11T11:43:12.304Z"}]}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test c02_same_dimension_reload_never_poisons_first_variant ... W10 c02: 原始请求与数据库收据已写入独立证据
+ok
+test c03_query_uses_served_identity_during_reload_and_isolates_dimensions ... 
+thread 'c03_query_uses_served_identity_during_reload_and_isolates_dimensions' (5263395) panicked at crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs:633:5:
+assertion `left == right` failed
+  left: 1
+ right: 2
+FAILED
+test c04_failed_build_restarts_under_changed_identity_without_reusing_old_space ... W10 c04-before: 原始请求与数据库收据已写入独立证据
+W10 c04: 原始请求与数据库收据已写入独立证据
+ok
+test configured_unknown_dimensions_and_parameter_compatibility_are_explicit ... W10 configured-identity: 原始请求与数据库收据已写入独立证据
+ok
+test crash_running_job_is_explicitly_refused_and_preserves_paid_vectors ... LINGXI_TEST_GUARD: armed (pid 67437, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_TEST_GUARD: armed (pid 67440, mem_limit=8192 MB, time_limit=600 s)
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/identity-original-06/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w10-crash-running-66746-1791719023920710000 previousInstanceId=c4e7dc6de5e82da3c080dbc6721c776a previousPid=67437 previousStartNonce=b4a6a875e9febf38 previousStartedAtUnixMs=1791719024876 handshakeMismatches=none
+2026-10-11T11:43:45.260812Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] stale_archive=/Users/[user]/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/identity-original-06/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w10-crash-running-66746-1791719023920710000/lingxi-service/instance.stale.json
+W10 crash-running: 原始请求与数据库收据已写入独立证据
+ok
+test legacy_paid_identity_is_preserved_and_requires_explicit_rebuild ... W10 legacy: 原始请求与数据库收据已写入独立证据
+ok
+test positive_production_ingestion_four_way_identity ... W10 positive: 原始请求与数据库收据已写入独立证据
+ok
+test same_model_endpoint_change_is_incompatible_but_unchanged_reload_is_compatible ... W10 parameters: 原始请求与数据库收据已写入独立证据
+ok
+
+failures:
+
+failures:
+    c01_resolved_route_is_immutable_across_pre_send_reload
+    c03_query_uses_served_identity_during_reload_and_isolates_dimensions
+
+test result: FAILED. 7 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 34.27s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_w10_embedding_identity`
+     Running tests/r06_t07_knowledge.rs (rust/target-w09-e01/debug/deps/r06_t07_knowledge-7ae0f9c2623b291a)
+LINGXI_TEST_GUARD: armed (pid 67443, mem_limit=8192 MB, time_limit=600 s)
+
+running 11 tests
+test a14_switching_to_incompatible_embedding_dimension_refuses_vector_channel_until_rebuild ... ok
+test citation_resolution_returns_block_snapshot_source_and_viewer ... ok
+test file_import_security_rules ... ok
+test import_pasted_text_parses_chunks_and_ingests_with_stub_embeddings ... ok
+test ingestion_without_model_lands_pending_embedding_then_completes_after_reboot ... ok
+test notebook_crud_settings_and_ingestion_summary ... ok
+test reingest_membership_and_delete_semantics ... ok
+test research_engine_tables_are_not_restored ... ok
+test settings_change_triggers_rebuild_and_variants_coexist ... ok
+test snapshot_content_serves_bytes_with_security_headers ... ok
+test source_delete_is_blocked_while_turn_scope_freezes_it ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 81.51s
+
+     Running tests/r06_t07_knowledge_tools.rs (rust/target-w09-e01/debug/deps/r06_t07_knowledge_tools-98f7b4f145bdffc7)
+LINGXI_TEST_GUARD: armed (pid 69245, mem_limit=8192 MB, time_limit=600 s)
+
+running 6 tests
+test a13_citation_markdown_resolves_to_actual_text ... ok
+test a13_search_within_scope_returns_only_allowed_sources ... ok
+test a13_untrusted_source_instructions_stay_material_not_privilege ... ok
+test knowledge_manage_actions_and_gates ... ok
+test knowledge_read_pagination_and_grep_outline ... ok
+test scope_violations_are_loud_not_fallback ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 222.20s
+
+error: 1 target failed:
+    `-p lingxi-service --test r06_ar_w10_embedding_identity`

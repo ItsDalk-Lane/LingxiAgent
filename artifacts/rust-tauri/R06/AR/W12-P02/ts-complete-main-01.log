@@ -1,0 +1,10 @@
+{"command": ["npx", "vitest", "run", "tests/r06-ar-f12-vector-cache-preservation.test.ts", "tests/r06-ar-f12-fulltext-cache-preservation.test.ts", "tests/r06-ar-f12-ann-cache-preservation.test.ts", "tests/knowledge-index-metadata-migration.test.ts", "tests/knowledge-section-index.test.ts", "tests/knowledge-query-index-separation.test.ts", "tests/knowledge-query-config-alignment.test.ts", "tests/knowledge-vector-index.test.ts", "tests/knowledge-vector-backend-parity.test.ts", "tests/knowledge-vector-backend-fallback.test.ts", "tests/knowledge-vector-shutdown.test.ts", "tests/knowledge-ann-crash-recovery.test.ts", "tests/knowledge-ann-rebuild.test.ts", "tests/knowledge-index-metadata-backfill.test.ts", "tests/knowledge-index-variants.test.ts", "tests/knowledge-ann-index-store.test.ts", "tests/knowledge-ingestion.test.ts", "tests/knowledge-lifecycle.test.ts", "--maxWorkers=1"], "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-ts-complete-main-01-vsyq635g", "start": 1791702441.1509461}
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+
+ Test Files  18 passed (18)
+      Tests  123 passed (123)
+   Start at  15:07:24
+   Duration  29.32s (transform 272ms, setup 79ms, import 1.91s, tests 26.25s, environment 1ms)
+

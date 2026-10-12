@@ -1,0 +1,13 @@
+{
+  "owner": "W05-E01 only synthetic execution temporary directory",
+  "root": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w05-e01-external-01e6i8at",
+  "TMPDIR": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w05-e01-external-01e6i8at/tmp",
+  "LINGXI_HOME": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w05-e01-external-01e6i8at/home",
+  "OS_HOME": "inherited unchanged",
+  "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01",
+  "outsideWorkspace": true,
+  "preExisting": false,
+  "productDir": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/lib",
+  "originalFormalReceiptSha256": "db21cc29034e78f589000e2c965706de49137594c8e22141bb4f400a64f7ff38",
+  "change": "receipt-only after original chain exit; source/env during original run unchanged"
+}

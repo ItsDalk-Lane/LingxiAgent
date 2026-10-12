@@ -149,6 +149,13 @@ fn classify_guard_reply(reply: &str) -> SkillReviewOutcome {
 
 // ── service ─────────────────────────────────────────────────────────────────
 
+struct SkillReferenceScrub {
+    path: PathBuf,
+    before: String,
+    patched: String,
+    agent: String,
+}
+
 pub struct SkillService {
     home: PathBuf,
     product_dir: PathBuf,
@@ -231,8 +238,11 @@ impl SkillService {
 
     fn read_external_paths(home: &Path) -> Vec<sl::ExternalSkillPath> {
         let prefs = am::read_json_file(&home.join("user").join("preferences.json"));
+        Self::external_paths_from_preferences(prefs.as_ref())
+    }
+
+    fn external_paths_from_preferences(prefs: Option<&Value>) -> Vec<sl::ExternalSkillPath> {
         prefs
-            .as_ref()
             .and_then(|p| p.get("external_skill_paths"))
             .and_then(Value::as_array)
             .map(|arr| {
@@ -258,8 +268,11 @@ impl SkillService {
 
     fn read_hidden_skills(home: &Path) -> std::collections::HashSet<String> {
         let prefs = am::read_json_file(&home.join("user").join("preferences.json"));
+        Self::hidden_skills_from_preferences(prefs.as_ref())
+    }
+
+    fn hidden_skills_from_preferences(prefs: Option<&Value>) -> std::collections::HashSet<String> {
         prefs
-            .as_ref()
             .and_then(|p| p.get("hidden_skills"))
             .and_then(Value::as_array)
             .map(|arr| {
@@ -275,7 +288,16 @@ impl SkillService {
     /// order (user pool first; external appended; workspace separately).
     pub fn scan_catalog(&self) -> Vec<sl::SkillEntry> {
         let hidden = self.hidden_skills.lock().unwrap().clone();
-        let mut all = sl::SkillCatalog::scan_user_pool(&self.skills_dir(), &hidden);
+        let external = self.external_paths.lock().unwrap().clone();
+        self.scan_catalog_with_preferences(&hidden, &external)
+    }
+
+    fn scan_catalog_with_preferences(
+        &self,
+        hidden: &std::collections::HashSet<String>,
+        external: &[sl::ExternalSkillPath],
+    ) -> Vec<sl::SkillEntry> {
+        let mut all = sl::SkillCatalog::scan_user_pool(&self.skills_dir(), hidden);
         if let Some(seed) = self.seed_dir() {
             // seeds are shown only when not shadowed by a same-name user skill
             let existing: std::collections::HashSet<String> =
@@ -286,8 +308,7 @@ impl SkillService {
                 }
             }
         }
-        let external = self.external_paths.lock().unwrap().clone();
-        let external_entries = sl::SkillCatalog::scan_external(&external);
+        let external_entries = sl::SkillCatalog::scan_external(external);
         // dedup: internal wins (skill-manager.ts:401-411)
         let existing: std::collections::HashSet<String> =
             all.iter().map(|s| s.name.clone()).collect();
@@ -334,9 +355,10 @@ impl SkillService {
                 "agent not found: {agent_id}"
             )));
         }
-        let text = std::fs::read_to_string(&path).map_err(|e| MemoryError::Io(e.to_string()))?;
-        let (enabled, workspace_disabled) = AgentConfigPatchAlias::read_skill_lists(&text);
-        let flags = AgentConfigPatchAlias::read_flags(&text);
+        let text =
+            am::config::read_config_text(&path).map_err(|e| MemoryError::Io(e.to_string()))?;
+        let (enabled, workspace_disabled) = AgentConfigPatchAlias::read_skill_lists(&text)?;
+        let flags = AgentConfigPatchAlias::read_flags(&text)?;
         let policy = lingxi_kernel::memory::workspace_skill_policy_from_config(
             flags.discover_project_skills,
             flags.discover_compatible_project_skills,
@@ -351,7 +373,7 @@ impl SkillService {
         enabled: &[String],
         workspace_disabled: &[String],
     ) -> Result<(), MemoryError> {
-        let patched = AgentConfigPatchAlias::write_skill_lists(text, enabled, workspace_disabled);
+        let patched = AgentConfigPatchAlias::write_skill_lists(text, enabled, workspace_disabled)?;
         am::atomic_write(
             &self.home.join("agents").join(agent_id).join("config.yaml"),
             &patched,
@@ -429,6 +451,7 @@ impl SkillService {
         requested: &[String],
         workspace_root: Option<&Path>,
     ) -> Result<Vec<String>, MemoryError> {
+        let _publication = am::ContextMaterialMutation::for_home(&self.home);
         let visible: std::collections::HashSet<String> = self
             .list_for_agent(agent_id, false, workspace_root)?
             .iter()
@@ -441,8 +464,7 @@ impl SkillService {
             .cloned()
             .collect();
         let (text, _enabled, workspace_disabled, _policy) = self.read_agent_config(agent_id)?;
-        // Patch the READ config text — the skills whitelist is a line-level
-        // subset edit; the rest of config.yaml survives byte-for-byte
+        // 只更新所属字段，未知字段的值保留；格式按现役 YAML 保存规则规范化
         // (skills.ts:284-310 rewrites only the skills lists).
         self.write_agent_config(agent_id, &text, &filtered, &workspace_disabled)?;
         Ok(filtered)
@@ -456,6 +478,7 @@ impl SkillService {
         enable: bool,
         workspace_root: Option<&Path>,
     ) -> Result<Value, MemoryError> {
+        let _publication = am::ContextMaterialMutation::for_home(&self.home);
         let (text, enabled, workspace_disabled, policy) = self.read_agent_config(agent_id)?;
         let workspace_skill = self
             .scan_workspace(workspace_root)
@@ -702,6 +725,7 @@ impl SkillService {
     /// (skills.ts:411-416). Returns the installed skill view.
     pub fn install_manual(&self, source_path: &Path) -> Result<sl::InstalledSkill, MemoryError> {
         let _guard = self.mutation_lock.lock().unwrap();
+        let _publication = am::ContextMaterialMutation::for_home(&self.home);
         sl::install_skill_package_from_path(source_path, &self.skills_dir(), None)
     }
 
@@ -713,6 +737,7 @@ impl SkillService {
         workspace_root: Option<&Path>,
     ) -> Result<Value, MemoryError> {
         let _guard = self.mutation_lock.lock().unwrap();
+        let _publication = am::ContextMaterialMutation::for_home(&self.home);
         if sanitize_skill_name(name).is_none() {
             return Err(MemoryError::InvalidRequest("invalid skill name".into()));
         }
@@ -733,42 +758,96 @@ impl SkillService {
         if !dir.exists() {
             return Err(MemoryError::NotFound("skill not found".into()));
         }
+        let names = [name.to_string()];
+        self.prepare_skill_reference_scrub(&names)?;
+        sl::BundlesStore::new(&self.home).load_checked()?;
         sl::remove_skill_directory(&self.skills_dir(), name)?;
         // scrub all agent configs + bundles (skill-removal.ts:126-135)
-        let scrubbed = self.scrub_skill_references(&[name.to_string()])?;
+        let scrubbed =
+            self.scrub_skill_references(&names)
+                .map_err(|err| MemoryError::Conflict {
+                    code: "SKILL_DELETED_REFERENCE_CLEANUP_FAILED".into(),
+                    message: format!("技能已删除，但引用清理失败：{err}"),
+                })?;
         Ok(json!({ "ok": true, "scrubbedAgents": scrubbed }))
     }
 
     /// removeUserSkills reference scrub (skill-removal.ts:82-98 + bundles).
-    fn scrub_skill_references(&self, names: &[String]) -> Result<Vec<String>, MemoryError> {
+    fn prepare_skill_reference_scrub(
+        &self,
+        names: &[String],
+    ) -> Result<Vec<SkillReferenceScrub>, MemoryError> {
         let agents_root = self.home.join("agents");
-        let mut scrubbed = Vec::new();
-        let Ok(entries) = std::fs::read_dir(&agents_root) else {
-            return Ok(scrubbed);
+        let entries = match std::fs::read_dir(&agents_root) {
+            Ok(entries) => entries,
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
+            Err(err) => {
+                return Err(MemoryError::Io(format!(
+                    "read agents for skill cleanup: {err}"
+                )))
+            }
         };
-        for entry in entries.flatten() {
-            if !entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+        let mut plan = Vec::new();
+        for entry in entries {
+            let entry = entry.map_err(|err| MemoryError::Io(err.to_string()))?;
+            if !entry
+                .file_type()
+                .map_err(|err| MemoryError::Io(err.to_string()))?
+                .is_dir()
+            {
                 continue;
             }
-            let config_path = entry.path().join("config.yaml");
-            if !config_path.is_file() {
+            if entry.path().join(".deleted-agent.json").exists() {
                 continue;
             }
-            let text = std::fs::read_to_string(&config_path)
-                .map_err(|e| MemoryError::Io(e.to_string()))?;
-            let (enabled, workspace_disabled) = AgentConfigPatchAlias::read_skill_lists(&text);
-            let hit = enabled.iter().any(|n| names.contains(n));
-            if hit {
-                let filtered: Vec<String> =
-                    enabled.into_iter().filter(|n| !names.contains(n)).collect();
+            let path = entry.path().join("config.yaml");
+            let text = match am::config::read_config_text(&path) {
+                Ok(text) => text,
+                Err(err) if err.kind() == std::io::ErrorKind::NotFound => continue,
+                Err(err) => {
+                    return Err(MemoryError::Io(format!(
+                        "read agent config before skill cleanup: {err}"
+                    )))
+                }
+            };
+            let (enabled, disabled) = AgentConfigPatchAlias::read_skill_lists(&text)?;
+            if enabled.iter().any(|name| names.contains(name)) {
+                let filtered: Vec<String> = enabled
+                    .into_iter()
+                    .filter(|name| !names.contains(name))
+                    .collect();
                 let patched =
-                    AgentConfigPatchAlias::write_skill_lists(&text, &filtered, &workspace_disabled);
-                am::atomic_write(&config_path, &patched).map_err(MemoryError::from)?;
-                scrubbed.push(entry.file_name().to_string_lossy().to_string());
+                    AgentConfigPatchAlias::write_skill_lists(&text, &filtered, &disabled)?;
+                plan.push(SkillReferenceScrub {
+                    path,
+                    before: text,
+                    patched,
+                    agent: entry.file_name().to_string_lossy().to_string(),
+                });
             }
         }
-        let bundles = sl::BundlesStore::new(&self.home);
-        let _ = bundles.remove_skills(names);
+        Ok(plan)
+    }
+    fn scrub_skill_references(&self, names: &[String]) -> Result<Vec<String>, MemoryError> {
+        let plan = self.prepare_skill_reference_scrub(names)?;
+        let mut scrubbed = Vec::new();
+        for SkillReferenceScrub {
+            path,
+            before,
+            patched,
+            agent,
+        } in plan
+        {
+            if am::config::read_config_text(&path).map_err(MemoryError::from)? != before {
+                return Err(MemoryError::Conflict {
+                    code: "AGENT_CONFIG_CHANGED".into(),
+                    message: "助手配置在技能引用清理前已改变".into(),
+                });
+            }
+            am::atomic_write(&path, &patched).map_err(MemoryError::from)?;
+            scrubbed.push(agent);
+        }
+        sl::BundlesStore::new(&self.home).remove_skills(names)?;
         Ok(scrubbed)
     }
 
@@ -804,7 +883,7 @@ impl SkillService {
             })
             .collect();
         let used_elsewhere =
-            sl::collect_enabled_skills_of_other_agents(&self.home.join("agents"), agent_id);
+            sl::collect_enabled_skills_of_other_agents(&self.home.join("agents"), agent_id)?;
         let skills: Vec<Value> = candidates
             .into_iter()
             .filter(|s| {
@@ -820,6 +899,7 @@ impl SkillService {
     }
 
     pub fn set_external_paths(&self, paths: &[String]) -> Result<(), MemoryError> {
+        let _publication = am::ContextMaterialMutation::for_home(&self.home);
         for path in paths {
             if !Path::new(path).is_absolute() {
                 return Err(MemoryError::InvalidRequest(format!(
@@ -898,6 +978,7 @@ impl SkillService {
     /// deletes take (skills.ts:548-559 与安装/删除共用锁).
     pub fn reload(&self) -> usize {
         let _guard = self.mutation_lock.lock().unwrap();
+        let _publication = am::ContextMaterialMutation::for_home(&self.home);
         self.scan_catalog().len()
     }
 
@@ -934,28 +1015,30 @@ impl SkillService {
         agent_id: &str,
     ) -> Result<Vec<SkillCatalogEntry>, MemoryError> {
         validate_agent_id(agent_id)?;
-        let config_path = self.home.join("agents").join(agent_id).join("config.yaml");
-        let (enabled, workspace_disabled, policy) = if config_path.is_file() {
-            let text = std::fs::read_to_string(&config_path)
-                .map_err(|e| MemoryError::Io(e.to_string()))?;
-            let (enabled, workspace_disabled) = AgentConfigPatchAlias::read_skill_lists(&text);
-            let flags = AgentConfigPatchAlias::read_flags(&text);
-            let policy = workspace_skill_policy_from_config(
-                flags.discover_project_skills,
-                flags.discover_compatible_project_skills,
-            );
-            (enabled, workspace_disabled, policy)
-        } else {
-            (
-                Vec::new(),
-                Vec::new(),
-                workspace_skill_policy_from_config(None, None),
-            )
+        let prefs_path = self.home.join("user").join("preferences.json");
+        // 本次采集使用同一份偏好文档，不能经由共享的可变字段拼接两版资料。
+        let prefs = match std::fs::read_to_string(&prefs_path) {
+            Ok(text) => Some(
+                serde_json::from_str::<Value>(&text)
+                    .map_err(|e| MemoryError::Store(format!("preferences parse failed: {e}")))?,
+            ),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+            Err(e) => return Err(MemoryError::Io(e.to_string())),
         };
+        let external = Self::external_paths_from_preferences(prefs.as_ref());
+        let hidden = Self::hidden_skills_from_preferences(prefs.as_ref());
+        let config_path = self.home.join("agents").join(agent_id).join("config.yaml");
+        let document = am::config::read_agent_config(&config_path)?;
+        let (enabled, workspace_disabled) = document.skill_lists()?;
+        let flags = document.flags()?;
+        let policy = workspace_skill_policy_from_config(
+            flags.discover_project_skills,
+            flags.discover_compatible_project_skills,
+        );
         let enabled_set: std::collections::HashSet<String> = enabled.into_iter().collect();
         let disabled_set: std::collections::HashSet<String> =
             workspace_disabled.into_iter().collect();
-        let mut catalog = self.scan_catalog();
+        let mut catalog = self.scan_catalog_with_preferences(&hidden, &external);
         catalog.extend(self.scan_workspace(self.workspace_root().as_deref()));
         let selection =
             sl::resolve_runtime_selection(&catalog, &enabled_set, &disabled_set, &policy);

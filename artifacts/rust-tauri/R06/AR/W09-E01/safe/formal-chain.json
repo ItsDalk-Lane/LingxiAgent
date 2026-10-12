@@ -1,0 +1,1513 @@
+{
+  "results": [
+    {
+      "path": "verify-R05-final/verify-stage-result.json",
+      "sha256": "da7415fbdadb885c323cc8b1889f6b2197a4e6f007e88d691df78e5cf65aed22",
+      "stage": "R05",
+      "overall": "FAIL",
+      "gateAbort": null,
+      "candidateSourceBinding": {
+        "after": {
+          "atUnixMs": 1791729822060,
+          "digestSha256": "f00f16d9a64b70485a4db7cb99d4aa07b666fbc095f3375f8b979e9108cd710b",
+          "fileCount": 81430,
+          "manifestPath": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final/candidate-source-after.json",
+          "manifestSha256": "4841b6ec5a98dd363123596e9f2d652d6d57b47f164746144b7cdda500a1ea9b"
+        },
+        "afterError": null,
+        "before": {
+          "atUnixMs": 1791726628698,
+          "digestSha256": "f00f16d9a64b70485a4db7cb99d4aa07b666fbc095f3375f8b979e9108cd710b",
+          "fileCount": 81430,
+          "manifestPath": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final/candidate-source-before.json",
+          "manifestSha256": "4841b6ec5a98dd363123596e9f2d652d6d57b47f164746144b7cdda500a1ea9b"
+        },
+        "checkpointAfterEveryCommand": [
+          {
+            "atUnixMs": 1791726724993,
+            "changedPathBytesHex": [],
+            "commandKey": "rust_test_workspace",
+            "digestSha256": "f00f16d9a64b70485a4db7cb99d4aa07b666fbc095f3375f8b979e9108cd710b",
+            "fileCount": 81430,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791727302056,
+            "changedPathBytesHex": [],
+            "commandKey": "r05_stage_suites",
+            "digestSha256": "f00f16d9a64b70485a4db7cb99d4aa07b666fbc095f3375f8b979e9108cd710b",
+            "fileCount": 81430,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791727358481,
+            "changedPathBytesHex": [],
+            "commandKey": "rust_fmt",
+            "digestSha256": "f00f16d9a64b70485a4db7cb99d4aa07b666fbc095f3375f8b979e9108cd710b",
+            "fileCount": 81430,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791727442112,
+            "changedPathBytesHex": [],
+            "commandKey": "rust_clippy",
+            "digestSha256": "f00f16d9a64b70485a4db7cb99d4aa07b666fbc095f3375f8b979e9108cd710b",
+            "fileCount": 81430,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791727493266,
+            "changedPathBytesHex": [],
+            "commandKey": "check_contracts",
+            "digestSha256": "f00f16d9a64b70485a4db7cb99d4aa07b666fbc095f3375f8b979e9108cd710b",
+            "fileCount": 81430,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791727541018,
+            "changedPathBytesHex": [],
+            "commandKey": "check_boundaries",
+            "digestSha256": "f00f16d9a64b70485a4db7cb99d4aa07b666fbc095f3375f8b979e9108cd710b",
+            "fileCount": 81430,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791729776640,
+            "changedPathBytesHex": [],
+            "commandKey": "r04_regression_gate",
+            "digestSha256": "f00f16d9a64b70485a4db7cb99d4aa07b666fbc095f3375f8b979e9108cd710b",
+            "fileCount": 81430,
+            "stable": true
+          }
+        ],
+        "excluded": {
+          "evidenceOutputPathBytesHex": "6172746966616374732f727573742d74617572692f5230362f41522f5730392d4530312f7665726966792d5230352d66696e616c",
+          "evidenceOutputRelativePath": "artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final",
+          "policy": "This invocation's fresh --evidence subtree and exact real OS fd stdout/stderr files of this process and its ancestors are excluded. No ancestor sink directory is excluded. The set is fixed before binding; other tracked and non-ignored untracked paths stay bound.",
+          "runOutputFiles": [
+            {
+              "kind": "FILE",
+              "pathBytesHex": "6172746966616374732f727573742d74617572692f5230362f41522f5730392d4530312f636f6d6d616e64732f666f726d616c2d7230352d66696e616c2d35392f6f75747075742e6c6f67",
+              "relativePath": "artifacts/rust-tauri/R06/AR/W09-E01/commands/formal-r05-final-59/output.log"
+            }
+          ]
+        },
+        "finalChangedPathBytesHex": [],
+        "headAtEndError": null,
+        "schema": "lingxi-candidate-source-binding-v1",
+        "stable": true,
+        "testedShaAtEnd": "bc2ce51fd005ea75b9949156974e15d2761eb734"
+      },
+      "runnerSourceBinding": {
+        "after": {
+          "compiledSourceFiles": [
+            {
+              "compiledAndDiskSha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+              "path": "scripts/rust-tauri/run_output_sinks.py"
+            },
+            {
+              "compiledAndDiskSha256": "051332d289953918cce09ceb84218768421d1f1d0b1f8a7fd7a475d84589b818",
+              "path": "rust/crates/xtask/src/main.rs"
+            },
+            {
+              "compiledAndDiskSha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+              "path": "rust/crates/xtask/src/verify.rs"
+            },
+            {
+              "compiledAndDiskSha256": "d926e08aa14a9a589ca026583213540d72407e3294834b8cab7da4da2caf122a",
+              "path": "rust/crates/xtask/src/stage_map.rs"
+            },
+            {
+              "compiledAndDiskSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+              "path": "rust/crates/xtask/src/candidate.rs"
+            },
+            {
+              "compiledAndDiskSha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+              "path": "rust/crates/xtask/src/runner_identity.rs"
+            },
+            {
+              "compiledAndDiskSha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+              "path": "rust/crates/xtask/src/stage_maps/R02.json"
+            },
+            {
+              "compiledAndDiskSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+              "path": "rust/crates/xtask/src/stage_maps/R03.json"
+            },
+            {
+              "compiledAndDiskSha256": "33950d59cf10291b0e8b1f529499a1cf5028a780c4c327234b50ea67f10fbba1",
+              "path": "rust/crates/xtask/src/stage_maps/R04.json"
+            },
+            {
+              "compiledAndDiskSha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+              "path": "rust/crates/xtask/src/stage_maps/R05.json"
+            },
+            {
+              "compiledAndDiskSha256": "529d44ff2bcd9e1c2a4a6083c8b79b485383fe5937185e337c541bf1c729005c",
+              "path": "rust/crates/xtask/Cargo.toml"
+            },
+            {
+              "compiledAndDiskSha256": "690e9ac59b5a647bbf97fa9ec74edde9ffc3e6c0389c03b83bc7781ceda2125f",
+              "path": "rust/Cargo.toml"
+            },
+            {
+              "compiledAndDiskSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+              "path": "rust-toolchain.toml"
+            }
+          ],
+          "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+          "schema": "lingxi-xtask-runner-source-v1",
+          "sourceInventory": [
+            "candidate.rs",
+            "candidate/tests.rs",
+            "main.rs",
+            "runner_identity.rs",
+            "stage_map.rs",
+            "stage_maps/R02.json",
+            "stage_maps/R03.json",
+            "stage_maps/R04.json",
+            "stage_maps/R05.json",
+            "verify.rs",
+            "verify/runner_tests.rs"
+          ],
+          "status": "PASS"
+        },
+        "afterError": null,
+        "before": {
+          "compiledSourceFiles": [
+            {
+              "compiledAndDiskSha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+              "path": "scripts/rust-tauri/run_output_sinks.py"
+            },
+            {
+              "compiledAndDiskSha256": "051332d289953918cce09ceb84218768421d1f1d0b1f8a7fd7a475d84589b818",
+              "path": "rust/crates/xtask/src/main.rs"
+            },
+            {
+              "compiledAndDiskSha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+              "path": "rust/crates/xtask/src/verify.rs"
+            },
+            {
+              "compiledAndDiskSha256": "d926e08aa14a9a589ca026583213540d72407e3294834b8cab7da4da2caf122a",
+              "path": "rust/crates/xtask/src/stage_map.rs"
+            },
+            {
+              "compiledAndDiskSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+              "path": "rust/crates/xtask/src/candidate.rs"
+            },
+            {
+              "compiledAndDiskSha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+              "path": "rust/crates/xtask/src/runner_identity.rs"
+            },
+            {
+              "compiledAndDiskSha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+              "path": "rust/crates/xtask/src/stage_maps/R02.json"
+            },
+            {
+              "compiledAndDiskSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+              "path": "rust/crates/xtask/src/stage_maps/R03.json"
+            },
+            {
+              "compiledAndDiskSha256": "33950d59cf10291b0e8b1f529499a1cf5028a780c4c327234b50ea67f10fbba1",
+              "path": "rust/crates/xtask/src/stage_maps/R04.json"
+            },
+            {
+              "compiledAndDiskSha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+              "path": "rust/crates/xtask/src/stage_maps/R05.json"
+            },
+            {
+              "compiledAndDiskSha256": "529d44ff2bcd9e1c2a4a6083c8b79b485383fe5937185e337c541bf1c729005c",
+              "path": "rust/crates/xtask/Cargo.toml"
+            },
+            {
+              "compiledAndDiskSha256": "690e9ac59b5a647bbf97fa9ec74edde9ffc3e6c0389c03b83bc7781ceda2125f",
+              "path": "rust/Cargo.toml"
+            },
+            {
+              "compiledAndDiskSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+              "path": "rust-toolchain.toml"
+            }
+          ],
+          "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+          "schema": "lingxi-xtask-runner-source-v1",
+          "sourceInventory": [
+            "candidate.rs",
+            "candidate/tests.rs",
+            "main.rs",
+            "runner_identity.rs",
+            "stage_map.rs",
+            "stage_maps/R02.json",
+            "stage_maps/R03.json",
+            "stage_maps/R04.json",
+            "stage_maps/R05.json",
+            "verify.rs",
+            "verify/runner_tests.rs"
+          ],
+          "status": "PASS"
+        },
+        "beforeError": null,
+        "status": "PASS"
+      },
+      "commands": [
+        {
+          "argv": [
+            "cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--workspace",
+            "--locked"
+          ],
+          "cleanup": null,
+          "durationMs": 96182,
+          "evidencePaths": [
+            "{EVIDENCE}/rust_test_workspace/stdout.log"
+          ],
+          "exitCode": 101,
+          "internalError": null,
+          "key": "rust_test_workspace",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "FAIL",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r05_t08_stage_suites.sh",
+            "{EVIDENCE}/R05_SUITES"
+          ],
+          "cleanup": null,
+          "durationMs": 577060,
+          "evidencePaths": [
+            "{EVIDENCE}/R05_SUITES/r05-cases.json",
+            "{EVIDENCE}/R05_SUITES/leaf-cases.json",
+            "{EVIDENCE}/R05_SUITES/summary.txt",
+            "{EVIDENCE}/R05_SUITES/pin-table.txt",
+            "{EVIDENCE}/R05_SUITES/cid-table.txt"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "r05_stage_suites",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "cargo",
+            "fmt",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "cleanup": null,
+          "durationMs": 56423,
+          "evidencePaths": [
+            "{EVIDENCE}/rust_fmt/stdout.log"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "rust_fmt",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "cargo",
+            "clippy",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--workspace",
+            "--all-targets",
+            "--locked",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "cleanup": null,
+          "durationMs": 83631,
+          "evidencePaths": [
+            "{EVIDENCE}/rust_clippy/stdout.log"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "rust_clippy",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r01-t02-check-generated.sh"
+          ],
+          "cleanup": null,
+          "durationMs": 51153,
+          "evidencePaths": [
+            "{EVIDENCE}/check_contracts/stdout.log"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "check_contracts",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "python3",
+            "-B",
+            "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+          ],
+          "cleanup": null,
+          "durationMs": 47751,
+          "evidencePaths": [
+            "{EVIDENCE}/check_boundaries/stdout.log"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "check_boundaries",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "verify-stage",
+            "R04",
+            "--evidence",
+            "{EVIDENCE}/R04_REGRESSION"
+          ],
+          "cleanup": null,
+          "durationMs": 2235610,
+          "evidencePaths": [
+            "{EVIDENCE}/R04_REGRESSION/verify-stage-result.json"
+          ],
+          "exitCode": 1,
+          "internalError": null,
+          "key": "r04_regression_gate",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "FAIL",
+          "timedOut": false
+        }
+      ],
+      "commandOutcomesIncomplete": null
+    },
+    {
+      "path": "verify-R05-final/R04_REGRESSION/verify-stage-result.json",
+      "sha256": "e7d3d092f91fb5c6f616c807bbf9a21461f7cb9b231cf12c3612457e5d00d9bc",
+      "stage": "R04",
+      "overall": "FAIL",
+      "gateAbort": null,
+      "candidateSourceBinding": {
+        "after": {
+          "atUnixMs": 1791729727223,
+          "digestSha256": "b22d965a45f0c8bfdc3f2b30b672d1cc4b6636614e7ebf8e35b9b68131c919c0",
+          "fileCount": 81545,
+          "manifestPath": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final/R04_REGRESSION/candidate-source-after.json",
+          "manifestSha256": "eb2d92a180937eb3065dcd5ed18eb669234973cd392b87d6daba213333b818b2"
+        },
+        "afterError": null,
+        "before": {
+          "atUnixMs": 1791727590168,
+          "digestSha256": "b22d965a45f0c8bfdc3f2b30b672d1cc4b6636614e7ebf8e35b9b68131c919c0",
+          "fileCount": 81545,
+          "manifestPath": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final/R04_REGRESSION/candidate-source-before.json",
+          "manifestSha256": "eb2d92a180937eb3065dcd5ed18eb669234973cd392b87d6daba213333b818b2"
+        },
+        "checkpointAfterEveryCommand": [
+          {
+            "atUnixMs": 1791727680396,
+            "changedPathBytesHex": [],
+            "commandKey": "rust_test_workspace",
+            "digestSha256": "b22d965a45f0c8bfdc3f2b30b672d1cc4b6636614e7ebf8e35b9b68131c919c0",
+            "fileCount": 81545,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791728038531,
+            "changedPathBytesHex": [],
+            "commandKey": "r04_tool_matrix",
+            "digestSha256": "b22d965a45f0c8bfdc3f2b30b672d1cc4b6636614e7ebf8e35b9b68131c919c0",
+            "fileCount": 81545,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791728088356,
+            "changedPathBytesHex": [],
+            "commandKey": "rust_fmt",
+            "digestSha256": "b22d965a45f0c8bfdc3f2b30b672d1cc4b6636614e7ebf8e35b9b68131c919c0",
+            "fileCount": 81545,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791728150980,
+            "changedPathBytesHex": [],
+            "commandKey": "rust_clippy",
+            "digestSha256": "b22d965a45f0c8bfdc3f2b30b672d1cc4b6636614e7ebf8e35b9b68131c919c0",
+            "fileCount": 81545,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791728204249,
+            "changedPathBytesHex": [],
+            "commandKey": "check_contracts",
+            "digestSha256": "b22d965a45f0c8bfdc3f2b30b672d1cc4b6636614e7ebf8e35b9b68131c919c0",
+            "fileCount": 81545,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791728257159,
+            "changedPathBytesHex": [],
+            "commandKey": "check_boundaries",
+            "digestSha256": "b22d965a45f0c8bfdc3f2b30b672d1cc4b6636614e7ebf8e35b9b68131c919c0",
+            "fileCount": 81545,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791729595200,
+            "changedPathBytesHex": [],
+            "commandKey": "r03_regression_gate",
+            "digestSha256": "b22d965a45f0c8bfdc3f2b30b672d1cc4b6636614e7ebf8e35b9b68131c919c0",
+            "fileCount": 81545,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791729679625,
+            "changedPathBytesHex": [],
+            "commandKey": "r04_rr1_repair_suites",
+            "digestSha256": "b22d965a45f0c8bfdc3f2b30b672d1cc4b6636614e7ebf8e35b9b68131c919c0",
+            "fileCount": 81545,
+            "stable": true
+          }
+        ],
+        "excluded": {
+          "evidenceOutputPathBytesHex": "6172746966616374732f727573742d74617572692f5230362f41522f5730392d4530312f7665726966792d5230352d66696e616c2f5230345f52454752455353494f4e",
+          "evidenceOutputRelativePath": "artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final/R04_REGRESSION",
+          "policy": "This invocation's fresh --evidence subtree and exact real OS fd stdout/stderr files of this process and its ancestors are excluded. No ancestor sink directory is excluded. The set is fixed before binding; other tracked and non-ignored untracked paths stay bound.",
+          "runOutputFiles": [
+            {
+              "kind": "FILE",
+              "pathBytesHex": "6172746966616374732f727573742d74617572692f5230362f41522f5730392d4530312f636f6d6d616e64732f666f726d616c2d7230352d66696e616c2d35392f6f75747075742e6c6f67",
+              "relativePath": "artifacts/rust-tauri/R06/AR/W09-E01/commands/formal-r05-final-59/output.log"
+            },
+            {
+              "kind": "FILE",
+              "pathBytesHex": "6172746966616374732f727573742d74617572692f5230362f41522f5730392d4530312f7665726966792d5230352d66696e616c2f7230345f72656772657373696f6e5f676174652f7374646572722e6c6f67",
+              "relativePath": "artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final/r04_regression_gate/stderr.log"
+            },
+            {
+              "kind": "FILE",
+              "pathBytesHex": "6172746966616374732f727573742d74617572692f5230362f41522f5730392d4530312f7665726966792d5230352d66696e616c2f7230345f72656772657373696f6e5f676174652f7374646f75742e6c6f67",
+              "relativePath": "artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final/r04_regression_gate/stdout.log"
+            }
+          ]
+        },
+        "finalChangedPathBytesHex": [],
+        "headAtEndError": null,
+        "schema": "lingxi-candidate-source-binding-v1",
+        "stable": true,
+        "testedShaAtEnd": "bc2ce51fd005ea75b9949156974e15d2761eb734"
+      },
+      "runnerSourceBinding": {
+        "after": {
+          "compiledSourceFiles": [
+            {
+              "compiledAndDiskSha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+              "path": "scripts/rust-tauri/run_output_sinks.py"
+            },
+            {
+              "compiledAndDiskSha256": "051332d289953918cce09ceb84218768421d1f1d0b1f8a7fd7a475d84589b818",
+              "path": "rust/crates/xtask/src/main.rs"
+            },
+            {
+              "compiledAndDiskSha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+              "path": "rust/crates/xtask/src/verify.rs"
+            },
+            {
+              "compiledAndDiskSha256": "d926e08aa14a9a589ca026583213540d72407e3294834b8cab7da4da2caf122a",
+              "path": "rust/crates/xtask/src/stage_map.rs"
+            },
+            {
+              "compiledAndDiskSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+              "path": "rust/crates/xtask/src/candidate.rs"
+            },
+            {
+              "compiledAndDiskSha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+              "path": "rust/crates/xtask/src/runner_identity.rs"
+            },
+            {
+              "compiledAndDiskSha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+              "path": "rust/crates/xtask/src/stage_maps/R02.json"
+            },
+            {
+              "compiledAndDiskSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+              "path": "rust/crates/xtask/src/stage_maps/R03.json"
+            },
+            {
+              "compiledAndDiskSha256": "33950d59cf10291b0e8b1f529499a1cf5028a780c4c327234b50ea67f10fbba1",
+              "path": "rust/crates/xtask/src/stage_maps/R04.json"
+            },
+            {
+              "compiledAndDiskSha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+              "path": "rust/crates/xtask/src/stage_maps/R05.json"
+            },
+            {
+              "compiledAndDiskSha256": "529d44ff2bcd9e1c2a4a6083c8b79b485383fe5937185e337c541bf1c729005c",
+              "path": "rust/crates/xtask/Cargo.toml"
+            },
+            {
+              "compiledAndDiskSha256": "690e9ac59b5a647bbf97fa9ec74edde9ffc3e6c0389c03b83bc7781ceda2125f",
+              "path": "rust/Cargo.toml"
+            },
+            {
+              "compiledAndDiskSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+              "path": "rust-toolchain.toml"
+            }
+          ],
+          "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+          "schema": "lingxi-xtask-runner-source-v1",
+          "sourceInventory": [
+            "candidate.rs",
+            "candidate/tests.rs",
+            "main.rs",
+            "runner_identity.rs",
+            "stage_map.rs",
+            "stage_maps/R02.json",
+            "stage_maps/R03.json",
+            "stage_maps/R04.json",
+            "stage_maps/R05.json",
+            "verify.rs",
+            "verify/runner_tests.rs"
+          ],
+          "status": "PASS"
+        },
+        "afterError": null,
+        "before": {
+          "compiledSourceFiles": [
+            {
+              "compiledAndDiskSha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+              "path": "scripts/rust-tauri/run_output_sinks.py"
+            },
+            {
+              "compiledAndDiskSha256": "051332d289953918cce09ceb84218768421d1f1d0b1f8a7fd7a475d84589b818",
+              "path": "rust/crates/xtask/src/main.rs"
+            },
+            {
+              "compiledAndDiskSha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+              "path": "rust/crates/xtask/src/verify.rs"
+            },
+            {
+              "compiledAndDiskSha256": "d926e08aa14a9a589ca026583213540d72407e3294834b8cab7da4da2caf122a",
+              "path": "rust/crates/xtask/src/stage_map.rs"
+            },
+            {
+              "compiledAndDiskSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+              "path": "rust/crates/xtask/src/candidate.rs"
+            },
+            {
+              "compiledAndDiskSha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+              "path": "rust/crates/xtask/src/runner_identity.rs"
+            },
+            {
+              "compiledAndDiskSha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+              "path": "rust/crates/xtask/src/stage_maps/R02.json"
+            },
+            {
+              "compiledAndDiskSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+              "path": "rust/crates/xtask/src/stage_maps/R03.json"
+            },
+            {
+              "compiledAndDiskSha256": "33950d59cf10291b0e8b1f529499a1cf5028a780c4c327234b50ea67f10fbba1",
+              "path": "rust/crates/xtask/src/stage_maps/R04.json"
+            },
+            {
+              "compiledAndDiskSha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+              "path": "rust/crates/xtask/src/stage_maps/R05.json"
+            },
+            {
+              "compiledAndDiskSha256": "529d44ff2bcd9e1c2a4a6083c8b79b485383fe5937185e337c541bf1c729005c",
+              "path": "rust/crates/xtask/Cargo.toml"
+            },
+            {
+              "compiledAndDiskSha256": "690e9ac59b5a647bbf97fa9ec74edde9ffc3e6c0389c03b83bc7781ceda2125f",
+              "path": "rust/Cargo.toml"
+            },
+            {
+              "compiledAndDiskSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+              "path": "rust-toolchain.toml"
+            }
+          ],
+          "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+          "schema": "lingxi-xtask-runner-source-v1",
+          "sourceInventory": [
+            "candidate.rs",
+            "candidate/tests.rs",
+            "main.rs",
+            "runner_identity.rs",
+            "stage_map.rs",
+            "stage_maps/R02.json",
+            "stage_maps/R03.json",
+            "stage_maps/R04.json",
+            "stage_maps/R05.json",
+            "verify.rs",
+            "verify/runner_tests.rs"
+          ],
+          "status": "PASS"
+        },
+        "beforeError": null,
+        "status": "PASS"
+      },
+      "commands": [
+        {
+          "argv": [
+            "cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--workspace",
+            "--locked"
+          ],
+          "cleanup": null,
+          "durationMs": 90115,
+          "evidencePaths": [
+            "{EVIDENCE}/rust_test_workspace/stdout.log"
+          ],
+          "exitCode": 101,
+          "internalError": null,
+          "key": "rust_test_workspace",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "FAIL",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r04_t08_matrix.sh",
+            "{EVIDENCE}/R04_MATRIX"
+          ],
+          "cleanup": null,
+          "durationMs": 358134,
+          "evidencePaths": [
+            "{EVIDENCE}/R04_MATRIX/leaf-cases.json",
+            "{EVIDENCE}/R04_MATRIX/matrix-counts.json",
+            "{EVIDENCE}/R04_MATRIX/integration.log",
+            "{EVIDENCE}/R04_MATRIX/summary.txt"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "r04_tool_matrix",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "cargo",
+            "fmt",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "cleanup": null,
+          "durationMs": 49824,
+          "evidencePaths": [
+            "{EVIDENCE}/rust_fmt/stdout.log"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "rust_fmt",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "cargo",
+            "clippy",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--workspace",
+            "--all-targets",
+            "--locked",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "cleanup": null,
+          "durationMs": 62624,
+          "evidencePaths": [
+            "{EVIDENCE}/rust_clippy/stdout.log"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "rust_clippy",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r01-t02-check-generated.sh"
+          ],
+          "cleanup": null,
+          "durationMs": 53268,
+          "evidencePaths": [
+            "{EVIDENCE}/check_contracts/stdout.log"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "check_contracts",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "python3",
+            "-B",
+            "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+          ],
+          "cleanup": null,
+          "durationMs": 52910,
+          "evidencePaths": [
+            "{EVIDENCE}/check_boundaries/stdout.log"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "check_boundaries",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "verify-stage",
+            "R03",
+            "--evidence",
+            "{EVIDENCE}/R03_REGRESSION"
+          ],
+          "cleanup": null,
+          "durationMs": 1338029,
+          "evidencePaths": [
+            "{EVIDENCE}/R03_REGRESSION/verify-stage-result.json"
+          ],
+          "exitCode": 1,
+          "internalError": null,
+          "key": "r03_regression_gate",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "FAIL",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r04_rr1_g05_repair_suites.sh",
+            "{EVIDENCE}/R04_RR1_REPAIR"
+          ],
+          "cleanup": null,
+          "durationMs": 84425,
+          "evidencePaths": [
+            "{EVIDENCE}/R04_RR1_REPAIR/rr1-cases.json",
+            "{EVIDENCE}/R04_RR1_REPAIR/summary.txt"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "r04_rr1_repair_suites",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        }
+      ],
+      "commandOutcomesIncomplete": null
+    },
+    {
+      "path": "verify-R05-final/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+      "sha256": "be2428e99702d9f42a74317a903f34a30fb9d518737df2ef70633ff10ebb155f",
+      "stage": "R03",
+      "overall": "FAIL",
+      "gateAbort": null,
+      "candidateSourceBinding": {
+        "after": {
+          "atUnixMs": 1791729542822,
+          "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+          "fileCount": 81620,
+          "manifestPath": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final/R04_REGRESSION/R03_REGRESSION/candidate-source-after.json",
+          "manifestSha256": "aff4c4db6483904822eb8adadcbe57918f34ebdb15634ef6aab79b2803b8c66e"
+        },
+        "afterError": null,
+        "before": {
+          "atUnixMs": 1791728313941,
+          "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+          "fileCount": 81620,
+          "manifestPath": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final/R04_REGRESSION/R03_REGRESSION/candidate-source-before.json",
+          "manifestSha256": "aff4c4db6483904822eb8adadcbe57918f34ebdb15634ef6aab79b2803b8c66e"
+        },
+        "checkpointAfterEveryCommand": [
+          {
+            "atUnixMs": 1791728420185,
+            "changedPathBytesHex": [],
+            "commandKey": "rust_test_workspace",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791728474381,
+            "changedPathBytesHex": [],
+            "commandKey": "a15_combo_and_leaves",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791728532347,
+            "changedPathBytesHex": [],
+            "commandKey": "r02_storage_tx",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791728626268,
+            "changedPathBytesHex": [],
+            "commandKey": "r02_full_chain",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791728698146,
+            "changedPathBytesHex": [],
+            "commandKey": "r02_backup_restore",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791728767296,
+            "changedPathBytesHex": [],
+            "commandKey": "r02_recovery_drill",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791728827459,
+            "changedPathBytesHex": [],
+            "commandKey": "rust_fmt",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791728884214,
+            "changedPathBytesHex": [],
+            "commandKey": "rust_clippy",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791728936449,
+            "changedPathBytesHex": [],
+            "commandKey": "check_contracts",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791728993236,
+            "changedPathBytesHex": [],
+            "commandKey": "check_boundaries",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791729109389,
+            "changedPathBytesHex": [],
+            "commandKey": "r02_auth_matrix",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791729282141,
+            "changedPathBytesHex": [],
+            "commandKey": "r02_legacy_regression",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791729360132,
+            "changedPathBytesHex": [],
+            "commandKey": "a16_seed_mechanism",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791729431622,
+            "changedPathBytesHex": [],
+            "commandKey": "repair_suites",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          },
+          {
+            "atUnixMs": 1791729495761,
+            "changedPathBytesHex": [],
+            "commandKey": "r02_events_matrix",
+            "digestSha256": "d4cdabf86542b2645b983aa8ffc917a84c5938d5848cd0f96ebf7780f642dc30",
+            "fileCount": 81620,
+            "stable": true
+          }
+        ],
+        "excluded": {
+          "evidenceOutputPathBytesHex": "6172746966616374732f727573742d74617572692f5230362f41522f5730392d4530312f7665726966792d5230352d66696e616c2f5230345f52454752455353494f4e2f5230335f52454752455353494f4e",
+          "evidenceOutputRelativePath": "artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final/R04_REGRESSION/R03_REGRESSION",
+          "policy": "This invocation's fresh --evidence subtree and exact real OS fd stdout/stderr files of this process and its ancestors are excluded. No ancestor sink directory is excluded. The set is fixed before binding; other tracked and non-ignored untracked paths stay bound.",
+          "runOutputFiles": [
+            {
+              "kind": "FILE",
+              "pathBytesHex": "6172746966616374732f727573742d74617572692f5230362f41522f5730392d4530312f636f6d6d616e64732f666f726d616c2d7230352d66696e616c2d35392f6f75747075742e6c6f67",
+              "relativePath": "artifacts/rust-tauri/R06/AR/W09-E01/commands/formal-r05-final-59/output.log"
+            },
+            {
+              "kind": "FILE",
+              "pathBytesHex": "6172746966616374732f727573742d74617572692f5230362f41522f5730392d4530312f7665726966792d5230352d66696e616c2f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646572722e6c6f67",
+              "relativePath": "artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final/R04_REGRESSION/r03_regression_gate/stderr.log"
+            },
+            {
+              "kind": "FILE",
+              "pathBytesHex": "6172746966616374732f727573742d74617572692f5230362f41522f5730392d4530312f7665726966792d5230352d66696e616c2f5230345f52454752455353494f4e2f7230335f72656772657373696f6e5f676174652f7374646f75742e6c6f67",
+              "relativePath": "artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final/R04_REGRESSION/r03_regression_gate/stdout.log"
+            },
+            {
+              "kind": "FILE",
+              "pathBytesHex": "6172746966616374732f727573742d74617572692f5230362f41522f5730392d4530312f7665726966792d5230352d66696e616c2f7230345f72656772657373696f6e5f676174652f7374646572722e6c6f67",
+              "relativePath": "artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final/r04_regression_gate/stderr.log"
+            },
+            {
+              "kind": "FILE",
+              "pathBytesHex": "6172746966616374732f727573742d74617572692f5230362f41522f5730392d4530312f7665726966792d5230352d66696e616c2f7230345f72656772657373696f6e5f676174652f7374646f75742e6c6f67",
+              "relativePath": "artifacts/rust-tauri/R06/AR/W09-E01/verify-R05-final/r04_regression_gate/stdout.log"
+            }
+          ]
+        },
+        "finalChangedPathBytesHex": [],
+        "headAtEndError": null,
+        "schema": "lingxi-candidate-source-binding-v1",
+        "stable": true,
+        "testedShaAtEnd": "bc2ce51fd005ea75b9949156974e15d2761eb734"
+      },
+      "runnerSourceBinding": {
+        "after": {
+          "compiledSourceFiles": [
+            {
+              "compiledAndDiskSha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+              "path": "scripts/rust-tauri/run_output_sinks.py"
+            },
+            {
+              "compiledAndDiskSha256": "051332d289953918cce09ceb84218768421d1f1d0b1f8a7fd7a475d84589b818",
+              "path": "rust/crates/xtask/src/main.rs"
+            },
+            {
+              "compiledAndDiskSha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+              "path": "rust/crates/xtask/src/verify.rs"
+            },
+            {
+              "compiledAndDiskSha256": "d926e08aa14a9a589ca026583213540d72407e3294834b8cab7da4da2caf122a",
+              "path": "rust/crates/xtask/src/stage_map.rs"
+            },
+            {
+              "compiledAndDiskSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+              "path": "rust/crates/xtask/src/candidate.rs"
+            },
+            {
+              "compiledAndDiskSha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+              "path": "rust/crates/xtask/src/runner_identity.rs"
+            },
+            {
+              "compiledAndDiskSha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+              "path": "rust/crates/xtask/src/stage_maps/R02.json"
+            },
+            {
+              "compiledAndDiskSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+              "path": "rust/crates/xtask/src/stage_maps/R03.json"
+            },
+            {
+              "compiledAndDiskSha256": "33950d59cf10291b0e8b1f529499a1cf5028a780c4c327234b50ea67f10fbba1",
+              "path": "rust/crates/xtask/src/stage_maps/R04.json"
+            },
+            {
+              "compiledAndDiskSha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+              "path": "rust/crates/xtask/src/stage_maps/R05.json"
+            },
+            {
+              "compiledAndDiskSha256": "529d44ff2bcd9e1c2a4a6083c8b79b485383fe5937185e337c541bf1c729005c",
+              "path": "rust/crates/xtask/Cargo.toml"
+            },
+            {
+              "compiledAndDiskSha256": "690e9ac59b5a647bbf97fa9ec74edde9ffc3e6c0389c03b83bc7781ceda2125f",
+              "path": "rust/Cargo.toml"
+            },
+            {
+              "compiledAndDiskSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+              "path": "rust-toolchain.toml"
+            }
+          ],
+          "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+          "schema": "lingxi-xtask-runner-source-v1",
+          "sourceInventory": [
+            "candidate.rs",
+            "candidate/tests.rs",
+            "main.rs",
+            "runner_identity.rs",
+            "stage_map.rs",
+            "stage_maps/R02.json",
+            "stage_maps/R03.json",
+            "stage_maps/R04.json",
+            "stage_maps/R05.json",
+            "verify.rs",
+            "verify/runner_tests.rs"
+          ],
+          "status": "PASS"
+        },
+        "afterError": null,
+        "before": {
+          "compiledSourceFiles": [
+            {
+              "compiledAndDiskSha256": "5080aebb46b7505a884f809be7b09a0ae5c170ca33bae3162b98d17ca64ed061",
+              "path": "scripts/rust-tauri/run_output_sinks.py"
+            },
+            {
+              "compiledAndDiskSha256": "051332d289953918cce09ceb84218768421d1f1d0b1f8a7fd7a475d84589b818",
+              "path": "rust/crates/xtask/src/main.rs"
+            },
+            {
+              "compiledAndDiskSha256": "78de27ba0e5339d2db32098211b3a69abb825d9b9860f923dd94c462704e185e",
+              "path": "rust/crates/xtask/src/verify.rs"
+            },
+            {
+              "compiledAndDiskSha256": "d926e08aa14a9a589ca026583213540d72407e3294834b8cab7da4da2caf122a",
+              "path": "rust/crates/xtask/src/stage_map.rs"
+            },
+            {
+              "compiledAndDiskSha256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+              "path": "rust/crates/xtask/src/candidate.rs"
+            },
+            {
+              "compiledAndDiskSha256": "27e2852e60df6096d5af549de057eabdee6bd78362bdf784af234f11fddb6cc7",
+              "path": "rust/crates/xtask/src/runner_identity.rs"
+            },
+            {
+              "compiledAndDiskSha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+              "path": "rust/crates/xtask/src/stage_maps/R02.json"
+            },
+            {
+              "compiledAndDiskSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+              "path": "rust/crates/xtask/src/stage_maps/R03.json"
+            },
+            {
+              "compiledAndDiskSha256": "33950d59cf10291b0e8b1f529499a1cf5028a780c4c327234b50ea67f10fbba1",
+              "path": "rust/crates/xtask/src/stage_maps/R04.json"
+            },
+            {
+              "compiledAndDiskSha256": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+              "path": "rust/crates/xtask/src/stage_maps/R05.json"
+            },
+            {
+              "compiledAndDiskSha256": "529d44ff2bcd9e1c2a4a6083c8b79b485383fe5937185e337c541bf1c729005c",
+              "path": "rust/crates/xtask/Cargo.toml"
+            },
+            {
+              "compiledAndDiskSha256": "690e9ac59b5a647bbf97fa9ec74edde9ffc3e6c0389c03b83bc7781ceda2125f",
+              "path": "rust/Cargo.toml"
+            },
+            {
+              "compiledAndDiskSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+              "path": "rust-toolchain.toml"
+            }
+          ],
+          "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+          "schema": "lingxi-xtask-runner-source-v1",
+          "sourceInventory": [
+            "candidate.rs",
+            "candidate/tests.rs",
+            "main.rs",
+            "runner_identity.rs",
+            "stage_map.rs",
+            "stage_maps/R02.json",
+            "stage_maps/R03.json",
+            "stage_maps/R04.json",
+            "stage_maps/R05.json",
+            "verify.rs",
+            "verify/runner_tests.rs"
+          ],
+          "status": "PASS"
+        },
+        "beforeError": null,
+        "status": "PASS"
+      },
+      "commands": [
+        {
+          "argv": [
+            "cargo",
+            "test",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--workspace",
+            "--locked"
+          ],
+          "cleanup": null,
+          "durationMs": 106123,
+          "evidencePaths": [
+            "{EVIDENCE}/rust_test_workspace/stdout.log"
+          ],
+          "exitCode": 101,
+          "internalError": null,
+          "key": "rust_test_workspace",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "FAIL",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r03_t08_matrix.sh",
+            "{EVIDENCE}/A15"
+          ],
+          "cleanup": null,
+          "durationMs": 54195,
+          "evidencePaths": [
+            "{EVIDENCE}/A15/leaf-cases.json",
+            "{EVIDENCE}/A15/combo-counts.json",
+            "{EVIDENCE}/A15/integration.log",
+            "{EVIDENCE}/A15/summary.txt"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "a15_combo_and_leaves",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r02_t04_storage_tx.sh",
+            "{EVIDENCE}/R02/A07_A08"
+          ],
+          "cleanup": null,
+          "durationMs": 57965,
+          "evidencePaths": [
+            "{EVIDENCE}/R02/A07_A08/s1-counts-after-stop.json",
+            "{EVIDENCE}/R02/A07_A08/s4-hashes-after.txt"
+          ],
+          "exitCode": 1,
+          "internalError": null,
+          "key": "r02_storage_tx",
+          "missingEvidence": [
+            "{EVIDENCE}/R02/A07_A08/s1-counts-after-stop.json",
+            "{EVIDENCE}/R02/A07_A08/s4-hashes-after.txt"
+          ],
+          "preExistingEvidence": [],
+          "status": "FAIL",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r02_t08_full_chain_smoke.sh",
+            "{EVIDENCE}/R02/A15"
+          ],
+          "cleanup": null,
+          "durationMs": 93919,
+          "evidencePaths": [
+            "{EVIDENCE}/R02/A15/full-chain/summary.txt"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "r02_full_chain",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r02_t06_backup_restore.sh",
+            "{EVIDENCE}/R02/A11"
+          ],
+          "cleanup": null,
+          "durationMs": 71877,
+          "evidencePaths": [
+            "{EVIDENCE}/R02/A11/backup-restore/summary.txt"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "r02_backup_restore",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r02_t06_recovery_drill.sh",
+            "{EVIDENCE}/R02/A12"
+          ],
+          "cleanup": null,
+          "durationMs": 69148,
+          "evidencePaths": [
+            "{EVIDENCE}/R02/A12/recovery-drill/summary.txt"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "r02_recovery_drill",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "cargo",
+            "fmt",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "cleanup": null,
+          "durationMs": 60159,
+          "evidencePaths": [
+            "{EVIDENCE}/rust_fmt/stdout.log"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "rust_fmt",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "cargo",
+            "clippy",
+            "--manifest-path",
+            "rust/Cargo.toml",
+            "--workspace",
+            "--all-targets",
+            "--locked",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "cleanup": null,
+          "durationMs": 56754,
+          "evidencePaths": [
+            "{EVIDENCE}/rust_clippy/stdout.log"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "rust_clippy",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r01-t02-check-generated.sh"
+          ],
+          "cleanup": null,
+          "durationMs": 52235,
+          "evidencePaths": [
+            "{EVIDENCE}/check_contracts/stdout.log"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "check_contracts",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "python3",
+            "-B",
+            "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+          ],
+          "cleanup": null,
+          "durationMs": 56785,
+          "evidencePaths": [
+            "{EVIDENCE}/check_boundaries/stdout.log"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "check_boundaries",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+            "{EVIDENCE}/R02/A05_A06"
+          ],
+          "cleanup": null,
+          "durationMs": 116152,
+          "evidencePaths": [
+            "{EVIDENCE}/R02/A05_A06/summary.txt",
+            "{EVIDENCE}/R02/A05_A06/leaf-cases.json",
+            "{EVIDENCE}/R02/A05_A06/ws-matrix.json",
+            "{EVIDENCE}/R02/A05_A06/sessions-list-matrix.json"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "r02_auth_matrix",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "env",
+            "R02_LEGACY_REGRESSION_MODE=directed-no-seal-family",
+            "bash",
+            "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+            "{EVIDENCE}/R02/A16"
+          ],
+          "cleanup": null,
+          "durationMs": 172750,
+          "evidencePaths": [
+            "{EVIDENCE}/R02/A16/legacy-entry/summary.txt"
+          ],
+          "exitCode": 1,
+          "internalError": null,
+          "key": "r02_legacy_regression",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "FAIL",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r03_t08_a16_seed_mechanism.sh",
+            "{EVIDENCE}/A16"
+          ],
+          "cleanup": null,
+          "durationMs": 77990,
+          "evidencePaths": [
+            "{EVIDENCE}/A16/summary.txt",
+            "{EVIDENCE}/A16/captured-seed.txt",
+            "{EVIDENCE}/A16/seed-mechanism.json"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "a16_seed_mechanism",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r03_g07_repair_suites.sh",
+            "{EVIDENCE}/G07_REPAIR"
+          ],
+          "cleanup": null,
+          "durationMs": 71489,
+          "evidencePaths": [
+            "{EVIDENCE}/G07_REPAIR/repair-cases.json",
+            "{EVIDENCE}/G07_REPAIR/summary.txt"
+          ],
+          "exitCode": 1,
+          "internalError": null,
+          "key": "repair_suites",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "FAIL",
+          "timedOut": false
+        },
+        {
+          "argv": [
+            "bash",
+            "scripts/rust-tauri/r02_t05_events_matrix.sh",
+            "{EVIDENCE}/R02/A09_A10"
+          ],
+          "cleanup": null,
+          "durationMs": 64138,
+          "evidencePaths": [
+            "{EVIDENCE}/R02/A09_A10/probe-matrix.jsonl",
+            "{EVIDENCE}/R02/A09_A10/key-events-dump.json"
+          ],
+          "exitCode": 0,
+          "internalError": null,
+          "key": "r02_events_matrix",
+          "missingEvidence": [],
+          "preExistingEvidence": [],
+          "status": "PASS",
+          "timedOut": false
+        }
+      ],
+      "commandOutcomesIncomplete": null
+    }
+  ],
+  "absent_stage_rule": "not present/aborted nested execution = NOT_RUN, never inferred PASS",
+  "R02": "Actual R03 mapped seven directed R02 consumers, not inherited full R02 accepted stage",
+  "official_scope_policy": "Original official manifests and result remain under verify-R05-final; final reports appended later change artifact-only full Git scope, not build-input byte scope; no claim they have same complete Git digest; process-only native own-cache exclusion explicitly bound in private-excludes-binding.json."
+}

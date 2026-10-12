@@ -1,0 +1,12 @@
+{
+  "cwd": "/Users/study_superior/.codex/worktrees/r06-independent-review/LingxiAgent",
+  "HEAD": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+  "git_status": " M rust/Cargo.lock\n M rust/crates/lingxi-adapters/Cargo.toml\n M rust/crates/lingxi-adapters/src/storage/agent_memory.rs\n M rust/crates/lingxi-adapters/src/storage/skill_library.rs\n M rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs\n M rust/crates/lingxi-service/src/context_compiler.rs\n M rust/crates/lingxi-service/src/memory.rs\n M rust/crates/lingxi-service/src/memorytools.rs\n M rust/crates/lingxi-service/src/persona.rs\n M rust/crates/lingxi-service/src/skills.rs\n M rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs\n?? artifacts/rust-tauri/R06/AR/\n?? docs/rust-tauri/R06/repair-current/\n?? rust/crates/lingxi-adapters/src/storage/agent_config.rs\n?? rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs\n?? rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs\n?? rust/crates/lingxi-service/tests/r06_ar_f06_config.rs\n",
+  "binding_source": "artifacts/rust-tauri/R06/AR/W06-CANDIDATE-01/binding.json",
+  "binding_sha256": "511276c731e9e09b551cbae341b74a68018126b12477f16834ca3780ae87cd65",
+  "owned_all_match": true,
+  "service_binary_sha256": "ac78d36d8f84034bc4b49c72ca293b3ce04cdbc901d6a5f9baa3ff83080a60f7",
+  "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-independent-review/LingxiAgent/rust/target",
+  "independent_review": "NOT_RUN",
+  "W02_W12_product_changes": "NONE; source is baseline + exact15 owned files only"
+}

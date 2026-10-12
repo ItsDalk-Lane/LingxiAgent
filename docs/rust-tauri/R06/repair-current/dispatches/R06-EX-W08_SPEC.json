@@ -1,0 +1,427 @@
+{
+  "id": "R06-EX-08",
+  "title": "知识清理、保留期限与不可达来源状态",
+  "original_requirements": [
+    {
+      "id": "R06-T07-S01",
+      "clause": "从当前knowledge routes/store/manager实测导入、分块、embedding、索引、检索、读取、来源引用、删除及配置流程；R00清单为范围。"
+    },
+    {
+      "id": "R06-T07-S04",
+      "clause": "保留现有后端fallback、持久化、取消、重启和schema兼容；原文和引用边界正确，索引可重建不等于源文件可删。"
+    }
+  ],
+  "r00_feature_ids": [
+    "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-DELETE-01E1E3",
+    "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-C12CD3",
+    "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-SOURCES-ID-D-928337",
+    "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-INGESTION-RE-76E2F5",
+    "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-DB95BA",
+    "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-8A6247",
+    "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-F49D5F"
+  ],
+  "reported_gap": "T07 D12接受vectorRetentionDays但无last_used_at/sweep/orphan GC；D14 unreachableSources固定空。watcher以后接不免除当前查询真假和删除/缓存生命周期。",
+  "deadline": "R06 阶段验收前：这里只要求当前核心/服务份额",
+  "status": "NOT_RUN",
+  "evidence_level": "SOURCE_ONLY",
+  "runtime_evidence": [],
+  "coverage_by_existing_f": "R06-AR-F15要求完整性，但F01-F14的具体修复不自动涵盖此行为；保留为extra，不改原F编号",
+  "production_paths": [
+    "rust/crates/lingxi-service/src/knowledge.rs",
+    "rust/crates/lingxi-adapters/src/storage/knowledge.rs"
+  ],
+  "proposed_real_checks": [
+    "导入后删除本地源/撤销权限，查询摄入状态准确显示不可达且不泄漏跨主体",
+    "固定时钟设置保留期限、删除笔记本/源，实际向量/引用/原文存留与源保护符合原策略并在重启后一致"
+  ],
+  "legal_later_basis": [
+    {
+      "task_id": "R07-T01",
+      "original_goal": "什么时候触发与谁执行继续分离。",
+      "original_steps": [
+        "迁移现役cron/提醒/插件动作/Agent后台执行/心跳入口，保持时区、开关、触发条件和用户可见设置。",
+        "调度器只生成有唯一triggerId的提交，执行/取消/恢复交给R03；不要为cron另写Agent循环。",
+        "明确错过触发、系统睡眠唤醒、时钟调整、夏令时重复/缺失时间和任务重叠策略；保留现役语义并写成测试。",
+        "持久化触发收据与通知结果；重启不重复发送已确认提醒，对未知外发按R03策略处理。"
+      ]
+    },
+    {
+      "task_id": "R07-T07",
+      "original_goal": "保留用户已采纳的工作方式。",
+      "original_steps": [
+        "按R00叶子清单迁移书桌文件树、监听、便笺、todo、checkpoint、workflow/goal/loop等真实注册功能。",
+        "文件操作全部走ResourceService/授权边界，监听事件是提示而非权限；工作流动作复用Supervisor和工具网关。",
+        "对长期监听/终端/loop定义作用域与回收，Agent删除、目录撤权、服务退出时停止相关资源。",
+        "现役实验功能保持默认状态，不因为重写顺手开启；已撤回功能不因名字相近被恢复。"
+      ]
+    }
+  ],
+  "current_vs_later": "后台cron、常驻watcher运行节奏后续；当前查询状态、显式清理与生命周期基本行为不能恒返回空或接受后忽略。",
+  "suggested_work_unit": {
+    "id": "R06-EX-W08",
+    "scope": "知识清理、保留期限与不可达来源状态",
+    "agent_policy": "一次性边界明确的工作单，主代理整合；不创建长期代理",
+    "prerequisites": [
+      "先核对原生产调用链与有效配置，再以当前真实服务/模型替身验证；不得mock被验收核心"
+    ],
+    "review_required": "全新审查者在实际候选上独立实验，资料核对不签关闭"
+  },
+  "r00_original_assertions": [
+    {
+      "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-DELETE-01E1E3",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "执行“删除知识笔记本”后核对：删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-01E1E3CF7FA8",
+        "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-DELETE-01E1E3",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "该入口所需目标、身份和数据已准备",
+        "when": "用户删除知识笔记本",
+        "then": "删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误",
+        "assertions": [
+          "执行“删除知识笔记本”后核对：删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-C12CD3",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "成功：执行“从笔记本移除源引用”后，移除该 notebook 对源的 membership，返回 membership；不等同删除源物理文件",
+        "拒绝/边界：studio/notebook/source 约束；失败不应删除共享源；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-C12CD37BA4A3",
+        "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-C12CD3",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户从笔记本移除源引用",
+        "then": "移除该 notebook 对源的 membership，返回 membership；不等同删除源物理文件",
+        "assertions": [
+          "成功：执行“从笔记本移除源引用”后，移除该 notebook 对源的 membership，返回 membership；不等同删除源物理文件",
+          "拒绝/边界：studio/notebook/source 约束；失败不应删除共享源；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-SOURCES-ID-D-928337",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "成功：执行“永久删除知识源”后，取消活跃摄入、清理索引变体及物理痕迹，返回 cancelledJobs/purge",
+        "拒绝/边界：活跃 turn 冻结引用时 409；delete wins 阻止并发 reingest；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-9283371CDAD8",
+        "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-SOURCES-ID-D-928337",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户永久删除知识源",
+        "then": "取消活跃摄入、清理索引变体及物理痕迹，返回 cancelledJobs/purge",
+        "assertions": [
+          "成功：执行“永久删除知识源”后，取消活跃摄入、清理索引变体及物理痕迹，返回 cancelledJobs/purge",
+          "拒绝/边界：活跃 turn 冻结引用时 409；delete wins 阻止并发 reingest；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-INGESTION-RE-76E2F5",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "成功：执行“查看摄入任务”后，返回指定 studio 的 jobs/counts 和不可达源文件状态",
+        "拒绝/边界：query.notebookId/sourceId 可筛选；studio 身份隔离；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-76E2F5AAF035",
+        "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-INGESTION-RE-76E2F5",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户查看摄入任务",
+        "then": "返回指定 studio 的 jobs/counts 和不可达源文件状态",
+        "assertions": [
+          "成功：执行“查看摄入任务”后，返回指定 studio 的 jobs/counts 和不可达源文件状态",
+          "拒绝/边界：query.notebookId/sourceId 可筛选；studio 身份隔离；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-DB95BA",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "成功：执行“刷新本地文件知识源”后，重新抓取文件形成最新快照/解析物，返回 changed；变化后重建摄入",
+        "拒绝/边界：仅 local owner；文件未变 changed=false；不可访问报错；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-DB95BAC2A204",
+        "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-DB95BA",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户刷新本地文件知识源",
+        "then": "重新抓取文件形成最新快照/解析物，返回 changed；变化后重建摄入",
+        "assertions": [
+          "成功：执行“刷新本地文件知识源”后，重新抓取文件形成最新快照/解析物，返回 changed；变化后重建摄入",
+          "拒绝/边界：仅 local owner；文件未变 changed=false；不可访问报错；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-8A6247",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "成功：执行“重试知识源摄入”后，失败任务重新入队并唤醒；无任务兜底新建任务",
+        "拒绝/边界：最新任务非 failed 返回 409；已删源不可重试；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-8A62470CC75D",
+        "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-8A6247",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户重试知识源摄入",
+        "then": "失败任务重新入队并唤醒；无任务兜底新建任务",
+        "assertions": [
+          "成功：执行“重试知识源摄入”后，失败任务重新入队并唤醒；无任务兜底新建任务",
+          "拒绝/边界：最新任务非 failed 返回 409；已删源不可重试；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-F49D5F",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "成功：执行“修改笔记本摄入与模型设置”后，更新笔记本 config；分块或嵌入模型变化触发全量重建",
+        "拒绝/边界：body 经 validateSettingsBody；数值范围/模型引用由 store 校验；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-F49D5F80D234",
+        "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-F49D5F",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户修改笔记本摄入与模型设置",
+        "then": "更新笔记本 config；分块或嵌入模型变化触发全量重建",
+        "assertions": [
+          "成功：执行“修改笔记本摄入与模型设置”后，更新笔记本 config；分块或嵌入模型变化触发全量重建",
+          "拒绝/边界：body 经 validateSettingsBody；数值范围/模型引用由 store 校验；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    }
+  ],
+  "report_sources": [
+    "docs/rust-tauri/R06/R06-T07_REPORT.md"
+  ],
+  "triage": "原义务需真实实验与范围核对，未确证当前Bug；不得因本清单推定修复完成/无需验证",
+  "legacy_comparison_excerpt": [
+    {
+      "path": "server/routes/knowledge.ts",
+      "line": 316,
+      "end_line": 335,
+      "original_source": "      return routeError(c, error);\n    }\n  });\n\n  route.get(\"/knowledge/ingestion\", (c) => {\n    const scope = bindKnowledgeScope(c, engine);\n    if (scope.error) return scope.error;\n    try {\n      const notebookId = c.req.query(\"notebookId\") || undefined;\n      const sourceId = c.req.query(\"sourceId\") || undefined;\n      const jobs = scope.knowledge.listIngestionJobs({ studioId: scope.studioId, notebookId, sourceId });\n      const counts = scope.knowledge.countIngestionJobsByStatus({ studioId: scope.studioId, notebookId });\n      // Phase 6 文件 watch 的\"源文件不可达\"显式状态顺带暴露（只列不可达项，不含可达噪音）。\n      const unreachableSources = scope.knowledge.listSourceFileWatchStates()\n        .filter((state: any) => state.unreachable && state.studioId === scope.studioId);\n      return c.json({ jobs, counts, unreachableSources });\n    } catch (error) {\n      return routeError(c, error);\n    }\n  });",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "path": "lib/knowledge/ingestion-service.ts",
+      "line": 735,
+      "end_line": 780,
+      "original_source": "  }\n\n  private waitForJobSettle(): Promise<void> {\n    return new Promise(resolve => {\n      this.settleWaiters.push(resolve);\n    });\n  }\n\n  private notifyJobSettled() {\n    const waiters = this.settleWaiters.splice(0);\n    for (const waiter of waiters) waiter();\n  }\n\n  private async loop() {\n    while (!this.stopped) {\n      let processed = 0;\n      try {\n        processed = await this.drainQueue();\n      } catch (error) {\n        // drainQueue 内的 job 错误已被 processJob 各自捕获；到这里是队列级意外，\n        // 显式记录后继续循环（不吞错、不退出）。\n        this.log(`knowledge ingestion: drain failed: ${describeIngestionError(error)}`);\n      }\n      this.sweepStaleVectorsIfDue();\n      if (this.stopped || processed > 0) continue;\n      await this.waitForWake(this.pollIntervalMs);\n    }\n  }\n\n  /** 向量保留策略 sweep：到期才跑，失败记日志不阻断摄入循环。 */\n  private sweepStaleVectorsIfDue() {\n    if (this.stopped) return;\n    const nowMs = Date.now();\n    if (nowMs - this.lastVectorSweepAt < VECTOR_SWEEP_INTERVAL_MS) return;\n    this.lastVectorSweepAt = nowMs;\n    try {\n      const removed = this.deps.queryService.sweepStaleVectorArtifacts();\n      if (removed > 0) {\n        this.log(`knowledge ingestion: vector retention sweep removed ${removed} stale artifact vector(s)`);\n      }\n    } catch (error) {\n      this.log(`knowledge ingestion: vector retention sweep failed: ${describeIngestionError(error)}`);\n    }\n  }\n\n  /** 退避到期由周期轮询兜底；enqueue/模型就绪通过 wake() 立即唤醒。 */",
+      "status": "SOURCE_ONLY"
+    }
+  ]
+}

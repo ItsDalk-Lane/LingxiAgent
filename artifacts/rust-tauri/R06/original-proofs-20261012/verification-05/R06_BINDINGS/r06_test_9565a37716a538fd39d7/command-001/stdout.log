@@ -1,0 +1,28 @@
+
+running 1 test
+test child_provider_panic_closes_out_and_the_thread_continues ... FAILED
+
+successes:
+
+successes:
+
+failures:
+
+---- child_provider_panic_closes_out_and_the_thread_continues stdout ----
+
+thread 'child_provider_panic_closes_out_and_the_thread_continues' (13517129) panicked at crates/lingxi-service/tests/subagent_closeout.rs:136:47:
+child provider exploded
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'child_provider_panic_closes_out_and_the_thread_continues' (13517129) panicked at crates/lingxi-service/tests/subagent_closeout.rs:375:14:
+run settles: Storage(Corrupted { detail: "model_history: 可信历史声明代次缺失" })
+
+thread 'child_provider_panic_closes_out_and_the_thread_continues' (13517129) panicked at crates/lingxi-service/tests/subagent_closeout.rs:894:35:
+parent settles: JoinError::Panic(Id(3), "run settles: Storage(Corrupted { detail: \"model_history: 可信历史声明代次缺失\" })", ...)
+
+
+failures:
+    child_provider_panic_closes_out_and_the_thread_continues
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.11s
+

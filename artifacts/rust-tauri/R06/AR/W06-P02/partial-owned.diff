@@ -1,0 +1,1189 @@
+--- W06-CANDIDATE-02/rust/Cargo.lock
++++ P02-PARTIAL/rust/Cargo.lock
+@@ -39,6 +39,29 @@
+ dependencies = [
+  "libc",
+ ]
++
++[[package]]
++name = "annotate-snippets"
++version = "0.12.16"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f211a51805bc641f3ad5b7664c77d2547af685cc33b4cd8d31964027a46f13f1"
++dependencies = [
++ "anstyle",
++ "memchr",
++ "unicode-width",
++]
++
++[[package]]
++name = "anstyle"
++version = "1.0.14"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "940b3a0ca603d1eade50a4846a2afffd5ef57a9feac2c0e2ec2e14f9ead76000"
++
++[[package]]
++name = "arraydeque"
++version = "0.5.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "7d902e3d592a523def97af8f317b08ce16b7ab854c1985a0c671e6f15cebc236"
+ 
+ [[package]]
+ name = "asn1-rs"
+@@ -501,6 +524,15 @@
+ ]
+ 
+ [[package]]
++name = "encoding_rs_io"
++version = "0.1.8"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "fba3fe847045ecff794b9c138293a80db914678c453ad63fbf0c6a9eb6e00b22"
++dependencies = [
++ "encoding_rs",
++]
++
++[[package]]
+ name = "equivalent"
+ version = "1.0.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+@@ -720,6 +752,16 @@
+  "r-efi 6.0.0",
+  "rand_core",
+  "wasm-bindgen",
++]
++
++[[package]]
++name = "granit-parser"
++version = "1.3.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e20f99e46474f56bd905c56e817ebddcf377a611f94c53ac4649e4d3fa3c0cd0"
++dependencies = [
++ "arraydeque",
++ "smallvec",
+ ]
+ 
+ [[package]]
+@@ -1228,6 +1270,7 @@
+ dependencies = [
+  "base64",
+  "getrandom 0.2.17",
++ "granit-parser",
+  "httpdate",
+  "libc",
+  "lingxi-kernel",
+@@ -1235,6 +1278,7 @@
+  "reqwest",
+  "rusqlite",
+  "serde",
++ "serde-saphyr",
+  "serde_json",
+  "serde_yaml_ng",
+  "sha2",
+@@ -1423,6 +1467,12 @@
+ version = "1.0.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "743fb55ba31b18fb1ecef6bdc9aa2743314978ac084044301a7eee33fb99a20d"
++
++[[package]]
++name = "nohash-hasher"
++version = "0.2.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "2bf50223579dc7cdcfb3bfcacf7069ff68243f8c363f62ffa99cf000a6b9c451"
+ 
+ [[package]]
+ name = "nom"
+@@ -2172,6 +2222,23 @@
+ ]
+ 
+ [[package]]
++name = "serde-saphyr"
++version = "1.3.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b8050abb251097357e24aff63ba2c52a6309ecb7d23a5474023df960a02694d8"
++dependencies = [
++ "annotate-snippets",
++ "base64",
++ "encoding_rs_io",
++ "granit-parser",
++ "nohash-hasher",
++ "num-traits",
++ "serde_core",
++ "smallvec",
++ "zmij",
++]
++
++[[package]]
+ name = "serde_core"
+ version = "1.0.229"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+@@ -2725,6 +2792,12 @@
+ checksum = "d245f478577f809a851594d02313b640fb437e0bb33866753cff937863096954"
+ 
+ [[package]]
++name = "unicode-width"
++version = "0.2.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b4ac048d71ede7ee76d585517add45da530660ef4390e49b098733c6e897f254"
++
++[[package]]
+ name = "unsafe-libyaml"
+ version = "0.2.11"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+--- W06-CANDIDATE-02/rust/crates/lingxi-adapters/Cargo.toml
++++ P02-PARTIAL/rust/crates/lingxi-adapters/Cargo.toml
+@@ -55,6 +55,9 @@
+ serde_json = "1.0.151"
+ # R06-AR-F06：真正解析 YAML，避免合法配置被逐行扫描静默误读。
+ serde_yaml_ng = "=0.10.0"
++# 保留键样式与标签，标准合并与严格标签检查共用同一 YAML 解析器。
++serde-saphyr = "=1.3.0"
++granit-parser = "=1.3.0"
+ sha2 = "0.11.0"
+ # R02-T06: `time` feature flag added for the backup-while-writing
+ # integration test's head-start sleep (same locked tokio 1.53.1; the flag
+--- W06-CANDIDATE-02/rust/crates/lingxi-adapters/src/storage/agent_config.rs
++++ P02-PARTIAL/rust/crates/lingxi-adapters/src/storage/agent_config.rs
+@@ -1,6 +1,8 @@
+ //! 助手配置的唯一 YAML 读取、类型验证与保留未知字段更新入口。
+ use super::MemoryError;
++use granit_parser::{Event, Parser, ScalarStyle};
+ use serde_yaml_ng::{Mapping, Value};
++use std::collections::{BTreeMap, BTreeSet};
+ 
+ #[derive(Debug, Default, Clone, PartialEq)]
+ pub struct AgentConfigScan {
+@@ -26,33 +28,149 @@
+     "workspace_context",
+ ];
+ 
+-/// 在默认值和更新之前拒绝不支持的键；未知字段的内部值保持原样。
+-fn validate_owned_keys(value: &Value, section: Option<&str>) -> Result<(), MemoryError> {
+-    let location = section.unwrap_or("root");
+-    let mapping = value
+-        .as_mapping()
+-        .ok_or_else(|| invalid(format!("{location} must be a mapping")))?;
+-    for (key, value) in mapping {
+-        let Value::String(key) = key else {
+-            return Err(invalid(format!(
+-                "{location}: unsupported YAML key type; keys must be strings"
+-            )));
+-        };
+-        if key == "<<" {
+-            // 合并前检查全部来源，即使后续覆盖也不能把不支持的键隐去。
+-            match value {
+-                Value::Sequence(sources) => {
+-                    for source in sources {
+-                        validate_owned_keys(source, section)?;
++/// 只记录真正解析器输出的结构与键身份，保留合并前全部来源；不解析 YAML 文本语法。
++#[derive(Default)]
++struct SourceGraph {
++    nodes: Vec<SourceNode>,
++    anchors: BTreeMap<usize, usize>,
++}
++
++enum SourceNode {
++    Scalar { key: Option<String>, merge: bool },
++    Sequence(Vec<usize>),
++    Mapping(Vec<(usize, usize)>),
++}
++
++impl SourceGraph {
++    fn node<'a>(
++        &mut self,
++        events: &mut std::iter::Peekable<impl Iterator<Item = Event<'a>>>,
++    ) -> Result<usize, MemoryError> {
++        let event = events.next().ok_or_else(|| invalid("missing YAML node"))?;
++        if let Event::Alias(anchor) = event {
++            return self
++                .anchors
++                .get(&anchor)
++                .copied()
++                .ok_or_else(|| invalid("undefined YAML alias"));
++        }
++        let (node, anchor) = match event {
++            Event::Scalar(value, style, anchor, tag) => {
++                let merge = value == "<<"
++                    && (tag.as_ref().is_some_and(|tag| {
++                        tag.suffix_in_namespace("tag:yaml.org,2002:").as_deref() == Some("merge")
++                    }) || (tag.is_none() && style == ScalarStyle::Plain));
++                let key = if merge
++                    || tag.as_ref().is_some_and(|tag| {
++                        tag.core_suffix() == Some("str")
++                            || (tag.handle().is_empty() && tag.suffix() == "!")
++                    }) {
++                    Some(value.into_owned())
++                } else if tag.is_some() {
++                    None
++                } else if style != ScalarStyle::Plain {
++                    Some(value.into_owned())
++                } else {
++                    // 标量类型仍交由标准 YAML 实现判定，不能把数字或布尔键当字符串。
++                    match serde_yaml_ng::from_str::<Value>(&value).map_err(invalid)? {
++                        Value::String(value) => Some(value),
++                        _ => None,
+                     }
+-                }
+-                source => validate_owned_keys(source, section)?,
+-            }
+-        } else if section.is_none() && OWNED_SECTIONS.contains(&key.as_str()) {
+-            validate_owned_keys(value, Some(key))?;
+-        }
+-    }
+-    Ok(())
++                };
++                (SourceNode::Scalar { key, merge }, anchor)
++            }
++            Event::SequenceStart(_, anchor, _) => (SourceNode::Sequence(Vec::new()), anchor),
++            Event::MappingStart(_, anchor, _) => (SourceNode::Mapping(Vec::new()), anchor),
++            _ => return Err(invalid("unexpected YAML node")),
++        };
++        let id = self.nodes.len();
++        self.nodes.push(node);
++        if anchor != 0 {
++            self.anchors.insert(anchor, id);
++        }
++        match &self.nodes[id] {
++            SourceNode::Sequence(_) => {
++                let mut children = Vec::new();
++                while !matches!(events.peek(), Some(Event::SequenceEnd)) {
++                    children.push(self.node(events)?);
++                }
++                events.next();
++                self.nodes[id] = SourceNode::Sequence(children);
++            }
++            SourceNode::Mapping(_) => {
++                let mut children = Vec::new();
++                while !matches!(events.peek(), Some(Event::MappingEnd)) {
++                    let key = self.node(events)?;
++                    let value = self.node(events)?;
++                    children.push((key, value));
++                }
++                events.next();
++                self.nodes[id] = SourceNode::Mapping(children);
++            }
++            SourceNode::Scalar { .. } => {}
++        }
++        Ok(id)
++    }
++
++    fn validate(
++        &self,
++        id: usize,
++        section: Option<usize>,
++        visited: &mut BTreeSet<(usize, Option<usize>)>,
++    ) -> Result<(), MemoryError> {
++        if !visited.insert((id, section)) {
++            return Ok(());
++        }
++        let location = section.map(|i| OWNED_SECTIONS[i]).unwrap_or("root");
++        let SourceNode::Mapping(entries) = &self.nodes[id] else {
++            return Err(invalid(format!("{location} must be a mapping")));
++        };
++        for &(key, value) in entries {
++            let SourceNode::Scalar {
++                key: Some(key),
++                merge,
++            } = &self.nodes[key]
++            else {
++                return Err(invalid(format!(
++                    "{location}: unsupported YAML key type; keys must be strings"
++                )));
++            };
++            if *merge {
++                // 包括被显式覆盖的来源；别名共享节点而不复制，递归由统一解析器拒绝。
++                if let SourceNode::Sequence(sources) = &self.nodes[value] {
++                    for &source in sources {
++                        self.validate(source, section, visited)?;
++                    }
++                } else {
++                    self.validate(value, section, visited)?;
++                }
++            } else if section.is_none() {
++                if let Some(i) = OWNED_SECTIONS.iter().position(|name| name == key) {
++                    self.validate(value, Some(i), visited)?;
++                }
++            }
++        }
++        Ok(())
++    }
++}
++
++fn validate_source_keys(text: &str) -> Result<(), MemoryError> {
++    let mut events = Vec::new();
++    for event in Parser::new_from_str(text) {
++        let (event, _) = event.map_err(invalid)?;
++        match event {
++            Event::StreamStart
++            | Event::StreamEnd
++            | Event::DocumentStart(..)
++            | Event::DocumentEnd
++            | Event::Comment(..) => {}
++            event => events.push(event),
++        }
++    }
++    let mut graph = SourceGraph::default();
++    let mut events = events.into_iter().peekable();
++    let root = graph.node(&mut events)?;
++    graph.validate(root, None, &mut BTreeSet::new())
+ }
+ 
+ impl AgentConfigDocument {
+@@ -61,14 +179,16 @@
+         let empty = text
+             .lines()
+             .all(|line| line.trim().is_empty() || line.trim_start().starts_with('#'));
+-        let mut value = if empty {
++        let value = if empty {
+             Value::Mapping(Mapping::new())
+         } else {
+-            serde_yaml_ng::from_str::<Value>(text).map_err(invalid)?
+-        };
+-        validate_owned_keys(&value, None)?;
+-        value.apply_merge().map_err(invalid)?;
+-        validate_owned_keys(&value, None)?;
++            validate_source_keys(text)?;
++            let options = serde_saphyr::options! {
++                strict_booleans: true,
++                reject_unsupported_tags: true,
++            };
++            serde_saphyr::from_str_with_options::<Value>(text, options).map_err(invalid)?
++        };
+         let doc = Self { value };
+         // 所有消费者都验证相同的敏感字段，不能按使用位置跳过错误。
+         doc.scan()?;
+@@ -161,7 +281,7 @@
+     }
+ 
+     pub fn render(&self) -> Result<String, MemoryError> {
+-        serde_yaml_ng::to_string(&self.value).map_err(invalid)
++        serde_saphyr::to_string(&self.value).map_err(invalid)
+     }
+ }
+ 
+--- W06-CANDIDATE-02/rust/crates/lingxi-service/src/memorytools.rs
++++ P02-PARTIAL/rust/crates/lingxi-service/src/memorytools.rs
+@@ -345,7 +345,7 @@
+             Ok(_) => {
+                 return text_success(
+                     "Memory is paused for this agent; proposals are not accepted right now.".into(),
+-                )
++                );
+             }
+             Err(err) => return failed(ErrorCode::Internal, err.to_string()),
+         }
+@@ -491,6 +491,14 @@
+                 );
+             }
+         };
++        // 安装前验证所属助手配置，不能先落盘再吞掉启用错误。
++        let agent = match self.bound_agent() {
++            Ok(agent) => agent,
++            Err(outcome) => return outcome,
++        };
++        if let Err(err) = self.memory.read_flags(&agent) {
++            return failed(ErrorCode::Internal, err.to_string());
++        }
+         let source_key = format!("local_path:{}", source.to_string_lossy());
+         let result = self
+             .skills
+@@ -502,7 +510,13 @@
+                 if ok {
+                     // onInstalled parity: add to the bound agent's enabled list
+                     if let Some(name) = value.get("skillName").and_then(Value::as_str) {
+-                        let _ = self.enable_for_agent(name);
++                        if let Err(err) = self.enable_for_agent(name) {
++                            // 安装已经发生时如实报告，不能伪称已启用或删除安装成果。
++                            return failed(
++                                ErrorCode::Internal,
++                                format!("Skill installed: {name}, but enabling failed: {err}"),
++                            );
++                        }
+                     }
+                     let mut text = format!(
+                         "Skill installed: {} (enabled for this agent).",
+@@ -534,7 +548,10 @@
+                         text_success(format!(
+                             "Safety review FAILED: {reason}\nExplain this risk to the user. Only after the user \
+                              explicitly accepts, retry with risk_accepted=true plus risk_confirmation_token={}.",
+-                            value.get("riskConfirmationToken").and_then(Value::as_str).unwrap_or("")
++                            value
++                                .get("riskConfirmationToken")
++                                .and_then(Value::as_str)
++                                .unwrap_or("")
+                         ))
+                     } else {
+                         failed(
+--- W06-CANDIDATE-02/rust/crates/lingxi-service/tests/r06_ar_f06_config.rs
++++ P02-PARTIAL/rust/crates/lingxi-service/tests/r06_ar_f06_config.rs
+@@ -606,3 +606,200 @@
+     }
+     std::fs::remove_dir_all(home).unwrap();
+ }
++
++#[tokio::test]
++async fn p02_real_gateway_rechecks_literal_merge_and_unknown_tags() {
++    use lingxi_kernel::ports::{ToolOutcome, ToolRequest};
++    use lingxi_kernel::toolcatalog::{SchemaBudget, ToolRegistry};
++    use lingxi_service::inject::SystemClock;
++    use lingxi_service::toolgateway::{InvocationPermissionContext, ToolInvocationGateway};
++    use lingxi_service::{
++        approval_service, memory::MemoryService, memorytools, skills::SkillService,
++    };
++    let home = fresh_dir("p02-tool-switch");
++    write_home_fixture(&home);
++    write(
++        &home.join("agents/lingxi/memory/tenets.json"),
++        r#"{"version":1,"tenets":[]}"#,
++    );
++    let memory = Arc::new(MemoryService::new(home.clone(), home.join("runtime")));
++    let registry = Arc::new(ToolRegistry::new());
++    let budget = SchemaBudget::default();
++    let approvals = Arc::new(approval_service::ApprovalService::new(Arc::new(
++        SystemClock,
++    )));
++    let gateway = ToolInvocationGateway::new(
++        Arc::clone(&registry),
++        approvals,
++        Arc::new(SystemClock),
++        budget,
++        lingxi_service::toolgateway::DEFAULT_PREPARED_TTL_MS,
++        lingxi_service::toolgateway::DEFAULT_LIVE_PREPARED_CAP,
++    );
++    memorytools::register_memory_tools(
++        &registry,
++        &gateway,
++        Arc::clone(&memory),
++        Arc::new(SkillService::new(home.clone(), home.join("product"))),
++        "lingxi".into(),
++        Arc::new(SystemClock),
++        &budget,
++    );
++    let ctx = lingxi_kernel::RunContext {
++        principal: lingxi_kernel::Principal::LocalUser,
++        session_id: lingxi_protocol::SessionId::new("session-config"),
++        run_id: lingxi_protocol::RunId::new("run-config"),
++        attempt: lingxi_protocol::AttemptId::new("run-config#a1"),
++        generation: 1,
++    };
++    for (i, yaml) in [
++        "memory: {enabled: false}",
++        "a: &a {enabled: false}\nmemory: {<<: *a}",
++        "memory: {\"<<\": {enabled: true}, enabled: false}",
++        "memory: {enabled: !custom true}",
++        "memory: !custom {enabled: true}",
++        "agent: {name: !custom 姓名}",
++        "skills: {enabled: [!custom one]}",
++        "workspace_context: {discover_project_skills: !custom false}",
++        "future: !custom {value: keep}",
++    ]
++    .iter()
++    .enumerate()
++    {
++        write(&home.join("agents/lingxi/config.yaml"), yaml);
++        let call = lingxi_protocol::ToolCallId::new(format!("config-{i}"));
++        let request = ToolRequest::from_effective_arguments(
++            "tool:first-party:tenet_propose",
++            serde_json::json!({"content":"不得落盘的提案"}),
++            &budget,
++        )
++        .unwrap();
++        let handle = gateway
++            .prepare_from_request(
++                &ctx,
++                lingxi_service::toolgateway::CallerSurface::UserRun,
++                "lingxi",
++                InvocationPermissionContext::UserSession {
++                    mode: lingxi_kernel::subagent::SessionPermissionMode::Operate,
++                },
++                &call,
++                &request,
++            )
++            .unwrap()
++            .handle;
++        let result = gateway
++            .execute_prepared(&ctx, &call, &handle)
++            .await
++            .unwrap();
++        if i < 3 {
++            match result.outcome {
++                ToolOutcome::Success { result } => {
++                    assert!(format!("{result:?}").contains("Memory is paused"))
++                }
++                other => panic!("{other:?}"),
++            }
++        } else {
++            assert!(
++                matches!(result.outcome, ToolOutcome::Failed { .. }),
++                "损坏或重复开关应明确失败"
++            );
++        }
++        assert!(
++            memory.tenets_store("lingxi").unwrap().pending().is_empty(),
++            "拒绝后没有提案落盘"
++        );
++    }
++    std::fs::remove_dir_all(home).unwrap();
++}
++
++#[tokio::test]
++async fn p02_real_install_gateway_checks_config_before_install_and_enable() {
++    use lingxi_kernel::ports::{ToolOutcome, ToolRequest};
++    use lingxi_kernel::toolcatalog::{SchemaBudget, ToolRegistry};
++    use lingxi_service::inject::SystemClock;
++    use lingxi_service::toolgateway::{InvocationPermissionContext, ToolInvocationGateway};
++    use lingxi_service::{
++        approval_service, memory::MemoryService, memorytools, skills::SkillService,
++    };
++    let home = fresh_dir("p02-install-switch");
++    write_home_fixture(&home);
++    write(
++        &home.join("user/preferences.json"),
++        r#"{"capabilities":{"learn_skills":{"enabled":true,"safety_review":false}}}"#,
++    );
++    write(
++        &home.join("agents/lingxi/memory/tenets.json"),
++        r#"{"version":1,"tenets":[]}"#,
++    );
++    let memory = Arc::new(MemoryService::new(home.clone(), home.join("runtime")));
++    let registry = Arc::new(ToolRegistry::new());
++    let budget = SchemaBudget::default();
++    let approvals = Arc::new(approval_service::ApprovalService::new(Arc::new(
++        SystemClock,
++    )));
++    let gateway = ToolInvocationGateway::new(
++        Arc::clone(&registry),
++        approvals,
++        Arc::new(SystemClock),
++        budget,
++        lingxi_service::toolgateway::DEFAULT_PREPARED_TTL_MS,
++        lingxi_service::toolgateway::DEFAULT_LIVE_PREPARED_CAP,
++    );
++    memorytools::register_memory_tools(
++        &registry,
++        &gateway,
++        Arc::clone(&memory),
++        Arc::new(SkillService::new(home.clone(), home.join("product"))),
++        "lingxi".into(),
++        Arc::new(SystemClock),
++        &budget,
++    );
++    let ctx = lingxi_kernel::RunContext {
++        principal: lingxi_kernel::Principal::LocalUser,
++        session_id: lingxi_protocol::SessionId::new("session-config"),
++        run_id: lingxi_protocol::RunId::new("run-config"),
++        attempt: lingxi_protocol::AttemptId::new("run-config#a1"),
++        generation: 1,
++    };
++    let mut failures = Vec::new();
++    for (i, yaml) in [
++        "memory: {enabled: false}\nskills: {\"<<\": {enabled: [must-not-enable]}}\nfuture: {\"<<\": {marker: keep}}",
++        "memory: {enabled: !custom true}",
++        "skills: {enabled: [!custom one]}",
++        "agent: {name: !custom 姓名}",
++    ].iter().enumerate() {
++        let config = home.join("agents/lingxi/config.yaml");
++        write(&config, yaml);
++        let name = format!("p02-install-{i}");
++        let source = home.join("source").join(&name);
++        write(&source.join("SKILL.md"), &format!("---\nname: {name}\ndescription: synthetic local package\n---\nA harmless local skill."));
++        let call = lingxi_protocol::ToolCallId::new(format!("install-{i}"));
++        let request = ToolRequest::from_effective_arguments(
++            "tool:first-party:install_skill",
++            serde_json::json!({"local_path":source}), &budget,
++        ).unwrap();
++        let handle = gateway.prepare_from_request(
++            &ctx, lingxi_service::toolgateway::CallerSurface::UserRun, "lingxi",
++            InvocationPermissionContext::UserSession {mode:lingxi_kernel::subagent::SessionPermissionMode::Operate},
++            &call,&request,
++        ).unwrap().handle;
++        let result = gateway.execute_prepared(&ctx,&call,&handle).await.unwrap();
++        let installed = home.join("skills").join(&name).join("SKILL.md").is_file();
++        let saved = std::fs::read_to_string(&config).unwrap();
++        let ok = if i == 0 {
++            matches!(result.outcome, ToolOutcome::Success {..}) && installed &&
++            lingxi_adapters::storage::agent_memory::AgentConfigPatch::read_skill_lists(&saved).unwrap().0 == vec![name.clone()] &&
++            saved.contains("marker: keep") && saved.contains("must-not-enable") &&
++            saved.contains("<<")
++        } else {
++            matches!(result.outcome, ToolOutcome::Failed {..}) && !installed && saved == *yaml
++        };
++        println!("p02_install={name} original={yaml:?} saved={saved:?} installed={installed} outcome={:?} matches={ok}",result.outcome);
++        if !ok {failures.push(name);}
++    }
++    std::fs::remove_dir_all(home).unwrap();
++    assert!(
++        failures.is_empty(),
++        "安装/启用不得掩盖配置错误: {failures:?}"
++    );
++}
+--- W06-CANDIDATE-02/rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs
++++ P02-PARTIAL/rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs
+@@ -697,3 +697,409 @@
+     }
+     assert!(failures.is_empty(), "全族真实入口未失败关闭: {failures:?}");
+ }
++
++#[tokio::test]
++async fn p02_literal_keys_tags_and_config_roundtrip_use_real_wire_and_http() {
++    let cases = [
++        (
++            "literal-memory",
++            "memory: {\"<<\": {enabled: false}}",
++            false,
++            true,
++            false,
++            true,
++        ),
++        (
++            "literal-explicit",
++            "memory: {!!str <<: {enabled: false}}",
++            false,
++            true,
++            false,
++            true,
++        ),
++        (
++            "literal-root",
++            "memory: {enabled: false}\n\"<<\": 7",
++            false,
++            false,
++            false,
++            true,
++        ),
++        (
++            "literal-future",
++            "memory: {enabled: false}\nfuture: {\"<<\": {marker: keep}, other: value}",
++            false,
++            false,
++            false,
++            true,
++        ),
++        (
++            "literal-experience",
++            "memory: {enabled: false}\nexperience: {\"<<\": {enabled: true}}",
++            false,
++            false,
++            false,
++            true,
++        ),
++        (
++            "literal-project",
++            "memory: {enabled: false}\nworkspace_context: {\"<<\": {discover_project_skills: false}}",
++            false,
++            false,
++            false,
++            true,
++        ),
++        (
++            "literal-name",
++            "memory: {enabled: false}\nagent: {\"<<\": {name: P02-NAME-MUST-NOT-LIFT}}",
++            false,
++            false,
++            false,
++            true,
++        ),
++        (
++            "true-merge",
++            "a: &a {enabled: true}\nb: &b {enabled: false}\nmemory: {<<: [*a,*b], enabled: false}\nexperience: {!!merge <<: *a}",
++            false,
++            false,
++            true,
++            true,
++        ),
++        (
++            "standard-tags",
++            "locale: !!str en\nagent: !!map {name: !!str P02-STANDARD-NAME, yuan: !!str lingxi}\nmemory: {enabled: !!bool FALSE}\nskills: {enabled: !!seq [!!str shared-p02]}",
++            false,
++            false,
++            false,
++            true,
++        ),
++        (
++            "tag-root",
++            "!custom {memory: {enabled: false}}",
++            true,
++            false,
++            false,
++            false,
++        ),
++        (
++            "tag-memory",
++            "memory: !custom {enabled: true}",
++            true,
++            false,
++            false,
++            false,
++        ),
++        (
++            "tag-bool",
++            "memory: {enabled: !custom true}",
++            true,
++            false,
++            false,
++            false,
++        ),
++        (
++            "tag-experience",
++            "experience: {enabled: !custom true}",
++            true,
++            false,
++            false,
++            false,
++        ),
++        (
++            "tag-name",
++            "agent: {name: !custom P02-NAME}",
++            true,
++            false,
++            false,
++            false,
++        ),
++        (
++            "tag-yuan",
++            "agent: {yuan: !custom lingxi}",
++            true,
++            false,
++            false,
++            false,
++        ),
++        (
++            "tag-locale",
++            "locale: !custom en",
++            true,
++            false,
++            false,
++            false,
++        ),
++        (
++            "tag-skills",
++            "skills: !custom {enabled: [shared-p02]}",
++            true,
++            false,
++            false,
++            false,
++        ),
++        (
++            "tag-list",
++            "skills: {enabled: !custom [shared-p02]}",
++            true,
++            false,
++            false,
++            false,
++        ),
++        (
++            "tag-list-entry",
++            "skills: {enabled: [!custom shared-p02]}",
++            true,
++            false,
++            false,
++            false,
++        ),
++        (
++            "tag-disabled-entry",
++            "skills: {workspace_disabled: [!custom project-p02]}",
++            true,
++            false,
++            false,
++            false,
++        ),
++        (
++            "tag-project",
++            "workspace_context: {discover_project_skills: !custom false}",
++            true,
++            false,
++            false,
++            false,
++        ),
++        (
++            "tag-compatible",
++            "workspace_context: {discover_compatible_project_skills: !custom false}",
++            true,
++            false,
++            false,
++            false,
++        ),
++        (
++            "tag-unknown",
++            "future: {nested: !custom {value: keep}}",
++            true,
++            false,
++            false,
++            false,
++        ),
++        (
++            "tag-overridden",
++            "a: &a {enabled: !custom true}\nmemory: {<<: *a, enabled: false}",
++            true,
++            false,
++            false,
++            false,
++        ),
++    ];
++    for (name, yaml, reject, memory, experience, project) in cases {
++        let stub = StubServer::start(final_turn_sse("离线 P02")).await;
++        let root = unique_dir(name);
++        let home = root.join("home");
++        let workspace = root.join("workspace");
++        std::fs::create_dir_all(&home).unwrap();
++        std::fs::create_dir_all(&workspace).unwrap();
++        let cfg = root.join("service.json");
++        write(&cfg, &serde_json::json!({"home":home,"workspace":workspace,"providers":{"main":{"protocol":"openai-completions","endpoint":format!("http://{}",stub.addr),"auth":{"kind":"apiKey","apiKey":"synthetic-p02"}}},"models":{"chat":{"provider":"main","model":"stub-p02","capabilities":{"tools":true}}}}).to_string());
++        let child = ServiceChild::start(&[
++            "--home".into(),
++            home.to_string_lossy().into(),
++            "--config".into(),
++            cfg.to_string_lossy().into(),
++            "--bind".into(),
++            "127.0.0.1:0".into(),
++        ])
++        .await;
++        let effective = std::fs::canonicalize(&home).unwrap();
++        let token = read_loopback_token(&home);
++        let config = effective.join("agents/lingxi/config.yaml");
++        write(&config, yaml);
++        write(
++            &effective.join("agents/lingxi/memory/memory.md"),
++            "P02-MEMORY-NONCE",
++        );
++        write(
++            &effective.join("agents/lingxi/experience/p02.md"),
++            "P02-EXPERIENCE-NONCE",
++        );
++        let shared = effective.join("skills/shared-p02/SKILL.md");
++        write(
++            &shared,
++            "---\nname: shared-p02\ndescription: P02 shared\n---\nSynthetic",
++        );
++        write(
++            &effective.join("agents/peer-p02/config.yaml"),
++            "skills: {\"<<\": {enabled: [shared-p02]}}",
++        );
++        write(
++            &workspace.join(".agents/skills/project-p02/SKILL.md"),
++            "---\nname: project-p02\ndescription: P02-PROJECT-NONCE\n---\nSynthetic",
++        );
++        let database = rusqlite::Connection::open_with_flags(
++            effective.join("lingxi-service/data/runs.db"),
++            rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
++        )
++        .unwrap();
++        let flags = http_json(
++            child.addr,
++            "GET",
++            "/lingxi/v1/agents/lingxi/config-flags",
++            Some(&token),
++            None,
++        )
++        .await;
++        let experience_read = http_json(
++            child.addr,
++            "GET",
++            "/lingxi/v1/agents/lingxi/experience",
++            Some(&token),
++            None,
++        )
++        .await;
++        let execute = http_json(
++            child.addr,
++            "POST",
++            "/lingxi/v1/sessions/sess_local_alpha/execute",
++            Some(&token),
++            Some(&serde_json::json!({"input":"回答"})),
++        )
++        .await;
++        let requests = stub.requests();
++        let terminal: String = database
++            .query_row(
++                "SELECT status FROM runs WHERE run_id=?1",
++                [execute.1["runId"].as_str().unwrap()],
++                |row| row.get(0),
++            )
++            .unwrap();
++        assert_eq!(std::fs::read_to_string(&config).unwrap(), yaml);
++        println!(
++            "p02_case={name} input_sha={} flags={flags:?} experience={experience_read:?} terminal={terminal} wire={:?}",
++            sha256_hex(yaml),
++            requests.iter().map(|r| &r.body).collect::<Vec<_>>()
++        );
++        if reject {
++            assert_eq!(flags.0, 400, "{name}");
++            assert_eq!(terminal, "failed", "{name}");
++            assert!(requests.is_empty(), "{name}");
++        } else {
++            assert_eq!(flags.0, 200, "{name}");
++            assert_eq!(flags.1["memoryEnabled"], memory, "{name}");
++            assert_eq!(flags.1["experienceEnabled"], experience, "{name}");
++            assert_eq!(
++                experience_read.0,
++                if experience { 200 } else { 403 },
++                "{name}"
++            );
++            if experience {
++                assert!(format!("{:?}", experience_read.1).contains("P02-EXPERIENCE-NONCE"));
++            }
++            assert_eq!(terminal, "completed", "{name}");
++            assert_eq!(requests.len(), 1, "{name}");
++            let sent = requests[0].body["messages"][0]["content"].as_str().unwrap();
++            assert_eq!(sent.contains("P02-MEMORY-NONCE"), memory, "{name}");
++            assert_eq!(sent.contains("P02-PROJECT-NONCE"), project, "{name}");
++            assert!(!sent.contains("P02-NAME-MUST-NOT-LIFT"), "{name}");
++            if name == "standard-tags" {
++                assert!(sent.contains("P02-STANDARD-NAME"));
++                let preview = http_json(
++                    child.addr,
++                    "GET",
++                    "/lingxi/v1/agents/lingxi/skills/cleanup-preview",
++                    Some(&token),
++                    None,
++                )
++                .await;
++                assert_eq!(preview.0, 200);
++                assert_eq!(preview.1["skills"][0]["name"], "shared-p02");
++                write(
++                    &effective.join("agents/peer-p02/config.yaml"),
++                    "skills: {enabled: [!custom shared-p02]}",
++                );
++                let preview = http_json(
++                    child.addr,
++                    "GET",
++                    "/lingxi/v1/agents/lingxi/skills/cleanup-preview",
++                    Some(&token),
++                    None,
++                )
++                .await;
++                assert_eq!(preview.0, 400);
++                write(
++                    &effective.join("agents/peer-p02/config.yaml"),
++                    "skills: {\"<<\": {enabled: [shared-p02]}}",
++                );
++            }
++        }
++        let patch = http_json(
++            child.addr,
++            "PATCH",
++            "/lingxi/v1/agents/lingxi/config",
++            Some(&token),
++            Some(&serde_json::json!({"memory":{"enabled":false}})),
++        )
++        .await;
++        let saved = std::fs::read_to_string(&config).unwrap();
++        println!("p02_case={name} patch={patch:?} original={yaml:?} saved={saved:?}");
++        if reject {
++            assert_eq!(patch.0, 400, "{name}");
++            assert_eq!(saved, yaml, "{name}");
++        } else {
++            assert_eq!(patch.0, 200, "{name}");
++            // 业务再次读取检查默认、列表和深层字面键；完整未知值相等检查在适配层及独立现役语义探针。
++            if name.starts_with("literal-") {
++                assert!(saved.contains("<<"), "{name}: 字面键必须保留");
++            }
++            if name == "literal-future" {
++                assert!(saved.contains("marker: keep"));
++                assert!(saved.contains("other: value"));
++            }
++            let reread = http_json(
++                child.addr,
++                "GET",
++                "/lingxi/v1/agents/lingxi/config-flags",
++                Some(&token),
++                None,
++            )
++            .await;
++            assert_eq!(reread.0, 200, "{name}");
++            assert_eq!(reread.1["memoryEnabled"], false, "{name}");
++            assert_eq!(reread.1["experienceEnabled"], experience, "{name}");
++            // 保存后的新会话必须重新采集配置；同会话缓存失效属于仍待修复的 F05。
++            let created = http_json(child.addr,"POST","/lingxi/v1/sessions",Some(&token),Some(&serde_json::json!({"sessionId":"p02-reread","agentId":"lingxi","title":"保存后读取"}))).await;
++            assert_eq!(created.0, 201, "{name}");
++            let execute = http_json(
++                child.addr,
++                "POST",
++                "/lingxi/v1/sessions/p02-reread/execute",
++                Some(&token),
++                Some(&serde_json::json!({"input":"保存后再次读取"})),
++            )
++            .await;
++            let requests = stub.requests();
++            assert_eq!(requests.len(), 1, "{name}");
++            assert!(
++                !requests[0].body["messages"][0]["content"]
++                    .as_str()
++                    .unwrap()
++                    .contains("P02-MEMORY-NONCE"),
++                "{name}"
++            );
++            let terminal: String = database
++                .query_row(
++                    "SELECT status FROM runs WHERE run_id=?1",
++                    [execute.1["runId"].as_str().unwrap()],
++                    |row| row.get(0),
++                )
++                .unwrap();
++            assert_eq!(terminal, "completed", "{name}");
++        }
++        assert!(shared.is_file());
++        drop(database);
++        assert!(child.stop().await.success());
++        stub.stop().await;
++        std::fs::remove_dir_all(root).unwrap();
++    }
++}
+--- W06-CANDIDATE-02/rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs
++++ P02-PARTIAL/rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs
+@@ -201,3 +201,156 @@
+     }
+     assert_eq!(before["memory"]["custom"], after["memory"]["custom"]);
+ }
++
++#[test]
++fn p02_literal_merge_keys_and_supported_tags_survive_repeated_updates() {
++    for key in ["\"<<\"", "'<<'", "!!str <<", "!<tag:yaml.org,2002:str> <<"] {
++        let text = format!(
++            "{key}: 7\nagent: {{{key}: {{name: 不得提升}}}}\nmemory: {{{key}: {{enabled: false}}}}\nexperience: {{{key}: {{enabled: true}}}}\nskills: {{{key}: {{enabled: [shared]}}}}\nworkspace_context: {{{key}: {{discover_project_skills: false}}}}\nfuture: {{{key}: {{marker: keep}}, other: value}}\n"
++        );
++        let before: Value = serde_yaml_ng::from_str(&text).unwrap();
++        let doc = AgentConfigDocument::parse(&text).unwrap();
++        assert_eq!(doc.scan().unwrap().agent_name, None);
++        assert_eq!(doc.flags().unwrap().memory_enabled, None);
++        assert_eq!(doc.flags().unwrap().experience_enabled, None);
++        assert_eq!(doc.flags().unwrap().discover_project_skills, None);
++        assert!(doc.skill_lists().unwrap().0.is_empty());
++        let patched = AgentConfigPatch::write_flags(
++            &text,
++            &AgentConfigFlags {
++                memory_enabled: Some(false),
++                ..Default::default()
++            },
++        )
++        .unwrap();
++        let patched = AgentConfigPatch::write_skill_lists(&patched, &["new".into()], &[]).unwrap();
++        let after: Value = serde_yaml_ng::from_str(&patched).unwrap();
++        for section in ["agent", "experience", "workspace_context", "future"] {
++            assert_eq!(before[section], after[section]);
++        }
++        for section in ["memory", "skills"] {
++            assert_eq!(before[section]["<<"], after[section]["<<"]);
++        }
++        assert_eq!(before["<<"], after["<<"]);
++        let reread = AgentConfigDocument::parse(&patched).unwrap();
++        assert_eq!(reread.flags().unwrap().memory_enabled, Some(false));
++        assert_eq!(reread.flags().unwrap().experience_enabled, None);
++        assert_eq!(reread.scan().unwrap().agent_name, None);
++        assert_eq!(reread.skill_lists().unwrap().0, vec!["new"]);
++        println!("p02_literal_key={key} input={text:?} persisted={patched:?}");
++    }
++    let doc = AgentConfigDocument::parse("locale: !!str en\nagent: !!map {name: !!str true, yuan: !!str lingxi}\nmemory: !!map {enabled: !!bool FALSE}\nskills: {enabled: !!seq [!!str one]}\nfuture: {bool: true, number: 7, text: !!str false, nested: [null, 中文]}").unwrap();
++    assert_eq!(doc.scan().unwrap().locale.as_deref(), Some("en"));
++    assert_eq!(doc.scan().unwrap().agent_name.as_deref(), Some("true"));
++    assert_eq!(doc.flags().unwrap().memory_enabled, Some(false));
++    assert_eq!(doc.skill_lists().unwrap().0, vec!["one"]);
++    let rendered = doc.render().unwrap();
++    assert_eq!(
++        AgentConfigDocument::parse(&rendered)
++            .unwrap()
++            .scan()
++            .unwrap(),
++        doc.scan().unwrap()
++    );
++}
++
++#[test]
++fn p02_unknown_tags_reject_all_positions_and_preserve_original_bytes() {
++    let root = std::env::temp_dir().join(format!("lingxi-p02-tag-patch-{}", std::process::id()));
++    std::fs::create_dir_all(&root).unwrap();
++    let path = root.join("config.yaml");
++    for text in [
++        "!custom {memory: {enabled: false}}",
++        "memory: !custom {enabled: true}",
++        "memory: {enabled: !custom true}",
++        "experience: {enabled: !custom false}",
++        "agent: {name: !custom 姓名}",
++        "agent: {yuan: !custom lingxi}",
++        "locale: !custom en",
++        "skills: !custom {enabled: [one]}",
++        "skills: {enabled: !custom [one]}",
++        "skills: {enabled: [!custom one]}",
++        "skills: {workspace_disabled: [!custom one]}",
++        "workspace_context: {discover_project_skills: !custom false}",
++        "workspace_context: {discover_compatible_project_skills: !custom false}",
++        "future: {value: !custom string}",
++        "future: !custom {value: false}",
++        "defaults: &d {enabled: !custom true}\nmemory: {<<: *d, enabled: false}",
++        "defaults: &d {memory: !custom {enabled: true}}\n<<: *d\nmemory: {enabled: false}",
++        "%TAG !t! tag:example.org,2026:\n---\nmemory: {enabled: !t!bool true}",
++        "memory: !!str {enabled: false}",
++        "memory: {enabled: !!str false}",
++        "memory: {enabled: !!merge true}",
++    ] {
++        std::fs::write(&path, text).unwrap();
++        assert!(
++            AgentConfigDocument::parse(text).is_err(),
++            "不得接受未知或不匹配类型: {text}"
++        );
++        assert!(
++            patch_agent_config(&path, |text| AgentConfigPatch::write_flags(
++                text,
++                &AgentConfigFlags {
++                    memory_enabled: Some(false),
++                    ..Default::default()
++                }
++            ))
++            .is_err()
++        );
++        assert_eq!(std::fs::read_to_string(&path).unwrap(), text);
++    }
++    std::fs::remove_dir_all(root).unwrap();
++}
++
++#[test]
++fn p02_true_merge_precedence_explicit_tags_and_overridden_sources_remain_checked() {
++    for text in [
++        "a: &a {enabled: false}\nb: &b {enabled: true}\nmemory: {<<: [*a, *b]}",
++        "a: &a {enabled: true}\nmemory: {!!merge <<: *a, enabled: false}",
++        "%TAG !m! tag:yaml.org,2002:me\n---\na: &a {enabled: false}\nmemory: {!m!rge <<: *a}",
++        "a: &a {enabled: false}\nb: &b {<<: *a}\nmemory: {<<: *b}",
++    ] {
++        let doc = AgentConfigDocument::parse(text).unwrap();
++        assert_eq!(doc.flags().unwrap().memory_enabled, Some(false));
++        assert_eq!(
++            AgentConfigDocument::parse(&doc.render().unwrap())
++                .unwrap()
++                .flags()
++                .unwrap()
++                .memory_enabled,
++            Some(false)
++        );
++    }
++    for text in [
++        "a: &a {? [enabled]: true}\nb: &b {enabled: false}\nmemory: {<<: [*b, *a], enabled: false}",
++        "a: &a {memory: {? [enabled]: true}}\n<<: *a\nmemory: {enabled: false}",
++        "a: &a {enabled: false, enabled: true}\nmemory: {<<: *a, enabled: false}",
++    ] {
++        assert!(
++            AgentConfigDocument::parse(text).is_err(),
++            "被覆盖的来源也必须验证: {text}"
++        );
++    }
++}
++
++#[test]
++fn p02_mixed_literal_and_merge_keys_and_alias_key_identity_remain_distinct() {
++    for text in [
++        "d: &d {enabled: false}\nmemory: {<<: *d, \"<<\": {enabled: true}}\nfuture: {\"<<\": [{nested: keep}]}",
++        "key: &k '<<'\nmemory: {*k : {enabled: true}, enabled: false}",
++        "%TAG !s! tag:yaml.org,2002:s\n---\nmemory: {!s!tr <<: {enabled: true}, enabled: false}",
++        "memory: {! enabled: false}",
++    ] {
++        let doc = AgentConfigDocument::parse(text).unwrap_or_else(|err| panic!("{text}: {err}"));
++        assert_eq!(doc.flags().unwrap().memory_enabled, Some(false));
++        let rendered = doc.render().unwrap();
++        let reread = AgentConfigDocument::parse(&rendered).unwrap();
++        assert_eq!(reread.flags().unwrap().memory_enabled, Some(false));
++        if text.contains("future:") {
++            let after: Value = serde_yaml_ng::from_str(&rendered).unwrap();
++            let expected: Value =
++                serde_yaml_ng::from_str("future: {\"<<\": [{nested: keep}]} ").unwrap();
++            assert_eq!(expected["future"], after["future"]);
++        }
++    }
++}

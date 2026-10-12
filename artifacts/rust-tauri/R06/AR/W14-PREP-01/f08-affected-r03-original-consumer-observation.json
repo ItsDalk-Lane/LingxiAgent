@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-11T23:43:07.634844+00:00",
+  "id": "R06-F08-AFFECTED-R03-STRICT-EVENT-OBSERVATION-01",
+  "status": "OPEN_AFFECTED_UPSTREAM_CONSUMER_RECONCILIATION_REQUIRED",
+  "current_committed_head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "only_commit_since_audited_base": [
+    "bc2ce51fd005ea75b9949156974e15d2761eb734"
+  ],
+  "reported_by": [
+    "/root/ar_w04_executor_01",
+    "/root/ar_w15_executor_01"
+  ],
+  "facts": "Both executors report original cancellation_tree strict event sequence fails because actual key events include tool_result_model_projection; W04 additionally reports own pure committed-bc clone 6/8 and original quota fixture6/7. No root re-execution or new independent Reviewer verdict.",
+  "historical_F08_repair_share_PASS": "PRESERVED_EXACT_ORIGINAL_SCOPE_NOT_EXTENDED",
+  "original_R03_required_share_status": "FAIL_REPORTED_PENDING_FROZEN_ACTUAL_RECORD_AND_FRESH_REVIEW",
+  "required": "Fresh F14 execute and independently review exact producer-consumer mapping, preserve original cancellation/event/raw semantics, explicitly verify bounded projection event content and its true sequence position. Do not drop old events, ignore actual projection, use contains instead of exact assertions, or retire gate.",
+  "task_closed_count_not_reinterpreted_as_all_original_scope_pass": true,
+  "stage_acceptance": false,
+  "R07_started": false
+}

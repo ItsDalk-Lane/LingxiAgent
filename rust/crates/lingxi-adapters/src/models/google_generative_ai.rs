@@ -275,17 +275,14 @@ fn enforce_turn_origin(
 /// when the anchor carried one (R05 RR1 F07).
 fn render_function_call_part(
     call: &lingxi_kernel::model_exchange::RequestedToolCall,
-    input: &ModelTurnInput,
+    _input: &ModelTurnInput,
     signature: Option<&str>,
 ) -> Result<serde_json::Value, ProtocolError> {
     let invalid = |detail: String| ProtocolError::new(ErrorCode::InvalidMessage, detail, false);
-    let wire_name = input
-        .tools
-        .wire_name_of_target(&call.target)
+    let wire_name = call.historical_wire_name()
         .ok_or_else(|| {
             invalid(format!(
-                "exchange history names tool target {:?}, which the current declaration \
-                 snapshot does not contain (the registry moved mid-run); cannot faithfully \
+                "exchange history names tool target {:?}, which lacks a trusted original declaration binding; cannot faithfully \
                  re-render the transcript",
                 call.target
             ))
@@ -438,10 +435,9 @@ pub fn render_generate_request(
             },
         }));
     }
-    contents.push(serde_json::json!({
-        "role": "user",
-        "parts": submission_parts,
-    }));
+    if !input.has_submission_position() {
+        contents.push(serde_json::json!({"role":"user","parts":submission_parts.clone()}));
+    }
     // The pairing chain of THIS exchange: host tool_call_id → the wire
     // name + provider id its call carried (functionResponse pairs by name,
     // so the name must come from the exchange's own history — never a
@@ -449,6 +445,12 @@ pub fn render_generate_request(
     let mut call_names: HashMap<String, (String, Option<String>)> = HashMap::new();
     for item in &input.prior {
         match item {
+            ExchangeItem::UserTurn { text } => {
+                contents.push(serde_json::json!({"role":"user","parts":[{"text":text}]}))
+            }
+            ExchangeItem::CurrentSubmission => {
+                contents.push(serde_json::json!({"role":"user","parts":submission_parts.clone()}))
+            }
             ExchangeItem::AssistantTurn {
                 content,
                 tool_calls,
@@ -484,9 +486,7 @@ pub fn render_generate_request(
                     if anchored {
                         continue;
                     }
-                    let wire_name = input
-                        .tools
-                        .wire_name_of_target(&call.target)
+                    let wire_name = call.historical_wire_name()
                         .ok_or_else(|| {
                             invalid(format!(
                                 "exchange history names tool target {:?}, which the current \
@@ -518,9 +518,7 @@ pub fn render_generate_request(
                     if !anchored {
                         continue;
                     }
-                    let wire_name = input
-                        .tools
-                        .wire_name_of_target(&call.target)
+                    let wire_name = call.historical_wire_name()
                         .ok_or_else(|| {
                             invalid(format!(
                                 "exchange history names tool target {:?}, which the current \
@@ -1361,6 +1359,7 @@ mod tests {
             call: ModelCallId::new("mc-1"),
             content: vec![],
             tool_calls: vec![lingxi_kernel::model_exchange::RequestedToolCall {
+                declaration_binding: input.tools.bind_target(&request.target),
                 tool_call_id: ToolCallId::new("run-tc0001"),
                 provider_call_id: request.provider_call_id.clone(),
                 target: request.target.clone(),
@@ -1458,6 +1457,7 @@ mod tests {
             call: call.clone(),
             content: content.clone(),
             tool_calls: vec![lingxi_kernel::model_exchange::RequestedToolCall {
+                declaration_binding: input.tools.bind_target(&requests[0].target),
                 tool_call_id: ToolCallId::new("run-tc0001"),
                 provider_call_id: requests[0].provider_call_id.clone(),
                 target: requests[0].target.clone(),

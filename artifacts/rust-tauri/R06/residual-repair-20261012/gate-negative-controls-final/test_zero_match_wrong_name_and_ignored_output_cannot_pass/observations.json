@@ -1,0 +1,98 @@
+[
+  {
+    "label": "zero-match",
+    "stdout": "running 0 tests\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s\n",
+    "outputCheck": {
+      "valid": false,
+      "expectedTest": "registered_actual_test",
+      "runningCounts": [
+        "0"
+      ],
+      "resultSummaries": [
+        [
+          "ok",
+          "0",
+          "0",
+          "0"
+        ]
+      ],
+      "passedTestNames": [],
+      "reason": "必须精确执行登记的一个测试；0 匹配、忽略、失败或名称错绑均不能通过"
+    }
+  },
+  {
+    "label": "wrong-name",
+    "stdout": "running 1 test\ntest different_test ... ok\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n",
+    "outputCheck": {
+      "valid": false,
+      "expectedTest": "registered_actual_test",
+      "runningCounts": [
+        "1"
+      ],
+      "resultSummaries": [
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "passedTestNames": [
+        "different_test"
+      ],
+      "reason": "必须精确执行登记的一个测试；0 匹配、忽略、失败或名称错绑均不能通过"
+    }
+  },
+  {
+    "label": "ignored",
+    "stdout": "running 1 test\ntest registered_actual_test ... ignored\ntest result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s\n",
+    "outputCheck": {
+      "valid": false,
+      "expectedTest": "registered_actual_test",
+      "runningCounts": [
+        "1"
+      ],
+      "resultSummaries": [
+        [
+          "ok",
+          "0",
+          "0",
+          "1"
+        ]
+      ],
+      "passedTestNames": [],
+      "reason": "必须精确执行登记的一个测试；0 匹配、忽略、失败或名称错绑均不能通过"
+    }
+  },
+  {
+    "label": "multiple-runs",
+    "stdout": "running 1 test\ntest registered_actual_test ... ok\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\nrunning 1 test\ntest registered_actual_test ... ok\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n",
+    "outputCheck": {
+      "valid": false,
+      "expectedTest": "registered_actual_test",
+      "runningCounts": [
+        "1",
+        "1"
+      ],
+      "resultSummaries": [
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "passedTestNames": [
+        "registered_actual_test",
+        "registered_actual_test"
+      ],
+      "reason": "必须精确执行登记的一个测试；0 匹配、忽略、失败或名称错绑均不能通过"
+    }
+  }
+]

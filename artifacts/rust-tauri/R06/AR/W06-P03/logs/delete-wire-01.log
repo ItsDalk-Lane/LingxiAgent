@@ -1,0 +1,35 @@
+{"command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-service", "--test", "r06_ar_f06_binary", "p03_delete_receipts", "--", "--nocapture"], "start": 1791705214.168303, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-delete-wire-01-r74snopj", "guard": "8192MB/600s"}
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.39s
+     Running tests/r06_ar_f06_binary.rs (rust/target-w06-p03/debug/deps/r06_ar_f06_binary-6ea1b25436d2ccda)
+LINGXI_TEST_GUARD: armed (pid 63323, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+verified_ready=LINGXI_SERVICE_READY addr=127.0.0.1:52691 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t01-bin-p03-delete-normal-63323-0/home source=cli
+p03_delete_wire mode=normal input_sha=daa3c9dbb042ed0886e67196b3fe5b07009fec840da6fd6244cabfdd164d7844 receipt=(200, Object {"ok": Bool(true), "scrubbedAgents": Array [String("lingxi"), String("peer")]}) skill_exists=false saved="skills:\n  enabled: []\n  workspace_disabled: []\nfuture:\n  payload: !<tag:yaml.org,2002:binary> /wABAA==\n  date: !<tag:yaml.org,2002:timestamp> \"2026-10-11\"\n"
+verified_ready=LINGXI_SERVICE_READY addr=127.0.0.1:52694 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t01-bin-p03-delete-bad-peer-63323-1/home source=cli
+p03_delete_wire mode=bad-peer input_sha=daa3c9dbb042ed0886e67196b3fe5b07009fec840da6fd6244cabfdd164d7844 receipt=(400, Object {"error": String("invalid agent config.yaml: unsupported YAML tag or tagged node type")}) skill_exists=true saved="skills: {enabled: [p03-owned]}\nfuture: {payload: !!binary /wABAA==, date: 2026-10-11}"
+verified_ready=LINGXI_SERVICE_READY addr=127.0.0.1:52696 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t01-bin-p03-delete-peer-directory-63323-2/home source=cli
+p03_delete_wire mode=peer-directory input_sha=daa3c9dbb042ed0886e67196b3fe5b07009fec840da6fd6244cabfdd164d7844 receipt=(500, Object {"error": String("read agent config before skill cleanup: Is a directory (os error 21)")}) skill_exists=true saved="skills: {enabled: [p03-owned]}\nfuture: {payload: !!binary /wABAA==, date: 2026-10-11}"
+verified_ready=LINGXI_SERVICE_READY addr=127.0.0.1:52698 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t01-bin-p03-delete-bad-bundles-63323-3/home source=cli
+p03_delete_wire mode=bad-bundles input_sha=daa3c9dbb042ed0886e67196b3fe5b07009fec840da6fd6244cabfdd164d7844 receipt=(400, Object {"error": String("invalid skill bundles: key must be a string at line 1 column 3")}) skill_exists=true saved="skills: {enabled: [p03-owned]}\nfuture: {payload: !!binary /wABAA==, date: 2026-10-11}"
+verified_ready=LINGXI_SERVICE_READY addr=127.0.0.1:52700 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t01-bin-p03-delete-bundle-directory-63323-4/home source=cli
+p03_delete_wire mode=bundle-directory input_sha=daa3c9dbb042ed0886e67196b3fe5b07009fec840da6fd6244cabfdd164d7844 receipt=(500, Object {"error": String("read skill bundles: Is a directory (os error 21)")}) skill_exists=true saved="skills: {enabled: [p03-owned]}\nfuture: {payload: !!binary /wABAA==, date: 2026-10-11}"
+verified_ready=LINGXI_SERVICE_READY addr=127.0.0.1:52702 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t01-bin-p03-delete-late-write-63323-5/home source=cli
+p03_delete_wire mode=late-write input_sha=daa3c9dbb042ed0886e67196b3fe5b07009fec840da6fd6244cabfdd164d7844 receipt=(500, Object {"code": String("SKILL_DELETED_REFERENCE_CLEANUP_FAILED"), "details": Object {"requestId": String("req-3168175fa949911d5c4f54aed75765b3")}, "error": String("技能已删除，但引用清理失败：Permission denied (os error 13)")}) skill_exists=false saved="skills:\n  enabled: []\n  workspace_disabled: []\nfuture:\n  payload: !<tag:yaml.org,2002:binary> /wABAA==\n  date: !<tag:yaml.org,2002:timestamp> \"2026-10-11\"\n"
+
+thread 'p03_delete_receipts_match_real_files_and_preflight' (2986107) panicked at crates/lingxi-service/tests/r06_ar_f06_binary.rs:1146:37:
+assertion `left == right` failed
+  left: 500
+ right: 409
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test p03_delete_receipts_match_real_files_and_preflight ... FAILED
+
+failures:
+
+failures:
+    p03_delete_receipts_match_real_files_and_preflight
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 1.76s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_f06_binary`

@@ -1,0 +1,22 @@
+
+running 1 test
+test original_session_rename_preserves_title_after_invalid_foreign_and_storage_refusal ... FAILED
+
+successes:
+
+successes:
+
+failures:
+
+---- original_session_rename_preserves_title_after_invalid_foreign_and_storage_refusal stdout ----
+
+thread 'original_session_rename_preserves_title_after_invalid_foreign_and_storage_refusal' (13438539) panicked at crates/lingxi-service/tests/r06_original_session_proofs.rs:451:5:
+assertion failed: serde_json::from_str::<serde_json::Value>(&body).unwrap()["error"].is_object()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    original_session_rename_preserves_title_after_invalid_foreign_and_storage_refusal
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 2.56s
+

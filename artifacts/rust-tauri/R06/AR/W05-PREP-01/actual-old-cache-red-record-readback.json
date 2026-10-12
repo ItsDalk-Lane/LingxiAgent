@@ -1,0 +1,67 @@
+{
+  "at": "2026-10-11T12:04:59.066598+00:00",
+  "role": "ROOT_ACTUAL_RECORD_READBACK_NOT_SECOND_EXECUTION_OR_INDEPENDENT_REVIEW",
+  "workspace": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01",
+  "status": "ACTUAL_OLD_BEHAVIOR_FAILURE_RECORDS_VALID_LIMITED",
+  "evidence": {
+    "old-c01-03.json": {
+      "absolute_path": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/old-c01-03.json",
+      "sha256": "1911e1c5bf1f454a864659a4a69382db5bad27d7915a39fcea91cfdf46937fb3"
+    },
+    "commands/old-c01-03.json": {
+      "absolute_path": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/commands/old-c01-03.json",
+      "sha256": "ef055d6d22f2e1a27698f81a073c3b62a16d76474a93b25fe1816f99f2051f5a"
+    },
+    "commands/old-c01-03.log": {
+      "absolute_path": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/commands/old-c01-03.log",
+      "sha256": "8a66f0d7bbd75112598d55a4fe9303592efbdd59da3cac8e06e0223ca312522b"
+    },
+    "commands/old-c02-03.json": {
+      "absolute_path": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/commands/old-c02-03.json",
+      "sha256": "c265fa0d03343be667ccbd332d22ed6f8cece026953c848e4d85882aca70bc7c"
+    },
+    "commands/old-c02-03.log": {
+      "absolute_path": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/commands/old-c02-03.log",
+      "sha256": "17057e83d752ad1e13775c00b2c7dccd4a21e57966460d2e1beb8402cf4b7e30"
+    },
+    "old-c02-03/c02-wire.json": {
+      "absolute_path": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/old-c02-03/c02-wire.json",
+      "sha256": "a7f020c16fb3a9de13e1acc915d14a03ad56e8fdf8f559a9d7f6ab2cb40820d0"
+    }
+  },
+  "C01": {
+    "positive": true,
+    "nextRunDynamic": false,
+    "request_observation_match": true,
+    "old_run_snapshot_preserved": true,
+    "service_exit": 0,
+    "test_exit": 1,
+    "binary_before_after": "dc55f283696188ac4aeead744b8c59758610d3afbae9038992bee89bfc11b9ce",
+    "input_before_after_equal": true
+  },
+  "C02": {
+    "matched_test": 1,
+    "test_exit": 101,
+    "assertions": [
+      true,
+      false,
+      false,
+      true
+    ],
+    "true_child_count": 2,
+    "captured_wire_count": 3,
+    "wire_count_breakdown": "1 real parent plus 2 real children",
+    "mock": "external loopback only",
+    "binary_before_after": "f0a8e46fab24854d349f38db7eafe3e2938bdd004bc6b73a09d1a3d0b980261f",
+    "input_before_after_equal": true
+  },
+  "guard": {
+    "timeSeconds": 600,
+    "memoryMiB": 8192,
+    "enabled": true
+  },
+  "no_candidate_product_copy": true,
+  "candidate_repair": "IN_PROGRESS_NO_FINAL_SELF_CHECK_OR_REVIEW",
+  "remaining": "F05 all four C/full original Steps/leafs/resources/observations/races must still final run and new Review",
+  "root_preparation_error_preserved": "first root extractor assumed whole wire count2 instead of parent1+child2=3; assertion stopped before any output/product mutation; current count read actual raw record, no change to records"
+}

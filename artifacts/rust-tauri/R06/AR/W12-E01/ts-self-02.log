@@ -1,0 +1,126 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/r06-ar-f12-vector-cache-preservation.test.ts (8 tests | 1 failed) 284ms
+   × crashed future WAL remains uncheckpointed when an old opener refuses 128ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/r06-ar-f12-vector-cache-preservation.test.ts > crashed future WAL remains uncheckpointed when an old opener refuses
+AssertionError: expected [ …(3) ] to deeply equal [ …(3) ]
+
+- Expected
++ Received
+
+@@ -57489,14 +57489,14 @@
+        0,
+        0,
+        0,
+        0,
+        0,
+-       3,
+        0,
+        0,
+        0,
++       0,
+        1,
+        0,
+        0,
+        16,
+        4,
+@@ -57521,27 +57521,27 @@
+        144,
+        80,
+        47,
+        236,
+        165,
+-       0,
+-       238,
++       217,
++       237,
+        175,
+        124,
+-       18,
+-       210,
++       211,
++       209,
+        6,
+        53,
+        24,
+        226,
+        45,
+        0,
+        0,
+        0,
+        0,
+        0,
+-       3,
++       0,
+        0,
+        0,
+        0,
+        1,
+        0,
+@@ -57569,27 +57569,27 @@
+        144,
+        80,
+        47,
+        236,
+        165,
+-       0,
+-       238,
++       217,
++       237,
+        175,
+        124,
+-       18,
+-       210,
++       211,
++       209,
+        6,
+        53,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+-       3,
++       4,
+        0,
+        0,
+        0,
+        255,
+        255,
+@@ -57609,11 +57609,11 @@
+        0,
+        0,
+        0,
+        0,
+        0,
+-       0,
++       4,
+        0,
+        0,
+        0,
+        0,
+        0,
+
+ ❯ tests/r06-ar-f12-vector-cache-preservation.test.ts:117:76
+    115|   const before=["", "-wal", "-shm"].map(suffix=>fs.readFileSync(dbPath…
+    116|   expect(()=>new PortableVectorIndexAdapter({dbPath})).toThrow(/newer/…
+    117|   expect(["", "-wal", "-shm"].map(suffix=>fs.readFileSync(dbPath+suffi…
+       |                                                                            ^
+    118| });
+    119|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 28 passed (29)
+   Start at  13:29:46
+   Duration  2.55s (transform 207ms, setup 26ms, import 546ms, tests 1.78s, environment 0ms)
+

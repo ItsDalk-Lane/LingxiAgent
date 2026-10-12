@@ -1,0 +1,28 @@
+LINGXI_TEST_GUARD: armed (pid 2404, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+p02_install=p02-install-0 original="memory: {enabled: false}\nskills: {\"<<\": {enabled: [must-not-enable]}}\nfuture: {\"<<\": {marker: keep}}" saved="memory:\n  enabled: false\nskills:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : enabled:\n    - must-not-enable\n  enabled:\n  - p02-install-0\n  workspace_disabled: []\nfuture:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : marker: keep\n" installed=true outcome=Success { result: ToolSuccess { content: [Text { text: "Skill installed: p02-install-0 (enabled for this agent).\nSafety review passed." }], resource_refs: [], truncated: false, status: None, content_digest: "b7b4df8f612c5f4a4621852fffccf56b83e35c0f9dd9f472183f2a18f12fd0eb" } } matches=true
+p02_install=p02-install-1 original="memory: {enabled: !custom true}" saved="memory: {enabled: !custom true}" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: unsupported YAML tag or tagged node type", retryable: false, details: None } } matches=true
+p02_install=p02-install-2 original="skills: {enabled: [!custom one]}" saved="skills: {enabled: [!custom one]}" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: unsupported YAML tag or tagged node type", retryable: false, details: None } } matches=true
+p02_install=p02-install-3 original="agent: {name: !custom 姓名}" saved="agent: {name: !custom 姓名}" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: unsupported YAML tag or tagged node type", retryable: false, details: None } } matches=true
+p02_install=p02-install-4 original="memory: {enabled: !bool true}" saved="memory: {enabled: !bool true}" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: unsupported YAML tag or tagged node type", retryable: false, details: None } } matches=true
+p02_install=p02-install-5 original="agent: {name: !str 姓名}" saved="agent: {name: !str 姓名}" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: unsupported YAML tag or tagged node type", retryable: false, details: None } } matches=true
+p02_install=p02-install-6 original="memory: !map {enabled: false}" saved="memory: !map {enabled: false}" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: unsupported YAML tag or tagged node type", retryable: false, details: None } } matches=true
+p02_install=p02-install-7 original="agent: {name: !!binary SGVsbG8=}" saved="agent: {name: !!binary SGVsbG8=}" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: agent.name must be a string", retryable: false, details: None } } matches=true
+p02_install=p02-install-8 original="future: [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[x]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]" saved="future: [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[x]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: recursion limit exceeded at char 72 line 1 column 73", retryable: false, details: None } } matches=true
+p02_install=p02-install-9 original="future: !!null wrong" saved="future: null\nskills:\n  enabled:\n  - p02-install-9\n  workspace_disabled: []\n" installed=true outcome=Success { result: ToolSuccess { content: [Text { text: "Skill installed: p02-install-9 (enabled for this agent).\nSafety review passed." }], resource_refs: [], truncated: false, status: None, content_digest: "23257aac53867e4406f555680571340c90c01890c0935defceb71f64e1f6f1c4" } } matches=false
+p02_install=p02-install-10 original="future: !!int 0B10" saved="future: 2\nskills:\n  enabled:\n  - p02-install-10\n  workspace_disabled: []\n" installed=true outcome=Success { result: ToolSuccess { content: [Text { text: "Skill installed: p02-install-10 (enabled for this agent).\nSafety review passed." }], resource_refs: [], truncated: false, status: None, content_digest: "c404bfef1cfeb82c34bf6da66a44aa518332f708975cb3090bcc29bce197e993" } } matches=false
+p03_late_install installed=true saved="memory: {enabled: false}\nskills: {enabled: []}\nfuture: {data: !!binary /w==}" outcome=Failed { error: ProtocolError { code: Internal, message: "Skill installed: p03-late-write, but enabling failed: Permission denied (os error 13)", retryable: false, details: None } }
+
+thread 'p02_real_install_gateway_checks_config_before_install_and_enable' (3424746) panicked at /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r03-old-flow-ry1xssse/test.rs:865:5:
+安装/启用不得掩盖配置错误: ["p02-install-9", "p02-install-10"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test p02_real_install_gateway_checks_config_before_install_and_enable ... FAILED
+
+failures:
+
+failures:
+    p02_real_install_gateway_checks_config_before_install_and_enable
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.03s
+

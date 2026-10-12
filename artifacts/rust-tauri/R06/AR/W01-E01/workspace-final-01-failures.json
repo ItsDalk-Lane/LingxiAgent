@@ -1,0 +1,161 @@
+{
+  "commandMetadata": "workspace-final-01.json",
+  "failures": [
+    {
+      "suite": "Running tests/admission_dedup_consistency.rs (rust/target/debug/deps/admission_dedup_consistency-d6c88a8ba7ad1aab)",
+      "test": "r03_f05_c04_post_side_effect_response_loss_never_reexecutes"
+    },
+    {
+      "suite": "Running tests/cancel_link_inheritance.rs (rust/target/debug/deps/cancel_link_inheritance-dc11306063bc8d32)",
+      "test": "subagent_timeout_settles_a_parked_quota_wait"
+    },
+    {
+      "suite": "Running tests/cancellation_tree.rs (rust/target/debug/deps/cancellation_tree-251f973d1c23eaf9)",
+      "test": "panicking_tool_child_is_supervised_and_the_run_settles_loudly"
+    },
+    {
+      "suite": "Running tests/cancellation_tree.rs (rust/target/debug/deps/cancellation_tree-251f973d1c23eaf9)",
+      "test": "approval_wait_round_trips_approve_and_reject_legs"
+    },
+    {
+      "suite": "Running tests/invocation_journal.rs (rust/target/debug/deps/invocation_journal-1ba82df26850c5a1)",
+      "test": "journal_lifecycle_progresses_and_closes_receipts_on_the_live_chain"
+    },
+    {
+      "suite": "Running tests/late_result_fence.rs (rust/target/debug/deps/late_result_fence-b1ac2f3978f180b9)",
+      "test": "r03_a07_tool_result_with_stale_fence_records_unknown_and_audits"
+    },
+    {
+      "suite": "Running tests/r00_management_leaves.rs (rust/target/debug/deps/r00_management_leaves-5fe67d4482ebba7b)",
+      "test": "r00_management_positive_and_negative_branches_on_real_service"
+    },
+    {
+      "suite": "Running tests/r03_t08_acceptance_matrix.rs (rust/target/debug/deps/r03_t08_acceptance_matrix-33230151f3594e5f)",
+      "test": "leaf_escalation_denied_zero_children"
+    },
+    {
+      "suite": "Running tests/r03_t08_acceptance_matrix.rs (rust/target/debug/deps/r03_t08_acceptance_matrix-33230151f3594e5f)",
+      "test": "leaf_subagent_dispatch_reply_close"
+    },
+    {
+      "suite": "Running tests/r04_t01_tool_catalog.rs (rust/target/debug/deps/r04_t01_tool_catalog-fb54f839c6f2d93c)",
+      "test": "adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain"
+    },
+    {
+      "suite": "Running tests/r04_t02_tool_gateway.rs (rust/target/debug/deps/r04_t02_tool_gateway-13ab4593bc859014)",
+      "test": "adversarial_subagent_blocklist_holds_under_registry_target_ids"
+    },
+    {
+      "suite": "Running tests/r04_t02_tool_gateway.rs (rust/target/debug/deps/r04_t02_tool_gateway-13ab4593bc859014)",
+      "test": "f01_read_only_attenuation_still_denies_write_and_blocklist_targets"
+    },
+    {
+      "suite": "Running tests/r04_t02_tool_gateway.rs (rust/target/debug/deps/r04_t02_tool_gateway-13ab4593bc859014)",
+      "test": "f01_delegation_family_routing_is_first_party_only"
+    },
+    {
+      "suite": "Running tests/r04_t02_tool_gateway.rs (rust/target/debug/deps/r04_t02_tool_gateway-13ab4593bc859014)",
+      "test": "r04_a03_delegation_entry_goes_through_the_gateway"
+    },
+    {
+      "suite": "Running tests/r04_t02_tool_gateway.rs (rust/target/debug/deps/r04_t02_tool_gateway-13ab4593bc859014)",
+      "test": "r04_a03_deny_group_unconfigured_policy_refuses_every_entry"
+    },
+    {
+      "suite": "Running tests/r04_t02_tool_gateway.rs (rust/target/debug/deps/r04_t02_tool_gateway-13ab4593bc859014)",
+      "test": "r04_a03_stricter_subagent_attenuation_is_explicit"
+    },
+    {
+      "suite": "Running tests/r04_t02_tool_gateway.rs (rust/target/debug/deps/r04_t02_tool_gateway-13ab4593bc859014)",
+      "test": "r04_a04_forged_arguments_never_override_host_facts"
+    },
+    {
+      "suite": "Running tests/r04_t02_tool_gateway.rs (rust/target/debug/deps/r04_t02_tool_gateway-13ab4593bc859014)",
+      "test": "r04_a03_needs_approval_group_round_trips_every_entry"
+    },
+    {
+      "suite": "Running tests/r04_t03_approval_service.rs (rust/target/debug/deps/r04_t03_approval_service-7e2db84d1ecc907e)",
+      "test": "one_approval_cannot_be_spent_by_two_concurrent_requests"
+    },
+    {
+      "suite": "Running tests/r04_t03_approval_service.rs (rust/target/debug/deps/r04_t03_approval_service-7e2db84d1ecc907e)",
+      "test": "r04_a05_approved_digest_a_cannot_execute_payload_b"
+    },
+    {
+      "suite": "Running tests/r04_t03_approval_service.rs (rust/target/debug/deps/r04_t03_approval_service-7e2db84d1ecc907e)",
+      "test": "approval_timeout_is_a_definite_rejection_and_late_approval_is_refused"
+    },
+    {
+      "suite": "Running tests/r04_t03_approval_service.rs (rust/target/debug/deps/r04_t03_approval_service-7e2db84d1ecc907e)",
+      "test": "r04_a06_wait_disabled_then_approved_still_refuses"
+    },
+    {
+      "suite": "Running tests/r04_t03_approval_service.rs (rust/target/debug/deps/r04_t03_approval_service-7e2db84d1ecc907e)",
+      "test": "o05_policy_allowed_never_re_prompts_the_wired_gate"
+    },
+    {
+      "suite": "Running tests/r04_t03_approval_service.rs (rust/target/debug/deps/r04_t03_approval_service-7e2db84d1ecc907e)",
+      "test": "user_session_mode_matrix_on_the_real_chain"
+    },
+    {
+      "suite": "Running tests/r04_t03_approval_service.rs (rust/target/debug/deps/r04_t03_approval_service-7e2db84d1ecc907e)",
+      "test": "sup01_ask_tier_subagent_matrix_on_the_real_chain"
+    },
+    {
+      "suite": "Running tests/r04_t04_file_tools.rs (rust/target/debug/deps/r04_t04_file_tools-c8fe933422a57bb7)",
+      "test": "r04_a08_resource_refusal_on_the_full_chain_is_never_dispatched"
+    },
+    {
+      "suite": "Running tests/r04_t04_file_tools.rs (rust/target/debug/deps/r04_t04_file_tools-c8fe933422a57bb7)",
+      "test": "r04_a07_concurrent_edit_never_overwrites_the_user_version"
+    },
+    {
+      "suite": "Running tests/r04_t04_file_tools.rs (rust/target/debug/deps/r04_t04_file_tools-c8fe933422a57bb7)",
+      "test": "read_only_session_denies_file_writes_at_the_policy_face"
+    },
+    {
+      "suite": "Running tests/r04_t07_mcp_and_workers.rs (rust/target/debug/deps/r04_t07_mcp_and_workers-d93bcc150753e7a1)",
+      "test": "r04_a13_full_chain_journals_unknown_and_a_new_decision_sees_the_real_count"
+    },
+    {
+      "suite": "Running tests/r04_t08_tool_matrix.rs (rust/target/debug/deps/r04_t08_tool_matrix-fbe8338708c434b9)",
+      "test": "a16_disabled_state_covers_every_route"
+    },
+    {
+      "suite": "Running tests/r04_t08_tool_matrix.rs (rust/target/debug/deps/r04_t08_tool_matrix-fbe8338708c434b9)",
+      "test": "approval_face_share_cases"
+    },
+    {
+      "suite": "Running tests/r04_t08_tool_matrix.rs (rust/target/debug/deps/r04_t08_tool_matrix-fbe8338708c434b9)",
+      "test": "outcome_semantics_and_receipts_unified"
+    },
+    {
+      "suite": "Running tests/r05_t03_protocol_adapters.rs (rust/target/debug/deps/r05_t03_protocol_adapters-6bbd300d305b549e)",
+      "test": "c08_a_policy_refusal_rides_the_next_request_as_a_structured_failure"
+    },
+    {
+      "suite": "Running tests/r05_t04_streaming.rs (rust/target/debug/deps/r05_t04_streaming-90ebcdaf6b74e806)",
+      "test": "rr1_f11_legal_then_schema_invalid_batch_has_zero_side_effects"
+    },
+    {
+      "suite": "Running tests/r05_t07_rr1_usage_ledger.rs (rust/target/debug/deps/r05_t07_rr1_usage_ledger-5d85889a32a2ca4f)",
+      "test": "rr1_f38_worker_deadline_expiry_of_in_flight_callback_leads_a_cancelled_row"
+    },
+    {
+      "suite": "Running tests/r05_t07_usage_trace.rs (rust/target/debug/deps/r05_t07_usage_trace-ba53cd93d3879420)",
+      "test": "c09_owner_scoped_queries_isolate_and_secrets_never_enter_the_db"
+    },
+    {
+      "suite": "Running tests/r05_t08_closed_loop.rs (rust/target/debug/deps/r05_t08_closed_loop-dbfd541642d82747)",
+      "test": "c03_allowed_and_denied_file_sentinels"
+    },
+    {
+      "suite": "Running tests/r05_t08_closed_loop.rs (rust/target/debug/deps/r05_t08_closed_loop-dbfd541642d82747)",
+      "test": "c02_two_full_chain_runs_different_runtime_nonces"
+    },
+    {
+      "suite": "Running tests/r05_t08_production_tools.rs (rust/target/debug/deps/r05_t08_production_tools-c6afd6f055fde73d)",
+      "test": "f24_exec_command_workdir_outside_the_workspace_is_refused"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-11T12:27:29.579570+00:00",
+  "role": "ROOT_ACTUAL_ARITHMETIC_READBACK_NOT_REVIEWER",
+  "status": "REPORTED_COUNT_CORRECTION_NO_ACCEPTANCE",
+  "original_record": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/focused-02/run.json",
+  "metadata_sha256": "39115041f5b53bb0cbdd661c35c55fb5e8e4aa95b2e7f9b69e8201a4de69aeb5",
+  "actual_result_blocks": 9,
+  "actual_counts": {
+    "passed": 121,
+    "failed": 0,
+    "ignored": 0,
+    "filtered_out": 0
+  },
+  "old_agent_report_and_root_control_count": 141,
+  "correct_count": 121,
+  "reason": "原九suite真实13+10+15+9+21+21+7+12+13=121；旧141算术错误，原记录不改写。",
+  "final_new_report": "Agent reports final-focused-01 10bins134/0 after necessary 37th owned test evidence extension; current whole/gates/final manifest pending.",
+  "current_stage_gate": "NOT_RUN",
+  "current_acceptance": "R06_NOT_ACCEPTED"
+}

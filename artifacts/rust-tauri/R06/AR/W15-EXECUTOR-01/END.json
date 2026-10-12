@@ -1,0 +1,20 @@
+{
+  "status": "READY_FOR_INDEPENDENT_REVIEW",
+  "candidate_head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "candidate_sources": {
+    "rust/crates/lingxi-service/tests/r06_t08_behavior_eval.rs": "3c4e194eea3e3949f7717d6b6069d57aaede6b1f5a37bd8c4d4d8765fdb3a981",
+    "scripts/rust-tauri/r06_evaluation_audit.py": "c125148aee718be26f683352160f5043a8f610f164935322d1b747620788c574"
+  },
+  "safe_manifest_sha256": "544dc9bfb0e5cbe0a65b431a207a3114d4dd2705e7307fb20b01ca458cc3d5df",
+  "frozen_source_manifest_sha256": "705760b97917bdede0546243c005ff0e0a115ece5173b71bf1e10272f466b009",
+  "full_source_and_inputs": "LOCAL_ONLY ownclone, no duplicate archives in SAFE; original files referenced by SHA",
+  "original_register_sha256": "db4ceda76ca3911b9e4001934bd49f6d756c800634d3fe1da481730907876fae",
+  "staged_at": "2026-10-11T23:58:54.255255+00:00",
+  "final_test_window": "final-stable-direct-be-battery",
+  "final_audit_window": "final-freeze-direct-audit",
+  "formal_gate": "NOT_RUN",
+  "independent_review": "NOT_RUN",
+  "current_stage": "R06_NOT_ACCEPTED",
+  "freeze_valid_only_after_external_controller_exit_zero": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/evidence/final-safe-freeze/run.json",
+  "no_commit_push": true
+}

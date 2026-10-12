@@ -1,0 +1,1342 @@
+{
+  "id": "R06-EX-10",
+  "title": "已交接的mount资源IO成功面及资源读取边界",
+  "original_requirements": [
+    {
+      "id": "R06-T05-S01",
+      "clause": "迁移SessionFile/Resource登记、附件stage/materialize、预览、缓存清理和引用授权的现役行为。"
+    },
+    {
+      "id": "R06-T05-S03",
+      "clause": "文件存在性、摘要、MIME、尺寸、所属会话/agent、授权生命周期与消息引用一致。"
+    }
+  ],
+  "r00_feature_ids": [
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-SUBSCRIP-00C88B",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WATCH-WA-757539",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-EVENTS-4E8EDC",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WATCH-DI-9FF4E1",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-LIST-5FA75F",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-MOVE-730E59",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-READ-563F04",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-RENAME-5FEFBF",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-SEARCH-2EB39A",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-STAT-C4F6E3",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-SUBSCRIB-F9277C",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-TRASH-BC2446",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WATCH-071B6E",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WRITE-0CDC88",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WRITE-EX-EB9E56",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCES-RESOURCES-RESOURCEID-R-127373",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-CONTENT-GET-78B181",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-CONTENT-HEAD-865A98",
+    "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCES-RESOURCES-RESOURCEID-T-0EC4C0"
+  ],
+  "reported_gap": "R04 stage map显式交接完整resource-io到R06；T05差异把mount拒绝改申报share，但R00成功断言含local_fs/mount。旧读流内存/TOCTOU观察也须用当前权限核验。",
+  "deadline": "R06 阶段验收前：这里只要求当前核心/服务份额",
+  "status": "NOT_RUN",
+  "evidence_level": "SOURCE_ONLY",
+  "runtime_evidence": [],
+  "coverage_by_existing_f": "R06-AR-F15要求完整性，但F01-F14的具体修复不自动涵盖此行为；保留为extra，不改原F编号",
+  "production_paths": [
+    "rust/crates/lingxi-service/src/resourceio.rs",
+    "rust/crates/lingxi-service/src/resources.rs"
+  ],
+  "proposed_real_checks": [
+    "真实获授权mount与local_fs执行R00原支持操作并核对文件变化；url/session_file不支持/跨provider移动明确拒绝",
+    "换符号链接/撤销授权/大内容限额经真实资源读取保证当前检查边界；无条件400不是mount成功对照"
+  ],
+  "legal_later_basis": [
+    {
+      "task_id": "R07-T07",
+      "original_goal": "保留用户已采纳的工作方式。",
+      "original_steps": [
+        "按R00叶子清单迁移书桌文件树、监听、便笺、todo、checkpoint、workflow/goal/loop等真实注册功能。",
+        "文件操作全部走ResourceService/授权边界，监听事件是提示而非权限；工作流动作复用Supervisor和工具网关。",
+        "对长期监听/终端/loop定义作用域与回收，Agent删除、目录撤权、服务退出时停止相关资源。",
+        "现役实验功能保持默认状态，不因为重写顺手开启；已撤回功能不因名字相近被恢复。"
+      ]
+    },
+    {
+      "task_id": "R09-T03",
+      "original_goal": "托盘、快捷键等实际操作不能只留按钮。",
+      "original_steps": [
+        "逐项迁移窗口状态/多窗口/单实例/菜单/托盘/通知/全局快捷键/剪贴板/文件对话框/拖放/外部链接/保持唤醒等现役能力。",
+        "实现登录启动与退出策略，保留用户偏好；DeepLink/文件关联如在R00已采纳也必须迁移。",
+        "路径打开、通知点击、剪贴板文件等做scope和类型校验；前端不能任意指定敏感系统操作。",
+        "平台无对应API时实现等价适配或列阻塞，不用统一空实现；每项能力映射到原叶子功能验收。"
+      ]
+    }
+  ],
+  "current_vs_later": "工作台界面/监听外层/native picker后续；R04明确laterShare=R06-T05完整API，不能再不经原依据转R07。",
+  "suggested_work_unit": {
+    "id": "R06-EX-W10",
+    "scope": "已交接的mount资源IO成功面及资源读取边界",
+    "agent_policy": "一次性边界明确的工作单，主代理整合；不创建长期代理",
+    "prerequisites": [
+      "先核对原生产调用链与有效配置，再以当前真实服务/模型替身验证；不得mock被验收核心"
+    ],
+    "review_required": "全新审查者在实际候选上独立实验，资料核对不签关闭"
+  },
+  "r00_original_assertions": [
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-SUBSCRIP-00C88B",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“取消资源事件订阅”后核对：释放指定订阅并返回 released 真值",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-00C88B996AA0",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-SUBSCRIP-00C88B",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户取消资源事件订阅",
+        "then": "释放指定订阅并返回 released 真值",
+        "assertions": [
+          "给定目标与相应权限，执行“取消资源事件订阅”后核对：释放指定订阅并返回 released 真值",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WATCH-WA-757539",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“结束资源监听”后核对：释放句柄，重复结束返回 released false",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-75753997F5C6",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WATCH-WA-757539",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户结束资源监听",
+        "then": "释放句柄，重复结束返回 released false",
+        "assertions": [
+          "给定目标与相应权限，执行“结束资源监听”后核对：释放句柄，重复结束返回 released false",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-EVENTS-4E8EDC",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“读取资源变更事件”后核对：按 since 游标返回事件；游标过期提示重新 stat",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-4E8EDC4E25FC",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-EVENTS-4E8EDC",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户读取资源变更事件",
+        "then": "按 since 游标返回事件；游标过期提示重新 stat",
+        "assertions": [
+          "给定目标与相应权限，执行“读取资源变更事件”后核对：按 since 游标返回事件；游标过期提示重新 stat",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WATCH-DI-9FF4E1",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“查看资源监听诊断”后核对：返回活跃订阅数量与监听清单，不更改资源",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-9FF4E1805297",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WATCH-DI-9FF4E1",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户查看资源监听诊断",
+        "then": "返回活跃订阅数量与监听清单，不更改资源",
+        "assertions": [
+          "给定目标与相应权限，执行“查看资源监听诊断”后核对：返回活跃订阅数量与监听清单，不更改资源",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-LIST-5FA75F",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“列出资源目录”后核对：POST 承载资源引用，经资源边界返回子项",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-5FA75FC2FE4C",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-LIST-5FA75F",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户列出资源目录",
+        "then": "POST 承载资源引用，经资源边界返回子项",
+        "assertions": [
+          "给定目标与相应权限，执行“列出资源目录”后核对：POST 承载资源引用，经资源边界返回子项",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-MOVE-730E59",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“移动资源”后核对：把 from 资源移动到 to 并返回结果，受资源权限边界限制",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-730E5984212D",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-MOVE-730E59",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户移动资源",
+        "then": "把 from 资源移动到 to 并返回结果，受资源权限边界限制",
+        "assertions": [
+          "给定目标与相应权限，执行“移动资源”后核对：把 from 资源移动到 to 并返回结果，受资源权限边界限制",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-READ-563F04",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“读取资源正文”后核对：按 encoding 返回 UTF-8 或 base64；二进制误按 UTF-8 读取明确拒绝",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-563F04AF5AD7",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-READ-563F04",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户读取资源正文",
+        "then": "按 encoding 返回 UTF-8 或 base64；二进制误按 UTF-8 读取明确拒绝",
+        "assertions": [
+          "给定目标与相应权限，执行“读取资源正文”后核对：按 encoding 返回 UTF-8 或 base64；二进制误按 UTF-8 读取明确拒绝",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-RENAME-5FEFBF",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“重命名资源”后核对：把 from 资源改到 to 并返回结果，受资源权限边界限制",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-5FEFBFCEBC04",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-RENAME-5FEFBF",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户重命名资源",
+        "then": "把 from 资源改到 to 并返回结果，受资源权限边界限制",
+        "assertions": [
+          "给定目标与相应权限，执行“重命名资源”后核对：把 from 资源改到 to 并返回结果，受资源权限边界限制",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-SEARCH-2EB39A",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“搜索资源”后核对：在指定资源范围按 query 返回匹配项",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-2EB39AE34CB5",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-SEARCH-2EB39A",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户搜索资源",
+        "then": "在指定资源范围按 query 返回匹配项",
+        "assertions": [
+          "给定目标与相应权限，执行“搜索资源”后核对：在指定资源范围按 query 返回匹配项",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-STAT-C4F6E3",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“读取资源状态”后核对：POST 承载资源引用，只读返回大小、版本等状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-C4F6E3BFF341",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-STAT-C4F6E3",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户读取资源状态",
+        "then": "POST 承载资源引用，只读返回大小、版本等状态",
+        "assertions": [
+          "给定目标与相应权限，执行“读取资源状态”后核对：POST 承载资源引用，只读返回大小、版本等状态",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-SUBSCRIB-F9277C",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“订阅资源变化”后核对：登记资源事件订阅并返回 subscriptionId；服务不可用报错",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-F9277C29D570",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-SUBSCRIB-F9277C",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户订阅资源变化",
+        "then": "登记资源事件订阅并返回 subscriptionId；服务不可用报错",
+        "assertions": [
+          "给定目标与相应权限，执行“订阅资源变化”后核对：登记资源事件订阅并返回 subscriptionId；服务不可用报错",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-TRASH-BC2446",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“回收资源”后核对：把指定资源送入回收区并返回结果，受资源权限边界限制",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-BC244641BC1E",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-TRASH-BC2446",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户回收资源",
+        "then": "把指定资源送入回收区并返回结果，受资源权限边界限制",
+        "assertions": [
+          "给定目标与相应权限，执行“回收资源”后核对：把指定资源送入回收区并返回结果，受资源权限边界限制",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WATCH-071B6E",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“开始监听资源”后核对：对指定资源保留监听句柄并返回 watchId",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-071B6E2C286A",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WATCH-071B6E",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户开始监听资源",
+        "then": "对指定资源保留监听句柄并返回 watchId",
+        "assertions": [
+          "给定目标与相应权限，执行“开始监听资源”后核对：对指定资源保留监听句柄并返回 watchId",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WRITE-0CDC88",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“写入资源”后核对：按编码解码后经资源权限写入，返回结果；冲突为 409",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-0CDC88FC0999",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WRITE-0CDC88",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户写入资源",
+        "then": "按编码解码后经资源权限写入，返回结果；冲突为 409",
+        "assertions": [
+          "给定目标与相应权限，执行“写入资源”后核对：按编码解码后经资源权限写入，返回结果；冲突为 409",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WRITE-EX-EB9E56",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“按版本写入资源”后核对：仅版本匹配时写入；冲突返回 409 且不覆盖",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-EB9E56CF6007",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-IO-RESOURCE-IO-WRITE-EX-EB9E56",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户按版本写入资源",
+        "then": "仅版本匹配时写入；冲突返回 409 且不覆盖",
+        "assertions": [
+          "给定目标与相应权限，执行“按版本写入资源”后核对：仅版本匹配时写入；冲突返回 409 且不覆盖",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCES-RESOURCES-RESOURCEID-R-127373",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "成功时核对：返回身份有权访问的元数据",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-127373C72E30",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCES-RESOURCES-RESOURCEID-R-127373",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "已挂载 HTTP 协议入口；以具备该入口权限的直接请求核对结果和拒绝，不要求现役桌面/CLI 按钮。",
+        "when": "用户查看资源元数据",
+        "then": "返回身份有权访问的元数据",
+        "assertions": [
+          "成功时核对：返回身份有权访问的元数据",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-CONTENT-GET-78B181",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "成功时核对：GET 返回正文或分段字节",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-78B18101F37D",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-CONTENT-GET-78B181",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户下载资源",
+        "then": "GET 返回正文或分段字节",
+        "assertions": [
+          "成功时核对：GET 返回正文或分段字节",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-CONTENT-HEAD-865A98",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "成功时核对：HEAD 仅返回元数据",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-865A9825A3EB",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCE-CONTENT-HEAD-865A98",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户探测资源",
+        "then": "HEAD 仅返回元数据",
+        "assertions": [
+          "成功时核对：HEAD 仅返回元数据",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCES-RESOURCES-RESOURCEID-T-0EC4C0",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "assertions": [
+        "成功时核对：先验权再返回短期 ticket 和内容地址",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-0EC4C0E2EB51",
+        "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-RESOURCES-RESOURCES-RESOURCEID-T-0EC4C0",
+        "task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "given": "已挂载 HTTP 协议入口；以具备该入口权限的直接请求核对结果和拒绝，不要求现役桌面/CLI 按钮。",
+        "when": "用户签发资源票据",
+        "then": "先验权再返回短期 ticket 和内容地址",
+        "assertions": [
+          "成功时核对：先验权再返回短期 ticket 和内容地址",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R04-A07",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R04-A08",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R06-A09",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R06-A10",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R04-T04",
+          "R06-T05"
+        ],
+        "execution_owner": "Rust Resource",
+        "execution_stage_ids": [
+          "R04",
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    }
+  ],
+  "report_sources": [
+    "docs/rust-tauri/R06/R06-T05_REPORT.md"
+  ],
+  "triage": "原义务需真实实验与范围核对，未确证当前Bug；不得因本清单推定修复完成/无需验证",
+  "legacy_comparison_excerpt": [
+    {
+      "path": "lib/resource-io/providers/mount-provider.ts",
+      "line": 1,
+      "end_line": 85,
+      "original_source": "import fs from \"fs\";\nimport path from \"path\";\nimport { loadStudioMountRegistry } from \"../../../core/studio-mounts.ts\";\nimport { capabilityDenied, providerNotAvailable, ResourceIOError } from \"../errors.ts\";\nimport { resourceKeyForRef } from \"../resource-refs.ts\";\nimport type {\n  MaterializeResult,\n  ResourceDescriptor,\n  ResourceEdit,\n  ResourceListResult,\n  ResourceMutationResult,\n  ResourceReadResult,\n  ResourceRef,\n  ResourceSearchResult,\n  ResourceStat,\n  ResourceTrashOptions,\n  ResourceTrashResult,\n  ResourceVersion,\n  ResourceWriteExpectedVersionResult,\n  ResourceMoveResult,\n} from \"../types.ts\";\n\ntype LocalFsProviderFactory = (options: { cwd: string; guard: { check: (filePath: string, operation: \"read\" | \"write\" | \"delete\") => { allowed: boolean; reason?: string } } }) => any;\n\ntype Options = {\n  lingxiHome: string;\n  studioId: string;\n  localFsProviderFactory: LocalFsProviderFactory;\n};\n\nexport class MountProvider {\n  readonly id = \"mount\" as const;\n\n  declare lingxiHome: string;\n  declare studioId: string;\n  declare localFsProviderFactory: LocalFsProviderFactory;\n\n  constructor({ lingxiHome, studioId, localFsProviderFactory }: Options) {\n    if (!lingxiHome) throw new Error(\"lingxiHome is required\");\n    if (!studioId) throw new Error(\"studioId is required\");\n    this.lingxiHome = lingxiHome;\n    this.studioId = studioId;\n    this.localFsProviderFactory = localFsProviderFactory;\n  }\n\n  capabilities(ref: ResourceRef) {\n    const mount = this.mountForRef(ref);\n    const has = (capability: string) => mount.capabilities?.includes(capability);\n    const local = mount.sourceKind === \"storage\" && mount.provider === \"local_fs\";\n    return {\n      stat: local && has(\"read\"),\n      read: local && has(\"read\"),\n      write: local && has(\"write\"),\n      writeExpectedVersion: local && has(\"write\"),\n      edit: local && has(\"write\"),\n      list: local && has(\"list\"),\n      search: local && has(\"list\"),\n      watch: local && has(\"watch\"),\n      materialize: local && has(\"materialize\"),\n      copy: local && has(\"read\") && has(\"write\"),\n      rename: local && has(\"write\"),\n      move: local && has(\"write\"),\n      trash: local && has(\"write\"),\n      delete: local && has(\"write\"),\n      mkdir: local && has(\"write\"),\n    };\n  }\n\n  async stat(ref: ResourceRef): Promise<ResourceStat> {\n    const resolved = this.resolveLocalMount(ref, \"read\");\n    return this.mapResult(ref, await resolved.provider.stat({ kind: \"local-file\", path: resolved.path }));\n  }\n\n  async read(ref: ResourceRef): Promise<ResourceReadResult> {\n    const resolved = this.resolveLocalMount(ref, \"read\");\n    return this.mapResult(ref, await resolved.provider.read({ kind: \"local-file\", path: resolved.path }));\n  }\n\n  async write(ref: ResourceRef, content: string | Buffer): Promise<ResourceMutationResult> {\n    const resolved = this.resolveLocalMount(ref, \"write\");\n    return this.mapResult(ref, await resolved.provider.write({ kind: \"local-file\", path: resolved.path }, content));\n  }\n\n  async writeExpectedVersion(ref: ResourceRef, content: string | Buffer, expectedVersion: ResourceVersion): Promise<ResourceWriteExpectedVersionResult> {\n    const resolved = this.resolveLocalMount(ref, \"write\");",
+      "status": "SOURCE_ONLY"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 17.35s
+     Running tests/r04_t01_tool_catalog.rs (rust/target/debug/deps/r04_t01_tool_catalog-b82fa817be91856b)
+LINGXI_TEST_GUARD: armed (pid 1069, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+
+thread 'adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain' (4114762) panicked at crates/lingxi-service/tests/r04_t01_tool_catalog.rs:705:10:
+execute accepted: Storage(Corrupted { detail: "model_history: bad request result is not exact refusal" })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain ... FAILED
+
+failures:
+
+failures:
+    adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.10s
+
+error: test failed, to rerun pass `-p lingxi-service --test r04_t01_tool_catalog`

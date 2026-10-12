@@ -1,0 +1,17 @@
+{"command": ["node", "artifacts/rust-tauri/R06/AR/W12-P01/old-open-control.mjs"], "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-old-open-ts-red-01-5rnpsp03", "start": 1791699888.940585}
+{"baseMode":true,"home":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-old-open-ts-red-01-5rnpsp03","records":[{"name":"vector","error":null,"bytesSame":false,"version":3,"sentinel":"MISSING"},{"name":"fulltext","error":"Knowledge search index migration or open failed","bytesSame":false,"version":999,"sentinel":{"value":"paid-original"}},{"name":"ann","error":"unsupported_ann_schema","bytesSame":false,"version":999,"sentinel":{"value":"paid-original"}}],"inodeSame":false}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: 所有future库必须明确拒绝且保留字节与版本
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W12-P01/old-open-control.mjs:32:1 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.16.0

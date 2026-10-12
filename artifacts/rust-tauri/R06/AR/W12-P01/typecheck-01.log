@@ -1,0 +1,5 @@
+{"command": ["npm", "run", "typecheck"], "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-typecheck-01-mk4irxcd", "start": 1791699333.3643699}
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+

@@ -1,0 +1,41 @@
+    Blocking waiting for file lock on build directory
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 28.23s
+     Running tests/r06_ar_f02_file_restore.rs (rust/target/debug/deps/r06_ar_f02_file_restore-dc7bd6d0c16c0e4c)
+
+running 5 tests
+
+thread 'ar_f02_c01_normal_restore_and_external_same_old_bytes_protected' (2242236) panicked at crates/lingxi-service/tests/r06_ar_f02_file_restore.rs:151:6:
+bootstrap: Storage(InvalidRequest { detail: "knowledge service init failed: KNOWLEDGE_STORAGE_IO: knowledge SQLite: unable to open database file: /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-normal-28578-1791696555457276000/knowledge/knowledge.db" })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'ar_f02_c04_failure_stage_receipts_and_original_bytes' (2242240) panicked at crates/lingxi-service/tests/r06_ar_f02_file_restore.rs:151:6:
+bootstrap: Storage(InvalidRequest { detail: "knowledge service init failed: KNOWLEDGE_STORAGE_IO: knowledge SQLite: unable to open database file: /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-temp_write-28578-1791696555457258000/knowledge/knowledge.db" })
+test ar_f02_c04_failure_stage_receipts_and_original_bytes ... FAILED
+test ar_f02_c01_normal_restore_and_external_same_old_bytes_protected ... FAILED
+
+thread 'ar_f02_c02_checkpoint_path_symlink_must_not_change_external_sentinel' (2242237) panicked at crates/lingxi-service/tests/r06_ar_f02_file_restore.rs:151:6:
+bootstrap: Storage(InvalidRequest { detail: "knowledge service init failed: KNOWLEDGE_STORAGE_IO: knowledge SQLite: unable to open database file: /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-ar-f02-old-red-28578-1791696555457354000/knowledge/knowledge.db" })
+
+thread 'ar_f02_c03_deterministic_external_content_and_identity_change' (2242239) panicked at crates/lingxi-service/tests/r06_ar_f02_file_restore.rs:151:6:
+bootstrap: Storage(InvalidRequest { detail: "knowledge service init failed: KNOWLEDGE_STORAGE_IO: knowledge SQLite: unable to open database file: /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-content-28578-1791696555457252000/knowledge/knowledge.db" })
+test ar_f02_c02_checkpoint_path_symlink_must_not_change_external_sentinel ... FAILED
+
+thread 'ar_f02_c02_current_folder_revocation' (2242238) panicked at crates/lingxi-service/tests/r06_ar_f02_file_restore.rs:151:6:
+bootstrap: Storage(InvalidRequest { detail: "knowledge service init failed: KNOWLEDGE_STORAGE_IO: knowledge SQLite: unable to open database file: /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-revoke-28578-1791696555457253000/knowledge/knowledge.db" })
+test ar_f02_c03_deterministic_external_content_and_identity_change ... FAILED
+test ar_f02_c02_current_folder_revocation ... FAILED
+
+failures:
+
+failures:
+    ar_f02_c01_normal_restore_and_external_same_old_bytes_protected
+    ar_f02_c02_checkpoint_path_symlink_must_not_change_external_sentinel
+    ar_f02_c02_current_folder_revocation
+    ar_f02_c03_deterministic_external_content_and_identity_change
+    ar_f02_c04_failure_stage_receipts_and_original_bytes
+
+test result: FAILED. 0 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_f02_file_restore`

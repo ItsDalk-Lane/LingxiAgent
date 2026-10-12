@@ -1,0 +1,52 @@
+{
+  "argv": [
+    "node",
+    "scripts/rust-tauri/r01-t02-extract-api-surface.mjs",
+    "--check"
+  ],
+  "cwd": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/own.git",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "started": "2026-10-11T23:39:31.308593+00:00",
+  "effective_env": {
+    "HOME": "/Users/study_superior",
+    "LINGXI_HOME": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/home",
+    "TMPDIR": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/tmp",
+    "LINGXI_PRODUCT_DIR": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/own.git/lib",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target",
+    "LINGXI_TEST_GUARD": "1",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "TEST_MEM_LIMIT_MB": "8192"
+  },
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "controller_seconds": 2700,
+  "process_seconds": 600,
+  "process_rss_mib": 8192,
+  "supervision": "external descendant PID sampling plus internal guard",
+  "controller_pid": 9437,
+  "ended": "2026-10-11T23:39:34.595317+00:00",
+  "elapsed_seconds": 3.294353792007314,
+  "exit_code": 0,
+  "guard_breaches": [],
+  "processes": [
+    {
+      "pid": 9437,
+      "ppid": 8892,
+      "argv": "node scripts/rust-tauri/r01-t02-extract-api-surface.mjs --check",
+      "comm": "node",
+      "first_seen_elapsed": 3.18500125000719,
+      "last_seen_elapsed": 3.18500125000719,
+      "peak_rss_bytes": 966656,
+      "limit_seconds": 600,
+      "controller": false,
+      "actual_executable": "node"
+    }
+  ],
+  "actual_executables_after": [
+    {
+      "path": "node",
+      "sha256": null
+    }
+  ],
+  "supervisor_source_sha256": "6606045cc092d770c989ea0d886e76d121d54810003c6ef71a6ef50549611a35"
+}

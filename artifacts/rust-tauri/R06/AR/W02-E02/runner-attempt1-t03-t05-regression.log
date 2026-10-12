@@ -1,0 +1,4 @@
+COMMAND ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-service", "--test", "r06_t03_session_tree", "--test", "r06_t05_session_files", "--test", "r06_t05_resources", "--test", "r06_t05_resourceio", "--test", "r06_t05_filehistory", "--test", "r04_t04_file_tools", "--", "--nocapture"]
+ISOLATED_LINGXI_HOME /tmp/lingxi-w02-e02-t03-t05-regression-09z5xkms
+START 2026-10-11T05:33:45.135437+00:00
+error: manifest path `rust/Cargo.toml` does not exist

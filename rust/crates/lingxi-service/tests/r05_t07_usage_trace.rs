@@ -760,6 +760,7 @@ async fn c02_background_subagent_and_worker_rows_carry_true_parentage() {
             &owner_principal(),
             "sess_local_alpha",
             &ExecuteSubmission {
+                knowledge: None,
                 input: "background task",
                 request_id: None,
             },
@@ -787,6 +788,7 @@ async fn c02_background_subagent_and_worker_rows_carry_true_parentage() {
     let child_run =
         lingxi_protocol::RunId::new(format!("run-subagent-child-{}", std::process::id()));
     let authorization = DriveAuthorization {
+        knowledge_selection: None,
         lineage: RunLineage {
             parent_run_id: Some(lingxi_protocol::RunId::new(main_run.clone())),
             origin: RunOrigin::Subagent,
@@ -1527,6 +1529,7 @@ async fn c10_a_ledger_write_failure_publishes_no_completion_and_the_retry_is_ide
     // write (the model call's usage row, which precedes the completed
     // event by contract) fails.
     let submission = ExecuteSubmission {
+        knowledge: None,
         input: "failing task",
         request_id: Some("req-t07-c10-a"),
     };

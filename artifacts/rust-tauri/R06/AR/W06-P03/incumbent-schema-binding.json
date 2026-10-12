@@ -1,0 +1,43 @@
+{
+  "schema": "loadConfig and saveConfig call YAML.load with no schema option => installed DEFAULT_SCHEMA; actual oracle invokes both original entrypoints",
+  "package_lock_entry": {
+    "version": "4.3.1",
+    "resolved": "https://registry.npmjs.org/js-yaml/-/js-yaml-4.3.1.tgz",
+    "integrity": "sha512-CY6crGq313MX8GkwvB7tzgp99vjQxY1++5y10/BKN/GUfHqWaOGQMNZkBvqSzsZKWk/ijwHlWzzkLulsGHhjWQ==",
+    "funding": [
+      {
+        "type": "github",
+        "url": "https://github.com/sponsors/puzrin"
+      },
+      {
+        "type": "github",
+        "url": "https://github.com/sponsors/nodeca"
+      }
+    ],
+    "license": "MIT",
+    "dependencies": {
+      "argparse": "^2.0.1"
+    },
+    "bin": {
+      "js-yaml": "bin/js-yaml.js"
+    }
+  },
+  "sources": {
+    "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+    "package.json": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+    "lib/memory/config-loader.ts": "43f16af56854350eafae6d9d4bf102198a24d650e437b2c6a9be266a33d486f1",
+    "shared/secret-fs.ts": "ef13fe928bdb6f080a5e372619c8e0332903f18fca76498d902022cccc8b9ed7",
+    "core/agent.ts": "f1525d4ade1d44a9ccb1ce9be5ed250fb4027b6215e43a77772883279b152d76",
+    "node_modules/js-yaml/package.json": "82b932c87c5da7901c6a8f984698c57912570146fffd3156dcdc96a6c210d847",
+    "node_modules/js-yaml/lib/type/timestamp.js": "54e2070e0319d7fa3becd426dd5bfdb822b9602bd4a3c366976cbaa2278bdb5c",
+    "node_modules/js-yaml/lib/type/int.js": "9d428a6e6de891a52b2b5ebd2bf09f9d1f9506514aaf35c6428f0111ecf86fdb",
+    "node_modules/js-yaml/lib/type/float.js": "42b4d238e5d00267fe126996b912f34506d273c39725524d662626bb9e2d4e7e",
+    "node_modules/js-yaml/lib/schema/default.js": "1c4c9573b4c05ce47391c6bcba10401385d8d6a4d596c1c0fd1d6ea664f97ea2",
+    "node_modules/js-yaml/lib/type/binary.js": "9dd6a70eb318a123fdc11a36d613419d79535b6ecf105bd865de3a5cbbb60e7c",
+    "node_modules/js-yaml/lib/type/bool.js": "cc0d255ac6c55064421c19bbea312dcb9e22aee49fa9f8461723d9fbf7a0f8b3",
+    "node_modules/js-yaml/lib/schema/core.js": "201ffb119aad04c9397df088452e00910becab9a43a3b3a392370878646c06ad",
+    "node_modules/js-yaml/lib/type/set.js": "fa5b815c6334def52dae5b58193d3798f8e53558f6c7f48a643898e996333dd7",
+    "node_modules/js-yaml/lib/type/omap.js": "8a865841abeb5f12a30f39f095967b6ac05ef6240e78872573fb23e8c9b5c47f",
+    "node_modules/js-yaml/lib/type/pairs.js": "f9eb5d2dc3cdbf7dd802e0a62b5aa2d09eedeb0509b71a247ebdad223315d6a5"
+  }
+}

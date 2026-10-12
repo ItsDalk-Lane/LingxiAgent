@@ -1,0 +1,2927 @@
+{
+  "work": "R06-AR-W06",
+  "finding": "R06-AR-F06",
+  "round": 2,
+  "reviewer": "/root/ar_w06_reviewer_02",
+  "verdict": "FAIL",
+  "independent": true,
+  "product_test_config_modified": false,
+  "git_writes": false,
+  "user_original_settings_read_or_written": false,
+  "candidate_base_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+  "candidate_binding_sha256": "5b8dec50c83a4a9195eda8ff8b4006c40f36e3c1dc056e64f7eef477e5822951",
+  "owned_hashes": {
+    "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+    "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+    "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+    "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+    "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+    "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+    "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+    "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+    "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+    "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+    "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+    "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+    "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+    "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+    "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+  },
+  "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+  "binary_sha256": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+  "toolchain": {
+    "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+    "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+    "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "node": "v24.16.0",
+    "incumbent_yaml_package_version": "4.3.1",
+    "incumbent_yaml_index_sha256": "e85d524fcd45466669dfc37618284e0c53ccaaf3f4bef1e23cd25ec6c43120bc",
+    "incumbent_config_loader_sha256": "43f16af56854350eafae6d9d4bf102198a24d650e437b2c6a9be266a33d486f1"
+  },
+  "guard": "8192MB/600s confirmed armed for every final binary sample",
+  "runs": [
+    {
+      "tag": "four-c",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "--no-fail-fast",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f06_binary",
+        "--test",
+        "r06_ar_f06_config",
+        "-p",
+        "lingxi-adapters",
+        "--test",
+        "r06_ar_f06_config_preservation",
+        "--",
+        "--nocapture"
+      ],
+      "start_time": 1791700468.401397,
+      "end_time": 1791700472.6663702,
+      "exit_code": 0,
+      "test_count": 13,
+      "passed_count": 13,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-four-c-y0cxzfz0",
+      "evidence_hash": "f47a5a95715f6346d10b08ddb4a42689745350604d97df183206065efbab1b60",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "PASS",
+      "fixtures": {}
+    },
+    {
+      "tag": "regression",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "--no-fail-fast",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_t01_context_compiler",
+        "--test",
+        "r06_t01_closed_loop",
+        "--test",
+        "r06_t06_memory",
+        "--test",
+        "r06_t06_skills",
+        "--test",
+        "r06_t06_skill_context",
+        "--test",
+        "r06_t06_hooks",
+        "-p",
+        "lingxi-adapters",
+        "--test",
+        "agent_memory_r06t06",
+        "-p",
+        "lingxi-kernel",
+        "--test",
+        "r06_t01_context_compiler",
+        "--",
+        "--nocapture"
+      ],
+      "start_time": 1791700472.759608,
+      "end_time": 1791700475.291958,
+      "exit_code": 0,
+      "test_count": 77,
+      "passed_count": 77,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-regression-zqe4ge8j",
+      "evidence_hash": "e1088305626559dedc4c88417aad0b76dd830b60578afaf59651b1a42bfb68c2",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "PASS",
+      "fixtures": {}
+    },
+    {
+      "tag": "fmt",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "fmt",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start_time": 1791700475.3843808,
+      "end_time": 1791700476.9436328,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-fmt-asrpgz5y",
+      "evidence_hash": "6ef5f645b867160b0e909c84c564e8cdfe2e0677019e432efeebd2383dbfa7af",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "PASS",
+      "fixtures": {}
+    },
+    {
+      "tag": "clippy",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "clippy",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "-j8",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start_time": 1791700477.035764,
+      "end_time": 1791700477.495606,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-clippy-0ze5i22g",
+      "evidence_hash": "6831f2b21964f4e68048b4c53d1b721eae2da0a122299f9ff050f0ffbb6594b0",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "PASS",
+      "fixtures": {}
+    },
+    {
+      "tag": "contracts",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "run",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "-p",
+        "xtask",
+        "--",
+        "check-contracts"
+      ],
+      "start_time": 1791700477.588683,
+      "end_time": 1791700478.555156,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-contracts-64htjq_e",
+      "evidence_hash": "30e6c46230808ff31c84578438b253a2862d761e6c252202483348d1afe974d2",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "PASS",
+      "fixtures": {}
+    },
+    {
+      "tag": "boundaries",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "run",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "-p",
+        "xtask",
+        "--",
+        "check-boundaries"
+      ],
+      "start_time": 1791700478.646828,
+      "end_time": 1791700479.151458,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-boundaries-a2alkzcd",
+      "evidence_hash": "e51f5666b25f992310f14af661a509a9b5ba82867a8599674ea837fd1a8d4960",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "PASS",
+      "fixtures": {}
+    },
+    {
+      "tag": "independent-probe",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/probe.py"
+      ],
+      "start_time": 1791700541.672458,
+      "end_time": 1791700546.997115,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-independent-probe-gpe7zpym",
+      "evidence_hash": "51a0eeb22e55e7882dcdd1e8810fb4bc804e51d58c1690263322021d30a4ff41",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "SEE_SCENARIO_RESULTS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/probe.py": "3df2079467a0e8506c37b3da1d38a50eac4f84e9942046bd6632c5730d28a9b5"
+      }
+    },
+    {
+      "tag": "effects-probe",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/effects-probe.py"
+      ],
+      "start_time": 1791700652.477947,
+      "end_time": 1791700656.0393212,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-effects-probe-4yffg571",
+      "evidence_hash": "caf99d28081f18d0d23bc1f1263f1e1939c8b3677cbfceecd38ff1bd05046a31",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "SEE_SCENARIO_RESULTS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/effects-probe.py": "0ef0000c0af55a0805e1ee3ab8cce4c89645fb0a4e24b8aaddc3ba84cf224fe0"
+      }
+    },
+    {
+      "tag": "compile-old",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "/Users/study_superior/.cargo/bin/rustc",
+        "--edition",
+        "2021",
+        "--test",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/old-scanner-probe.rs",
+        "-L",
+        "dependency=/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/deps",
+        "--extern",
+        "lingxi_test_guard=/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/deps/liblingxi_test_guard-f783bfb6840c426c.rlib",
+        "-o",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/old-scanner-probe"
+      ],
+      "start_time": 1791700667.319762,
+      "end_time": 1791700667.555933,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-compile-old-20w7tz_i",
+      "evidence_hash": "d6a3505fad19854d13ba881001b879a1853270b6a3c86b57cf41c17728007167",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "PASS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/old-scanner-probe.rs": "817c39911e08fa25d2d966d94a234b797b7127ad467d5ab8bc2b7c76c0b8df2d"
+      }
+    },
+    {
+      "tag": "old-contract",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/old-scanner-probe",
+        "--nocapture"
+      ],
+      "start_time": 1791700667.641301,
+      "end_time": 1791700667.9502048,
+      "exit_code": 101,
+      "test_count": 3,
+      "passed_count": 1,
+      "failed_count": 2,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-old-contract-pws26jrg",
+      "evidence_hash": "f1301fc5005b0ee9de36e71a8da4912289bcb92da6256fe39a606f4710d8fc59",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "FAIL",
+      "business_verdict": "EXPECTED_CONTRACT_RED",
+      "fixtures": {}
+    },
+    {
+      "tag": "additional-family",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/additional-family.py"
+      ],
+      "start_time": 1791700770.660201,
+      "end_time": 1791700773.196316,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-additional-family-zjjgir7q",
+      "evidence_hash": "faa636fcc2e3d6c8614695bfe7fae7f8b25adb611dbf0f5f2a9edf5c4789f1ce",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "SEE_SCENARIO_RESULTS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/additional-family.py": "562ffc7933feacd08a0fd3228a911a81010081373733c86b6c95ba44ecae9270"
+      }
+    },
+    {
+      "tag": "incumbent-oracle",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "node",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/oracle.mjs"
+      ],
+      "start_time": 1791700773.2855082,
+      "end_time": 1791700773.357973,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-incumbent-oracle-3n3xgwug",
+      "evidence_hash": "6b29fba7b1a7e649187c0a84f2e94666c02025982a5b89c4ca8d35ba7c37ea0e",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "PASS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/oracle.mjs": "e76b70d783ff8d7c37f365196b1f4573d86e2ffa00e48f8ef290599cd1ba0a7d"
+      }
+    },
+    {
+      "tag": "additional-oracle",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "node",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/additional-oracle.mjs"
+      ],
+      "start_time": 1791700773.445295,
+      "end_time": 1791700773.518553,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-additional-oracle-rzfgzv6q",
+      "evidence_hash": "cf912bb4110f926c3eba3b8342d9b377bcada6fd78be863ee4b9853fbc9431d0",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "PASS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/additional-oracle.mjs": "24013611387a8e9731c3ccbe7679ef1133e96a4fb9bb0d62d9253878c503df08"
+      }
+    },
+    {
+      "tag": "semantic-check",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "node",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/semantic-check.mjs"
+      ],
+      "start_time": 1791700882.31844,
+      "end_time": 1791700882.396348,
+      "exit_code": 1,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-semantic-check-86hoeiko",
+      "evidence_hash": "1607aef93b7967de5ab086b54fadf3add2db7938805d8660c65f252890bf9626",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "FAIL",
+      "business_verdict": "SEE_SCENARIO_RESULTS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/semantic-check.mjs": "bd214fb0aa68db432283bd9dd198a7afa6cc4be7f2154a6c79ce2eed26fd6f1d"
+      }
+    },
+    {
+      "tag": "tagged-value",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/tagged-value.py"
+      ],
+      "start_time": 1791700962.263864,
+      "end_time": 1791700964.349258,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-tagged-value-jfrn79ng",
+      "evidence_hash": "66b88f60e35e3f43d4eef8644dedefe122df5d4a09e6f18534f287a4d6770e4f",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "SEE_SCENARIO_RESULTS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/tagged-value.py": "3cff0380b274f1d4d8eaa1a9948a2d1ff27bcaad52a7340beb4aa283f57e1e68"
+      }
+    },
+    {
+      "tag": "tagged-value-oracle",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "node",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/tagged-value-oracle.mjs"
+      ],
+      "start_time": 1791700964.4358468,
+      "end_time": 1791700964.5145001,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-tagged-value-oracle-aoo0nsw6",
+      "evidence_hash": "6cb7a4bb77eb95eb5e5265d5a6873225682429bed55d50ec776c2d0db04e9db1",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "SEE_SCENARIO_RESULTS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/tagged-value-oracle.mjs": "1ad0074588bcb89f22da30a62e479005a1adf6169e17761575cb2509ab5d2c22"
+      }
+    },
+    {
+      "tag": "tagged-check",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/tagged-check.py"
+      ],
+      "start_time": 1791701020.325276,
+      "end_time": 1791701020.3857439,
+      "exit_code": 1,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-tagged-check-s727d56v",
+      "evidence_hash": "bb29aa2c6cfbbfc4ae7830be1a7b52b5b32a2ba4df0d9020d46bb79b9f30efd5",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "FAIL",
+      "business_verdict": "SEE_SCENARIO_RESULTS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/tagged-check.py": "7e1e742ef561b41df9d94053d8d77a3fca1b13c2828473442682d01741f34f19"
+      }
+    },
+    {
+      "tag": "registry",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "python3",
+        "scripts/rust-tauri/r02_registry_consistency.py"
+      ],
+      "start_time": 1791701067.224874,
+      "end_time": 1791701067.305683,
+      "exit_code": 1,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-registry-n7sattgt",
+      "evidence_hash": "95633c5bdc2fe035cbebd388d53d44f7940533c30550320a52f4523e04606002",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "FAIL",
+      "business_verdict": "FAIL",
+      "fixtures": {
+        "scripts/rust-tauri/r02_registry_consistency.py": "43642ef04976f416df93f76921337bb812f278ea6dc3d330167ff21806acf31b"
+      }
+    },
+    {
+      "tag": "probe-v2",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/probe-v2.py"
+      ],
+      "start_time": 1791701138.3846772,
+      "end_time": 1791701143.550936,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-probe-v2-u8lbame7",
+      "evidence_hash": "0965d10909df15c9a9df1f50eb49fe73ba3970b8567ded21de45420e7852b200",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "SEE_SCENARIO_RESULTS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/probe-v2.py": "72571cb1a16dcd74e2c0faba9b43747edd3f0fae62c81a4a1e4907e753ac11d4"
+      }
+    },
+    {
+      "tag": "effects-probe-v2",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/effects-probe-v2.py"
+      ],
+      "start_time": 1791701143.641909,
+      "end_time": 1791701147.172718,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-effects-probe-v2-jhi7so69",
+      "evidence_hash": "1a113872eb758774dd89cdeb2b530887e3d82e1a2142cf35595ac1ddc8a7c612",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "SEE_SCENARIO_RESULTS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/effects-probe-v2.py": "608489e16afeb33b0c753bca655cb0c7040a5ac080c89e42ce4444ede9eeb716"
+      }
+    },
+    {
+      "tag": "additional-family-v2",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/additional-family-v2.py"
+      ],
+      "start_time": 1791701147.261356,
+      "end_time": 1791701149.778576,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-additional-family-v2-3i3ctd70",
+      "evidence_hash": "959cb1de236b05eb89f71ccfe1fc6c44542a113e85de3f7df5ff28fd1e307c25",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "SEE_SCENARIO_RESULTS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/additional-family-v2.py": "fd2c8f70b17066452db6f0d7acecf17030684dde9a2d63a143b6d2712269d384"
+      }
+    },
+    {
+      "tag": "tagged-value-v2",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/tagged-value-v2.py"
+      ],
+      "start_time": 1791701149.8699672,
+      "end_time": 1791701151.7983801,
+      "exit_code": 0,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-tagged-value-v2-g8i2vb89",
+      "evidence_hash": "42aad50c82e97b19a4cb74a6aca5fa8d5c7e2da3e6284ce786f0545d64f56892",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "PASS",
+      "business_verdict": "SEE_SCENARIO_RESULTS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/tagged-value-v2.py": "36cbb14885653db5e710f191c813c5dd1d80a3b73c7863fe60ab47ba495ec371"
+      }
+    },
+    {
+      "tag": "semantic-check-v2",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "node",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/semantic-check-v2.mjs"
+      ],
+      "start_time": 1791701228.554803,
+      "end_time": 1791701228.627827,
+      "exit_code": 1,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-semantic-check-v2-4qdq_568",
+      "evidence_hash": "8cc43379cec796a36466a2898be14bba801eb180ec90c483091d5abd56bf1ee8",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "FAIL",
+      "business_verdict": "SEE_SCENARIO_RESULTS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/semantic-check-v2.mjs": "14f7a8efcf14f6fda7a71bd87234f24ac8a352d32a887d03e163e33bf613f26b"
+      }
+    },
+    {
+      "tag": "tagged-check-v2",
+      "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+      "working_tree_digest": "f8e1084cf13130c2f86fa1000adaba120bd23e6126d39033de7c85595f77fae6",
+      "owned_hashes_before": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "owned_hashes_after": {
+        "rust/Cargo.lock": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+        "rust/crates/lingxi-adapters/Cargo.toml": "9b9704e81f2df10816614b00bee59b498cada62f59348512e888851a8ac2769e",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "0501492fad5bc7f1f7022754cec7885f44bff5d7a4f3b16d0ca1f7d71ff9e78c",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "f5d4e33b22404b7d42f4dc583a819deacfa43424eca4fbc2b20515f118f36b49",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs": "a88c5bd73851fedb111cb845c4b55b8eec0ffca122a74aca0d0657ccf16f1dde",
+        "rust/crates/lingxi-service/src/context_compiler.rs": "c31120dac95715d577b75277a268e9723abf18257c39478951582da64068e54b",
+        "rust/crates/lingxi-service/src/memory.rs": "13ec97760e51b732c97c2cee90031c0ef4b5362110901777225370760a700f9c",
+        "rust/crates/lingxi-service/src/memorytools.rs": "94fe1aafb37794bd3493eaab20b58b5b42438ff40f32cfab3a5d7fb69cd5463d",
+        "rust/crates/lingxi-service/src/persona.rs": "e2c81d4ce35a925da258e30a3419b9f245b164d41d8c72720a316948f2028b73",
+        "rust/crates/lingxi-service/src/skills.rs": "ad597c498070e16794a7751329f353b2bb5abefaff41d568f4683f2d358680cd",
+        "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+        "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_config.rs": "b80b1b0b8b4d78f81d68df3797718f0725268cfcc1de16b7719c92409530d276",
+        "rust/crates/lingxi-service/tests/r06_ar_f06_binary.rs": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+        "rust/crates/lingxi-adapters/tests/r06_ar_f06_config_preservation.rs": "b577ded0d7875cd424617969512476c2402b4e11bfcab24fb457b601b10f74d0"
+      },
+      "toolchain": "cargo 1.98.1",
+      "lock_hash": "9e91ff754118fa274c95363e3a9f3d0c802667b179c2576bd10e45fc146b6506",
+      "fixture_hash": "2273e67b7bc3860a8a039d72cc3eb3e5a27962bee810b048e3ab1f5c9ce0426b",
+      "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+      "command": [
+        "python3",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/tagged-check-v2.py"
+      ],
+      "start_time": 1791701228.708964,
+      "end_time": 1791701228.7707598,
+      "exit_code": 1,
+      "test_count": 0,
+      "passed_count": 0,
+      "failed_count": 0,
+      "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-tagged-check-v2-y7fwbg0s",
+      "evidence_hash": "45f31407120470f371ae6d8d4db905e56e033df126e61d5867e15764584df1b6",
+      "guard": "8192MB/600s",
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent",
+      "CARGO_TARGET_DIR": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target",
+      "service_binary_path": "/Users/study_superior/.codex/worktrees/r06-w06-review2/LingxiAgent/rust/target/debug/lingxi-service",
+      "service_binary_sha256_before": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "service_binary_sha256_after": "406279b9ecabfc8d1ce3678c322ae6900064f00dd2f156d893be77d5ba3d47c1",
+      "mock_boundary": "仅外部模型端点/应答，生产配置/材料/网关/存储/服务进程不mock",
+      "fixture_home_removed": true,
+      "command_execution_status": "FAIL",
+      "business_verdict": "SEE_SCENARIO_RESULTS",
+      "fixtures": {
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/tagged-check-v2.py": "e1c0ce40bee906866dab80d767ac392e81693efc3ef262f9f6c4e42539d7746c"
+      }
+    }
+  ],
+  "binary_sample_count": 22,
+  "four_c_test_count": 13,
+  "original_regression_test_count": 77,
+  "business_counterexample_checks": {
+    "merge_family": {
+      "checks": [
+        {
+          "name": "merge-control",
+          "part": "configuration_read",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "merge-control",
+          "part": "memory_default_and_semantics",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "merge-control",
+          "part": "provider_memory_nonce",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "merge-control",
+          "part": "run_terminal",
+          "expected": "completed",
+          "actual": "completed",
+          "status": "PASS"
+        },
+        {
+          "name": "merge-control",
+          "part": "patch_status",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "merge-control",
+          "part": "patch_only_owned_field",
+          "expected": {
+            "d": {
+              "enabled": false
+            },
+            "memory": {
+              "enabled": false
+            }
+          },
+          "actual": {
+            "d": {
+              "enabled": false
+            },
+            "memory": {
+              "enabled": false
+            }
+          },
+          "status": "PASS"
+        },
+        {
+          "name": "sequence-root",
+          "part": "configuration_read",
+          "expected": 400,
+          "actual": 400,
+          "status": "PASS"
+        },
+        {
+          "name": "sequence-root",
+          "part": "zero_provider_requests",
+          "expected": 0,
+          "actual": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "sequence-root",
+          "part": "run_terminal",
+          "expected": "failed",
+          "actual": "failed",
+          "status": "PASS"
+        },
+        {
+          "name": "sequence-root",
+          "part": "patch_reject_keeps_bytes",
+          "expected": "? [memory]\n: {enabled: false}\n",
+          "actual": "? [memory]\n: {enabled: false}\n",
+          "status": "PASS"
+        },
+        {
+          "name": "sequence-field",
+          "part": "configuration_read",
+          "expected": 400,
+          "actual": 400,
+          "status": "PASS"
+        },
+        {
+          "name": "sequence-field",
+          "part": "zero_provider_requests",
+          "expected": 0,
+          "actual": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "sequence-field",
+          "part": "run_terminal",
+          "expected": "failed",
+          "actual": "failed",
+          "status": "PASS"
+        },
+        {
+          "name": "sequence-field",
+          "part": "patch_reject_keeps_bytes",
+          "expected": "memory: {? [enabled]: false}\n",
+          "actual": "memory: {? [enabled]: false}\n",
+          "status": "PASS"
+        },
+        {
+          "name": "quoted-literal-owned",
+          "part": "configuration_read",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "quoted-literal-owned",
+          "part": "memory_default_and_semantics",
+          "expected": true,
+          "actual": false,
+          "status": "FAIL"
+        },
+        {
+          "name": "quoted-literal-owned",
+          "part": "provider_memory_nonce",
+          "expected": true,
+          "actual": false,
+          "status": "FAIL"
+        },
+        {
+          "name": "quoted-literal-owned",
+          "part": "run_terminal",
+          "expected": "completed",
+          "actual": "completed",
+          "status": "PASS"
+        },
+        {
+          "name": "quoted-literal-owned",
+          "part": "patch_status",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "quoted-literal-owned",
+          "part": "patch_only_owned_field",
+          "expected": {
+            "memory": {
+              "<<": {
+                "enabled": false
+              },
+              "enabled": false
+            }
+          },
+          "actual": {
+            "memory": {
+              "enabled": false
+            }
+          },
+          "status": "FAIL"
+        },
+        {
+          "name": "explicit-string-merge-owned",
+          "part": "configuration_read",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "explicit-string-merge-owned",
+          "part": "memory_default_and_semantics",
+          "expected": true,
+          "actual": false,
+          "status": "FAIL"
+        },
+        {
+          "name": "explicit-string-merge-owned",
+          "part": "provider_memory_nonce",
+          "expected": true,
+          "actual": false,
+          "status": "FAIL"
+        },
+        {
+          "name": "explicit-string-merge-owned",
+          "part": "run_terminal",
+          "expected": "completed",
+          "actual": "completed",
+          "status": "PASS"
+        },
+        {
+          "name": "explicit-string-merge-owned",
+          "part": "patch_status",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "explicit-string-merge-owned",
+          "part": "patch_only_owned_field",
+          "expected": {
+            "memory": {
+              "<<": {
+                "enabled": false
+              },
+              "enabled": false
+            }
+          },
+          "actual": {
+            "memory": {
+              "enabled": false
+            }
+          },
+          "status": "FAIL"
+        },
+        {
+          "name": "quoted-literal-root-scalar",
+          "part": "configuration_read",
+          "expected": 200,
+          "actual": 400,
+          "status": "FAIL"
+        },
+        {
+          "name": "quoted-literal-root-scalar",
+          "part": "memory_default_and_semantics",
+          "expected": false,
+          "actual": null,
+          "status": "FAIL"
+        },
+        {
+          "name": "quoted-literal-root-scalar",
+          "part": "provider_memory_nonce",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "quoted-literal-root-scalar",
+          "part": "run_terminal",
+          "expected": "completed",
+          "actual": "failed",
+          "status": "FAIL"
+        },
+        {
+          "name": "quoted-literal-root-scalar",
+          "part": "patch_status",
+          "expected": 200,
+          "actual": 400,
+          "status": "FAIL"
+        },
+        {
+          "name": "quoted-literal-root-scalar",
+          "part": "patch_only_owned_field",
+          "expected": {
+            "memory": {
+              "enabled": false
+            },
+            "<<": 7
+          },
+          "actual": {
+            "memory": {
+              "enabled": false
+            },
+            "<<": 7
+          },
+          "status": "PASS"
+        },
+        {
+          "name": "quoted-literal-unknown-nested",
+          "part": "configuration_read",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "quoted-literal-unknown-nested",
+          "part": "memory_default_and_semantics",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "quoted-literal-unknown-nested",
+          "part": "provider_memory_nonce",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "quoted-literal-unknown-nested",
+          "part": "run_terminal",
+          "expected": "completed",
+          "actual": "completed",
+          "status": "PASS"
+        },
+        {
+          "name": "quoted-literal-unknown-nested",
+          "part": "patch_status",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "quoted-literal-unknown-nested",
+          "part": "patch_only_owned_field",
+          "expected": {
+            "memory": {
+              "enabled": false
+            },
+            "future": {
+              "<<": {
+                "marker": "keep"
+              },
+              "other": "value"
+            }
+          },
+          "actual": {
+            "memory": {
+              "enabled": false
+            },
+            "future": {
+              "other": "value",
+              "marker": "keep"
+            }
+          },
+          "status": "FAIL"
+        },
+        {
+          "name": "double-nested-merge-source",
+          "part": "configuration_read",
+          "expected": 400,
+          "actual": 400,
+          "status": "PASS"
+        },
+        {
+          "name": "double-nested-merge-source",
+          "part": "zero_provider_requests",
+          "expected": 0,
+          "actual": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "double-nested-merge-source",
+          "part": "run_terminal",
+          "expected": "failed",
+          "actual": "failed",
+          "status": "PASS"
+        },
+        {
+          "name": "double-nested-merge-source",
+          "part": "patch_reject_keeps_bytes",
+          "expected": "a: &a {? [enabled]: false}\nb: &b {<<: *a}\nmemory: {<<: *b, enabled: false}\n",
+          "actual": "a: &a {? [enabled]: false}\nb: &b {<<: *a}\nmemory: {<<: *b, enabled: false}\n",
+          "status": "PASS"
+        },
+        {
+          "name": "unknown-complex-inner",
+          "part": "configuration_read",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "unknown-complex-inner",
+          "part": "memory_default_and_semantics",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "unknown-complex-inner",
+          "part": "provider_memory_nonce",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "unknown-complex-inner",
+          "part": "run_terminal",
+          "expected": "completed",
+          "actual": "completed",
+          "status": "PASS"
+        },
+        {
+          "name": "unknown-complex-inner",
+          "part": "patch_status",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "unknown-complex-inner",
+          "part": "patch_only_owned_field",
+          "expected": {
+            "memory": {
+              "enabled": false,
+              "future": {
+                "enabled": true
+              }
+            }
+          },
+          "actual": {
+            "memory": {
+              "enabled": false,
+              "future": {
+                "enabled": true
+              }
+            }
+          },
+          "status": "PASS"
+        },
+        {
+          "name": "experience-paused-control",
+          "part": "configuration_read",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-paused-control",
+          "part": "memory_default_and_semantics",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-paused-control",
+          "part": "provider_memory_nonce",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-paused-control",
+          "part": "run_terminal",
+          "expected": "completed",
+          "actual": "completed",
+          "status": "PASS"
+        },
+        {
+          "name": "experience-paused-control",
+          "part": "patch_status",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-paused-control",
+          "part": "patch_only_owned_field",
+          "expected": {
+            "memory": {
+              "enabled": false
+            },
+            "experience": {
+              "enabled": false
+            }
+          },
+          "actual": {
+            "memory": {
+              "enabled": false
+            },
+            "experience": {
+              "enabled": false
+            }
+          },
+          "status": "PASS"
+        },
+        {
+          "name": "experience-paused-control",
+          "part": "experience_flag",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-paused-control",
+          "part": "experience_read_guard",
+          "expected": 403,
+          "actual": 403,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-real-merge-control",
+          "part": "configuration_read",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-real-merge-control",
+          "part": "memory_default_and_semantics",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-real-merge-control",
+          "part": "provider_memory_nonce",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-real-merge-control",
+          "part": "run_terminal",
+          "expected": "completed",
+          "actual": "completed",
+          "status": "PASS"
+        },
+        {
+          "name": "experience-real-merge-control",
+          "part": "patch_status",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-real-merge-control",
+          "part": "patch_only_owned_field",
+          "expected": {
+            "d": {
+              "enabled": true
+            },
+            "memory": {
+              "enabled": false
+            },
+            "experience": {
+              "enabled": true
+            }
+          },
+          "actual": {
+            "d": {
+              "enabled": true
+            },
+            "memory": {
+              "enabled": false
+            },
+            "experience": {
+              "enabled": true
+            }
+          },
+          "status": "PASS"
+        },
+        {
+          "name": "experience-real-merge-control",
+          "part": "experience_flag",
+          "expected": true,
+          "actual": true,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-real-merge-control",
+          "part": "experience_read_guard",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-literal-merge",
+          "part": "configuration_read",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-literal-merge",
+          "part": "memory_default_and_semantics",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-literal-merge",
+          "part": "provider_memory_nonce",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-literal-merge",
+          "part": "run_terminal",
+          "expected": "completed",
+          "actual": "completed",
+          "status": "PASS"
+        },
+        {
+          "name": "experience-literal-merge",
+          "part": "patch_status",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "experience-literal-merge",
+          "part": "patch_only_owned_field",
+          "expected": {
+            "memory": {
+              "enabled": false
+            },
+            "experience": {
+              "<<": {
+                "enabled": true
+              }
+            }
+          },
+          "actual": {
+            "memory": {
+              "enabled": false
+            },
+            "experience": {
+              "enabled": true
+            }
+          },
+          "status": "FAIL"
+        },
+        {
+          "name": "experience-literal-merge",
+          "part": "experience_flag",
+          "expected": false,
+          "actual": true,
+          "status": "FAIL"
+        },
+        {
+          "name": "experience-literal-merge",
+          "part": "experience_read_guard",
+          "expected": 403,
+          "actual": 200,
+          "status": "FAIL"
+        },
+        {
+          "name": "name-literal-merge",
+          "part": "configuration_read",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "name-literal-merge",
+          "part": "memory_default_and_semantics",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "name-literal-merge",
+          "part": "provider_memory_nonce",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "name-literal-merge",
+          "part": "run_terminal",
+          "expected": "completed",
+          "actual": "completed",
+          "status": "PASS"
+        },
+        {
+          "name": "name-literal-merge",
+          "part": "patch_status",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "name-literal-merge",
+          "part": "patch_only_owned_field",
+          "expected": {
+            "memory": {
+              "enabled": false
+            },
+            "agent": {
+              "<<": {
+                "name": "LITERAL-NAME-UNEXPECTED"
+              }
+            }
+          },
+          "actual": {
+            "memory": {
+              "enabled": false
+            },
+            "agent": {
+              "name": "LITERAL-NAME-UNEXPECTED"
+            }
+          },
+          "status": "FAIL"
+        },
+        {
+          "name": "name-literal-merge",
+          "part": "experience_flag",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "name-literal-merge",
+          "part": "experience_read_guard",
+          "expected": 403,
+          "actual": 403,
+          "status": "PASS"
+        },
+        {
+          "name": "name-literal-merge",
+          "part": "nested_name_not_lifted",
+          "expected": false,
+          "actual": true,
+          "status": "FAIL"
+        },
+        {
+          "name": "orphan-block-control",
+          "part": "cleanup_status",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "orphan-block-control",
+          "part": "shared_file_preserved",
+          "expected": true,
+          "actual": true,
+          "status": "PASS"
+        },
+        {
+          "name": "orphan-block-control",
+          "part": "project_skill_in_wire",
+          "expected": true,
+          "actual": true,
+          "status": "PASS"
+        },
+        {
+          "name": "orphan-block-control",
+          "part": "orphan_preview",
+          "expected": [],
+          "actual": [],
+          "status": "PASS"
+        },
+        {
+          "name": "orphan-complex-peer",
+          "part": "cleanup_status",
+          "expected": 400,
+          "actual": 400,
+          "status": "PASS"
+        },
+        {
+          "name": "orphan-complex-peer",
+          "part": "shared_file_preserved",
+          "expected": true,
+          "actual": true,
+          "status": "PASS"
+        },
+        {
+          "name": "orphan-complex-peer",
+          "part": "zero_provider_requests",
+          "expected": 0,
+          "actual": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "orphan-complex-peer",
+          "part": "run_terminal",
+          "expected": "failed",
+          "actual": "failed",
+          "status": "PASS"
+        },
+        {
+          "name": "project-block-control",
+          "part": "cleanup_status",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "project-block-control",
+          "part": "shared_file_preserved",
+          "expected": true,
+          "actual": true,
+          "status": "PASS"
+        },
+        {
+          "name": "project-block-control",
+          "part": "project_skill_in_wire",
+          "expected": false,
+          "actual": false,
+          "status": "PASS"
+        },
+        {
+          "name": "project-block-control",
+          "part": "orphan_preview",
+          "expected": [],
+          "actual": [],
+          "status": "PASS"
+        },
+        {
+          "name": "project-complex-key",
+          "part": "cleanup_status",
+          "expected": 400,
+          "actual": 400,
+          "status": "PASS"
+        },
+        {
+          "name": "project-complex-key",
+          "part": "shared_file_preserved",
+          "expected": true,
+          "actual": true,
+          "status": "PASS"
+        },
+        {
+          "name": "project-complex-key",
+          "part": "zero_provider_requests",
+          "expected": 0,
+          "actual": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "project-complex-key",
+          "part": "run_terminal",
+          "expected": "failed",
+          "actual": "failed",
+          "status": "PASS"
+        },
+        {
+          "name": "project-literal-merge",
+          "part": "cleanup_status",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "project-literal-merge",
+          "part": "shared_file_preserved",
+          "expected": true,
+          "actual": true,
+          "status": "PASS"
+        },
+        {
+          "name": "project-literal-merge",
+          "part": "project_skill_in_wire",
+          "expected": true,
+          "actual": false,
+          "status": "FAIL"
+        },
+        {
+          "name": "project-literal-merge",
+          "part": "orphan_preview",
+          "expected": [],
+          "actual": [],
+          "status": "PASS"
+        },
+        {
+          "name": "orphan-literal-peer",
+          "part": "cleanup_status",
+          "expected": 200,
+          "actual": 200,
+          "status": "PASS"
+        },
+        {
+          "name": "orphan-literal-peer",
+          "part": "shared_file_preserved",
+          "expected": true,
+          "actual": true,
+          "status": "PASS"
+        },
+        {
+          "name": "orphan-literal-peer",
+          "part": "project_skill_in_wire",
+          "expected": true,
+          "actual": true,
+          "status": "PASS"
+        },
+        {
+          "name": "orphan-literal-peer",
+          "part": "orphan_preview",
+          "expected": [
+            "shared-review"
+          ],
+          "actual": [],
+          "status": "FAIL"
+        }
+      ],
+      "passed": 87,
+      "failed": 18
+    },
+    "tag_family": {
+      "checks": [
+        {
+          "name": "unsupported-bool-tag",
+          "part": "read_status",
+          "expected": 400,
+          "actual": 200,
+          "status": "FAIL"
+        },
+        {
+          "name": "unsupported-bool-tag",
+          "part": "run_terminal",
+          "expected": "failed",
+          "actual": "completed",
+          "status": "FAIL"
+        },
+        {
+          "name": "unsupported-bool-tag",
+          "part": "zero_provider_wire",
+          "expected": 0,
+          "actual": 1,
+          "status": "FAIL"
+        },
+        {
+          "name": "unsupported-bool-tag",
+          "part": "patch_status",
+          "expected": 400,
+          "actual": 200,
+          "status": "FAIL"
+        },
+        {
+          "name": "unsupported-bool-tag",
+          "part": "unchanged_after_rejected_patch",
+          "expected": "memory: {enabled: !custom true}\n",
+          "actual": "memory:\n  enabled: false\n",
+          "status": "FAIL"
+        },
+        {
+          "name": "unsupported-string-tag",
+          "part": "read_status",
+          "expected": 400,
+          "actual": 200,
+          "status": "FAIL"
+        },
+        {
+          "name": "unsupported-string-tag",
+          "part": "run_terminal",
+          "expected": "failed",
+          "actual": "completed",
+          "status": "FAIL"
+        },
+        {
+          "name": "unsupported-string-tag",
+          "part": "zero_provider_wire",
+          "expected": 0,
+          "actual": 1,
+          "status": "FAIL"
+        },
+        {
+          "name": "unsupported-string-tag",
+          "part": "patch_status",
+          "expected": 400,
+          "actual": 200,
+          "status": "FAIL"
+        },
+        {
+          "name": "unsupported-string-tag",
+          "part": "unchanged_after_rejected_patch",
+          "expected": "memory: {enabled: false}\nagent: {name: !custom LITERAL-TAG-NAME}\n",
+          "actual": "memory:\n  enabled: false\nagent:\n  name: !custom LITERAL-TAG-NAME\n",
+          "status": "FAIL"
+        },
+        {
+          "name": "unsupported-section-tag",
+          "part": "read_status",
+          "expected": 400,
+          "actual": 200,
+          "status": "FAIL"
+        },
+        {
+          "name": "unsupported-section-tag",
+          "part": "run_terminal",
+          "expected": "failed",
+          "actual": "completed",
+          "status": "FAIL"
+        },
+        {
+          "name": "unsupported-section-tag",
+          "part": "zero_provider_wire",
+          "expected": 0,
+          "actual": 1,
+          "status": "FAIL"
+        },
+        {
+          "name": "unsupported-section-tag",
+          "part": "patch_status",
+          "expected": 400,
+          "actual": 200,
+          "status": "FAIL"
+        },
+        {
+          "name": "unsupported-section-tag",
+          "part": "unchanged_after_rejected_patch",
+          "expected": "memory: !custom {enabled: true}\n",
+          "actual": "memory: !custom\n  enabled: false\n",
+          "status": "FAIL"
+        }
+      ],
+      "passed": 0,
+      "failed": 15
+    }
+  },
+  "four_c": [
+    {
+      "id": "F06-C01",
+      "required_samples": "PASS_EXECUTED",
+      "status": "PASS",
+      "observed": "block/flow false real wire no nonce",
+      "evidence": [
+        "four-c.json"
+      ],
+      "scope": "Only the original required named sample conditions; not full YAML compatibility or full original Task acceptance"
+    },
+    {
+      "id": "F06-C02",
+      "required_samples": "PASS_EXECUTED",
+      "status": "PASS",
+      "observed": "quoted hash escape Unicode BOM CRLF real wire name preserved",
+      "evidence": [
+        "four-c.json"
+      ],
+      "scope": "Only the original required named sample conditions; not full YAML compatibility or full original Task acceptance"
+    },
+    {
+      "id": "F06-C03",
+      "required_samples": "PASS_EXECUTED",
+      "status": "FAIL",
+      "observed": "ordinary invalid and R01 compound keys reject; literal-key deep-field lifting and unknown tagged values accept",
+      "evidence": [
+        "four-c.json",
+        "semantic-check-results-v2.json",
+        "tagged-check-results-v2.json"
+      ]
+    },
+    {
+      "id": "F06-C04",
+      "required_samples": "PASS_EXECUTED",
+      "status": "FAIL",
+      "observed": "missing empty partial example ordinary unknown values pass; literal keys alter defaults and unknown fields lost in HTTP patch",
+      "evidence": [
+        "four-c.json",
+        "semantic-check-results-v2.json",
+        "tagged-check-results-v2.json"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "R06-AR-W06-R02-F01",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "root_cause": "Literal string << key loses YAML merge distinction; validate_owned_keys and apply_merge treat all such strings as merge, including unknown values",
+      "source": [
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:41",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:67",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:70"
+      ],
+      "violated": [
+        "F06-REPAIR-01",
+        "F06-REPAIR-03",
+        "F06-REPAIR-04",
+        "F06-C03",
+        "F06-C04",
+        "R06-T01-S01",
+        "R06-T01-S03",
+        "R06-T01-S04",
+        "R06-T06-S01",
+        "R06-T06-S02",
+        "R06-T06-S03"
+      ],
+      "evidence": [
+        "probe-results-v2.json",
+        "effects-probe-results-v2.json",
+        "additional-family-results-v2.json",
+        "semantic-check-results-v2.json"
+      ],
+      "required_retest": [
+        "F06-C01",
+        "F06-C02",
+        "F06-C03",
+        "F06-C04",
+        "R01 counterexamples",
+        "literal versus true merge family",
+        "actual gateway",
+        "shared preview",
+        "HTTP config patch preservation",
+        "77 affected regressions",
+        "fmt",
+        "clippy",
+        "contracts",
+        "boundaries"
+      ]
+    },
+    {
+      "id": "R06-AR-W06-R02-F02",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "root_cause": "Sensitive mappings/string/bool/lists use as_* helpers that untag unknown custom types rather than reject unsupported types",
+      "source": [
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:32",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:88",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:100",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:110"
+      ],
+      "violated": [
+        "F06-REPAIR-01",
+        "F06-REPAIR-02",
+        "F06-REPAIR-04",
+        "F06-C03",
+        "F06-C04",
+        "R06-T01-S01",
+        "R06-T01-S04",
+        "R06-T06-S01",
+        "R06-T06-S03"
+      ],
+      "evidence": [
+        "tagged-value-results-v2.json",
+        "logs/tagged-value-oracle.log",
+        "tagged-check-results-v2.json"
+      ],
+      "required_retest": [
+        "F06-C01",
+        "F06-C02",
+        "F06-C03",
+        "F06-C04",
+        "unknown tag key/value/section/list family",
+        "supported bool and string tags",
+        "actual gateway",
+        "HTTP flags and patch preservation",
+        "77 affected regressions",
+        "fmt",
+        "clippy",
+        "contracts",
+        "boundaries"
+      ]
+    }
+  ],
+  "historical_finding_R01": "CLOSED_FOR_EXACT_COMPOUND_KEY_COUNTEREXAMPLES; F06 full contract remains FAIL",
+  "original_obligations": {
+    "records": 354,
+    "r00_assertions": 263,
+    "leaf_groups": 101,
+    "complete_original_acceptance": false,
+    "mapping": "original-obligation-review.json",
+    "scope": "scope-leaf-reconciliation.json",
+    "remaining_full_scopes": [
+      "F01",
+      "F05",
+      "F07",
+      "F08",
+      "F13",
+      "F14",
+      "F15",
+      "EX",
+      "original lifecycle and full A requirements"
+    ]
+  },
+  "registry": {
+    "status": "FAIL_INHERITED_F14",
+    "exit_code": 1,
+    "reason": "migration registry v8/v9 absent; 9 source versus 7 registry; not caused by W06 current changes"
+  },
+  "not_run": [
+    "full workspace tests",
+    "R06 stage gate",
+    "R05 to R02 full stage closure",
+    "other OS",
+    "packaging",
+    "live providers",
+    "real shared deletion",
+    "R07"
+  ],
+  "cleanup": {
+    "all_final_22_children_waited_exit0": true,
+    "all_final_fixture_homes_removed": true,
+    "shared_preview_only": true,
+    "wrapper_empty_homes_removed": true
+  },
+  "evidence_boundary": "Synthetic fixtures only. External provider response is loopback substitute; current business parser/gather/compiler/Run/Gateway/storage/message assembly real. All historical failures and first output preserved."
+}

@@ -1,0 +1,73 @@
+{"command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "--no-fail-fast", "-p", "lingxi-service", "--test", "r06_ar_f06_config", "-p", "lingxi-adapters", "--test", "r06_ar_f06_config_preservation", "--", "--nocapture"], "start": 1791704841.2585092, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-green-types-delete-02-zfmq3bbv", "guard": "8192MB/600s"}
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.57s
+     Running tests/r06_ar_f06_config_preservation.rs (rust/target-w06-p03/debug/deps/r06_ar_f06_config_preservation-a1d504a6b8dd600b)
+LINGXI_TEST_GUARD: armed (pid 49864, mem_limit=8192 MB, time_limit=600 s)
+
+running 12 tests
+p03_type input="memory: {enabled: !bool true}" actual=Err(InvalidRequest("invalid agent config.yaml: unsupported YAML tag or tagged node type"))
+p03_type input="agent: {name: !str 姓名}" actual=Err(InvalidRequest("invalid agent config.yaml: unsupported YAML tag or tagged node type"))
+p03_type input="memory: !map {enabled: false}" actual=Err(InvalidRequest("invalid agent config.yaml: unsupported YAML tag or tagged node type"))
+p03_type input="skills: {enabled: !seq [one]}" actual=Err(InvalidRequest("invalid agent config.yaml: unsupported YAML tag or tagged node type"))
+p03_type input="future: {n: !int 7}" actual=Err(InvalidRequest("invalid agent config.yaml: unsupported YAML tag or tagged node type"))
+p03_type input="agent: {name: !!binary SGVsbG8=}" actual=Err(InvalidRequest("invalid agent config.yaml: agent.name must be a string"))
+p03_type input="locale: !!binary ZW4=" actual=Err(InvalidRequest("invalid agent config.yaml: locale must be a string"))
+p03_type input="skills: {enabled: [!!binary b25l]}" actual=Err(InvalidRequest("invalid agent config.yaml: skills.enabled must be a list"))
+test c03_aliases_and_merge_keys_follow_standard_yaml_semantics ... ok
+p03_type input="d: &d {enabled: !bool true}\nmemory: {<<: *d, enabled: false}" actual=Err(InvalidRequest("invalid agent config.yaml: unsupported YAML tag or tagged node type"))
+p03_type input="d: &d {enabled: 'true'}\nmemory: {<<: *d, enabled: false}" actual=Err(InvalidRequest("invalid agent config.yaml: memory.enabled must be a boolean"))
+p03_roundtrip={"after":"memory:\n  enabled: true\nfuture:\n  utf8: !<tag:yaml.org,2002:binary> SGVsbG8=\n  bytes: !<tag:yaml.org,2002:binary> /wABAA==\nskills:\n  enabled:\n  - 中文 skill\n  workspace_disabled:\n  - project\n","before":"memory: {enabled: false}\nfuture: {utf8: !!binary SGVsbG8=, bytes: !!binary /wABAA==}"}
+test c03_duplicate_sensitive_keys_and_nested_keys_fail_before_writing ... ok
+test p02_unknown_tags_reject_all_positions_and_preserve_original_bytes ... ok
+test p02_mixed_literal_and_merge_keys_and_alias_key_identity_remain_distinct ... ok
+test p03_tags_cannot_erase_type_and_unsupported_data_never_rewrites ... ok
+test p02_true_merge_precedence_explicit_tags_and_overridden_sources_remain_checked ... ok
+p02_literal_key="<<" input="\"<<\": 7\nagent: {\"<<\": {name: 不得提升}}\nmemory: {\"<<\": {enabled: false}}\nexperience: {\"<<\": {enabled: true}}\nskills: {\"<<\": {enabled: [shared]}}\nworkspace_context: {\"<<\": {discover_project_skills: false}}\nfuture: {\"<<\": {marker: keep}, other: value}\n" persisted="? !<tag:yaml.org,2002:str> \"<<\"\n: 7\nagent:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : name: 不得提升\nmemory:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : enabled: false\n  enabled: false\nexperience:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : enabled: true\nskills:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : enabled:\n    - shared\n  enabled:\n  - new\n  workspace_disabled: []\nworkspace_context:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : discover_project_skills: false\nfuture:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : marker: keep\n  other: value\n"
+test p01_string_key_alias_merge_controls_and_unknown_values_survive_patch ... ok
+p03_roundtrip={"after":"memory:\n  enabled: true\nfuture:\n  date: !<tag:yaml.org,2002:timestamp> \"2026-10-11\"\n  broad: !<tag:yaml.org,2002:timestamp> \"2026-1-2t3:04:05.123456 +8\"\n  zoneless: !<tag:yaml.org,2002:timestamp> \"2026-1-2 3:04:05\"\n  z: !<tag:yaml.org,2002:timestamp> \"2026-10-11T03:04:05Z\"\n  malformed: 2026-10-11x\n  explicit: !<tag:yaml.org,2002:timestamp> \"2026-10-11\"\n  time: !<tag:yaml.org,2002:timestamp> \"2026-10-11T13:42:23.456+08:00\"\n  quoted: \"2026-10-11\"\n  string: \"2026-10-11\"\nskills:\n  enabled:\n  - 中文 skill\n  workspace_disabled:\n  - project\n","before":"memory: {enabled: false}\nfuture: {date: 2026-10-11, broad: 2026-1-2t3:04:05.123456 +8, zoneless: 2026-1-2 3:04:05, z: 2026-10-11T03:04:05Z, malformed: 2026-10-11x, explicit: !!timestamp 2026-10-11, time: 2026-10-11T13:42:23.456+08:00, quoted: '2026-10-11', string: !!str 2026-10-11}"}
+test c04_updates_preserve_all_unknown_nested_values_and_escaped_lists ... ok
+p03_roundtrip={"after":"memory:\n  enabled: true\nfuture:\n  set: !<tag:yaml.org,2002:set>\n    one: null\n    two: null\n  omap: !<tag:yaml.org,2002:omap>\n    - one: 1\n    - two: 2\n  pairs: !<tag:yaml.org,2002:pairs>\n    - one: 1\n    - one: 2\nskills:\n  enabled:\n  - 中文 skill\n  workspace_disabled:\n  - project\n","before":"memory: {enabled: false}\nfuture: {set: !!set {one: null, two: null}, omap: !!omap [{one: 1}, {two: 2}], pairs: !!pairs [{one: 1}, {one: 2}]}"}
+p02_literal_key='<<' input="'<<': 7\nagent: {'<<': {name: 不得提升}}\nmemory: {'<<': {enabled: false}}\nexperience: {'<<': {enabled: true}}\nskills: {'<<': {enabled: [shared]}}\nworkspace_context: {'<<': {discover_project_skills: false}}\nfuture: {'<<': {marker: keep}, other: value}\n" persisted="? !<tag:yaml.org,2002:str> \"<<\"\n: 7\nagent:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : name: 不得提升\nmemory:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : enabled: false\n  enabled: false\nexperience:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : enabled: true\nskills:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : enabled:\n    - shared\n  enabled:\n  - new\n  workspace_disabled: []\nworkspace_context:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : discover_project_skills: false\nfuture:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : marker: keep\n  other: value\n"
+test p01_all_owned_key_types_and_merge_sources_reject_before_defaults_and_patch ... ok
+p03_roundtrip={"after":"memory:\n  enabled: true\nfuture:\n  num: 12.0\n  neg: -12.0\n  large: 9007199254740993\n  fraction: 1.25\n  exponent: 1000.0\n  \"inf\": \".inf\"\n  \"nan\": \".nan\"\n  \"yes\": \"yes\"\n  \"off\": \"off\"\nmultiline: |+\n  中文 # :\n  \nskills:\n  enabled:\n  - 中文 skill\n  workspace_disabled:\n  - project\n","before":"memory: {enabled: false}\nfuture: {num: 012, neg: -012, large: 9007199254740993, fraction: 1.25, exponent: 1e3, inf: .inf, nan: .nan, yes: yes, off: off}\nmultiline: |+\n  中文 # :\n\n"}
+p03_roundtrip={"after":"future:\n  bytes: !<tag:yaml.org,2002:binary> /wABAA==\nmemory:\n  enabled: true\nskills:\n  enabled:\n  - 中文 skill\n  workspace_disabled:\n  - project\n","before":"%TAG !b! tag:yaml.org,2002:bi\n---\nfuture: {bytes: !b!nary /wABAA==}\nmemory: {enabled: false}"}
+test p03_standard_unknown_types_roundtrip_without_erasure ... ok
+p02_literal_key=!!str << input="!!str <<: 7\nagent: {!!str <<: {name: 不得提升}}\nmemory: {!!str <<: {enabled: false}}\nexperience: {!!str <<: {enabled: true}}\nskills: {!!str <<: {enabled: [shared]}}\nworkspace_context: {!!str <<: {discover_project_skills: false}}\nfuture: {!!str <<: {marker: keep}, other: value}\n" persisted="? !<tag:yaml.org,2002:str> \"<<\"\n: 7\nagent:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : name: 不得提升\nmemory:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : enabled: false\n  enabled: false\nexperience:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : enabled: true\nskills:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : enabled:\n    - shared\n  enabled:\n  - new\n  workspace_disabled: []\nworkspace_context:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : discover_project_skills: false\nfuture:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : marker: keep\n  other: value\n"
+p02_literal_key=!<tag:yaml.org,2002:str> << input="!<tag:yaml.org,2002:str> <<: 7\nagent: {!<tag:yaml.org,2002:str> <<: {name: 不得提升}}\nmemory: {!<tag:yaml.org,2002:str> <<: {enabled: false}}\nexperience: {!<tag:yaml.org,2002:str> <<: {enabled: true}}\nskills: {!<tag:yaml.org,2002:str> <<: {enabled: [shared]}}\nworkspace_context: {!<tag:yaml.org,2002:str> <<: {discover_project_skills: false}}\nfuture: {!<tag:yaml.org,2002:str> <<: {marker: keep}, other: value}\n" persisted="? !<tag:yaml.org,2002:str> \"<<\"\n: 7\nagent:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : name: 不得提升\nmemory:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : enabled: false\n  enabled: false\nexperience:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : enabled: true\nskills:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : enabled:\n    - shared\n  enabled:\n  - new\n  workspace_disabled: []\nworkspace_context:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : discover_project_skills: false\nfuture:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : marker: keep\n  other: value\n"
+test p02_literal_merge_keys_and_supported_tags_survive_repeated_updates ... ok
+test p03_resource_limits_precede_graph_and_alias_allocations ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.54s
+
+     Running tests/r06_ar_f06_config.rs (rust/target-w06-p03/debug/deps/r06_ar_f06_config-c702cd77027f5f82)
+LINGXI_TEST_GUARD: armed (pid 49867, mem_limit=8192 MB, time_limit=600 s)
+
+running 9 tests
+p03_delete input="skills: {enabled: [owned]}" outcome=Ok(Object {"ok": Bool(true), "scrubbedAgents": Array [String("lingxi"), String("peer")]}) exists=false current="skills:\n  enabled: []\n  workspace_disabled: []\n"
+test c04_incumbent_sample_defaults_and_unknown_fields_survive_updates ... ok
+test adversarial_real_memory_tool_rechecks_flow_and_corrupt_config ... ok
+p02_install=p02-install-0 original="memory: {enabled: false}\nskills: {\"<<\": {enabled: [must-not-enable]}}\nfuture: {\"<<\": {marker: keep}}" saved="memory:\n  enabled: false\nskills:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : enabled:\n    - must-not-enable\n  enabled:\n  - p02-install-0\n  workspace_disabled: []\nfuture:\n  ? !<tag:yaml.org,2002:str> \"<<\"\n  : marker: keep\n" installed=true outcome=Success { result: ToolSuccess { content: [Text { text: "Skill installed: p02-install-0 (enabled for this agent).\nSafety review passed." }], resource_refs: [], truncated: false, status: None, content_digest: "b7b4df8f612c5f4a4621852fffccf56b83e35c0f9dd9f472183f2a18f12fd0eb" } } matches=true
+test p02_real_gateway_rechecks_literal_merge_and_unknown_tags ... ok
+p02_install=p02-install-1 original="memory: {enabled: !custom true}" saved="memory: {enabled: !custom true}" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: unsupported YAML tag or tagged node type", retryable: false, details: None } } matches=true
+p03_delete input="skills: {enabled: !seq [owned]}" outcome=Err(InvalidRequest("invalid agent config.yaml: unsupported YAML tag or tagged node type")) exists=true current="skills: {enabled: [owned]}"
+p02_install=p02-install-2 original="skills: {enabled: [!custom one]}" saved="skills: {enabled: [!custom one]}" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: unsupported YAML tag or tagged node type", retryable: false, details: None } } matches=true
+p02_install=p02-install-3 original="agent: {name: !custom 姓名}" saved="agent: {name: !custom 姓名}" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: unsupported YAML tag or tagged node type", retryable: false, details: None } } matches=true
+p02_install=p02-install-4 original="memory: {enabled: !bool true}" saved="memory: {enabled: !bool true}" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: unsupported YAML tag or tagged node type", retryable: false, details: None } } matches=true
+test c02_quoted_hash_gather_preserved ... ok
+p02_install=p02-install-5 original="agent: {name: !str 姓名}" saved="agent: {name: !str 姓名}" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: unsupported YAML tag or tagged node type", retryable: false, details: None } } matches=true
+p03_delete input="skills: {enabled: [owned" outcome=Err(InvalidRequest("invalid agent config.yaml: unclosed bracket '[' at char 18 line 1 column 19")) exists=true current="skills: {enabled: [owned]}"
+p02_install=p02-install-6 original="memory: !map {enabled: false}" saved="memory: !map {enabled: false}" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: unsupported YAML tag or tagged node type", retryable: false, details: None } } matches=true
+p02_install=p02-install-7 original="agent: {name: !!binary SGVsbG8=}" saved="agent: {name: !!binary SGVsbG8=}" installed=false outcome=Failed { error: ProtocolError { code: Internal, message: "invalid agent config.yaml: agent.name must be a string", retryable: false, details: None } } matches=true
+p03_delete input="DIRECTORY" outcome=Err(Io("read agent config before skill cleanup: Is a directory (os error 21)")) exists=true current="skills: {enabled: [owned]}"
+test c02_c03_standard_semantics_and_fail_closed_gather ... ok
+p03_late_install installed=true saved="memory: {enabled: false}\nskills: {enabled: []}\nfuture: {data: !!binary /w==}" outcome=Failed { error: ProtocolError { code: Internal, message: "Skill installed: p03-late-write, but enabling failed: Permission denied (os error 13)", retryable: false, details: None } }
+test p03_delete_preflights_every_peer_before_any_effect ... ok
+test p02_real_install_gateway_checks_config_before_install_and_enable ... ok
+isolated_home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t01-boot-f06-49867-1791704846578-9 captured_calls=1
+isolated_home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t01-boot-f06-49867-1791704846578-8 captured_calls=1
+test c01_flow_disabled_real_request ... ok
+test positive_block_disabled_real_request ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+

@@ -1,0 +1,155 @@
+{
+  "changed": {
+    "degraded": [
+      {
+        "detail": "vector variant missing or incompatible (model=model-a; dims=2); rebuild the notebook index",
+        "reason": "KNOWLEDGE_VECTOR_NOT_READY"
+      }
+    ],
+    "mode": "fts",
+    "searchedVectorVariants": []
+  },
+  "original": {
+    "degraded": [],
+    "mode": "hybrid",
+    "searchedVectorVariants": [
+      {
+        "chunkIndexVariantId": "civ_e97af499645f5bd3340b2c1eb10b8115",
+        "chunkProfileHash": "0f9da6dad6bde4f5",
+        "dimensions": 2,
+        "parameterFingerprint": "2561c351361566b9e2376d7f330ddcffbbfb9d6b728dc1e5fbcd2e9c5df56f03",
+        "parseArtifactId": "kpa_efe84914a8ff426146ac3636",
+        "vectorIndexVariantId": "viv_e601e582f4ae294985d0213eff39cf15"
+      }
+    ]
+  },
+  "requestsA": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "# 资料\n\n来源隔离与模型身份必须一致。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:51713"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "# 资料\n\n来源隔离与模型身份必须一致。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:51713"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "来源隔离"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:51713"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "来源隔离"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:51713"
+    }
+  ],
+  "requestsNewEndpoint": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "来源隔离"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:51837"
+    }
+  ],
+  "unchanged": {
+    "degraded": [],
+    "mode": "hybrid",
+    "searchedVectorVariants": [
+      {
+        "chunkIndexVariantId": "civ_e97af499645f5bd3340b2c1eb10b8115",
+        "chunkProfileHash": "0f9da6dad6bde4f5",
+        "dimensions": 2,
+        "parameterFingerprint": "2561c351361566b9e2376d7f330ddcffbbfb9d6b728dc1e5fbcd2e9c5df56f03",
+        "parseArtifactId": "kpa_efe84914a8ff426146ac3636",
+        "vectorIndexVariantId": "viv_e601e582f4ae294985d0213eff39cf15"
+      }
+    ]
+  },
+  "usage": [
+    {
+      "inputTokens": 5,
+      "model": "model-a",
+      "outcome": "succeeded",
+      "outputTokens": null,
+      "protocol": "openai-embeddings",
+      "provider": "embed",
+      "transportAttempts": 1,
+      "usageState": "partial"
+    },
+    {
+      "inputTokens": 5,
+      "model": "model-a",
+      "outcome": "succeeded",
+      "outputTokens": null,
+      "protocol": "openai-embeddings",
+      "provider": "embed",
+      "transportAttempts": 1,
+      "usageState": "partial"
+    },
+    {
+      "inputTokens": 5,
+      "model": "model-a",
+      "outcome": "succeeded",
+      "outputTokens": null,
+      "protocol": "openai-embeddings",
+      "provider": "embed",
+      "transportAttempts": 1,
+      "usageState": "partial"
+    },
+    {
+      "inputTokens": 5,
+      "model": "model-a",
+      "outcome": "succeeded",
+      "outputTokens": null,
+      "protocol": "openai-embeddings",
+      "provider": "embed",
+      "transportAttempts": 1,
+      "usageState": "partial"
+    },
+    {
+      "inputTokens": 5,
+      "model": "model-a",
+      "outcome": "succeeded",
+      "outputTokens": null,
+      "protocol": "openai-embeddings",
+      "provider": "embed",
+      "transportAttempts": 1,
+      "usageState": "partial"
+    }
+  ],
+  "vectors": [
+    {
+      "dimensions": 2,
+      "key": "f3f3cfce8f4d85986e1bcec878e07d92468be66dc8eed0de614c6cd6a5238f86",
+      "status": "ready",
+      "variant": "viv_e601e582f4ae294985d0213eff39cf15",
+      "vector": "0000803F00000000"
+    }
+  ]
+}

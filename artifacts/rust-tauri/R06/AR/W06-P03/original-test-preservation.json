@@ -1,0 +1,14 @@
+[
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs",
+    "P02_sha256": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+    "frozen_candidate_sha256": "c8ee1915777a5f9f15d8c87955bfc1ced0e5887920e282d58bf28938e83c82be",
+    "status": "EXACT_UNCHANGED_IN_P03"
+  },
+  {
+    "path": "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs",
+    "P02_sha256": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+    "frozen_candidate_sha256": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+    "status": "EXACT_UNCHANGED_IN_P03"
+  }
+]

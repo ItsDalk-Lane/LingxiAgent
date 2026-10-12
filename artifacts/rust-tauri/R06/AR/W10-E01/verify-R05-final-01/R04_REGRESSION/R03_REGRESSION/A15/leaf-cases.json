@@ -1,0 +1,174 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "producedBy": "cargo test -p lingxi-service --test r03_t08_acceptance_matrix (real chain)",
+ "cases": [
+  {
+   "case": "background-run-completes-decoupled",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "background-survives-unrelated-cancel",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cancel-live-run-accepted-terminal-cancelled",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cancel-terminal-run-already-terminal",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cancel-unknown-run-not-found",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cancel-waiting-approval-cancels-cleanly",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "combo-cancel-stream-terminal-cancelled",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "combo-crash-recovery-honest-interrupted",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "combo-cross-session-both-complete",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "combo-duplicate-conflict-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "combo-duplicate-replay-no-second-run",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "combo-events-subscriber-saw-terminal",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "combo-multi-tool-three-calls",
+   "expect": 3,
+   "actual": 3,
+   "ok": true
+  },
+  {
+   "case": "combo-multi-turn-one-terminal",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "combo-normal-run-completed",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "combo-out-of-order-late-result-fenced",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "combo-timeout-budget-loud-failure",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "parent-cancel-stops-child-run",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "reconnect-resume-no-model-restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "steer-busy-accepted",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "steer-idle-miss",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "steer-text-drained-into-model-input",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "subagent-child-cancel-stops-child-only",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "subagent-close-thread-closed-status",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "subagent-dispatch-child-lineage-recorded",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "subagent-escalation-write-denied-zero-children",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "subagent-policy-proactive-delegation-default-off",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "subagent-reply-continues-thread",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  }
+ ]
+}

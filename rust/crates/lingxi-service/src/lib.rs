@@ -36,6 +36,7 @@ pub mod dedup;
 pub mod epoch;
 pub mod events;
 pub mod exectools;
+pub mod file_safety;
 pub mod filehistory;
 pub mod filemeta;
 pub mod filetools;
@@ -54,6 +55,7 @@ mod management;
 pub mod mcpbridge;
 pub mod memory;
 pub mod memorytools;
+pub mod model_history;
 pub mod operations;
 pub mod paths;
 pub mod persona;
@@ -76,10 +78,12 @@ pub mod sessionfiles;
 pub mod sessions;
 pub mod shutdown;
 pub mod skills;
+pub mod stagefiles;
 mod static_web;
 pub mod streaming_norm;
 pub mod subagents;
 pub mod task_supervisor;
+pub mod toolcatalog_bridge;
 pub mod toolgateway;
 pub mod transport;
 pub mod workermodel;
@@ -427,11 +431,20 @@ pub struct HealthResponse {
     pub data_epoch: u32,
 }
 
+/// 最后一个服务状态所有者离开时发出停止信号，不把自持 Arc 的 worker 留活。
+struct KnowledgeWorkerOwner(Arc<knowledge::KnowledgeService>);
+impl Drop for KnowledgeWorkerOwner {
+    fn drop(&mut self) {
+        self.0.shutdown();
+    }
+}
+
 /// Live service state shared by handlers: the injected port implementations
 /// (auth / tickets / storage / sessions / events / limits) live here.
 #[derive(Clone)]
 pub struct ServiceState {
     config: Arc<ServiceConfig>,
+    _knowledge_worker_owner: Arc<KnowledgeWorkerOwner>,
     auth: Arc<AuthService>,
     management: Arc<management::ManagementState>,
     static_web: Arc<static_web::StaticWebConfig>,
@@ -593,6 +606,9 @@ impl std::error::Error for ServiceStartupError {}
 /// sleeps.
 #[derive(Clone)]
 pub struct ServiceDeps {
+    /// 可信宿主的确定性文件写入时序探针，生产默认关闭，无 HTTP 或配置入口。
+    #[doc(hidden)]
+    pub native_file_mutation_test_hook: Option<filetools::MutationTestHook>,
     /// WS upgrade-ticket lifetime (R02-T03).
     pub ws_ticket_ttl_ms: u64,
     /// Per-peer HTTP rate-limit window (R02-T03).
@@ -756,6 +772,7 @@ type ToolPlaneHandles = (
 impl Default for ServiceDeps {
     fn default() -> Self {
         Self {
+            native_file_mutation_test_hook: None,
             ws_ticket_ttl_ms: ws::DEFAULT_WS_TICKET_TTL_MS,
             rate_window_ms: limits::DEFAULT_HTTP_RATE_WINDOW_MS,
             rate_max: limits::DEFAULT_HTTP_RATE_MAX,
@@ -1189,6 +1206,18 @@ impl ServiceState {
                 }
                 None => None,
             };
+        if let Some((access, _)) = &workspace_access {
+            for name in ["file-write-witnesses", "file-recovery-records"] {
+                access
+                    .protect_service_root(&config.data_home.join(name))
+                    .map_err(|error| {
+                        ServiceStartupError::Storage(StorageError::InvalidRequest {
+                            detail: error.to_string(),
+                        })
+                    })?;
+            }
+        }
+        let file_safety = Arc::new(file_safety::FileSafety::new(&config.data_home));
         // R06-T06：记忆/技能/人格服务（工具面注册模型侧工具需要它们）。
         // product_dir 复用 T01 的解析链。
         let t06_data_home = config.data_home.clone();
@@ -1226,6 +1255,22 @@ impl ServiceState {
         // R05 RR1 F24: the tool-plane handles the worker registration below
         // consumes (registry + gateway + access + workspace). Present
         // exactly when the real chain was wired with a scoped workspace.
+        let file_history = Arc::new(filehistory::FileHistoryService::new(
+            Arc::clone(&storage),
+            workspace_access.as_ref().map(|(_, root)| root.clone()),
+            {
+                let clock = deps.clock.clone();
+                move || clock.now_unix_ms()
+            },
+        ));
+        let session_files = Arc::new(sessionfiles::SessionFileService::new(
+            config.data_home.clone(),
+            Arc::clone(&storage),
+            {
+                let clock = deps.clock.clone();
+                move || clock.now_unix_ms()
+            },
+        ));
         let mut tool_plane: Option<ToolPlaneHandles> = None;
         if let Some(model_gateway) = model_gateway_for_wiring {
             // R05-T02 (C01): the production chain dispatches through the
@@ -1253,16 +1298,32 @@ impl ServiceState {
                 toolgateway::DEFAULT_PREPARED_TTL_MS,
                 toolgateway::DEFAULT_LIVE_PREPARED_CAP,
             ));
+            // 子任务与其他正式工具共用当轮声明、参数校验和权限判断。
+            subagents::register_tools(&registry, gateway.as_ref(), &budget);
             if let Some((access, workspace)) = workspace_access.clone() {
-                let _core_file_tools = filetools::register_core_file_tools(
+                let core_file_tools = filetools::register_core_file_tools(
                     &registry,
                     gateway.as_ref(),
                     Arc::clone(&access),
                     workspace.clone(),
                     Arc::clone(&deps.clock),
-                    Arc::new(filetools::NoopChangeLog),
+                    Arc::new(filehistory::FileHistoryChangeLog::new(file_history.clone())),
                     &budget,
                 );
+                stagefiles::register_stage_files(
+                    &registry,
+                    gateway.as_ref(),
+                    session_files.clone(),
+                    access.clone(),
+                    workspace.clone(),
+                    &budget,
+                );
+                core_file_tools
+                    .tools
+                    .set_file_safety(Arc::clone(&file_safety));
+                core_file_tools
+                    .tools
+                    .set_mutation_test_hook(deps.native_file_mutation_test_hook.clone());
                 // R05 RR1 F24 (CL-05): the FOURTH basic tool of the formal
                 // gate's "四工具真实闭环" — exec_command (+ write_stdin, its
                 // interactive-terminal pair) — registers through the SAME
@@ -1322,6 +1383,7 @@ impl ServiceState {
                     Arc::clone(&knowledge_service),
                     &budget,
                 );
+                toolcatalog_bridge::register(&registry, gateway.as_ref(), &budget);
                 tool_plane = Some((
                     Arc::clone(&registry),
                     Arc::clone(&gateway),
@@ -1372,6 +1434,11 @@ impl ServiceState {
             Arc::clone(session_arc.session_supervisor()),
             deps.subagent_policy.clone(),
         );
+        subagent_runtime.bind_agents_root(memory_service.agents_root());
+        subagent_runtime
+            .initialize()
+            .await
+            .map_err(ServiceStartupError::Storage)?;
         let runs = runs::RunSupervisor::new(
             deps.turn_provider.clone(),
             deps.tool_executor.clone(),
@@ -1389,7 +1456,8 @@ impl ServiceState {
         // through it (prepare before the journal's authorized step,
         // handle-verified dispatch after `started`); `None` keeps the R03
         // shape exactly (raw executor port / loud no-tools failure).
-        .with_tool_gateway(deps.tool_gateway.clone());
+        .with_tool_gateway(deps.tool_gateway.clone())
+        .with_session_admission(Arc::clone(storage.session_admission()));
         // R05-T05: the per-call wall-clock tuning (validated in
         // `validate_resource_deps`; revalidated at the builder boundary).
         let runs = runs
@@ -1502,7 +1570,9 @@ impl ServiceState {
         // driven run's system text is its artifact's render and the
         // observation endpoint serves the SAME artifact (R06-A01); `None`
         // keeps the pre-R06 shape exactly.
-        let runs = runs.with_context_compiler(deps.context_compiler.clone());
+        let runs = runs
+            .with_context_compiler(deps.context_compiler.clone())
+            .with_context_session_store(Arc::clone(&storage));
         // R06-T06: the Pi extension hooks port — production ON (the
         // agent-loop-guard + tool_result guard pipeline). The loop guard's
         // block/warn behavior mirrors lib/extensions/agent-loop-guard-ext.ts;
@@ -1514,7 +1584,10 @@ impl ServiceState {
         let runs = runs.with_user_message_recorder(Some(Arc::new(
             session_tree::DbUserMessageRecorder::new(Arc::clone(&storage)),
         )));
-        let runs = Arc::new(runs);
+        let runs = runs.with_model_history(Some(Arc::new(model_history::ModelHistory::new(
+            Arc::clone(&storage),
+        ))));
+        let runs = Arc::new(runs.with_knowledge(Arc::clone(&knowledge_service)));
         subagent_runtime.bind_supervisor(Arc::downgrade(&runs));
         // R05-T06: the worker model-callback port. An injected port always
         // wins (the test-seam rule of `turn_provider`); otherwise, when the
@@ -1755,6 +1828,7 @@ impl ServiceState {
                         ),
                     })
                 })?
+                .with_embedding_supervisor(Arc::clone(runs.task_supervisor()))
                 // R05 RR1 F20: the system-speech platform lane spawns
                 // through the SAME supervised process discipline as exec
                 // (process group, reaper, RAII ownership, honest kill
@@ -1794,6 +1868,13 @@ impl ServiceState {
         };
         // R03-T06: the background-drive registry (submission surface whose
         // runs outlive the client connection + the minimal exit hook).
+        if let Some(operations) = &operations_entry {
+            operations.recover_embedding_usage().await.map_err(|e| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest {
+                    detail: e.to_string(),
+                })
+            })?;
+        }
         let background = background::BackgroundDriveRegistry::new();
         // R03-T07: the STARTUP RECOVERY SCAN. Every non-terminal run a
         // previous process left behind is resolved NOW, before serving
@@ -1828,7 +1909,6 @@ impl ServiceState {
                 knowledge::GatewayKnowledgeEmbedder::new(model_gateway, operations),
             )));
         }
-        knowledge_service.start_worker();
         // R06-T05: session-file 服务的 lingxiHome 等价根（config 在下面的
         // struct literal 里被 Arc 收走，先取出）。
         let data_home = config.data_home.clone();
@@ -1837,14 +1917,7 @@ impl ServiceState {
         let studio_id = management.identity_ids().1;
         // R06-T05：资源服务共享同一会话文件服务句柄（Arc 复用，现役
         // engine 的 sessionFiles 注册表同样是全局单例）。
-        let session_files = Arc::new(sessionfiles::SessionFileService::new(
-            data_home.clone(),
-            Arc::clone(&storage),
-            {
-                let clock = deps.clock.clone();
-                move || clock.now_unix_ms()
-            },
-        ));
+
         let resources = Arc::new(resources::ResourceService::new(
             session_files.clone(),
             studio_id,
@@ -1900,15 +1973,8 @@ impl ServiceState {
         // workspace_access；ResourceIO 写路径经 set_file_history 接线捕获
         // （origin "event"；restore 路由经 OpContext.capture_origin 传
         // "restore"）。
-        let file_history = Arc::new(filehistory::FileHistoryService::new(
-            Arc::clone(&storage),
-            workspace_access.as_ref().map(|(_, root)| root.clone()),
-            {
-                let clock = deps.clock.clone();
-                move || clock.now_unix_ms()
-            },
-        ));
         resource_io.set_file_history(file_history.clone());
+        resource_io.set_file_safety(Arc::clone(&file_safety));
         // R06-T05 Round 5：fs 直读面授权根（fs.ts :77-86 的候选映射：
         // data_home + workspace）。
         let fs_read = Arc::new(fsread::FsReadService::new(
@@ -1916,6 +1982,7 @@ impl ServiceState {
             workspace_access.as_ref().map(|(_, root)| root.as_path()),
         ));
         let state = Self {
+            _knowledge_worker_owner: Arc::new(KnowledgeWorkerOwner(knowledge_service.clone())),
             config: Arc::new(config),
             auth: Arc::new(auth),
             management: Arc::new(management),
@@ -1927,13 +1994,21 @@ impl ServiceState {
             )),
             storage: Arc::clone(&storage),
             sessions: session_arc,
-            session_tree: Arc::new(session_tree::SessionService::new(
-                Arc::clone(&storage),
-                Arc::clone(&events),
-            )),
-            session_admin: Arc::new(session_admin::SessionAdminService::new(Arc::clone(
-                &storage,
-            ))),
+            session_tree: Arc::new(
+                session_tree::SessionService::new(Arc::clone(&storage), Arc::clone(&events))
+                    .with_file_safety(
+                        file_safety,
+                        workspace_access
+                            .as_ref()
+                            .map(|(access, _)| Arc::clone(access)),
+                    )
+                    .with_session_files(session_files.clone()),
+            ),
+            session_admin: Arc::new(
+                session_admin::SessionAdminService::new(Arc::clone(&storage))
+                    .with_context_compiler(deps.context_compiler.clone())
+                    .with_session_files(session_files.clone()),
+            ),
             session_files,
             // R06-T05: 资源面（res_ 信封 / 内容解析 / 票据）。
             resources,
@@ -1989,6 +2064,42 @@ impl ServiceState {
             network_plane: deps.network_plane.clone(),
             context_compiler: deps.context_compiler.clone(),
         };
+        let knowledge_owner = Arc::downgrade(state.knowledge());
+        state
+            .storage()
+            .register_before_close(Arc::new(move || {
+                let knowledge_owner = knowledge_owner.clone();
+                Box::pin(async move {
+                    if let Some(knowledge) = knowledge_owner.upgrade() {
+                        knowledge.wait_worker_stopped().await.map_err(|error| {
+                            StorageError::Internal {
+                                detail: format!("knowledge resource stop failed: {error}"),
+                            }
+                        })?;
+                    }
+                    Ok(())
+                })
+            }))
+            .map_err(ServiceStartupError::Storage)?;
+        // 同进程最后 owner 的 Drop 已通知停止，但原任务必须真实退出并释放 OS 锁。
+        // 有界异步等待不提前释放锁，也不把仍活任务恢复为 queued。
+        let handoff_deadline = tokio::time::Instant::now() + std::time::Duration::from_millis(500);
+        loop {
+            match state.knowledge().start_worker() {
+                Ok(()) => break,
+                Err(error)
+                    if error.code == "KNOWLEDGE_CONFLICT"
+                        && tokio::time::Instant::now() < handoff_deadline =>
+                {
+                    tokio::time::sleep(std::time::Duration::from_millis(10)).await
+                }
+                Err(error) => {
+                    return Err(ServiceStartupError::Storage(StorageError::InvalidRequest {
+                        detail: error.to_string(),
+                    }))
+                }
+            }
+        }
         // R06-T05 D14：启动清扫一次（现役 server/index.ts:563-570
         // fire-and-forget + warn 日志；失败不阻断启动）。现役 24h
         // setInterval 不引入——常驻定时器违背 R02-T06 关停纪律，周期调度
@@ -3404,6 +3515,28 @@ async fn list_sessions(
 // FileRollbackDisabled→403、NotFound→404、Forbidden→403、Storage→存储映射。
 // （REPAIR-R1：文件冲突不再整批 409——rewind 逐文件三档判定并如实入收据。）
 
+fn session_operation_storage_response(err: &lingxi_kernel::ports::StorageError) -> Response {
+    if let lingxi_kernel::ports::StorageError::Conflict { detail } = err {
+        let reason = detail.split(':').next().unwrap_or(detail);
+        if matches!(
+            reason,
+            "session_request_id_conflict"
+                | "session_operation_unconfirmed"
+                | "session_file_operation_unconfirmed"
+                | "session_snapshot_changed"
+                | "session_not_active"
+                | "session_operation_receipt_conflict"
+                | "session_operation_not_prepared"
+        ) {
+            return EndpointError::new(StatusCode::CONFLICT, ErrorCode::Conflict, detail.clone())
+                .with_reason(reason)
+                .with_cause("session.operation_conflict")
+                .into_response();
+        }
+    }
+    EndpointError::storage(err).into_response()
+}
+
 fn session_tree_error_response(err: session_tree::SessionTreeError) -> Response {
     use session_tree::SessionTreeError as E;
     match err {
@@ -3432,6 +3565,13 @@ fn session_tree_error_response(err: session_tree::SessionTreeError) -> Response 
         .with_reason("checkpoint_conflict")
         .with_cause("session.checkpoint_conflict")
         .into_response(),
+        E::IdentityRetired { session_id } => EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            format!("session {session_id} identity is retired"),
+        )
+        .with_reason("session_identity_retired")
+        .into_response(),
         E::SessionExists { session_id } => EndpointError::new(
             StatusCode::CONFLICT,
             ErrorCode::Conflict,
@@ -3449,7 +3589,7 @@ fn session_tree_error_response(err: session_tree::SessionTreeError) -> Response 
         .into_response(),
         E::NotFound => EndpointError::not_found().into_response(),
         E::Forbidden => EndpointError::forbidden("session_forbidden").into_response(),
-        E::Storage(err) => EndpointError::storage(&err).into_response(),
+        E::Storage(err) => session_operation_storage_response(&err),
     }
 }
 
@@ -3502,11 +3642,47 @@ async fn gate_session_tree_write(
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct ForkRequestBody {
+    #[serde(default)]
+    request_id: Option<String>,
     new_session_id: String,
     boundary_message_id: String,
 }
 
 /// `POST /lingxi/v1/sessions/{id}/fork` — 从指定消息分叉会话（R06-A05）。
+async fn session_operations_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(sid): Path<String>,
+) -> Response {
+    let deleted = match state.sessions.get_for(&principal, &sid).await {
+        Ok(sessions::SessionAccess::Ok(_)) => false,
+        Ok(sessions::SessionAccess::NotFound) => true,
+        Ok(sessions::SessionAccess::Forbidden) => {
+            return EndpointError::forbidden("cross_principal_access").into_response()
+        }
+        Err(error) => return EndpointError::storage(&error).into_response(),
+    };
+    let kp = sessions::kernel_principal_of(&principal);
+    match lingxi_adapters::storage::session_operations::list(
+        state.storage(),
+        &sid,
+        kp.storage_kind(),
+        &kp.storage_subject(),
+    )
+    .await
+    {
+        Ok(operations) if deleted && operations.is_empty() => {
+            EndpointError::not_found().into_response()
+        }
+        Ok(operations) => (
+            StatusCode::OK,
+            Json(serde_json::json!({"operations":operations})),
+        )
+            .into_response(),
+        Err(e) => EndpointError::storage(&e).into_response(),
+    }
+}
+
 async fn fork_session_route(
     axum::Extension(principal): axum::Extension<Principal>,
     State(state): State<ServiceState>,
@@ -3520,7 +3696,6 @@ async fn fork_session_route(
     if let Err(resp) = gate_session_tree_write(&state, &principal, &session_id).await {
         return resp;
     }
-    let busy = state.sessions.session_supervisor().is_busy(&session_id);
     match state
         .session_tree
         .fork_session(
@@ -3528,7 +3703,7 @@ async fn fork_session_route(
             &session_id,
             &req.new_session_id,
             &req.boundary_message_id,
-            busy,
+            req.request_id.as_deref(),
             state.clock.now_unix_ms(),
         )
         .await
@@ -3541,6 +3716,8 @@ async fn fork_session_route(
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct RetryRequestBody {
+    #[serde(default)]
+    request_id: Option<String>,
     /// 目标消息（user=该回合；assistant=其前方最近 user 回合）。
     /// 缺省 = 最近 user 回合（现役 latestUserOnly 兼容形态）。
     /// 重置点只由服务端从当前分支解析——客户端传 new_head 的旧口径已废止。
@@ -3581,16 +3758,16 @@ async fn retry_turn_route(
     if let Err(resp) = gate_session_tree_write(&state, &principal, &session_id).await {
         return resp;
     }
-    let busy = state.sessions.session_supervisor().is_busy(&session_id);
     let rollback_enabled = state.rollback_file_changes_enabled();
     match state
         .session_tree
         .retry_turn(
+            &principal,
             &session_id,
             req.target_message_id.as_deref(),
             file_rollback,
             rollback_enabled,
-            busy,
+            req.request_id.as_deref(),
             state.clock.now_unix_ms(),
         )
         .await
@@ -3603,6 +3780,8 @@ async fn retry_turn_route(
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct RewindRequestBody {
+    #[serde(default)]
+    request_id: Option<String>,
     checkpoint: String,
     #[serde(default)]
     restore_files: bool,
@@ -3625,7 +3804,6 @@ async fn rewind_route(
     if let Err(resp) = gate_session_tree_write(&state, &principal, &session_id).await {
         return resp;
     }
-    let busy = state.sessions.session_supervisor().is_busy(&session_id);
     // 回退偏好闸（现役 getRollbackFileChanges）：restoreFiles 且偏好未开 → 403。
     let rollback_enabled = state.rollback_file_changes_enabled();
     match state
@@ -3636,7 +3814,8 @@ async fn rewind_route(
                 checkpoint_name: &req.checkpoint,
                 restore_files: req.restore_files,
                 file_rollback_enabled: rollback_enabled,
-                busy,
+                principal: &principal,
+                request_id: req.request_id.as_deref(),
                 now_unix_ms: state.clock.now_unix_ms(),
             },
         )
@@ -3682,6 +3861,7 @@ async fn rewind_preview_route(
     match state
         .session_tree
         .preview_rewind(
+            &principal,
             &session_id,
             &req.checkpoint,
             req.restore_files,
@@ -3725,6 +3905,7 @@ async fn create_checkpoint_route(
     match state
         .session_tree
         .create_checkpoint(
+            &principal,
             &session_id,
             req.name.trim(),
             &req.target_message_id,
@@ -3831,6 +4012,13 @@ fn session_admin_error_response(err: session_admin::SessionAdminError) -> Respon
                 .with_reason("session_lifecycle_conflict")
                 .into_response()
         }
+        E::IdentityRetired { session_id } => EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            format!("session {session_id} identity is retired"),
+        )
+        .with_reason("session_identity_retired")
+        .into_response(),
         E::SessionExists { session_id } => EndpointError::new(
             StatusCode::CONFLICT,
             ErrorCode::Conflict,
@@ -3850,6 +4038,14 @@ fn session_admin_error_response(err: session_admin::SessionAdminError) -> Respon
         E::InvalidRequest { detail } => EndpointError::invalid_message(detail).into_response(),
         E::Busy => EndpointError::session_busy().into_response(),
         E::Storage(err) => EndpointError::storage(&err).into_response(),
+        E::ArchiveFailed {
+            source,
+            view,
+            rolled_back,
+        } => EndpointError::storage(&source)
+            .with_detail_value("archive", serde_json::json!(view))
+            .with_detail_value("rolledBack", serde_json::json!(rolled_back))
+            .into_response(),
     }
 }
 
@@ -4078,18 +4274,9 @@ async fn archive_session_route(
             .into_response();
         }
     };
-    let supervisor = state.sessions.session_supervisor();
-    let target_busy = supervisor.is_busy(&req.session_id);
-    let is_busy = |id: &str| supervisor.is_busy(id);
     match state
         .session_admin
-        .archive_session(
-            &req.session_id,
-            child_mode,
-            target_busy,
-            &is_busy,
-            state.clock.now_unix_ms(),
-        )
+        .archive_session(&req.session_id, child_mode, state.clock.now_unix_ms())
         .await
     {
         Ok(view) => (StatusCode::OK, Json(view)).into_response(),
@@ -4140,10 +4327,9 @@ async fn delete_archived_route(
     if let Err(resp) = gate_session_owned(&state, &principal, &req.session_id).await {
         return resp;
     }
-    let busy = state.sessions.session_supervisor().is_busy(&req.session_id);
     match state
         .session_admin
-        .delete_archived_session(&req.session_id, busy)
+        .delete_archived_session(&req.session_id)
         .await
     {
         Ok(()) => (StatusCode::OK, Json(serde_json::json!({ "ok": true }))).into_response(),
@@ -4173,15 +4359,12 @@ async fn cleanup_archived_route(
         Ok(j) => j,
         Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
     };
-    let supervisor = state.sessions.session_supervisor();
-    let is_busy = |id: &str| supervisor.is_busy(id);
     match state
         .session_admin
         .cleanup_archived(
             owner_filter(&principal),
             req.max_age_days,
             state.clock.now_unix_ms(),
-            &is_busy,
         )
         .await
     {
@@ -4448,19 +4631,47 @@ async fn get_session(
 /// Digest-only segments carry per-segment sha256 over the SENT bytes and
 /// never their content. A session whose run never reached a model call has
 /// no compiled artifact — 404, observation never builds one on demand.
+#[derive(Default, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct ContextObservationQuery {
+    run_id: Option<String>,
+    model_call_id: Option<String>,
+    snapshot_id: Option<String>,
+    #[serde(default)]
+    include_cache_stats: bool,
+}
+
 async fn session_context_observation(
     axum::Extension(principal): axum::Extension<Principal>,
     State(state): State<ServiceState>,
     Path(session_id): Path<String>,
+    axum::extract::Query(query): axum::extract::Query<ContextObservationQuery>,
 ) -> Response {
     match state.sessions.get_for(&principal, &session_id).await {
         Ok(sessions::SessionAccess::Ok(_facts)) => {
-            let observation = state
-                .context_compiler()
-                .and_then(|compiler| compiler.observation_for_session(&session_id));
-            match observation {
-                Some(view) => (StatusCode::OK, Json(view)).into_response(),
-                None => EndpointError::not_found().into_response(),
+            match state
+                .storage()
+                .model_context_observation(
+                    &session_id,
+                    query.run_id.as_deref(),
+                    query.model_call_id.as_deref(),
+                    query.snapshot_id.as_deref(),
+                )
+                .await
+            {
+                Ok(Some(view)) if query.include_cache_stats => {
+                    let stats = state
+                        .context_compiler()
+                        .map(|compiler| compiler.cache_stats());
+                    (
+                        StatusCode::OK,
+                        Json(serde_json::json!({"snapshot":view,"cacheStats":stats})),
+                    )
+                        .into_response()
+                }
+                Ok(Some(view)) => (StatusCode::OK, Json(view)).into_response(),
+                Ok(None) => EndpointError::not_found().into_response(),
+                Err(err) => EndpointError::storage(&err).into_response(),
             }
         }
         Ok(sessions::SessionAccess::NotFound) => EndpointError::not_found().into_response(),
@@ -4650,9 +4861,13 @@ async fn execute_session(
         },
     };
     let submission = sessions::ExecuteSubmission {
+        knowledge: request.knowledge.as_ref(),
         input: &request.input,
         request_id: validated_request_id.as_deref(),
     };
+    if let Err(resp) = gate_session_owned(&state, &principal, &session_id).await {
+        return resp;
+    }
     // R06-T03 生命周期闸（现役 assertManifestLifecycle "active"）：归档会话
     // 拒绝执行。归档语义 = 不再接受新轮次；不闸归属（归属在 admit 链上
     // 已有 404/403 区分），此处只查 lifecycle，存在性由 admit 链负责。
@@ -4677,13 +4892,15 @@ async fn execute_session(
     }
     match state
         .sessions
-        .execute_submission_for(
-            storage.as_ref(),
-            state.events(),
-            state.runs(),
-            &principal,
-            &session_id,
-            &submission,
+        .execute_submission_owned_with_knowledge(
+            storage,
+            Arc::clone(state.events()),
+            Arc::clone(state.runs()),
+            principal,
+            session_id,
+            submission.input.to_string(),
+            submission.request_id.map(str::to_string),
+            request.knowledge,
             state.clock.now_unix_ms(),
         )
         .await
@@ -4768,7 +4985,7 @@ async fn execute_session(
             .into_response()
         }
         Err(sessions::SessionExecuteError::Storage(err)) => {
-            EndpointError::storage(&err).into_response()
+            session_operation_storage_response(&err)
         }
     }
 }
@@ -5548,6 +5765,10 @@ pub fn build_router(state: ServiceState) -> Router {
         .route("/lingxi/v1/sessions/rename", post(rename_session_route))
         .route("/lingxi/v1/sessions/pin", post(pin_session_route))
         .route("/lingxi/v1/sessions/pin-order", post(pin_order_route))
+        .route(
+            "/lingxi/v1/sessions/{id}/operations",
+            get(session_operations_route),
+        )
         .route("/lingxi/v1/sessions/archive", post(archive_session_route))
         .route("/lingxi/v1/sessions/restore", post(restore_session_route))
         .route("/lingxi/v1/sessions/archived", get(list_archived_route))
@@ -6031,17 +6252,42 @@ pub async fn run_with_tls<F>(
 where
     F: Future<Output = ()> + Send + 'static,
 {
+    let knowledge_worker = Arc::clone(state.knowledge());
     let bind_addr = state.config().bind_addr;
-    let listener = tokio::net::TcpListener::bind(bind_addr)
-        .await
-        .map_err(|source| ServiceError::Bind {
-            addr: bind_addr,
-            source,
-        })?;
-    let local = listener.local_addr().map_err(|source| ServiceError::Bind {
-        addr: bind_addr,
-        source,
-    })?;
+    let listener = match tokio::net::TcpListener::bind(bind_addr).await {
+        Ok(listener) => listener,
+        Err(source) => {
+            knowledge_worker
+                .wait_worker_stopped()
+                .await
+                .map_err(|error| ServiceError::Serve {
+                    source: std::io::Error::other(format!(
+                        "bind failed: {source}; knowledge worker stop failed: {error}"
+                    )),
+                })?;
+            return Err(ServiceError::Bind {
+                addr: bind_addr,
+                source,
+            });
+        }
+    };
+    let local = match listener.local_addr() {
+        Ok(addr) => addr,
+        Err(source) => {
+            knowledge_worker
+                .wait_worker_stopped()
+                .await
+                .map_err(|error| ServiceError::Serve {
+                    source: std::io::Error::other(format!(
+                        "listener address failed: {source}; knowledge worker stop failed: {error}"
+                    )),
+                })?;
+            return Err(ServiceError::Bind {
+                addr: bind_addr,
+                source,
+            });
+        }
+    };
     *state
         .bound_addr
         .write()
@@ -6056,6 +6302,7 @@ where
     // (`--http-max-in-flight` / `--http-request-budget-ms`).
     let conn_admission = Arc::clone(state.connection_admission());
     let header_budget = state.admission().request_budget();
+    let knowledge_on_signal = knowledge_worker.clone();
     let router = build_router(state);
     // The graceful-shutdown future consumes the stop signal and records the
     // signal instant; the drain budget watchdog is armed at THAT instant (the
@@ -6065,6 +6312,7 @@ where
     let (signal_tx, signal_rx) = tokio::sync::oneshot::channel::<std::time::Instant>();
     let graceful = async move {
         shutdown.await;
+        knowledge_on_signal.shutdown();
         let _ = signal_tx.send(std::time::Instant::now());
     };
     let server = serve::serve_with_connection_admission(
@@ -6076,7 +6324,7 @@ where
         tls_acceptor,
     );
     tokio::pin!(server);
-    match drain_budget {
+    let outcome = match drain_budget {
         None => server
             .await
             .map(|()| ServeOutcome {
@@ -6113,7 +6361,14 @@ where
                 }
             }
         }
-    }
+    };
+    knowledge_worker
+        .wait_worker_stopped()
+        .await
+        .map_err(|error| ServiceError::Serve {
+            source: std::io::Error::other(error.to_string()),
+        })?;
+    outcome
 }
 
 #[cfg(test)]

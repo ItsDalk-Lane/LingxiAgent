@@ -1,0 +1,27 @@
+fn main() {
+    tauri_build::try_build(tauri_build::Attributes::new().app_manifest(
+        tauri_build::AppManifest::new().commands(&[
+            "select_files",
+            "read_file",
+            "read_file_snapshot",
+            "read_file_base64",
+            "file_info",
+            "write_file",
+            "write_file_binary",
+            "copy_file",
+            "write_file_if_unchanged",
+            "open_file",
+            "trash_item",
+            "run_edit_command",
+            "watch_file",
+            "unwatch_file",
+            "resource_subscribe",
+            "resource_events",
+            "resource_unsubscribe",
+            "spawn_viewer",
+            "viewer_request_load",
+            "viewer_close",
+        ]),
+    ))
+    .expect("desktop command registration failed");
+}

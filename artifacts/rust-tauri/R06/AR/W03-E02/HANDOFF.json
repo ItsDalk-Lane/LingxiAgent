@@ -1,0 +1,30 @@
+{
+  "status": "READY_FOR_INDEPENDENT_REVIEW",
+  "executor": "R06/W03-F03 fresh instance02",
+  "candidate_root": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "owned_count": 37,
+  "source_fingerprint": "47bf2b262d78422376fe31bd663bcfe5da1975d0c207447d529f812173b7f59a",
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "report": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/REPORT.md",
+  "results": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/results.json",
+  "safe_manifest": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/safeManifest.json",
+  "scope": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/scope-current.json",
+  "source_family": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/SOURCEFAMILY.json",
+  "source_aggregate": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/source-aggregate.json",
+  "owned_sha_manifest": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/owned-current-source.json",
+  "actual_bin_manifest": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/actual-binary-execution-index.json",
+  "formal_settlement": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/formal-chain-settlement.json",
+  "task_or_stage_pass": false,
+  "independent_review_status": "NOT_YET_RUN; root dispatches first fresh reviewer after executor ends",
+  "open_failed_gates": [
+    "whole workspace three strict projection assertions",
+    "registry8/9/10 and inherited formal R03/R04/R05 overallFAIL"
+  ],
+  "old_incomplete_not_rewritten": "E01workspace06, cancelledformal01 downstream, initialproductionprep, capturehelperfailure retained",
+  "shared_other_evidence": "STALE after candidate composition; rebind/retest required",
+  "no_remaining_owned_running_group": true,
+  "no_product_changes_after_final_windows": true,
+  "sensitive_evidence": "LOCAL_ONLY_NEVER_GIT",
+  "handoff_time": 1791727315.995073
+}

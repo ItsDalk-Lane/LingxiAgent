@@ -1,0 +1,21 @@
+{
+  "role": "ROOT_READ_ONLY_ACCESS_STATUS_NOT_APPROVAL",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Codex Security Daybreak access: status=unknown; programs=none; checkedAt=2026-10-11T08:07:16.987Z; stale=false."
+      }
+    ],
+    "structuredContent": {
+      "schemaVersion": 1,
+      "status": "unknown",
+      "programs": [],
+      "checkedAt": "2026-10-11T08:07:16.987Z",
+      "stale": false
+    }
+  },
+  "meaning": "当前ChatGPT账号只读建议性状态unknown，不能确认所需访问已启用；不证明其它API组织或任何实际验收获准。",
+  "actual_blocking_reason": "W02/W12独立Reviewer此前被平台实际中止并要求Daybreak访问；并非本建议性工具自行阻断。",
+  "retry": "NOT_RETRIED_NO_CONFIRMED_ACCESS"
+}

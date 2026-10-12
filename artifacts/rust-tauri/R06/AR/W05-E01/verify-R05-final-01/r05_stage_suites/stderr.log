@@ -1,0 +1,3 @@
+cid ownership gaps:
+cid R05-T07-C03: test 'rr1_f21_operation_queue_timeout_never_invents_an_http_attempt' has no `... ok` line in svc_r05_t07_rr1_usage_ledger.log (renamed, deleted, moved module, or not green)
+FAIL: case assembly failed

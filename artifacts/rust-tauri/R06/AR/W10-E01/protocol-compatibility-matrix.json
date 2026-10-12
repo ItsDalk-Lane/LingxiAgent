@@ -1,0 +1,95 @@
+{
+  "status": "SELF_CHECKED_NOT_LIVE",
+  "actual_dispatch_coverage": "OpenAI embeddings only: real Gateway/OperationService/KnowledgeService/usage/storage, loopback external response stub",
+  "protocols": [
+    {
+      "protocol": "openai-embeddings",
+      "old_golden_case": "c01_embedding_openai_wire",
+      "golden_execution": "commands/affected-old-adapters-01/record.json",
+      "pure_positive_negative": "commands/final-nine-cases-13/configured-identity.json",
+      "actual_build": "actual build_embedding document/query plan emitted, no dispatch; old JSON/header/url goldens preserve original protocol semantics",
+      "compatibility": "roles/text/generation same; provider/model/endpoint changed fingerprint differs",
+      "special_parameter_negative": "declared Ollama contextWindow and MiniMax groupId tested in same algorithm case; dimensions parameter changes tested; served dimensions through actual OpenAI2/3-dimensional wire tests",
+      "live_status": "NOT_RUN",
+      "end_to_end_dispatch_status": "SELF_CHECKED_LOOPBACK"
+    },
+    {
+      "protocol": "ollama-embed",
+      "old_golden_case": "c01_embedding_ollama_wire",
+      "golden_execution": "commands/affected-old-adapters-01/record.json",
+      "pure_positive_negative": "commands/final-nine-cases-13/configured-identity.json",
+      "actual_build": "actual build_embedding document/query plan emitted, no dispatch; old JSON/header/url goldens preserve original protocol semantics",
+      "compatibility": "roles/text/generation same; provider/model/endpoint changed fingerprint differs",
+      "special_parameter_negative": "declared Ollama contextWindow and MiniMax groupId tested in same algorithm case; dimensions parameter changes tested; served dimensions through actual OpenAI2/3-dimensional wire tests",
+      "live_status": "NOT_RUN",
+      "end_to_end_dispatch_status": "NOT_RUN"
+    },
+    {
+      "protocol": "gemini-embed",
+      "old_golden_case": "c01_embedding_gemini_voyage_minimax_wire",
+      "golden_execution": "commands/affected-old-adapters-01/record.json",
+      "pure_positive_negative": "commands/final-nine-cases-13/configured-identity.json",
+      "actual_build": "actual build_embedding document/query plan emitted, no dispatch; old JSON/header/url goldens preserve original protocol semantics",
+      "compatibility": "roles/text/generation same; provider/model/endpoint changed fingerprint differs",
+      "special_parameter_negative": "declared Ollama contextWindow and MiniMax groupId tested in same algorithm case; dimensions parameter changes tested; served dimensions through actual OpenAI2/3-dimensional wire tests",
+      "live_status": "NOT_RUN",
+      "end_to_end_dispatch_status": "NOT_RUN"
+    },
+    {
+      "protocol": "voyage-embeddings",
+      "old_golden_case": "c01_embedding_gemini_voyage_minimax_wire",
+      "golden_execution": "commands/affected-old-adapters-01/record.json",
+      "pure_positive_negative": "commands/final-nine-cases-13/configured-identity.json",
+      "actual_build": "actual build_embedding document/query plan emitted, no dispatch; old JSON/header/url goldens preserve original protocol semantics",
+      "compatibility": "roles/text/generation same; provider/model/endpoint changed fingerprint differs",
+      "special_parameter_negative": "declared Ollama contextWindow and MiniMax groupId tested in same algorithm case; dimensions parameter changes tested; served dimensions through actual OpenAI2/3-dimensional wire tests",
+      "live_status": "NOT_RUN",
+      "end_to_end_dispatch_status": "NOT_RUN"
+    },
+    {
+      "protocol": "minimax-embeddings",
+      "old_golden_case": "c01_embedding_gemini_voyage_minimax_wire",
+      "golden_execution": "commands/affected-old-adapters-01/record.json",
+      "pure_positive_negative": "commands/final-nine-cases-13/configured-identity.json",
+      "actual_build": "actual build_embedding document/query plan emitted, no dispatch; old JSON/header/url goldens preserve original protocol semantics",
+      "compatibility": "roles/text/generation same; provider/model/endpoint changed fingerprint differs",
+      "special_parameter_negative": "declared Ollama contextWindow and MiniMax groupId tested in same algorithm case; dimensions parameter changes tested; served dimensions through actual OpenAI2/3-dimensional wire tests",
+      "live_status": "NOT_RUN",
+      "end_to_end_dispatch_status": "NOT_RUN"
+    }
+  ],
+  "paired_space_rule": "Document/Query are paired purposes; input text/credentials/config_generation not vector identity; route endpoint change conservatively isolates",
+  "ollama_boundary": "num_ctx still derived per raw UTF-16 input length and clamp max(declared,derived); fingerprint uses stable declared contextWindow plus schema algorithm version, not each text-dependent derived capacity",
+  "dimensions_boundary": "configured identity dims0 means unknown; actual key includes measured width. MiniMax wire fixed model contract omits dimensions; requested dimensions fingerprint conservatively isolates rather than pretending a supported width change.",
+  "final_owned_binding": {
+    "at": "2026-10-11T10:34:35.713600+00:00",
+    "owned_digest_sha256": "533b8e44f60b4d72522ab69d8b022a524c0ff091d8b571a8fda6eb25f5a83dda",
+    "owned": [
+      {
+        "path": "rust/crates/lingxi-service/src/knowledge.rs",
+        "sha256": "0d9fd6679e7681b42bde359657b7a78bd9bc4862c01da2f5c96a1d3f7e439cef"
+      },
+      {
+        "path": "rust/crates/lingxi-service/src/operations.rs",
+        "sha256": "da58f7822cc80e05af0893995e3ade915c8901967ae718bb74d8f979590167ce"
+      },
+      {
+        "path": "rust/crates/lingxi-kernel/src/knowledge.rs",
+        "sha256": "1adbc82ca36805080b9297a6337322fd0858c1fb24a700af185d19b8ae4e5944"
+      },
+      {
+        "path": "rust/crates/lingxi-adapters/src/models/operations/embedding.rs",
+        "sha256": "c3692626e3bbc5df1d5d91cc0dded2371093775868effb739146733d9a08026b"
+      },
+      {
+        "path": "rust/crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs",
+        "sha256": "0d37fb59194f41ec3d3af867c65e8259ca2b7a7be862f22219e5b14e29d35bed"
+      }
+    ],
+    "actual_final_regression_receipts": [
+      "commands/affected-old-service-final-02/record.json",
+      "commands/affected-old-adapters-final-02/record.json"
+    ],
+    "earlier_01_receipts": "Preserved STALE/superseded; final02 unchanged source both exit0; original obligations/clauses unchanged; not full leaf acceptance."
+  }
+}

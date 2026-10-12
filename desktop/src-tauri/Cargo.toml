@@ -1,0 +1,36 @@
+[package]
+name = "lingxi-resource-desktop"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+# 桌面宿主独立构建，不把原生窗口依赖带入无界面的服务工作区。
+[workspace]
+
+[lib]
+name = "lingxi_resource_desktop"
+
+[build-dependencies]
+tauri-build = "=2.6.3"
+
+[dependencies]
+tauri = "=2.11.6"
+tauri-plugin-dialog = "=2.7.3"
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+base64 = "=0.23.1"
+sha2 = "=0.11.0"
+tokio = { version = "=1.53.1", features = ["sync", "time"] }
+reqwest = { version = "=0.13.5", default-features = false, features = ["json"] }
+open = "=5.4.4"
+trash = "=5.2.9"
+tauri-plugin-wdio-webdriver = { version = "=1.4.0", optional = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "=0.6.4"
+
+[features]
+e2e-test = ["dep:tauri-plugin-wdio-webdriver"]
+
+[dev-dependencies]
+tokio = { version = "=1.53.1", features = ["macros", "rt-multi-thread", "time"] }

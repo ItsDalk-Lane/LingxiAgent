@@ -1,0 +1,33 @@
+{
+  "time": 1791721364.5661912,
+  "records": [
+    {
+      "original_path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/focused-01/synthetic-home",
+      "retained_path": "/private/tmp/lingxi-w03-e02-retained-window01-o9tnttip/focused-01",
+      "run_exit": 101,
+      "closed_owned_group": true,
+      "action": "仅迁移本轮owned合成输出到LOCAL_ONLY保留区，不删除，不改原运行记录"
+    },
+    {
+      "original_path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/focused-02/synthetic-home",
+      "retained_path": "/private/tmp/lingxi-w03-e02-retained-window01-o9tnttip/focused-02",
+      "run_exit": 0,
+      "closed_owned_group": true,
+      "action": "仅迁移本轮owned合成输出到LOCAL_ONLY保留区，不删除，不改原运行记录"
+    },
+    {
+      "original_path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/boundaries-01/synthetic-home",
+      "retained_path": "/private/tmp/lingxi-w03-e02-retained-window01-o9tnttip/boundaries-01",
+      "run_exit": 0,
+      "closed_owned_group": true,
+      "action": "仅迁移本轮owned合成输出到LOCAL_ONLY保留区，不删除，不改原运行记录"
+    },
+    {
+      "original_path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/workspace-01/synthetic-home",
+      "retained_path": "/private/tmp/lingxi-w03-e02-retained-window01-o9tnttip/workspace-01",
+      "run_exit": 101,
+      "closed_owned_group": true,
+      "action": "仅迁移本轮owned合成输出到LOCAL_ONLY保留区，不删除，不改原运行记录"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+
+running 1 test
+test readonly_parent_write_access_request_is_refused_at_dispatch ... FAILED
+
+successes:
+
+successes:
+
+failures:
+
+---- readonly_parent_write_access_request_is_refused_at_dispatch stdout ----
+
+thread 'readonly_parent_write_access_request_is_refused_at_dispatch' (13519996) panicked at crates/lingxi-service/tests/subagent_permission_inheritance.rs:321:10:
+parent run settles: Storage(Corrupted { detail: "model_history: 可信历史声明代次缺失" })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    readonly_parent_write_access_request_is_refused_at_dispatch
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.09s
+

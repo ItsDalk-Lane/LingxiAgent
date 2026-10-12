@@ -1,0 +1,99 @@
+{
+  "at": "2026-10-11T13:34:19.218119+00:00",
+  "verification": "ROOT_ACTUAL_RAW_LOG_AND_METADATA_READBACK",
+  "metadata": "/Users/study_superior/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/workspace-final-42/record.json",
+  "metadata_sha256": "909e181924af89caf24ef52e7a520e09a202c58675d7bede4276ab0834b74c19",
+  "log": "/Users/study_superior/.codex/worktrees/r06-w09-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W09-E01/commands/workspace-final-42/output.log",
+  "log_sha256": "b11ada69ace98e98f218e29a378ed8d66e6fe821555f2b5aecc855d0aeaa4039",
+  "actual_exit": 101,
+  "actual_duration_seconds": 1197.767187874997,
+  "input_count": 4928,
+  "inputs_before_after_equal": true,
+  "actual_test_binary_start_end_pairs": 142,
+  "all_actual_bin_before_after_equal": true,
+  "all_actual_bin_wait_reaped": true,
+  "all_actual_guard_600_8192_ON": true,
+  "actual_parent_wait_reaped": true,
+  "process_group_residue": [],
+  "rss_measured_mib": null,
+  "raw_result_blocks": 149,
+  "raw_passed": 1897,
+  "raw_assertion_failed": 6,
+  "failed_targets": [
+    {
+      "target": "Running tests/cancel_link_inheritance.rs (rust/target-w09-e01/debug/deps/cancel_link_inheritance-e5f5d953d20e1991)",
+      "result": "FAILED",
+      "passed": 6,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "subagent_timeout_settles_a_parked_quota_wait"
+      ],
+      "cause_lines": [
+        "thread 'subagent_timeout_settles_a_parked_quota_wait' (6539819) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:387:9:"
+      ]
+    },
+    {
+      "target": "Running tests/cancellation_tree.rs (rust/target-w09-e01/debug/deps/cancellation_tree-b3a582b4ff422c09)",
+      "result": "FAILED",
+      "passed": 6,
+      "failed": 2,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "approval_wait_round_trips_approve_and_reject_legs",
+        "panicking_tool_child_is_supervised_and_the_run_settles_loudly"
+      ],
+      "cause_lines": [
+        "thread 'panicking_tool_child_is_supervised_and_the_run_settles_loudly' (6541009) panicked at crates/lingxi-service/tests/cancellation_tree.rs:226:49:",
+        "thread 'panicking_tool_child_is_supervised_and_the_run_settles_loudly' (6541009) panicked at crates/lingxi-service/tests/cancellation_tree.rs:1535:5:",
+        "  left: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"tool_call_completed\", \"tool_result_model_projection\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\"]",
+        " right: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"tool_call_completed\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\"]",
+        "thread 'approval_wait_round_trips_approve_and_reject_legs' (6541006) panicked at crates/lingxi-service/tests/cancellation_tree.rs:1779:5:",
+        "  left: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"run_state_changed\", \"run_state_changed\", \"tool_call_completed\", \"tool_result_model_projection\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\", \"final_message_committed\"]",
+        " right: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"run_state_changed\", \"run_state_changed\", \"tool_call_completed\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\", \"final_message_committed\"]"
+      ]
+    },
+    {
+      "target": "Running tests/run_lifecycle.rs (rust/target-w09-e01/debug/deps/run_lifecycle-db982f1310f95692)",
+      "result": "FAILED",
+      "passed": 11,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "r03_a01_three_model_calls_produce_exactly_one_task_terminal"
+      ],
+      "cause_lines": [
+        "thread 'r03_a01_three_model_calls_produce_exactly_one_task_terminal' (6719711) panicked at crates/lingxi-service/tests/run_lifecycle.rs:442:5:",
+        "  left: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"tool_call_completed\", \"tool_result_model_projection\", \"model_call_started\", \"model_call_completed\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\", \"final_message_committed\"]",
+        " right: [\"run_state_changed\", \"model_call_started\", \"model_call_completed\", \"tool_call_started\", \"tool_call_completed\", \"model_call_started\", \"model_call_completed\", \"model_call_started\", \"model_call_completed\", \"run_state_changed\", \"final_message_committed\"]"
+      ]
+    },
+    {
+      "target": "Running tests/subagent_closeout.rs (rust/target-w09-e01/debug/deps/subagent_closeout-155dfebe8fca79e8)",
+      "result": "FAILED",
+      "passed": 6,
+      "failed": 2,
+      "ignored": 0,
+      "filtered": 0,
+      "failed_cases": [
+        "parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls",
+        "parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap"
+      ],
+      "cause_lines": [
+        "thread 'panicking_background_exits_are_recorded_and_reaped_without_a_waiter' (6722150) panicked at crates/lingxi-service/tests/subagent_closeout.rs:1238:17:",
+        "thread 'panicking_background_exits_are_recorded_and_reaped_without_a_waiter' (6722150) panicked at crates/lingxi-service/tests/subagent_closeout.rs:1238:17:",
+        "thread 'panicking_background_exits_are_recorded_and_reaped_without_a_waiter' (6722150) panicked at crates/lingxi-service/tests/subagent_closeout.rs:1238:17:",
+        "thread 'child_provider_panic_closes_out_and_the_thread_continues' (6722146) panicked at crates/lingxi-service/tests/subagent_closeout.rs:136:47:",
+        "thread 'parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls' (6722151) panicked at crates/lingxi-service/tests/subagent_closeout.rs:297:9:",
+        "thread 'parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap' (6722152) panicked at crates/lingxi-service/tests/subagent_closeout.rs:500:9:",
+        "  left: \"run_000001a0dcba6c00_000003\"",
+        " right: \"run_000001a0dcba6c00_000004\""
+      ]
+    }
+  ],
+  "scope": "workspace current full command FAIL; no Task/Step/A/leaf/Stage PASS",
+  "historical_whole30_execution_before_unknown_preserved": true
+}

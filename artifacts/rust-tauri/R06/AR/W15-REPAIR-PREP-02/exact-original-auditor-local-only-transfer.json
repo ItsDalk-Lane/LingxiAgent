@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-12T02:25:59.272333+00:00",
+  "role": "ROOT_EXACT_LOCAL_OLD_CANDIDATE_TRANSFER_ONLY",
+  "source": "/private/tmp/lingxi-r06-w15-repair-01/scripts/rust-tauri/r06_evaluation_audit.py",
+  "destination": "/private/tmp/lingxi-r06-w15-repair-02/artifacts/rust-tauri/R06/AR/W15-REPAIR-02/local-only/audit-before-repair02.py",
+  "sha256": "634510ca2cc021bf25c645ff2b9ab59d7f54889b600c1b0025cde6302bcfec6e",
+  "root_preexisting_recovery_receipt": "artifacts/rust-tauri/R06/AR/W15-REPAIR-PREP-02/transport-interruption-exact-partial-recovery.json",
+  "local_only": true,
+  "active_candidate_changed": false,
+  "old_source_changed": false,
+  "behavior_result": "NOT_RUN_BY_ROOT",
+  "acceptance": "NONE"
+}

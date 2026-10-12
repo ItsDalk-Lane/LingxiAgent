@@ -1,0 +1,22 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.48s
+     Running tests/run_lifecycle.rs (rust/target-w10-r01/debug/deps/run_lifecycle-060747317e86c211)
+LINGXI_TEST_GUARD: armed (pid 51866, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+test r03_a01_three_model_calls_produce_exactly_one_task_terminal ... 
+thread 'r03_a01_three_model_calls_produce_exactly_one_task_terminal' (4874769) panicked at crates/lingxi-service/tests/run_lifecycle.rs:442:5:
+assertion `left == right` failed: middle model-call ends are process facts, never task terminals
+  left: ["run_state_changed", "model_call_started", "model_call_completed", "tool_call_started", "tool_call_completed", "tool_result_model_projection", "model_call_started", "model_call_completed", "model_call_started", "model_call_completed", "run_state_changed", "final_message_committed"]
+ right: ["run_state_changed", "model_call_started", "model_call_completed", "tool_call_started", "tool_call_completed", "model_call_started", "model_call_completed", "model_call_started", "model_call_completed", "run_state_changed", "final_message_committed"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    r03_a01_three_model_calls_produce_exactly_one_task_terminal
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.10s
+
+error: test failed, to rerun pass `-p lingxi-service --test run_lifecycle`

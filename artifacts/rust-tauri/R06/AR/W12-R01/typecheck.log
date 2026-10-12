@@ -1,0 +1,5 @@
+{"command": ["npm", "run", "typecheck"], "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r01-typecheck-dwahzw35", "start": 1791698572.174911}
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+

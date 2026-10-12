@@ -1,0 +1,297 @@
+{
+  "original_task": {
+    "name": "会话树、重试、fork与回退",
+    "goal": "保留现役可见功能而非只保留消息列表。",
+    "steps": [
+      "按R00叶子功能迁移创建/列表/搜索/置顶/归档/恢复/删除/fork/重试/编辑/rewind等实际入口。",
+      "保持session/parent/branch和message稳定ID；fork共享历史来源但新写入独立，权限和附件授权不能跨分支扩大。",
+      "重试区分新的用户Run与同Run内部attempt；沿用现役产品语义，不覆盖已审计的旧结果。",
+      "回退检查checkpoint及真实文件版本，冲突拒绝；外部消息/网络副作用不可假装回滚。"
+    ],
+    "deliverables": [
+      "SessionService",
+      "树/分支索引",
+      "回退检查"
+    ],
+    "acceptance": [
+      {
+        "name": "fork不串写",
+        "given": "会话A在中段fork为B",
+        "when": "在两分支各自追加内容",
+        "then": "共同历史可读，新消息独立，资源权限正确",
+        "evidence": "树与消息查询",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "status": "NOT_STARTED",
+        "id": "R06-A05",
+        "stage_id": "R06",
+        "task_id": "R06-T03",
+        "requirement": "REQUIRED",
+        "activation_condition": "本阶段范围内必须验证；环境不足为BLOCKED，不改写为通过。"
+      },
+      {
+        "name": "rewind不覆盖外部修改",
+        "given": "checkpoint之后用户手动改文件",
+        "when": "执行回退",
+        "then": "检测冲突并保护用户修改；不能伪称全部撤销",
+        "evidence": "文件与回退收据",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "status": "NOT_STARTED",
+        "id": "R06-A06",
+        "stage_id": "R06",
+        "task_id": "R06-T03",
+        "requirement": "REQUIRED",
+        "activation_condition": "本阶段范围内必须验证；环境不足为BLOCKED，不改写为通过。"
+      }
+    ],
+    "avoid": "不得以占位实现、跳过断言或仅更新完成状态替代真实实现。",
+    "id": "R06-T03",
+    "stage_id": "R06",
+    "status": "NOT_STARTED",
+    "depends_on": [
+      "R06-T02"
+    ],
+    "sources": [
+      "S05",
+      "S07",
+      "S09",
+      "S12",
+      "S13",
+      "S15",
+      "S16",
+      "S22",
+      "S23"
+    ],
+    "acceptance_ids": [
+      "R06-A05",
+      "R06-A06"
+    ]
+  },
+  "rows": [
+    {
+      "id": "R06-T03-STEP-01",
+      "original_clause": "按R00叶子功能迁移创建/列表/搜索/置顶/归档/恢复/删除/fork/重试/编辑/rewind等实际入口。",
+      "status": "PARTIAL_CURRENT_SHARE_SELF_CHECK_FULL_ORIGINAL_OPEN",
+      "current_share": "当前W03重核创建/归档/恢复/删除/fork/retry/rewind共享准入、真正退出和退休身份；其余原叶成功/拒绝面必须逐项保留，不从本次134条测试推导完整迁移。",
+      "evidence": [
+        {
+          "run": "final-focused-01",
+          "case": "management_surface_rename_pin_memory_archive_restore_delete_cleanup",
+          "actual_ok_line": true
+        },
+        {
+          "run": "final-focused-01",
+          "case": "busy_session_refuses_fork_retry_rewind_409",
+          "actual_ok_line": true
+        },
+        {
+          "run": "final-focused-01",
+          "case": "authenticated_barrier_rewind_execute_and_cancelled_waiter",
+          "actual_ok_line": true
+        }
+      ],
+      "original_deadline": "R06阶段验收前",
+      "remaining": "完整原Task与原叶义务保留；F01/F02/F04/F05/F06等组合和跨平台未结案；独立Reviewer未创建。"
+    },
+    {
+      "id": "R06-T03-STEP-02",
+      "original_clause": "保持session/parent/branch和message稳定ID；fork共享历史来源但新写入独立，权限和附件授权不能跨分支扩大。",
+      "status": "PARTIAL_CURRENT_SHARE_SELF_CHECK_FULL_ORIGINAL_OPEN",
+      "current_share": "稳定ID/分支独立及归属由原T03与F03正负实验；旧附件跨fork与全引用清理组合仍属F04 OPEN，当前只保权限不扩大。",
+      "evidence": [
+        {
+          "run": "final-focused-01",
+          "case": "fork_copies_history_with_stable_ids_and_writes_stay_independent",
+          "actual_ok_line": true
+        },
+        {
+          "run": "final-focused-01",
+          "case": "actual_different_agent_child_keeps_exact_parent_permit",
+          "actual_ok_line": true
+        }
+      ],
+      "original_deadline": "R06阶段验收前",
+      "remaining": "完整原Task与原叶义务保留；F01/F02/F04/F05/F06等组合和跨平台未结案；独立Reviewer未创建。"
+    },
+    {
+      "id": "R06-T03-STEP-03",
+      "original_clause": "重试区分新的用户Run与同Run内部attempt；沿用现役产品语义，不覆盖已审计的旧结果。",
+      "status": "PARTIAL_CURRENT_SHARE_SELF_CHECK_FULL_ORIGINAL_OPEN",
+      "current_share": "原retry目标解析与新Run/attempt保留；同requestId completed只读重放与冲突/unknown、后台durable-start由F03与原共享suite再检。",
+      "evidence": [
+        {
+          "run": "final-focused-01",
+          "case": "retry_target_resolution_matches_incumbent",
+          "actual_ok_line": true
+        },
+        {
+          "run": "final-focused-01",
+          "case": "retry_resets_branch_and_new_run_never_overwrites_old",
+          "actual_ok_line": true
+        },
+        {
+          "run": "final-focused-01",
+          "case": "completed_fork_replay_conflict_and_recovered_event_are_consistent",
+          "actual_ok_line": true
+        }
+      ],
+      "original_deadline": "R06阶段验收前",
+      "remaining": "完整原Task与原叶义务保留；F01/F02/F04/F05/F06等组合和跨平台未结案；独立Reviewer未创建。"
+    },
+    {
+      "id": "R06-T03-STEP-04",
+      "original_clause": "回退检查checkpoint及真实文件版本，冲突拒绝；外部消息/网络副作用不可假装回滚。",
+      "status": "PARTIAL_CURRENT_SHARE_SELF_CHECK_FULL_ORIGINAL_OPEN",
+      "current_share": "原A06外部修改保护及真实写回由原T03；W03补会话互斥、快照重核、实际文件副作用未知与transaction一致；完整F02跨平台窗口仍OPEN。",
+      "evidence": [
+        {
+          "run": "final-focused-01",
+          "case": "rewind_restores_content_with_per_file_verdicts_and_branch_rewinds",
+          "actual_ok_line": true
+        },
+        {
+          "run": "final-focused-01",
+          "case": "retry_file_rollback_contract_matches_incumbent",
+          "actual_ok_line": true
+        },
+        {
+          "run": "final-focused-01",
+          "case": "unknown_file_effect_survives_storage_failure_restart_and_replay",
+          "actual_ok_line": true
+        }
+      ],
+      "original_deadline": "R06阶段验收前",
+      "remaining": "完整原Task与原叶义务保留；F01/F02/F04/F05/F06等组合和跨平台未结案；独立Reviewer未创建。"
+    },
+    {
+      "id": "R06-T03-DELIVERY-01",
+      "original_clause": "SessionService",
+      "status": "PARTIAL_CURRENT_SHARE_SELF_CHECK_FULL_ORIGINAL_OPEN",
+      "evidence": [
+        {
+          "run": "final-focused-01",
+          "case": "authenticated_barrier_rewind_execute_and_cancelled_waiter",
+          "actual_ok_line": true
+        }
+      ],
+      "original_deadline": "R06阶段验收前",
+      "current_share": "",
+      "remaining": "完整原Task与原叶义务保留；F01/F02/F04/F05/F06等组合和跨平台未结案；独立Reviewer未创建。"
+    },
+    {
+      "id": "R06-T03-DELIVERY-02",
+      "original_clause": "树/分支索引",
+      "status": "PARTIAL_CURRENT_SHARE_SELF_CHECK_FULL_ORIGINAL_OPEN",
+      "evidence": [
+        {
+          "run": "final-focused-01",
+          "case": "positive_and_fork_event_atomicity",
+          "actual_ok_line": true
+        },
+        {
+          "run": "final-focused-01",
+          "case": "fork_copies_history_with_stable_ids_and_writes_stay_independent",
+          "actual_ok_line": true
+        }
+      ],
+      "original_deadline": "R06阶段验收前",
+      "current_share": "",
+      "remaining": "完整原Task与原叶义务保留；F01/F02/F04/F05/F06等组合和跨平台未结案；独立Reviewer未创建。"
+    },
+    {
+      "id": "R06-T03-DELIVERY-03",
+      "original_clause": "回退检查",
+      "status": "PARTIAL_CURRENT_SHARE_SELF_CHECK_FULL_ORIGINAL_OPEN",
+      "evidence": [
+        {
+          "run": "final-focused-01",
+          "case": "rewind_restores_content_with_per_file_verdicts_and_branch_rewinds",
+          "actual_ok_line": true
+        }
+      ],
+      "original_deadline": "R06阶段验收前",
+      "current_share": "",
+      "remaining": "完整原Task与原叶义务保留；F01/F02/F04/F05/F06等组合和跨平台未结案；独立Reviewer未创建。"
+    },
+    {
+      "id": "R06-A05",
+      "original_clause": {
+        "name": "fork不串写",
+        "given": "会话A在中段fork为B",
+        "when": "在两分支各自追加内容",
+        "then": "共同历史可读，新消息独立，资源权限正确",
+        "evidence": "树与消息查询",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "status": "NOT_STARTED",
+        "id": "R06-A05",
+        "stage_id": "R06",
+        "task_id": "R06-T03",
+        "requirement": "REQUIRED",
+        "activation_condition": "本阶段范围内必须验证；环境不足为BLOCKED，不改写为通过。"
+      },
+      "status": "PARTIAL_CURRENT_SHARE_SELF_CHECK_FULL_ORIGINAL_OPEN",
+      "evidence": [
+        {
+          "run": "final-focused-01",
+          "case": "fork_copies_history_with_stable_ids_and_writes_stay_independent",
+          "actual_ok_line": true
+        },
+        {
+          "run": "final-focused-01",
+          "case": "fork_session_files_rewrites_ids_and_keeps_legacy_aliases",
+          "actual_ok_line": true
+        }
+      ],
+      "remaining": "完整原Task与原叶义务保留；F01/F02/F04/F05/F06等组合和跨平台未结案；独立Reviewer未创建。",
+      "original_deadline": "R06阶段验收前",
+      "current_share": ""
+    },
+    {
+      "id": "R06-A06",
+      "original_clause": {
+        "name": "rewind不覆盖外部修改",
+        "given": "checkpoint之后用户手动改文件",
+        "when": "执行回退",
+        "then": "检测冲突并保护用户修改；不能伪称全部撤销",
+        "evidence": "文件与回退收据",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "status": "NOT_STARTED",
+        "id": "R06-A06",
+        "stage_id": "R06",
+        "task_id": "R06-T03",
+        "requirement": "REQUIRED",
+        "activation_condition": "本阶段范围内必须验证；环境不足为BLOCKED，不改写为通过。"
+      },
+      "status": "PARTIAL_CURRENT_SHARE_SELF_CHECK_FULL_ORIGINAL_OPEN",
+      "evidence": [
+        {
+          "run": "final-focused-01",
+          "case": "rewind_restores_content_with_per_file_verdicts_and_branch_rewinds",
+          "actual_ok_line": true
+        },
+        {
+          "run": "final-focused-01",
+          "case": "retry_file_rollback_contract_matches_incumbent",
+          "actual_ok_line": true
+        }
+      ],
+      "remaining": "完整原Task与原叶义务保留；F01/F02/F04/F05/F06等组合和跨平台未结案；独立Reviewer未创建。",
+      "original_deadline": "R06阶段验收前",
+      "current_share": ""
+    }
+  ],
+  "scope_warning": "原Task完整义务保留；当前份额不等于完整Stage或完整74叶通过",
+  "final_current_share_binding": {
+    "focused": 134,
+    "whole_passed": 1889,
+    "whole_failed": 3,
+    "formal_stages": [
+      "R05 FAIL",
+      "R04 FAIL",
+      "R03 FAIL"
+    ],
+    "original_leaf_count": 74,
+    "original_assertions": 169,
+    "fully_closed_original_leaves": 0,
+    "original_clause_status_unchanged": true
+  }
+}

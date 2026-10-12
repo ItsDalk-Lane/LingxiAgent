@@ -1,0 +1,78 @@
+{
+  "home": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W10-E01/commands/first-green-01/synthetic-home/lingxi-r06-ar-w10-positive-78365-1791709470354398000",
+  "job": {
+    "artifactId": "kpa_5832898febd3959e37544303",
+    "attempt": 1,
+    "cancelledAt": null,
+    "chunkerConfigId": "8b93f0aa4fa689af",
+    "createdAt": "2026-10-11T09:04:30.495Z",
+    "embeddingStats": {
+      "chunksNewlyEmbedded": 2,
+      "chunksResumedFromCheckpoint": 0,
+      "chunksReusedFromReadyVariant": 0,
+      "model": {
+        "dimensions": 2,
+        "key": "b1007139845344938190b68a725fe46d1f3ad2cd807ea2648468f47870204d88",
+        "modelId": "model-a",
+        "parameterFingerprint": "abb3de9f7f313190dfae1481890111608dde1d545940bfb00e457737bc8601c0",
+        "protocol": "openai-embeddings",
+        "provider": "embed"
+      },
+      "requestCount": 2,
+      "resetStaleVectors": false
+    },
+    "error": null,
+    "id": "kjob_1a59b258e82a5128cebf0d1f",
+    "notebookId": "knb_388b95a70d7cab4d681f0032",
+    "phase": "done",
+    "progressDone": 2,
+    "progressTotal": 1,
+    "sourceId": "ksrc_cb5c29eecf1e49d2d6e658a8",
+    "status": "done",
+    "updatedAt": "2026-10-11T09:04:30.498Z"
+  },
+  "ready": "127.0.0.1:60690",
+  "requests": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "# 资料\n\n来源隔离与模型身份必须一致。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:60681"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "# 资料\n\n来源隔离与模型身份必须一致。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:60681"
+    }
+  ],
+  "usage": [
+    {
+      "model": "model-a",
+      "outcome": "succeeded",
+      "provider": "embed"
+    },
+    {
+      "model": "model-a",
+      "outcome": "succeeded",
+      "provider": "embed"
+    }
+  ],
+  "vectors": [
+    {
+      "dimensions": 2,
+      "key": "b1007139845344938190b68a725fe46d1f3ad2cd807ea2648468f47870204d88",
+      "status": "ready",
+      "variant": "viv_49782b742e8cad45fb9bbbec953ca0c5",
+      "vector": "0000803F00000000"
+    }
+  ]
+}

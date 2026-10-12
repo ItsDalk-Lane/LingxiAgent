@@ -1,0 +1,62 @@
+{
+  "deliveryClassification": "known_not_sent_connect_failure; usage_unknown_is_not_zero",
+  "endpoint": "127.0.0.1:50286",
+  "failed": {
+    "artifactId": "kpa_b542474325b042a01e3ce9bf",
+    "attempt": 1,
+    "cancelledAt": null,
+    "chunkerConfigId": "8b93f0aa4fa689af",
+    "createdAt": "2026-10-11T13:26:52.458Z",
+    "embeddingStats": {
+      "abandonedStaleVariantId": null,
+      "actualWrittenChunkCount": 0,
+      "attempt": 1,
+      "callAttemptCount": 1,
+      "chunksNewlyEmbedded": 0,
+      "chunksResumedFromCheckpoint": 0,
+      "chunksReusedFromReadyVariant": 0,
+      "confirmedResponseRequestCount": 0,
+      "failedCallCount": 1,
+      "failedRequestCount": 0,
+      "failedTransportAttemptCount": 1,
+      "knownNotSentAttemptCount": 1,
+      "model": null,
+      "pendingCallIntentCount": 0,
+      "pendingRequestCount": 0,
+      "plannedChunkCount": 1,
+      "previousKnownNotSentAttemptCount": 0,
+      "previousRequestCount": 0,
+      "previousTransportAttemptCount": 0,
+      "requestCount": 0,
+      "requestCountSemantics": "confirmed_or_possibly_sent_excluding_known_not_sent",
+      "resetStaleVectors": false,
+      "successfulRequestCount": 0,
+      "transportAttemptCount": 1,
+      "unknownRequestsFromPreviousAttempt": 0,
+      "unknownSentRequestCount": 0
+    },
+    "error": "KNOWLEDGE_MODEL_UNAVAILABLE: provider request failed before a response: error sending request for url (http://127.0.0.1:50286/v1/embeddings)",
+    "id": "kjob_a8997511074604105caf60e7",
+    "notebookId": "knb_bb23922881f6640fcb9a8c65",
+    "phase": "embed",
+    "progressDone": 0,
+    "progressTotal": 1,
+    "sourceId": "ksrc_616ae177d250383384b3ed96",
+    "status": "failed",
+    "updatedAt": "2026-10-11T13:26:52.468Z"
+  },
+  "ledger": [
+    {
+      "input_tokens": null,
+      "model": "model-a",
+      "model_call_id": "op-embedding-1791725212466-0",
+      "outcome": "failed",
+      "provider": "embed",
+      "transport_attempts": 1,
+      "usage_state": "unknown"
+    }
+  ],
+  "listenerClosedBeforeImport": true,
+  "serverWire": 0,
+  "vectors": []
+}

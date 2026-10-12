@@ -1,0 +1,3 @@
+COMMAND ["/Users/study_superior/.cargo/bin/cargo", "fmt", "--manifest-path", "rust/Cargo.toml", "--all", "--", "--check"]
+ISOLATED_HOME /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w02-r01-fmt-priuh8bo
+START 2026-10-11T06:17:46.215560+00:00

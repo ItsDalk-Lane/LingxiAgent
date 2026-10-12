@@ -1,0 +1,25 @@
+
+running 1 test
+test busy_thread_refuses_reply_with_a_structured_conflict ... FAILED
+
+successes:
+
+successes:
+
+failures:
+
+---- busy_thread_refuses_reply_with_a_structured_conflict stdout ----
+
+thread 'busy_thread_refuses_reply_with_a_structured_conflict' (13523468) panicked at crates/lingxi-service/tests/subagent_lifecycle.rs:600:14:
+the parent settles after the busy refusal: Storage(Corrupted { detail: "model_history: 可信历史声明代次缺失" })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'busy_thread_refuses_reply_with_a_structured_conflict' (13523468) panicked at crates/lingxi-service/tests/subagent_lifecycle.rs:621:35:
+parent task: JoinError::Panic(Id(3), "the parent settles after the busy refusal: Storage(Corrupted { detail: \"model_history: 可信历史声明代次缺失\" })", ...)
+
+
+failures:
+    busy_thread_refuses_reply_with_a_structured_conflict
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.13s
+

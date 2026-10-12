@@ -33,10 +33,16 @@ use lingxi_kernel::ports::{
     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
     ToolExecutorPort, ToolOutcome, ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
+use lingxi_kernel::toolcatalog::{
+    Availability, DeclaredPermission, PermissionContract, PermissionKind, SchemaBudget,
+    ToolManifest, ToolOrigin, ToolRegistry,
+};
 use lingxi_kernel::RunContext;
 use lingxi_protocol::{
     ContentBlock, ErrorCode, ModelCallId, NormalizedMessage, ProtocolError, ToolCallId,
+    ToolSchemaDocument,
 };
+use lingxi_service::toolgateway::ToolInvocationGateway;
 use lingxi_service::{
     cancel, prepare_layout, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
     TaskExit,
@@ -105,8 +111,7 @@ impl TurnProviderPort for ScriptedProvider {
 
         _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
-        let input = input.submission.as_str();
-        let marker = Self::marker_of(input);
+        let marker = Self::marker_of(&input.submission);
         let pop = {
             let mut pops = self.pops.lock().unwrap();
             let next = pops.get(&marker).copied().unwrap_or(0) + 1;
@@ -128,10 +133,10 @@ impl TurnProviderPort for ScriptedProvider {
             }
             let turn = match step {
                 Some(Step::Turn(turn)) => turn,
-                Some(Step::Dispatch { task }) => delegation_turn("subagent", task, None),
+                Some(Step::Dispatch { task }) => delegation_turn(input, "subagent", task, None),
                 Some(Step::Reply { task }) => {
                     let thread_id = thread.lock().unwrap().clone();
-                    delegation_turn("subagent_reply", task, thread_id)
+                    delegation_turn(input, "subagent_reply", task, thread_id)
                 }
                 Some(Step::Panic(message)) => panic!("{message}"),
                 None => ProviderTurn::Failed {
@@ -148,14 +153,33 @@ impl TurnProviderPort for ScriptedProvider {
     }
 }
 
-fn delegation_turn(target: &'static str, task: &str, thread_id: Option<String>) -> ProviderTurn {
+fn delegation_turn(
+    input: &ModelTurnInput,
+    target: &'static str,
+    task: &str,
+    thread_id: Option<String>,
+) -> ProviderTurn {
+    // 目标和声明代次来自宿主该轮实际发送的目录；替身只提供外部模型响应。
+    let declaration = input
+        .tools
+        .declarations
+        .iter()
+        .find(|declaration| declaration.wire_name == target)
+        .expect("该轮真实声明须包含子代理入口");
+    let binding = input
+        .tools
+        .bind_target(&declaration.target)
+        .expect("该轮真实声明须具备宿主历史绑定");
+    assert!(binding.catalog_generation > 0);
+    let mut arguments = serde_json::json!({ "task": task });
+    if let Some(thread_id) = &thread_id {
+        arguments["threadId"] = serde_json::json!(thread_id);
+    }
     ProviderTurn::ToolRequests {
         content: Vec::new(),
         requests: vec![ToolRequest::from_effective_arguments(
-            target,
-            serde_json::json!({
-                "task": task,
-            }),
+            &declaration.target,
+            arguments,
             &lingxi_kernel::toolcatalog::SchemaBudget::default(),
         )
         .expect("effective tool request")
@@ -253,7 +277,79 @@ fn owner_principal() -> lingxi_service::Principal {
     }
 }
 
-async fn boot(tag: &str, deps: ServiceDeps) -> (ServiceState, PathBuf) {
+fn prepare_delegation_gateway(deps: &ServiceDeps) -> Arc<ToolInvocationGateway> {
+    let registry = Arc::new(ToolRegistry::new());
+    let clock = Arc::clone(&deps.clock);
+    let approvals = Arc::new(lingxi_service::approval_service::ApprovalService::new(
+        Arc::clone(&clock),
+    ));
+    let budget = SchemaBudget::default();
+    let gateway = Arc::new(ToolInvocationGateway::new(
+        registry.clone(),
+        approvals,
+        clock,
+        budget,
+        lingxi_service::toolgateway::DEFAULT_PREPARED_TTL_MS,
+        lingxi_service::toolgateway::DEFAULT_LIVE_PREPARED_CAP,
+    ));
+    let executor = deps
+        .tool_executor
+        .clone()
+        .expect("原收尾夹具须保持既有外部工具替身");
+    // 复用R04子代理的原参数面；登记和权限判断由真实目录及审批服务完成。
+    for name in ["subagent", "subagent_reply"] {
+        let manifest = ToolManifest {
+            origin: ToolOrigin::FirstParty,
+            local_name: name.into(),
+            display_name: name.into(),
+            aliases: Vec::new(),
+            version: "1.0.0".into(),
+            description: "子代理任务与同会话续接；权限不得超出父任务，线程身份沿真实登记传入。"
+                .into(),
+            input_schema: ToolSchemaDocument {
+                dialect: "json-schema/2020-12".into(),
+                schema: serde_json::json!({
+                    "type":"object",
+                    "properties":{
+                        "task":{"type":"string","minLength":1},
+                        "access":{"type":"string","enum":["read","write"]},
+                        "label":{"type":"string"},
+                        "agent":{"type":"string"},
+                        "model":{"type":"string"},
+                        "threadId":{"type":"string"}
+                    },
+                    "required":["task"],
+                    "additionalProperties":false
+                }),
+            },
+            output_schema: None,
+            permission: PermissionContract {
+                kind: PermissionKind::Read,
+                capability_base: format!("{name}.capability"),
+            },
+            availability: Availability::Available,
+            timeout_ms: Some(30_000),
+            max_concurrency: Some(4),
+            declared_permission: DeclaredPermission::None,
+            recovery: lingxi_kernel::invocation::ToolRecoveryCapability::CONSERVATIVE,
+        };
+        let target = registry
+            .register(manifest, &budget)
+            .expect("真实子代理目录登记")
+            .target_id;
+        gateway.bind_executor(
+            target,
+            Arc::clone(&executor),
+            "保留原外部替身；子代理运行仍由正式driver处理",
+        );
+    }
+    gateway
+}
+
+async fn boot(tag: &str, mut deps: ServiceDeps) -> (ServiceState, PathBuf) {
+    if deps.turn_provider.is_some() && deps.tool_gateway.is_none() {
+        deps.tool_gateway = Some(prepare_delegation_gateway(&deps));
+    }
     let home = synthetic_home(tag);
     let layout = prepare_layout(&home).expect("layout");
     let state = ServiceState::bootstrap_with_deps(config_for(&home), &layout, deps)
@@ -1310,6 +1406,7 @@ async fn finished_background_drives_reap_both_registries() {
     for round in 0..3 {
         let request_id = format!("c05-round-{round}");
         let submission = lingxi_service::ExecuteSubmission {
+            knowledge: None,
             input: "BG: quick background run",
             request_id: Some(request_id.as_str()),
         };

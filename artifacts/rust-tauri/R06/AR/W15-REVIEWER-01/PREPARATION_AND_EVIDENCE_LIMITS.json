@@ -1,0 +1,47 @@
+[
+  {
+    "window": "build-original-workspace",
+    "status": "INVALID_PREPARATION",
+    "detail": "沙箱ps权限不足，table预检在Popen前失败；随后只读ps提升已获批准，正式窗口另名运行。没有业务失败或自动审批拒绝。"
+  },
+  {
+    "window": "independent-be-battery",
+    "status": "INVALID_PREPARATION",
+    "detail": "猜测binary文件名不存在，Popen前FileNotFoundError；实际存在bin已另名亲跑。"
+  },
+  {
+    "window": "independent-real-home-collision",
+    "status": "INVALID_FIXTURE_PRECONDITION",
+    "detail": "合成session请求缺title，400；修正自己探针另名亲跑。初次config-0后来由自己下一窗口覆盖，首次原配置字节没有冻结；保留实际400及时间/退出，不当作产品反例。"
+  },
+  {
+    "window": "independent-sql-wire-mutations",
+    "status": "INVALID_NO_CHANGE_CONTROL_ONLY_FOR_HOME_COLLISION_CASE",
+    "detail": "原BE04各腿同home，第一home-collision变异没有变化，不能作为拒绝或缺陷；随后有效crosshome forgery被拒，另有真正两home同Run实际控制。其余独立变异保留原结果。"
+  },
+  {
+    "window": "build-original-workspace-02",
+    "status": "PREPARATION_SUPERVISOR_PROVENANCE_LIMIT",
+    "detail": "构建准备期间仅自己的guard脚本增加launch_binary前后字段；运行载入旧版，结束supervisor_sha取新版磁盘。不能把记录末SHA冒称启动脚本SHA。该准备构建exit0且产品源完整不变；随后直接行为窗口均载入稳定现版并记录启动/结束实际bin。"
+  },
+  {
+    "window": "ALL",
+    "status": "SAMPLING_AND_WAIT_LIMIT",
+    "detail": "RSS是50ms左右采样峰值，不是内核绝对峰值；短命/僵尸路径未知保留null；子代由原父进程等待，Reviewer只对自己Popen直接wait，消失记录不冒充独立wait。"
+  },
+  {
+    "window": "source-scope-preparation",
+    "status": "OWN_SCRIPT_PREPARATION_ONLY",
+    "detail": "自制整理脚本的optional key和原R07文件名初次错误已修正；不改原输入，不作产品失败或验收PASS。"
+  },
+  {
+    "window": "original-resource-precondition",
+    "status": "MOUNT_POSITIVE_PRECONDITION_NOT_ESTABLISHED",
+    "detail": "mount未建立成功注册，仅观察当前统一unsupported并有源缺席依据；local-file和URL的成功前置已实际建立。"
+  },
+  {
+    "window": "probe-scope28/persona/resource",
+    "status": "PROBE_REUSE_DECLARED",
+    "detail": "协议捕获探针来自作者方法，仅路径/隔离home改为自己独立执行，非作者结果继承；首次新反例为自己metrics变异和独立homecollision。方法SHA见PROBE_REUSE_PROVENANCE.json。"
+  }
+]

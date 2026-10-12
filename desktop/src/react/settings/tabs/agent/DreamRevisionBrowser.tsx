@@ -168,10 +168,10 @@ export function DreamRevisionBrowser({
   };
 
   const restoreSelected = async () => {
-    if (!selectedId) return;
+    if (!selectedId || !detail) return;
     setRestoring(true);
     try {
-      await restoreDream(agentId, selectedId);
+      await restoreDream(agentId, selectedId, detail.currentHash);
       setMessage(t('settings.memory.dream.revisions.restored'));
       setConfirming(false);
       setError(null);

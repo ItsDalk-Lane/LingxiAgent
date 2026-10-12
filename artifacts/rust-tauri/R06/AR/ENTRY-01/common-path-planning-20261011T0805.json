@@ -1,0 +1,60 @@
+{
+  "role": "ROOT_INTEGRATION_PLANNING_NOT_TEST",
+  "time_utc": "2026-10-11T08:04:18.320517+00:00",
+  "snapshots": [
+    {
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent",
+      "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "modified_product": [
+        "rust/crates/lingxi-adapters/src/models/anthropic_messages.rs",
+        "rust/crates/lingxi-adapters/src/models/google_generative_ai.rs",
+        "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+        "rust/crates/lingxi-adapters/src/models/openai_responses.rs",
+        "rust/crates/lingxi-adapters/src/storage/session_tree.rs",
+        "rust/crates/lingxi-kernel/src/compaction.rs",
+        "rust/crates/lingxi-kernel/src/model_exchange.rs",
+        "rust/crates/lingxi-service/src/compaction.rs",
+        "rust/crates/lingxi-service/src/history_projection.rs",
+        "rust/crates/lingxi-service/src/lib.rs",
+        "rust/crates/lingxi-service/src/runs.rs",
+        "rust/crates/lingxi-service/tests/r05_t05_timeouts.rs",
+        "rust/crates/lingxi-service/tests/r06_t02_compaction.rs"
+      ],
+      "new_crate_sources_or_tests": [
+        "rust/crates/lingxi-service/src/model_history.rs",
+        "rust/crates/lingxi-service/tests/fixtures/r06_ar_f01_probe.py",
+        "rust/crates/lingxi-service/tests/r06_ar_f01_history.rs"
+      ],
+      "freeze": "NOT_FROZEN_NOT_REVIEWED"
+    },
+    {
+      "workspace": "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent",
+      "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+      "modified_product": [
+        "rust/crates/lingxi-adapters/src/storage/migrations.rs",
+        "rust/crates/lingxi-adapters/src/storage/mod.rs",
+        "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+        "rust/crates/lingxi-adapters/src/storage/session_tree.rs",
+        "rust/crates/lingxi-kernel/src/lib.rs",
+        "rust/crates/lingxi-service/src/lib.rs",
+        "rust/crates/lingxi-service/src/session_admin.rs",
+        "rust/crates/lingxi-service/src/session_supervisor.rs",
+        "rust/crates/lingxi-service/src/session_tree.rs",
+        "rust/crates/lingxi-service/src/sessions.rs"
+      ],
+      "new_crate_sources_or_tests": [
+        "rust/crates/lingxi-adapters/src/storage/session_operations.rs",
+        "rust/crates/lingxi-kernel/src/session_admission.rs",
+        "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs"
+      ],
+      "freeze": "NOT_FROZEN_NOT_REVIEWED"
+    }
+  ],
+  "currently_overlapping_modified_paths": [
+    "rust/crates/lingxi-adapters/src/storage/session_tree.rs",
+    "rust/crates/lingxi-service/src/lib.rs"
+  ],
+  "integration": "NECESSARY_THREE_WAY_INTEGRATION_AND_ACTUAL_REVALIDATION_AFTER_INDEPENDENT_TASK_RESULTS",
+  "main_W02_W06_W12_unaccepted": "PRESERVE_DO_NOT_STAGE_WITH_THESE_TASKS",
+  "independent_review": "NOT_RUN"
+}

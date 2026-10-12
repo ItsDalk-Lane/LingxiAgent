@@ -1,0 +1,4 @@
+suite cancel_link_inheritance: cargo test exit 101
+suite cancel_link_inheritance: no parseable libtest summary (running='7' passed='') — the filter matched nothing or the harness output drifted
+suite subagent_closeout: cargo test exit 101
+suite subagent_closeout: no parseable libtest summary (running='8' passed='') — the filter matched nothing or the harness output drifted

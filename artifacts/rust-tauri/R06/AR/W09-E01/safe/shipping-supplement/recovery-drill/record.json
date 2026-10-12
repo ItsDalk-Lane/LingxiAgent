@@ -1,0 +1,717 @@
+{
+  "owner": "R06-AR-W09-E01",
+  "label": "recovery-drill",
+  "argv": [
+    "bash",
+    "scripts/rust-tauri/r02_t06_recovery_drill.sh",
+    "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/shipping-supplement/recovery-drill"
+  ],
+  "cwd": "<W09_WORKSPACE>",
+  "start": "2026-10-11T14:45:23.940622+00:00",
+  "binaries_before": {
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service": "b3e04e9a5246975a5bca8ab600ab01d8c55b93140221f8e5c25952c281d343e9",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-storage-inspect": "65071093207329b48dd073fbe39b3ca7b731ad608eb04033e2c16a5cb22a6be5"
+  },
+  "runner_sha256": "74c49b0fda095e4161116365921a03a15fb22477b2eb98ffa2036f0859babcaf",
+  "effective_environment": {
+    "HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/os-home-shipping-supplement",
+    "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/os-home-shipping-supplement/product-home",
+    "TMPDIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement",
+    "CARGO_HOME": "<LOCAL_USER>/.cargo",
+    "RUSTUP_HOME": "<LOCAL_USER>/.rustup",
+    "LINGXI_PRODUCT_DIR": "<W09_WORKSPACE>/lib",
+    "CARGO_TARGET_DIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target",
+    "CARGO_BUILD_JOBS": "8",
+    "CARGO_NET_OFFLINE": "true",
+    "LINGXI_TEST_GUARD": "1",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "TEST_MEM_LIMIT_MB": "8192",
+    "TEST_GUARD_VERBOSE": "1",
+    "GIT_CONFIG_COUNT": "1",
+    "GIT_CONFIG_KEY_0": "core.excludesFile",
+    "GIT_CONFIG_VALUE_0": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/git-excludes-w09-e01"
+  },
+  "resource_anchor_sha256": "fff0f7a338337ee7a8f049fe5b65182d6c2c4af0ef5a3b21bae071dd346c6865",
+  "guard": {
+    "kind": "external_owned_process_group_sampling",
+    "per_process_time_sec": 600,
+    "per_process_rss_mib": 8192,
+    "sample_interval_sec": 0.1,
+    "command_budget_sec": 720,
+    "cleanup_grace_sec": 15,
+    "shipping_builtin_guard": "NOT_LINKED; environment alone is not internal guard proof",
+    "short_lived_unobserved_processes": "PID/RSS unknown, never filled with zero"
+  },
+  "pid": 28880,
+  "pgid": 28880,
+  "end": "2026-10-11T14:45:27.079977+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 3.1377528330049245,
+  "actual_parent_wait_reaped": true,
+  "observed_processes": [
+    {
+      "pid": 28880,
+      "ppid": 27973,
+      "pgid": 28880,
+      "args": "bash scripts/rust-tauri/r02_t06_recovery_drill.sh <W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/shipping-supplement/recovery-drill",
+      "first_observed_at": "2026-10-11T14:45:23.981197+00:00",
+      "max_rss_kib": 3376,
+      "max_elapsed_sec": 3,
+      "samples": 22,
+      "last_observed_at": "2026-10-11T14:45:26.969818+00:00"
+    },
+    {
+      "pid": 28882,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "(dirname)",
+      "first_observed_at": "2026-10-11T14:45:23.981230+00:00",
+      "max_rss_kib": 384,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:23.981232+00:00"
+    },
+    {
+      "pid": 28890,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "(cargo)",
+      "first_observed_at": "2026-10-11T14:45:24.123742+00:00",
+      "max_rss_kib": 94800,
+      "max_elapsed_sec": 1,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:24.123745+00:00"
+    },
+    {
+      "pid": 28901,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement/lingxi-r02t06-drill.qpdpRl/v1-v6foRu --bind 127.0.0.1:0",
+      "first_observed_at": "2026-10-11T14:45:24.269623+00:00",
+      "max_rss_kib": 32,
+      "max_elapsed_sec": 0,
+      "samples": 6,
+      "last_observed_at": "2026-10-11T14:45:24.981100+00:00"
+    },
+    {
+      "pid": 28907,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:45:24.269628+00:00",
+      "max_rss_kib": 176,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:24.269629+00:00"
+    },
+    {
+      "pid": 28911,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:45:24.414097+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:24.414099+00:00"
+    },
+    {
+      "pid": 28916,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "(sleep)",
+      "first_observed_at": "2026-10-11T14:45:24.552913+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:24.552914+00:00"
+    },
+    {
+      "pid": 28921,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "(sleep)",
+      "first_observed_at": "2026-10-11T14:45:24.697807+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:24.697808+00:00"
+    },
+    {
+      "pid": 28929,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:45:24.834614+00:00",
+      "max_rss_kib": 144,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:24.834615+00:00"
+    },
+    {
+      "pid": 28933,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:45:24.981103+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:24.981106+00:00"
+    },
+    {
+      "pid": 28949,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "(diff)",
+      "first_observed_at": "2026-10-11T14:45:25.126660+00:00",
+      "max_rss_kib": 112,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:25.126662+00:00"
+    },
+    {
+      "pid": 28974,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "(python3.14)",
+      "first_observed_at": "2026-10-11T14:45:25.271819+00:00",
+      "max_rss_kib": 1424,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:25.271821+00:00"
+    },
+    {
+      "pid": 28995,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement/lingxi-r02t06-drill.qpdpRl/v4-C0cFDi --bind 127.0.0.1:0",
+      "first_observed_at": "2026-10-11T14:45:25.417219+00:00",
+      "max_rss_kib": 13696,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:25.417221+00:00"
+    },
+    {
+      "pid": 28998,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:45:25.417224+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:25.417225+00:00"
+    },
+    {
+      "pid": 29007,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "bash scripts/rust-tauri/r02_t06_recovery_drill.sh <W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/shipping-supplement/recovery-drill",
+      "first_observed_at": "2026-10-11T14:45:25.556564+00:00",
+      "max_rss_kib": 2464,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:25.556565+00:00"
+    },
+    {
+      "pid": 29018,
+      "ppid": 29007,
+      "pgid": 28880,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:45:25.556568+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:25.556569+00:00"
+    },
+    {
+      "pid": 29030,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement/lingxi-r02t06-drill.qpdpRl/v5-8PWxNV --bind 127.0.0.1:0",
+      "first_observed_at": "2026-10-11T14:45:25.699902+00:00",
+      "max_rss_kib": 14128,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:25.699903+00:00"
+    },
+    {
+      "pid": 29033,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:45:25.699905+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:25.699906+00:00"
+    },
+    {
+      "pid": 29046,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement/lingxi-r02t06-drill.qpdpRl/v6-ABaQEv --bind 127.0.0.1:0",
+      "first_observed_at": "2026-10-11T14:45:25.835700+00:00",
+      "max_rss_kib": 18352,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:25.835702+00:00"
+    },
+    {
+      "pid": 29052,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:45:25.835705+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:25.835706+00:00"
+    },
+    {
+      "pid": 29073,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement/lingxi-r02t06-drill.qpdpRl/v6-ABaQEv --bind 127.0.0.1:0",
+      "first_observed_at": "2026-10-11T14:45:25.976038+00:00",
+      "max_rss_kib": 11728,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:25.976039+00:00"
+    },
+    {
+      "pid": 29099,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-storage-inspect /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement/lingxi-r02t06-drill.qpdpRl/v6-ABaQEv/lingxi-service/data/runs.db dump",
+      "first_observed_at": "2026-10-11T14:45:26.115294+00:00",
+      "max_rss_kib": 32,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:26.115296+00:00"
+    },
+    {
+      "pid": 29100,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "(Python)",
+      "first_observed_at": "2026-10-11T14:45:26.258944+00:00",
+      "max_rss_kib": 14496,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:26.258946+00:00"
+    },
+    {
+      "pid": 29108,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "(lingxi-service)",
+      "first_observed_at": "2026-10-11T14:45:26.396897+00:00",
+      "max_rss_kib": 24112,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:26.396899+00:00"
+    },
+    {
+      "pid": 29113,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "(sleep)",
+      "first_observed_at": "2026-10-11T14:45:26.396902+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:26.396903+00:00"
+    },
+    {
+      "pid": 29140,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:45:26.535068+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:26.535070+00:00"
+    },
+    {
+      "pid": 29153,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement/lingxi-r02t06-drill.qpdpRl/v8-G48Mnp --bind 127.0.0.1:0",
+      "first_observed_at": "2026-10-11T14:45:26.672609+00:00",
+      "max_rss_kib": 18048,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:26.672610+00:00"
+    },
+    {
+      "pid": 29156,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "(sleep)",
+      "first_observed_at": "2026-10-11T14:45:26.672613+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:26.672614+00:00"
+    },
+    {
+      "pid": 29252,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement/lingxi-r02t06-drill.qpdpRl/v8-G48Mnp --bind 127.0.0.1:0",
+      "first_observed_at": "2026-10-11T14:45:26.821468+00:00",
+      "max_rss_kib": 656,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:26.821470+00:00"
+    },
+    {
+      "pid": 29253,
+      "ppid": 28880,
+      "pgid": 28880,
+      "args": "(bash)",
+      "first_observed_at": "2026-10-11T14:45:26.821473+00:00",
+      "max_rss_kib": 0,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:45:26.821475+00:00"
+    }
+  ],
+  "guard_error": null,
+  "binaries_after": {
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service": "b3e04e9a5246975a5bca8ab600ab01d8c55b93140221f8e5c25952c281d343e9",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-storage-inspect": "65071093207329b48dd073fbe39b3ca7b731ad608eb04033e2c16a5cb22a6be5"
+  },
+  "runner_after_sha256": "74c49b0fda095e4161116365921a03a15fb22477b2eb98ffa2036f0859babcaf",
+  "inputs_stable": true,
+  "binaries_stable": true,
+  "process_group_residue": [],
+  "material_files": [
+    {
+      "path": "recovery-drill/output.log",
+      "sha256": "c9b27490bfc52a9151066b2bb7f2390bc74999c543c5232c1bc3881fc18ebc54",
+      "bytes": 1857
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7-hashes-after.txt",
+      "sha256": "b7d7e77f4c04893d1c53c7e80a1994ccfd405a40e283317255d68d3e1e425e7b",
+      "bytes": 263
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6-seed.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7-seed.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v3-hashes-after.txt",
+      "sha256": "a33ffd69acb495d9a221778bb2317e4cef00e4d752d794b9c1267890666ec43d",
+      "bytes": 93
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6-seed-execute.txt",
+      "sha256": "27badc983df1780b60c2b3fa9d3a19a00e46aac798451f0febdca52920faaddf",
+      "bytes": 3
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8.err",
+      "sha256": "116f58faabf283c6e9179d38f5db96a87d7fcb6add4d39f86a8dca16c95bfe26",
+      "bytes": 757
+    },
+    {
+      "path": "recovery-drill/recovery-drill/coexist-after.txt",
+      "sha256": "a837e7ff4ed96af6782702f4e565bd04446d89ab93bfac63a447f2da3daa7919",
+      "bytes": 275
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8.out",
+      "sha256": "c4b5fde82b18693e5b9f81937d00499aa18810589927bc613d996487cf7b6d3e",
+      "bytes": 235
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6-seed.out",
+      "sha256": "dc08922a55bb0ad879d3e60a2849aea110f16951d5112f67fd2f533ae7fce331",
+      "bytes": 235
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7-seed.out",
+      "sha256": "cf18f1a8e29f8ca7db8c79712832304f25b31d8c76da1af6b2bfcead2267bbfd",
+      "bytes": 235
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v2-hashes-after.txt",
+      "sha256": "fcb269f1fc43e20619871bab0f6e464d30773313e55b17f725fc62249ab521be",
+      "bytes": 175
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v1.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7-hashes-before.txt",
+      "sha256": "b7d7e77f4c04893d1c53c7e80a1994ccfd405a40e283317255d68d3e1e425e7b",
+      "bytes": 263
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v3.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v5-hashes-after.txt",
+      "sha256": "4d8834d6fb1b72e3c4e549b26414f1efc9c6dd791b302306c68a7584c8b3d696",
+      "bytes": 263
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v2.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/summary.txt",
+      "sha256": "f28ea0dd5d39fcca056cf6fd52dfaf917644eed59d1762f7bb544ded856a2faa",
+      "bytes": 1818
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v2-hashes-before.txt",
+      "sha256": "fcb269f1fc43e20619871bab0f6e464d30773313e55b17f725fc62249ab521be",
+      "bytes": 175
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6.out",
+      "sha256": "6e220292d238c1a0e392ea134acfa2a29400b4cf015350828b82a3fac4ff3f4d",
+      "bytes": 235
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8-seed.out",
+      "sha256": "389860cc89627a3991aa7daa3264011d2b2f6563c2449d5f964e830c852808cb",
+      "bytes": 235
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v1-hashes-after.txt",
+      "sha256": "7b2f675d535131e9ee3b95eb996b520af42000b1efea572dc62eff72fd758a84",
+      "bytes": 175
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v5.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8-observed.err",
+      "sha256": "116f58faabf283c6e9179d38f5db96a87d7fcb6add4d39f86a8dca16c95bfe26",
+      "bytes": 757
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v4.out",
+      "sha256": "066c9bc36999287d705f581513cb80d24f96ae4f6b4e587fdf9d2252c8bbd728",
+      "bytes": 235
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v3-hashes-before.txt",
+      "sha256": "a33ffd69acb495d9a221778bb2317e4cef00e4d752d794b9c1267890666ec43d",
+      "bytes": 93
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v5.err",
+      "sha256": "d16d1ac155ae77a78403861f5a1c06ee660ba9b3d770e8b907d2adc3b3d657a9",
+      "bytes": 83
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v4.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v5-hashes-before.txt",
+      "sha256": "4d8834d6fb1b72e3c4e549b26414f1efc9c6dd791b302306c68a7584c8b3d696",
+      "bytes": 263
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6.err",
+      "sha256": "77cf92580471d76f4967a25b851cbd08e8727e7d9272da929493845462589278",
+      "bytes": 757
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7.err",
+      "sha256": "14689ff677ec89f4d3c4b0b5917ac05a33e23e46e551408aa6c762bd453b4854",
+      "bytes": 286
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8-seed.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v3.err",
+      "sha256": "187dcd4bed215d77dd6406c795bf7b55000a3f88512b295e92fdd957f24764ed",
+      "bytes": 1141
+    },
+    {
+      "path": "recovery-drill/recovery-drill/coexist-before.txt",
+      "sha256": "a837e7ff4ed96af6782702f4e565bd04446d89ab93bfac63a447f2da3daa7919",
+      "bytes": 275
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v2.err",
+      "sha256": "d40a386969adf9937ed18ff77ce39c5ac1fe9b40bead7826470c9acf28a3588c",
+      "bytes": 937
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6-recovered-dump.jsonl",
+      "sha256": "669ed0a5240ffd7f6492ae71e148da0c80067d747b4440b3928283de11ddf01e",
+      "bytes": 3265
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v1.err",
+      "sha256": "2db6ddbd3953c636f825273d2b0a103d7350a446ec0709874be7df034d9cc7f2",
+      "bytes": 1287
+    },
+    {
+      "path": "recovery-drill/recovery-drill/own-created-homes.txt",
+      "sha256": "816cf00dd30c99dd889a817e209441e595de42be1779d0132b49c922ba744376",
+      "bytes": 1352
+    },
+    {
+      "path": "recovery-drill/recovery-drill/build.log",
+      "sha256": "22e0df986057b9ba5be07526ac5fb348862a3dedef42108383cc3e088acbb889",
+      "bytes": 72
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v1-hashes-before.txt",
+      "sha256": "7b2f675d535131e9ee3b95eb996b520af42000b1efea572dc62eff72fd758a84",
+      "bytes": 175
+    }
+  ],
+  "script_build_logs": [
+    {
+      "path": "recovery-drill/recovery-drill/build.log",
+      "sha256": "22e0df986057b9ba5be07526ac5fb348862a3dedef42108383cc3e088acbb889",
+      "contents": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.12s\n"
+    }
+  ],
+  "no_recompile_proof": true,
+  "ready_logs": [
+    {
+      "path": "recovery-drill/recovery-drill/v8.out",
+      "lines": [
+        "LINGXI_SERVICE_READY addr=127.0.0.1:61437 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement/lingxi-r02t06-drill.qpdpRl/v8-G48Mnp source=cli"
+      ]
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6-seed.out",
+      "lines": [
+        "LINGXI_SERVICE_READY addr=127.0.0.1:61430 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement/lingxi-r02t06-drill.qpdpRl/v6-ABaQEv source=cli"
+      ]
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7-seed.out",
+      "lines": [
+        "LINGXI_SERVICE_READY addr=127.0.0.1:61433 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement/lingxi-r02t06-drill.qpdpRl/v7-BUeeMt source=cli"
+      ]
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v1.out",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v3.out",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v2.out",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6.out",
+      "lines": [
+        "LINGXI_SERVICE_READY addr=127.0.0.1:61432 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement/lingxi-r02t06-drill.qpdpRl/v6-ABaQEv source=cli"
+      ]
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7.out",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8-seed.out",
+      "lines": [
+        "LINGXI_SERVICE_READY addr=127.0.0.1:61434 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement/lingxi-r02t06-drill.qpdpRl/v8-G48Mnp source=cli"
+      ]
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v5.out",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v4.out",
+      "lines": [
+        "LINGXI_SERVICE_READY addr=127.0.0.1:61429 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement/lingxi-r02t06-drill.qpdpRl/v4-C0cFDi source=cli"
+      ]
+    }
+  ],
+  "internal_guard_markers": [
+    {
+      "path": "recovery-drill/recovery-drill/v6-seed.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7-seed.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8-observed.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v5.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v4.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8-seed.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v3.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v2.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v1.err",
+      "lines": []
+    }
+  ],
+  "inputs_before_digest": "5e75b53dedec8c0faa94fe4674731c0cbb0c53ef04aac4c53de0420e0f6abe79",
+  "inputs_after_digest": "5e75b53dedec8c0faa94fe4674731c0cbb0c53ef04aac4c53de0420e0f6abe79"
+}

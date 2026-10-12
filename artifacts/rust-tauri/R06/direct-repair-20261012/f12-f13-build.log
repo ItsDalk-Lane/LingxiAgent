@@ -1,0 +1,78 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0433]: cannot find module or crate `reqwest` in this scope
+   --> crates/lingxi-service/tests/r06_ar_f13_submission.rs:190:9
+    |
+190 |         reqwest::StatusCode::OK,
+    |         ^^^^^^^ use of unresolved module or unlinked crate `reqwest`
+    |
+    = help: if you wanted to use a crate named `reqwest`, use `cargo add reqwest` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `reqwest` in this scope
+   --> crates/lingxi-service/tests/r06_ar_f13_submission.rs:241:18
+    |
+241 |     let client = reqwest::Client::builder()
+    |                  ^^^^^^^ use of unresolved module or unlinked crate `reqwest`
+    |
+    = help: if you wanted to use a crate named `reqwest`, use `cargo add reqwest` to add it to your `Cargo.toml`
+
+warning: unused `Result` that must be used
+   --> crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs:173:5
+    |
+173 |     service.start_worker();
+    |     ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: this `Result` may be an `Err` variant, which should be handled
+    = note: `#[warn(unused_must_use)]` (part of `#[warn(unused)]`) on by default
+help: use `let _ = ...` to ignore the resulting value
+    |
+173 |     let _ = service.start_worker();
+    |     +++++++
+
+warning: unused `Result` that must be used
+   --> crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs:341:5
+    |
+341 |     service.start_worker();
+    |     ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: this `Result` may be an `Err` variant, which should be handled
+help: use `let _ = ...` to ignore the resulting value
+    |
+341 |     let _ = service.start_worker();
+    |     +++++++
+
+error[E0599]: no method named `into_future` found for struct `axum::serve::Serve<L, M, S>` in the current scope
+   --> crates/lingxi-service/tests/r06_ar_f13_submission.rs:218:10
+    |
+212 | /         axum::serve(
+213 | |             listener,
+214 | |             axum::Router::new()
+215 | |                 .route("/chat/completions", post(provider))
+...   |
+218 | |         .into_future(),
+    | |         -^^^^^^^^^^^ method not found in `axum::serve::Serve<tokio::net::TcpListener, Router, Router>`
+    | |_________|
+    |
+    |
+   --> /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/future/into_future.rs:134:7
+    |
+    = note: the method is available for `axum::serve::Serve<tokio::net::TcpListener, Router, Router>` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `IntoFuture` which provides `into_future` is implemented but not in scope; perhaps you want to import it
+    |
+  2 + use std::future::IntoFuture;
+    |
+
+error[E0433]: cannot find module or crate `reqwest` in this scope
+   --> crates/lingxi-service/tests/r06_ar_f13_submission.rs:176:27
+    |
+176 | async fn execute(client: &reqwest::Client, endpoint: &str, token: &str, body: Value) -> Value {
+    |                           ^^^^^^^ use of unresolved module or unlinked crate `reqwest`
+    |
+    = help: if you wanted to use a crate named `reqwest`, use `cargo add reqwest` to add it to your `Cargo.toml`
+
+Some errors have detailed explanations: E0433, E0599.
+For more information about an error, try `rustc --explain E0433`.
+error: could not compile `lingxi-service` (test "r06_ar_f13_submission") due to 4 previous errors
+warning: build failed, waiting for other jobs to finish...
+warning: `lingxi-service` (test "r06_ar_f12_cache_consumers") generated 2 warnings

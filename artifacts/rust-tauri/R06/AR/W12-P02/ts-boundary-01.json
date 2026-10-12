@@ -1,0 +1,15 @@
+{
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "tests/r06-ar-f12-ann-cache-preservation.test.ts",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-ts-boundary-01-orqiffec",
+  "start": 1791702339.180416,
+  "end": 1791702349.536125,
+  "exit_code": 0,
+  "log_sha256": "b861d0c0305bbd8fbfb64ea293c00fbea383010fe5ed6244b2be0f23a02b7438"
+}

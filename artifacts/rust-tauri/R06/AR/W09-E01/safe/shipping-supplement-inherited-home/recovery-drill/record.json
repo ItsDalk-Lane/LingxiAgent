@@ -1,0 +1,764 @@
+{
+  "owner": "R06-AR-W09-E01",
+  "label": "recovery-drill",
+  "argv": [
+    "bash",
+    "scripts/rust-tauri/r02_t06_recovery_drill.sh",
+    "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/shipping-supplement-inherited-home/recovery-drill"
+  ],
+  "cwd": "<W09_WORKSPACE>",
+  "os_home": "<LOCAL_USER>",
+  "os_home_policy": "INHERITED; never overwritten by this supervisor",
+  "start": "2026-10-11T14:54:05.819553+00:00",
+  "binaries_before": {
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service": "b3e04e9a5246975a5bca8ab600ab01d8c55b93140221f8e5c25952c281d343e9",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-storage-inspect": "65071093207329b48dd073fbe39b3ca7b731ad608eb04033e2c16a5cb22a6be5"
+  },
+  "runner_sha256": "d2738c047db4bcdf487ac80a2025624b77f6367c0f287dd35b682010aa97357d",
+  "effective_environment": {
+    "HOME": "<LOCAL_USER>",
+    "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/product-home-shipping-supplement-inherited/product-home",
+    "TMPDIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement-inherited",
+    "CARGO_HOME": "<LOCAL_USER>/.cargo",
+    "RUSTUP_HOME": "<LOCAL_USER>/.rustup",
+    "LINGXI_PRODUCT_DIR": "<W09_WORKSPACE>/lib",
+    "CARGO_TARGET_DIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target",
+    "CARGO_BUILD_JOBS": "8",
+    "CARGO_NET_OFFLINE": "true",
+    "LINGXI_TEST_GUARD": "1",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "TEST_MEM_LIMIT_MB": "8192",
+    "TEST_GUARD_VERBOSE": "1",
+    "GIT_CONFIG_COUNT": "1",
+    "GIT_CONFIG_KEY_0": "core.excludesFile",
+    "GIT_CONFIG_VALUE_0": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/git-excludes-w09-e01"
+  },
+  "resource_anchor_sha256": "fff0f7a338337ee7a8f049fe5b65182d6c2c4af0ef5a3b21bae071dd346c6865",
+  "guard": {
+    "kind": "external_owned_process_group_sampling",
+    "per_process_time_sec": 600,
+    "per_process_rss_mib": 8192,
+    "sample_interval_sec": 0.1,
+    "command_budget_sec": 720,
+    "cleanup_grace_sec": 15,
+    "shipping_builtin_guard": "NOT_LINKED; environment alone is not internal guard proof",
+    "short_lived_unobserved_processes": "PID/RSS unknown, never filled with zero"
+  },
+  "pid": 42584,
+  "pgid": 42584,
+  "end": "2026-10-11T14:54:08.956223+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 3.1351905839983374,
+  "actual_parent_wait_reaped": true,
+  "observed_processes": [
+    {
+      "pid": 42584,
+      "ppid": 41932,
+      "pgid": 42584,
+      "args": "bash scripts/rust-tauri/r02_t06_recovery_drill.sh <W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/shipping-supplement-inherited-home/recovery-drill",
+      "first_observed_at": "2026-10-11T14:54:05.858802+00:00",
+      "max_rss_kib": 3392,
+      "max_elapsed_sec": 3,
+      "samples": 22,
+      "last_observed_at": "2026-10-11T14:54:08.852768+00:00"
+    },
+    {
+      "pid": 42586,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "(dirname)",
+      "first_observed_at": "2026-10-11T14:54:05.858851+00:00",
+      "max_rss_kib": 112,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:05.858853+00:00"
+    },
+    {
+      "pid": 42594,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "(cargo)",
+      "first_observed_at": "2026-10-11T14:54:06.004994+00:00",
+      "max_rss_kib": 96896,
+      "max_elapsed_sec": 1,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:06.004996+00:00"
+    },
+    {
+      "pid": 42605,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement-inherited/lingxi-r02t06-drill.emS41Y/v1-V6axPl --bind 127.0.0.1:0",
+      "first_observed_at": "2026-10-11T14:54:06.150999+00:00",
+      "max_rss_kib": 32,
+      "max_elapsed_sec": 0,
+      "samples": 6,
+      "last_observed_at": "2026-10-11T14:54:06.855406+00:00"
+    },
+    {
+      "pid": 42610,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:54:06.151005+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:06.151007+00:00"
+    },
+    {
+      "pid": 42615,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "(sleep)",
+      "first_observed_at": "2026-10-11T14:54:06.295922+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:06.295924+00:00"
+    },
+    {
+      "pid": 42620,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "(sleep)",
+      "first_observed_at": "2026-10-11T14:54:06.432556+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:06.432559+00:00"
+    },
+    {
+      "pid": 42627,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:54:06.571100+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:06.571102+00:00"
+    },
+    {
+      "pid": 42632,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:54:06.713920+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:06.713922+00:00"
+    },
+    {
+      "pid": 42637,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:54:06.855408+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:06.855410+00:00"
+    },
+    {
+      "pid": 42658,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "(bash)",
+      "first_observed_at": "2026-10-11T14:54:07.001789+00:00",
+      "max_rss_kib": 2320,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:07.001792+00:00"
+    },
+    {
+      "pid": 42659,
+      "ppid": 42658,
+      "pgid": 42584,
+      "args": "(perl)",
+      "first_observed_at": "2026-10-11T14:54:07.001795+00:00",
+      "max_rss_kib": 4624,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:07.001796+00:00"
+    },
+    {
+      "pid": 42679,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "(Python)",
+      "first_observed_at": "2026-10-11T14:54:07.143388+00:00",
+      "max_rss_kib": 17088,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:07.143390+00:00"
+    },
+    {
+      "pid": 42700,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement-inherited/lingxi-r02t06-drill.emS41Y/v4-ob4IjQ --bind 127.0.0.1:0",
+      "first_observed_at": "2026-10-11T14:54:07.283261+00:00",
+      "max_rss_kib": 14160,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:07.283264+00:00"
+    },
+    {
+      "pid": 42703,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:54:07.283267+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:07.283268+00:00"
+    },
+    {
+      "pid": 42712,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "bash scripts/rust-tauri/r02_t06_recovery_drill.sh <W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/shipping-supplement-inherited-home/recovery-drill",
+      "first_observed_at": "2026-10-11T14:54:07.424707+00:00",
+      "max_rss_kib": 2416,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:07.424710+00:00"
+    },
+    {
+      "pid": 42723,
+      "ppid": 42712,
+      "pgid": 42584,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:54:07.424713+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:07.424714+00:00"
+    },
+    {
+      "pid": 42758,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "(lingxi-service)",
+      "first_observed_at": "2026-10-11T14:54:07.560924+00:00",
+      "max_rss_kib": 14240,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:07.560927+00:00"
+    },
+    {
+      "pid": 42761,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "(sleep)",
+      "first_observed_at": "2026-10-11T14:54:07.560930+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:07.560931+00:00"
+    },
+    {
+      "pid": 42774,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement-inherited/lingxi-r02t06-drill.emS41Y/v6-B2Nzvs --bind 127.0.0.1:0",
+      "first_observed_at": "2026-10-11T14:54:07.702705+00:00",
+      "max_rss_kib": 24368,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:07.702707+00:00"
+    },
+    {
+      "pid": 42779,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:54:07.702710+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:07.702711+00:00"
+    },
+    {
+      "pid": 42801,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement-inherited/lingxi-r02t06-drill.emS41Y/v6-B2Nzvs --bind 127.0.0.1:0",
+      "first_observed_at": "2026-10-11T14:54:07.848809+00:00",
+      "max_rss_kib": 22688,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:07.848812+00:00"
+    },
+    {
+      "pid": 42804,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "(sleep)",
+      "first_observed_at": "2026-10-11T14:54:07.848815+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:07.848817+00:00"
+    },
+    {
+      "pid": 42824,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-storage-inspect /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement-inherited/lingxi-r02t06-drill.emS41Y/v6-B2Nzvs/lingxi-service/data/runs.db dump",
+      "first_observed_at": "2026-10-11T14:54:07.995352+00:00",
+      "max_rss_kib": 32,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:07.995355+00:00"
+    },
+    {
+      "pid": 42835,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement-inherited/lingxi-r02t06-drill.emS41Y/v7-SdkrkQ --bind 127.0.0.1:0",
+      "first_observed_at": "2026-10-11T14:54:08.138475+00:00",
+      "max_rss_kib": 14192,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:08.138477+00:00"
+    },
+    {
+      "pid": 42838,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "sleep 0.05",
+      "first_observed_at": "2026-10-11T14:54:08.138480+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:08.138481+00:00"
+    },
+    {
+      "pid": 42847,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "(bash)",
+      "first_observed_at": "2026-10-11T14:54:08.276222+00:00",
+      "max_rss_kib": 2416,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:08.276225+00:00"
+    },
+    {
+      "pid": 42858,
+      "ppid": 42847,
+      "pgid": 42584,
+      "args": "(sleep)",
+      "first_observed_at": "2026-10-11T14:54:08.276228+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:08.276229+00:00"
+    },
+    {
+      "pid": 42873,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "(bash)",
+      "first_observed_at": "2026-10-11T14:54:08.414725+00:00",
+      "max_rss_kib": 704,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:08.414728+00:00"
+    },
+    {
+      "pid": 42880,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service --home /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement-inherited/lingxi-r02t06-drill.emS41Y/v8-Zjhhv0 --bind 127.0.0.1:0",
+      "first_observed_at": "2026-10-11T14:54:08.561511+00:00",
+      "max_rss_kib": 24240,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:08.561513+00:00"
+    },
+    {
+      "pid": 42885,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "(sleep)",
+      "first_observed_at": "2026-10-11T14:54:08.561516+00:00",
+      "max_rss_kib": 1488,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:08.561517+00:00"
+    },
+    {
+      "pid": 42907,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "(lingxi-service)",
+      "first_observed_at": "2026-10-11T14:54:08.707195+00:00",
+      "max_rss_kib": 24608,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:08.707198+00:00"
+    },
+    {
+      "pid": 42960,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "<defunct>",
+      "first_observed_at": "2026-10-11T14:54:08.852776+00:00",
+      "max_rss_kib": 0,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:08.852779+00:00"
+    },
+    {
+      "pid": 42961,
+      "ppid": 42584,
+      "pgid": 42584,
+      "args": "(bash)",
+      "first_observed_at": "2026-10-11T14:54:08.852782+00:00",
+      "max_rss_kib": 1280,
+      "max_elapsed_sec": 0,
+      "samples": 1,
+      "last_observed_at": "2026-10-11T14:54:08.852783+00:00"
+    }
+  ],
+  "guard_error": null,
+  "binaries_after": {
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service": "b3e04e9a5246975a5bca8ab600ab01d8c55b93140221f8e5c25952c281d343e9",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-storage-inspect": "65071093207329b48dd073fbe39b3ca7b731ad608eb04033e2c16a5cb22a6be5"
+  },
+  "runner_after_sha256": "d2738c047db4bcdf487ac80a2025624b77f6367c0f287dd35b682010aa97357d",
+  "inputs_stable": true,
+  "binaries_stable": true,
+  "process_group_residue": [],
+  "material_files": [
+    {
+      "path": "recovery-drill/output.log",
+      "sha256": "c9b27490bfc52a9151066b2bb7f2390bc74999c543c5232c1bc3881fc18ebc54",
+      "bytes": 1857
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7-hashes-after.txt",
+      "sha256": "00cc41ca13d2be089fad3336e29f816380835386af443887c06ba805de0604c7",
+      "bytes": 273
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6-seed.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7-seed.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v3-hashes-after.txt",
+      "sha256": "a33ffd69acb495d9a221778bb2317e4cef00e4d752d794b9c1267890666ec43d",
+      "bytes": 93
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6-seed-execute.txt",
+      "sha256": "27badc983df1780b60c2b3fa9d3a19a00e46aac798451f0febdca52920faaddf",
+      "bytes": 3
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8.err",
+      "sha256": "e0ba0c70722cfc645d460f38b02b0abdba327cc4459501be042baf56e5810df2",
+      "bytes": 777
+    },
+    {
+      "path": "recovery-drill/recovery-drill/coexist-after.txt",
+      "sha256": "e1807c9057ccf3f73d7d11a6498b28e7bb896af41b0afe6c7e17d3719bb5a5c0",
+      "bytes": 285
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8.out",
+      "sha256": "b15b4ccbf7321db49ac92139f7ebe8e125e017ed14799e3b29d107bcb04e7314",
+      "bytes": 245
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6-seed.out",
+      "sha256": "bcd34bac23462edb12815016eba5e3c7ab4b51c1a95a8a49e06e7728703c3f21",
+      "bytes": 245
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7-seed.out",
+      "sha256": "1be0fdfc3d78dee451f5930b4caee4dd7442a1326eac31bd2ce4630074d5dfc6",
+      "bytes": 245
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v2-hashes-after.txt",
+      "sha256": "fcb269f1fc43e20619871bab0f6e464d30773313e55b17f725fc62249ab521be",
+      "bytes": 175
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v1.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7-hashes-before.txt",
+      "sha256": "00cc41ca13d2be089fad3336e29f816380835386af443887c06ba805de0604c7",
+      "bytes": 273
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v3.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v5-hashes-after.txt",
+      "sha256": "91b6c161c3777490d6f156680ba71daa486692f0f6fd3354eb1c7b18c4a44d81",
+      "bytes": 273
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v2.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/summary.txt",
+      "sha256": "f28ea0dd5d39fcca056cf6fd52dfaf917644eed59d1762f7bb544ded856a2faa",
+      "bytes": 1818
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v2-hashes-before.txt",
+      "sha256": "fcb269f1fc43e20619871bab0f6e464d30773313e55b17f725fc62249ab521be",
+      "bytes": 175
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6.out",
+      "sha256": "c3ba5ba48bf72c3e2476eb543e026b1728edf0f31aaffda5206b4a6c28494af1",
+      "bytes": 245
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8-seed.out",
+      "sha256": "e025555151bfa27b5b797e3764585e52e1b37739ebe52187c61d33f97c3b11d8",
+      "bytes": 245
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v1-hashes-after.txt",
+      "sha256": "7b2f675d535131e9ee3b95eb996b520af42000b1efea572dc62eff72fd758a84",
+      "bytes": 175
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v5.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8-observed.err",
+      "sha256": "e0ba0c70722cfc645d460f38b02b0abdba327cc4459501be042baf56e5810df2",
+      "bytes": 777
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v4.out",
+      "sha256": "5ae04523c39188702cda3fda04f9ce774dd1992e1dd5d4bbdce07bad82b8d905",
+      "bytes": 245
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v3-hashes-before.txt",
+      "sha256": "a33ffd69acb495d9a221778bb2317e4cef00e4d752d794b9c1267890666ec43d",
+      "bytes": 93
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v5.err",
+      "sha256": "d16d1ac155ae77a78403861f5a1c06ee660ba9b3d770e8b907d2adc3b3d657a9",
+      "bytes": 83
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v4.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v5-hashes-before.txt",
+      "sha256": "91b6c161c3777490d6f156680ba71daa486692f0f6fd3354eb1c7b18c4a44d81",
+      "bytes": 273
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6.err",
+      "sha256": "0f1937af8f2a7a0266017b10a264efd9d6fede8cb0e595edb866b861ff305e86",
+      "bytes": 777
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7.err",
+      "sha256": "14689ff677ec89f4d3c4b0b5917ac05a33e23e46e551408aa6c762bd453b4854",
+      "bytes": 286
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8-seed.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v3.err",
+      "sha256": "af548ae489a900a8250a9392573135a0a49dc850b07a6d538b7cb3bc99c2c578",
+      "bytes": 1151
+    },
+    {
+      "path": "recovery-drill/recovery-drill/coexist-before.txt",
+      "sha256": "e1807c9057ccf3f73d7d11a6498b28e7bb896af41b0afe6c7e17d3719bb5a5c0",
+      "bytes": 285
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v2.err",
+      "sha256": "3350819a6fc3007b9887a6ce20114ea17e68a8dca7f58735ef549b754625abe1",
+      "bytes": 947
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6-recovered-dump.jsonl",
+      "sha256": "c86e5ca0f51576fc24efca93372b6cccc5407896e629bd1a933a0ff3ab7df059",
+      "bytes": 3265
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v1.err",
+      "sha256": "0bafe5279c499637c0d70aeb36e84ba8d4117fd81d68ded379af77587026eccd",
+      "bytes": 1297
+    },
+    {
+      "path": "recovery-drill/recovery-drill/own-created-homes.txt",
+      "sha256": "1baf079dade1f9d13d7199a3a3dd5bdbd8b4fc291f22e79f0786b5dc85fa2d83",
+      "bytes": 1432
+    },
+    {
+      "path": "recovery-drill/recovery-drill/build.log",
+      "sha256": "4cf86278c1e6d659943a46a3d7e3da429ac15be90f0f17742e24ef85228e7d3e",
+      "bytes": 72
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v1-hashes-before.txt",
+      "sha256": "7b2f675d535131e9ee3b95eb996b520af42000b1efea572dc62eff72fd758a84",
+      "bytes": 175
+    }
+  ],
+  "script_build_logs": [
+    {
+      "path": "recovery-drill/recovery-drill/build.log",
+      "sha256": "4cf86278c1e6d659943a46a3d7e3da429ac15be90f0f17742e24ef85228e7d3e",
+      "contents": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.11s\n"
+    }
+  ],
+  "no_recompile_proof": true,
+  "ready_logs": [
+    {
+      "path": "recovery-drill/recovery-drill/v8.out",
+      "lines": [
+        "LINGXI_SERVICE_READY addr=127.0.0.1:62507 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement-inherited/lingxi-r02t06-drill.emS41Y/v8-Zjhhv0 source=cli"
+      ]
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6-seed.out",
+      "lines": [
+        "LINGXI_SERVICE_READY addr=127.0.0.1:62500 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement-inherited/lingxi-r02t06-drill.emS41Y/v6-B2Nzvs source=cli"
+      ]
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7-seed.out",
+      "lines": [
+        "LINGXI_SERVICE_READY addr=127.0.0.1:62503 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement-inherited/lingxi-r02t06-drill.emS41Y/v7-SdkrkQ source=cli"
+      ]
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v1.out",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v3.out",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v2.out",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6.out",
+      "lines": [
+        "LINGXI_SERVICE_READY addr=127.0.0.1:62502 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement-inherited/lingxi-r02t06-drill.emS41Y/v6-B2Nzvs source=cli"
+      ]
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7.out",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8-seed.out",
+      "lines": [
+        "LINGXI_SERVICE_READY addr=127.0.0.1:62505 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement-inherited/lingxi-r02t06-drill.emS41Y/v8-Zjhhv0 source=cli"
+      ]
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v5.out",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v4.out",
+      "lines": [
+        "LINGXI_SERVICE_READY addr=127.0.0.1:62499 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/tmp-shipping-supplement-inherited/lingxi-r02t06-drill.emS41Y/v4-ob4IjQ source=cli"
+      ]
+    }
+  ],
+  "internal_guard_markers": [
+    {
+      "path": "recovery-drill/recovery-drill/v6-seed.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7-seed.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8-observed.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v5.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v4.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v6.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v7.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v8-seed.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v3.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v2.err",
+      "lines": []
+    },
+    {
+      "path": "recovery-drill/recovery-drill/v1.err",
+      "lines": []
+    }
+  ],
+  "original_record_sha256": "69815865536aad1a1827c3cee316939131682891fbfc1166f6b5dd9580bbb670",
+  "inputs_before_digest": "5e75b53dedec8c0faa94fe4674731c0cbb0c53ef04aac4c53de0420e0f6abe79",
+  "inputs_after_digest": "5e75b53dedec8c0faa94fe4674731c0cbb0c53ef04aac4c53de0420e0f6abe79"
+}

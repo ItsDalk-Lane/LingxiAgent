@@ -21,6 +21,7 @@ use lingxi_protocol::{EventEnvelope, EventId, EventPayload, Seq, SessionId, Stre
 
 use super::migrations;
 use super::run_store::{with_write_txn, RunDatabase};
+use super::session_operations::{self, Operation};
 
 /// fork 源会话行快照（agent/owner/title/权限档/授权目录 JSON/谱系深度）。
 type SourceSessionFacts = (String, String, String, Option<String>, String, i64);
@@ -185,6 +186,7 @@ pub async fn seed_session(db: &RunDatabase, req: SeedSession<'_>) -> Result<(), 
     db.queue()
         .submit(move |conn| {
             with_write_txn(conn, busy, |conn| {
+                session_operations::assert_fresh_identity(conn, &session_id)?;
                 conn.execute(
                     "INSERT INTO sessions \
                  (session_id, agent_id, owner_user_id, title, created_at_unix_ms, \
@@ -215,6 +217,24 @@ pub async fn append_message(db: &RunDatabase, req: AppendMessage<'_>) -> Result<
     db.queue()
         .submit(move |conn| {
             with_write_txn(conn, busy, |conn| {
+                // 模型档案只允许接在读取到的同一有效头；检查和写入共用事务。
+                if entry_type == "lingxi-model-exchange-v1" {
+                    let head: Option<String> = conn
+                        .query_row(
+                            "SELECT head_message_id FROM session_branch_heads WHERE session_id=?1",
+                            [&session_id],
+                            |r| r.get(0),
+                        )
+                        .optional()
+                        .map_err(map_err)?
+                        .flatten();
+                    if head != parent {
+                        return Err(StorageError::InvalidRequest {
+                            detail: "model_history: branch head changed before archive commit"
+                                .into(),
+                        });
+                    }
+                }
                 let seq: i64 = conn
                     .query_row(
                         "SELECT COALESCE(MAX(seq),0)+1 FROM messages WHERE session_id=?1",
@@ -241,6 +261,13 @@ pub async fn append_message(db: &RunDatabase, req: AppendMessage<'_>) -> Result<
                     ],
                 )
                 .map_err(map_err)?;
+                super::session_files::sync_message_refs(
+                    conn,
+                    &session_id,
+                    &message_id,
+                    &content,
+                    now as u64,
+                )?;
                 // 追加推进分支头（append-only 的当前叶；分支重置另行回移）。
                 conn.execute(
                     "INSERT INTO session_branch_heads \
@@ -307,9 +334,15 @@ async fn branch_id_chain(
             // 从 head 回溯到 root；`include_markers=false` 时跳过 branch-reset
             // 标记（标记不是历史内容条目）。
             let mut chain = vec![head];
+            let mut seen = std::collections::HashSet::new();
             loop {
                 let cur = chain.last().unwrap().clone();
-                let parent: Option<String> = conn
+                if !seen.insert(cur.clone()) {
+                    return Err(StorageError::Corrupted {
+                        detail: format!("model_history: cycle in branch {sid}"),
+                    });
+                }
+                let row: Option<Option<String>> = conn
                 .query_row(
                     "SELECT parent_message_id FROM messages WHERE session_id=?1 AND message_id=?2",
                     rusqlite::params![sid, cur],
@@ -317,7 +350,10 @@ async fn branch_id_chain(
                 )
                 .optional()
                 .map_err(map_err)?
-                .flatten();
+                ;
+                let parent = row.ok_or_else(|| StorageError::Corrupted {
+                    detail: format!("model_history: missing branch node {cur} in {sid}"),
+                })?;
                 match parent {
                     Some(p) => chain.push(p),
                     None => break,
@@ -332,7 +368,7 @@ async fn branch_id_chain(
                         rusqlite::params![sid, id],
                         |r| r.get::<_, String>(0),
                     )
-                    .map(|t| t == "message")
+                    .map(|t| t == "message" || t == "lingxi-model-exchange-v1")
                     .unwrap_or(false)
                 });
             }
@@ -347,6 +383,33 @@ pub async fn fork_session(
     db: &RunDatabase,
     req: ForkRequest<'_>,
 ) -> Result<ForkOutcome, StorageError> {
+    fork_session_committed(db, req, None)
+        .await
+        .map(|(outcome, _)| outcome)
+}
+pub async fn fork_session_with_files(
+    db: &RunDatabase,
+    req: ForkRequest<'_>,
+    home: Option<std::path::PathBuf>,
+) -> Result<ForkOutcome, StorageError> {
+    fork_session_committed_with_files(db, req, None, home)
+        .await
+        .map(|(outcome, _)| outcome)
+}
+pub async fn fork_session_committed(
+    db: &RunDatabase,
+    req: ForkRequest<'_>,
+    operation: Option<Operation>,
+) -> Result<(ForkOutcome, EventEnvelope), StorageError> {
+    fork_session_committed_with_files(db, req, operation, None).await
+}
+pub async fn fork_session_committed_with_files(
+    db: &RunDatabase,
+    req: ForkRequest<'_>,
+    operation: Option<Operation>,
+    home: Option<std::path::PathBuf>,
+) -> Result<(ForkOutcome, EventEnvelope), StorageError> {
+    let payload_lease = db.file_payload_leases().read_owned().await;
     // 先读源分支链与源会话权限快照（只读）。
     let chain = branch_id_chain(db, req.source_session_id, false).await?;
     let retained = session_tree::plan_fork_retained_ids(chain, req.boundary_message_id).ok_or(
@@ -444,11 +507,36 @@ pub async fn fork_session(
             detail: e.to_string(),
         })?;
 
+    let outcome = ForkOutcome {
+        session_id: req.new_session_id.to_string(),
+        parent_session_id: req.source_session_id.to_string(),
+        fork_point_message_id: req.boundary_message_id.to_string(),
+        lineage_depth: child_depth,
+        permission_mode: perm,
+        authorized_folders: folders,
+    };
+    let receipt = serde_json::json!({"sessionId":outcome.session_id,"parentSessionId":outcome.parent_session_id,"forkPointMessageId":outcome.fork_point_message_id,"lineageDepth":outcome.lineage_depth,"permissionMode":outcome.permission_mode,"authorizedFolders":outcome.authorized_folders});
+    let mut fields = serde_json::Map::new();
+    fields.insert("sessionId".into(), outcome.session_id.clone().into());
+    fields.insert(
+        "parentSessionId".into(),
+        outcome.parent_session_id.clone().into(),
+    );
+    fields.insert(
+        "forkedFromEntryId".into(),
+        outcome.fork_point_message_id.clone().into(),
+    );
+    let expected = operation.as_ref().map(|op| op.snapshot.clone());
     let busy = db.options().busy_timeout_ms;
-    let _: () = db
+    let envelope = db
         .queue()
         .submit(move |conn| {
-            with_write_txn(conn, busy, |conn| {
+            let _payload_lease = payload_lease;
+            let mut copies = super::session_files::ForkCopies::default();
+            let result = with_write_txn(conn, busy, |conn| {
+                if let Some(expected) = expected.as_ref() {
+                    session_operations::verify(conn, &src3, expected)?;
+                }
                 // 事务内重查深度闸（防并发 fork 绕过）。
                 let cur_depth: i64 = conn
                     .query_row(
@@ -478,6 +566,7 @@ pub async fn fork_session(
                         detail: format!("session_exists:{new_id}"),
                     });
                 }
+                session_operations::assert_fresh_identity(conn, &new_id)?;
                 // 新会话行（继承权限快照，绝不扩大）。
                 conn.execute(
                     "INSERT INTO sessions \
@@ -499,6 +588,25 @@ pub async fn fork_session(
                     ],
                 )
                 .map_err(map_err)?;
+                if let Some(home) = &home {
+                    let mut identities = Vec::new();
+                    for row in &rows {
+                        let value: serde_json::Value =
+                            serde_json::from_str(&row.4).map_err(|e| StorageError::Corrupted {
+                                detail: e.to_string(),
+                            })?;
+                        identities.extend(super::session_files::reference_identities(&value));
+                    }
+                    super::session_files::fork_files_on_connection(
+                        conn,
+                        &src3,
+                        &new_id,
+                        &identities,
+                        home,
+                        now as u64,
+                        &mut copies,
+                    )?;
+                }
                 // 复制保留段：除 run_id 外全字段保真（ID/模型调用溯源/提交时刻/
                 // 条目类型原样），仅 seq 重排、parent 重链（root 的 parent 置 NULL）。
                 // run_id 置 NULL（REPAIR-R1 裁决）：副本归属新会话，不持有指向源
@@ -521,6 +629,87 @@ pub async fn fork_session(
                 ) in rows.iter().enumerate()
                 {
                     let seq = (idx + 1) as i64;
+                    // 专档复制只重绑定目标会话，原Run/opaque/工具投影原封保留，不持源Run活外键。
+                    let rebound_content;
+                    let content = if entry_type == "lingxi-model-exchange-v1" {
+                        let mut body: serde_json::Value =
+                            serde_json::from_str(content).map_err(|e| StorageError::Corrupted {
+                                detail: format!("model_history fork JSON: {e}"),
+                            })?;
+                        let digest = body["digest"]
+                            .as_str()
+                            .ok_or_else(|| StorageError::Corrupted {
+                                detail: "model_history fork missing digest".into(),
+                            })?
+                            .to_string();
+                        body.as_object_mut()
+                            .ok_or_else(|| StorageError::Corrupted {
+                                detail: "model_history fork object".into(),
+                            })?
+                            .remove("digest");
+                        let actor = lingxi_kernel::recovery::principal_from_storage_facts(
+                            body["actorKind"]
+                                .as_str()
+                                .ok_or_else(|| StorageError::Corrupted {
+                                    detail: "model_history fork missing actor kind".into(),
+                                })?,
+                            body["actorSubject"].as_str().ok_or_else(|| {
+                                StorageError::Corrupted {
+                                    detail: "model_history fork missing actor subject".into(),
+                                }
+                            })?,
+                        )?;
+                        if !matches!(actor, lingxi_kernel::Principal::LocalUser)
+                            && actor.storage_subject() != owner
+                        {
+                            return Err(StorageError::Corrupted {
+                                detail: "model_history fork actor/session owner mismatch".into(),
+                            });
+                        }
+                        if body["schema"] != "lingxi-model-exchange-v1"
+                            || body["boundSession"] != src3
+                            || body["owner"] != owner
+                            || body["agent"] != agent_id
+                            || digest != canon::sha256_hex(&canon::canonical_json_bytes(&body))
+                        {
+                            return Err(StorageError::Corrupted {
+                                detail: "model_history fork scope/digest disagreement".into(),
+                            });
+                        }
+                        let source_run = body["sourceRun"]
+                            .as_str()
+                            .filter(|id| !id.is_empty())
+                            .ok_or_else(|| StorageError::Corrupted {
+                                detail: "model_history fork source Run missing".into(),
+                            })?;
+                        if body["sourceSession"].as_str().is_none_or(str::is_empty)
+                            || !rows.iter().any(|r| r.0 == format!("user:{source_run}"))
+                            || !matches!(
+                                body["payload"]["mode"].as_str(),
+                                Some("append" | "replace")
+                            )
+                            || body["payload"]["items"].as_array().is_none_or(|items| {
+                                items.iter().any(|item| {
+                                    !matches!(
+                                        item["kind"].as_str(),
+                                        Some("user" | "assistant" | "tool" | "summary")
+                                    )
+                                })
+                            })
+                        {
+                            return Err(StorageError::Corrupted {
+                                detail: "model_history fork source/structure disagreement".into(),
+                            });
+                        }
+                        body["boundSession"] = serde_json::json!(new_id);
+                        body["digest"] = serde_json::json!(canon::sha256_hex(
+                            &canon::canonical_json_bytes(&body)
+                        ));
+                        rebound_content = body.to_string();
+                        &rebound_content
+                    } else {
+                        content
+                    };
                     conn.execute(
                         "INSERT INTO messages \
                      (message_id, session_id, run_id, role, content_json, model_call_id, \
@@ -539,6 +728,11 @@ pub async fn fork_session(
                         ],
                     )
                     .map_err(map_err)?;
+                    if home.is_some() {
+                        super::session_files::sync_message_refs(
+                            conn, &new_id, mid, content, now as u64,
+                        )?;
+                    }
                     prev = Some(mid.clone());
                 }
                 // 新会话分支头 = boundary。
@@ -550,19 +744,26 @@ pub async fn fork_session(
                     rusqlite::params![new_id, boundary, now],
                 )
                 .map_err(map_err)?;
-                Ok(())
-            })
+                let envelope = insert_key_event(
+                    conn,
+                    &new_id,
+                    &format!("{new_id}-fork"),
+                    unknown_payload("session_created", fields.clone()),
+                    now,
+                )?;
+                if let Some(op) = operation.as_ref() {
+                    session_operations::complete(conn, op, &receipt, now)?;
+                }
+                Ok(envelope)
+            });
+            if result.is_ok() {
+                copies.commit();
+            }
+            result
         })
         .await?;
 
-    Ok(ForkOutcome {
-        session_id: req.new_session_id.to_string(),
-        parent_session_id: req.source_session_id.to_string(),
-        fork_point_message_id: req.boundary_message_id.to_string(),
-        lineage_depth: child_depth,
-        permission_mode: perm,
-        authorized_folders: folders,
-    })
+    Ok((outcome, envelope))
 }
 
 /// 当前分支的有序消息（root→…→head）。
@@ -879,6 +1080,17 @@ pub async fn reset_branch_head(
     db: &RunDatabase,
     req: ResetBranchHead<'_>,
 ) -> Result<String, StorageError> {
+    reset_branch_head_committed(db, req, None, serde_json::Map::new(), serde_json::json!({}))
+        .await
+        .map(|(id, _)| id)
+}
+pub async fn reset_branch_head_committed(
+    db: &RunDatabase,
+    req: ResetBranchHead<'_>,
+    operation: Option<Operation>,
+    fields: serde_json::Map<String, serde_json::Value>,
+    mut receipt: serde_json::Value,
+) -> Result<(String, EventEnvelope), StorageError> {
     let sid = req.session_id.to_string();
     let new_head: Option<String> = req.new_head_message_id.map(str::to_string);
     let source_id: Option<String> = req.source_message_id.map(str::to_string);
@@ -888,6 +1100,9 @@ pub async fn reset_branch_head(
     db.queue()
         .submit(move |conn| {
             with_write_txn(conn, busy, |conn| {
+                if let Some(op) = operation.as_ref() {
+                    session_operations::verify(conn, &sid, &op.snapshot)?;
+                }
                 // 1) 追加 reset 标记（parent=新头，append-only）。
                 let seq: i64 = conn
                     .query_row(
@@ -936,7 +1151,18 @@ pub async fn reset_branch_head(
                     rusqlite::params![sid, marker_id, now],
                 )
                 .map_err(map_err)?;
-                Ok(marker_id)
+                let envelope = insert_key_event(
+                    conn,
+                    &sid,
+                    &marker_id,
+                    unknown_payload("session_branch_reset", fields.clone()),
+                    now,
+                )?;
+                receipt["resetMarkerId"] = marker_id.clone().into();
+                if let Some(op) = operation.as_ref() {
+                    session_operations::complete(conn, op, &receipt, now)?;
+                }
+                Ok((marker_id, envelope))
             })
         })
         .await
@@ -952,43 +1178,43 @@ pub async fn stage_key_event(
     payload: EventPayload,
     now_unix_ms: u64,
 ) -> Result<EventEnvelope, StorageError> {
-    let sid = session_id.to_string();
-    let eid = event_id.to_string();
-    let now = now_unix_ms as i64;
+    let (sid, eid) = (session_id.to_string(), event_id.to_string());
     let busy = db.options().busy_timeout_ms;
     db.queue()
         .submit(move |conn| {
             with_write_txn(conn, busy, |conn| {
-                let current: Option<i64> = conn
-                    .query_row(
-                        "SELECT MAX(seq) FROM key_events WHERE stream_id=?1",
-                        [&sid],
-                        |r| r.get(0),
-                    )
-                    .map_err(map_err)?;
-                let seq = current.unwrap_or(0) + 1;
-                let payload_json = canon::canonical_string(&payload);
-                let event_type = payload.event_type().to_string();
-                conn.execute(
-                    "INSERT INTO key_events \
-                 (event_id, stream_id, seq, session_id, run_id, attempt, event_type, \
-                  payload_json, committed_at_unix_ms) \
-                 VALUES (?1,?2,?3,?4,NULL,NULL,?5,?6,?7)",
-                    rusqlite::params![eid, sid, seq, sid, event_type, payload_json, now],
-                )
-                .map_err(map_err)?;
-                Ok(EventEnvelope::new(
-                    EventId::new(eid),
-                    StreamId::new(sid.clone()),
-                    Seq::new(seq as u64),
-                    SessionId::new(sid),
-                    None,
-                    None,
-                    payload,
-                ))
+                insert_key_event(conn, &sid, &eid, payload.clone(), now_unix_ms as i64)
             })
         })
         .await
+}
+fn insert_key_event(
+    conn: &rusqlite::Connection,
+    sid: &str,
+    eid: &str,
+    payload: EventPayload,
+    now: i64,
+) -> Result<EventEnvelope, StorageError> {
+    let current: Option<i64> = conn
+        .query_row(
+            "SELECT MAX(seq) FROM key_events WHERE stream_id=?1",
+            [sid],
+            |r| r.get(0),
+        )
+        .map_err(map_err)?;
+    let seq = current.unwrap_or(0) + 1;
+    let payload_json = canon::canonical_string(&payload);
+    let event_type = payload.event_type().to_string();
+    conn.execute("INSERT INTO key_events(event_id,stream_id,seq,session_id,run_id,attempt,event_type,payload_json,committed_at_unix_ms) VALUES(?1,?2,?3,?2,NULL,NULL,?4,?5,?6)",rusqlite::params![eid,sid,seq,event_type,payload_json,now]).map_err(map_err)?;
+    Ok(EventEnvelope::new(
+        EventId::new(eid),
+        StreamId::new(sid),
+        Seq::new(seq as u64),
+        SessionId::new(sid),
+        None,
+        None,
+        payload,
+    ))
 }
 
 /// 构造一个 Unknown 透传事件负载（`lingxi.wire` v1 开放词汇的显式扩展面）。
@@ -1235,9 +1461,8 @@ pub async fn list_file_contents(
         .await
 }
 
-/// 会话全部检查点见证过的 (file_path, sha256) 集合（rewind 三档判定的
-/// 「系统见证」输入：当前内容哈希在此集合内 = 检查点之后的改动曾被系统
-/// 记录过，如模型自己的后续回合 → 可安全写回存档；不在 = 外部修改 → 拒绝覆盖）。
+/// 会话检查点的历史 (file_path, sha256) 内容索引。
+/// 曾读取相同哈希不证明当前文件来自应用写入，不能单独作为恢复授权。
 pub async fn list_session_file_hashes(
     db: &RunDatabase,
     session_id: &str,
@@ -1296,6 +1521,31 @@ pub async fn find_checkpoint_by_turn_input(
             )
             .optional()
             .map_err(map_err)
+        })
+        .await
+}
+
+/// 当前会话文件授权的串行操作边界；恢复期间授权修改不会穿过本操作。
+pub async fn with_current_file_authorization<T: Send + 'static>(
+    db: &RunDatabase,
+    session_id: &str,
+    operation: impl FnOnce(Vec<String>) -> Result<T, StorageError> + Send + 'static,
+) -> Result<T, StorageError> {
+    let session = session_id.to_owned();
+    db.queue()
+        .submit(move |conn| {
+            let folders: String = conn
+                .query_row(
+                    "SELECT authorized_folders_json FROM sessions WHERE session_id=?1",
+                    [&session],
+                    |r| r.get(0),
+                )
+                .map_err(map_err)?;
+            let roots: Vec<String> =
+                serde_json::from_str(&folders).map_err(|e| StorageError::InvalidRequest {
+                    detail: format!("invalid current file authorization: {e}"),
+                })?;
+            operation(roots)
         })
         .await
 }

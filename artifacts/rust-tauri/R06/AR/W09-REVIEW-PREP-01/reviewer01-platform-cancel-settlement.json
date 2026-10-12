@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-11T15:28:16.590340+00:00",
+  "role": "ROOT_AFTER_PLATFORM_CANCEL_ACTUAL_SETTLEMENT_NOT_REVIEW",
+  "owner": "/root/ar_w09_reviewer_01",
+  "record": "/Users/study_superior/.codex/r06-isolated-checkouts/w09-first-review-source-01/artifacts/rust-tauri/R06/AR/W09-R01/safe/commands/whole-workspace-01/record.json",
+  "record_sha256": "c1f0039432a21ae5b7b18b4ebc7e767d2e764a955763f1d64ea7c44163cfe7f4",
+  "source_stable": true,
+  "runner_exception": "KeyboardInterrupt()",
+  "monitor_supervised_child_exit": -15,
+  "elapsed_seconds": 468.37222050000855,
+  "wait_reap_root": true,
+  "recorded_guard_trigger": null,
+  "recorded_pid_windows": 638,
+  "recorded_pid_windows_are_not_test_count": true,
+  "actual_registered_group_late_PS_live": [],
+  "actual_known_owned_marker_PS_live": [],
+  "record_residual_owned_pids": [],
+  "unknown_adopted_exit_codes_not_invented": true,
+  "formal_chain": "NOT_RUN_NO_COMPLETED_STAGE_OR_REVIEW",
+  "formal_review_verdict": "NONE_PLATFORM_INTERRUPTED",
+  "completed_formal_Reviewer_FAIL_count_increment": false,
+  "retry": false
+}

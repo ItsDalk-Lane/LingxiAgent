@@ -1,0 +1,51 @@
+{
+  "failed": {
+    "artifactId": "kpa_2ab96beff4c5f5d3989136ad",
+    "attempt": 1,
+    "cancelledAt": null,
+    "chunkerConfigId": "8b93f0aa4fa689af",
+    "createdAt": "2026-10-11T11:54:53.359Z",
+    "embeddingStats": {
+      "abandonedStaleVariantId": null,
+      "actualWrittenChunkCount": 0,
+      "attempt": 1,
+      "callAttemptCount": 1,
+      "chunksNewlyEmbedded": 0,
+      "chunksResumedFromCheckpoint": 0,
+      "chunksReusedFromReadyVariant": 0,
+      "failedCallCount": 1,
+      "failedRequestCount": 0,
+      "model": null,
+      "pendingCallIntentCount": 0,
+      "pendingRequestCount": 0,
+      "plannedChunkCount": 1,
+      "previousRequestCount": 0,
+      "requestCount": 0,
+      "resetStaleVectors": false,
+      "successfulRequestCount": 0,
+      "unknownRequestsFromPreviousAttempt": 0
+    },
+    "error": "KNOWLEDGE_MODEL_UNAVAILABLE: provider request construction failed before send: builder error",
+    "id": "kjob_ea77ab731c0e0a086b1d04c7",
+    "notebookId": "knb_f913f42b207824cc3911a14f",
+    "phase": "embed",
+    "progressDone": 0,
+    "progressTotal": 1,
+    "sourceId": "ksrc_01f73db9e76c22a845724f74",
+    "status": "failed",
+    "updatedAt": "2026-10-11T11:54:53.362Z"
+  },
+  "ledger": [
+    {
+      "input_tokens": null,
+      "model": "model-a",
+      "model_call_id": "op-embedding-1791719693361-0",
+      "outcome": "failed",
+      "provider": "embed",
+      "transport_attempts": 0,
+      "usage_state": "unknown"
+    }
+  ],
+  "vectors": [],
+  "wire": []
+}

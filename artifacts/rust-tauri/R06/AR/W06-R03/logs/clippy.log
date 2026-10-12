@@ -1,0 +1,2 @@
+{"command": ["/Users/study_superior/.cargo/bin/cargo", "clippy", "--manifest-path", "rust/Cargo.toml", "--workspace", "--all-targets", "--locked", "-j8", "--", "-D", "warnings"], "start": 1791707329.997194, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-clippy-_tu4gmys", "guard": "8192MB/600s"}
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.31s

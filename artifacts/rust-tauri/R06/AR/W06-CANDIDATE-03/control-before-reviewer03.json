@@ -1,0 +1,270 @@
+{
+  "id": "R06-AR-F06",
+  "work_id": "R06-AR-W06",
+  "title": "行扫描 YAML 会静默误读合法配置，甚至把关闭的记忆恢复为默认开启",
+  "original_requirement": [
+    "R06-T01",
+    "R06-T06"
+  ],
+  "source_path": [
+    {
+      "path": "rust/crates/lingxi-service/src/context_compiler.rs",
+      "source_lines_hint": "372-452",
+      "citation_reference": "turn135file0",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/context_compiler.rs#L372-L452"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/context_compiler.rs",
+      "source_lines_hint": "695-774",
+      "citation_reference": "turn136file0",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/context_compiler.rs#L695-L774"
+    }
+  ],
+  "observed_fact": "scan_agent_config 使用逐行 section/key 扫描，clean_value 在处理引号前先按“ #”切断。它不理解 flow mapping、完整 YAML 引号/转义/层次语义；gather 在 memory.enabled 未识别时 unwrap_or(true)。因此合法的 memory: { enabled: false } 不会得到 false；带引号的名称如 \"Agent #1\" 会被错误截断。代码把它登记为子集实现，但没有对未支持的合法格式响亮拒绝。",
+  "reproduction_status": "OLD_BEHAVIOR_FAILURE_CONFIRMED_FROM_ACTUAL_LOG",
+  "root_cause": {
+    "status": "SOURCE_AND_OLD_RUNTIME_CONFIRMED_NEW_PARSER_COUNTEREXAMPLES_REQUIRE_P02",
+    "description": "scan_agent_config 使用逐行 section/key 扫描，clean_value 在处理引号前先按“ #”切断。它不理解 flow mapping、完整 YAML 引号/转义/层次语义；gather 在 memory.enabled 未识别时 unwrap_or(true)。因此合法的 memory: { enabled: false } 不会得到 false；带引号的名称如 \"Agent #1\" 会被错误截断。代码把它登记为子集实现，但没有对未支持的合法格式响亮拒绝。"
+  },
+  "all_affected_paths": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/agent_config.rs",
+      "entry_points": "parse/validate_owned_keys/apply_merge/scan/flags/skill_lists/set/render",
+      "evidence_status": "FORMAL_R02_FAIL_LITERAL_MERGE_AND_TAG_CONFIRMED_P02_PENDING",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-R02/probe-results.json"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/context_compiler.rs",
+      "entry_points": "scan_agent_config/read_config_scan/gather/roster",
+      "evidence_status": "REPAIR_SOURCE_SCAN_AND_PARTIAL_RUNTIME_PENDING_VALID_INDEPENDENT_PASS",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-P01/family-matrix.json"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/memory.rs",
+      "entry_points": "locale_is_zh/read_flags/patch_flags/config/experience routes",
+      "evidence_status": "REPAIR_SOURCE_SCAN_AND_PARTIAL_RUNTIME_PENDING_VALID_INDEPENDENT_PASS",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-P01/family-matrix.json"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/memorytools.rs",
+      "entry_points": "run-time memory switch / enable_for_agent",
+      "evidence_status": "REPAIR_SOURCE_SCAN_AND_PARTIAL_RUNTIME_PENDING_VALID_INDEPENDENT_PASS",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-P01/family-matrix.json"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/persona.rs",
+      "entry_points": "locale/yuan/personality reads",
+      "evidence_status": "REPAIR_SOURCE_SCAN_AND_PARTIAL_RUNTIME_PENDING_VALID_INDEPENDENT_PASS",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-P01/family-matrix.json"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/skills.rs",
+      "entry_points": "list/policy/enable/disable/scrub/cleanup/runtime catalog",
+      "evidence_status": "REPAIR_SOURCE_SCAN_AND_PARTIAL_RUNTIME_PENDING_VALID_INDEPENDENT_PASS",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-P01/family-matrix.json"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/agent_memory.rs",
+      "entry_points": "read/write flags/lists/atomic patch",
+      "evidence_status": "REPAIR_SOURCE_SCAN_AND_PARTIAL_RUNTIME_PENDING_VALID_INDEPENDENT_PASS",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-P01/family-matrix.json"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/skill_library.rs",
+      "entry_points": "collect_enabled_skills_of_other_agents",
+      "evidence_status": "REPAIR_SOURCE_SCAN_AND_PARTIAL_RUNTIME_PENDING_VALID_INDEPENDENT_PASS",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-P01/family-matrix.json"
+    }
+  ],
+  "repair": {
+    "required_steps": [
+      "复用或建立单一真正的配置解析/归一化入口，支持现役允许的 YAML 语义；依赖需按现有锁定版本和官方接口验证，不为简单读取自造另一套不完整语言。",
+      "区分文件缺失允许默认、字段缺失允许默认、语法损坏/不支持类型必须报错；不得把解析失败当默认开启。",
+      "引号内 #、转义、flow/block mapping、嵌套层级、CRLF/BOM/Unicode 和明确布尔值都做等价性测试。",
+      "所有使用同类行扫描读取安全/记忆/人格开关的地方一起排查，保持未知兼容字段而不整体覆盖配置。"
+    ],
+    "status": "P03_FROZEN_FINAL_SELF_CHECK_IN_PROGRESS",
+    "latest_candidate": "W06-CANDIDATE-03",
+    "root_aggregate": "ff5e2a83231ae6f6f306a7558d9c801fffdb66667d47da7e9fff986d1aa51e35"
+  },
+  "repair_commits": [],
+  "self_check": {
+    "status": "REPAIR_REPORT_PASS_NOT_INDEPENDENT_ACCEPTANCE",
+    "cases": [
+      {
+        "name": "等价 YAML 不改变记忆开关",
+        "procedure": "同一配置分别使用 block mapping 与 memory: { enabled: false }，经真正材料采集和模型请求执行。",
+        "expected": "两种合法写法都关闭相应记忆注入行为；不得 fallback 为 true；与现役配置定义一致。",
+        "status": "REPAIR_SELF_CHECK_PASS_PENDING_INDEPENDENT_REVIEW",
+        "evidence": [
+          "artifacts/rust-tauri/R06/AR/W06-P01/final-four-c-01.json",
+          "artifacts/rust-tauri/R06/AR/W06-P01/family-business-results.json"
+        ],
+        "id": "R06-AR-F06-C01",
+        "issue_id": "R06-AR-F06",
+        "required": true
+      },
+      {
+        "name": "引号、注释和转义保真",
+        "procedure": "名称包含 #、引号转义、中文和冒号；加入行外注释、CRLF/BOM。",
+        "expected": "解析后的字符串与标准语义一致；行外注释忽略，字符串内部内容保留。",
+        "status": "REPAIR_SELF_CHECK_PASS_PENDING_INDEPENDENT_REVIEW",
+        "evidence": [
+          "artifacts/rust-tauri/R06/AR/W06-P01/final-four-c-01.json"
+        ],
+        "id": "R06-AR-F06-C02",
+        "issue_id": "R06-AR-F06",
+        "required": true
+      },
+      {
+        "name": "嵌套同名键与异常类型",
+        "procedure": "在 unrelated 子对象放 name/enabled，并分别输入无效语法、错误类型、重复敏感键。",
+        "expected": "不会误把深层键当 agent/memory 直接字段；非法输入明确诊断，不悄悄启用功能。",
+        "status": "REPAIR_SELF_CHECK_PASS_PENDING_INDEPENDENT_REVIEW",
+        "evidence": [
+          "artifacts/rust-tauri/R06/AR/W06-P01/final-four-c-01.json",
+          "artifacts/rust-tauri/R06/AR/W06-P01/family-matrix.json",
+          "artifacts/rust-tauri/R06/AR/W06-P01/family-business-results.json"
+        ],
+        "id": "R06-AR-F06-C03",
+        "issue_id": "R06-AR-F06",
+        "required": true
+      },
+      {
+        "name": "默认值与老配置兼容",
+        "procedure": "缺文件、空配置、部分配置和现役脱敏样本分别加载。",
+        "expected": "允许默认的情况按原行为，损坏和不支持不被混同；用户配置没有被解析后重写丢字段。",
+        "status": "REPAIR_SELF_CHECK_PASS_PENDING_INDEPENDENT_REVIEW",
+        "evidence": [
+          "artifacts/rust-tauri/R06/AR/W06-P01/final-four-c-01.json"
+        ],
+        "id": "R06-AR-F06-C04",
+        "issue_id": "R06-AR-F06",
+        "required": true
+      }
+    ],
+    "executor_evidence": "artifacts/rust-tauri/R06/AR/W06-E01/results.json",
+    "repair_evidence": "artifacts/rust-tauri/R06/AR/W06-P01/results.json",
+    "latest_candidate_status": "P02_FINAL_FORMAT_SHA_NOT_RUN_PRIOR_INTERMEDIATE_RESULTS_STALE"
+  },
+  "adversarial_self_check": {
+    "status": "REPAIR_REPORT_PASS_PENDING_NEW_REVIEW",
+    "required": [
+      "必须经生产 gather/请求捕获验证开关，而非测试新解析器但生产仍调用旧扫描器。",
+      "将 flow mapping 恢复为旧扫描逻辑的变异副本应命中必需反例。"
+    ],
+    "latest_candidate_status": "P02_PARTIAL_NOT_FINAL"
+  },
+  "independent_review": {
+    "status": "FAIL",
+    "rounds": [
+      {
+        "round": 1,
+        "agent": "/root/ar_w06_reviewer_01",
+        "status": "FAIL",
+        "evidence": "artifacts/rust-tauri/R06/AR/W06-R01",
+        "binding": "artifacts/rust-tauri/R06/AR/W06-CANDIDATE-01/binding.json",
+        "blockers": [
+          "R06-AR-W06-R01-F01"
+        ],
+        "report": "artifacts/rust-tauri/R06/AR/W06-R01/REPORT.md"
+      },
+      {
+        "round": 2,
+        "agent": "/root/ar_w06_reviewer_02",
+        "status": "FAIL",
+        "evidence": "artifacts/rust-tauri/R06/AR/W06-R02",
+        "binding": "artifacts/rust-tauri/R06/AR/W06-CANDIDATE-02/binding.json",
+        "trigger": "R01 FAIL -> new Repair P01 -> new Reviewer R02",
+        "blockers": [
+          "R06-AR-W06-R02-F01",
+          "R06-AR-W06-R02-F02"
+        ],
+        "report": "artifacts/rust-tauri/R06/AR/W06-R02/REPORT.md"
+      }
+    ],
+    "confirmed_blockers_pending_final_report": [
+      {
+        "id": "W06-R01-B01",
+        "actual": "合法复合键对应memory/enabled时未识别，flags200 memoryEnabled=true，真实binary执行wire包含合成记忆；agent/name与workspace_context同族也漏读",
+        "root_cause": "结构化解析保留非字符串键，敏感字段只按字符串key查询，未校验/归一化导致错误当缺失",
+        "evidence": [
+          "artifacts/rust-tauri/R06/AR/W06-R01/probe-results.json",
+          "artifacts/rust-tauri/R06/AR/W06-R01/family-probe-results.json"
+        ],
+        "required": "按原现役配置合法形态明确处理键及归一化冲突，禁止默认启用敏感功能；全同族消费者检查"
+      }
+    ],
+    "new_confirmed_counterexamples_pending_final_report": [
+      {
+        "id": "W06-R02-MERGE-LITERAL",
+        "status": "FORMAL_R02_FAIL_CONFIRMED",
+        "actual": "合法quoted/!!str字面<<错误变merge：memory/experience/workspace/agent/peer skills及未知字段patch被改变；真实HTTP/wire与现役js-yaml对照",
+        "source": "artifacts/rust-tauri/R06/AR/W06-R02/probe-results.json",
+        "same_family": "统一AgentConfigDocument.parse/validate_owned_keys/apply_merge全部消费者",
+        "repair_required": "恢复真实merge键和普通字符串键的语义区别；保留未知结构、有效开关默认与实际merge正对照",
+        "prior_intermediate_status": "ACTUAL_PRODUCTION_CONTRACT_FAILURE_REPORTED_REVIEW_NOT_FINAL",
+        "formal_report": "artifacts/rust-tauri/R06/AR/W06-R02/REPORT.md"
+      },
+      {
+        "id": "W06-R02-UNKNOWN-YAML-TAG",
+        "status": "FORMAL_R02_FAIL_CONFIRMED",
+        "actual": "!custom标签在memory.enabled/agent.name/memory分区被as_bool/as_str/as_mapping自动解包；实际flags200/Run完成及模型wire，PATCH200；现役js-yaml拒绝未知tag",
+        "source": "artifacts/rust-tauri/R06/AR/W06-R02/probe-results.json",
+        "same_family": "统一AgentConfigDocument类型检查所有消费者",
+        "repair_required": "不支持的YAML类型/标签明确拒绝，不能隐式解包或变成缺字段默认；真实当前请求与保存入口全族检查",
+        "prior_intermediate_status": "ACTUAL_PRODUCTION_CONTRACT_FAILURE_REPORTED_REVIEW_NOT_FINAL",
+        "formal_report": "artifacts/rust-tauri/R06/AR/W06-R02/REPORT.md"
+      }
+    ]
+  },
+  "remaining_scope": [
+    "复用或建立单一真正的配置解析/归一化入口，支持现役允许的 YAML 语义；依赖需按现有锁定版本和官方接口验证，不为简单读取自造另一套不完整语言。",
+    "区分文件缺失允许默认、字段缺失允许默认、语法损坏/不支持类型必须报错；不得把解析失败当默认开启。",
+    "引号内 #、转义、flow/block mapping、嵌套层级、CRLF/BOM/Unicode 和明确布尔值都做等价性测试。",
+    "所有使用同类行扫描读取安全/记忆/人格开关的地方一起排查，保持未知兼容字段而不整体覆盖配置。",
+    "R06-AR-W06-R01-F01：复合键/归一化重复的敏感默认与更新边界"
+  ],
+  "status": "FRESH_P03_REPAIR_AFTER_R02_FAIL_AND_ROOT_CAUSE",
+  "evidence": [
+    "artifacts/rust-tauri/R06/AR/W06-E01/logs/old-positive.log",
+    "artifacts/rust-tauri/R06/AR/W06-E01/logs/old-red.log",
+    "artifacts/rust-tauri/R06/AR/W06-P01/results.json",
+    "artifacts/rust-tauri/R06/AR/W06-CANDIDATE-03/binding.json"
+  ],
+  "old_behavior_reproduction": {
+    "status": "FAIL_AS_EXPECTED",
+    "normal_positive_passed": 1,
+    "contract_failures": 2,
+    "actual_model_requests": 1,
+    "guard": "armed8192MB/600s",
+    "scope": "合法flow关闭没有关闭实际模型请求记忆，quoted#名称遭截断；不是编译失败或空测试",
+    "evidence": [
+      "artifacts/rust-tauri/R06/AR/W06-E01/logs/old-positive.log",
+      "artifacts/rust-tauri/R06/AR/W06-E01/logs/old-red.log"
+    ]
+  },
+  "current_repair_evidence": "artifacts/rust-tauri/R06/AR/W06-P03",
+  "current_reviewer_evidence": "artifacts/rust-tauri/R06/AR/W06-R02",
+  "control_observations": [
+    {
+      "recorded_at": "2026-10-11T07:05:41.916009+00:00",
+      "role": "ROOT_CONTROL_NOT_REVIEWER",
+      "status": "SOURCE_CONFIRMED_PENDING_P02_RUNTIME",
+      "path": "rust/crates/lingxi-service/src/memorytools.rs",
+      "entry": "run_install_skill/enable_for_agent",
+      "fact": "let _ = self.enable_for_agent(name)吞配置错误仍称enabled；允许原owned内最小前置验证和真实错误传播",
+      "remaining": "新Gateway正反实测与全新Reviewer；EX03整包格式义务仍OPEN"
+    }
+  ],
+  "stale_dependencies": [
+    {
+      "id": "R06-AR-F05",
+      "status": "OPEN_REPORTED_RUNTIME_FAILURE_PENDING_OWN_EXECUTION",
+      "fact": "P02保存后同一session下一Run仍取冻结材料；新sessionreload仅证明F06解析/保存契约，不代完整材料刷新",
+      "evidence": "artifacts/rust-tauri/R06/AR/W06-P02",
+      "recorded_at": "2026-10-11T07:05:41.916009+00:00"
+    }
+  ],
+  "current_root_cause_evidence": "artifacts/rust-tauri/R06/AR/W06-RC01"
+}

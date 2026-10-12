@@ -1,0 +1,76 @@
+{
+  "at": "2026-10-11T14:50:17.160046+00:00",
+  "actual_exit": 1,
+  "cause": "KeyError binaries_after in evidence packaging; earliest preparation-failed command has no executed-after inventory; never backfill old unknown",
+  "missing_records": [
+    {
+      "record": "commands/registry-current-07/record.json",
+      "record_sha256": "facf10ff9d8f586984c0a83daedc472536a9189d387904acd326198c208ba537",
+      "exit": 1,
+      "preparation_failure": null
+    },
+    {
+      "record": "commands/baseline-build-01/record.json",
+      "record_sha256": "fe6e111863d2ad97d415d3a6fe30b72db08e084b212fbbe8deb568aca99df2ba",
+      "exit": 0,
+      "preparation_failure": null
+    },
+    {
+      "record": "commands/repair-green-02/record.json",
+      "record_sha256": "d8bd5129ab8c9baf42e868697d15c1754c8dd49b166d34647f9b93ef90e25a53",
+      "exit": 0,
+      "preparation_failure": null
+    },
+    {
+      "record": "commands/broad-regression-build-04/record.json",
+      "record_sha256": "8ceed043284ccb58ffe520e725e939f5f5fd1bdf6437fa1d73277fb686cb681a",
+      "exit": 101,
+      "preparation_failure": null
+    },
+    {
+      "record": "commands/expanded-family-03/record.json",
+      "record_sha256": "b73db80801e4e41bcee6b1f019ade9e46f1b93ebae1100cbd5f541b363ec865c",
+      "exit": 0,
+      "preparation_failure": null
+    },
+    {
+      "record": "commands/baseline-red-01/record.json",
+      "record_sha256": "22af8408ba69feb768a083e9d08ee619936c450f0bbf2c8e35becb0bc6a67860",
+      "exit": 101,
+      "preparation_failure": null
+    },
+    {
+      "record": "commands/build-repair-01/record.json",
+      "record_sha256": "d2089c5b0556a310619ea3f87eeacf0ed808a4fe5bb7a15d210507bcc9a39de0",
+      "exit": 101,
+      "preparation_failure": null
+    },
+    {
+      "record": "commands/identity-original-06/record.json",
+      "record_sha256": "78f213526e2750b4703b5da8464355f7f3cc9e71fa385d2cfc6367f2d46a6d09",
+      "exit": 101,
+      "preparation_failure": null
+    },
+    {
+      "record": "commands/baseline-red-03/record.json",
+      "record_sha256": "8fc6f68309559ef330b1e2beea521b1faba2f6b7fbe8284101c33136aebd04c4",
+      "exit": 101,
+      "preparation_failure": null
+    },
+    {
+      "record": "commands/observer-family-05/record.json",
+      "record_sha256": "6ced7b0a2952eaa9616de7c8786a99fd8827de2bed92aa2e35d02dadd82ff903",
+      "exit": 0,
+      "preparation_failure": null
+    },
+    {
+      "record": "commands/baseline-red-02/record.json",
+      "record_sha256": "c00119315ff919c99d61a64328b9d60391ae90a29e0310c6a72e7ac621f187b8",
+      "exit": 101,
+      "preparation_failure": null
+    }
+  ],
+  "partial_safe_retained": "LOCAL_ONLY_NEVER_GIT/failed-safe-preparation-01/partial-safe",
+  "product_changes": "NONE",
+  "correction": "Original description called the missing after-inventory an early preparation-failed record. Actual missing set contains11 early records, including genuine executed green/red commands. Their original command results remain valid observations; absent after-inventory remains UNKNOWN. Packaging KeyError is evidence-generation failure only."
+}

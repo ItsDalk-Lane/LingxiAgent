@@ -1,0 +1,16 @@
+{
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "tests/knowledge-index-metadata-backfill.test.ts",
+    "tests/knowledge-index-variants.test.ts",
+    "tests/knowledge-ann-index-store.test.ts",
+    "--maxWorkers=1"
+  ],
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r01-ts-extra-izf55hto",
+  "start": 1791698709.5368462,
+  "end": 1791698711.7212002,
+  "exit_code": 0,
+  "log_sha256": "7252e4342cf7dcff3f4dd96982e3aae8ec2656ff19bffa345ba2adf66ad2bb07"
+}

@@ -1,0 +1,62 @@
+{
+  "binding": {
+    "kind": "script",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/rust-tauri/r02_registry_consistency.py",
+      "--root",
+      "."
+    ],
+    "stdoutPattern": "^PASS: migrations\\.rs MIGRATIONS == registry \\(",
+    "timeoutSecs": 120,
+    "evidenceMeaning": "严格核对源码迁移与登记"
+  },
+  "argv": [
+    "python3",
+    "-B",
+    "scripts/rust-tauri/r02_registry_consistency.py",
+    "--root",
+    "."
+  ],
+  "cwd": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq",
+  "sourceBeforeSha256": "977f5e40336a695542ff4b1fc3553b408efafb110e5794da22eee70ab4d2d29d",
+  "exitCode": 0,
+  "timedOut": false,
+  "stdout": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq/artifacts/R06_BINDINGS/r06_test_e5f01f8bd649246f5708/command-001/stdout.log",
+  "stderr": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq/artifacts/R06_BINDINGS/r06_test_e5f01f8bd649246f5708/command-001/stderr.log",
+  "timeoutSecs": 120,
+  "syntheticEnvironment": {
+    "LINGXI_HOME": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq/artifacts/R06_BINDINGS/r06_test_e5f01f8bd649246f5708/command-001/runtime/home",
+    "TMPDIR": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq/artifacts/R06_BINDINGS/r06_test_e5f01f8bd649246f5708/command-001/runtime/tmp",
+    "LINGXI_PRODUCT_DIR": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq/lib",
+    "W01_EVIDENCE": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq/artifacts/R06_BINDINGS/r06_test_e5f01f8bd649246f5708/command-001/raw/w01_evidence",
+    "W09_EVIDENCE": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq/artifacts/R06_BINDINGS/r06_test_e5f01f8bd649246f5708/command-001/raw/w09_evidence",
+    "W10_EVIDENCE": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq/artifacts/R06_BINDINGS/r06_test_e5f01f8bd649246f5708/command-001/raw/w10_evidence",
+    "W11_EVIDENCE": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq/artifacts/R06_BINDINGS/r06_test_e5f01f8bd649246f5708/command-001/raw/w11_evidence",
+    "LINGXI_W03_EVIDENCE": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq/artifacts/R06_BINDINGS/r06_test_e5f01f8bd649246f5708/command-001/raw/lingxi_w03_evidence",
+    "LINGXI_F05_EVIDENCE": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq/artifacts/R06_BINDINGS/r06_test_e5f01f8bd649246f5708/command-001/raw/lingxi_f05_evidence",
+    "LINGXI_F08_EVIDENCE": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq/artifacts/R06_BINDINGS/r06_test_e5f01f8bd649246f5708/command-001/raw/lingxi_f08_evidence",
+    "R06_T08_RAW_OUT": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq/artifacts/R06_BINDINGS/r06_test_e5f01f8bd649246f5708/command-001/raw/t08",
+    "R06_T08_EVAL_OUT": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-prh0colq/artifacts/R06_BINDINGS/r06_test_e5f01f8bd649246f5708/command-001/raw/t08-evaluations.jsonl"
+  },
+  "actualArgv": [
+    "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+    "-B",
+    "scripts/rust-tauri/r02_registry_consistency.py",
+    "--root",
+    "."
+  ],
+  "pid": 4180,
+  "elapsedSecs": 0.075,
+  "outputCheck": {
+    "valid": true,
+    "matchedExpectedScriptResult": true,
+    "reason": ""
+  },
+  "stdoutSha256": "da1c4b6420e3997a2868f163a1fe43d3e19da8f74ac06d5cdd8a7c74f784ebbb",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sourceAfterSha256": "977f5e40336a695542ff4b1fc3553b408efafb110e5794da22eee70ab4d2d29d",
+  "sourceStable": true,
+  "localPassed": true
+}

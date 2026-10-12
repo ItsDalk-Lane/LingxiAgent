@@ -282,13 +282,13 @@ pub(crate) fn render_input_items(
             "image_url": super::image_data_url(image),
         }));
     }
-    items.push(serde_json::json!({
-        "type": "message",
-        "role": "user",
-        "content": submission_content,
-    }));
+    if !input.has_submission_position() {
+        items.push(serde_json::json!({"type":"message","role":"user","content":submission_content.clone()}));
+    }
     for item in &input.prior {
         match item {
+            ExchangeItem::UserTurn { text } => items.push(serde_json::json!({"type":"message","role":"user","content":[{"type":"input_text","text":text}]})),
+            ExchangeItem::CurrentSubmission => items.push(serde_json::json!({"type":"message","role":"user","content":submission_content.clone()})),
             ExchangeItem::AssistantTurn {
                 content,
                 tool_calls,
@@ -477,16 +477,13 @@ pub(crate) fn render_input_items(
 /// arguments}` (the pairing fields verbatim).
 fn render_function_call_item(
     call: &lingxi_kernel::model_exchange::RequestedToolCall,
-    input: &ModelTurnInput,
+    _input: &ModelTurnInput,
 ) -> Result<serde_json::Value, ProtocolError> {
     let invalid = |detail: String| ProtocolError::new(ErrorCode::InvalidMessage, detail, false);
-    let wire_name = input
-        .tools
-        .wire_name_of_target(&call.target)
+    let wire_name = call.historical_wire_name()
         .ok_or_else(|| {
             invalid(format!(
-                "exchange history names tool target {:?}, which the current declaration \
-                 snapshot does not contain (the registry moved mid-run); cannot faithfully \
+                "exchange history names tool target {:?}, which lacks a trusted original declaration binding; cannot faithfully \
                  re-render the transcript",
                 call.target
             ))
@@ -1138,6 +1135,7 @@ mod tests {
                 text: "reading".to_string(),
             }],
             tool_calls: vec![lingxi_kernel::model_exchange::RequestedToolCall {
+                declaration_binding: input.tools.bind_target(&request.target),
                 tool_call_id: ToolCallId::new("run-tc0001"),
                 provider_call_id: request.provider_call_id.clone(),
                 target: request.target.clone(),

@@ -1,0 +1,112 @@
+{
+  "at": "2026-10-12T01:08:51.805629+00:00",
+  "role": "ROOT_MECHANICAL_DISPATCH_PREPARATION_NOT_EXECUTION",
+  "template_applicability_corrections": [
+    {
+      "template": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W01_EXECUTOR_TEMPLATE.md",
+      "before_sha256": "1630c195b9d00cb8cff2ceaa6d8371fc22b83ee8d9a724dad31017208c5f0be1",
+      "after_sha256": "23acb32ffb32a97035b0cce0eb0e6e82824e9e5b25e8250d983f91dc89f9a03b",
+      "spec_sha256_unchanged": "725580c062bb5f853b1aab33dbe17df4fc754831f3ef323707dba92875588e9c",
+      "original_leaf_count": 4,
+      "original_assertion_count": 8
+    },
+    {
+      "template": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W02_EXECUTOR_TEMPLATE.md",
+      "before_sha256": "26f09b4d71e72eb13f98a86c15512a49e9a374102afbff8df17de342a899c76b",
+      "after_sha256": "42d5e668507d3c080d9de79cca75f5db4e97c44b88e38206de4b71827e5bbc0b",
+      "spec_sha256_unchanged": "296eb1dbdca6872d86a6e101d3abd8d91395c8802dd095c73247d5fc91f964fe",
+      "original_leaf_count": 9,
+      "original_assertion_count": 20
+    },
+    {
+      "template": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W03_EXECUTOR_TEMPLATE.md",
+      "before_sha256": "85a5bde3597fae6fb29d429a4aa667bccdea40cee3f623ce7cbf17e71e32b05b",
+      "after_sha256": "566652f3e559a8034d1968e2deb48ecbe61324459f4afe5b502b18ce975d6c7c",
+      "spec_sha256_unchanged": "24911976402a28a371c1ea1a9da80986b3e5556d7dd4b5b18a12adb47b3b02ad",
+      "original_leaf_count": 32,
+      "original_assertion_count": 79
+    },
+    {
+      "template": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W04_EXECUTOR_TEMPLATE.md",
+      "before_sha256": "acab5fb176b04e9339b2813ad75d9989587ba3481187e431fd9757cb62500570",
+      "after_sha256": "470942ae20b351e4d8ca8427312e226c9682afac010307df37886658f16fc9a7",
+      "spec_sha256_unchanged": "55b193c92aab93bd9289bfd352d942b8b85fe1356c3f63d9d8d76879d4c4af1d",
+      "original_leaf_count": 5,
+      "original_assertion_count": 10
+    },
+    {
+      "template": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W05_EXECUTOR_TEMPLATE.md",
+      "before_sha256": "713e6c7d1ff01159fec1def1e63f1218853a3d86f1761129fdbc75cb85b2a9e1",
+      "after_sha256": "e20f20b9d65596106af4809cea60d031a84f3507645ad110846fd10b40900ad2",
+      "spec_sha256_unchanged": "b26b094817a7f8bba52aa1ddf48a8c0883c2a8232951b78587681601044146e8",
+      "original_leaf_count": 5,
+      "original_assertion_count": 10
+    },
+    {
+      "template": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W06_EXECUTOR_TEMPLATE.md",
+      "before_sha256": "43bb35697dcf7924230c2ae59c4a52e627bbde01ed30b19d5889b5bfbf653777",
+      "after_sha256": "379a5568093d388152d5648dafe4ca1aa9afaf5f21609d757c39ce25ad20965c",
+      "spec_sha256_unchanged": "4db1f3ba6876b375f2fdcba01640416da0cc341e1d7f6918ff2391f9418acce1",
+      "original_leaf_count": 7,
+      "original_assertion_count": 19
+    },
+    {
+      "template": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W07_EXECUTOR_TEMPLATE.md",
+      "before_sha256": "ec9c7f5137f993923dfc487fc9ff1094546e81c232043ef337d8f27b81772dcc",
+      "after_sha256": "097e1f4f6e78b56e733602d89483c6563f184df1218c5d2558487cfa6590b33e",
+      "spec_sha256_unchanged": "f2e4edffa8e71036df78b997bf0eecc3a1d06e3205b814e031a68fae2e3754be",
+      "original_leaf_count": 6,
+      "original_assertion_count": 12
+    },
+    {
+      "template": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W08_EXECUTOR_TEMPLATE.md",
+      "before_sha256": "20cc049b0d6abf3e31c35f12f17192a83524b322f2b6d35825b28b035f786659",
+      "after_sha256": "76812dc03ebe21b8b06cb6464084038ef983b5faff2e94ca30a7c9d0b15237f5",
+      "spec_sha256_unchanged": "81629231aa975678eac2e90a91f65b558482465bd77e1095822719e3b6946b34",
+      "original_leaf_count": 7,
+      "original_assertion_count": 14
+    },
+    {
+      "template": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W09_EXECUTOR_TEMPLATE.md",
+      "before_sha256": "a987bf7f3b643d7f2a1ff23bfabd795d5f8514a42674172d54613b051637be6f",
+      "after_sha256": "53831d1d4bc3c99c5cad5ccafef465b0cee86a2be7969d37d406372028f453fd",
+      "spec_sha256_unchanged": "85074b70bfb25841710581a2bb1349ccf929edc556172419030caa4e2e5b8c87",
+      "original_leaf_count": 5,
+      "original_assertion_count": 14
+    },
+    {
+      "template": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W10_EXECUTOR_TEMPLATE.md",
+      "before_sha256": "d80fcdd856fb0b8ecd860b66a8701cec635f46ec5391119ffc630db1b5277fc4",
+      "after_sha256": "ff957ad3337629c65de9b8f5300dcccbc8e0751acbe89d8e2e4e150c8737b507",
+      "spec_sha256_unchanged": "74b0f3a62a816e70831cc2297e2e5f0801596ca1610f31388dfc858e9596748a",
+      "original_leaf_count": 19,
+      "original_assertion_count": 53
+    },
+    {
+      "template": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W11_EXECUTOR_TEMPLATE.md",
+      "before_sha256": "4a6f09237caa27ad4eaa502d4f3fbd0c8e4801fe9c1e6e7bb4bc53ced34b0ff3",
+      "after_sha256": "346019e8922c08539235c3e7ad774d20c1b25e2a0904fac2d9dd49817e9a0084",
+      "spec_sha256_unchanged": "b4442ed133e29e1f936d3039b9e2aebb46ac779deb1ab9729d43bc2277c58377",
+      "original_leaf_count": 54,
+      "original_assertion_count": 106
+    },
+    {
+      "template": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W12_EXECUTOR_TEMPLATE.md",
+      "before_sha256": "4207418239f05d0c183cc3ea2b52d34173e5e5946650d0f4d37d971b2e1d7c8a",
+      "after_sha256": "a4313b278aee53879770f9cb22612cd53b2a92ed6bbbac223c600f34870930c6",
+      "spec_sha256_unchanged": "776d10e721e55d56fd5832a8d4d891bee5628e04c055a2af938924bb3f215449",
+      "original_leaf_count": 28,
+      "original_assertion_count": 70
+    }
+  ],
+  "specs_and_original_register_unchanged": true,
+  "concrete_dispatch": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W03_EXECUTOR_01.md",
+  "concrete_dispatch_sha256": "fa73e32165531aa5b4ad180e5613079004b7851344cb72d0f90127347889ffe5",
+  "actor": "NOT_CREATED",
+  "workspace": "NOT_PREPARED",
+  "tests": "NOT_RUN",
+  "task_acceptance": "NONE",
+  "formal_stage": "NOT_RUN",
+  "R07_started": false,
+  "root_preparation_initial_error": "First metadata update treated existing prepared_dispatches list as dict; exit1 after templates, dispatch and receipt written; no product change. Corrected with preserved prior inputs; no repeated execution or acceptance."
+}

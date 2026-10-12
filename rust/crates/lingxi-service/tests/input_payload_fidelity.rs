@@ -225,7 +225,8 @@ async fn submit_fg<P: lingxi_kernel::ports::StoragePort>(
     input: &str,
     request_id: Option<&str>,
 ) -> Result<ExecuteAccepted, SessionExecuteError> {
-    let submission = ExecuteSubmission { input, request_id };
+    let submission = ExecuteSubmission {
+    knowledge: None, input, request_id };
     state
         .sessions()
         .execute_submission_for(
@@ -247,6 +248,7 @@ async fn submit_bg(
     request_id: &str,
 ) -> Result<ExecuteAccepted, SessionExecuteError> {
     let submission = ExecuteSubmission {
+        knowledge: None,
         input,
         request_id: Some(request_id),
     };

@@ -1,0 +1,43 @@
+{
+  "recorded_at": "2026-10-11T12:19:52.888051+00:00",
+  "role": "ROOT_READ_ONLY_SOURCE_PREPARATION_NOT_EXECUTOR_NOT_REVIEWER",
+  "status": "SOURCE_ONLY_NOT_RUN",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "main_workspace_contains_unaccepted_task_candidates": true,
+  "product_mutated": false,
+  "runtime_cases_executed": false,
+  "independent_verdict": "NOT_RUN",
+  "facts": [
+    "当前 SessionFile 方法存在；当前读到的生产 fork_session 路径只调用 SessionTree store fork 和事件提交，尚未运行 fork附件正/反例。",
+    "当前 cleanup_cold_sessions 依赖 last_activity_unix_ms 非 NULL；原 upsert_session_activity 是可覆盖旧时间的 UPSERT，活动缺失/时间回退需要真实正对照验证，不能仅因为未误删就通过。",
+    "当前 fork_session_files 按全局 resolve_alias 未存在才登记旧 ID；多次 fork/主体范围仍须正式入口验证，不据源码判断实际泄漏。",
+    "当前生产 FileTools bootstrap 仍使用 NoopChangeLog；具体 R06 文件历史承诺及同族路径必须独立执行者确认。"
+  ],
+  "source_binding": {
+    "rust/crates/lingxi-service/src/lib.rs": {
+      "current_sha256": "39d114c237cecf12e2bdbb115f3df07f864d2218136db3662732503c4c53ea22",
+      "accepted_head_sha256": "abb05a164499956657395906134d20beafbb277547e794d277ed26c3986ef82c",
+      "same_as_accepted_head": false
+    },
+    "rust/crates/lingxi-service/src/runs.rs": {
+      "current_sha256": "eca52e6151299a43d7386fb2056908a3d86afeadc1085cd3aa55dd35b5646a6e",
+      "accepted_head_sha256": "eca52e6151299a43d7386fb2056908a3d86afeadc1085cd3aa55dd35b5646a6e",
+      "same_as_accepted_head": true
+    },
+    "rust/crates/lingxi-service/src/session_tree.rs": {
+      "current_sha256": "7803a33d81ceb888ccc2df9d15c5b391631b16e02c8f72fc485a619b57ca151a",
+      "accepted_head_sha256": "fc78deada94cdfc8f013979cc4ce52ef342e75fd9bc91117110958f926370838",
+      "same_as_accepted_head": false
+    },
+    "rust/crates/lingxi-service/src/sessionfiles.rs": {
+      "current_sha256": "d0a3f90ce0f5fe9127ae11490e8f595ee09fdefbf3d66139ad052342d77f145e",
+      "accepted_head_sha256": "cb42c48fc08c1304394fd09861b5ef31112d2632ee9c63949d3ff0e8f842be55",
+      "same_as_accepted_head": false
+    },
+    "rust/crates/lingxi-adapters/src/storage/session_files.rs": {
+      "current_sha256": "bbb444abf517ee5b2971cbb27f76e372856bdbf451cf4be84704106a41b6b01e",
+      "accepted_head_sha256": "bbb444abf517ee5b2971cbb27f76e372856bdbf451cf4be84704106a41b6b01e",
+      "same_as_accepted_head": true
+    }
+  }
+}

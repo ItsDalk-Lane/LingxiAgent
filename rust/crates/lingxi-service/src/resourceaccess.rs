@@ -164,6 +164,7 @@ struct GrantKey {
 #[derive(Default)]
 struct AccessState {
     grants: HashMap<GrantKey, Vec<GrantedRoot>>,
+    protected_roots: Vec<PathBuf>,
 }
 
 /// The resource authorization boundary of the native file tools.
@@ -205,6 +206,19 @@ impl ResourceAccess {
             workspace_roots: canonical,
             state: std::sync::Mutex::new(AccessState::default()),
         })
+    }
+
+    /// 服务来源证明与恢复收据不能由通用文件能力读取、改写或连父目录一起删除。
+    pub fn protect_service_root(&self, path: &Path) -> Result<(), AccessRefusal> {
+        let resolved = resolve_real(path).ok_or_else(|| AccessRefusal {
+            cause: AccessRefusalCause::Unresolvable,
+            requested_path: path.display().to_string(),
+            resolved_path: None,
+            op: ResourceOp::Write,
+            message: "protected service state root cannot be resolved".into(),
+        })?;
+        self.lock().protected_roots.push(resolved);
+        Ok(())
     }
 
     /// Grants one additional root to exactly one (principal, session) —
@@ -300,6 +314,23 @@ impl ResourceAccess {
                 ),
             });
         };
+        let protected = self.lock().protected_roots.iter().any(|root| {
+            is_inside(&resolved, root) || (op == ResourceOp::Write && is_inside(root, &resolved))
+        });
+        let recovery_object = resolved.components().any(|c| {
+            c.as_os_str()
+                .to_string_lossy()
+                .starts_with(".lingxi-recovery-")
+        });
+        if protected || recovery_object {
+            return Err(AccessRefusal {
+                cause: AccessRefusalCause::Blocked,
+                requested_path: requested.display().to_string(),
+                resolved_path: Some(resolved.display().to_string()),
+                op,
+                message: "resource is protected service recovery state".into(),
+            });
+        }
         // 1) Workspace roots: read-write for the instance.
         for root in &self.workspace_roots {
             if is_inside(&resolved, root) {

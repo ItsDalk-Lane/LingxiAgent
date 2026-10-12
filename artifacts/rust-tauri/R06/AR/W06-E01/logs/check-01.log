@@ -1,0 +1,13 @@
+    Updating crates.io index
+     Locking 2 packages to latest compatible versions
+      Adding serde_yaml_ng v0.10.0
+      Adding unsafe-libyaml v0.2.11
+ Downloading crates ...
+  Downloaded unsafe-libyaml v0.2.11
+  Downloaded serde_yaml_ng v0.10.0
+    Blocking waiting for file lock on build directory
+    Checking unsafe-libyaml v0.2.11
+    Checking serde_yaml_ng v0.10.0
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 36.40s

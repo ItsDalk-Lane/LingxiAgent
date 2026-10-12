@@ -1,0 +1,29 @@
+{
+  "id": "R06-POST-SPACE-WORKSPACE-AVAILABILITY-01",
+  "at": "2026-10-11T22:58:58.663606+00:00",
+  "status": "OPEN_READ_ONLY_RECOVERY_IN_PROGRESS",
+  "user_space_answer": "已腾出",
+  "actual_free_bytes": 446464000000,
+  "missing_roots": [
+    "/Users/study_superior/.codex/r06-isolated-checkouts",
+    "/Users/study_superior/.codex/worktrees"
+  ],
+  "cause": "UNKNOWN_PENDING_USER_REPLY_AND_RECOVERY_INVENTORY",
+  "main_protected_settingsSHA": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3",
+  "actual_owned_process_readback": "artifacts/rust-tauri/R06/AR/ENTRY-01/post-space-restoration-owned-processes.json",
+  "previous_failed_cleanup": "NOT_EXECUTED_APPROVAL_INITIALIZATION_ERRNO28",
+  "current_available_source_is_not_automatically_same_candidate": true,
+  "historical_PASS_or_FAIL_not_erased": true,
+  "missing_runtime_or_source_not_fabricated": true,
+  "no_R07": true,
+  "old_control_SHA": {
+    "docs/rust-tauri/R06/repair-current/AR_PROGRESS.json": "75f6be9f95123a0bed2d76a637cd9fe560a41bc12efdc097f10372e2b5c2d409",
+    "docs/rust-tauri/R06/repair-current/AR_ISSUE_MATRIX.json": "4af8c6a8a469c5bba6ebc7bbc7456b1640d9740b324771e723e4f90cc137de60",
+    "docs/rust-tauri/R06/repair-current/AR_HANDOFF.md": "532100d09b0d4ad5953fdf7d041d5d9a4a29c50f407ec3623a217c34e1fabe0a"
+  },
+  "new_control_SHA": {
+    "docs/rust-tauri/R06/repair-current/AR_PROGRESS.json": "f199916b4831a5367c9bd81330ff3f3fd49c36a38117db396bc067f74c4ea5f6",
+    "docs/rust-tauri/R06/repair-current/AR_ISSUE_MATRIX.json": "625b1a9269c2b8ebe69b348236543c8bf4374a48d4ede1ed18afcaa0bf2bea08",
+    "docs/rust-tauri/R06/repair-current/AR_HANDOFF.md": "89abc407a754402c4a9f1f4c5ef623053821d5674a6c0b6d98a3bbbba43392c2"
+  }
+}

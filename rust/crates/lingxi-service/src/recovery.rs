@@ -144,6 +144,86 @@ impl RecoveryScanReport {
 }
 
 impl RecoveryCoordinator {
+    /// 当前进程只恢复明确Abandoned的准确Run；不凭缺登记、时间或客户端声明猜测。
+    #[allow(clippy::too_many_arguments)]
+    pub async fn recover_abandoned_run(
+        storage: &RunDatabase,
+        events: &EventService,
+        registry: &crate::cancel::CancelRegistry,
+        principal: &lingxi_kernel::Principal,
+        session: &str,
+        run: &str,
+        now: u64,
+    ) -> Result<(), StorageError> {
+        if registry.get(run).is_some()
+            || !matches!(
+                registry.recent_verdict(run),
+                Some(crate::cancel::CancelPhase::Abandoned { .. })
+            )
+        {
+            return Ok(());
+        }
+        let text = storage.query_one_text("SELECT json_object('session',session_id,'ownerKind',owner_kind,'ownerSubject',owner_subject,'generation',generation,'attempt',(SELECT attempt FROM run_attempts WHERE run_id=runs.run_id ORDER BY rowid DESC LIMIT 1)) FROM runs WHERE run_id=?1", vec![run.to_string()]).await?.ok_or_else(|| StorageError::Corrupted{detail:"abandoned recovery source Run missing".into()})?;
+        let v: serde_json::Value =
+            serde_json::from_str(&text).map_err(|e| StorageError::Corrupted {
+                detail: e.to_string(),
+            })?;
+        if v["session"] != session
+            || v["ownerKind"] != principal.storage_kind()
+            || v["ownerSubject"] != principal.storage_subject()
+        {
+            return Err(StorageError::InvalidRequest {
+                detail: "abandoned recovery source scope mismatch".into(),
+            });
+        }
+        let ctx = lingxi_kernel::RunContext {
+            principal: principal.clone(),
+            session_id: SessionId::new(session),
+            run_id: RunId::new(run),
+            generation: v["generation"]
+                .as_u64()
+                .ok_or_else(|| StorageError::Corrupted {
+                    detail: "abandoned generation missing".into(),
+                })?,
+            attempt: AttemptId::new(v["attempt"].as_str().ok_or_else(|| {
+                StorageError::Corrupted {
+                    detail: "abandoned attempt missing".into(),
+                }
+            })?),
+        };
+        let record =
+            storage
+                .load_run(&ctx.run_id)
+                .await?
+                .ok_or_else(|| StorageError::Corrupted {
+                    detail: "abandoned Run disappeared".into(),
+                })?;
+        if record.status.is_terminal() {
+            return Ok(());
+        }
+        if registry.get(run).is_some()
+            || !matches!(
+                registry.recent_verdict(run),
+                Some(crate::cancel::CancelPhase::Abandoned { .. })
+            )
+        {
+            return Err(StorageError::Conflict {
+                detail: "abandoned source became live".into(),
+            });
+        }
+        let journal = recover_run_invocations(
+            storage,
+            run,
+            &crate::invocations::ConservativeCapabilities,
+            now,
+        )
+        .await?;
+        let decisions: Vec<_> = journal.entries.iter().map(|e| e.decision.clone()).collect();
+        let plan = classify_run_recovery(&decisions);
+        Self::settle(storage, events, &ctx, record.status, &plan, now).await?;
+        Ok(())
+    }
+
     /// The startup scan. Errors are LOUD (a corrupted journal/status that
     /// cannot be classified refuses startup rather than serving a guess —
     /// the same fail-closed stance as the R02 integrity gates).

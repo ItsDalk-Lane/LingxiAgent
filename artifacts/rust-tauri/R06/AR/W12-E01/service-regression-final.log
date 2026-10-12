@@ -1,0 +1,47 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 32.85s
+     Running tests/r06_ar_f12_cache_consumers.rs (rust/target/debug/deps/r06_ar_f12_cache_consumers-026372389865eab1)
+
+running 2 tests
+test deletion_cache_error_is_reported_and_source_original_remains ... ok
+test deletion_of_a_keeps_b_and_removes_all_a_versions ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running tests/r06_t07_knowledge.rs (rust/target/debug/deps/r06_t07_knowledge-3473c20f9f060687)
+
+running 11 tests
+test research_engine_tables_are_not_restored ... ok
+test notebook_crud_settings_and_ingestion_summary ... ok
+test citation_resolution_returns_block_snapshot_source_and_viewer ... ok
+test snapshot_content_serves_bytes_with_security_headers ... ok
+test reingest_membership_and_delete_semantics ... ok
+test source_delete_is_blocked_while_turn_scope_freezes_it ... ok
+test file_import_security_rules ... ok
+test import_pasted_text_parses_chunks_and_ingests_with_stub_embeddings ... ok
+test ingestion_without_model_lands_pending_embedding_then_completes_after_reboot ... ok
+test settings_change_triggers_rebuild_and_variants_coexist ... ok
+test a14_switching_to_incompatible_embedding_dimension_refuses_vector_channel_until_rebuild has been running for over 60 seconds
+test a14_switching_to_incompatible_embedding_dimension_refuses_vector_channel_until_rebuild ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 60.85s
+
+     Running tests/r06_t07_knowledge_tools.rs (rust/target/debug/deps/r06_t07_knowledge_tools-15c506a8725a067f)
+
+running 6 tests
+test a13_citation_markdown_resolves_to_actual_text has been running for over 60 seconds
+test a13_search_within_scope_returns_only_allowed_sources has been running for over 60 seconds
+test a13_untrusted_source_instructions_stay_material_not_privilege has been running for over 60 seconds
+test knowledge_manage_actions_and_gates has been running for over 60 seconds
+test knowledge_read_pagination_and_grep_outline has been running for over 60 seconds
+test scope_violations_are_loud_not_fallback has been running for over 60 seconds
+test scope_violations_are_loud_not_fallback ... ok
+test a13_untrusted_source_instructions_stay_material_not_privilege ... ok
+test knowledge_read_pagination_and_grep_outline ... ok
+test a13_citation_markdown_resolves_to_actual_text ... ok
+test a13_search_within_scope_returns_only_allowed_sources ... ok
+test knowledge_manage_actions_and_gates ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 80.70s
+

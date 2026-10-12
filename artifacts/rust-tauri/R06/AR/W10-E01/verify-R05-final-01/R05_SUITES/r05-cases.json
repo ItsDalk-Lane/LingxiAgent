@@ -1,0 +1,1205 @@
+{
+ "schema": "lingxi.r05-stage-suite-results.v1",
+ "producedBy": "scripts/rust-tauri/r05_t08_stage_suites.sh (cargo test, real chain: service+adapters integration + pinned lib tests)",
+ "suites": [
+  {
+   "run": "adp:r05_t02_oauth_flows",
+   "issue": "r05_t02_oauth_flows",
+   "expect": 21,
+   "actual": 21,
+   "ok": true
+  },
+  {
+   "run": "adp:r05_t03_goldens",
+   "issue": "r05_t03_goldens",
+   "expect": 3,
+   "actual": 3,
+   "ok": true
+  },
+  {
+   "run": "adp:r05_t03_rr1_replay",
+   "issue": "r05_t03_rr1_replay",
+   "expect": 33,
+   "actual": 33,
+   "ok": true
+  },
+  {
+   "run": "adp:r05_t04_rr1_batch_terminal",
+   "issue": "r05_t04_rr1_batch_terminal",
+   "expect": 10,
+   "actual": 10,
+   "ok": true
+  },
+  {
+   "run": "adp:r05_t04_streaming",
+   "issue": "r05_t04_streaming",
+   "expect": 18,
+   "actual": 18,
+   "ok": true
+  },
+  {
+   "run": "adp:r05_t05_compat",
+   "issue": "r05_t05_compat",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "adp:r05_t05_timeouts",
+   "issue": "r05_t05_timeouts",
+   "expect": 13,
+   "actual": 13,
+   "ok": true
+  },
+  {
+   "run": "adp:r05_t06_operations",
+   "issue": "r05_t06_operations",
+   "expect": 27,
+   "actual": 27,
+   "ok": true
+  },
+  {
+   "run": "adp:r05_t07_rr1_usage_strict",
+   "issue": "r05_t07_rr1_usage_strict",
+   "expect": 7,
+   "actual": 7,
+   "ok": true
+  },
+  {
+   "run": "adp:r05_t07_usage_families",
+   "issue": "r05_t07_usage_families",
+   "expect": 14,
+   "actual": 14,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::anthropic_messages::tests::cross_family_opaque_state_is_never_echoed",
+   "issue": "cross_family_opaque_state_is_never_echoed",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::anthropic_messages::tests::thinking_and_signature_roundtrip_as_state_never_text",
+   "issue": "thinking_and_signature_roundtrip_as_state_never_text",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::compat::tests::anthropic_marks_system_and_two_recent_user_messages",
+   "issue": "anthropic_marks_system_and_two_recent_user_messages",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::compat::tests::anthropic_max_effort_raises_the_implicit_one_third_cap",
+   "issue": "anthropic_max_effort_raises_the_implicit_one_third_cap",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::compat::tests::codex_strips_budget_and_temperature_fields",
+   "issue": "codex_strips_budget_and_temperature_fields",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::compat::tests::dispatch_is_first_match_in_incumbent_order",
+   "issue": "dispatch_is_first_match_in_incumbent_order",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::compat::tests::ollama_bridges_response_format_and_num_ctx",
+   "issue": "ollama_bridges_response_format_and_num_ctx",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::compat::tests::openrouter_adaptive_disable_is_a_loud_refusal",
+   "issue": "openrouter_adaptive_disable_is_a_loud_refusal",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::compat::tests::volcengine_disable_guard_passes_through_without_controls",
+   "issue": "volcengine_disable_guard_passes_through_without_controls",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::config::tests::credential_is_explicit_and_never_defaulted",
+   "issue": "credential_is_explicit_and_never_defaulted",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::dispatch::tests::error_status_classification_matches_the_incumbent",
+   "issue": "error_status_classification_matches_the_incumbent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception",
+   "issue": "guarded_ipv4_literals_refuse_outside_the_endpoint_exception",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only",
+   "issue": "https_public_passes_and_plain_http_is_same_origin_only",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide",
+   "issue": "ipv4_parsing_is_strict_and_default_ports_elide",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::egress::tests::scheme_userinfo_and_host_shapes_refuse",
+   "issue": "scheme_userinfo_and_host_shapes_refuse",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through",
+   "issue": "the_endpoint_origin_exception_lets_the_loopback_stub_through",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::gateway::tests::a_family_outside_the_operations_matrix_is_loud",
+   "issue": "a_family_outside_the_operations_matrix_is_loud",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::gateway::tests::chat_and_auxiliary_routes_resolve_independently",
+   "issue": "chat_and_auxiliary_routes_resolve_independently",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::gateway::tests::reload_swaps_atomically_and_bumps_the_generation",
+   "issue": "reload_swaps_atomically_and_bumps_the_generation",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::gateway::tests::the_pin_pair_rule_never_guesses_a_provider_from_a_model",
+   "issue": "the_pin_pair_rule_never_guesses_a_provider_from_a_model",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::gateway::tests::unconfigured_operations_are_loud_route_gaps",
+   "issue": "unconfigured_operations_are_loud_route_gaps",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::google_generative_ai::tests::thoughts_signatures_and_function_calls_parse_in_order",
+   "issue": "thoughts_signatures_and_function_calls_parse_in_order",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::openai_codex_responses::tests::codex_body_pins_store_stream_and_instructions",
+   "issue": "codex_body_pins_store_stream_and_instructions",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::openai_completions::tests::a_history_target_missing_from_the_snapshot_fails_loudly",
+   "issue": "a_history_target_missing_from_the_snapshot_fails_loudly",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::openai_completions::tests::final_answer_identity_comes_from_the_driver_not_the_response",
+   "issue": "final_answer_identity_comes_from_the_driver_not_the_response",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::openai_completions::tests::parses_tool_calls_with_usage_and_identity_from_the_driver",
+   "issue": "parses_tool_calls_with_usage_and_identity_from_the_driver",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::openai_completions::tests::unknown_wire_names_are_protocol_violations_never_guesses",
+   "issue": "unknown_wire_names_are_protocol_violations_never_guesses",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::openai_responses::tests::reasoning_items_roundtrip_verbatim_with_summary_as_reasoning",
+   "issue": "reasoning_items_roundtrip_verbatim_with_summary_as_reasoning",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::openai_responses::tests::request_shape_instructions_tools_and_no_server_state",
+   "issue": "request_shape_instructions_tools_and_no_server_state",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::streaming::tests::a_leading_bom_is_stripped_once",
+   "issue": "a_leading_bom_is_stripped_once",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::streaming::tests::comments_and_id_and_retry_fields_are_ignored",
+   "issue": "comments_and_id_and_retry_fields_are_ignored",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::streaming::tests::multi_line_data_joins_and_chunks_may_split_anywhere",
+   "issue": "multi_line_data_joins_and_chunks_may_split_anywhere",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::streaming::tests::simple_frames_dispatch_on_blank_lines",
+   "issue": "simple_frames_dispatch_on_blank_lines",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::streaming::tests::the_buffer_bound_is_loud",
+   "issue": "the_buffer_bound_is_loud",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::streaming::tests::the_per_frame_bound_is_loud_across_lines_and_chunks",
+   "issue": "the_per_frame_bound_is_loud_across_lines_and_chunks",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest",
+   "issue": "running_and_stop_unconfirmed_statuses_are_honest",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::tool_render::tests::success_renders_resources_status_and_truncation_last",
+   "issue": "success_renders_resources_status_and_truncation_last",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-adapters/models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary",
+   "issue": "the_four_base_states_keep_the_t01_vocabulary",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-kernel/model_exchange::tests::empty_snapshot_is_generation_zero",
+   "issue": "empty_snapshot_is_generation_zero",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-kernel/model_exchange::tests::snapshot_declares_only_callable_resident_targets_at_the_pinned_generation",
+   "issue": "snapshot_declares_only_callable_resident_targets_at_the_pinned_generation",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-kernel/model_exchange::tests::wire_name_collisions_resolve_deterministically_or_fail_loudly",
+   "issue": "wire_name_collisions_resolve_deterministically_or_fail_loudly",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-kernel/model_exchange::tests::wire_name_sanitization_fits_the_strictest_protocol_face",
+   "issue": "wire_name_sanitization_fits_the_strictest_protocol_face",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-kernel/toolcatalog::tests::aliases_resolve_to_the_authoritative_identity_and_share_permissions",
+   "issue": "aliases_resolve_to_the_authoritative_identity_and_share_permissions",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-kernel/toolcatalog::tests::disable_and_uninstall_change_callability_and_generation",
+   "issue": "disable_and_uninstall_change_callability_and_generation",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-kernel/toolcatalog::tests::same_name_two_sources_never_overwrites_and_name_only_is_ambiguous",
+   "issue": "same_name_two_sources_never_overwrites_and_name_only_is_ambiguous",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-kernel/toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh",
+   "issue": "stale_catalog_generation_refuses_and_requires_refresh",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-kernel/toolcatalog::tests::update_cannot_change_the_target_identity",
+   "issue": "update_cannot_change_the_target_identity",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/credentials::store::tests::a_failed_write_keeps_the_previous_state_and_reports",
+   "issue": "a_failed_write_keeps_the_previous_state_and_reports",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/credentials::store::tests::a_version_conflict_is_loud",
+   "issue": "a_version_conflict_is_loud",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/credentials::store::tests::missing_file_loads_empty_and_round_trips",
+   "issue": "missing_file_loads_empty_and_round_trips",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/credentials::store::tests::unknown_fields_survive_a_write",
+   "issue": "unknown_fields_survive_a_write",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/credentials::tests::a_cancelled_waiter_does_not_disturb_the_flight",
+   "issue": "a_cancelled_waiter_does_not_disturb_the_flight",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/credentials::tests::a_reload_replacing_the_cell_discards_the_late_writeback",
+   "issue": "a_reload_replacing_the_cell_discards_the_late_writeback",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/credentials::tests::a_rotated_credential_is_reused_without_a_second_refresh",
+   "issue": "a_rotated_credential_is_reused_without_a_second_refresh",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/credentials::tests::an_expired_handle_is_refused",
+   "issue": "an_expired_handle_is_refused",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/credentials::tests::concurrent_401s_merge_into_one_refresh",
+   "issue": "concurrent_401s_merge_into_one_refresh",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/credentials::tests::forged_handles_and_provider_references_are_refused",
+   "issue": "forged_handles_and_provider_references_are_refused",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/credentials::tests::handle_refusal_texts_carry_no_material",
+   "issue": "handle_refusal_texts_carry_no_material",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/credentials::tests::resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit",
+   "issue": "resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/credentials::tests::resolve_refreshes_at_most_once_when_every_mint_is_already_expired",
+   "issue": "resolve_refreshes_at_most_once_when_every_mint_is_already_expired",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/credentials::tests::revoke_fences_a_late_writeback",
+   "issue": "revoke_fences_a_late_writeback",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/redaction::tests::r05_provider_api_key_shapes_are_redacted",
+   "issue": "r05_provider_api_key_shapes_are_redacted",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/redaction::tests::r05_secret_key_words_match_case_insensitively",
+   "issue": "r05_secret_key_words_match_case_insensitively",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "lib-service/redaction::tests::r05_t02_base64_tokens_with_slash_and_padding_are_redacted",
+   "issue": "r05_t02_base64_tokens_with_slash_and_padding_are_redacted",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t01_binary_wiring",
+   "issue": "r05_t01_binary_wiring",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t01_model_plane",
+   "issue": "r05_t01_model_plane",
+   "expect": 24,
+   "actual": 24,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t02_credentials",
+   "issue": "r05_t02_credentials",
+   "expect": 38,
+   "actual": 38,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t03_protocol_adapters",
+   "issue": "r05_t03_protocol_adapters",
+   "expect": 12,
+   "actual": 12,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t04_streaming",
+   "issue": "r05_t04_streaming",
+   "expect": 18,
+   "actual": 18,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t05_network",
+   "issue": "r05_t05_network",
+   "expect": 21,
+   "actual": 21,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t05_timeouts",
+   "issue": "r05_t05_timeouts",
+   "expect": 9,
+   "actual": 9,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t06_operations",
+   "issue": "r05_t06_operations",
+   "expect": 7,
+   "actual": 7,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t06_rr1_media_resource",
+   "issue": "r05_t06_rr1_media_resource",
+   "expect": 17,
+   "actual": 17,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t06_rr1_system_speech",
+   "issue": "r05_t06_rr1_system_speech",
+   "expect": 10,
+   "actual": 10,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t06_worker_model",
+   "issue": "r05_t06_worker_model",
+   "expect": 10,
+   "actual": 10,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t07_persistence",
+   "issue": "r05_t07_persistence",
+   "expect": 5,
+   "actual": 5,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t07_rr1_usage_ledger",
+   "issue": "r05_t07_rr1_usage_ledger",
+   "expect": 15,
+   "actual": 15,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t07_usage_trace",
+   "issue": "r05_t07_usage_trace",
+   "expect": 9,
+   "actual": 9,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t08_closed_loop",
+   "issue": "r05_t08_closed_loop",
+   "expect": 11,
+   "actual": 11,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t08_production_tools",
+   "issue": "r05_t08_production_tools",
+   "expect": 6,
+   "actual": 6,
+   "ok": true
+  },
+  {
+   "run": "svc:r05_t08_resources",
+   "issue": "r05_t08_resources",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  }
+ ],
+ "cases": [
+  {
+   "case": "R05-T01-C02",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T01-C03",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T01-C04",
+   "expect": 3,
+   "actual": 3,
+   "ok": true
+  },
+  {
+   "case": "R05-T01-C05",
+   "expect": 12,
+   "actual": 12,
+   "ok": true
+  },
+  {
+   "case": "R05-T01-C06",
+   "expect": 9,
+   "actual": 9,
+   "ok": true
+  },
+  {
+   "case": "R05-T01-C07",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T01-C08",
+   "expect": 7,
+   "actual": 7,
+   "ok": true
+  },
+  {
+   "case": "R05-T01-C09",
+   "expect": 4,
+   "actual": 4,
+   "ok": true
+  },
+  {
+   "case": "R05-T01-C10",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T01-C11",
+   "expect": 4,
+   "actual": 4,
+   "ok": true
+  },
+  {
+   "case": "R05-T02-C01",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T02-C02",
+   "expect": 3,
+   "actual": 3,
+   "ok": true
+  },
+  {
+   "case": "R05-T02-C03",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T02-C04",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T02-C05",
+   "expect": 5,
+   "actual": 5,
+   "ok": true
+  },
+  {
+   "case": "R05-T02-C06",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T02-C07",
+   "expect": 8,
+   "actual": 8,
+   "ok": true
+  },
+  {
+   "case": "R05-T02-C08",
+   "expect": 32,
+   "actual": 32,
+   "ok": true
+  },
+  {
+   "case": "R05-T02-C09",
+   "expect": 7,
+   "actual": 7,
+   "ok": true
+  },
+  {
+   "case": "R05-T02-C10",
+   "expect": 3,
+   "actual": 3,
+   "ok": true
+  },
+  {
+   "case": "R05-T02-C11",
+   "expect": 5,
+   "actual": 5,
+   "ok": true
+  },
+  {
+   "case": "R05-T02-C12",
+   "expect": 6,
+   "actual": 6,
+   "ok": true
+  },
+  {
+   "case": "R05-T03-C01",
+   "expect": 3,
+   "actual": 3,
+   "ok": true
+  },
+  {
+   "case": "R05-T03-C02",
+   "expect": 3,
+   "actual": 3,
+   "ok": true
+  },
+  {
+   "case": "R05-T03-C03",
+   "expect": 3,
+   "actual": 3,
+   "ok": true
+  },
+  {
+   "case": "R05-T03-C04",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T03-C05",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T03-C06",
+   "expect": 12,
+   "actual": 12,
+   "ok": true
+  },
+  {
+   "case": "R05-T03-C07",
+   "expect": 3,
+   "actual": 3,
+   "ok": true
+  },
+  {
+   "case": "R05-T03-C08",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T03-C09",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T03-C10",
+   "expect": 20,
+   "actual": 20,
+   "ok": true
+  },
+  {
+   "case": "R05-T03-C11",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T03-C12",
+   "expect": 7,
+   "actual": 7,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C01",
+   "expect": 3,
+   "actual": 3,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C02",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C03",
+   "expect": 4,
+   "actual": 4,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C04",
+   "expect": 3,
+   "actual": 3,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C05",
+   "expect": 4,
+   "actual": 4,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C06",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C07",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C08",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C09",
+   "expect": 4,
+   "actual": 4,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C10",
+   "expect": 6,
+   "actual": 6,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C11",
+   "expect": 14,
+   "actual": 14,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C12",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C13",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C14",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C15",
+   "expect": 3,
+   "actual": 3,
+   "ok": true
+  },
+  {
+   "case": "R05-T04-C16",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T05-C01",
+   "expect": 16,
+   "actual": 16,
+   "ok": true
+  },
+  {
+   "case": "R05-T05-C02",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T05-C03",
+   "expect": 9,
+   "actual": 9,
+   "ok": true
+  },
+  {
+   "case": "R05-T05-C05",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T05-C07",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T05-C08",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T05-C11",
+   "expect": 7,
+   "actual": 7,
+   "ok": true
+  },
+  {
+   "case": "R05-T05-C11B",
+   "expect": 5,
+   "actual": 5,
+   "ok": true
+  },
+  {
+   "case": "R05-T05-C12",
+   "expect": 9,
+   "actual": 9,
+   "ok": true
+  },
+  {
+   "case": "R05-T05-C13",
+   "expect": 8,
+   "actual": 8,
+   "ok": true
+  },
+  {
+   "case": "R05-T06-C01",
+   "expect": 27,
+   "actual": 27,
+   "ok": true
+  },
+  {
+   "case": "R05-T06-C02",
+   "expect": 7,
+   "actual": 7,
+   "ok": true
+  },
+  {
+   "case": "R05-T06-C03",
+   "expect": 9,
+   "actual": 9,
+   "ok": true
+  },
+  {
+   "case": "R05-T06-C04",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T06-C05",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T06-C06",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T06-C07",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T06-C08",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T06-C09",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T06-C10",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T06-C11",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T06-C12",
+   "expect": 15,
+   "actual": 15,
+   "ok": true
+  },
+  {
+   "case": "R05-T07-C01",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T07-C02",
+   "expect": 4,
+   "actual": 4,
+   "ok": true
+  },
+  {
+   "case": "R05-T07-C03",
+   "expect": 10,
+   "actual": 10,
+   "ok": true
+  },
+  {
+   "case": "R05-T07-C04",
+   "expect": 6,
+   "actual": 6,
+   "ok": true
+  },
+  {
+   "case": "R05-T07-C05",
+   "expect": 5,
+   "actual": 5,
+   "ok": true
+  },
+  {
+   "case": "R05-T07-C06",
+   "expect": 8,
+   "actual": 8,
+   "ok": true
+  },
+  {
+   "case": "R05-T07-C07",
+   "expect": 6,
+   "actual": 6,
+   "ok": true
+  },
+  {
+   "case": "R05-T07-C08",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T07-C09",
+   "expect": 8,
+   "actual": 8,
+   "ok": true
+  },
+  {
+   "case": "R05-T07-C10",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T08-C01",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T08-C02",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T08-C03",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T08-C04",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T08-C05",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T08-C06",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T08-C07",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T08-C08",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T08-C09",
+   "expect": 2,
+   "actual": 2,
+   "ok": true
+  },
+  {
+   "case": "R05-T08-C11",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "R05-T08-C12",
+   "expect": 3,
+   "actual": 3,
+   "ok": true
+  }
+ ],
+ "allSuitesOk": true,
+ "allCasesOk": true
+}

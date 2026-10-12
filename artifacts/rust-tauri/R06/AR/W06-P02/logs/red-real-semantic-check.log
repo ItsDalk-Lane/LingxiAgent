@@ -1,0 +1,20 @@
+{"command": ["node", "artifacts/rust-tauri/R06/AR/W06-P02/red/semantic-check-v2.mjs"], "start": 1791702118.4074812, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-red-real-semantic-check-tolupxoa", "guard": "8192MB/600s"}
+{"name":"quoted-literal-owned","part":"memory_default_and_semantics","expected":true,"actual":false,"status":"FAIL"}
+{"name":"quoted-literal-owned","part":"provider_memory_nonce","expected":true,"actual":false,"status":"FAIL"}
+{"name":"quoted-literal-owned","part":"patch_only_owned_field","expected":{"memory":{"<<":{"enabled":false},"enabled":false}},"actual":{"memory":{"enabled":false}},"status":"FAIL"}
+{"name":"explicit-string-merge-owned","part":"memory_default_and_semantics","expected":true,"actual":false,"status":"FAIL"}
+{"name":"explicit-string-merge-owned","part":"provider_memory_nonce","expected":true,"actual":false,"status":"FAIL"}
+{"name":"explicit-string-merge-owned","part":"patch_only_owned_field","expected":{"memory":{"<<":{"enabled":false},"enabled":false}},"actual":{"memory":{"enabled":false}},"status":"FAIL"}
+{"name":"quoted-literal-root-scalar","part":"configuration_read","expected":200,"actual":400,"status":"FAIL"}
+{"name":"quoted-literal-root-scalar","part":"memory_default_and_semantics","expected":false,"actual":null,"status":"FAIL"}
+{"name":"quoted-literal-root-scalar","part":"run_terminal","expected":"completed","actual":"failed","status":"FAIL"}
+{"name":"quoted-literal-root-scalar","part":"patch_status","expected":200,"actual":400,"status":"FAIL"}
+{"name":"quoted-literal-unknown-nested","part":"patch_only_owned_field","expected":{"memory":{"enabled":false},"future":{"<<":{"marker":"keep"},"other":"value"}},"actual":{"memory":{"enabled":false},"future":{"other":"value","marker":"keep"}},"status":"FAIL"}
+{"name":"experience-literal-merge","part":"patch_only_owned_field","expected":{"memory":{"enabled":false},"experience":{"<<":{"enabled":true}}},"actual":{"memory":{"enabled":false},"experience":{"enabled":true}},"status":"FAIL"}
+{"name":"experience-literal-merge","part":"experience_flag","expected":false,"actual":true,"status":"FAIL"}
+{"name":"experience-literal-merge","part":"experience_read_guard","expected":403,"actual":200,"status":"FAIL"}
+{"name":"name-literal-merge","part":"patch_only_owned_field","expected":{"memory":{"enabled":false},"agent":{"<<":{"name":"LITERAL-NAME-UNEXPECTED"}}},"actual":{"memory":{"enabled":false},"agent":{"name":"LITERAL-NAME-UNEXPECTED"}},"status":"FAIL"}
+{"name":"name-literal-merge","part":"nested_name_not_lifted","expected":false,"actual":true,"status":"FAIL"}
+{"name":"project-literal-merge","part":"project_skill_in_wire","expected":true,"actual":false,"status":"FAIL"}
+{"name":"orphan-literal-peer","part":"orphan_preview","expected":["shared-review"],"actual":[],"status":"FAIL"}
+{"passed":87,"failed":18}

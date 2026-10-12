@@ -1,0 +1,118 @@
+{
+  "time": "2026-10-11T11:07:27.256993+00:00",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "tracked_product_diff": [
+    "rust/crates/lingxi-adapters/src/models/operations/embedding.rs",
+    "rust/crates/lingxi-kernel/src/knowledge.rs",
+    "rust/crates/lingxi-service/src/knowledge.rs",
+    "rust/crates/lingxi-service/src/operations.rs"
+  ],
+  "owned": {
+    "rust/crates/lingxi-service/src/knowledge.rs": "0d9fd6679e7681b42bde359657b7a78bd9bc4862c01da2f5c96a1d3f7e439cef",
+    "rust/crates/lingxi-service/src/operations.rs": "da58f7822cc80e05af0893995e3ade915c8901967ae718bb74d8f979590167ce",
+    "rust/crates/lingxi-kernel/src/knowledge.rs": "1adbc82ca36805080b9297a6337322fd0858c1fb24a700af185d19b8ae4e5944",
+    "rust/crates/lingxi-adapters/src/models/operations/embedding.rs": "c3692626e3bbc5df1d5d91cc0dded2371093775868effb739146733d9a08026b",
+    "rust/crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs": "0d37fb59194f41ec3d3af867c65e8259ca2b7a7be862f22219e5b14e29d35bed"
+  },
+  "lock": {
+    "path": "rust/Cargo.lock",
+    "sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4"
+  },
+  "spec_and_original_books": {
+    "artifacts/rust-tauri/R06/AR/ENTRY-01/specification/R06_完整问题清单与修复验收总控提示词.md": "0989765e75c4664be1b3c953e466d829339a65346c49f7c245219ae34f7b7d23",
+    "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R06_上下文、会话语义、记忆与知识库.md": "d54e7fcc638b62fc4303ce4af8f01ba8c358fd1a90d0f85a491bfd4a439bbd2e",
+    "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R05_模型协议、凭证、流式处理与最小完整闭环.md": "a10490c115d00f1f0c5bbcf1a5e2f6b8740397103d8b8ad5cc029a3427f1a3e0"
+  },
+  "all_runs_input_stable": true,
+  "input_scope": "git ls-files minus artifacts plus dedicated untracked fifth owned test; per-run full hashes retained; immutable specification and taskbook bindings added above",
+  "executed_binaries": [
+    {
+      "command": "old-service-01",
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/rust/target-w10-r01/debug/deps/r05_t06_operations-38d1ae7b39915a9f",
+      "sha256": "c6857f19564578d020e751a00dc5d0a2abdbf1de41d65213997ec9992b4a936b",
+      "current_sha256": "c6857f19564578d020e751a00dc5d0a2abdbf1de41d65213997ec9992b4a936b"
+    },
+    {
+      "command": "old-service-01",
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/rust/target-w10-r01/debug/deps/r06_t07_knowledge-7ae0f9c2623b291a",
+      "sha256": "5282211fc65f838ec8dba9a61044c9baed83c1a26c1c6130068307a972b7bb2c",
+      "current_sha256": "5282211fc65f838ec8dba9a61044c9baed83c1a26c1c6130068307a972b7bb2c"
+    },
+    {
+      "command": "old-service-01",
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/rust/target-w10-r01/debug/deps/r06_t07_knowledge_tools-98f7b4f145bdffc7",
+      "sha256": "acf5e0179a8babecc324f25bc26e924dc96f99440d66fa3b08b92b268e951009",
+      "current_sha256": "acf5e0179a8babecc324f25bc26e924dc96f99440d66fa3b08b92b268e951009"
+    },
+    {
+      "command": "old-adapters-01",
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/rust/target-w10-r01/debug/deps/knowledge_store_r06t07-60406ec468abc31a",
+      "sha256": "e1b9e7a87d05bd9c0e8829b4d7840851f69ec21fe7e4452bb838ac66d9262a4a",
+      "current_sha256": "e1b9e7a87d05bd9c0e8829b4d7840851f69ec21fe7e4452bb838ac66d9262a4a"
+    },
+    {
+      "command": "old-adapters-01",
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/rust/target-w10-r01/debug/deps/r05_t06_operations-7af6297027d2d65e",
+      "sha256": "235b137323970573973fd37746df50b9d3466c40faf065f37037e203b2dc9d1e",
+      "current_sha256": "235b137323970573973fd37746df50b9d3466c40faf065f37037e203b2dc9d1e"
+    },
+    {
+      "command": "old-event-list-01",
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/rust/target-w10-r01/debug/deps/run_lifecycle-060747317e86c211",
+      "sha256": "6f2b9d7e842c20312f8d7dfb18d001d69e91a7ccffb67082d149b768871e0873",
+      "current_sha256": "6f2b9d7e842c20312f8d7dfb18d001d69e91a7ccffb67082d149b768871e0873"
+    },
+    {
+      "command": "c-all-01",
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/rust/target-w10-r01/debug/deps/r06_ar_w10_embedding_identity-a492dffe06646973",
+      "sha256": "30414039c44816abd708082f87123756506c5c0e499e2c303cbc1e9bc72b1004",
+      "current_sha256": "30414039c44816abd708082f87123756506c5c0e499e2c303cbc1e9bc72b1004"
+    },
+    {
+      "command": "mutant-c02-red-01",
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/artifacts/rust-tauri/R06/AR/W10-R01/LOCAL_ONLY_NEVER_GIT/mutant-target/debug/deps/r06_ar_w10_embedding_identity-a492dffe06646973",
+      "sha256": "6efbdbbd8c2cbe2d15dac98dd64bd1a37433dc1c464ee674b4c016593dc00140",
+      "current_sha256": "6efbdbbd8c2cbe2d15dac98dd64bd1a37433dc1c464ee674b4c016593dc00140"
+    },
+    {
+      "command": "contracts-01",
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/rust/target-w10-r01/debug/xtask",
+      "sha256": "cd7053f34871bf511fd2304c4ef45c1f59d6fccd2f4178e581e2a5683c26aca5",
+      "current_sha256": "cd7053f34871bf511fd2304c4ef45c1f59d6fccd2f4178e581e2a5683c26aca5"
+    },
+    {
+      "command": "mutation-green-control-02",
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/rust/target-w10-r01/debug/deps/r06_ar_w10_embedding_identity-a492dffe06646973",
+      "sha256": "30414039c44816abd708082f87123756506c5c0e499e2c303cbc1e9bc72b1004",
+      "current_sha256": "30414039c44816abd708082f87123756506c5c0e499e2c303cbc1e9bc72b1004"
+    },
+    {
+      "command": "mutation-green-control-01",
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/rust/target-w10-r01/debug/deps/r06_ar_w10_embedding_identity-a492dffe06646973",
+      "sha256": "30414039c44816abd708082f87123756506c5c0e499e2c303cbc1e9bc72b1004",
+      "current_sha256": "30414039c44816abd708082f87123756506c5c0e499e2c303cbc1e9bc72b1004"
+    },
+    {
+      "command": "boundaries-01",
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/rust/target-w10-r01/debug/xtask",
+      "sha256": "cd7053f34871bf511fd2304c4ef45c1f59d6fccd2f4178e581e2a5683c26aca5",
+      "current_sha256": "cd7053f34871bf511fd2304c4ef45c1f59d6fccd2f4178e581e2a5683c26aca5"
+    },
+    {
+      "command": "C04 actual shipping SIGKILL/restart; provider-alias-02",
+      "path": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/rust/target-w10-r01/debug/lingxi-service",
+      "sha256": "86680bfa80908d169f7cd4e306ef50407bff9bbd6a00fe9e259f574ad5189924",
+      "current_sha256": "86680bfa80908d169f7cd4e306ef50407bff9bbd6a00fe9e259f574ad5189924"
+    }
+  ],
+  "cargo": "/Users/study_superior/.cargo/bin/cargo 1.98.1; --locked -j8 on all cargo build/test/clippy/xtask",
+  "guard": {
+    "seconds": 600,
+    "memory_mib": 8192,
+    "enabled": true,
+    "measured_peak_mib": null
+  },
+  "product_or_original_tests_modified_by_reviewer": false,
+  "commit_push_reset_clean": false,
+  "r07_started": false
+}

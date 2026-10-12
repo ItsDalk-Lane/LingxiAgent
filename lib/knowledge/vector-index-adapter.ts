@@ -1,6 +1,6 @@
 /**
  * 不依赖本机扩展的可移植向量缓存（knowledge-vector.db）。它只保存可重算的 Chunk 向量，
- * 事实库损坏处理与这里完全分开；缓存打不开时只重建这个精确文件。
+ * 事实库损坏处理与这里完全分开；打开失败保留原件，恢复必须保留一致快照。
  *
  * ── Schema v2 契约（VectorIndexVariant，Phase 1 / P0 索引身份）──────────────────
  *
@@ -26,8 +26,7 @@
  * 迁移 v1→v2 在单事务内完成（建表 → 回填 → 重建 chunk_vectors → DROP vector_artifacts），
  * 只建立身份、映射已有向量，禁止触发任何重新 embedding；resolver 缺失/返回 null 的行
  * 以 chunkProfileHash = 'legacy_unknown' 建档（宁可标记 legacy 也不丢向量）。
- * 注意：迁移抛错会被 openWithRecovery 按「缓存损坏」语义删库重建，因此
- * profileHashResolver 必须是全函数（任何 parseArtifactId 都不许抛）。
+ * 迁移错误保留原库并明确拒绝；resolver 抛错不会被伪装成缓存损坏。
  *
  * ── API 锚点 ────────────────────────────────────────────────────────────────
  * hasArtifact / buildOrReplaceArtifact 以 (chunkIndexVariantId + parseArtifactId)
@@ -67,6 +66,7 @@
  * 4. 孤儿 GC（待建）：removeVariant / removeArtifact 用于零引用 variant 清扫；
  *    vector_index_variants.parse_artifact_id 冗余列即为此预留。
  */
+import { openKnowledgeCacheDatabase, closeKnowledgeCacheDatabase } from "./ann-index-store.ts";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -304,13 +304,14 @@ export interface PortableVectorIndexAdapterOptions {
    * 迁移 v1→v2 回填用：parseArtifactId → chunkProfileHash（FTS 库
    * chunk_index_variants.chunk_profile_hash）。由 KnowledgeManager 打开两库后注入；
    * 缺失或返回 null 的行以 LEGACY_UNKNOWN_CHUNK_PROFILE_HASH 建档。
-   * 必须是全函数：抛错会中止迁移并触发缓存级重建（见文件头）。
+   * 抛错中止迁移并保留旧向量，不触发重新 embedding。
    */
   profileHashResolver?: (parseArtifactId: string) => string | null;
 }
 
 export class PortableVectorIndexAdapter implements VectorIndexAdapter {
   declare db: any;
+  private closeGuard: any;
   readonly dbPath: string;
   private readonly Database: any;
   private readonly now: () => string;
@@ -337,92 +338,113 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
   private openWithRecovery() {
     try {
       this.open();
-    } catch {
+    } catch (error: unknown) {
       this.closeQuietly();
-      this.deleteFiles();
-      try {
-        this.open();
-      } catch {
-        this.closeQuietly();
-        throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge vector index cannot be opened");
-      }
+      if (error instanceof KnowledgeError) throw error;
+      const cause = String((error as NodeJS.ErrnoException)?.code || "migration_failed");
+      // 不能以打开失败推断不存在活跃写者；原库/WAL/SHM一律保留。
+      throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge vector index open failed; original preserved", {
+        cause,
+        recoveryRequired: cause === "SQLITE_CORRUPT" || cause === "SQLITE_NOTADB",
+      });
     }
   }
 
   private open() {
-    this.db = new this.Database(this.dbPath);
-    this.db.pragma("journal_mode = WAL");
-    this.db.pragma("synchronous = NORMAL");
-    this.db.pragma("busy_timeout = 5000");
-    const version = Number(this.db.pragma("user_version", { simple: true }));
-    if (!Number.isSafeInteger(version) || version < 0 || version > VECTOR_INDEX_SCHEMA_VERSION) {
-      throw new Error("unsupported_vector_index_schema");
-    }
-    if (version === 0) {
-      this.db.transaction(() => {
-        this.db.exec(`
-          CREATE TABLE vector_index_variants (
-            id TEXT PRIMARY KEY,
-            chunk_index_variant_id TEXT NOT NULL,
-            parse_artifact_id TEXT NOT NULL,
-            model_key TEXT NOT NULL,
-            chunk_fingerprint TEXT NOT NULL,
-            dimensions INTEGER NOT NULL CHECK(dimensions > 0),
-            status TEXT NOT NULL CHECK(status IN ('building', 'ready', 'failed', 'retiring')),
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL,
-            last_used_at TEXT NOT NULL DEFAULT '',
-            UNIQUE(chunk_index_variant_id, model_key)
-          );
-          CREATE TABLE chunk_vectors (
-            vector_index_variant_id TEXT NOT NULL,
-            parse_artifact_id TEXT NOT NULL,
-            model_key TEXT NOT NULL,
-            chunk_id TEXT NOT NULL,
-            ordinal INTEGER NOT NULL CHECK(ordinal >= 0),
-            dimensions INTEGER NOT NULL CHECK(dimensions > 0),
-            vector BLOB NOT NULL,
-            PRIMARY KEY(vector_index_variant_id, chunk_id),
-            UNIQUE(vector_index_variant_id, ordinal)
-          );
-
-          CREATE INDEX idx_chunk_vectors_scope
-            ON chunk_vectors(vector_index_variant_id, parse_artifact_id, ordinal);
-          CREATE INDEX idx_chunk_vectors_artifact
-            ON chunk_vectors(parse_artifact_id);
-          CREATE INDEX idx_vector_index_variants_artifact
-            ON vector_index_variants(parse_artifact_id);
-        `);
-        this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);
-      })();
-    } else if (version === 1) {
-      // 祖先线 v1（vector_artifacts 无 last_used_at）：身份迁移 + 补列。
-      this.migrateV1ToV2();
-      this.addVariantLastUsedAt();
-    } else if (version === 2) {
-      // v2 有两条历史线（本分支 variant 表 vs main 线 vector_artifacts+last_used_at），
-      // 按表形分流：本分支线只补列；main 线先做身份迁移再补列。
-      const columns = this.db.prepare(`PRAGMA table_info(vector_index_variants)`).all() as any[];
-      if (columns.length === 0) {
-        this.migrateV1ToV2();
+    let meta: fs.Stats | undefined;
+    try { meta = fs.lstatSync(this.dbPath); }
+    catch (error: unknown) { if ((error as NodeJS.ErrnoException)?.code !== "ENOENT") throw error; }
+    if (meta) {
+      if (!meta.isFile() || meta.nlink !== 1) {
+        throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge vector cache is not an exclusive regular file");
       }
-      this.addVariantLastUsedAt();
+      if (meta.size > 0) {
+        const fd = fs.openSync(this.dbPath, "r");
+        const header = Buffer.alloc(16);
+        try {
+          if (fs.readSync(fd, header, 0, 16, 0) !== 16 || !header.equals(Buffer.from("SQLite format 3\0"))) {
+            throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge vector cache is corrupt; original and sidecars preserved", { recoveryRequired: true });
+          }
+        } finally { fs.closeSync(fd); }
+      }
     }
-    if (this.db.pragma("quick_check", { simple: true }) !== "ok") {
-      throw new Error("vector_index_quick_check_failed");
-    }
+    const opened = openKnowledgeCacheDatabase(this.Database, this.dbPath, VECTOR_INDEX_SCHEMA_VERSION, db => {
+      this.db = db;
+      this.db.transaction(() => {
+        this.assertWritableSchema();
+        const version = Number(this.db.pragma("user_version", { simple: true }));
+        // 获得写事务后的版本闸口也保护长期存活的旧句柄。
+        if (version === 0) {
+          this.db.transaction(() => {
+            this.assertWritableSchema();
+            this.db.exec(`
+              CREATE TABLE vector_index_variants (
+                id TEXT PRIMARY KEY,
+                chunk_index_variant_id TEXT NOT NULL,
+                parse_artifact_id TEXT NOT NULL,
+                model_key TEXT NOT NULL,
+                chunk_fingerprint TEXT NOT NULL,
+                dimensions INTEGER NOT NULL CHECK(dimensions > 0),
+                status TEXT NOT NULL CHECK(status IN ('building', 'ready', 'failed', 'retiring')),
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                last_used_at TEXT NOT NULL DEFAULT '',
+                UNIQUE(chunk_index_variant_id, model_key)
+              );
+              CREATE TABLE chunk_vectors (
+                vector_index_variant_id TEXT NOT NULL,
+                parse_artifact_id TEXT NOT NULL,
+                model_key TEXT NOT NULL,
+                chunk_id TEXT NOT NULL,
+                ordinal INTEGER NOT NULL CHECK(ordinal >= 0),
+                dimensions INTEGER NOT NULL CHECK(dimensions > 0),
+                vector BLOB NOT NULL,
+                PRIMARY KEY(vector_index_variant_id, chunk_id),
+                UNIQUE(vector_index_variant_id, ordinal)
+              );
+
+              CREATE INDEX idx_chunk_vectors_scope
+                ON chunk_vectors(vector_index_variant_id, parse_artifact_id, ordinal);
+              CREATE INDEX idx_chunk_vectors_artifact
+                ON chunk_vectors(parse_artifact_id);
+              CREATE INDEX idx_vector_index_variants_artifact
+                ON vector_index_variants(parse_artifact_id);
+            `);
+            this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);
+          }).immediate();
+        } else if (version === 1) {
+          // 祖先线 v1（vector_artifacts 无 last_used_at）：身份迁移 + 补列。
+          this.migrateV1ToV2();
+          this.addVariantLastUsedAt();
+        } else if (version === 2) {
+          // v2 有两条历史线（本分支 variant 表 vs main 线 vector_artifacts+last_used_at），
+          // 按表形分流：本分支线只补列；main 线先做身份迁移再补列。
+          const columns = this.db.prepare(`PRAGMA table_info(vector_index_variants)`).all() as any[];
+          if (columns.length === 0) {
+            this.migrateV1ToV2();
+          }
+          this.addVariantLastUsedAt();
+        }
+        if (this.db.pragma("quick_check", { simple: true }) !== "ok") {
+          throw new Error("vector_index_quick_check_failed");
+        }
+      }).immediate();
+    });
+    this.db = opened.db;
+    this.closeGuard = opened.closeGuard;
   }
 
   /** v3 补列（幂等）：variant 表加 last_used_at，存量行回填 created_at（=indexed_at 语义）。 */
   private addVariantLastUsedAt() {
     this.db.transaction(() => {
+      this.assertWritableSchema();
       const columns = this.db.prepare(`PRAGMA table_info(vector_index_variants)`).all() as any[];
       if (!columns.some((col: any) => col.name === "last_used_at")) {
         this.db.exec(`ALTER TABLE vector_index_variants ADD COLUMN last_used_at TEXT NOT NULL DEFAULT '';`);
       }
       this.db.exec(`UPDATE vector_index_variants SET last_used_at = created_at WHERE last_used_at = '';`);
       this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);
-    })();
+    }).immediate();
   }
 
   /**
@@ -434,6 +456,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
    */
   private migrateV1ToV2() {
     this.db.transaction(() => {
+      this.assertWritableSchema();
       this.db.exec(`
         CREATE TABLE vector_index_variants (
           id TEXT PRIMARY KEY,
@@ -553,22 +576,20 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
         DROP TABLE vector_artifacts;
       `);
       this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);
-    })();
+    }).immediate();
+  }
+
+  private assertWritableSchema() {
+    const version = Number(this.db.pragma("user_version", { simple: true }));
+    if (version > VECTOR_INDEX_SCHEMA_VERSION) {
+      throw new KnowledgeError("KNOWLEDGE_SCHEMA_NEWER", "Knowledge vector schema is newer than this program supports");
+    }
   }
 
   private closeQuietly() {
-    try { this.db?.close?.(); } catch { /* 缓存关闭失败不覆盖原错误。 */ }
+    try { closeKnowledgeCacheDatabase(this.db, this.closeGuard); } catch { /* 缓存关闭失败不覆盖原错误。 */ }
     this.db = null;
-  }
-
-  private deleteFiles() {
-    for (const suffix of ["", "-wal", "-shm"]) {
-      try { fs.unlinkSync(`${this.dbPath}${suffix}`); } catch (error: any) {
-        if (error?.code !== "ENOENT") {
-          throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge vector index cannot be rebuilt");
-        }
-      }
-    }
+    this.closeGuard = null;
   }
 
   private normalizeModel(model: VectorIndexModelIdentity): VectorIndexModelIdentity {
@@ -691,6 +712,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
       ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
     this.db.transaction(() => {
+      this.assertWritableSchema();
       this.db.prepare(`
         DELETE FROM chunk_vectors WHERE vector_index_variant_id = ?
       `).run(anchor.vectorIndexVariantId);
@@ -733,7 +755,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
         this.now(),
         this.now(),
       );
-    })();
+    }).immediate();
     this.onInvalidateVariant?.(anchor.vectorIndexVariantId);
     this.onReadyVariant?.(anchor.vectorIndexVariantId);
     return { vectorIndexVariantId: anchor.vectorIndexVariantId };
@@ -743,18 +765,20 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
     const artifactId = requiredId(parseArtifactId, "parseArtifactId");
     const ids = this.db.prepare("SELECT id FROM vector_index_variants WHERE parse_artifact_id = ?").all(artifactId).map((row: any) => row.id);
     this.db.transaction(() => {
+      this.assertWritableSchema();
       this.db.prepare(`DELETE FROM chunk_vectors WHERE parse_artifact_id = ?`).run(artifactId);
       this.db.prepare(`DELETE FROM vector_index_variants WHERE parse_artifact_id = ?`).run(artifactId);
-    })();
+    }).immediate();
     for (const id of ids) this.onInvalidateVariant?.(id);
   }
 
   removeVariant(vectorIndexVariantId: unknown): void {
     const id = requiredId(vectorIndexVariantId, "vectorIndexVariantId", 64);
     this.db.transaction(() => {
+      this.assertWritableSchema();
       this.db.prepare(`DELETE FROM chunk_vectors WHERE vector_index_variant_id = ?`).run(id);
       this.db.prepare(`DELETE FROM vector_index_variants WHERE id = ?`).run(id);
-    })();
+    }).immediate();
     this.onInvalidateVariant?.(id);
   }
 
@@ -794,8 +818,11 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
   }
 
   touchVectorVariants(variantIds: string[]): void {
-    this.db.prepare("UPDATE vector_index_variants SET last_used_at = ? WHERE id IN (SELECT value FROM json_each(?))")
-      .run(this.now(), JSON.stringify(variantIds));
+    this.db.transaction(() => {
+      this.assertWritableSchema();
+      this.db.prepare("UPDATE vector_index_variants SET last_used_at = ? WHERE id IN (SELECT value FROM json_each(?))")
+        .run(this.now(), JSON.stringify(variantIds));
+    }).immediate();
   }
 
   setVariantStatus(vectorIndexVariantId: unknown, status: VectorIndexVariantStatus): void {
@@ -803,9 +830,12 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
     if (!["building", "ready", "failed", "retiring"].includes(status)) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Vector index variant status is invalid");
     }
-    const result = this.db.prepare(`
-      UPDATE vector_index_variants SET status = ?, updated_at = ? WHERE id = ?
-    `).run(status, this.now(), id);
+    const result = this.db.transaction(() => {
+      this.assertWritableSchema();
+      return this.db.prepare(`
+        UPDATE vector_index_variants SET status = ?, updated_at = ? WHERE id = ?
+      `).run(status, this.now(), id);
+    }).immediate();
     if (result.changes === 0) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Vector index variant does not exist");
     }
@@ -862,6 +892,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
     const model = this.normalizeModel(input.model);
     const anchor = this.resolveBuildAnchor(input, model.key);
     return this.db.transaction(() => {
+      this.assertWritableSchema();
       const row = this.db.prepare(`
         SELECT * FROM vector_index_variants WHERE id = ?
       `).get(anchor.vectorIndexVariantId);
@@ -906,7 +937,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
         UPDATE vector_index_variants SET status = 'building', updated_at = ? WHERE id = ?
       `).run(this.now(), anchor.vectorIndexVariantId);
       return { vectorIndexVariantId: anchor.vectorIndexVariantId, resetStaleVectors: false };
-    })();
+    }).immediate();
   }
 
   upsertChunkVectorBatch(input: {
@@ -926,6 +957,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
       ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
     this.db.transaction(() => {
+      this.assertWritableSchema();
       const variant = this.requireVariantForBuild(
         input.vectorIndexVariantId,
         input.chunkFingerprint,
@@ -946,7 +978,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
           vectorBuffer(entry.vector, model.dimensions),
         );
       }
-    })();
+    }).immediate();
   }
 
   completeVectorVariantBuild(input: {
@@ -960,6 +992,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Vector variant expected chunk count is invalid");
     }
     this.db.transaction(() => {
+      this.assertWritableSchema();
       const variant = this.requireVariantForBuild(
         input?.vectorIndexVariantId,
         input?.chunkFingerprint,
@@ -981,7 +1014,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
       this.db.prepare(`
         UPDATE vector_index_variants SET status = 'ready', updated_at = ? WHERE id = ?
       `).run(this.now(), variant.id);
-    })();
+    }).immediate();
     this.onReadyVariant?.(String(input.vectorIndexVariantId));
   }
 
@@ -1057,26 +1090,36 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
         || left.ordinal - right.ordinal
       )).slice(0, limit);
       // 查询涉及即为使用：scope 内全部 variant 刷新 last_used_at（按 artifact 维度
-      // 判定保留期），供笔记本级向量保留策略判定"超期未使用"。刷新失败不阻断查询。
+      // 判定保留期），供笔记本级向量保留策略判定"超期未使用"。合法 I/O 失败可降级。
       try {
-        const usageConditions: string[] = [];
-        const usageParams: unknown[] = [this.now()];
-        if (artifactIds) {
-          usageConditions.push(`parse_artifact_id IN (${artifactIds.map(() => "?").join(", ")})`);
-          usageParams.push(...artifactIds);
-        }
-        if (variantIds) {
-          usageConditions.push(`id IN (${variantIds.map(() => "?").join(", ")})`);
-          usageParams.push(...variantIds);
-        }
-        this.db.prepare(`
-          UPDATE vector_index_variants SET last_used_at = ? WHERE ${usageConditions.join(" OR ")}
-        `).run(...usageParams);
-      } catch { /* 使用时间刷新失败不影响检索结果 */ }
+        this.db.transaction(() => {
+          this.assertWritableSchema();
+          const usageConditions: string[] = [];
+          const usageParams: unknown[] = [this.now()];
+          if (artifactIds) {
+            usageConditions.push(`parse_artifact_id IN (${artifactIds.map(() => "?").join(", ")})`);
+            usageParams.push(...artifactIds);
+          }
+          if (variantIds) {
+            usageConditions.push(`id IN (${variantIds.map(() => "?").join(", ")})`);
+            usageParams.push(...variantIds);
+          }
+          this.db.prepare(`
+            UPDATE vector_index_variants SET last_used_at = ? WHERE ${usageConditions.join(" OR ")}
+          `).run(...usageParams);
+        }).immediate();
+      } catch (error) {
+        // 只允许使用时间记录的锁/权限/I/O失败按最佳努力处理；版本拒绝和损坏必须可见。
+        const code = String((error as NodeJS.ErrnoException)?.code || "");
+        if (!/^SQLITE_(?:BUSY|LOCKED|READONLY|IOERR|FULL|CANTOPEN)(?:_|$)/u.test(code)) throw error;
+        console.warn("[knowledge] 使用时间未刷新，检索继续；保留期仍以原记录为准", { code });
+      }
       return results;
     } catch (error) {
       if (error instanceof KnowledgeError) throw error;
-      throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge vector index query failed");
+      throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge vector index query failed; original preserved", {
+        cause: String((error as NodeJS.ErrnoException)?.code || "query_failed"),
+      });
     }
   }
 
@@ -1105,13 +1148,14 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
     const ids = this.db.prepare("SELECT id FROM vector_index_variants WHERE parse_artifact_id = ? AND model_key = ?")
       .all(artifactId, modelKey).map((row: any) => row.id);
     this.db.transaction(() => {
+      this.assertWritableSchema();
       this.db.prepare(
         `DELETE FROM chunk_vectors WHERE parse_artifact_id = ? AND model_key = ?`,
       ).run(artifactId, modelKey);
       this.db.prepare(
         `DELETE FROM vector_index_variants WHERE parse_artifact_id = ? AND model_key = ?`,
       ).run(artifactId, modelKey);
-    })();
+    }).immediate();
     for (const id of ids) this.onInvalidateVariant?.(id);
   }
 
@@ -1120,9 +1164,40 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
   }
 
   rebuild(): void {
-    this.closeQuietly();
-    this.deleteFiles();
-    this.openWithRecovery();
+    // SQLite事务阻止其它写者；serialize包含已提交WAL内容，不unlink活跃句柄。
+    // 先同步保存唯一恢复副本，备份失败则事务中不删除任何向量。
+    this.db.transaction(() => {
+      this.assertWritableSchema();
+      const version = Number(this.db.pragma("user_version", { simple: true }));
+      if (version > VECTOR_INDEX_SCHEMA_VERSION) {
+        throw new KnowledgeError("KNOWLEDGE_SCHEMA_NEWER", "Knowledge vector schema is newer than this program supports");
+      }
+      const snapshot: Buffer = this.db.serialize();
+      const quarantine = `${this.dbPath}.quarantine-${crypto.randomUUID()}`;
+      fs.mkdirSync(quarantine, { mode: 0o700 });
+      const original = path.join(quarantine, "original.db");
+      const fd = fs.openSync(original, "wx", 0o600);
+      try {
+        fs.writeFileSync(fd, snapshot);
+        fs.fsyncSync(fd);
+      } finally { fs.closeSync(fd); }
+      const receipt = fs.openSync(path.join(quarantine, "recovery.json"), "wx", 0o600);
+      try {
+        fs.writeFileSync(receipt, JSON.stringify({
+        state: "snapshot_retained_reindex_required", embeddingsRegenerated: false,
+        schemaVersion: version, sha256: crypto.createHash("sha256").update(snapshot).digest("hex"),
+        }));
+        fs.fsyncSync(receipt);
+      } finally { fs.closeSync(receipt); }
+      // Unix还需同步目录项，避免清空后断电丢失备份文件名。
+      if (process.platform !== "win32") {
+        for (const directory of [quarantine, path.dirname(this.dbPath)]) {
+          const directoryFd = fs.openSync(directory, "r");
+          try { fs.fsyncSync(directoryFd); } finally { fs.closeSync(directoryFd); }
+        }
+      }
+      this.db.exec("DELETE FROM chunk_vectors; DELETE FROM vector_index_variants;");
+    }).immediate();
   }
 
   close(): void {

@@ -24,11 +24,11 @@ use std::sync::Arc;
 
 use sha2::{Digest, Sha256};
 
+use lingxi_adapters::storage::RunDatabase;
 use lingxi_adapters::storage::session_files as store;
 use lingxi_adapters::storage::session_files::{
     FileKind, RefKind, SessionFileOrigin, SessionFileRow, SessionFileStatus, StorageKind,
 };
-use lingxi_adapters::storage::RunDatabase;
 use lingxi_kernel::ports::StorageError;
 
 use crate::filemeta;
@@ -219,6 +219,13 @@ fn real_path_or_none(value: &Path) -> Option<PathBuf> {
 /// 现役 isSensitivePath：相对/不可解析路径按敏感处理；$HOME 下的
 /// SENSITIVE_DIRS 与 lingxiHome 一律封锁。
 fn is_sensitive_path(resolved: &Path, lingxi_home: Option<&Path>) -> bool {
+    if resolved.components().any(|c| {
+        c.as_os_str()
+            .to_string_lossy()
+            .starts_with(".lingxi-recovery-")
+    }) {
+        return true;
+    }
     let Some(home) = home_dir() else {
         // 无法确定 $HOME 时按敏感处理（现役 realPath 失败 → true 的同构
         // 保守臂）。
@@ -437,6 +444,8 @@ pub struct SessionFileService {
     home: PathBuf,
     db: Arc<RunDatabase>,
     now: Arc<dyn Fn() -> u64 + Send + Sync>,
+    cleanup_observer: std::sync::RwLock<Option<store::MaintenanceObserver>>,
+    read_observer: std::sync::RwLock<Option<Arc<dyn Fn() + Send + Sync>>>,
 }
 
 impl SessionFileService {
@@ -449,11 +458,64 @@ impl SessionFileService {
             home,
             db,
             now: Arc::new(now),
+            cleanup_observer: std::sync::RwLock::new(None),
+            read_observer: std::sync::RwLock::new(None),
         }
+    }
+
+    /// 真实存储对象的共享准入，供内部资源作业核验归属，不能靠 home 字符串猜测。
+    pub(crate) fn admission_gate(&self) -> Arc<lingxi_kernel::session_admission::SessionAdmission> {
+        Arc::clone(self.db.session_admission())
+    }
+    /// 观察真实维护窗口；观察者不能替换待测存储或字节操作。
+    pub fn set_cleanup_observer(&self, observer: Arc<dyn Fn(&str) + Send + Sync>) {
+        *self
+            .cleanup_observer
+            .write()
+            .expect("cleanup observer lock") = Some(observer);
+    }
+    pub fn set_payload_read_observer(&self, observer: Arc<dyn Fn() + Send + Sync>) {
+        *self.read_observer.write().expect("read observer lock") = Some(observer);
+    }
+    pub fn payload_read_observer(&self) -> Option<Arc<dyn Fn() + Send + Sync>> {
+        self.read_observer
+            .read()
+            .expect("read observer lock")
+            .clone()
     }
 
     pub fn home(&self) -> &Path {
         &self.home
+    }
+
+    /// 交付只关联现有会话；拒绝缺失身份，不能借登记文件自动创建会话。
+    pub(crate) async fn ensure_stage_session(
+        &self,
+        ctx: &lingxi_kernel::RunContext,
+    ) -> Result<(), StorageError> {
+        let session_id = ctx.session_id.as_str();
+        if session_id.trim().is_empty() || session_id.trim() != session_id {
+            return Err(StorageError::InvalidRequest {
+                detail: "stage_files requires a non-empty session identity".into(),
+            });
+        }
+        let row =
+            self.db
+                .get_session(session_id)
+                .await?
+                .ok_or_else(|| StorageError::InvalidRequest {
+                    detail: "stage_files requires an existing session".into(),
+                })?;
+        if matches!(
+            ctx.principal,
+            lingxi_kernel::Principal::Device { .. } | lingxi_kernel::Principal::WebSession { .. }
+        ) && row.owner_user_id != ctx.principal.storage_subject()
+        {
+            return Err(StorageError::InvalidRequest {
+                detail: "stage_files session ownership mismatch".into(),
+            });
+        }
+        Ok(())
     }
 
     fn now_ms(&self) -> u64 {
@@ -477,7 +539,7 @@ impl SessionFileService {
     fn managed_cache_root(&self) -> PathBuf {
         // 与现役 isInsideRoot(identityKey(file), identityKey(root)) 同口径：
         // 根侧也过 canonical（macOS /tmp → /private/tmp 这类 symlink 宿主
-        // 必须对齐，否则 managed 判定整体失效）。home 必定存在（布局在
+        // 必须对齐，否则托管删除根的判定失效）。home 必定存在（布局在
         // bootstrap 已 prepare），session-files 子目录可能尚未创建——
         // 对 home canonical 后拼接，而不是 canonicalize 不存在的子目录。
         let home = std::fs::canonicalize(&self.home).unwrap_or_else(|_| self.home.clone());
@@ -486,9 +548,8 @@ impl SessionFileService {
 
     /// 现役 registerFile（:74-165）：sourceKey 优先去重，realPath 兜底；
     /// 命中且 materialization 仍在时保留既有 filePath/realPath；新行
-    /// 8KB 采样探测 mime；storageKind 按「realPath 是否落在托管缓存根
-    /// 内」判定（现役由调用方显式传 managed_cache——upload 路由的 blob
-    /// 副本恰好都写进该根，位置判定与现役效果一致；差异台账申报）。
+    /// 8KB 采样探测 mime。新登记的既有路径是外部引用；只有实际创建副本
+    /// 的 blob、fork 或可信旧登记才能声明托管所有权，目录位置不能授予删除权。
     pub async fn register_file(
         &self,
         session_id: &str,
@@ -497,13 +558,64 @@ impl SessionFileService {
         label: Option<&str>,
         origin: &str,
     ) -> Result<SessionFileView, SessionFileError> {
+        let _lease = self.payload_lease().await;
+        self.register_file_inner(session_id, real_path, source_key, label, origin)
+            .await
+    }
+
+    /// 已持有整批租约时不再排队申请读锁，避免清理等待者引起重入死锁。
+    pub(crate) async fn register_file_under_lease(
+        &self,
+        session_id: &str,
+        real_path: &Path,
+        source_key: Option<&str>,
+        label: Option<&str>,
+        origin: &str,
+        _lease: &tokio::sync::OwnedRwLockReadGuard<()>,
+    ) -> Result<SessionFileView, SessionFileError> {
+        self.register_file_inner(session_id, real_path, source_key, label, origin)
+            .await
+    }
+
+    /// 把同一执行窗口的租约转移给整批提交，取消等待也不提前释放。
+    pub(crate) async fn commit_stage_references(
+        &self,
+        session_id: &str,
+        file_ids: Vec<String>,
+        call_id: &str,
+        lease: tokio::sync::OwnedRwLockReadGuard<()>,
+    ) -> Result<(), SessionFileError> {
+        store::insert_stage_refs(
+            &self.db,
+            session_id,
+            file_ids,
+            call_id,
+            self.now_ms(),
+            lease,
+        )
+        .await?;
+        Ok(())
+    }
+
+    async fn register_file_inner(
+        &self,
+        session_id: &str,
+        real_path: &Path,
+        source_key: Option<&str>,
+        label: Option<&str>,
+        origin: &str,
+    ) -> Result<SessionFileView, SessionFileError> {
         let now = self.now_ms();
+        store::record_current_activity(&self.db, session_id, now).await?;
         let canonical = std::fs::canonicalize(real_path).map_err(|_| {
             SessionFileError::Io(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
                 format!("file not found: {}", real_path.display()),
             ))
         })?;
+        if crate::file_safety::FileSafety::new(&self.home).is_protected(&canonical) {
+            return Err(SessionFileError::Inspect(InspectError::PathBlocked));
+        }
         let identity = canonical_identity_key(&canonical);
         let owner_key = session_file_owner_key(Some(session_id), None);
 
@@ -538,6 +650,14 @@ impl SessionFileService {
                 && existing.source_key.as_deref() == source_key
                 && existing.real_path != canonical.to_string_lossy()
                 && Path::new(&existing.real_path).exists();
+            if existing.storage_kind == StorageKind::ManagedCache
+                && (!keep && existing.real_path != canonical.to_string_lossy()
+                    || existing.status == SessionFileStatus::Expired)
+            {
+                return Err(SessionFileError::Storage(StorageError::InvalidRequest {
+                    detail: "managed_file_recovery_requires_owned_creation".into(),
+                }));
+            }
             if !keep && existing.real_path != canonical.to_string_lossy() {
                 store::update_session_file_paths(
                     &self.db,
@@ -593,11 +713,7 @@ impl SessionFileService {
             .map(|d| d.as_millis() as u64)
             .unwrap_or(0);
         let file_id = build_session_file_id(&owner_key, source_key, &identity);
-        let storage_kind = if canonical.starts_with(self.managed_cache_root()) {
-            StorageKind::ManagedCache
-        } else {
-            StorageKind::External
-        };
+        let storage_kind = StorageKind::External;
         let row = SessionFileRow {
             file_id: file_id.clone(),
             owner_session_id: session_id.to_string(),
@@ -628,7 +744,7 @@ impl SessionFileService {
 
     /// 现役 blob 上传（upload.ts sourceKeyForUploadBlob :242-250 +
     /// sanitizeBlobName/uniqueUploadName）：白名单外 mime 响亮拒绝；
-    /// 内容寻址 sourceKey 去重；副本写进会话托管缓存后走 register_file。
+    /// 内容寻址 sourceKey 去重；实际新建副本和登记恢复在同一个写队列事务内完成。
     pub async fn register_blob(
         &self,
         session_id: &str,
@@ -651,16 +767,9 @@ impl SessionFileService {
             "upload:blob-content:v1",
             &[presentation, mime, &sha256_hex(bytes)],
         );
-        // 现役 existingSessionFileForSourceKey：命中且 target 仍在 → 直接复用。
-        if let Some(existing) =
-            store::get_session_file_by_source_key(&self.db, session_id, &source_key).await?
-        {
-            if existing.status != SessionFileStatus::Expired
-                && Path::new(&existing.real_path).exists()
-            {
-                return Ok(SessionFileView::from_row(&existing));
-            }
-        }
+        let now = self.now_ms();
+        let lease = self.payload_lease().await;
+        store::record_current_activity(&self.db, session_id, now).await?;
         let sanitized = filemeta::sanitize_blob_name(name, mime);
         let ext = filemeta::ext_of_name(&sanitized);
         let (base, ext_with_dot) = if ext.is_empty() {
@@ -674,11 +783,40 @@ impl SessionFileService {
         let random = random_hex4()?;
         let unique = filemeta::unique_upload_name(base, &ext_with_dot, self.now_ms(), &random);
         let cache_dir = session_files_cache_dir(&self.home, Some(session_id), None);
-        std::fs::create_dir_all(&cache_dir)?;
         let dest = cache_dir.join(unique);
-        std::fs::write(&dest, bytes)?;
-        self.register_file(session_id, &dest, Some(&source_key), None, origin)
-            .await
+        let filename = dest
+            .file_name()
+            .expect("upload filename")
+            .to_string_lossy()
+            .into_owned();
+        let identity = canonical_identity_key(&dest);
+        let owner_key = session_file_owner_key(Some(session_id), None);
+        let row = SessionFileRow {
+            file_id: build_session_file_id(&owner_key, Some(&source_key), &identity),
+            owner_session_id: session_id.into(),
+            owner_key,
+            source_key: Some(source_key),
+            identity_key: identity,
+            file_path: dest.to_string_lossy().into_owned(),
+            real_path: dest.to_string_lossy().into_owned(),
+            storage_kind: StorageKind::ManagedCache,
+            status: SessionFileStatus::Available,
+            label: Some(filename.clone()),
+            mime: filemeta::detect_mime(bytes, mime, &filename),
+            filename,
+            size_bytes: bytes.len() as u64,
+            mtime_ms: now,
+            is_directory: false,
+            file_kind: parse_kind(filemeta::infer_file_kind(mime, &ext, false)),
+            origin: parse_origin(origin),
+            registered_at_ms: now,
+            updated_at_ms: now,
+            expires_at_ms: None,
+            legacy_file_ids: vec![],
+            legacy_file_paths: vec![],
+        };
+        let stored = store::register_owned_blob(&self.db, row, bytes.to_vec(), lease).await?;
+        Ok(SessionFileView::from_row(&stored))
     }
 
     /// alias 感知读取（A09 读路径）：sf_ id 直接命中且属本会话 → 行；
@@ -691,6 +829,11 @@ impl SessionFileService {
     ) -> Result<Option<SessionFileView>, SessionFileError> {
         if let Some(row) = store::get_session_file(&self.db, id_or_alias).await? {
             if row.owner_session_id == session_id {
+                return Ok(Some(SessionFileView::from_row(&row)));
+            }
+        }
+        for row in store::list_session_files_for_owner(&self.db, session_id).await? {
+            if row.legacy_file_ids.iter().any(|id| id == id_or_alias) {
                 return Ok(Some(SessionFileView::from_row(&row)));
             }
         }
@@ -740,6 +883,7 @@ impl SessionFileService {
         session_id: &str,
         sidecar_path: &Path,
     ) -> Result<ImportReport, SessionFileError> {
+        let _lease = self.payload_lease().await;
         let raw = std::fs::read_to_string(sidecar_path)?;
         let parsed: serde_json::Value = serde_json::from_str(&raw)
             .map_err(|err| SessionFileError::BadSidecar(err.to_string()))?;
@@ -767,15 +911,20 @@ impl SessionFileService {
                 skipped += 1;
                 continue;
             };
-            if store::get_session_file(&self.db, &row.file_id)
-                .await?
-                .is_some()
-            {
+            if let Some(existing) = store::get_session_file(&self.db, &row.file_id).await? {
+                if existing.owner_session_id != session_id {
+                    return Err(SessionFileError::ForkCollision(row.file_id));
+                }
+                if existing.identity_key != row.identity_key || existing.real_path != row.real_path
+                {
+                    return Err(SessionFileError::ForkCollision(row.file_id));
+                }
                 skipped += 1;
-                continue;
+            } else {
+                store::insert_session_file(&self.db, &row).await?;
+                imported += 1;
             }
             let legacy_ids = row.legacy_file_ids.clone();
-            store::insert_session_file(&self.db, &row).await?;
             for legacy in legacy_ids {
                 // 别名冲突不致命：现役语义是「旧 id 仍可解析」，后到的
                 // 同别名词条跳过（保留先登记者的指向）。
@@ -783,7 +932,6 @@ impl SessionFileService {
                     store::insert_alias(&self.db, &legacy, &row.file_id, now).await?;
                 }
             }
-            imported += 1;
         }
         // 现役 sidecar refs（注册操作日志）→ 候选 import 引用行。
         if let Some(refs) = parsed.get("refs").and_then(serde_json::Value::as_array) {
@@ -791,9 +939,13 @@ impl SessionFileService {
                 let Some(file_id) = refr.get("fileId").and_then(serde_json::Value::as_str) else {
                     continue;
                 };
-                if store::get_session_file(&self.db, file_id).await?.is_none() {
+                let Some(file) = self.get_file(session_id, file_id).await? else {
+                    continue;
+                };
+                if file.status != "available" {
                     continue;
                 }
+                let file_id = file.file_id.as_str();
                 let created = refr
                     .get("createdAt")
                     .and_then(serde_json::Value::as_u64)
@@ -863,11 +1015,14 @@ impl SessionFileService {
             Some("managed_cache") => StorageKind::ManagedCache,
             _ => StorageKind::External,
         };
-        let status = match value.get("status").and_then(serde_json::Value::as_str) {
+        let mut status = match value.get("status").and_then(serde_json::Value::as_str) {
             Some("expired") => SessionFileStatus::Expired,
             Some("missing") => SessionFileStatus::Missing,
             _ => SessionFileStatus::Available,
         };
+        if !Path::new(real_path).exists() {
+            status = SessionFileStatus::Missing;
+        }
         let legacy_file_ids = string_list(value.get("legacyFileIds"));
         let legacy_file_paths = string_list(value.get("legacyFilePaths"));
         let registered = value
@@ -926,172 +1081,43 @@ impl SessionFileService {
         target_session_id: &str,
         retained_identities: &[String],
     ) -> Result<Vec<String>, SessionFileError> {
-        let retained: HashSet<&str> = retained_identities.iter().map(String::as_str).collect();
-        let source_files = store::list_session_files_for_owner(&self.db, source_session_id).await?;
-        let now = self.now_ms();
-        let target_owner_key = session_file_owner_key(Some(target_session_id), None);
-        let target_cache_dir = session_files_cache_dir(&self.home, Some(target_session_id), None);
-        let mut used_names: HashSet<String> = HashSet::new();
-        let mut new_ids = Vec::new();
-        for source in &source_files {
-            let mut identities: Vec<&str> = vec![
-                source.file_id.as_str(),
-                source.file_path.as_str(),
-                source.real_path.as_str(),
-            ];
-            identities.extend(source.legacy_file_ids.iter().map(String::as_str));
-            identities.extend(source.legacy_file_paths.iter().map(String::as_str));
-            if !identities.iter().any(|id| retained.contains(id)) {
-                continue;
-            }
-            let (child_file_path, child_real_path) =
-                if source.storage_kind == StorageKind::ManagedCache {
-                    let managed_name = unique_managed_fork_name(source, &mut used_names);
-                    let dest = target_cache_dir.join(&managed_name);
-                    std::fs::create_dir_all(&target_cache_dir)?;
-                    if source.status == SessionFileStatus::Available
-                        && Path::new(&source.real_path).exists()
-                    {
-                        copy_payload(Path::new(&source.real_path), &dest, source.is_directory)?;
-                    }
-                    (
-                        dest.to_string_lossy().into_owned(),
-                        dest.to_string_lossy().into_owned(),
-                    )
-                } else {
-                    (source.file_path.clone(), source.real_path.clone())
-                };
-            let identity = canonical_identity_key(Path::new(&child_real_path));
-            let child_id =
-                build_session_file_id(&target_owner_key, source.source_key.as_deref(), &identity);
-            if store::get_session_file(&self.db, &child_id)
-                .await?
-                .is_some()
-            {
-                return Err(SessionFileError::ForkCollision(child_id));
-            }
-            let mut legacy_ids = source.legacy_file_ids.clone();
-            if !legacy_ids.contains(&source.file_id) {
-                legacy_ids.push(source.file_id.clone());
-            }
-            legacy_ids.retain(|id| id != &child_id);
-            let mut legacy_paths = source.legacy_file_paths.clone();
-            for p in [&source.file_path, &source.real_path] {
-                if !legacy_paths.contains(p) {
-                    legacy_paths.push(p.clone());
-                }
-            }
-            legacy_paths.retain(|p| p != &child_file_path && p != &child_real_path);
-            let row = SessionFileRow {
-                file_id: child_id.clone(),
-                owner_session_id: target_session_id.to_string(),
-                owner_key: target_owner_key.clone(),
-                source_key: source.source_key.clone(),
-                identity_key: identity,
-                file_path: child_file_path,
-                real_path: child_real_path,
-                storage_kind: source.storage_kind,
-                status: source.status,
-                label: source.label.clone(),
-                filename: source.filename.clone(),
-                mime: source.mime.clone(),
-                size_bytes: source.size_bytes,
-                mtime_ms: source.mtime_ms,
-                is_directory: source.is_directory,
-                file_kind: source.file_kind,
-                origin: source.origin,
-                registered_at_ms: now,
-                updated_at_ms: now,
-                expires_at_ms: source.expires_at_ms,
-                legacy_file_ids: legacy_ids.clone(),
-                legacy_file_paths: legacy_paths,
-            };
-            store::insert_session_file(&self.db, &row).await?;
-            // 旧 id 全链登记别名（A09：fork 前的历史引用无断链）。
-            for legacy in &legacy_ids {
-                if store::resolve_alias(&self.db, legacy).await?.is_none() {
-                    store::insert_alias(&self.db, legacy, &child_id, now).await?;
-                }
-            }
-            store::insert_ref(
-                &self.db,
-                &store::SessionFileRefRow {
-                    file_id: child_id.clone(),
-                    session_id: target_session_id.to_string(),
-                    message_id: None,
-                    ref_kind: RefKind::Import,
-                    created_at_ms: now,
-                },
-            )
-            .await?;
-            new_ids.push(child_id);
-        }
-        Ok(new_ids)
+        Ok(store::fork_file_subset(
+            &self.db,
+            source_session_id.to_string(),
+            target_session_id.to_string(),
+            retained_identities.to_vec(),
+            self.home.clone(),
+            self.now_ms(),
+        )
+        .await?)
     }
 
     /// 冷缓存清理（cleanupColdSessionFiles :517-571 的全量扫描形态 +
     /// 任务书第 4 条跨会话引用保护）：冷会话集合 → 逐文件（仅
-    /// managed_cache 且非 expired）→ 被任何「非冷」会话引用的跳过 →
-    /// managed-cache 根守卫 → 递归删除 → 行转 expired（expires_at_ms
-    /// 承载现役 missingAt）。
+    /// managed_cache 且非 expired）→ 保护所有有效引用、活跃运行及实际读线程 →
+    /// 托管根与实际规范路径守卫 → 删除 → 行转 expired（expires_at_ms 承载
+    /// 现役 missingAt）；会话已删除时仅在清扫成功后移除持久托管身份。
     pub async fn cleanup_cold_sessions(&self) -> Result<CleanupOutcome, SessionFileError> {
         let now = self.now_ms();
-        let cutoff = now.saturating_sub(SESSION_FILE_CACHE_INACTIVE_TTL_MS);
-        let cold = store::list_cold_session_ids(&self.db, cutoff).await?;
-        let cold_set: HashSet<&str> = cold.iter().map(String::as_str).collect();
-        let root = self.managed_cache_root();
-        let mut expired = Vec::new();
-        let mut deleted = 0usize;
-        for session_id in &cold {
-            let files = store::list_session_files_for_owner(&self.db, session_id).await?;
-            for file in &files {
-                if file.storage_kind != StorageKind::ManagedCache
-                    || file.status == SessionFileStatus::Expired
-                {
-                    continue;
-                }
-                // 任务书第 4 条：被存活（非冷）会话引用的交付物不得回收。
-                let refs = store::list_refs_for_file(&self.db, &file.file_id).await?;
-                if refs
-                    .iter()
-                    .any(|r| !cold_set.contains(r.session_id.as_str()))
-                {
-                    continue;
-                }
-                let target = if file.real_path.is_empty() {
-                    file.file_path.clone()
-                } else {
-                    file.real_path.clone()
-                };
-                // 现役 _assertManagedCacheTarget（:693-700）：目标必须落在
-                // session-files 根内（组件级包含，与 isInsideRoot 同口径），
-                // 否则响亮拒绝整个清理（不静默跳过）。
-                let canonical_target = canonical_identity_key(Path::new(&target));
-                let canonical_root = canonical_identity_key(&root);
-                if !Path::new(&canonical_target).starts_with(Path::new(&canonical_root)) {
-                    return Err(SessionFileError::ManagedCacheEscape(target));
-                }
-                let target_path = Path::new(&target);
-                if target_path.exists() {
-                    if target_path.is_dir() {
-                        std::fs::remove_dir_all(target_path)?;
-                    } else {
-                        std::fs::remove_file(target_path)?;
-                    }
-                    deleted += 1;
-                }
-                store::update_session_file_status(
-                    &self.db,
-                    &file.file_id,
-                    SessionFileStatus::Expired,
-                    Some(now),
-                    now,
-                )
-                .await?;
-                expired.push(file.file_id.clone());
-            }
-        }
+        let observer = self
+            .cleanup_observer
+            .read()
+            .expect("cleanup observer lock")
+            .clone();
+        let (expired, deleted) = store::cleanup_cold_payloads(
+            &self.db,
+            self.managed_cache_root(),
+            now.saturating_sub(SESSION_FILE_CACHE_INACTIVE_TTL_MS),
+            now,
+            observer,
+        )
+        .await?;
         Ok(CleanupOutcome { expired, deleted })
+    }
+
+    /// 实际读线程持有的租约；取消等待不等于线程退出。
+    pub async fn payload_lease(&self) -> tokio::sync::OwnedRwLockReadGuard<()> {
+        self.db.file_payload_leases().read_owned().await
     }
 
     /// 冷度写入（差异台账 D3 配套）：会话最近一次活动时刻。
@@ -1122,7 +1148,7 @@ impl SessionFileService {
             other => {
                 return Err(SessionFileError::Storage(StorageError::InvalidRequest {
                     detail: format!("unknown ref kind {other:?}"),
-                }))
+                }));
             }
         };
         store::insert_ref(
@@ -1202,6 +1228,12 @@ impl SessionFileService {
                 if row.owner_session_id == session_id {
                     return Ok(Some(row.file_id));
                 }
+            }
+            if let Some(row) = known
+                .iter()
+                .find(|row| row.legacy_file_ids.iter().any(|id| id == identity))
+            {
+                return Ok(Some(row.file_id.clone()));
             }
             if let Some(target) = store::resolve_alias(&self.db, identity).await? {
                 if let Some(row) = store::get_session_file(&self.db, &target).await? {
@@ -1306,6 +1338,7 @@ fn string_list(value: Option<&serde_json::Value>) -> Vec<String> {
 
 /// 现役 uniqueManagedForkName（registry :1049-1063）：`{sourceId}-{basename}`，
 /// 碰撞时 `{sourceId}-{n}-{basename}`（n 从 2 起）。
+#[cfg(test)]
 fn unique_managed_fork_name(source: &SessionFileRow, used: &mut HashSet<String>) -> String {
     let source_id: String = source
         .file_id
@@ -1346,26 +1379,6 @@ fn unique_managed_fork_name(source: &SessionFileRow, used: &mut HashSet<String>)
     }
     used.insert(candidate.clone());
     candidate
-}
-
-fn copy_payload(source: &Path, dest: &Path, is_directory: bool) -> Result<(), std::io::Error> {
-    if is_directory {
-        std::fs::create_dir_all(dest)?;
-        for entry in std::fs::read_dir(source)? {
-            let entry = entry?;
-            let child_dest = dest.join(entry.file_name());
-            let child_type = entry.file_type()?;
-            if child_type.is_dir() {
-                copy_payload(&entry.path(), &child_dest, true)?;
-            } else if child_type.is_file() {
-                std::fs::copy(entry.path(), &child_dest)?;
-            }
-            // symlink 等其它类型不复制（安全闸同 stance：不跟随）。
-        }
-        Ok(())
-    } else {
-        std::fs::copy(source, dest).map(|_| ())
-    }
 }
 
 fn random_hex4() -> Result<String, SessionFileError> {
@@ -1511,9 +1524,9 @@ fn collect_from_text(text: &str, ordered: &mut Vec<String>, seen: &mut HashSet<S
 
 // ── 路由 handler（history.rs 模式：归属闸先于一切实体读取） ──
 
+use axum::Json;
 use axum::extract::{Path as AxumPath, State};
 use axum::response::{IntoResponse, Response};
-use axum::Json;
 
 use crate::{EndpointError, Principal, ServiceState};
 

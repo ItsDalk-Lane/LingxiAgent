@@ -1,0 +1,130 @@
+{
+  "changed": {
+    "degraded": [
+      {
+        "detail": "vector variant missing or incompatible (model=model-a; dims=2); rebuild the notebook index",
+        "reason": "KNOWLEDGE_VECTOR_NOT_READY"
+      }
+    ],
+    "mode": "fts",
+    "searchedVectorVariants": []
+  },
+  "original": {
+    "degraded": [],
+    "mode": "hybrid",
+    "searchedVectorVariants": [
+      {
+        "chunkIndexVariantId": "civ_d21f8b87bf7204977b460c4acef216b4",
+        "chunkProfileHash": "0f9da6dad6bde4f5",
+        "dimensions": 2,
+        "parameterFingerprint": "52b5785d6bb521b5f46d808523867a0a653444130b149be3dbade968c907c03f",
+        "parseArtifactId": "kpa_1b29cb69d0d5eec1a69db9b4",
+        "vectorIndexVariantId": "viv_2336b0bead4b3a9fa01542bde298c833"
+      }
+    ]
+  },
+  "requestsA": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "# 资料\n\n来源隔离与模型身份必须一致。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:65334"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "# 资料\n\n来源隔离与模型身份必须一致。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:65334"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "来源隔离"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:65334"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "来源隔离"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:65334"
+    }
+  ],
+  "requestsNewEndpoint": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "来源隔离"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:65401"
+    }
+  ],
+  "unchanged": {
+    "degraded": [],
+    "mode": "hybrid",
+    "searchedVectorVariants": [
+      {
+        "chunkIndexVariantId": "civ_d21f8b87bf7204977b460c4acef216b4",
+        "chunkProfileHash": "0f9da6dad6bde4f5",
+        "dimensions": 2,
+        "parameterFingerprint": "52b5785d6bb521b5f46d808523867a0a653444130b149be3dbade968c907c03f",
+        "parseArtifactId": "kpa_1b29cb69d0d5eec1a69db9b4",
+        "vectorIndexVariantId": "viv_2336b0bead4b3a9fa01542bde298c833"
+      }
+    ]
+  },
+  "usage": [
+    {
+      "model": "model-a",
+      "outcome": "succeeded",
+      "provider": "embed"
+    },
+    {
+      "model": "model-a",
+      "outcome": "succeeded",
+      "provider": "embed"
+    },
+    {
+      "model": "model-a",
+      "outcome": "succeeded",
+      "provider": "embed"
+    },
+    {
+      "model": "model-a",
+      "outcome": "succeeded",
+      "provider": "embed"
+    },
+    {
+      "model": "model-a",
+      "outcome": "succeeded",
+      "provider": "embed"
+    }
+  ],
+  "vectors": [
+    {
+      "dimensions": 2,
+      "key": "5d18c3273c069aab72043c672d9aaa533e8c83bd99b061d8f253075bfa1dbc45",
+      "status": "ready",
+      "variant": "viv_2336b0bead4b3a9fa01542bde298c833",
+      "vector": "0000803F00000000"
+    }
+  ]
+}

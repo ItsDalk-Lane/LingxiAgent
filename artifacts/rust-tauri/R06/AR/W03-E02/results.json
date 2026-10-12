@@ -1,0 +1,85 @@
+{
+  "status": "READY_FOR_INDEPENDENT_REVIEW",
+  "task_acceptance": "NOT_ACCEPTED",
+  "stage_acceptance": "OPEN_WITH_ACTUAL_REQUIRED_GATE_FAILURES",
+  "self_check": {
+    "focused": {
+      "passed": 134,
+      "failed": 0,
+      "suite_count": 10,
+      "actual_execution_records": 10
+    },
+    "private_certificate": {
+      "passed": 2,
+      "failed": 0
+    },
+    "native_mutant": {
+      "expected_failed": 2,
+      "actual_failed": 2,
+      "exit": 101
+    },
+    "resourceio_fifo_mutant": {
+      "expected_failed": 1,
+      "actual_failed": 1,
+      "exit": 101
+    },
+    "formal_bin_guard": "四次真实production execution; 同home拒绝3，独立home并发0，真正退出后重开0"
+  },
+  "whole_workspace": {
+    "passed": 1889,
+    "failed": 3,
+    "blocks": 147,
+    "exact_executed_bins": 140,
+    "exit": 101,
+    "status": "FAIL"
+  },
+  "formal_chain": {
+    "R05": "FAIL",
+    "R04": "FAIL",
+    "R03": "FAIL",
+    "all_30_commands_actual_exit": true,
+    "outer_exit": 1,
+    "elapsed_seconds": 2689.572629928589,
+    "producer_status": "PASS",
+    "source_stable": true,
+    "remaining_owned_group": []
+  },
+  "required_gates": {
+    "fmt": "PASS",
+    "all_workspace_all_targets_clippy_Dwarnings": "PASS",
+    "contracts": "PASS",
+    "boundaries": "PASS",
+    "registry": "FAIL: migrations10 vs registered7, missing8/9/10"
+  },
+  "remaining_failures": [
+    "cancellation_tree::approval_wait_round_trips_approve_and_reject_legs",
+    "cancellation_tree::panicking_tool_child_is_supervised_and_the_run_settles_loudly",
+    "run_lifecycle::r03_a01_three_model_calls_produce_exactly_one_task_terminal",
+    "registry/migration original strict registration mismatch8/9/10"
+  ],
+  "scope": {
+    "t03_unique_original_leaves": 74,
+    "t03_original_assertions": 169,
+    "t03_leaves_with_partial_current_service_cases": 22,
+    "fully_closed_original_leaves": 0,
+    "all_stage_unique_leaves": 281,
+    "all_stage_memberships": 376,
+    "all_stage_assertions": 687
+  },
+  "stale_or_open": [
+    "F01/F02/F04/F05/F06/F08/F15及其原owner份额不关闭",
+    "共享37文件后其它候选旧证据STALE，集成必须重新绑定验证",
+    "完整R06/全281原叶687断言、平台/UI/真实供应商未结案",
+    "R02 legacy原directed范围E5完整npm与seal为原scope NOT_RUN，不当PASS"
+  ],
+  "count_corrections": [
+    "原九suite121；旧reported141错误；本轮加原T03 13得到134",
+    "旧259异质义务不是281unique/376memberships/687assertions",
+    "combined+五单字段共六类，不新增凑数head契约",
+    "formal01 closed-loop271.96秒正常101；143监督取消不是guard abort"
+  ],
+  "source_digest": "47bf2b262d78422376fe31bd663bcfe5da1975d0c207447d529f812173b7f59a",
+  "sensitive_policy": "synthetic HOME/config/credentials/privatekeys/target/bin/raw headers SQL full archives LOCAL_ONLY_NEVER_GIT",
+  "unexecuted_incomplete": "old E01 workspace06 INCOMPLETE，初次production准备错误NOT_EXECUTED，首raw helper错误INCOMPLETE，formal01取消未跑R04/R03 NOT_RUN",
+  "independent_reviewer": "NOT_YET_RUN; parent dispatches fresh reviewer; executor never self-accepts"
+}

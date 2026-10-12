@@ -1,0 +1,80 @@
+{
+  "job": {
+    "artifactId": "kpa_8b186a744a81b83e4c9c3f95",
+    "attempt": 1,
+    "cancelledAt": null,
+    "chunkerConfigId": "8b93f0aa4fa689af",
+    "createdAt": "2026-10-11T11:34:06.068Z",
+    "embeddingStats": {
+      "actualWrittenChunkCount": 1,
+      "attempt": 1,
+      "chunksNewlyEmbedded": 1,
+      "chunksResumedFromCheckpoint": 0,
+      "chunksReusedFromReadyVariant": 0,
+      "failedRequestCount": 0,
+      "model": {
+        "dimensions": 2,
+        "key": "efa9bbc3b47d979a0f0ac0516420fb11d72e60fa225f25b3de7d93babc41c095",
+        "modelId": "model-a",
+        "parameterFingerprint": "ae7b27b903cd0a7042a6efa8d6f1da71d1150f6ed29dd5eaf7842ce6d38fcf51",
+        "protocol": "openai-embeddings",
+        "provider": "embed"
+      },
+      "pendingRequestCount": 0,
+      "plannedChunkCount": 1,
+      "previousRequestCount": 0,
+      "requestCount": 1,
+      "resetStaleVectors": false,
+      "successfulRequestCount": 1,
+      "unknownRequestsFromPreviousAttempt": 0
+    },
+    "error": null,
+    "id": "kjob_5453a3074187aad682645c2d",
+    "notebookId": "knb_32d7b096ad674d7ba685b1ca",
+    "phase": "done",
+    "progressDone": 1,
+    "progressTotal": 1,
+    "sourceId": "ksrc_f653473f40bb1de1bfddb676",
+    "status": "done",
+    "updatedAt": "2026-10-11T11:34:06.073Z"
+  },
+  "ledger": [
+    {
+      "input_tokens": 5,
+      "model": "model-a",
+      "model_call_id": "op-embedding-1791718446072-0",
+      "outcome": "succeeded",
+      "provider": "embed",
+      "transport_attempts": 1,
+      "usage_state": "partial"
+    }
+  ],
+  "plan": [
+    {
+      "chunk_id": "chunk_0b3740426c1bb85cc629534c7e8bcd8b",
+      "ordinal": 0,
+      "text": "Chapter 0000 W09唯一章节\n\n唯一计划块0000的独立合成资料。"
+    }
+  ],
+  "ready": "LINGXI_SERVICE_READY addr=127.0.0.1:62799 home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/expanded-family-03/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-exact-1-46449-1791718445139073000 source=env",
+  "requests": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "Chapter 0000 W09唯一章节\n\n唯一计划块0000的独立合成资料。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:62798"
+    }
+  ],
+  "vectors": [
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0b3740426c1bb85cc629534c7e8bcd8b",
+      "ordinal": 0,
+      "vector_index_variant_id": "viv_e4c955d569b4973a409d005a009753fb"
+    }
+  ]
+}

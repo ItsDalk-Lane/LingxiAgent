@@ -1,0 +1,11 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/own.git/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.41s
+     Running tests/r06_t08_behavior_eval.rs (/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/r06_t08_behavior_eval-c42a2aaf03511ea7)
+LINGXI_TEST_GUARD: armed (pid 40112, mem_limit=8192 MB, time_limit=600 s)
+
+thread 'usage_real_wire_unknown_partial_and_measured_zero_are_distinct' (9219843) panicked at crates/lingxi-service/tests/r06_t08_behavior_eval.rs:1548:17:
+assertion `left == right` failed
+  left: Number(0)
+ right: Null
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p lingxi-service --test r06_t08_behavior_eval`

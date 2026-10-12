@@ -1,0 +1,9 @@
+{"command": ["/Users/study_superior/.codex/worktrees/r06-w12-review/LingxiAgent/rust/target/debug/deps/r06_ar_f12_cache_preservation-12406c3bb45b46a5", "--exact", "positive_normal_cache_open_and_reopen", "--nocapture"], "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-normal-before-01-3_xgh0_s", "start": 1791699324.0185962}
+LINGXI_TEST_GUARD: armed (pid 79441, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+synthetic knowledge root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-normal-before-01-3_xgh0_s/positive-79441-1791699324058899000
+test positive_normal_cache_open_and_reopen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.04s
+

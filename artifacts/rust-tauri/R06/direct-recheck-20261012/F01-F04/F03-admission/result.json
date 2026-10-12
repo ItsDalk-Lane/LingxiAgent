@@ -1,0 +1,15 @@
+{
+  "test": "authenticated_barrier_rewind_execute_and_cancelled_waiter",
+  "argv": [
+    "/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/r06_ar_f03_operations-e105ff127ca409f5",
+    "authenticated_barrier_rewind_execute_and_cancelled_waiter",
+    "--exact",
+    "--nocapture"
+  ],
+  "exit": 0,
+  "seconds": 2.88,
+  "binarySha256": "23d25a4ec31a40f8f4725bcb8446f4866b208ddc322907813ecda58ad6972572",
+  "binaryMtime": 1791780611.8151414,
+  "evidence": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/F01-F04/F03-admission/check.log",
+  "role": "direct_recheck_not_formal_acceptance"
+}

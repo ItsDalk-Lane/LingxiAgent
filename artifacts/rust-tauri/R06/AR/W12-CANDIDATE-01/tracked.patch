@@ -1,0 +1,1663 @@
+diff --git a/lib/knowledge/ann-index-store.ts b/lib/knowledge/ann-index-store.ts
+index 8ce857404..bf9ed9309 100644
+--- a/lib/knowledge/ann-index-store.ts
++++ b/lib/knowledge/ann-index-store.ts
+@@ -38,13 +38,34 @@ export class AnnIndexStore {
+     this.now = options.now ?? (() => new Date().toISOString());
+     fs.mkdirSync(path.dirname(options.dbPath), { recursive: true, mode: 0o700 });
+     const Database = options.Database ?? require("better-sqlite3");
++    let meta: fs.Stats | undefined;
++    try { meta = fs.lstatSync(options.dbPath); }
++    catch (error: unknown) { if ((error as NodeJS.ErrnoException)?.code !== "ENOENT") throw error; }
++    if (meta) {
++      if (!meta.isFile() || meta.nlink !== 1) throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "ANN catalog is not an exclusive regular file");
++      if (meta.size > 0) {
++        const fd = fs.openSync(options.dbPath, "r"), header = Buffer.alloc(16);
++        try {
++          if (fs.readSync(fd, header, 0, 16, 0) !== 16 || !header.equals(Buffer.from("SQLite format 3\0"))) {
++            throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "ANN catalog corrupt; original preserved");
++          }
++        } finally { fs.closeSync(fd); }
++      }
++      // 只读拒绝未来版本，避免关闭可写句柄时改变未来WAL。
++      const probe = new Database(options.dbPath, { readonly: true, fileMustExist: true });
++      try { if (Number(probe.pragma("user_version", { simple: true })) > 1) throw new KnowledgeError("KNOWLEDGE_SCHEMA_NEWER", "ANN schema newer; original preserved"); }
++      finally { probe.close(); }
++    }
+     const db = new Database(options.dbPath);
+     this.db = db;
+     try {
++      this.assertWritableSchema();
+       db.pragma("journal_mode = WAL"); db.pragma("busy_timeout = 5000");
+       const version = Number(db.pragma("user_version", { simple: true }));
+       if (version !== 0 && version !== 1) throw new Error("unsupported_ann_schema");
+-      if (version === 0) db.transaction(() => {
++      db.transaction(() => {
++        this.assertWritableSchema();
++        if (version === 0) {
+         db.exec(`CREATE TABLE ann_variants (
+           vector_index_variant_id TEXT PRIMARY KEY,
+           model_key TEXT NOT NULL,
+@@ -58,11 +79,18 @@ export class AnnIndexStore {
+           updated_at TEXT NOT NULL
+         );`);
+         db.pragma("user_version = 1");
+-      })();
++        }
++      }).immediate();
+       if (db.pragma("quick_check", { simple: true }) !== "ok") throw new Error("ann_quick_check_failed");
+     } catch (error) { db.close(); throw error; }
+   }
+ 
++  private assertWritableSchema(): void {
++    const version = Number(this.db.pragma("user_version", { simple: true }));
++    if (version > 1) throw new KnowledgeError("KNOWLEDGE_SCHEMA_NEWER", "ANN schema newer; old writer refused");
++    if (!Number.isSafeInteger(version) || version < 0) throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "ANN schema invalid");
++  }
++
+   get(vectorIndexVariantId: string): KnowledgeAnnVariant | null {
+     const row = this.db.prepare("SELECT * FROM ann_variants WHERE vector_index_variant_id = ?").get(vectorIndexVariantId);
+     if (!row) return null;
+@@ -80,6 +108,8 @@ export class AnnIndexStore {
+   }
+ 
+   begin(input: Omit<KnowledgeAnnVariant, "status" | "createdAt" | "updatedAt" | "indexFormatVersion" | "fileName">): KnowledgeAnnVariant {
++    return this.db.transaction(() => {
++      this.assertWritableSchema();
+     const fileName = knowledgeAnnFileName(input.modelKey, input.vectorIndexVariantId), now = this.now();
+     if (!Number.isSafeInteger(input.dimensions) || input.dimensions <= 0
+       || !Number.isSafeInteger(input.vectorCount) || input.vectorCount <= 0 || !input.chunkFingerprint) {
+@@ -96,14 +126,21 @@ export class AnnIndexStore {
+     `).run(input.vectorIndexVariantId, input.modelKey, input.dimensions, input.chunkFingerprint, input.vectorCount,
+       KNOWLEDGE_ANN_INDEX_FORMAT_VERSION, fileName, now, now);
+     return this.get(input.vectorIndexVariantId)!;
++    }).immediate();
+   }
+ 
+   markReady(vectorIndexVariantId: string): void {
++    return this.db.transaction(() => {
++      this.assertWritableSchema();
+     if (this.db.prepare("UPDATE ann_variants SET status = 'ready', updated_at = ? WHERE vector_index_variant_id = ? AND status = 'building'")
+       .run(this.now(), vectorIndexVariantId).changes !== 1) throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "ANN build is not active");
++    }).immediate();
+   }
+   markFailed(vectorIndexVariantId: string): void {
++    return this.db.transaction(() => {
++      this.assertWritableSchema();
+     this.db.prepare("UPDATE ann_variants SET status = 'failed', updated_at = ? WHERE vector_index_variant_id = ?").run(this.now(), vectorIndexVariantId);
++    }).immediate();
+   }
+   listInterrupted(): string[] {
+     return this.db.prepare("SELECT vector_index_variant_id FROM ann_variants WHERE status = 'building' ORDER BY vector_index_variant_id")
+diff --git a/lib/knowledge/knowledge-index-store.ts b/lib/knowledge/knowledge-index-store.ts
+index 6a31e6d6f..175618d88 100644
+--- a/lib/knowledge/knowledge-index-store.ts
++++ b/lib/knowledge/knowledge-index-store.ts
+@@ -372,64 +372,73 @@ export class KnowledgeIndexStore {
+   }
+ 
+   private openWithRecovery() {
+-    try {
+-      this.open();
+-    } catch (error: any) {
+-      try { this.db?.close?.(); } catch { /* 丢弃可重建缓存时保留原始处理路径。 */ }
++    try { this.open(); }
++    catch (error: unknown) {
++      try { this.db?.close?.(); } catch { /* 保留原错误和原件。 */ }
+       this.db = null;
+-      // 迁移失败不能删除仍可读的旧索引；只有确认数据库损坏才重建精确缓存文件。
+-      if (error?.code !== "SQLITE_CORRUPT" && error?.code !== "SQLITE_NOTADB"
+-        && error?.message !== "index_quick_check_failed") {
+-        throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge search index migration or open failed");
+-      }
+-      for (const suffix of ["", "-wal", "-shm"]) {
+-        try { fs.unlinkSync(`${this.dbPath}${suffix}`); } catch (error: any) {
+-          if (error?.code !== "ENOENT") {
+-            throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge search index cannot be rebuilt");
+-          }
+-        }
+-      }
+-      try {
+-        this.open();
+-      } catch {
+-        try { this.db?.close?.(); } catch { /* 保留重建失败。 */ }
+-        this.db = null;
+-        throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge search index cannot be opened");
+-      }
++      if (error instanceof KnowledgeError) throw error;
++      throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge search index open failed; original preserved", {
++        cause: String((error as NodeJS.ErrnoException)?.code || "migration_failed"),
++        recoveryRequired: ["SQLITE_CORRUPT", "SQLITE_NOTADB"].includes(String((error as NodeJS.ErrnoException)?.code)),
++      });
+     }
+   }
+ 
++  private assertWritableSchema() {
++    const version = Number(this.db.pragma("user_version", { simple: true }));
++    if (version > KNOWLEDGE_INDEX_SCHEMA_VERSION) {
++      throw new KnowledgeError("KNOWLEDGE_SCHEMA_NEWER", "Knowledge search schema is newer than this program supports");
++    }
++    if (!Number.isSafeInteger(version) || version < 0) {
++      throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge search schema version is invalid");
++    }
++  }
++
++  private queryFailure(error: unknown): KnowledgeError {
++    if (error instanceof KnowledgeError) return error;
++    const cause = String((error as NodeJS.ErrnoException)?.code || "query_failed");
++    return new KnowledgeError(["SQLITE_CORRUPT", "SQLITE_NOTADB"].includes(cause)
++      ? "KNOWLEDGE_INDEX_INVALID" : "KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge search index query failed", { cause });
++  }
++
+   private open() {
++    let meta: fs.Stats | undefined;
++    try { meta = fs.lstatSync(this.dbPath); }
++    catch (error: unknown) { if ((error as NodeJS.ErrnoException)?.code !== "ENOENT") throw error; }
++    if (meta) {
++      if (!meta.isFile() || meta.nlink !== 1) throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge search cache is not an exclusive regular file");
++      if (meta.size > 0) {
++        const fd = fs.openSync(this.dbPath, "r"); const header = Buffer.alloc(16);
++        try {
++          if (fs.readSync(fd, header, 0, 16, 0) !== 16 || !header.equals(Buffer.from("SQLite format 3\0"))) {
++            throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge search cache is corrupt; original and sidecars preserved", { recoveryRequired: true });
++          }
++        } finally { fs.closeSync(fd); }
++      }
++      // 未来版本只用只读探针，避免可写句柄关闭时checkpoint未来WAL。
++      const probe = new this.Database(this.dbPath, { readonly: true, fileMustExist: true });
++      try {
++        if (Number(probe.pragma("user_version", { simple: true })) > KNOWLEDGE_INDEX_SCHEMA_VERSION) {
++          throw new KnowledgeError("KNOWLEDGE_SCHEMA_NEWER", "Knowledge search schema is newer than this program supports");
++        }
++      } finally { probe.close(); }
++    }
+     this.db = new this.Database(this.dbPath);
++    this.assertWritableSchema();
+     this.db.pragma("journal_mode = WAL");
+     this.db.pragma("synchronous = NORMAL");
+     this.db.pragma("busy_timeout = 5000");
+-    const version = Number(this.db.pragma("user_version", { simple: true }));
+-    if (!Number.isSafeInteger(version) || version < 0 || version > KNOWLEDGE_INDEX_SCHEMA_VERSION) {
+-      throw new Error("unsupported_index_schema");
+-    }
+-    if (version === 0) {
+-      this.db.transaction(() => {
+-        this.createSchema();
+-        this.db.pragma(`user_version = ${KNOWLEDGE_INDEX_SCHEMA_VERSION}`);
+-      })();
+-    } else if (version === 1) {
+-      this.migrateV1ToV2();
+-    }
+-    if (version === 1 || version === 2) {
+-      this.db.transaction(() => {
+-        this.db.exec(CHUNK_VARIANT_METADATA_DDL);
+-        this.db.pragma("user_version = 3");
+-      })();
+-    }
+-    if (version > 0 && version < 4) {
+-      this.db.transaction(() => {
+-        this.db.exec(KNOWLEDGE_MULTIGRAIN_DDL);
+-        this.db.pragma("user_version = 4");
+-      })();
+-    }
+-    const check = this.db.pragma("quick_check", { simple: true });
+-    if (check !== "ok") throw new Error("index_quick_check_failed");
++    this.db.transaction(() => {
++      this.assertWritableSchema();
++      const version = Number(this.db.pragma("user_version", { simple: true }));
++      if (version === 0) { this.createSchema(); this.db.pragma(`user_version = ${KNOWLEDGE_INDEX_SCHEMA_VERSION}`); }
++      else if (version === 1) { this.migrateV1ToV2(); }
++      if (version === 1 || version === 2) { this.db.exec(CHUNK_VARIANT_METADATA_DDL); this.db.pragma("user_version = 3"); }
++      if (version > 0 && version < 4) { this.db.exec(KNOWLEDGE_MULTIGRAIN_DDL); this.db.pragma("user_version = 4"); }
++      if (this.db.pragma("quick_check", { simple: true }) !== "ok") {
++        throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge search cache quick_check failed; original preserved", { recoveryRequired: true });
++      }
++    }).immediate();
+   }
+ 
+   private createSchema() {
+@@ -450,6 +459,7 @@ export class KnowledgeIndexStore {
+    */
+   private migrateV1ToV2() {
+     this.db.transaction(() => {
++      this.assertWritableSchema();
+       const legacyIndexes = this.db.prepare(`
+         SELECT parse_artifact_id, block_fingerprint, chunker_version, indexed_at
+         FROM artifact_indexes
+@@ -491,7 +501,7 @@ export class KnowledgeIndexStore {
+       this.db.exec(`INSERT INTO knowledge_chunks_fts(knowledge_chunks_fts) VALUES('rebuild');`);
+       this.db.exec(`DROP TABLE artifact_indexes;`);
+       this.db.pragma("user_version = 2");
+-    })();
++    }).immediate();
+   }
+ 
+   /** 按身份解析变体；不存在返回 null（missing 不等于 corrupt，由 ingestion 补齐）。 */
+@@ -568,6 +578,8 @@ export class KnowledgeIndexStore {
+   }
+ 
+   writeVariantMetadata(variantId: string, metadata: KnowledgeChunkVariantMetadata): void {
++    return this.db.transaction(() => {
++      this.assertWritableSchema();
+     validateVariantMetadata(metadata);
+     const now = this.now();
+     const result = this.db.prepare(`
+@@ -584,6 +596,7 @@ export class KnowledgeIndexStore {
+     `).run(metadata.firstHeadingPath === null ? null : JSON.stringify(metadata.firstHeadingPath),
+       JSON.stringify(metadata.sectionKeys), now, now, requiredId(variantId, "chunkIndexVariantId"));
+     if (result.changes !== 1) throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Ready variant metadata cannot be written");
++    }).immediate();
+   }
+ 
+   /** 幂等建立 building 状态的变体行；已存在（任意状态）则原样返回，不回退状态。 */
+@@ -592,6 +605,8 @@ export class KnowledgeIndexStore {
+     chunkProfileHash: unknown;
+     blockFingerprint: unknown;
+   }): KnowledgeChunkIndexVariant {
++    return this.db.transaction(() => {
++      this.assertWritableSchema();
+     const artifactId = requiredId(input?.parseArtifactId, "parseArtifactId");
+     const profileHash = requiredChunkProfileHash(input?.chunkProfileHash);
+     const blockFingerprint = requiredId(input?.blockFingerprint, "blockFingerprint");
+@@ -604,9 +619,12 @@ export class KnowledgeIndexStore {
+       ) VALUES (?, ?, ?, 'building', ?, ?, ?)
+     `).run(knowledgeChunkIndexVariantId(artifactId, profileHash), artifactId, profileHash, blockFingerprint, now, now);
+     return this.resolveChunkIndexVariant(artifactId, profileHash)!;
++    }).immediate();
+   }
+ 
+   setChunkIndexVariantStatus(chunkIndexVariantId: unknown, status: unknown): KnowledgeChunkIndexVariant {
++    return this.db.transaction(() => {
++      this.assertWritableSchema();
+     const variantId = requiredId(chunkIndexVariantId, "chunkIndexVariantId");
+     const nextStatus = requiredVariantStatus(status);
+     const result = this.db.prepare(`
+@@ -616,6 +634,7 @@ export class KnowledgeIndexStore {
+       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "chunkIndexVariantId is unknown");
+     }
+     return mapVariantRow(this.db.prepare(`SELECT * FROM chunk_index_variants WHERE id = ?`).get(variantId));
++    }).immediate();
+   }
+ 
+   /**
+@@ -658,6 +677,7 @@ export class KnowledgeIndexStore {
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+     `);
+     this.db.transaction(() => {
++      this.assertWritableSchema();
+       const now = this.now();
+       this.db.prepare(`
+         INSERT INTO chunk_index_variants (
+@@ -698,11 +718,13 @@ export class KnowledgeIndexStore {
+         );
+       }
+       if (input.metadata) this.writeVariantMetadata(variantId, input.metadata);
+-    })();
++    }).immediate();
+   }
+ 
+   /** 来源摘要完全由宿主派生；同一解析产物更新时保持创建时间和 FTS 同步。 */
+   upsertSourceDocument(input: KnowledgeSourceDocumentDraft): void {
++    return this.db.transaction(() => {
++      this.assertWritableSchema();
+     const artifactId = requiredId(input?.parseArtifactId, "parseArtifactId");
+     if (typeof input.title !== "string" || typeof input.outlineText !== "string" || typeof input.searchText !== "string") {
+       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge source document is invalid");
+@@ -714,6 +736,7 @@ export class KnowledgeIndexStore {
+       ON CONFLICT(parse_artifact_id) DO UPDATE SET title = excluded.title, outline_text = excluded.outline_text,
+         search_text = excluded.search_text, updated_at = excluded.updated_at
+     `).run(artifactId, input.title, input.outlineText, buildSearchDocumentText(input.searchText), now, now);
++    }).immediate();
+   }
+ 
+   /** 章节按解析产物确定；只更新同一身份，不删除其他变体仍引用的章节。 */
+@@ -739,6 +762,7 @@ export class KnowledgeIndexStore {
+       previousEnd = section.endBlockOrdinal;
+     }
+     this.db.transaction(() => {
++      this.assertWritableSchema();
+       const now = this.now();
+       const insert = this.db.prepare(`
+         INSERT INTO knowledge_sections (id, parse_artifact_id, section_ordinal, heading_path_json,
+@@ -758,7 +782,7 @@ export class KnowledgeIndexStore {
+           section.startBlockOrdinal, section.endBlockOrdinal, section.text, section.tokenCount,
+           buildSearchDocumentText(`${section.headingPath.join(" > ")}\n${section.text}`), now, now);
+       }
+-    })();
++    }).immediate();
+   }
+ 
+   getSourceDocument(parseArtifactId: string): StoredKnowledgeSourceDocument | null {
+@@ -820,7 +844,7 @@ export class KnowledgeIndexStore {
+           AND d.parse_artifact_id IN (SELECT value FROM json_each(?))
+         ORDER BY score ASC, d.parse_artifact_id ASC LIMIT ?
+       `).all(query, JSON.stringify(ids), limit).map((row: any) => ({ ...mapSourceDocument(row), score: Number(row.score) }));
+-    } catch { throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge source index query failed"); }
++    } catch (error) { throw this.queryFailure(error); }
+   }
+ 
+   searchSections(input: KnowledgeGrainSearchInput): Array<StoredKnowledgeSection & { score: number }> {
+@@ -835,7 +859,7 @@ export class KnowledgeIndexStore {
+           AND s.parse_artifact_id IN (SELECT value FROM json_each(?))
+         ORDER BY score ASC, s.parse_artifact_id ASC, s.section_ordinal ASC, s.id ASC LIMIT ?
+       `).all(query, JSON.stringify(ids), limit).map((row: any) => ({ ...mapSection(row), score: Number(row.score) }));
+-    } catch { throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge section index query failed"); }
++    } catch (error) { throw this.queryFailure(error); }
+   }
+ 
+   /** 删除某解析产物的全部 FTS chunk 行（源被移除/孤儿清理时调用）。
+@@ -844,11 +868,12 @@ export class KnowledgeIndexStore {
+   removeArtifact(parseArtifactId: unknown) {
+     const artifactId = requiredId(parseArtifactId, "parseArtifactId");
+     this.db.transaction(() => {
++      this.assertWritableSchema();
+       this.db.prepare(`DELETE FROM knowledge_chunks WHERE parse_artifact_id = ?`).run(artifactId);
+       this.db.prepare(`DELETE FROM chunk_index_variant_metadata WHERE parse_artifact_id = ?`).run(artifactId);
+       this.db.prepare(`DELETE FROM knowledge_sections WHERE parse_artifact_id = ?`).run(artifactId);
+       this.db.prepare(`DELETE FROM knowledge_source_documents WHERE parse_artifact_id = ?`).run(artifactId);
+-    })();
++    }).immediate();
+   }
+ 
+   listArtifactChunks(parseArtifactId: unknown): KnowledgeChunkDraft[] {
+@@ -962,6 +987,7 @@ export class KnowledgeIndexStore {
+   removeChunkIndexVariantsByArtifact(parseArtifactId: unknown): number {
+     const artifactId = requiredId(parseArtifactId, "parseArtifactId");
+     return Number(this.db.transaction(() => {
++      this.assertWritableSchema();
+       const variants = this.db.prepare(`
+         SELECT id FROM chunk_index_variants WHERE parse_artifact_id = ?
+       `).all(artifactId) as any[];
+@@ -979,7 +1005,7 @@ export class KnowledgeIndexStore {
+       this.db.prepare(`DELETE FROM knowledge_sections WHERE parse_artifact_id = ?`).run(artifactId);
+       this.db.prepare(`DELETE FROM knowledge_source_documents WHERE parse_artifact_id = ?`).run(artifactId);
+       return variants.length;
+-    })());
++    }).immediate());
+   }
+ 
+   /**
+@@ -1116,8 +1142,7 @@ export class KnowledgeIndexStore {
+         score: Number(row.score),
+       }));
+     } catch (error) {
+-      if (error instanceof KnowledgeError) throw error;
+-      throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge search index query failed");
++      throw this.queryFailure(error);
+     }
+   }
+ 
+@@ -1160,8 +1185,7 @@ export class KnowledgeIndexStore {
+         score: Number(row.score),
+       }));
+     } catch (error) {
+-      if (error instanceof KnowledgeError) throw error;
+-      throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge search index query failed");
++      throw this.queryFailure(error);
+     }
+   }
+ 
+@@ -1171,16 +1195,40 @@ export class KnowledgeIndexStore {
+   }
+ 
+   reset() {
+-    try { this.db?.close?.(); } catch { /* 可重建缓存无需保留关闭错误。 */ }
+-    this.db = null;
+-    for (const suffix of ["", "-wal", "-shm"]) {
+-      try { fs.unlinkSync(`${this.dbPath}${suffix}`); } catch (error: any) {
+-        if (error?.code !== "ENOENT") {
+-          throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge search index cannot be reset");
++    // SQLite事务阻止其它写者；serialize包含已提交WAL内容，不unlink活跃句柄。
++    // 先同步保存唯一恢复副本，备份失败则事务中不删除任何向量。
++    this.db.transaction(() => {
++      this.assertWritableSchema();
++      const version = Number(this.db.pragma("user_version", { simple: true }));
++      if (version > KNOWLEDGE_INDEX_SCHEMA_VERSION) {
++        throw new KnowledgeError("KNOWLEDGE_SCHEMA_NEWER", "Knowledge search schema is newer than this program supports");
++      }
++      const snapshot: Buffer = this.db.serialize();
++      const quarantine = `${this.dbPath}.quarantine-${crypto.randomUUID()}`;
++      fs.mkdirSync(quarantine, { mode: 0o700 });
++      const original = path.join(quarantine, "original.db");
++      const fd = fs.openSync(original, "wx", 0o600);
++      try {
++        fs.writeFileSync(fd, snapshot);
++        fs.fsyncSync(fd);
++      } finally { fs.closeSync(fd); }
++      const receipt = fs.openSync(path.join(quarantine, "recovery.json"), "wx", 0o600);
++      try {
++        fs.writeFileSync(receipt, JSON.stringify({
++        state: "snapshot_retained_reindex_required", embeddingsRegenerated: false,
++        schemaVersion: version, sha256: crypto.createHash("sha256").update(snapshot).digest("hex"),
++        }));
++        fs.fsyncSync(receipt);
++      } finally { fs.closeSync(receipt); }
++      // Unix还需同步目录项，避免清空后断电丢失备份文件名。
++      if (process.platform !== "win32") {
++        for (const directory of [quarantine, path.dirname(this.dbPath)]) {
++          const directoryFd = fs.openSync(directory, "r");
++          try { fs.fsyncSync(directoryFd); } finally { fs.closeSync(directoryFd); }
+         }
+       }
+-    }
+-    this.openWithRecovery();
++      this.db.exec("DELETE FROM knowledge_chunks; DELETE FROM chunk_index_variant_metadata; DELETE FROM knowledge_sections; DELETE FROM knowledge_source_documents; DELETE FROM chunk_index_variants;");
++    }).immediate();
+   }
+ 
+   close() {
+diff --git a/lib/knowledge/vector-index-adapter.ts b/lib/knowledge/vector-index-adapter.ts
+index bab249ee2..215fc2014 100644
+--- a/lib/knowledge/vector-index-adapter.ts
++++ b/lib/knowledge/vector-index-adapter.ts
+@@ -1,6 +1,6 @@
+ /**
+  * 不依赖本机扩展的可移植向量缓存（knowledge-vector.db）。它只保存可重算的 Chunk 向量，
+- * 事实库损坏处理与这里完全分开；缓存打不开时只重建这个精确文件。
++ * 事实库损坏处理与这里完全分开；打开失败保留原件，恢复必须保留一致快照。
+  *
+  * ── Schema v2 契约（VectorIndexVariant，Phase 1 / P0 索引身份）──────────────────
+  *
+@@ -26,8 +26,7 @@
+  * 迁移 v1→v2 在单事务内完成（建表 → 回填 → 重建 chunk_vectors → DROP vector_artifacts），
+  * 只建立身份、映射已有向量，禁止触发任何重新 embedding；resolver 缺失/返回 null 的行
+  * 以 chunkProfileHash = 'legacy_unknown' 建档（宁可标记 legacy 也不丢向量）。
+- * 注意：迁移抛错会被 openWithRecovery 按「缓存损坏」语义删库重建，因此
+- * profileHashResolver 必须是全函数（任何 parseArtifactId 都不许抛）。
++ * 迁移错误保留原库并明确拒绝；resolver 抛错不会被伪装成缓存损坏。
+  *
+  * ── API 锚点 ────────────────────────────────────────────────────────────────
+  * hasArtifact / buildOrReplaceArtifact 以 (chunkIndexVariantId + parseArtifactId)
+@@ -304,7 +303,7 @@ export interface PortableVectorIndexAdapterOptions {
+    * 迁移 v1→v2 回填用：parseArtifactId → chunkProfileHash（FTS 库
+    * chunk_index_variants.chunk_profile_hash）。由 KnowledgeManager 打开两库后注入；
+    * 缺失或返回 null 的行以 LEGACY_UNKNOWN_CHUNK_PROFILE_HASH 建档。
+-   * 必须是全函数：抛错会中止迁移并触发缓存级重建（见文件头）。
++   * 抛错中止迁移并保留旧向量，不触发重新 embedding。
+    */
+   profileHashResolver?: (parseArtifactId: string) => string | null;
+ }
+@@ -337,92 +336,129 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+   private openWithRecovery() {
+     try {
+       this.open();
+-    } catch {
++    } catch (error: unknown) {
+       this.closeQuietly();
+-      this.deleteFiles();
+-      try {
+-        this.open();
+-      } catch {
+-        this.closeQuietly();
+-        throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge vector index cannot be opened");
+-      }
++      if (error instanceof KnowledgeError) throw error;
++      const cause = String((error as NodeJS.ErrnoException)?.code || "migration_failed");
++      // 不能以打开失败推断不存在活跃写者；原库/WAL/SHM一律保留。
++      throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge vector index open failed; original preserved", {
++        cause,
++        recoveryRequired: cause === "SQLITE_CORRUPT" || cause === "SQLITE_NOTADB",
++      });
+     }
+   }
+ 
+   private open() {
++    let meta: fs.Stats | undefined;
++    try { meta = fs.lstatSync(this.dbPath); }
++    catch (error: unknown) { if ((error as NodeJS.ErrnoException)?.code !== "ENOENT") throw error; }
++    if (meta) {
++      if (!meta.isFile() || meta.nlink !== 1) {
++        throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge vector cache is not an exclusive regular file");
++      }
++      if (meta.size > 0) {
++        const fd = fs.openSync(this.dbPath, "r");
++        const header = Buffer.alloc(16);
++        try {
++          if (fs.readSync(fd, header, 0, 16, 0) !== 16 || !header.equals(Buffer.from("SQLite format 3\0"))) {
++            throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge vector cache is corrupt; original and sidecars preserved", { recoveryRequired: true });
++          }
++        } finally { fs.closeSync(fd); }
++      }
++    }
++    // 只读句柄拒绝未来版本，避免可写句柄关闭时checkpoint未来WAL。
++    if (fs.existsSync(this.dbPath)) {
++      const probe = new this.Database(this.dbPath, { readonly: true, fileMustExist: true });
++      try {
++        const future = Number(probe.pragma("user_version", { simple: true }));
++        if (future > VECTOR_INDEX_SCHEMA_VERSION) {
++          throw new KnowledgeError("KNOWLEDGE_SCHEMA_NEWER", "Knowledge vector schema is newer than this program supports");
++        }
++      } finally { probe.close(); }
++    }
+     this.db = new this.Database(this.dbPath);
++    // 版本检查必须早于任何写入参数、迁移或恢复。
++    const version = Number(this.db.pragma("user_version", { simple: true }));
++    if (Number.isSafeInteger(version) && version > VECTOR_INDEX_SCHEMA_VERSION) {
++      throw new KnowledgeError("KNOWLEDGE_SCHEMA_NEWER", "Knowledge vector schema is newer than this program supports");
++    }
++    if (!Number.isSafeInteger(version) || version < 0) {
++      throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Knowledge vector schema version is invalid");
++    }
+     this.db.pragma("journal_mode = WAL");
+     this.db.pragma("synchronous = NORMAL");
+     this.db.pragma("busy_timeout = 5000");
+-    const version = Number(this.db.pragma("user_version", { simple: true }));
+-    if (!Number.isSafeInteger(version) || version < 0 || version > VECTOR_INDEX_SCHEMA_VERSION) {
+-      throw new Error("unsupported_vector_index_schema");
+-    }
+-    if (version === 0) {
+-      this.db.transaction(() => {
+-        this.db.exec(`
+-          CREATE TABLE vector_index_variants (
+-            id TEXT PRIMARY KEY,
+-            chunk_index_variant_id TEXT NOT NULL,
+-            parse_artifact_id TEXT NOT NULL,
+-            model_key TEXT NOT NULL,
+-            chunk_fingerprint TEXT NOT NULL,
+-            dimensions INTEGER NOT NULL CHECK(dimensions > 0),
+-            status TEXT NOT NULL CHECK(status IN ('building', 'ready', 'failed', 'retiring')),
+-            created_at TEXT NOT NULL,
+-            updated_at TEXT NOT NULL,
+-            last_used_at TEXT NOT NULL DEFAULT '',
+-            UNIQUE(chunk_index_variant_id, model_key)
+-          );
+-          CREATE TABLE chunk_vectors (
+-            vector_index_variant_id TEXT NOT NULL,
+-            parse_artifact_id TEXT NOT NULL,
+-            model_key TEXT NOT NULL,
+-            chunk_id TEXT NOT NULL,
+-            ordinal INTEGER NOT NULL CHECK(ordinal >= 0),
+-            dimensions INTEGER NOT NULL CHECK(dimensions > 0),
+-            vector BLOB NOT NULL,
+-            PRIMARY KEY(vector_index_variant_id, chunk_id),
+-            UNIQUE(vector_index_variant_id, ordinal)
+-          );
++    this.db.transaction(() => {
++      this.assertWritableSchema();
++      // 获得写事务后的版本闸口也保护长期存活的旧句柄。
++      if (version === 0) {
++        this.db.transaction(() => {
++          this.assertWritableSchema();
++          this.db.exec(`
++            CREATE TABLE vector_index_variants (
++              id TEXT PRIMARY KEY,
++              chunk_index_variant_id TEXT NOT NULL,
++              parse_artifact_id TEXT NOT NULL,
++              model_key TEXT NOT NULL,
++              chunk_fingerprint TEXT NOT NULL,
++              dimensions INTEGER NOT NULL CHECK(dimensions > 0),
++              status TEXT NOT NULL CHECK(status IN ('building', 'ready', 'failed', 'retiring')),
++              created_at TEXT NOT NULL,
++              updated_at TEXT NOT NULL,
++              last_used_at TEXT NOT NULL DEFAULT '',
++              UNIQUE(chunk_index_variant_id, model_key)
++            );
++            CREATE TABLE chunk_vectors (
++              vector_index_variant_id TEXT NOT NULL,
++              parse_artifact_id TEXT NOT NULL,
++              model_key TEXT NOT NULL,
++              chunk_id TEXT NOT NULL,
++              ordinal INTEGER NOT NULL CHECK(ordinal >= 0),
++              dimensions INTEGER NOT NULL CHECK(dimensions > 0),
++              vector BLOB NOT NULL,
++              PRIMARY KEY(vector_index_variant_id, chunk_id),
++              UNIQUE(vector_index_variant_id, ordinal)
++            );
+ 
+-          CREATE INDEX idx_chunk_vectors_scope
+-            ON chunk_vectors(vector_index_variant_id, parse_artifact_id, ordinal);
+-          CREATE INDEX idx_chunk_vectors_artifact
+-            ON chunk_vectors(parse_artifact_id);
+-          CREATE INDEX idx_vector_index_variants_artifact
+-            ON vector_index_variants(parse_artifact_id);
+-        `);
+-        this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);
+-      })();
+-    } else if (version === 1) {
+-      // 祖先线 v1（vector_artifacts 无 last_used_at）：身份迁移 + 补列。
+-      this.migrateV1ToV2();
+-      this.addVariantLastUsedAt();
+-    } else if (version === 2) {
+-      // v2 有两条历史线（本分支 variant 表 vs main 线 vector_artifacts+last_used_at），
+-      // 按表形分流：本分支线只补列；main 线先做身份迁移再补列。
+-      const columns = this.db.prepare(`PRAGMA table_info(vector_index_variants)`).all() as any[];
+-      if (columns.length === 0) {
++            CREATE INDEX idx_chunk_vectors_scope
++              ON chunk_vectors(vector_index_variant_id, parse_artifact_id, ordinal);
++            CREATE INDEX idx_chunk_vectors_artifact
++              ON chunk_vectors(parse_artifact_id);
++            CREATE INDEX idx_vector_index_variants_artifact
++              ON vector_index_variants(parse_artifact_id);
++          `);
++          this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);
++        }).immediate();
++      } else if (version === 1) {
++        // 祖先线 v1（vector_artifacts 无 last_used_at）：身份迁移 + 补列。
+         this.migrateV1ToV2();
++        this.addVariantLastUsedAt();
++      } else if (version === 2) {
++        // v2 有两条历史线（本分支 variant 表 vs main 线 vector_artifacts+last_used_at），
++        // 按表形分流：本分支线只补列；main 线先做身份迁移再补列。
++        const columns = this.db.prepare(`PRAGMA table_info(vector_index_variants)`).all() as any[];
++        if (columns.length === 0) {
++          this.migrateV1ToV2();
++        }
++        this.addVariantLastUsedAt();
+       }
+-      this.addVariantLastUsedAt();
+-    }
+-    if (this.db.pragma("quick_check", { simple: true }) !== "ok") {
+-      throw new Error("vector_index_quick_check_failed");
+-    }
++      if (this.db.pragma("quick_check", { simple: true }) !== "ok") {
++        throw new Error("vector_index_quick_check_failed");
++      }
++    }).immediate();
+   }
+ 
+   /** v3 补列（幂等）：variant 表加 last_used_at，存量行回填 created_at（=indexed_at 语义）。 */
+   private addVariantLastUsedAt() {
+     this.db.transaction(() => {
++      this.assertWritableSchema();
+       const columns = this.db.prepare(`PRAGMA table_info(vector_index_variants)`).all() as any[];
+       if (!columns.some((col: any) => col.name === "last_used_at")) {
+         this.db.exec(`ALTER TABLE vector_index_variants ADD COLUMN last_used_at TEXT NOT NULL DEFAULT '';`);
+       }
+       this.db.exec(`UPDATE vector_index_variants SET last_used_at = created_at WHERE last_used_at = '';`);
+       this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);
+-    })();
++    }).immediate();
+   }
+ 
+   /**
+@@ -434,6 +470,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+    */
+   private migrateV1ToV2() {
+     this.db.transaction(() => {
++      this.assertWritableSchema();
+       this.db.exec(`
+         CREATE TABLE vector_index_variants (
+           id TEXT PRIMARY KEY,
+@@ -553,7 +590,14 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+         DROP TABLE vector_artifacts;
+       `);
+       this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);
+-    })();
++    }).immediate();
++  }
++
++  private assertWritableSchema() {
++    const version = Number(this.db.pragma("user_version", { simple: true }));
++    if (version > VECTOR_INDEX_SCHEMA_VERSION) {
++      throw new KnowledgeError("KNOWLEDGE_SCHEMA_NEWER", "Knowledge vector schema is newer than this program supports");
++    }
+   }
+ 
+   private closeQuietly() {
+@@ -561,16 +605,6 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+     this.db = null;
+   }
+ 
+-  private deleteFiles() {
+-    for (const suffix of ["", "-wal", "-shm"]) {
+-      try { fs.unlinkSync(`${this.dbPath}${suffix}`); } catch (error: any) {
+-        if (error?.code !== "ENOENT") {
+-          throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge vector index cannot be rebuilt");
+-        }
+-      }
+-    }
+-  }
+-
+   private normalizeModel(model: VectorIndexModelIdentity): VectorIndexModelIdentity {
+     const dimensions = requiredDimensions(model?.dimensions);
+     return {
+@@ -691,6 +725,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+       ) VALUES (?, ?, ?, ?, ?, ?, ?)
+     `);
+     this.db.transaction(() => {
++      this.assertWritableSchema();
+       this.db.prepare(`
+         DELETE FROM chunk_vectors WHERE vector_index_variant_id = ?
+       `).run(anchor.vectorIndexVariantId);
+@@ -733,7 +768,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+         this.now(),
+         this.now(),
+       );
+-    })();
++    }).immediate();
+     this.onInvalidateVariant?.(anchor.vectorIndexVariantId);
+     this.onReadyVariant?.(anchor.vectorIndexVariantId);
+     return { vectorIndexVariantId: anchor.vectorIndexVariantId };
+@@ -743,18 +778,20 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+     const artifactId = requiredId(parseArtifactId, "parseArtifactId");
+     const ids = this.db.prepare("SELECT id FROM vector_index_variants WHERE parse_artifact_id = ?").all(artifactId).map((row: any) => row.id);
+     this.db.transaction(() => {
++      this.assertWritableSchema();
+       this.db.prepare(`DELETE FROM chunk_vectors WHERE parse_artifact_id = ?`).run(artifactId);
+       this.db.prepare(`DELETE FROM vector_index_variants WHERE parse_artifact_id = ?`).run(artifactId);
+-    })();
++    }).immediate();
+     for (const id of ids) this.onInvalidateVariant?.(id);
+   }
+ 
+   removeVariant(vectorIndexVariantId: unknown): void {
+     const id = requiredId(vectorIndexVariantId, "vectorIndexVariantId", 64);
+     this.db.transaction(() => {
++      this.assertWritableSchema();
+       this.db.prepare(`DELETE FROM chunk_vectors WHERE vector_index_variant_id = ?`).run(id);
+       this.db.prepare(`DELETE FROM vector_index_variants WHERE id = ?`).run(id);
+-    })();
++    }).immediate();
+     this.onInvalidateVariant?.(id);
+   }
+ 
+@@ -794,8 +831,11 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+   }
+ 
+   touchVectorVariants(variantIds: string[]): void {
+-    this.db.prepare("UPDATE vector_index_variants SET last_used_at = ? WHERE id IN (SELECT value FROM json_each(?))")
+-      .run(this.now(), JSON.stringify(variantIds));
++    this.db.transaction(() => {
++      this.assertWritableSchema();
++      this.db.prepare("UPDATE vector_index_variants SET last_used_at = ? WHERE id IN (SELECT value FROM json_each(?))")
++        .run(this.now(), JSON.stringify(variantIds));
++    }).immediate();
+   }
+ 
+   setVariantStatus(vectorIndexVariantId: unknown, status: VectorIndexVariantStatus): void {
+@@ -803,9 +843,12 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+     if (!["building", "ready", "failed", "retiring"].includes(status)) {
+       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Vector index variant status is invalid");
+     }
+-    const result = this.db.prepare(`
+-      UPDATE vector_index_variants SET status = ?, updated_at = ? WHERE id = ?
+-    `).run(status, this.now(), id);
++    const result = this.db.transaction(() => {
++      this.assertWritableSchema();
++      return this.db.prepare(`
++        UPDATE vector_index_variants SET status = ?, updated_at = ? WHERE id = ?
++      `).run(status, this.now(), id);
++    }).immediate();
+     if (result.changes === 0) {
+       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Vector index variant does not exist");
+     }
+@@ -862,6 +905,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+     const model = this.normalizeModel(input.model);
+     const anchor = this.resolveBuildAnchor(input, model.key);
+     return this.db.transaction(() => {
++      this.assertWritableSchema();
+       const row = this.db.prepare(`
+         SELECT * FROM vector_index_variants WHERE id = ?
+       `).get(anchor.vectorIndexVariantId);
+@@ -906,7 +950,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+         UPDATE vector_index_variants SET status = 'building', updated_at = ? WHERE id = ?
+       `).run(this.now(), anchor.vectorIndexVariantId);
+       return { vectorIndexVariantId: anchor.vectorIndexVariantId, resetStaleVectors: false };
+-    })();
++    }).immediate();
+   }
+ 
+   upsertChunkVectorBatch(input: {
+@@ -926,6 +970,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+       ) VALUES (?, ?, ?, ?, ?, ?, ?)
+     `);
+     this.db.transaction(() => {
++      this.assertWritableSchema();
+       const variant = this.requireVariantForBuild(
+         input.vectorIndexVariantId,
+         input.chunkFingerprint,
+@@ -946,7 +991,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+           vectorBuffer(entry.vector, model.dimensions),
+         );
+       }
+-    })();
++    }).immediate();
+   }
+ 
+   completeVectorVariantBuild(input: {
+@@ -960,6 +1005,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Vector variant expected chunk count is invalid");
+     }
+     this.db.transaction(() => {
++      this.assertWritableSchema();
+       const variant = this.requireVariantForBuild(
+         input?.vectorIndexVariantId,
+         input?.chunkFingerprint,
+@@ -981,7 +1027,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+       this.db.prepare(`
+         UPDATE vector_index_variants SET status = 'ready', updated_at = ? WHERE id = ?
+       `).run(this.now(), variant.id);
+-    })();
++    }).immediate();
+     this.onReadyVariant?.(String(input.vectorIndexVariantId));
+   }
+ 
+@@ -1059,6 +1105,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+       // 查询涉及即为使用：scope 内全部 variant 刷新 last_used_at（按 artifact 维度
+       // 判定保留期），供笔记本级向量保留策略判定"超期未使用"。刷新失败不阻断查询。
+       try {
++        this.assertWritableSchema();
+         const usageConditions: string[] = [];
+         const usageParams: unknown[] = [this.now()];
+         if (artifactIds) {
+@@ -1076,7 +1123,9 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+       return results;
+     } catch (error) {
+       if (error instanceof KnowledgeError) throw error;
+-      throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge vector index query failed");
++      throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge vector index query failed; original preserved", {
++        cause: String((error as NodeJS.ErrnoException)?.code || "query_failed"),
++      });
+     }
+   }
+ 
+@@ -1105,13 +1154,14 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+     const ids = this.db.prepare("SELECT id FROM vector_index_variants WHERE parse_artifact_id = ? AND model_key = ?")
+       .all(artifactId, modelKey).map((row: any) => row.id);
+     this.db.transaction(() => {
++      this.assertWritableSchema();
+       this.db.prepare(
+         `DELETE FROM chunk_vectors WHERE parse_artifact_id = ? AND model_key = ?`,
+       ).run(artifactId, modelKey);
+       this.db.prepare(
+         `DELETE FROM vector_index_variants WHERE parse_artifact_id = ? AND model_key = ?`,
+       ).run(artifactId, modelKey);
+-    })();
++    }).immediate();
+     for (const id of ids) this.onInvalidateVariant?.(id);
+   }
+ 
+@@ -1120,9 +1170,40 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
+   }
+ 
+   rebuild(): void {
+-    this.closeQuietly();
+-    this.deleteFiles();
+-    this.openWithRecovery();
++    // SQLite事务阻止其它写者；serialize包含已提交WAL内容，不unlink活跃句柄。
++    // 先同步保存唯一恢复副本，备份失败则事务中不删除任何向量。
++    this.db.transaction(() => {
++      this.assertWritableSchema();
++      const version = Number(this.db.pragma("user_version", { simple: true }));
++      if (version > VECTOR_INDEX_SCHEMA_VERSION) {
++        throw new KnowledgeError("KNOWLEDGE_SCHEMA_NEWER", "Knowledge vector schema is newer than this program supports");
++      }
++      const snapshot: Buffer = this.db.serialize();
++      const quarantine = `${this.dbPath}.quarantine-${crypto.randomUUID()}`;
++      fs.mkdirSync(quarantine, { mode: 0o700 });
++      const original = path.join(quarantine, "original.db");
++      const fd = fs.openSync(original, "wx", 0o600);
++      try {
++        fs.writeFileSync(fd, snapshot);
++        fs.fsyncSync(fd);
++      } finally { fs.closeSync(fd); }
++      const receipt = fs.openSync(path.join(quarantine, "recovery.json"), "wx", 0o600);
++      try {
++        fs.writeFileSync(receipt, JSON.stringify({
++        state: "snapshot_retained_reindex_required", embeddingsRegenerated: false,
++        schemaVersion: version, sha256: crypto.createHash("sha256").update(snapshot).digest("hex"),
++        }));
++        fs.fsyncSync(receipt);
++      } finally { fs.closeSync(receipt); }
++      // Unix还需同步目录项，避免清空后断电丢失备份文件名。
++      if (process.platform !== "win32") {
++        for (const directory of [quarantine, path.dirname(this.dbPath)]) {
++          const directoryFd = fs.openSync(directory, "r");
++          try { fs.fsyncSync(directoryFd); } finally { fs.closeSync(directoryFd); }
++        }
++      }
++      this.db.exec("DELETE FROM chunk_vectors; DELETE FROM vector_index_variants;");
++    }).immediate();
+   }
+ 
+   close(): void {
+diff --git a/lib/knowledge/vector-search-backend-factory.ts b/lib/knowledge/vector-search-backend-factory.ts
+index 75ec59cca..3f54d09a0 100644
+--- a/lib/knowledge/vector-search-backend-factory.ts
++++ b/lib/knowledge/vector-search-backend-factory.ts
+@@ -1,4 +1,3 @@
+-import fs from "node:fs";
+ import path from "node:path";
+ import { AnnIndexStore } from "./ann-index-store.ts";
+ import { UseArchVectorBackend, type KnowledgeNativeModule } from "./usearch-vector-backend.ts";
+@@ -13,12 +12,8 @@ export function createKnowledgeVectorSearchBackend(options: {
+   const dbPath = path.join(options.indexesRoot, "knowledge-ann.db");
+   let store: AnnIndexStore | undefined;
+   try {
+-    try { store = new AnnIndexStore({ dbPath, Database: options.Database, now: options.now }); }
+-    catch {
+-      options.log?.("knowledge ANN: rebuilding unavailable derived catalog");
+-      for (const suffix of ["", "-wal", "-shm"]) fs.rmSync(`${dbPath}${suffix}`, { force: true });
+-      store = new AnnIndexStore({ dbPath, Database: options.Database, now: options.now });
+-    }
++    // 无法证明目录没有活跃写者；构造失败保留原件并显式回退。
++    store = new AnnIndexStore({ dbPath, Database: options.Database, now: options.now });
+     // 原生扩展在后台构建和查询时加载；缺少可选依赖不影响应用启动。
+     return new UseArchVectorBackend({ portable: options.portable, store,
+       root: path.join(options.indexesRoot, "knowledge-ann"), loadNative: options.loadNative, log: options.log });
+diff --git a/rust/crates/lingxi-adapters/src/storage/knowledge.rs b/rust/crates/lingxi-adapters/src/storage/knowledge.rs
+index eecf55cbb..b3da368d4 100644
+--- a/rust/crates/lingxi-adapters/src/storage/knowledge.rs
++++ b/rust/crates/lingxi-adapters/src/storage/knowledge.rs
+@@ -7,9 +7,9 @@
+ //!   content_snapshots / parse_artifacts / knowledge_blocks /
+ //!   knowledge_citations / ingestion_jobs / knowledge_turn_scopes(+sources)。
+ //! - `knowledge_index.db`（FTS 缓存）：chunk_index_variants + knowledge_chunks
+-//!   (+FTS5) + sections。可重建缓存：打不开/迁移失败 → 只重建该文件。
++//!   (+FTS5) + sections。确证且静止的损坏缓存隔离后重建；其它错误保留。
+ //! - `knowledge_vector.db`（向量缓存）：vector_index_variants + chunk_vectors
+-//!   （f32 LE BLOB，维度铁律）。可重建缓存：同上。
++//!   （f32 LE BLOB，维度铁律）。损坏保留隔离原件，不自动重新付费嵌入。
+ //! - 快照字节 `knowledge/snapshots/<id>`；解析产物 JSON
+ //!   `knowledge/artifacts/<snapshotId>/<artifactId>.json`。
+ //!   索引可重建 ≠ 源文件可删。
+@@ -17,6 +17,8 @@
+ //! 退役边界：不建 research_runs / analysis_* / coverage_* 等已退役研究引擎表
+ //! （兼容残留叶 F-D08-C-RESEARCH-LEDGER）；runs.db v1–v9 冻结不动。
+ 
++use std::fs::{File, OpenOptions};
++use std::io::{Read, Write};
+ use std::path::{Path, PathBuf};
+ use std::sync::{Arc, Mutex, MutexGuard};
+ 
+@@ -230,20 +232,84 @@ fn parse_json(raw: Option<String>) -> serde_json::Value {
+         .unwrap_or(serde_json::Value::Null)
+ }
+ 
+-fn open_connection(path: &Path) -> Result<Connection, KnowledgeError> {
+-    let conn = Connection::open(path)
+-        .map_err(|e| KnowledgeError::storage_invalid(format!("cannot open knowledge db: {e}")))?;
++fn storage_io(error: std::io::Error) -> KnowledgeError {
++    let code = match error.kind() {
++        std::io::ErrorKind::PermissionDenied => "KNOWLEDGE_STORAGE_PERMISSION",
++        std::io::ErrorKind::WouldBlock => "KNOWLEDGE_STORAGE_BUSY",
++        _ => "KNOWLEDGE_STORAGE_IO",
++    };
++    KnowledgeError::new(code, format!("knowledge storage I/O: {error}"))
++}
++
++fn storage_lock(error: std::fs::TryLockError) -> KnowledgeError {
++    match error {
++        std::fs::TryLockError::WouldBlock => KnowledgeError::new(
++            "KNOWLEDGE_STORAGE_BUSY",
++            "cache recovery lock is held by another instance",
++        ),
++        std::fs::TryLockError::Error(error) => storage_io(error),
++    }
++}
++
++fn storage_sqlite(error: rusqlite::Error) -> KnowledgeError {
++    let code = match error.sqlite_error_code() {
++        Some(rusqlite::ErrorCode::DatabaseBusy | rusqlite::ErrorCode::DatabaseLocked) => {
++            "KNOWLEDGE_STORAGE_BUSY"
++        }
++        Some(rusqlite::ErrorCode::PermissionDenied | rusqlite::ErrorCode::ReadOnly) => {
++            "KNOWLEDGE_STORAGE_PERMISSION"
++        }
++        Some(
++            rusqlite::ErrorCode::SystemIoFailure
++            | rusqlite::ErrorCode::DiskFull
++            | rusqlite::ErrorCode::CannotOpen,
++        ) => "KNOWLEDGE_STORAGE_IO",
++        Some(rusqlite::ErrorCode::DatabaseCorrupt | rusqlite::ErrorCode::NotADatabase) => {
++            "KNOWLEDGE_STORAGE_CORRUPT"
++        }
++        _ => "KNOWLEDGE_STORAGE_INVALID",
++    };
++    KnowledgeError::new(code, format!("knowledge SQLite: {error}"))
++}
++
++fn open_connection(path: &Path, supported: i64) -> Result<Connection, KnowledgeError> {
++    // /var、/tmp等系统目录别名可规范化；最终数据库文件仍必须NOFOLLOW。
++    let canonical_path = std::fs::canonicalize(
++        path.parent()
++            .ok_or_else(|| KnowledgeError::storage_invalid("knowledge db parent missing"))?,
++    )
++    .map_err(storage_io)?
++    .join(
++        path.file_name()
++            .ok_or_else(|| KnowledgeError::storage_invalid("knowledge db filename missing"))?,
++    );
++    let path = canonical_path.as_path();
++    if path.exists() {
++        let probe = Connection::open_with_flags(
++            path,
++            rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY | rusqlite::OpenFlags::SQLITE_OPEN_NOFOLLOW,
++        )
++        .map_err(storage_sqlite)?;
++        check_user_version(&probe, supported)?;
++    }
++    let conn = Connection::open_with_flags(
++        path,
++        rusqlite::OpenFlags::default() | rusqlite::OpenFlags::SQLITE_OPEN_NOFOLLOW,
++    )
++    .map_err(storage_sqlite)?;
++    // 先只读版本；旧程序不能先改 journal_mode 再拒绝未来版本。
++    check_user_version(&conn, supported)?;
+     conn.pragma_update(None, "journal_mode", "WAL")
+-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
++        .map_err(storage_sqlite)?;
+     conn.pragma_update(None, "synchronous", "NORMAL")
+-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
++        .map_err(storage_sqlite)?;
+     Ok(conn)
+ }
+ 
+ fn check_user_version(conn: &Connection, supported: i64) -> Result<(), KnowledgeError> {
+     let current: i64 = conn
+         .query_row("PRAGMA user_version", [], |row| row.get(0))
+-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
++        .map_err(storage_sqlite)?;
+     if current > supported {
+         return Err(KnowledgeError::new(
+             "KNOWLEDGE_SCHEMA_NEWER",
+@@ -253,6 +319,268 @@ fn check_user_version(conn: &Connection, supported: i64) -> Result<(), Knowledge
+     Ok(())
+ }
+ 
++fn sidecar(path: &Path, suffix: &str) -> PathBuf {
++    let mut name = path.as_os_str().to_os_string();
++    name.push(suffix);
++    PathBuf::from(name)
++}
++
++// 不跟随缓存/守卫/归属文件的链接；多链接文件也不能当作专属缓存恢复。
++fn regular_file(path: &Path) -> Result<Option<std::fs::Metadata>, KnowledgeError> {
++    match std::fs::symlink_metadata(path) {
++        Ok(meta) => {
++            if !meta.is_file() {
++                return Err(KnowledgeError::new(
++                    "KNOWLEDGE_STORAGE_UNSAFE",
++                    "knowledge cache must be a regular file",
++                ));
++            }
++            #[cfg(unix)]
++            {
++                use std::os::unix::fs::MetadataExt;
++                if meta.nlink() != 1 {
++                    return Err(KnowledgeError::new(
++                        "KNOWLEDGE_STORAGE_UNSAFE",
++                        "knowledge cache has multiple hard links",
++                    ));
++                }
++            }
++            Ok(Some(meta))
++        }
++        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
++        Err(e) => Err(storage_io(e)),
++    }
++}
++
++fn cache_identity(path: &Path) -> Result<String, KnowledgeError> {
++    let meta =
++        regular_file(path)?.ok_or_else(|| KnowledgeError::storage_invalid("cache disappeared"))?;
++    #[cfg(unix)]
++    {
++        use std::os::unix::fs::MetadataExt;
++        Ok(format!("{}:{}", meta.dev(), meta.ino()))
++    }
++    #[cfg(not(unix))]
++    {
++        let created = meta.created().map_err(storage_io)?;
++        Ok(format!("{:?}", created))
++    }
++}
++
++fn ownership_record(path: &Path) -> Result<String, KnowledgeError> {
++    Ok(format!(
++        "lingxi-cache-v1\n{}\n{}\n",
++        path.file_name().unwrap().to_string_lossy(),
++        cache_identity(path)?
++    ))
++}
++
++fn record_cache_owner(path: &Path) -> Result<(), KnowledgeError> {
++    let marker = sidecar(path, ".owner");
++    regular_file(&marker)?;
++    let temporary = sidecar(path, &format!(".owner-{}", new_id("tmp")));
++    let mut file = OpenOptions::new()
++        .write(true)
++        .create_new(true)
++        .open(&temporary)
++        .map_err(storage_io)?;
++    file.write_all(ownership_record(path)?.as_bytes())
++        .map_err(storage_io)?;
++    file.sync_all().map_err(storage_io)?;
++    std::fs::rename(&temporary, marker).map_err(storage_io)
++}
++
++fn try_cache_connection(
++    path: &Path,
++    supported: i64,
++    schema: &str,
++) -> Result<Connection, KnowledgeError> {
++    if let Some(meta) = regular_file(path)? {
++        if meta.len() > 0 {
++            let mut header = [0_u8; 16];
++            let mut file = File::open(path).map_err(storage_io)?;
++            let bytes = file.read(&mut header).map_err(storage_io)?;
++            if bytes != 16 || &header != b"SQLite format 3\0" {
++                return Err(KnowledgeError::new(
++                    "KNOWLEDGE_STORAGE_CORRUPT",
++                    "invalid SQLite header; original and sidecars preserved",
++                ));
++            }
++        }
++    }
++    if path.exists() {
++        // 只读预检保护尚未checkpoint的未来版本WAL；可写句柄的Drop也可能checkpoint。
++        let probe = Connection::open_with_flags(
++            path,
++            rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY | rusqlite::OpenFlags::SQLITE_OPEN_NOFOLLOW,
++        )
++        .map_err(storage_sqlite)?;
++        check_user_version(&probe, supported)?;
++        let integrity: String = probe
++            .query_row("PRAGMA quick_check", [], |row| row.get(0))
++            .map_err(storage_sqlite)?;
++        if integrity != "ok" {
++            return Err(KnowledgeError::new(
++                "KNOWLEDGE_STORAGE_CORRUPT",
++                "SQLite quick_check failed; original preserved",
++            ));
++        }
++        let expected_table = if schema == INDEX_SCHEMA_SQL {
++            "chunk_index_variants"
++        } else {
++            "vector_index_variants"
++        };
++        let tables: i64 = probe
++            .query_row(
++                "SELECT count(*) FROM sqlite_master WHERE type='table'",
++                [],
++                |row| row.get(0),
++            )
++            .map_err(storage_sqlite)?;
++        let owned: i64 = probe
++            .query_row(
++                "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?1",
++                [expected_table],
++                |row| row.get(0),
++            )
++            .map_err(storage_sqlite)?;
++        if tables > 0 && owned == 0 {
++            return Err(KnowledgeError::new(
++                "KNOWLEDGE_STORAGE_UNSAFE",
++                "existing SQLite file is not a recognized knowledge cache",
++            ));
++        }
++    }
++    let conn = open_connection(path, supported)?;
++    let tx = rusqlite::Transaction::new_unchecked(&conn, rusqlite::TransactionBehavior::Immediate)
++        .map_err(storage_sqlite)?;
++    check_user_version(&tx, supported)?;
++    tx.execute_batch(schema).map_err(storage_sqlite)?;
++    tx.pragma_update(None, "user_version", supported)
++        .map_err(storage_sqlite)?;
++    tx.commit().map_err(storage_sqlite)?;
++    Ok(conn)
++}
++
++/// 正常打开持有共享恢复锁；损坏隔离必须独占，且不能有任何 WAL/journal。
++/// 无法确认归属/静止点时保留原件并拒绝，绝不尝试删除 sidecar。
++fn open_cache(
++    path: &Path,
++    supported: i64,
++    schema: &str,
++) -> Result<(Connection, File), KnowledgeError> {
++    let canonical_path = std::fs::canonicalize(
++        path.parent()
++            .ok_or_else(|| KnowledgeError::storage_invalid("knowledge cache parent missing"))?,
++    )
++    .map_err(storage_io)?
++    .join(
++        path.file_name()
++            .ok_or_else(|| KnowledgeError::storage_invalid("knowledge cache filename missing"))?,
++    );
++    let path = canonical_path.as_path();
++    regular_file(path)?;
++    let guard_path = sidecar(path, ".guard");
++    regular_file(&guard_path)?;
++    let guard = OpenOptions::new()
++        .read(true)
++        .write(true)
++        .create(true)
++        .truncate(false)
++        .open(&guard_path)
++        .map_err(storage_io)?;
++    guard.try_lock_shared().map_err(storage_lock)?;
++    let first = match try_cache_connection(path, supported, schema) {
++        Ok(conn) => {
++            record_cache_owner(path)?;
++            return Ok((conn, guard));
++        }
++        Err(error) => error,
++    };
++    if first.code != "KNOWLEDGE_STORAGE_CORRUPT" {
++        return Err(first);
++    }
++    guard.unlock().map_err(storage_io)?;
++    guard.try_lock().map_err(storage_lock)?;
++    // 锁升级后重新验证：另一个打开者可能已恢复，或版本已改变。
++    match try_cache_connection(path, supported, schema) {
++        Ok(conn) => {
++            record_cache_owner(path)?;
++            return Ok((conn, guard));
++        }
++        Err(error) if error.code == "KNOWLEDGE_STORAGE_CORRUPT" => {}
++        Err(error) => return Err(error),
++    }
++    for suffix in ["-wal", "-shm", "-journal"] {
++        if std::fs::symlink_metadata(sidecar(path, suffix)).is_ok() {
++            return Err(KnowledgeError::new(
++                "KNOWLEDGE_STORAGE_BUSY",
++                "corrupt cache has SQLite sidecars; preserve the complete database for offline recovery",
++            ));
++        }
++    }
++    let marker = sidecar(path, ".owner");
++    if regular_file(&marker)?.is_none() {
++        return Err(KnowledgeError::new(
++            "KNOWLEDGE_STORAGE_CORRUPT",
++            "cache ownership unknown; original preserved",
++        ));
++    }
++    let expected_owner = ownership_record(path)?;
++    if std::fs::read_to_string(&marker).map_err(storage_io)? != expected_owner {
++        return Err(KnowledgeError::new(
++            "KNOWLEDGE_STORAGE_CORRUPT",
++            "cache ownership changed; original preserved",
++        ));
++    }
++    // 无 sidecar 的只读检查避免把迁移 SQL 或权限错误当作可重建损坏。
++    let probe = Connection::open_with_flags(path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)
++        .and_then(|conn| conn.query_row("PRAGMA quick_check", [], |row| row.get::<_, String>(0)));
++    let confirmed = match probe {
++        Ok(result) => result != "ok",
++        Err(error) => storage_sqlite(error).code == "KNOWLEDGE_STORAGE_CORRUPT",
++    };
++    if !confirmed {
++        return Err(first);
++    }
++    if ownership_record(path)? != expected_owner {
++        return Err(KnowledgeError::new(
++            "KNOWLEDGE_STORAGE_UNSAFE",
++            "cache identity changed before quarantine",
++        ));
++    }
++    let quarantine = sidecar(path, &format!(".quarantine-{}", new_id("cache")));
++    std::fs::create_dir(&quarantine).map_err(storage_io)?;
++    std::fs::copy(&marker, quarantine.join("owner")).map_err(storage_io)?;
++    std::fs::rename(path, quarantine.join("original.db")).map_err(storage_io)?;
++    #[cfg(unix)]
++    {
++        File::open(&quarantine)
++            .and_then(|dir| dir.sync_all())
++            .map_err(storage_io)?;
++        File::open(path.parent().unwrap())
++            .and_then(|dir| dir.sync_all())
++            .map_err(storage_io)?;
++    }
++    // 保留原始缓存以供人工恢复；此处不生成 embedding，不宣称恢复付费向量。
++    tracing::warn!(cache = %path.display(), quarantine = %quarantine.display(),
++        "confirmed corrupt cache quarantined; empty cache rebuilt, reindex required, embeddings not regenerated");
++    let conn = try_cache_connection(path, supported, schema)?;
++    record_cache_owner(path)?;
++    Ok((conn, guard))
++}
++
++fn cache_write(
++    conn: &mut Connection,
++    supported: i64,
++) -> Result<rusqlite::Transaction<'_>, KnowledgeError> {
++    let tx = conn
++        .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)
++        .map_err(storage_sqlite)?;
++    check_user_version(&tx, supported)?;
++    Ok(tx)
++}
++
+ fn lock_conn(conn: &Mutex<Connection>) -> MutexGuard<'_, Connection> {
+     conn.lock().unwrap_or_else(|poison| poison.into_inner())
+ }
+@@ -547,12 +875,15 @@ impl KnowledgeFactStore {
+     pub fn open_with_clock(root: &Path, clock: ClockMs) -> Result<Self, KnowledgeError> {
+         std::fs::create_dir_all(root)
+             .map_err(|e| KnowledgeError::storage_invalid(format!("knowledge root: {e}")))?;
+-        let conn = open_connection(&root.join("knowledge.db"))?;
+-        check_user_version(&conn, FACTS_SCHEMA_VERSION)?;
+-        conn.execute_batch(FACTS_SCHEMA_SQL)
+-            .map_err(|e| KnowledgeError::storage_invalid(format!("facts schema: {e}")))?;
+-        conn.pragma_update(None, "user_version", FACTS_SCHEMA_VERSION)
+-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
++        let conn = open_connection(&root.join("knowledge.db"), FACTS_SCHEMA_VERSION)?;
++        let tx =
++            rusqlite::Transaction::new_unchecked(&conn, rusqlite::TransactionBehavior::Immediate)
++                .map_err(storage_sqlite)?;
++        check_user_version(&tx, FACTS_SCHEMA_VERSION)?;
++        tx.execute_batch(FACTS_SCHEMA_SQL).map_err(storage_sqlite)?;
++        tx.pragma_update(None, "user_version", FACTS_SCHEMA_VERSION)
++            .map_err(storage_sqlite)?;
++        tx.commit().map_err(storage_sqlite)?;
+         Ok(Self {
+             conn: Mutex::new(conn),
+             root: root.to_path_buf(),
+@@ -1225,6 +1556,19 @@ impl KnowledgeFactStore {
+         })
+     }
+ 
++    /// 删除来源时覆盖它的所有解析版本，而非只清最新版本。
++    pub fn list_source_parse_artifacts(
++        &self,
++        source_id: &str,
++    ) -> Result<Vec<(String, String)>, KnowledgeError> {
++        let conn = lock_conn(&self.conn);
++        let mut stmt = conn.prepare("SELECT p.id, p.content_snapshot_id FROM parse_artifacts p JOIN content_snapshots s ON s.id=p.content_snapshot_id WHERE s.source_id=?1").map_err(storage_sqlite)?;
++        let rows = stmt
++            .query_map(params![source_id], |row| Ok((row.get(0)?, row.get(1)?)))
++            .map_err(storage_sqlite)?;
++        rows.collect::<Result<Vec<_>, _>>().map_err(storage_sqlite)
++    }
++
+     pub fn latest_parse_artifact_for_snapshot(
+         &self,
+         snapshot_id: &str,
+@@ -1856,42 +2200,23 @@ pub struct IndexHit {
+ 
+ pub struct KnowledgeIndexStore {
+     conn: Mutex<Connection>,
+-    db_path: PathBuf,
++    _recovery_guard: File,
+ }
+ 
+ const INDEX_SCHEMA_VERSION: i64 = 1;
+ 
+ impl KnowledgeIndexStore {
+-    /// 打开 FTS 缓存库；打不开/损坏 → 按「缓存损坏」语义删库重建（只重建该文件）。
++    /// 打开缓存；未来版本/权限/锁/I/O保留原件，只有确证损坏才隔离恢复。
+     pub fn open(root: &Path) -> Result<Self, KnowledgeError> {
+-        std::fs::create_dir_all(root)
+-            .map_err(|e| KnowledgeError::storage_invalid(format!("knowledge root: {e}")))?;
+-        let db_path = root.join("knowledge_index.db");
+-        match Self::try_open(&db_path) {
+-            Ok(store) => Ok(store),
+-            Err(first_error) => {
+-                tracing::warn!(
+-                    error = %first_error,
+-                    "knowledge index cache unreadable; resetting the cache file"
+-                );
+-                let _ = std::fs::remove_file(&db_path);
+-                let _ = std::fs::remove_file(root.join("knowledge_index.db-wal"));
+-                let _ = std::fs::remove_file(root.join("knowledge_index.db-shm"));
+-                Self::try_open(&db_path)
+-            }
+-        }
+-    }
+-
+-    fn try_open(db_path: &Path) -> Result<Self, KnowledgeError> {
+-        let conn = open_connection(db_path)?;
+-        check_user_version(&conn, INDEX_SCHEMA_VERSION)?;
+-        conn.execute_batch(INDEX_SCHEMA_SQL)
+-            .map_err(|e| KnowledgeError::storage_invalid(format!("index schema: {e}")))?;
+-        conn.pragma_update(None, "user_version", INDEX_SCHEMA_VERSION)
+-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
++        std::fs::create_dir_all(root).map_err(storage_io)?;
++        let (conn, guard) = open_cache(
++            &root.join("knowledge_index.db"),
++            INDEX_SCHEMA_VERSION,
++            INDEX_SCHEMA_SQL,
++        )?;
+         Ok(Self {
+             conn: Mutex::new(conn),
+-            db_path: db_path.to_path_buf(),
++            _recovery_guard: guard,
+         })
+     }
+ 
+@@ -1902,14 +2227,16 @@ impl KnowledgeIndexStore {
+         block_fingerprint: &str,
+     ) -> Result<IndexVariantRow, KnowledgeError> {
+         let id = chunk_index_variant_id(parse_artifact_id, chunk_profile_hash);
+-        let conn = lock_conn(&self.conn);
++        let mut connection = lock_conn(&self.conn);
++        let conn = cache_write(&mut connection, INDEX_SCHEMA_VERSION)?;
+         conn.execute(
+             "INSERT INTO chunk_index_variants (id, parse_artifact_id, chunk_profile_hash, block_fingerprint, status) VALUES (?1, ?2, ?3, ?4, 'building')
+              ON CONFLICT(id) DO NOTHING",
+             params![id, parse_artifact_id, chunk_profile_hash, block_fingerprint],
+         )
+         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+-        drop(conn);
++        conn.commit().map_err(storage_sqlite)?;
++        drop(connection);
+         self.get_variant(&id)?
+             .ok_or_else(|| KnowledgeError::storage_invalid("chunk index variant vanished"))
+     }
+@@ -1986,9 +2313,7 @@ impl KnowledgeIndexStore {
+             ));
+         }
+         let mut conn = lock_conn(&self.conn);
+-        let tx = conn
+-            .transaction()
+-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
++        let tx = cache_write(&mut conn, INDEX_SCHEMA_VERSION)?;
+         tx.execute(
+             "UPDATE chunk_index_variants SET block_fingerprint=?1, status='building' WHERE id=?2",
+             params![block_fingerprint, variant.id],
+@@ -2218,10 +2543,30 @@ impl KnowledgeIndexStore {
+             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+     }
+ 
+-    /// 缓存级 reset（损坏自愈；只动缓存文件）。
++    /// 显式失效只清同一SQLite事务中的派生行，不unlink活跃数据库。
+     pub fn reset(&self) -> Result<(), KnowledgeError> {
+-        let _ = std::fs::remove_file(&self.db_path);
+-        Ok(())
++        let mut conn = lock_conn(&self.conn);
++        let tx = cache_write(&mut conn, INDEX_SCHEMA_VERSION)?;
++        tx.execute_batch("DELETE FROM knowledge_chunks; DELETE FROM chunk_index_variants; DELETE FROM knowledge_sections;").map_err(storage_sqlite)?;
++        tx.commit().map_err(storage_sqlite)
++    }
++
++    /// 显式删源仅清该解析产物的派生索引，其它来源不受影响。
++    pub fn remove_artifact(&self, artifact: &str) -> Result<(), KnowledgeError> {
++        let mut conn = lock_conn(&self.conn);
++        let tx = cache_write(&mut conn, INDEX_SCHEMA_VERSION)?;
++        tx.execute("DELETE FROM knowledge_chunks WHERE variant_id IN (SELECT id FROM chunk_index_variants WHERE parse_artifact_id=?1)", params![artifact]).map_err(storage_sqlite)?;
++        tx.execute(
++            "DELETE FROM chunk_index_variants WHERE parse_artifact_id=?1",
++            params![artifact],
++        )
++        .map_err(storage_sqlite)?;
++        tx.execute(
++            "DELETE FROM knowledge_sections WHERE parse_artifact_id=?1",
++            params![artifact],
++        )
++        .map_err(storage_sqlite)?;
++        tx.commit().map_err(storage_sqlite)
+     }
+ }
+ 
+@@ -2304,6 +2649,7 @@ pub struct BuildBegin {
+ 
+ pub struct KnowledgeVectorStore {
+     conn: Mutex<Connection>,
++    _recovery_guard: File,
+ }
+ 
+ const VECTOR_SCHEMA_VERSION: i64 = 1;
+@@ -2331,34 +2677,15 @@ CREATE TABLE IF NOT EXISTS chunk_vectors (
+ 
+ impl KnowledgeVectorStore {
+     pub fn open(root: &Path) -> Result<Self, KnowledgeError> {
+-        std::fs::create_dir_all(root)
+-            .map_err(|e| KnowledgeError::storage_invalid(format!("knowledge root: {e}")))?;
+-        let db_path = root.join("knowledge_vector.db");
+-        match Self::try_open(&db_path) {
+-            Ok(store) => Ok(store),
+-            Err(first_error) => {
+-                tracing::warn!(
+-                    error = %first_error,
+-                    "knowledge vector cache unreadable; resetting the cache file"
+-                );
+-                let _ = std::fs::remove_file(&db_path);
+-                let _ = std::fs::remove_file(root.join("knowledge_vector.db-wal"));
+-                let _ = std::fs::remove_file(root.join("knowledge_vector.db-shm"));
+-                Self::try_open(&db_path)
+-            }
+-        }
+-    }
+-
+-    fn try_open(db_path: &Path) -> Result<Self, KnowledgeError> {
+-        let conn = open_connection(db_path)?;
+-        check_user_version(&conn, VECTOR_SCHEMA_VERSION)?;
+-        conn.execute_batch(VECTOR_SCHEMA_SQL)
+-            .map_err(|e| KnowledgeError::storage_invalid(format!("vector schema: {e}")))?;
+-        conn.pragma_update(None, "user_version", VECTOR_SCHEMA_VERSION)
+-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+-        let _ = db_path;
++        std::fs::create_dir_all(root).map_err(storage_io)?;
++        let (conn, guard) = open_cache(
++            &root.join("knowledge_vector.db"),
++            VECTOR_SCHEMA_VERSION,
++            VECTOR_SCHEMA_SQL,
++        )?;
+         Ok(Self {
+             conn: Mutex::new(conn),
++            _recovery_guard: guard,
+         })
+     }
+ 
+@@ -2378,7 +2705,8 @@ impl KnowledgeVectorStore {
+             ));
+         }
+         let variant_id = vector_index_variant_id(chunk_index_variant_id, model_key);
+-        let conn = lock_conn(&self.conn);
++        let mut connection = lock_conn(&self.conn);
++        let conn = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;
+         let existing = conn
+             .query_row(
+                 "SELECT id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status FROM vector_index_variants WHERE id=?1",
+@@ -2407,6 +2735,7 @@ impl KnowledgeVectorStore {
+             params![variant_id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions],
+         )
+         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
++        conn.commit().map_err(storage_sqlite)?;
+         Ok(BuildBegin {
+             variant_id,
+             reset_stale,
+@@ -2420,7 +2749,8 @@ impl KnowledgeVectorStore {
+         entries: &[VectorEntry],
+     ) -> Result<(), KnowledgeError> {
+         let mut conn = lock_conn(&self.conn);
+-        let variant = conn
++        let tx = cache_write(&mut conn, VECTOR_SCHEMA_VERSION)?;
++        let variant = tx
+             .query_row(
+                 "SELECT id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status FROM vector_index_variants WHERE id=?1",
+                 params![variant_id],
+@@ -2436,9 +2766,6 @@ impl KnowledgeVectorStore {
+                 ));
+             }
+         }
+-        let tx = conn
+-            .transaction()
+-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+         for entry in entries {
+             let mut blob = Vec::with_capacity(entry.vector.len() * 4);
+             for value in &entry.vector {
+@@ -2461,7 +2788,8 @@ impl KnowledgeVectorStore {
+         variant_id: &str,
+         expected_count: usize,
+     ) -> Result<(), KnowledgeError> {
+-        let conn = lock_conn(&self.conn);
++        let mut connection = lock_conn(&self.conn);
++        let conn = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;
+         let count: i64 = conn
+             .query_row(
+                 "SELECT COUNT(*) FROM chunk_vectors WHERE vector_index_variant_id=?1",
+@@ -2489,17 +2817,18 @@ impl KnowledgeVectorStore {
+             params![variant_id],
+         )
+         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+-        Ok(())
++        conn.commit().map_err(storage_sqlite)
+     }
+ 
+     pub fn fail_build(&self, variant_id: &str) -> Result<(), KnowledgeError> {
+-        let conn = lock_conn(&self.conn);
++        let mut connection = lock_conn(&self.conn);
++        let conn = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;
+         conn.execute(
+             "UPDATE vector_index_variants SET status='failed' WHERE id=?1",
+             params![variant_id],
+         )
+         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+-        Ok(())
++        conn.commit().map_err(storage_sqlite)
+     }
+ 
+     fn map_variant(row: &rusqlite::Row<'_>) -> rusqlite::Result<VectorVariantRecord> {
+@@ -2616,9 +2945,7 @@ impl KnowledgeVectorStore {
+     pub fn remove_artifact(&self, parse_artifact_id: &str) -> Result<usize, KnowledgeError> {
+         let variants = self.list_variants_by_artifact(parse_artifact_id)?;
+         let mut conn = lock_conn(&self.conn);
+-        let tx = conn
+-            .transaction()
+-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
++        let tx = cache_write(&mut conn, VECTOR_SCHEMA_VERSION)?;
+         let mut removed = 0;
+         for variant in &variants {
+             tx.execute(
+diff --git a/rust/crates/lingxi-service/src/knowledge.rs b/rust/crates/lingxi-service/src/knowledge.rs
+index 87e5df0a1..7ecfa8063 100644
+--- a/rust/crates/lingxi-service/src/knowledge.rs
++++ b/rust/crates/lingxi-service/src/knowledge.rs
+@@ -792,25 +792,30 @@ impl KnowledgeService {
+                 "source is referenced by an active turn scope",
+             ));
+         }
+-        let source = self.facts.get_source(source_id)?;
+-        // 物理痕迹：解析产物与变体（索引可重建 ≠ 源文件可删——这里是显式删除）。
+-        if let Ok(snapshot) = self.facts.latest_snapshot_for_source(source_id) {
+-            if let Ok(Some(artifact)) = self.facts.latest_parse_artifact_for_snapshot(&snapshot.id)
+-            {
+-                let _ = self.vectors.remove_artifact(&artifact.id);
+-                let _ = self.index.reset();
+-                let _ = std::fs::remove_file(
+-                    self.facts
+-                        .root()
+-                        .join("artifacts")
+-                        .join(&snapshot.id)
+-                        .join(format!("{}.json", artifact.id)),
+-                );
++        self.facts.get_source(source_id)?;
++        let artifacts = self.facts.list_source_parse_artifacts(source_id)?;
++        let cancelled = self.facts.cancel_jobs_for_source(source_id)?;
++        // 只清此来源的全部版本；缓存写入失败必须返回错误，不能声称purge成功。
++        for (artifact_id, snapshot_id) in artifacts {
++            self.vectors.remove_artifact(&artifact_id)?;
++            self.index.remove_artifact(&artifact_id)?;
++            let artifact_path = self
++                .facts
++                .root()
++                .join("artifacts")
++                .join(snapshot_id)
++                .join(format!("{artifact_id}.json"));
++            match std::fs::remove_file(artifact_path) {
++                Ok(()) => {}
++                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
++                Err(error) => {
++                    return Err(KnowledgeError::storage_invalid(format!(
++                        "knowledge artifact cleanup failed: {error}"
++                    )))
++                }
+             }
+         }
+-        let cancelled = self.facts.cancel_jobs_for_source(source_id)?;
+-        let _ = source;
+-        let _ = self.facts.delete_source(source_id)?;
++        self.facts.delete_source(source_id)?;
+         self.facts.purge_source(source_id)?;
+         Ok(json!({"cancelledJobs": cancelled, "purge": {"snapshots": true, "indexVariants": true}}))
+     }

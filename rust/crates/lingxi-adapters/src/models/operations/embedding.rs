@@ -73,6 +73,26 @@ pub struct EmbeddingRequest {
     pub input_type: EmbeddingInputType,
 }
 
+/// 嵌入空间指纹：只取影响向量含义的稳定参数，不把输入文本、凭证或配置代次
+/// 当作模型版本。文档/查询角色是同一空间的一对用途，不能因此隔离。
+/// 端点变化采取保守隔离；无关配置 reload 仍保持兼容。
+pub fn embedding_space_fingerprint(
+    route: &ResolvedModelRoute,
+    request: &EmbeddingRequest,
+) -> String {
+    let descriptor = serde_json::json!({
+        "schema": "lingxi.embedding-space.v1",
+        "provider": route.provider,
+        "model": route.model,
+        "protocol": route.protocol.config_name(),
+        "endpoint": route.endpoint.trim_end_matches('/'),
+        "groupId": if route.protocol == ProtocolFamily::MinimaxEmbeddings { route.group_id.as_deref() } else { None },
+        "dimensions": request.dimensions,
+        "contextWindow": if route.protocol == ProtocolFamily::OllamaEmbed { request.context_window } else { None },
+    });
+    lingxi_kernel::knowledge::sha256_hex(descriptor.to_string().as_bytes())
+}
+
 /// A validated embedding answer: one vector per input, in input order.
 #[derive(Debug, Clone)]
 pub struct EmbeddingOutcome {

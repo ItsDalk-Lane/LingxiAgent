@@ -1,0 +1,17 @@
+{
+  "scope": "own clone local metadata only; no tracked ignore/gate/source change",
+  "paths": [
+    "/rust/target-w05-e01/",
+    "/rust/target-w05-e01-mutant/",
+    "/artifacts/rust-tauri/R06/AR/W05-E01/local-only/",
+    "/rust/crates/lingxi-service/artifacts/"
+  ],
+  "beforeSha256": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+  "afterSha256": "cb1828d32ff4d6ba0d99f89f0b5707f96fa869d81d3fe9f84797a0a7e5d6c4cb",
+  "reason": "LOCAL_ONLY_NEVER_GIT own target and synthetic home; effective source independently bound by supervise inputs",
+  "beforeContent": "# git ls-files --others --exclude-from=.git/info/exclude\n# Lines that start with '#' are comments.\n# For a project mostly in C, the following would be a good set of\n# exclude patterns (uncomment them if you want to use them):\n# *.[oa]\n# *~\n",
+  "afterContent": "# git ls-files --others --exclude-from=.git/info/exclude\n# Lines that start with '#' are comments.\n# For a project mostly in C, the following would be a good set of\n# exclude patterns (uncomment them if you want to use them):\n# *.[oa]\n# *~\n\n# W05-E01 仅本次自有可再生缓存与合成私有运行目录\n/rust/target-w05-e01/\n/rust/target-w05-e01-mutant/\n/artifacts/rust-tauri/R06/AR/W05-E01/local-only/\n/rust/crates/lingxi-service/artifacts/\n",
+  "pathProvenance": "all four directories first created for this executor or its earlier erroneous synthetic test-home setup; no user/other-agent files existed there",
+  "authorization": "parent explicit message permits exact own .git/info/exclude paths",
+  "effectiveSourceCoverage": "git tracked paths unchanged; every rust source, manifests/lock, scripts and all copied isolated mutant source remain independently fingerprinted"
+}

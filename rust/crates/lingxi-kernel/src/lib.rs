@@ -398,6 +398,8 @@ pub enum FailureCause {
     /// The provider call failed and no retry attempt remains (or the
     /// failure was not retryable). Carries the provider error code.
     ProviderFailed { code: String, retryable: bool },
+    /// 本地存储拒绝了必要提交；供应商尚未调用时不能记成供应商故障。
+    StorageFailed { code: String, retryable: bool },
     /// The per-run model-turn budget was exhausted before a final answer.
     TurnBudgetExceeded { max_turns: u32 },
     /// The provider requested tool calls while no tool executor is wired
@@ -414,6 +416,7 @@ impl FailureCause {
     pub fn cause_code(&self) -> &'static str {
         match self {
             FailureCause::ProviderFailed { .. } => "provider_error",
+            FailureCause::StorageFailed { .. } => "storage_error",
             FailureCause::TurnBudgetExceeded { .. } => "turn_budget_exceeded",
             FailureCause::ToolExecutorUnavailable => "tool_executor_unavailable",
             FailureCause::QuotaExhausted { .. } => "quota_exhausted",
@@ -1011,5 +1014,23 @@ mod tests {
         assert_ne!(model_call_id(&run, 1).as_str(), run.as_str());
         assert_ne!(model_call_id(&run, 1), model_call_id(&run, 2));
         assert_ne!(tool_call_id(&run, 1), tool_call_id(&run, 2));
+    }
+}
+
+pub mod session_admission;
+#[cfg(test)]
+mod f04_storage_outcome_contract {
+    use super::*;
+    #[test]
+    fn storage_failure_has_accurate_reason_and_no_fabricated_final() {
+        let finish = RunFinish::Failed {
+            cause: FailureCause::StorageFailed {
+                code: "session_file_reference_missing".into(),
+                retryable: false,
+            },
+        };
+        assert_eq!(finish.status(), RunStatus::Failed);
+        assert_eq!(finish.terminal_reason(), "failed.storage_error");
+        assert!(finish.final_message().is_none());
     }
 }

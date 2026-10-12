@@ -104,6 +104,10 @@ pub struct CancelScope {
 }
 
 impl CancelScope {
+    /// 独立后台任务使用同一取消树机制，身份不冒充用户 Run。
+    pub fn background_root(label: &str) -> Self {
+        Self::new(label.to_string(), ScopeKind::Background, None)
+    }
     /// The root scope of one run.
     pub fn run_root(run_id: &str) -> Self {
         Self::new(format!("run:{run_id}"), ScopeKind::Run, None)
@@ -155,6 +159,21 @@ impl CancelScope {
         scope
     }
 
+    /// 比较实际取消树节点，不能用可伪造的文字标签冒充父运行。
+    pub(crate) fn same_scope(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.inner, &other.inner)
+    }
+    /// 真实节点的祖先关系，名称相同不能冒充同一取消树。
+    pub(crate) fn descends_from(&self, ancestor: &Self) -> bool {
+        let mut node = Some(Arc::clone(&self.inner));
+        while let Some(current) = node {
+            if Arc::ptr_eq(&current, &ancestor.inner) {
+                return true;
+            }
+            node = current.parent.clone();
+        }
+        false
+    }
     pub fn label(&self) -> &str {
         &self.inner.label
     }

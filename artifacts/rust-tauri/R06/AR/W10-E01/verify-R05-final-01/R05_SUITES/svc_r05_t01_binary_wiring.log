@@ -1,0 +1,10 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.22s
+     Running tests/r05_t01_binary_wiring.rs (rust/target/debug/deps/r05_t01_binary_wiring-a1a199c3f0ea13b8)
+LINGXI_TEST_GUARD: armed (pid 25973, mem_limit=8192 MB, time_limit=600 s)
+
+running 2 tests
+test c03_real_binary_without_plane_settles_unconfigured ... ok
+test c02_real_binary_full_chain_through_authenticated_endpoint ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.31s
+

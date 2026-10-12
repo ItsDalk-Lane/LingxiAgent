@@ -1,0 +1,8 @@
+{
+  "actual_db": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/runtime/tmp/lingxi-r06t03-svc-fork-happy-90185-1791786208857274000/lingxi-service/data/runs.db",
+  "actual_home": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/runtime/tmp/lingxi-r06t03-svc-fork-happy-90185-1791786208857274000",
+  "case_tag": "fork-happy",
+  "home_source": "Cli",
+  "provider_boundary": "确定性响应替身；原生产 Run 与 SQLite 未替换",
+  "ready_address": "127.0.0.1:50417"
+}

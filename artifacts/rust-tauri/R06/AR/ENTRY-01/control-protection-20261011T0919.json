@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-11T09:17:59.117908+00:00",
+  "role": "ROOT_CONTROL_PROTECTION_NOT_PRODUCT_ACCEPTANCE",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "index_empty": true,
+  "user_setting_sha256": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3",
+  "open": 14,
+  "closed": 1,
+  "disk_free_GiB": 241.67,
+  "working_executors": [
+    "new W01 history/boundSession/real backgroundstart",
+    "new W03 disconnect/full formal regression",
+    "new W10 embedding identity/original recovery boundary"
+  ],
+  "blocked_reviews": [
+    "W02",
+    "W12",
+    "W06"
+  ],
+  "review_retries": false,
+  "all15_60C_unique": true,
+  "R06": "NOT_ACCEPTED",
+  "R07_started": false
+}

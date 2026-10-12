@@ -1,0 +1,11 @@
+{
+  "role": "ROOT_CONTROL_NOT_REVIEWER",
+  "status": "PARTIAL_P02_HANDOFF_INTEGRITY_VERIFIED_NOT_ACCEPTED",
+  "time_utc": "2026-10-11T07:14:54.362693+00:00",
+  "evidence_files_checked": 97,
+  "evidence_mismatches": [],
+  "owned_files_checked": 15,
+  "source_mismatches": [],
+  "test_status": "FINAL_PRECISE_FORMAT_SHA_NOT_RUN",
+  "next": "NEW_ROOT_CAUSE_THEN_NEW_P03_REPAIR"
+}

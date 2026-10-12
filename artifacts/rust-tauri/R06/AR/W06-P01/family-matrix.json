@@ -1,0 +1,60 @@
+{
+  "finding": "R06-AR-W06-R01-F01",
+  "root_cause": "非字符串键不进入字符串lookup，未识别字段触发默认；set可能新增并掩盖未识别键",
+  "boundary": "根/owned敏感分区键必须为字符串；不支持类型响亮InvalidRequest，merge全来源先验证、展开后再验证；未知内部值保留；敏感重复普通字符串由真实YAML parser拒绝；规范化复合重复通过类型边界拒绝",
+  "consumers": [
+    {
+      "consumer": "context_compiler.rs",
+      "production_paths": "scan_agent_config/read_config_scan/gather/roster",
+      "original_share": "R06-T01 S01/S04;A01/A02",
+      "repair": "所有路径复用AgentConfigDocument.parse；修复仅该入口，无消费者特例",
+      "validation": "真正binary Run wire与gather"
+    },
+    {
+      "consumer": "memory.rs",
+      "production_paths": "locale_is_zh/read_flags/patch_flags/config/experience routes",
+      "original_share": "R06-T06 S01/S02;A11",
+      "repair": "所有路径复用AgentConfigDocument.parse；修复仅该入口，无消费者特例",
+      "validation": "四C与原memory回归"
+    },
+    {
+      "consumer": "memorytools.rs",
+      "production_paths": "run-time memory switch / enable_for_agent",
+      "original_share": "R06-T06 S01/S03;A11/A12",
+      "repair": "所有路径复用AgentConfigDocument.parse；修复仅该入口，无消费者特例",
+      "validation": "真实Gateway tenet拒绝+普通暂停"
+    },
+    {
+      "consumer": "persona.rs",
+      "production_paths": "locale/yuan/personality reads",
+      "original_share": "R06-T01 S04;R06-T06 S03",
+      "repair": "所有路径复用AgentConfigDocument.parse；修复仅该入口，无消费者特例",
+      "validation": "原身份route及新binary name/locale/yuan拒绝"
+    },
+    {
+      "consumer": "skills.rs",
+      "production_paths": "list/policy/enable/disable/scrub/cleanup/runtime catalog",
+      "original_share": "R06-T06 S03;A12",
+      "repair": "所有路径复用AgentConfigDocument.parse；修复仅该入口，无消费者特例",
+      "validation": "真正HTTP预览与workspace wire，原skills回归"
+    },
+    {
+      "consumer": "agent_memory.rs",
+      "production_paths": "read/write flags/lists/atomic patch",
+      "original_share": "R06-T06 S01/S03",
+      "repair": "所有路径复用AgentConfigDocument.parse；修复仅该入口，无消费者特例",
+      "validation": "adapter22反例+原文件字节保护+未知保真"
+    },
+    {
+      "consumer": "skill_library.rs",
+      "production_paths": "collect_enabled_skills_of_other_agents",
+      "original_share": "R06-T06 S02/S03",
+      "repair": "所有路径复用AgentConfigDocument.parse；修复仅该入口，无消费者特例",
+      "validation": "peer复合enabled预览明确400，普通peer清单为空"
+    }
+  ],
+  "binary_family_samples": 18,
+  "peer_preview_additional_case": 1,
+  "adapter_invalid_samples": 22,
+  "source_inference_limit": "并非所有locale/yuan/experience行为逐项生产成功链；本次binary对异常键拒绝与零wire亲验，正常链依原四C/77影响回归；完整生命周期/其它F到期义务未关闭"
+}

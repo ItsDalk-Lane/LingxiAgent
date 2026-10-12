@@ -1,0 +1,6 @@
+{
+  "status": "STALE_COMPILE_PREPARATION_NO_BUSINESS_RUN",
+  "reason": "drop(()) warnings corrected in dedicated test only for required clippy; product unchanged",
+  "old_test_sha256": "e291c50ee95652746bb70649a0c30615d1d0c166d9a2d84b7ebfecff51ef8312",
+  "superseded_by": "W12-CANDIDATE-05"
+}

@@ -34,18 +34,23 @@ use std::path::PathBuf;
 use std::pin::Pin;
 use std::sync::Arc;
 
+use lingxi_kernel::RunContext;
 use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
     ToolExecutorPort, ToolOutcome, ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::subagent::{AccessRequest, SessionPermissionMode};
-use lingxi_kernel::RunContext;
+use lingxi_kernel::toolcatalog::{
+    Availability, DeclaredPermission, PermissionContract, PermissionKind, SchemaBudget,
+    ToolManifest, ToolOrigin, ToolRegistry,
+};
 use lingxi_protocol::{
     ContentBlock, ErrorCode, ModelCallId, NormalizedMessage, ProtocolError, ToolCallId,
 };
+use lingxi_service::toolgateway::ToolInvocationGateway;
 use lingxi_service::{
-    prepare_layout, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
+    HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState, prepare_layout,
 };
 
 /// The parent's user submission (marker = everything before ':').
@@ -114,6 +119,7 @@ impl TurnProviderPort for ScriptedProvider {
 
         _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        let declarations = input.tools.clone();
         let turn = input.turn;
         let input = input.submission.as_str();
         let marker = Self::marker_of(input);
@@ -148,6 +154,33 @@ impl TurnProviderPort for ScriptedProvider {
                 // Park mid-"stream": this turn waits for the test anchor.
                 let _permit = gate.acquire().await.expect("provider gate closed");
             }
+            // 使用服务当轮实际发送的声明和代次，保留原工具参数及委派请求。
+            let turn = match turn {
+                ProviderTurn::ToolRequests { content, requests } => {
+                    assert!(declarations.catalog_generation > 0);
+                    let requests = requests
+                        .into_iter()
+                        .map(|mut request| {
+                            let declaration = declarations
+                                .declarations
+                                .iter()
+                                .find(|declaration| declaration.wire_name == request.target)
+                                .expect("当轮真实声明须包含脚本请求的工具");
+                            request.target = declaration.target.clone();
+                            assert_eq!(
+                                declarations
+                                    .bind_target(&request.target)
+                                    .expect("真实目标须绑定当轮声明")
+                                    .catalog_generation,
+                                declarations.catalog_generation
+                            );
+                            request
+                        })
+                        .collect();
+                    ProviderTurn::ToolRequests { content, requests }
+                }
+                turn => turn,
+            };
             ProviderTurnResult::of_ctx(&ctx_at_issue, turn)
         })
     }
@@ -185,11 +218,19 @@ fn delegation_request(
     access: Option<AccessRequest>,
     model: Option<&str>,
 ) -> ToolRequest {
+    let mut arguments = serde_json::json!({"task":task,"label":"research"});
+    if let Some(access) = access {
+        arguments["access"] = serde_json::json!(match access {
+            AccessRequest::Read => "read",
+            AccessRequest::Write => "write",
+        });
+    }
+    if let Some(model) = model {
+        arguments["model"] = serde_json::json!(model);
+    }
     ToolRequest::from_effective_arguments(
         "subagent",
-        serde_json::json!({
-            "task": task,
-        }),
+        arguments,
         &lingxi_kernel::toolcatalog::SchemaBudget::default(),
     )
     .expect("effective tool request")
@@ -281,6 +322,83 @@ fn owner_principal() -> lingxi_service::Principal {
     }
 }
 
+fn tool_gateway(tool: Arc<RecordingTool>) -> Arc<ToolInvocationGateway> {
+    let registry = Arc::new(ToolRegistry::new());
+    let clock = Arc::new(lingxi_service::inject::SystemClock);
+    let approvals = Arc::new(lingxi_service::approval_service::ApprovalService::new(
+        clock.clone(),
+    ));
+    let gateway = Arc::new(ToolInvocationGateway::new(
+        registry.clone(),
+        approvals,
+        clock,
+        SchemaBudget::default(),
+        lingxi_service::toolgateway::DEFAULT_PREPARED_TTL_MS,
+        lingxi_service::toolgateway::DEFAULT_LIVE_PREPARED_CAP,
+    ));
+    // 三种原工具接入真实登记、参数校验和权限边界；外部执行仍由原计数器记录。
+    for (name, permission, schema) in [
+        (
+            "subagent",
+            PermissionKind::Read,
+            serde_json::json!({"type":"object","properties":{
+                "task":{"type":"string","minLength":1},
+                "access":{"type":"string","enum":["read","write"]},
+                "label":{"type":"string"},"agent":{"type":"string"},
+                "model":{"type":"string"},"threadId":{"type":"string"}
+            },"required":["task"],"additionalProperties":false}),
+        ),
+        (
+            "write",
+            PermissionKind::Execute,
+            serde_json::json!({"type":"object","properties":{
+                "path":{"type":"string","minLength":1},"content":{"type":"string"}
+            },"required":["path","content"],"additionalProperties":false}),
+        ),
+        (
+            "read",
+            PermissionKind::Read,
+            serde_json::json!({"type":"object","properties":{
+                "path":{"type":"string","minLength":1}
+            },"required":["path"],"additionalProperties":false}),
+        ),
+    ] {
+        let receipt = registry
+            .register(
+                ToolManifest {
+                    origin: ToolOrigin::FirstParty,
+                    local_name: name.into(),
+                    display_name: name.into(),
+                    aliases: Vec::new(),
+                    version: "1.0.0".into(),
+                    description: "原子代理权限继承检查的真实工具声明".into(),
+                    input_schema: lingxi_protocol::ToolSchemaDocument {
+                        dialect: "json-schema/2020-12".into(),
+                        schema,
+                    },
+                    output_schema: None,
+                    permission: PermissionContract {
+                        kind: permission,
+                        capability_base: format!("{name}.capability"),
+                    },
+                    availability: Availability::Available,
+                    timeout_ms: Some(30_000),
+                    max_concurrency: Some(4),
+                    declared_permission: DeclaredPermission::None,
+                    recovery: lingxi_kernel::invocation::ToolRecoveryCapability::CONSERVATIVE,
+                },
+                &SchemaBudget::default(),
+            )
+            .expect("原工具真实声明须登记成功");
+        gateway.bind_executor(
+            receipt.target_id,
+            tool.clone(),
+            "原权限继承检查的外部执行计数器",
+        );
+    }
+    gateway
+}
+
 async fn boot(
     tag: &str,
     provider: Arc<ScriptedProvider>,
@@ -290,7 +408,7 @@ async fn boot(
     let layout = prepare_layout(&home).expect("layout");
     let deps = ServiceDeps {
         turn_provider: Some(provider),
-        tool_executor: Some(tool),
+        tool_gateway: Some(tool_gateway(tool)),
         ..ServiceDeps::default()
     };
     let state = ServiceState::bootstrap_with_deps(config_for(&home), &layout, deps)
@@ -485,7 +603,7 @@ async fn r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary() {
     //    invoked for the write target.
     let journal = query_text(
         &state,
-        "SELECT receipt_detail FROM invocation_journal WHERE run_id = ?1 AND target = 'write'",
+        "SELECT receipt_detail FROM invocation_journal WHERE run_id = ?1 AND target = 'tool:first-party:write'",
         &child_run,
     )
     .await
@@ -500,7 +618,7 @@ async fn r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary() {
     );
     let dispatched = query_text(
         &state,
-        "SELECT dispatched FROM invocation_journal WHERE run_id = ?1 AND target = 'write'",
+        "SELECT dispatched FROM invocation_journal WHERE run_id = ?1 AND target = 'tool:first-party:write'",
         &child_run,
     )
     .await
@@ -650,7 +768,7 @@ async fn operate_parent_child_write_is_executed_once() {
     }
     assert_eq!(
         arrivals,
-        vec![format!("{child_run}|write")],
+        vec![format!("{child_run}|tool:first-party:write")],
         "the operable grant allowed the write — exactly one execution"
     );
     teardown(&state, &home).await;
@@ -725,7 +843,7 @@ async fn readonly_parent_write_access_request_is_refused_at_dispatch() {
     // The parent's journal closes the delegation as never dispatched.
     let journal = query_text(
         &state,
-        "SELECT receipt_detail FROM invocation_journal WHERE run_id = ?1 AND target = 'subagent'",
+        "SELECT receipt_detail FROM invocation_journal WHERE run_id = ?1 AND target = 'tool:first-party:subagent'",
         &parent_run,
     )
     .await
@@ -739,7 +857,7 @@ async fn readonly_parent_write_access_request_is_refused_at_dispatch() {
     // must say so (zero child runs were created by every refusal path).
     let dispatched = query_text(
         &state,
-        "SELECT dispatched FROM invocation_journal WHERE run_id = ?1 AND target = 'subagent'",
+        "SELECT dispatched FROM invocation_journal WHERE run_id = ?1 AND target = 'tool:first-party:subagent'",
         &parent_run,
     )
     .await
@@ -817,7 +935,7 @@ async fn model_override_cannot_widen_the_readonly_grant() {
     }
     let journal = query_text(
         &state,
-        "SELECT receipt_detail FROM invocation_journal WHERE run_id = ?1 AND target = 'write'",
+        "SELECT receipt_detail FROM invocation_journal WHERE run_id = ?1 AND target = 'tool:first-party:write'",
         &child_run,
     )
     .await

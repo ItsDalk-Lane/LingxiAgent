@@ -1,0 +1,175 @@
+diff a/rust/crates/lingxi-service/src/lib.rs b/rust/crates/lingxi-service/src/lib.rs	(rejected hunks)
+@@ -427,11 +427,20 @@ pub struct HealthResponse {
+     pub data_epoch: u32,
+ }
+ 
++/// 最后一个服务状态所有者离开时发出停止信号，不把自持 Arc 的 worker 留活。
++struct KnowledgeWorkerOwner(Arc<knowledge::KnowledgeService>);
++impl Drop for KnowledgeWorkerOwner {
++    fn drop(&mut self) {
++        self.0.shutdown();
++    }
++}
++
+ /// Live service state shared by handlers: the injected port implementations
+ /// (auth / tickets / storage / sessions / events / limits) live here.
+ #[derive(Clone)]
+ pub struct ServiceState {
+     config: Arc<ServiceConfig>,
++    _knowledge_worker_owner: Arc<KnowledgeWorkerOwner>,
+     auth: Arc<AuthService>,
+     management: Arc<management::ManagementState>,
+     static_web: Arc<static_web::StaticWebConfig>,
+@@ -1828,7 +1845,6 @@ impl ServiceState {
+                 knowledge::GatewayKnowledgeEmbedder::new(model_gateway, operations),
+             )));
+         }
+-        knowledge_service.start_worker();
+         // R06-T05: session-file 服务的 lingxiHome 等价根（config 在下面的
+         // struct literal 里被 Arc 收走，先取出）。
+         let data_home = config.data_home.clone();
+@@ -1916,6 +1932,7 @@ impl ServiceState {
+             workspace_access.as_ref().map(|(_, root)| root.as_path()),
+         ));
+         let state = Self {
++            _knowledge_worker_owner: Arc::new(KnowledgeWorkerOwner(knowledge_service.clone())),
+             config: Arc::new(config),
+             auth: Arc::new(auth),
+             management: Arc::new(management),
+@@ -1989,6 +2006,42 @@ impl ServiceState {
+             network_plane: deps.network_plane.clone(),
+             context_compiler: deps.context_compiler.clone(),
+         };
++        let knowledge_owner = Arc::downgrade(state.knowledge());
++        state
++            .storage()
++            .register_before_close(Arc::new(move || {
++                let knowledge_owner = knowledge_owner.clone();
++                Box::pin(async move {
++                    if let Some(knowledge) = knowledge_owner.upgrade() {
++                        knowledge.wait_worker_stopped().await.map_err(|error| {
++                            StorageError::Internal {
++                                detail: format!("knowledge resource stop failed: {error}"),
++                            }
++                        })?;
++                    }
++                    Ok(())
++                })
++            }))
++            .map_err(ServiceStartupError::Storage)?;
++        // 同进程最后 owner 的 Drop 已通知停止，但原任务必须真实退出并释放 OS 锁。
++        // 有界异步等待不提前释放锁，也不把仍活任务恢复为 queued。
++        let handoff_deadline = tokio::time::Instant::now() + std::time::Duration::from_millis(500);
++        loop {
++            match state.knowledge().start_worker() {
++                Ok(()) => break,
++                Err(error)
++                    if error.code == "KNOWLEDGE_CONFLICT"
++                        && tokio::time::Instant::now() < handoff_deadline =>
++                {
++                    tokio::time::sleep(std::time::Duration::from_millis(10)).await
++                }
++                Err(error) => {
++                    return Err(ServiceStartupError::Storage(StorageError::InvalidRequest {
++                        detail: error.to_string(),
++                    }))
++                }
++            }
++        }
+         // R06-T05 D14：启动清扫一次（现役 server/index.ts:563-570
+         // fire-and-forget + warn 日志；失败不阻断启动）。现役 24h
+         // setInterval 不引入——常驻定时器违背 R02-T06 关停纪律，周期调度
+@@ -6031,17 +6084,42 @@ pub async fn run_with_tls<F>(
+ where
+     F: Future<Output = ()> + Send + 'static,
+ {
++    let knowledge_worker = Arc::clone(state.knowledge());
+     let bind_addr = state.config().bind_addr;
+-    let listener = tokio::net::TcpListener::bind(bind_addr)
+-        .await
+-        .map_err(|source| ServiceError::Bind {
+-            addr: bind_addr,
+-            source,
+-        })?;
+-    let local = listener.local_addr().map_err(|source| ServiceError::Bind {
+-        addr: bind_addr,
+-        source,
+-    })?;
++    let listener = match tokio::net::TcpListener::bind(bind_addr).await {
++        Ok(listener) => listener,
++        Err(source) => {
++            knowledge_worker
++                .wait_worker_stopped()
++                .await
++                .map_err(|error| ServiceError::Serve {
++                    source: std::io::Error::other(format!(
++                        "bind failed: {source}; knowledge worker stop failed: {error}"
++                    )),
++                })?;
++            return Err(ServiceError::Bind {
++                addr: bind_addr,
++                source,
++            });
++        }
++    };
++    let local = match listener.local_addr() {
++        Ok(addr) => addr,
++        Err(source) => {
++            knowledge_worker
++                .wait_worker_stopped()
++                .await
++                .map_err(|error| ServiceError::Serve {
++                    source: std::io::Error::other(format!(
++                        "listener address failed: {source}; knowledge worker stop failed: {error}"
++                    )),
++                })?;
++            return Err(ServiceError::Bind {
++                addr: bind_addr,
++                source,
++            });
++        }
++    };
+     *state
+         .bound_addr
+         .write()
+@@ -6056,6 +6134,7 @@ where
+     // (`--http-max-in-flight` / `--http-request-budget-ms`).
+     let conn_admission = Arc::clone(state.connection_admission());
+     let header_budget = state.admission().request_budget();
++    let knowledge_on_signal = knowledge_worker.clone();
+     let router = build_router(state);
+     // The graceful-shutdown future consumes the stop signal and records the
+     // signal instant; the drain budget watchdog is armed at THAT instant (the
+@@ -6065,6 +6144,7 @@ where
+     let (signal_tx, signal_rx) = tokio::sync::oneshot::channel::<std::time::Instant>();
+     let graceful = async move {
+         shutdown.await;
++        knowledge_on_signal.shutdown();
+         let _ = signal_tx.send(std::time::Instant::now());
+     };
+     let server = serve::serve_with_connection_admission(
+@@ -6076,7 +6156,7 @@ where
+         tls_acceptor,
+     );
+     tokio::pin!(server);
+-    match drain_budget {
++    let outcome = match drain_budget {
+         None => server
+             .await
+             .map(|()| ServeOutcome {
+@@ -6113,7 +6193,14 @@ where
+                 }
+             }
+         }
+-    }
++    };
++    knowledge_worker
++        .wait_worker_stopped()
++        .await
++        .map_err(|error| ServiceError::Serve {
++            source: std::io::Error::other(error.to_string()),
++        })?;
++    outcome
+ }
+ 
+ #[cfg(test)]

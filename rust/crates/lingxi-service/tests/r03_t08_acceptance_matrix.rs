@@ -974,6 +974,7 @@ async fn combo_duplicate_request_id_replays_and_conflicts() {
             &owner_principal(),
             "sess_local_alpha",
             &ExecuteSubmission {
+                knowledge: None,
                 input: "DUP: idempotent",
                 request_id: Some("req-dup-1"),
             },
@@ -991,6 +992,7 @@ async fn combo_duplicate_request_id_replays_and_conflicts() {
             &owner_principal(),
             "sess_local_alpha",
             &ExecuteSubmission {
+                knowledge: None,
                 input: "DUP: idempotent",
                 request_id: Some("req-dup-1"),
             },
@@ -1011,6 +1013,7 @@ async fn combo_duplicate_request_id_replays_and_conflicts() {
             &owner_principal(),
             "sess_local_alpha",
             &ExecuteSubmission {
+                knowledge: None,
                 input: "DUP: CHANGED CONTENT under the same id",
                 request_id: Some("req-dup-1"),
             },
@@ -1740,6 +1743,7 @@ async fn leaf_background_completes_decoupled_and_survives_cancels() {
             &owner_principal(),
             "sess_local_beta",
             &ExecuteSubmission {
+                knowledge: None,
                 input: "BG: decoupled",
                 request_id: None,
             },

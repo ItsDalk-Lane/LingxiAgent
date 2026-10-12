@@ -1,0 +1,51 @@
+{
+  "status": "FAIL_OPEN_NOT_STAGE_PASS",
+  "complete_command": "cargo test --manifest-path rust/Cargo.toml --locked -j8 --workspace --all-targets --no-fail-fast",
+  "exit_code": 101,
+  "suite_summaries": 139,
+  "passed": 1865,
+  "failed": 7,
+  "ignored": 0,
+  "failed_tests": [
+    "subagent_timeout_settles_a_parked_quota_wait",
+    "panicking_tool_child_is_supervised_and_the_run_settles_loudly",
+    "approval_wait_round_trips_approve_and_reject_legs",
+    "r04_a12_filesystem_write_isolation_holds_with_real_sentinels",
+    "worker_sandbox_binding_denies_out_of_boundary_writes",
+    "r03_a01_three_model_calls_produce_exactly_one_task_terminal",
+    "parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls"
+  ],
+  "failed_original_tests_unchanged": [
+    {
+      "path": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
+      "sha256": "c14272566afcee269520ffef460eac0361fde8a54235466fc4315a37dc4fdb43",
+      "identical_to_committed_HEAD": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/cancellation_tree.rs",
+      "sha256": "d107a05d3f3b33f492a9be4e37d9c93e2566318abe4e285bba1f180fa0cf7eee",
+      "identical_to_committed_HEAD": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r04_t06_sandbox.rs",
+      "sha256": "f1c7f450e939c26278453b314d8532b460ce70dc08f4fe7961ba1b5b26f7bb38",
+      "identical_to_committed_HEAD": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs",
+      "sha256": "98e2a672103242033f82f4182de3662a3c2d9a57c883e835132b3c8589aa8d1a",
+      "identical_to_committed_HEAD": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/run_lifecycle.rs",
+      "sha256": "1678e32936755408f553c10d05a3c91a880614aadd8a1b6d9833cd3c98df6e06",
+      "identical_to_committed_HEAD": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/subagent_closeout.rs",
+      "sha256": "be74628bd47c4fea91c61294783188ab59ca00123237f1686ec6ddfd550c7d41",
+      "identical_to_committed_HEAD": true
+    }
+  ],
+  "note": "Counts summarize actual test binary summaries only, not R00 leaf acceptance. Seven failed assertions across six original targets retained; no test edits or semantic waiver. Formal R05 seven-command stage chain and R06 stage acceptance remain NOT_RUN."
+}

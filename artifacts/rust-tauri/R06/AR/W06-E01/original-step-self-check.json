@@ -1,0 +1,388 @@
+[
+  {
+    "id": "R06-T01-S01",
+    "expected": "从core/agent.ts及现役prompt测试提取系统约束、人格、工具目录、记忆、技能、资源、会话历史等实际组成，保留顺序与作用域。",
+    "actual": "共享配置解析已接材料采集；原24段顺序未改，原内核/采集回归核对。",
+    "evidence": [
+      "logs/regression.log",
+      "logs/regression-final.log",
+      "family-paths.txt"
+    ],
+    "status": "CONFIG_SHARE_SELF_CHECKED_ORIGINAL_FULL_OBLIGATION_RETAINED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T01-S02",
+    "expected": "建立ContextArtifact：每段有来源、可见范围、优先级、token预算与脱敏标记；最终请求直接由artifact渲染。",
+    "actual": "真正binary请求system和观测摘要一致；配置异常在构建前失败且wire为0。",
+    "evidence": [
+      "logs/regression.log",
+      "logs/regression-final.log",
+      "family-paths.txt"
+    ],
+    "status": "CONFIG_SHARE_SELF_CHECKED_ORIGINAL_FULL_OBLIGATION_RETAINED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T01-S03",
+    "expected": "静态提示前缀稳定，动态内容与工具目录按原规则载入；不可把全部工具说明重新塞回常驻提示词。",
+    "actual": "本轮未增加prompt段或工具声明；原预算回归运行；全部声明开销仍由F07裁决。",
+    "evidence": [
+      "logs/regression.log",
+      "logs/regression-final.log",
+      "family-paths.txt"
+    ],
+    "status": "CONFIG_SHARE_SELF_CHECKED_ORIGINAL_FULL_OBLIGATION_RETAINED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T01-S04",
+    "expected": "保留中英文及现役语言策略，子代理上下文按权限裁剪；源材料里的指令不提升为系统指令。",
+    "actual": "中英文、子代理裁剪原测试保留；本轮只纠正locale/name/yuan解析；完整历史/权限跨任务不签通过。",
+    "evidence": [
+      "logs/regression.log",
+      "logs/regression-final.log",
+      "family-paths.txt"
+    ],
+    "status": "CONFIG_SHARE_SELF_CHECKED_ORIGINAL_FULL_OBLIGATION_RETAINED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T01-S05",
+    "expected": "冻结迁移前后模板差异，只允许修复契约所必需的改动，并纳入行为评测。",
+    "actual": "差异仅配置误读与明确错误；原模板字节golden和预算断言保留。",
+    "evidence": [
+      "logs/regression.log",
+      "logs/regression-final.log",
+      "family-paths.txt"
+    ],
+    "status": "CONFIG_SHARE_SELF_CHECKED_ORIGINAL_FULL_OBLIGATION_RETAINED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T01-DELIVERY-1",
+    "expected": "ContextCompiler",
+    "actual": "现有产物不替换；配置修复候选及影响清单交付。完整任务交付独立判定不由本F06签署。",
+    "evidence": [
+      "owned-files.json",
+      "REPORT.md"
+    ],
+    "status": "RETAINED_NOT_FULL_ACCEPTED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T01-DELIVERY-2",
+    "expected": "ContextArtifact",
+    "actual": "现有产物不替换；配置修复候选及影响清单交付。完整任务交付独立判定不由本F06签署。",
+    "evidence": [
+      "owned-files.json",
+      "REPORT.md"
+    ],
+    "status": "RETAINED_NOT_FULL_ACCEPTED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T01-DELIVERY-3",
+    "expected": "提示词差异报告",
+    "actual": "现有产物不替换；配置修复候选及影响清单交付。完整任务交付独立判定不由本F06签署。",
+    "evidence": [
+      "owned-files.json",
+      "REPORT.md"
+    ],
+    "status": "RETAINED_NOT_FULL_ACCEPTED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-A01",
+    "expected": {
+      "name": "观测和实际请求同源",
+      "given": "构建含人格/记忆/技能/工具目录的任务",
+      "when": "比较发给模型的内容与观测展开",
+      "then": "除明示脱敏外一致，无另一套重建prompt",
+      "evidence": "请求和artifact摘要",
+      "environment": "本机隔离环境；外部协议使用确定性替身",
+      "status": "NOT_STARTED",
+      "id": "R06-A01",
+      "stage_id": "R06",
+      "task_id": "R06-T01",
+      "requirement": "REQUIRED",
+      "activation_condition": "本阶段范围内必须验证；环境不足为BLOCKED，不改写为通过。"
+    },
+    "actual": "关联原具名断言保留并回归；本F06仅配置份额，全部R00/实验原范围不因回归数量自动PASS。",
+    "evidence": [
+      "logs/regression.log",
+      "logs/regression-final.log",
+      "r00-full-original-obligations.json"
+    ],
+    "status": "REGRESSION_AND_SCOPE_RETAINED_NOT_INDEPENDENT_PASS",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-A02",
+    "expected": {
+      "name": "提示词长度不暗增",
+      "given": "相同Agent配置和工具集",
+      "when": "测量新旧静态提示及总上下文",
+      "then": "不超过冻结预算；新增冗余段使测试失败",
+      "evidence": "token与段来源对照",
+      "environment": "本机隔离环境；外部协议使用确定性替身",
+      "status": "NOT_STARTED",
+      "id": "R06-A02",
+      "stage_id": "R06",
+      "task_id": "R06-T01",
+      "requirement": "REQUIRED",
+      "activation_condition": "本阶段范围内必须验证；环境不足为BLOCKED，不改写为通过。"
+    },
+    "actual": "关联原具名断言保留并回归；本F06仅配置份额，全部R00/实验原范围不因回归数量自动PASS。",
+    "evidence": [
+      "logs/regression.log",
+      "logs/regression-final.log",
+      "r00-full-original-obligations.json"
+    ],
+    "status": "REGRESSION_AND_SCOPE_RETAINED_NOT_INDEPENDENT_PASS",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T06-S01",
+    "expected": "迁移现役记忆事实/摘要/信条/梦境等实际流程的数据访问与调度调用；业务状态和模型调用由Rust负责。",
+    "actual": "配置入口、compiled语言、experience flags和反馈错误传播已修；梦境业务/调度不扩展，原回归核对。",
+    "evidence": [
+      "logs/regression.log",
+      "logs/regression-final.log",
+      "family-paths.txt"
+    ],
+    "status": "CONFIG_SHARE_SELF_CHECKED_ORIGINAL_FULL_OBLIGATION_RETAINED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T06-S02",
+    "expected": "按Agent隔离记忆查询与写入；现役知识内容/外装技能材料均按来源和权限进入上下文。",
+    "actual": "原Agent隔离回归与构造绑定测试保留；配置不新增身份来源。",
+    "evidence": [
+      "logs/regression.log",
+      "logs/regression-final.log",
+      "family-paths.txt"
+    ],
+    "status": "CONFIG_SHARE_SELF_CHECKED_ORIGINAL_FULL_OBLIGATION_RETAINED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T06-S03",
+    "expected": "迁移Skills发现、安装/审核、启停、同步、技能包和人格文件加载，保留白名单、工作区边界与用户覆盖顺序。",
+    "actual": "enabled/workspace_disabled/workspace发现flags读取/保存统一；未知值语义保留，原override/readonly/安装回归。",
+    "evidence": [
+      "logs/regression.log",
+      "logs/regression-final.log",
+      "family-paths.txt"
+    ],
+    "status": "CONFIG_SHARE_SELF_CHECKED_ORIGINAL_FULL_OBLIGATION_RETAINED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T06-S04",
+    "expected": "Pi extensions实际使用的hooks逐项迁入Rust扩展ports或受控worker；不能让扩展重新调用旧Agent loop。",
+    "actual": "原hooks四项回归保留；本轮没有改变hook/worker调用链。",
+    "evidence": [
+      "logs/regression.log",
+      "logs/regression-final.log",
+      "family-paths.txt"
+    ],
+    "status": "CONFIG_SHARE_SELF_CHECKED_ORIGINAL_FULL_OBLIGATION_RETAINED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T06-S05",
+    "expected": "安全检查不是保证技能无恶意；执行脚本仍受R04授权和沙盒。",
+    "actual": "原安装层风险确认与R04工具层越界拒绝断言保留；没有变更授权或沙盒。",
+    "evidence": [
+      "logs/regression.log",
+      "logs/regression-final.log",
+      "family-paths.txt"
+    ],
+    "status": "CONFIG_SHARE_SELF_CHECKED_ORIGINAL_FULL_OBLIGATION_RETAINED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T06-DELIVERY-1",
+    "expected": "MemoryService",
+    "actual": "现有产物不替换；配置修复候选及影响清单交付。完整任务交付独立判定不由本F06签署。",
+    "evidence": [
+      "owned-files.json",
+      "REPORT.md"
+    ],
+    "status": "RETAINED_NOT_FULL_ACCEPTED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T06-DELIVERY-2",
+    "expected": "SkillService",
+    "actual": "现有产物不替换；配置修复候选及影响清单交付。完整任务交付独立判定不由本F06签署。",
+    "evidence": [
+      "owned-files.json",
+      "REPORT.md"
+    ],
+    "status": "RETAINED_NOT_FULL_ACCEPTED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-T06-DELIVERY-3",
+    "expected": "PI_REPLACEMENT_MATRIX更新",
+    "actual": "现有产物不替换；配置修复候选及影响清单交付。完整任务交付独立判定不由本F06签署。",
+    "evidence": [
+      "owned-files.json",
+      "REPORT.md"
+    ],
+    "status": "RETAINED_NOT_FULL_ACCEPTED",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-A11",
+    "expected": {
+      "name": "Agent记忆不串用",
+      "given": "AgentA/B有不同事实与权限",
+      "when": "分别询问及写入记忆",
+      "then": "只读取/修改所属范围，子代理不扩大可见性",
+      "evidence": "隔离测试",
+      "environment": "本机隔离环境；外部协议使用确定性替身",
+      "status": "NOT_STARTED",
+      "id": "R06-A11",
+      "stage_id": "R06",
+      "task_id": "R06-T06",
+      "requirement": "REQUIRED",
+      "activation_condition": "本阶段范围内必须验证；环境不足为BLOCKED，不改写为通过。"
+    },
+    "actual": "关联原具名断言保留并回归；本F06仅配置份额，全部R00/实验原范围不因回归数量自动PASS。",
+    "evidence": [
+      "logs/regression.log",
+      "logs/regression-final.log",
+      "r00-full-original-obligations.json"
+    ],
+    "status": "REGRESSION_AND_SCOPE_RETAINED_NOT_INDEPENDENT_PASS",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-A12",
+    "expected": {
+      "name": "技能审核和执行边界仍有效",
+      "given": "技能包含越权文件命令",
+      "when": "安装/启用后请求执行",
+      "then": "保持原审核行为且工具层仍拒绝越权",
+      "evidence": "安装与执行双层证据",
+      "environment": "本机隔离环境；外部协议使用确定性替身",
+      "status": "NOT_STARTED",
+      "id": "R06-A12",
+      "stage_id": "R06",
+      "task_id": "R06-T06",
+      "requirement": "REQUIRED",
+      "activation_condition": "本阶段范围内必须验证；环境不足为BLOCKED，不改写为通过。"
+    },
+    "actual": "关联原具名断言保留并回归；本F06仅配置份额，全部R00/实验原范围不因回归数量自动PASS。",
+    "evidence": [
+      "logs/regression.log",
+      "logs/regression-final.log",
+      "r00-full-original-obligations.json"
+    ],
+    "status": "REGRESSION_AND_SCOPE_RETAINED_NOT_INDEPENDENT_PASS",
+    "formal_evidence": [
+      "isolated-final-regression.json",
+      "isolated-final-dedicated-four-c.json"
+    ],
+    "full_original_obligation": "REQUIRED_RETAINED_NOT_BLANKET_PASS",
+    "independent_review": "NOT_RUN"
+  }
+]

@@ -1,0 +1,31 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r06_ar_f01_history.rs (rust/target/debug/deps/r06_ar_f01_history-369cc4500f952c90)
+LINGXI_TEST_GUARD: armed (pid 47646, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+{"case": "uncertain", "status": "FAIL", "checks": [], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/uncertain-F01-719c320d610ba5590138f2d5381e885a-evidence.json"}
+
+
+thread 'f01_unknown_outcome_actual_crash_wire_diagnostic' (3223143) panicked at crates/lingxi-service/tests/r06_ar_f01_history.rs:14:5:
+{"case": "uncertain", "status": "FAIL", "checks": [], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/uncertain-F01-719c320d610ba5590138f2d5381e885a-evidence.json"}
+
+Traceback (most recent call last):
+  File "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/rust/crates/lingxi-service/tests/fixtures/r06_ar_f01_probe.py", line 146, in <module>
+    globals()[CASE]();status='PASS'
+    ~~~~~~~~~~~~~~~^^
+  File "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/rust/crates/lingxi-service/tests/fixtures/r06_ar_f01_probe.py", line 109, in uncertain
+    assert counter.exists() and pidfile.exists(),('real side effect not reached',f.logs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('real side effect not reached', ['LINGXI_TEST_GUARD: armed (pid 47651, mem_limit=8192 MB, time_limit=600 s)\n', '2026-10-11T08:21:48.200924Z  WARN lingxi_service::runs: whole-batch admission refused this model tool turn (zero dispatch); the journal closes a never-dispatched failure run_id=run_000001a12a0dc61f_000001 [token] target="tool:first-party:exec_command"\n', '2026-10-11T08:21:48.201915Z  WARN lingxi_service::runs: run driver exited without a finalize; cancellation tree fired, registry entry removed, durable row left honest (R03-T07 owns recovery) run_id=run_000001a12a0dc61f_000001\n'])
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test f01_unknown_outcome_actual_crash_wire_diagnostic ... FAILED
+
+failures:
+
+failures:
+    f01_unknown_outcome_actual_crash_wire_diagnostic
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 7.66s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_f01_history`

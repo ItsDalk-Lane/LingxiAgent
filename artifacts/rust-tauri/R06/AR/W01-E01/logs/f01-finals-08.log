@@ -1,0 +1,39 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 19.62s
+     Running tests/r06_ar_f01_history.rs (rust/target/debug/deps/r06_ar_f01_history-369cc4500f952c90)
+LINGXI_TEST_GUARD: armed (pid 70503, mem_limit=8192 MB, time_limit=600 s)
+
+running 8 tests
+test f01_archive_child_append_race_and_reset_foreign_writer_controls ... ok
+{"case": "c01", "status": "PASS", "checks": ["C01 actual wire roles/order/current once/session isolation/UI no archive duplicates", "legacy plain user/assistant history restored without guessed run"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c01-F01-e69e39c327430e881c2cfc392dfda2ce-evidence.json"}
+
+test f01_c01_real_authenticated_history_and_isolation ... ok
+{"case": "c02", "status": "PASS", "checks": ["C02 real ancestor tool executed once; fork mutually exclusive nonce/restart/rewind old suffix absent", "fork archive survives real source delete without source Run FK"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c02-F01-a1add001435f22a9a76ca40c275ab375-evidence.json"}
+
+test f01_c02_fork_restart_retry_rewind_source_delete ... ok
+
+thread 'f01_child_inherits_authorized_material_only' (3650376) panicked at crates/lingxi-service/tests/r06_ar_f01_history.rs:424:10:
+called `Result::unwrap()` on an `Err` value: Storage(Corrupted { detail: "model_history: legacy_fork_source_unavailable: named model call lacks authoritative source; originals retained" })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test f01_child_inherits_authorized_material_only ... FAILED
+{"case": "uncertain", "status": "PASS", "checks": ["actual tool side effect +1/crash/recovery: old requestId refused; fresh accepted; explicit Unknown model diagnostic/no completion receipt/no old tool execution; parked process exited"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/uncertain-F01-81c498f78ed4bbef8164175fbfe01800-evidence.json"}
+
+{"case": "families", "status": "PASS", "checks": ["openai-completions actual wire chronological roles", "anthropic-messages actual wire chronological roles", "google-generative-ai actual wire chronological roles", "openai-responses actual wire chronological roles", "openai-codex-responses actual wire chronological roles"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/families-F01-9297458cdf80eb565eb81b4f51c60f09-evidence.json"}
+
+test f01_unknown_outcome_actual_crash_wire_diagnostic ... ok
+test f01_all_five_families_actual_wire_roles ... ok
+{"case": "c03", "status": "PASS", "checks": ["C03 real read raw complete/F08 projection only/restart IDs/no re-execution", "scope/source binding corruption rejected before provider request", "opaque exact restored; changed serving provider explicitly failed before wire", "raw-only legacy fork rejects before wire/keeps original raw/no re-execution", "plain legacy fork exact usage positive; unknown-source/cross-owner explicit rejection/no fallback/zero wire"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c03-F01-0d5dcbf8b57d07f24739e1f3c2d2ed7f-evidence.json"}
+
+test f01_c03_projected_tools_opaque_origins_corruption ... ok
+{"case": "c04", "status": "PASS", "checks": ["C04 multiple actual Runs trigger summary; version+retained suffix survive restart; all authoritative originals immutable", "summary failure no fake successful version/all prior originals survive restart", "real binary shutdown cancellation/no late fabricated model success/history preserved on restart"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c04-F01-112b883cbfca38cf2c5ed2159eca3c84-evidence.json"}
+
+test f01_c04_cross_run_compaction_failure_restart ... ok
+
+failures:
+
+failures:
+    f01_child_inherits_authorized_material_only
+
+test result: FAILED. 7 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.46s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_f01_history`

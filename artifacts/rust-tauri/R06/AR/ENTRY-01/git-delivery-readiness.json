@@ -1,0 +1,11 @@
+{
+  "status": "READ_ONLY_PERMISSION_CONFIRMED",
+  "repository": "ItsDalk-Lane/LingxiAgent",
+  "viewer_permission": "ADMIN",
+  "command": "gh repo view ItsDalk-Lane/LingxiAgent --json viewerPermission,nameWithOwner",
+  "exit_code": 0,
+  "authorization_scope": "本会话授权逐Task独立PASS后同分支精确commit/push；不扩大到发布/tag/main/外发",
+  "writes_performed": false,
+  "push_status": "NOT_RUN",
+  "note": "拥有仓库权限不等于新的用户授权；当前没有任何Task独立PASS，因此未提交推送。"
+}

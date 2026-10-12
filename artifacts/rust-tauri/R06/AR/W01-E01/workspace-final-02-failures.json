@@ -1,0 +1,45 @@
+{
+  "commandMetadata": "workspace-final-02.json",
+  "failures": [
+    {
+      "suite": "Running tests/admission_dedup_adversarial.rs (rust/target/debug/deps/admission_dedup_adversarial-4f7a8eb40d96c885)",
+      "test": "adv_c01_spawn_window_failure_and_retraction_leave_no_sticky_state"
+    },
+    {
+      "suite": "Running tests/admission_dedup_consistency.rs (rust/target/debug/deps/admission_dedup_consistency-d6c88a8ba7ad1aab)",
+      "test": "r03_f05_c01_background_spawn_rejection_leaves_no_ghost_replay"
+    },
+    {
+      "suite": "Running tests/cancel_link_inheritance.rs (rust/target/debug/deps/cancel_link_inheritance-dc11306063bc8d32)",
+      "test": "subagent_timeout_settles_a_parked_quota_wait"
+    },
+    {
+      "suite": "Running tests/cancellation_tree.rs (rust/target/debug/deps/cancellation_tree-251f973d1c23eaf9)",
+      "test": "panicking_tool_child_is_supervised_and_the_run_settles_loudly"
+    },
+    {
+      "suite": "Running tests/cancellation_tree.rs (rust/target/debug/deps/cancellation_tree-251f973d1c23eaf9)",
+      "test": "approval_wait_round_trips_approve_and_reject_legs"
+    },
+    {
+      "suite": "Running tests/late_result_fence.rs (rust/target/debug/deps/late_result_fence-b1ac2f3978f180b9)",
+      "test": "r03_a07_tool_result_with_stale_fence_records_unknown_and_audits"
+    },
+    {
+      "suite": "Running tests/r00_management_leaves.rs (rust/target/debug/deps/r00_management_leaves-5fe67d4482ebba7b)",
+      "test": "r00_management_positive_and_negative_branches_on_real_service"
+    },
+    {
+      "suite": "Running tests/r04_t01_tool_catalog.rs (rust/target/debug/deps/r04_t01_tool_catalog-fb54f839c6f2d93c)",
+      "test": "adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain"
+    },
+    {
+      "suite": "Running tests/r04_t07_mcp_and_workers.rs (rust/target/debug/deps/r04_t07_mcp_and_workers-d93bcc150753e7a1)",
+      "test": "r04_a13_full_chain_journals_unknown_and_a_new_decision_sees_the_real_count"
+    },
+    {
+      "suite": "Running tests/r04_t08_tool_matrix.rs (rust/target/debug/deps/r04_t08_tool_matrix-fbe8338708c434b9)",
+      "test": "outcome_semantics_and_receipts_unified"
+    }
+  ]
+}

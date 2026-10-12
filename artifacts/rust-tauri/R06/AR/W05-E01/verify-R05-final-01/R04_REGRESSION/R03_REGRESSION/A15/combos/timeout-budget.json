@@ -1,0 +1,12 @@
+{
+  "combo": "timeout-budget",
+  "counts": {
+    "final_reason": "failed.turn_budget_exceeded",
+    "final_status": "failed",
+    "model_calls": 3,
+    "runs": 1,
+    "terminal_events": 1,
+    "tool_calls": 0
+  },
+  "schema": "lingxi.r03-t08-combo-counts.v1"
+}

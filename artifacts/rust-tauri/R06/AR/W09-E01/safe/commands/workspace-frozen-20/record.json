@@ -1,0 +1,2550 @@
+{
+  "argv": [
+    "<LOCAL_USER>/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-j8",
+    "--workspace",
+    "--no-fail-fast",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "<W09_WORKSPACE>",
+  "toolchain": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "node": "v24.16.0",
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64",
+  "start": "2026-10-11T12:22:21.314543+00:00",
+  "end": "2026-10-11T12:40:59.449445+00:00",
+  "exit_code": 101,
+  "elapsed_seconds": 1117.5649935419933,
+  "inputs_stable": true,
+  "environment": {
+    "LINGXI_HOME": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/workspace-frozen-20/LOCAL_ONLY_NEVER_GIT/synthetic-home",
+    "CARGO_TARGET_DIR": "<W09_WORKSPACE>/rust/target-w09-e01",
+    "CARGO_BUILD_JOBS": "8",
+    "TEST_MEM_LIMIT_MB": "8192",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "LINGXI_TEST_GUARD": "1"
+  },
+  "rss_measured_mib": null,
+  "outer_budget_seconds": null,
+  "actual_parent_wait_reaped": null,
+  "process_group_residue": null,
+  "outer_timeout": null,
+  "executed_binaries": [
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/lingxi_adapters-08891693a21d73df",
+      "sha256": "9993b38f2c6873c4ce5c52c6767f944369b4b393a400d732b241a731f5811428",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "c32ae9355eeabb03469bc4fb5cf85d41cfc2f0d9f9354b7dcbc7d29e40b0eee0",
+      "inventory_after_sha256": "9993b38f2c6873c4ce5c52c6767f944369b4b393a400d732b241a731f5811428",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/lingxi_storage_inspect-149a8da8222fc3ff",
+      "sha256": "d067ac206df8e0fdff93604570d69b3b856bbf402690badf6717cc3888cb4087",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "8d7dd9afe5db675f354cda4aa9b1d1f7ff248c0d2bf14b59beb0f4c774398990",
+      "inventory_after_sha256": "d067ac206df8e0fdff93604570d69b3b856bbf402690badf6717cc3888cb4087",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/active_run_listing-59231531a918859c",
+      "sha256": "9392cb88d1714df5f63a58b266b692d87c6bc9b3e2ecfc023e8bb280fd3e596a",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "a3683384c7a36f2ffaa616ffba43354530e1d487aa4b67199d66049dc0c0b15b",
+      "inventory_after_sha256": "9392cb88d1714df5f63a58b266b692d87c6bc9b3e2ecfc023e8bb280fd3e596a",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/agent_memory_r06t06-9df8c9f4b0ff7a47",
+      "sha256": "97d5b7a74b2141468440568955fc153efe4cdc8a09872d346481590cfe2bea0a",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "99fc0bc1791042528c1bbd377d009fb0bf9b613c8cbbe6d67e178ff9a60f0dad",
+      "inventory_after_sha256": "97d5b7a74b2141468440568955fc153efe4cdc8a09872d346481590cfe2bea0a",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/backup_faults-2805ba97150d8c69",
+      "sha256": "5a373d148f507586e4b197e12be459834197464ee17ffd0cf966dd893897cb81",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "396117d6c85f2a988a4534f6358bcd797a21eb3dc12f0d48b30450f512dba5af",
+      "inventory_after_sha256": "5a373d148f507586e4b197e12be459834197464ee17ffd0cf966dd893897cb81",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/backup_restore-d2dcc141d6e2a4ed",
+      "sha256": "b90eac46dffd27530762edf9c7116d3bd2ed99ef88dbb8c1013a277e262dba1c",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "044cfd9cc13dd9f1baa0a4e4d93918f63b3e4c32b0f143dba4b85bac3ad77006",
+      "inventory_after_sha256": "b90eac46dffd27530762edf9c7116d3bd2ed99ef88dbb8c1013a277e262dba1c",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/canonical_message_store-7e71bf9dc10a5589",
+      "sha256": "1ebacc69b4ca8f2dbbe2716fea4a34681cbfd356950d8d5eff7777737a177715",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "f7e8f8ca64da404e45f6a2773180bd999d5be84fd683a1fb76c2092406a7e124",
+      "inventory_after_sha256": "1ebacc69b4ca8f2dbbe2716fea4a34681cbfd356950d8d5eff7777737a177715",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/disk_full_fault-adfa2c7b7f3eda14",
+      "sha256": "742219c7513ab417bba37d0f1921f2e72f26f70da23513469acb793a85bbb5d1",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "eb2ac97e5a93bb506e8833f01fc2a1286ed4efebfba3fc1531f29187aae64628",
+      "inventory_after_sha256": "742219c7513ab417bba37d0f1921f2e72f26f70da23513469acb793a85bbb5d1",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/event_store_reads-c95a0013547fbf9c",
+      "sha256": "ad789c9664a0c1949cfac2a60e4af2f134b50720d78da12a6e49beda9eb58d75",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "46577d64087d521d4eacc2cbecf66d8aadff8010c7ac38eef23b256e8f682468",
+      "inventory_after_sha256": "ad789c9664a0c1949cfac2a60e4af2f134b50720d78da12a6e49beda9eb58d75",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/invocation_journal_store-eba14770e7929475",
+      "sha256": "3202eb9715b478c5a595dc767cfd3123ea57ac208ece61d58db1ac8587c7ef19",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "645dc6c10c703ae4e44da0c67e915a4fd895ec607906b1d5089cb0d3ab69a94e",
+      "inventory_after_sha256": "3202eb9715b478c5a595dc767cfd3123ea57ac208ece61d58db1ac8587c7ef19",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/knowledge_store_r06t07-f4ecebe485202202",
+      "sha256": "170fd059c4661ed927b5590b95e581740e9a6822a4c3a561311ecbabd3de65af",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "727da4cb31a9dc6aec7669e080ff9faa1fdf2ec656c6f603e0ffa477d3886d86",
+      "inventory_after_sha256": "170fd059c4661ed927b5590b95e581740e9a6822a4c3a561311ecbabd3de65af",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/late_result_fencing_property-bfe66acf3ae304e1",
+      "sha256": "87d4d1f720ff4b824642214fed081c11b38efc3a880a3a3ddf044eb61c1ebc1e",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "343859c89183603cb7a40d265f91ea6cec92e6865d54c1cd4be7e1dd53e3af5e",
+      "inventory_after_sha256": "87d4d1f720ff4b824642214fed081c11b38efc3a880a3a3ddf044eb61c1ebc1e",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/migration_idempotency-e942ea6511b62d19",
+      "sha256": "e3390e7130a6168ba7d7bdcc071428c8140b0e9c83877646f6e7307f33c80f4a",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "83c5aa1c2a6bd97f1a7f7a32a9cb560916244975bd37acd74e037b94ac7124a5",
+      "inventory_after_sha256": "e3390e7130a6168ba7d7bdcc071428c8140b0e9c83877646f6e7307f33c80f4a",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t02_oauth_flows-027c944d79a3722b",
+      "sha256": "a4ce4cbbca1a9f5722539bbe7b1d39c5628b3d52862c82864c9ecffc587e2b71",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "37d5a02d24067c50241734f492f2c3794793a3741156f31cc713a06738df7f61",
+      "inventory_after_sha256": "a4ce4cbbca1a9f5722539bbe7b1d39c5628b3d52862c82864c9ecffc587e2b71",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t03_goldens-38f4851e02d86b05",
+      "sha256": "5ad91b61d1a021b0dd0d802d25ac446137fb87edf30dd6cff36945dc650db461",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "2cbb7c362ccdd661b8e848bbff95b8989a59d7208dce251a653046129457c1cd",
+      "inventory_after_sha256": "5ad91b61d1a021b0dd0d802d25ac446137fb87edf30dd6cff36945dc650db461",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t03_rr1_replay-48e973613ec69c40",
+      "sha256": "5c153e2723da107c54a24d14cf859108b4b6271d24bc9e5981ccf7cbcaeae36f",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "cf6708fe809b3172311e5662e0f70e47efb410134c57da6b8999370afb7c425c",
+      "inventory_after_sha256": "5c153e2723da107c54a24d14cf859108b4b6271d24bc9e5981ccf7cbcaeae36f",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t04_rr1_batch_terminal-afa86a77023e29f7",
+      "sha256": "1759881a30085c5e8a7a3db9c8979058cb2f757e25a31e8eeb7035704a54fefc",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "b2bcf23eeb0dae23f5d2cab46abfa88440f7ae27430720def81efc04b2b7041d",
+      "inventory_after_sha256": "1759881a30085c5e8a7a3db9c8979058cb2f757e25a31e8eeb7035704a54fefc",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t04_streaming-ec339850fc73b3ca",
+      "sha256": "15ea54b8342d3006b40f44433bd653529724861c1d87ac5187565094dd0a47c5",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "ce01501d33817953a43c074e6ad55194760b60748e3c9092cfb848118581b566",
+      "inventory_after_sha256": "15ea54b8342d3006b40f44433bd653529724861c1d87ac5187565094dd0a47c5",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t05_compat-2309aea4d92b8029",
+      "sha256": "fac1709ff1de0e14f97ddcc99a1866ca81c5bd1c505e4831bf3e7872a9dd3813",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "727ac86244ba7e66b255b76aa72a46d119c416fa1db8d42e27a9aea0213c3126",
+      "inventory_after_sha256": "fac1709ff1de0e14f97ddcc99a1866ca81c5bd1c505e4831bf3e7872a9dd3813",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t05_timeouts-a8809dc8404f2ea2",
+      "sha256": "bb4d9ec08c6a3c2b639110e444297649a6e32d8404973621bf3495911833c5a5",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "c07bef59ba94918600bd5fe60c25a7d18e38e776b3c42cdd9f6a7f7ada63872b",
+      "inventory_after_sha256": "bb4d9ec08c6a3c2b639110e444297649a6e32d8404973621bf3495911833c5a5",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t06_operations-5a78c1b4cfff1faa",
+      "sha256": "3d67db760f1aebe1d58deb211c1929fc74c5e1f99185a72bdd4d38ef17f1ff52",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "4a3532653afd7bb2c4ad95b0da62df2da4578279f1da423bb06067f41be74f31",
+      "inventory_after_sha256": "3d67db760f1aebe1d58deb211c1929fc74c5e1f99185a72bdd4d38ef17f1ff52",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t07_rr1_usage_strict-367ab53b41085754",
+      "sha256": "94d57cee13dd490c24b0e41a37096bb5f6a8aaca290a00b01499bd50d5e9e711",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "99bf4189d2cf306444a458e03879e33b6b39766b799265a16a827a9fe5036c19",
+      "inventory_after_sha256": "94d57cee13dd490c24b0e41a37096bb5f6a8aaca290a00b01499bd50d5e9e711",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t07_usage_families-681f08ccb55f87cc",
+      "sha256": "af47c7700e18199d496a8e41979d04b5ddb7f035127ce094c3f7aca340c74214",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "56a05ce10f36e98cb8d8820521260e166f9e2adf220f1f4abf28e4eb077583c9",
+      "inventory_after_sha256": "af47c7700e18199d496a8e41979d04b5ddb7f035127ce094c3f7aca340c74214",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_ar_w09_vector_integrity-bdf8926f2a91bf49",
+      "sha256": "2b4d1e5b9d4aae9b5d99ab04a18cd4a2c2521eb55509a33120d4da6eaff1458c",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "28171a2ca3216a216b8a5e40c9c44aa7065f7cc815c84180ccaeeed64b7d6625",
+      "inventory_after_sha256": "2b4d1e5b9d4aae9b5d99ab04a18cd4a2c2521eb55509a33120d4da6eaff1458c",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t02_compaction_render-29d0c1a374ab3565",
+      "sha256": "57ec9305f135d0f814dadb5c30de78cf47e37c77317ee74969e9461db4d50a29",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "f0eb6e6528bf1bec6ee8760b1a106063fec6ebeb5d9cbd5902a678d51599749d",
+      "inventory_after_sha256": "57ec9305f135d0f814dadb5c30de78cf47e37c77317ee74969e9461db4d50a29",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/run_finalize_property-d25aa231ffb49448",
+      "sha256": "d39a33a9a13d6d0692f28d5f9e5b1f34ec3ce3c62286519bc79031ae4cb1dbb1",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "573e9f911e77c88c5a7ff0e33d8e6219869a478f110463862b2a69d377770907",
+      "inventory_after_sha256": "d39a33a9a13d6d0692f28d5f9e5b1f34ec3ce3c62286519bc79031ae4cb1dbb1",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/run_id_allocator-4557579b1171d252",
+      "sha256": "c845545b6de7dbcba9ecc489fa0616babd7c9d3fecc27c0d620b3ecc57939e12",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "b0cc679aad50e81ef4020417704d765d58392399b1a47e34f159f343910373e2",
+      "inventory_after_sha256": "c845545b6de7dbcba9ecc489fa0616babd7c9d3fecc27c0d620b3ecc57939e12",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/run_lineage_store-3912e8ae838df482",
+      "sha256": "68e16e35a33f52ef4743767fba313e1e0b283f46813da7f50c00be5ef650ff6f",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "aaba60ed0267c4f264391d1a9a3c40de0be1796f02b197915c9407e4f6347f81",
+      "inventory_after_sha256": "68e16e35a33f52ef4743767fba313e1e0b283f46813da7f50c00be5ef650ff6f",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/session_file_store-1cab4ae4c3af0fdd",
+      "sha256": "405e18c19ecf8be110057e70c08b338baaa1ec6fad423851ee0d466f72ea0e2e",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "33874a3320a774ff487d6a1cfe1185d3da72fb93d5067dab1066118bd56811fe",
+      "inventory_after_sha256": "405e18c19ecf8be110057e70c08b338baaa1ec6fad423851ee0d466f72ea0e2e",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/session_tree_r06t03-ab890dff2dfe6977",
+      "sha256": "10a6708a79aa9dd0780d8aa2bcfa35b669502e2bde1780036ed570bb0c1ccecd",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "564fd700ec37862eeac5f8216916ba8de4d4e5c313e421d8dda58b95abc250cc",
+      "inventory_after_sha256": "10a6708a79aa9dd0780d8aa2bcfa35b669502e2bde1780036ed570bb0c1ccecd",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/storage_transactions-64370c114e95eea8",
+      "sha256": "679a963079af042922cf70ef3d59ce3d45447b3c796273263a127616607ed8a9",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "cb4d43249d441668bf7ace69a87273e10c4c199f5fd25dbbfb1e41a546f67d9c",
+      "inventory_after_sha256": "679a963079af042922cf70ef3d59ce3d45447b3c796273263a127616607ed8a9",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/lingxi_browser_spike-21922237f585d80e",
+      "sha256": "f68b488d4b68de14624407587dc5f9a521181d85e4dde4174f96bb2ff876b2b3",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "f68b488d4b68de14624407587dc5f9a521181d85e4dde4174f96bb2ff876b2b3",
+      "inventory_after_sha256": "f68b488d4b68de14624407587dc5f9a521181d85e4dde4174f96bb2ff876b2b3",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/spike_browser-1f2d989b467b70df",
+      "sha256": "3d674bc3454c1d020f303c46beda7dd1efccf2bda75447d9f96db41db0d04da5",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "3d674bc3454c1d020f303c46beda7dd1efccf2bda75447d9f96db41db0d04da5",
+      "inventory_after_sha256": "3d674bc3454c1d020f303c46beda7dd1efccf2bda75447d9f96db41db0d04da5",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/spike_pdf-0c6f4c9632f9866a",
+      "sha256": "50e29311ac1bc41604d197371aee40aad10e629fd864ef69f7c4b3c9ce8fb72b",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "50e29311ac1bc41604d197371aee40aad10e629fd864ef69f7c4b3c9ce8fb72b",
+      "inventory_after_sha256": "50e29311ac1bc41604d197371aee40aad10e629fd864ef69f7c4b3c9ce8fb72b",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/lingxi_kernel-094bb4151f357e00",
+      "sha256": "11c70ecd2ec97dbaab0aff971d66b6a8492ec39a33565a3453b81503b61c6a4f",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "11c70ecd2ec97dbaab0aff971d66b6a8492ec39a33565a3453b81503b61c6a4f",
+      "inventory_after_sha256": "11c70ecd2ec97dbaab0aff971d66b6a8492ec39a33565a3453b81503b61c6a4f",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t01_context_compiler-489c582c010312fe",
+      "sha256": "8881eb17a81703ce09f278cadb28ee7248cf63c5a3188d4a1de76454d504f329",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "8881eb17a81703ce09f278cadb28ee7248cf63c5a3188d4a1de76454d504f329",
+      "inventory_after_sha256": "8881eb17a81703ce09f278cadb28ee7248cf63c5a3188d4a1de76454d504f329",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t02_compaction-2a93e01aa5acb098",
+      "sha256": "97e87fc5329782a43118d521cee8e893f132561f0a37165c44d5905d47b49d6b",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "97e87fc5329782a43118d521cee8e893f132561f0a37165c44d5905d47b49d6b",
+      "inventory_after_sha256": "97e87fc5329782a43118d521cee8e893f132561f0a37165c44d5905d47b49d6b",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/lingxi_protocol-9b84322372dbbbf5",
+      "sha256": "de958c298c239f9be9b3f61fcc4e3c26bf98f948ef61a62b678b64561da27c1f",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "de958c298c239f9be9b3f61fcc4e3c26bf98f948ef61a62b678b64561da27c1f",
+      "inventory_after_sha256": "de958c298c239f9be9b3f61fcc4e3c26bf98f948ef61a62b678b64561da27c1f",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/lingxi_proto_server-f24b68a96075a29e",
+      "sha256": "0fbc872ab4e3a3e8a430768989651c012990e9e5c2d97d9996ed26c012fe6433",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "0fbc872ab4e3a3e8a430768989651c012990e9e5c2d97d9996ed26c012fe6433",
+      "inventory_after_sha256": "0fbc872ab4e3a3e8a430768989651c012990e9e5c2d97d9996ed26c012fe6433",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/lingxi_protocol_gen-3aa0bf84ca2e8c94",
+      "sha256": "293238e8966e43ad71261eec07afc7d48703849fdb4182610b7a75be60699e6b",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "293238e8966e43ad71261eec07afc7d48703849fdb4182610b7a75be60699e6b",
+      "inventory_after_sha256": "293238e8966e43ad71261eec07afc7d48703849fdb4182610b7a75be60699e6b",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/lingxi_protocol_verify-4046271e9c8e85d9",
+      "sha256": "19e2f864654084ee2f68582f4728612644dc12455383749242aa4c8ebf8945c6",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "19e2f864654084ee2f68582f4728612644dc12455383749242aa4c8ebf8945c6",
+      "inventory_after_sha256": "19e2f864654084ee2f68582f4728612644dc12455383749242aa4c8ebf8945c6",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/lingxi_service-fed47d112dfd427c",
+      "sha256": "7bcfa8c1395bc3c06aad66e58d3461a8e027d692ad60ac4dfeee800d4091a072",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "530b07f1eab09e1c6b0a7d2db0457de025b544fe35b2c94511d6ec1f6bb467a6",
+      "inventory_after_sha256": "7bcfa8c1395bc3c06aad66e58d3461a8e027d692ad60ac4dfeee800d4091a072",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/lingxi_service-c1b7a7820dfd6051",
+      "sha256": "7425a7d95e4c979dcd1a1f993b36ed7fb69a31483503bec150242896b4a9afef",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "a0e049aa044d639b0d7d52e6cc106b5c585d7d4ebfd199fe54ee686cc864c7fe",
+      "inventory_after_sha256": "7425a7d95e4c979dcd1a1f993b36ed7fb69a31483503bec150242896b4a9afef",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_t07_fixture-b19e3c07924144f6",
+      "sha256": "72e1a2708b46975e5a5ff3a882a7cf9323b7e3317183791e3d71c8a86e9eda41",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "865cae8fbd3019c61ae74dc543f9c113514aba01923be44f6b041d8cc6f803fc",
+      "inventory_after_sha256": "72e1a2708b46975e5a5ff3a882a7cf9323b7e3317183791e3d71c8a86e9eda41",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/admission_dedup_adversarial-65b0b2c6c62f884b",
+      "sha256": "200efb94232cf4d8238ffe515ed98369ba95384667df50a6e087bebaded163ce",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "819ef91c399aef20bdf2098a0c98a6f96acfd77d198dabbd058e43b6bdf871e2",
+      "inventory_after_sha256": "200efb94232cf4d8238ffe515ed98369ba95384667df50a6e087bebaded163ce",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/admission_dedup_consistency-a877aefb04b73fdb",
+      "sha256": "341165786bb25fa8e7e3a943a9b14c57bc42180c165cdfa792c0456009cc4e2d",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "15f5d688ccbaffa519d8030bc2f95adf2f6598edb2828621d21ccb92efd69e4f",
+      "inventory_after_sha256": "341165786bb25fa8e7e3a943a9b14c57bc42180c165cdfa792c0456009cc4e2d",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/auth_matrix-d09f49dea52f525f",
+      "sha256": "1f32c645978f4460c21a6a789ac05027e51e6efc48e11bd790bb20750b87315a",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "0818d608db3b6fffc997a12b86f7b443e754594251c333f46dfcf907ffc6d9e0",
+      "inventory_after_sha256": "1f32c645978f4460c21a6a789ac05027e51e6efc48e11bd790bb20750b87315a",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/background_disconnect_recovery-3f4b0a43cef46a79",
+      "sha256": "c48238a308325f5260548163a7da873198f36798bc6b9795d6de3d0b569a517a",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "a9c053112fc50199480fa0b6052d62ac358a24ac3b385aad7ea1eb6a1c0d1678",
+      "inventory_after_sha256": "c48238a308325f5260548163a7da873198f36798bc6b9795d6de3d0b569a517a",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/background_steering-dc7408cd519ed822",
+      "sha256": "b3eb977f50e6be657fae244d3d993b730451e7ac3cb88ee18faaed88df4d9890",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "42fef46594f8b7b463e403b6c365ddccd1b7fea9317631b4fc0dfecc53ef70e7",
+      "inventory_after_sha256": "b3eb977f50e6be657fae244d3d993b730451e7ac3cb88ee18faaed88df4d9890",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/cancel_link_inheritance-e5f5d953d20e1991",
+      "sha256": "a09b04b0bae49d1c16bbc1fc5a36938988a312557a502b84b8b54ade9bb4ef0b",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "4d9a334a8c1610c376de7360c70b034da8497400229cee7402498c8480605ed9",
+      "inventory_after_sha256": "a09b04b0bae49d1c16bbc1fc5a36938988a312557a502b84b8b54ade9bb4ef0b",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/cancel_terminal_race-d2a0803b53ca4a12",
+      "sha256": "b03dbdc120555dce4d722ccd4ec7c72802473964b007615040bd123b05145b52",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "770f99a841643282aca4bf564dca89618a771cf6d14eef86c3d92d730bd14c11",
+      "inventory_after_sha256": "b03dbdc120555dce4d722ccd4ec7c72802473964b007615040bd123b05145b52",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/cancellation_tree-b3a582b4ff422c09",
+      "sha256": "de39b13c8d41f13583bc27e52c2d83a4339feb50d92bdadb1e292422a2f5aa5b",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "432e61e2447ef74f9a69f5809692ec74ea9a35768ac8f4e9d9ceb6b6fa9fedf4",
+      "inventory_after_sha256": "de39b13c8d41f13583bc27e52c2d83a4339feb50d92bdadb1e292422a2f5aa5b",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/config_bounds-238f8b55c2ebe01d",
+      "sha256": "714dc11d3a1be4f3d04b1d38eb9748c0d9e7a2f744e32876437728e53dbc7644",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "fda2d31a8a261c4f9a56d691593768bea223f93c33a5bc8f5b10382b5669b4fa",
+      "inventory_after_sha256": "714dc11d3a1be4f3d04b1d38eb9748c0d9e7a2f744e32876437728e53dbc7644",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/event_subscription-a033e791aef2173b",
+      "sha256": "0d0164bd5465e55f028d2e6741b05f0ace739fd99c392070e61b6c066299250e",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "9ccce3462b5531150ffb17b59fbd7504c6f8deef3e3d1dd50b00e64d1d199702",
+      "inventory_after_sha256": "0d0164bd5465e55f028d2e6741b05f0ace739fd99c392070e61b6c066299250e",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/execute_concurrency-ecaca029cdbf8c91",
+      "sha256": "535ef89383a9106dfd2073a8cd52581f65ba9074192b8daccfb370fc01805e12",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "c1d1f0fc5f83e84543e33ca8bed67f3d1269d9085d746b75be9b1a94e729d7f7",
+      "inventory_after_sha256": "535ef89383a9106dfd2073a8cd52581f65ba9074192b8daccfb370fc01805e12",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/exit_race_rejections-215eca14cff0bbc5",
+      "sha256": "483590253ba6307fb86c96882fceac2cdf0eab6e15556ceb02f955af2fd8605c",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "80a4da37d31cab5fe5d5ae164aa73dcfd9d4b770ecaa8a7bcb0983053dfedb5e",
+      "inventory_after_sha256": "483590253ba6307fb86c96882fceac2cdf0eab6e15556ceb02f955af2fd8605c",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/input_budget_refusal-0ec4f68a2273fa19",
+      "sha256": "afc370eaa540fa380ab56144f087f4fb3e1a0f232d26781c345c5b81d7053dbd",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "fb7e2c72668799d8c085efbeed6ec13ae37fa3332a800365e77aa0387726a182",
+      "inventory_after_sha256": "afc370eaa540fa380ab56144f087f4fb3e1a0f232d26781c345c5b81d7053dbd",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/input_payload_fidelity-ba831ba8fc97c770",
+      "sha256": "161faca1f75eb1c4fc6d8aed1b8817ee8ea1b07f275ff7b570897a30564cb161",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "593ca79a264431935c2a431637cf9005ac49764b54a6677a9ee0ae9e58d37901",
+      "inventory_after_sha256": "161faca1f75eb1c4fc6d8aed1b8817ee8ea1b07f275ff7b570897a30564cb161",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/instance_lifecycle-dce62daa804b6162",
+      "sha256": "586427e16093ce4d24d785cfbf67e4b6ba96551b8de74994179f7c3a91d15135",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "3e2ef944c374760c4faeedebf1d96fda486c9a5a65cac399d7eac52e371860c8",
+      "inventory_after_sha256": "586427e16093ce4d24d785cfbf67e4b6ba96551b8de74994179f7c3a91d15135",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/invocation_journal-ecc90d063471817d",
+      "sha256": "1cb36784f749807048253562efaa2d1bc382291950ebcfed5e4868f6da75680d",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "60813a70da01a2f3bf31d998b4d03f2896bb81e2c225b24b81c86c1765513f33",
+      "inventory_after_sha256": "1cb36784f749807048253562efaa2d1bc382291950ebcfed5e4868f6da75680d",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/late_result_fence-cf6692bd7e13ab35",
+      "sha256": "90779b3b6e13242eb5d1818cce7c1bf655ec193255bec10f33da311e93adca41",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "1c7a1a81504a6320518a825bd3c7002e99dce7cb2b6e7dfd13bd608cdf3a6227",
+      "inventory_after_sha256": "90779b3b6e13242eb5d1818cce7c1bf655ec193255bec10f33da311e93adca41",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r00_management_leaves-f24ef2551ec864d8",
+      "sha256": "9c00ef3a63d837428dfeee0dfc98cb43c8ab05c9505e3132d2b379a7479885ff",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "37acbbd8661b4ee0b93b291de8632a2d76e9a98c80e17b7eaa3f8ee8b6dba194",
+      "inventory_after_sha256": "9c00ef3a63d837428dfeee0dfc98cb43c8ab05c9505e3132d2b379a7479885ff",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r00_static_web_leaves-ecb49608edf68f3f",
+      "sha256": "450e88464f3e6cc932d7fa969090e374fe4cf2d0fbc1a243d8fbebcc0a47b941",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "e5be0e72df2f76f65bf19de6f10811c95bb8b66704a4a5a2630e79aa9df66b10",
+      "inventory_after_sha256": "450e88464f3e6cc932d7fa969090e374fe4cf2d0fbc1a243d8fbebcc0a47b941",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r03_t08_acceptance_matrix-ec6a1a77c2e7c47c",
+      "sha256": "53c68291a60beed73212c526e6d446e9fbabcb51869dba73629778267cc0efcc",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "04097dc2a9cc85a08862d5ea08e95a8b16483ab5d0bfa3093946204c3926af31",
+      "inventory_after_sha256": "53c68291a60beed73212c526e6d446e9fbabcb51869dba73629778267cc0efcc",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_rr1_f02_reaper_cleanup-f7cf02f7e3b0e592",
+      "sha256": "fc6d86dbbadb2c708df0d6e25575170011e52c165ea481776d2bd34bf549b9c1",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "36ba47b571de568315b347164ac3d313e2160b1d965cc9573572e456840661c3",
+      "inventory_after_sha256": "fc6d86dbbadb2c708df0d6e25575170011e52c165ea481776d2bd34bf549b9c1",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_rr1_f03_stop_honesty-ab214e5da2bc6286",
+      "sha256": "3de38a755c95375fcb72cccc38b32c53f0ac003597f20bb772289e49284ec891",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "9e3864fd88f8299d8f214f80b7f0082de2b2413a5fc440698f91418246e6bd42",
+      "inventory_after_sha256": "3de38a755c95375fcb72cccc38b32c53f0ac003597f20bb772289e49284ec891",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_rr1_f04_pty_consumption-542bf0220c913fee",
+      "sha256": "f8536038bc763b4c55101ed5578f74bd2e13082fb5f4f5495f3914dfafc2bde0",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "a12e4e6db96efca1ebf3c0123b6e7304d2293d1d909d93bf1ac56182ae083f21",
+      "inventory_after_sha256": "f8536038bc763b4c55101ed5578f74bd2e13082fb5f4f5495f3914dfafc2bde0",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_rr1_f05_output_integrity-1f2b466aacdbba79",
+      "sha256": "ebb0bb632dc449f0b6fdd27547cd21151788a25326c5a0229684c73a7636cca6",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "fc7b5d3103de7e8309e6b86afa6dd6aeb6cfd13c2bc3a11c27f7eb302dee23b2",
+      "inventory_after_sha256": "ebb0bb632dc449f0b6fdd27547cd21151788a25326c5a0229684c73a7636cca6",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_rr1_f05_spill_failure-8f07b6c17982f210",
+      "sha256": "dd8413b2b96844047e83fb3006e2805aa79d3c28e8da025f16aa6b047fbd373e",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "9f5b1510498fd0ca60bf7010da2484e2d3e90f5d3cd73df8728c30e80ddbdb12",
+      "inventory_after_sha256": "dd8413b2b96844047e83fb3006e2805aa79d3c28e8da025f16aa6b047fbd373e",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_t01_tool_catalog-186ce68fb25a6528",
+      "sha256": "00e0e1d9b41a8085c1a6d4e8b3b9561b3bb925dcb6746f2ff81afb06e5419e09",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "8e7769f471ae00fe18464b68d05fa633d5fe84fd03ae0fbf4fdb75b3e29cf28e",
+      "inventory_after_sha256": "00e0e1d9b41a8085c1a6d4e8b3b9561b3bb925dcb6746f2ff81afb06e5419e09",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_t02_tool_gateway-61350d8b5de56531",
+      "sha256": "c5440e2fd3c71362135641c405f23be4b177e5ff13810ab8947b17bb37c950fe",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "f3e5d7f9e6626fd03cb9f6c7ee96510357ebbfa8b561d1b1fcc3aba84c80f387",
+      "inventory_after_sha256": "c5440e2fd3c71362135641c405f23be4b177e5ff13810ab8947b17bb37c950fe",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_t03_approval_service-5a0df677f7a6b507",
+      "sha256": "11d32b8a3d0f2f140916cea07ce15c0ad2625fc5ecaf4c2a95134d8216ae2837",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "fbb4133a89ebbd8b6642c93ddf7f4c439d03c1f3396b592b535976bcb18b36ae",
+      "inventory_after_sha256": "11d32b8a3d0f2f140916cea07ce15c0ad2625fc5ecaf4c2a95134d8216ae2837",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_t04_file_tools-be948adc85b9c4c0",
+      "sha256": "8746b9125305168eebbb8050adb5df89d5074de3d08ccab965155729f54f618c",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "f2532f8c1d68c6c865d7c896b5554aaacd554eaad7d4d55876f18fb5ef9809bd",
+      "inventory_after_sha256": "8746b9125305168eebbb8050adb5df89d5074de3d08ccab965155729f54f618c",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_t05_process_tools-6e8f250ea3186c06",
+      "sha256": "690951b973509dc94acead7783661bc08ac33c9faeb7200a07d41e14eacf5df2",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "3b677fc1f6c1c0f845145348da9ad41b19ab637a97cdf85f81aaa041452c3814",
+      "inventory_after_sha256": "690951b973509dc94acead7783661bc08ac33c9faeb7200a07d41e14eacf5df2",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_t05_registry_capacity-ee8958560a6f40eb",
+      "sha256": "3e818a41c3077585d0ca0d27b99a1be665d436ead07658d655bc287dc88cefeb",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "75fdbb304d65115168a17e8b427c85bdfe61e3dbbfd8143273a68e27933d6b33",
+      "inventory_after_sha256": "3e818a41c3077585d0ca0d27b99a1be665d436ead07658d655bc287dc88cefeb",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_t06_sandbox-3bfa8b39a3542f98",
+      "sha256": "8e9fe6f7a46a6c0ea3dae03da64daabb8b0b175b0c6fcc167516dd1ddbed7ec4",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "8fe70945f3910f34b1d9d4ef8b2f82e195e0f23726d04ada587d29bb1ad29eee",
+      "inventory_after_sha256": "8e9fe6f7a46a6c0ea3dae03da64daabb8b0b175b0c6fcc167516dd1ddbed7ec4",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_t07_mcp_and_workers-e70c8519f1b8e6a4",
+      "sha256": "99aaedc1c2b4443a885bb6aac3a889489d5bb45f37e94ece346cf8add60ff83e",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "27c79a5543a1103673e214db0a5fd3772ed0ddd70d0fcdd1aebd572a539ebff6",
+      "inventory_after_sha256": "99aaedc1c2b4443a885bb6aac3a889489d5bb45f37e94ece346cf8add60ff83e",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r04_t08_tool_matrix-fe64cab26649e9e8",
+      "sha256": "3ccd1b803647c4895299342b51ea83ba74e0e2665973e55cf118f8a8cf9964db",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "40b2fa900519bd4060019e65c55d57b226f5e7685f4bb6dc522470e28a56723b",
+      "inventory_after_sha256": "3ccd1b803647c4895299342b51ea83ba74e0e2665973e55cf118f8a8cf9964db",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t01_binary_wiring-7cd5c9ca2ecff78c",
+      "sha256": "6354b08ab186abbf5b2b7230280f4035f769deac56fcc0270ba8bfa401e6ea76",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "fdc4aed2d9028c27c99c87852fd3ecb91ab3db783ebf8dec58a72344a5b0c339",
+      "inventory_after_sha256": "6354b08ab186abbf5b2b7230280f4035f769deac56fcc0270ba8bfa401e6ea76",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t01_model_plane-9636e751a9852f12",
+      "sha256": "22a5ddaed640eca14fda767e6de1a765d91811dc1243b794adcf6c13fab02c31",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "b6a1b967c40da1bb3000cfe5d5e615ffdc19612a392c37c6f5bbb8586e2a920d",
+      "inventory_after_sha256": "22a5ddaed640eca14fda767e6de1a765d91811dc1243b794adcf6c13fab02c31",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t02_credentials-4afac6d8afc444a1",
+      "sha256": "e5ac4444f832f4b9b9e23f2ef09fb36e3ab6ba9760f019bcdf274eacff7d2d4f",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "10a53956bd2d28fcbb1b5161708145cfa81db77ad30ece3f37c54058b9cbac60",
+      "inventory_after_sha256": "e5ac4444f832f4b9b9e23f2ef09fb36e3ab6ba9760f019bcdf274eacff7d2d4f",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t03_protocol_adapters-87d6729a6a6b21c9",
+      "sha256": "14c550dea51d61510847c2cc0212ef1445611b823b6dc561c04564e644ae2a3c",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "355c116710289ab54522cf3978612d9ba39a8fbadcc90adc31e3c7f15c079fe5",
+      "inventory_after_sha256": "14c550dea51d61510847c2cc0212ef1445611b823b6dc561c04564e644ae2a3c",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t04_streaming-f8d93fc18bd068c1",
+      "sha256": "797a2b0641832ef90336ee860a63aa31422a75a6bd5b263c307cae40c4a36d21",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "82c2a37a1d5827fbcf362dc8bfa867427cf71ecc8ccfd3f4a8622f7b31549adb",
+      "inventory_after_sha256": "797a2b0641832ef90336ee860a63aa31422a75a6bd5b263c307cae40c4a36d21",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t05_network-f6ae5345629dd569",
+      "sha256": "4d95be0cc9b4e05602df9f0acdd5b88b4598cadb75983841e0352acc85e66e05",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "1938bf83e6ff5fb70f5cf75506e7376cd9c9d02a381984bce331f562153e7c05",
+      "inventory_after_sha256": "4d95be0cc9b4e05602df9f0acdd5b88b4598cadb75983841e0352acc85e66e05",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t05_timeouts-33865142849be705",
+      "sha256": "46a917b1dc8c016f665b841f7ffc3888884e7c5145ac8156308019d50a3a9423",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "e2d48bd433fb55260fa82c3f156c6201ab92338d760e5e162cc7b84bdb8f3cfb",
+      "inventory_after_sha256": "46a917b1dc8c016f665b841f7ffc3888884e7c5145ac8156308019d50a3a9423",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t06_operations-3312dfa164026601",
+      "sha256": "62c996aece70f3be49aec9412339b63ec4f52e09e7a768b8ce32ac90b3de7441",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "e5f0cc12bd58e04dbe0252179d5136e7130c6197c744fc4c9f0a10435bc2f9e6",
+      "inventory_after_sha256": "62c996aece70f3be49aec9412339b63ec4f52e09e7a768b8ce32ac90b3de7441",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t06_rr1_media_resource-2d3956772a4e173d",
+      "sha256": "2ddb3d1784d4cf97f6e9b0b7435246b5de6150e6683ec4051eddb8077f977284",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "22dc795741a7ba791e2a382c32b4c7f0cb5de9ab5a574e0bf1bc44d2f6730d1a",
+      "inventory_after_sha256": "2ddb3d1784d4cf97f6e9b0b7435246b5de6150e6683ec4051eddb8077f977284",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t06_rr1_system_speech-9c3861f6a85a164b",
+      "sha256": "c78c247de150678429fd7cb864b227ec15b010f17a74cb4f0fe4bd9b161a0424",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "a36f6084984cb596de20e24f41fea649abd4b169a73de898d49a77f9a716d44c",
+      "inventory_after_sha256": "c78c247de150678429fd7cb864b227ec15b010f17a74cb4f0fe4bd9b161a0424",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t06_worker_model-77fb858f866b0b10",
+      "sha256": "cf69a12f97219b00e9677f8b70edd701012904083070d72622b1b66ddc22bca9",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "97334613ad585c2f1248f528951ac05d0d6e8866767532be5759a6569a432a98",
+      "inventory_after_sha256": "cf69a12f97219b00e9677f8b70edd701012904083070d72622b1b66ddc22bca9",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t07_persistence-bd94f3467855fb6a",
+      "sha256": "aa83d1d3428816b51ffaf29acf2e0b3dcb50e3807413a9edc913020951aa2b56",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "e16cefc175f1865fe30ec02f48c46b0c7dac3ae70723db34dffd14f6104d336b",
+      "inventory_after_sha256": "aa83d1d3428816b51ffaf29acf2e0b3dcb50e3807413a9edc913020951aa2b56",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t07_rr1_usage_ledger-86403f6105e6ec71",
+      "sha256": "9c61d12901a23fea3b62ee7183c2d8197f524a90efcd798fb90bb6e4d32cbd02",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "6f3697839bac284739fa4853139b543195f7a3afd7f90a7c810ab123d1a86931",
+      "inventory_after_sha256": "9c61d12901a23fea3b62ee7183c2d8197f524a90efcd798fb90bb6e4d32cbd02",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t07_usage_trace-6eb4379be5cdf600",
+      "sha256": "f57419ec5592f73a93e8acf2c56897a28e63d7352c551529f1daa92d6fa12b1d",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "aafdda27764ffb80ca59a50224a59d018b07229cda0c0e55c776ddd37a53ac8e",
+      "inventory_after_sha256": "f57419ec5592f73a93e8acf2c56897a28e63d7352c551529f1daa92d6fa12b1d",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t08_closed_loop-2109da1b20e54b56",
+      "sha256": "b511af7f5c16a4139c615d3f55b10ac8ad2bc7da982514da93527db72df48213",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "b3f619224ff3f94cdcefb29cf33ce0bc09f2a2b74daa9a0c4daec3d08b032c05",
+      "inventory_after_sha256": "b511af7f5c16a4139c615d3f55b10ac8ad2bc7da982514da93527db72df48213",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t08_production_tools-bbd8b61f87293c1e",
+      "sha256": "89b9ec5eca4badb7155b922e72b716f6edfa26d5f45f76b8abb0801b7f048093",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "3a8c0ea6861b053aadac8a5635f1334d09b2ff80b8bef29f4207318d913f2315",
+      "inventory_after_sha256": "89b9ec5eca4badb7155b922e72b716f6edfa26d5f45f76b8abb0801b7f048093",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r05_t08_resources-dd31f9c22872dbc7",
+      "sha256": "19f45160a7b39dddc8abdc53a54c761975c03762ed4f580c2970c6a8213646b5",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "4d5d062730f16f6a7f382b979ab943b28d8c8c1c7a81592c7158e3696e705788",
+      "inventory_after_sha256": "19f45160a7b39dddc8abdc53a54c761975c03762ed4f580c2970c6a8213646b5",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_ar_f08_projection-485d4d877f7e9378",
+      "sha256": "8e310c90b4ee051a9f0a04bf3c9f2dee634d79417034c32c27c8535d1cf7e30d",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "057f42d1876426af989e2b7f6f9e33bb66400aec589f6e87bcff6d8f4c2defc5",
+      "inventory_after_sha256": "8e310c90b4ee051a9f0a04bf3c9f2dee634d79417034c32c27c8535d1cf7e30d",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_ar_w09_embedding_batches-dae336279e2e98d2",
+      "sha256": "140c2d15c658f80177ab4a374841523d353092e5fcbff8a4de556537d111f55a",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "90ace1a88a023f8ceb68e3ae9a2fa83479eb3e42362c11ecf2715734da4e2c50",
+      "inventory_after_sha256": "140c2d15c658f80177ab4a374841523d353092e5fcbff8a4de556537d111f55a",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_ar_w10_embedding_identity-4d74d95bb3749e90",
+      "sha256": "67ece2ef3c24b52eb1531eadf602dd33a44fb94e4b762fc4ab90e5ab0671a6e5",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "2e73ba0c6c48ca260d07864c66f65c9cbd90ef0004422342847ea0a3f147a567",
+      "inventory_after_sha256": "67ece2ef3c24b52eb1531eadf602dd33a44fb94e4b762fc4ab90e5ab0671a6e5",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t01_closed_loop-e33d856577fae1c9",
+      "sha256": "ae37557dba2ed75be24523a37ca0b5ad7c16f01853e78038a85a15c5acf03006",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "3cc8bcf7612b62e2b70a25f623b02ef64ad7ed8e1e594e2b44546d23efe47f12",
+      "inventory_after_sha256": "ae37557dba2ed75be24523a37ca0b5ad7c16f01853e78038a85a15c5acf03006",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t01_context_compiler-144a171f080c6b7f",
+      "sha256": "2eba627cbc01768d4783b9211b66587ee25bce190a5c4c4ee99dc92c333ffba0",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "7848678498b5c9def2485e6c0a1b207222774f740c59ffc926cdc06dda50852b",
+      "inventory_after_sha256": "2eba627cbc01768d4783b9211b66587ee25bce190a5c4c4ee99dc92c333ffba0",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t02_closed_loop-126503580810af56",
+      "sha256": "5a9fb5768de76dd3cfce99d76497db3fc3011a7b07d726570e9ec3614b04d5c2",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "317bb7c393ac6e47507492a82c6ba16253e9743521a05f50b70adb343ec9cc48",
+      "inventory_after_sha256": "5a9fb5768de76dd3cfce99d76497db3fc3011a7b07d726570e9ec3614b04d5c2",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t02_compaction-e98ff86757e618ca",
+      "sha256": "9909a2333d73fc0431c9de4db08ebcc5ec93b53344de8c3f99da2a45a787ac22",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "e5c8bc765fbb888d702d95cdcf4c223e39d39b8b5fc0de529a3cb1f27eb6eada",
+      "inventory_after_sha256": "9909a2333d73fc0431c9de4db08ebcc5ec93b53344de8c3f99da2a45a787ac22",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t03_session_tree-c15c21c630ae2b1b",
+      "sha256": "acb419b1d9178030d1441bc6026967afaddbabf7d385bf43adf797fef44a6a3a",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "54beac65b53447a74c4814213d340da794a28a395c5ea565de55c09594b5a0cf",
+      "inventory_after_sha256": "acb419b1d9178030d1441bc6026967afaddbabf7d385bf43adf797fef44a6a3a",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t04_history-6a53eaf75d33ad08",
+      "sha256": "727799fbd90c384ae182aeb074ea2c9baff1e9b826c70811ca21f9a856415617",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "e8567468f00e115480de90531aa4c4945a96788c89430aa11bf41d138037c11b",
+      "inventory_after_sha256": "727799fbd90c384ae182aeb074ea2c9baff1e9b826c70811ca21f9a856415617",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t05_bridgemedia-702792c74d38841c",
+      "sha256": "afe8a96f48ff1937c25f5dbb8203c3603deebd7cd6c472390b055e6fb2e9879c",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "8bf31f95eefa771cd62a876fdaf66bf7170b74add6ba4f997a53dd8feee9ae37",
+      "inventory_after_sha256": "afe8a96f48ff1937c25f5dbb8203c3603deebd7cd6c472390b055e6fb2e9879c",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t05_filehistory-ecea22980db197d0",
+      "sha256": "a751ca1b1978a1e7f594a38d315b23cc4d46cafb29db3f46e4e1e97475af4235",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "0fb407a4318a7ab18e62d0874ca51df1c3a30b4313d27da51bd1960afc39eda1",
+      "inventory_after_sha256": "a751ca1b1978a1e7f594a38d315b23cc4d46cafb29db3f46e4e1e97475af4235",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t05_fsread-c42a84f8f746aaf7",
+      "sha256": "e59cfb559e0cbfccca85abafc33b9fdcca7bcb7478d303ef6370d33810d9a0c3",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "3ea92a091e87b082ecdf2f3f6c59bd09e9f8b77f2573f70c5181fb25c13389d2",
+      "inventory_after_sha256": "e59cfb559e0cbfccca85abafc33b9fdcca7bcb7478d303ef6370d33810d9a0c3",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t05_preview-c849aa82cc09d5f8",
+      "sha256": "f26a3cc3e8ad93db8dd64ccda44c016e190fffedeff92f7e3175573e265a16d5",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "4ff871a373ea91d23cf391678f85f9c8508a0872155b07b83a0fdff3d3f1bfec",
+      "inventory_after_sha256": "f26a3cc3e8ad93db8dd64ccda44c016e190fffedeff92f7e3175573e265a16d5",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t05_resourceio-c0c3fac302c19e40",
+      "sha256": "0dbe0eef342e0a432f750ff1313ac40c4c1a318d541c76ee1f224f744ff7b910",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "eeba6eb53c0a29045606ff4523c929adc4bfd3352e7111496a20da60ece2fa25",
+      "inventory_after_sha256": "0dbe0eef342e0a432f750ff1313ac40c4c1a318d541c76ee1f224f744ff7b910",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t05_resources-d83ba8045f4c6e0f",
+      "sha256": "2f759bb1f51ed62b0f5c5a4c8520d8b4b05f85530cbcfa7f947b5a6d54161dc8",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "189f1f403deb1a54658799bb1618d9591334d492e00d43908953bb957ce99227",
+      "inventory_after_sha256": "2f759bb1f51ed62b0f5c5a4c8520d8b4b05f85530cbcfa7f947b5a6d54161dc8",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t05_session_files-a2b4fb92af671611",
+      "sha256": "f90409222f42194c3cc206d15a157f21e6faffebbb9289f75e85d96f9ef5da77",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "997422c38a211d60170bfafdd9b01547d31061f558de6fefba45e7fec5fe7fb4",
+      "inventory_after_sha256": "f90409222f42194c3cc206d15a157f21e6faffebbb9289f75e85d96f9ef5da77",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t06_hooks-ebd1ce0af9e61194",
+      "sha256": "080203ec58c7e1ce60558c118eeb0a4f447cd77aff9e7852d76e9e4d08cf1053",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "0a4bd700bffdd90adeab48dd311dbfdfd3e08e6fcf6f07466f8febc80a124b2b",
+      "inventory_after_sha256": "080203ec58c7e1ce60558c118eeb0a4f447cd77aff9e7852d76e9e4d08cf1053",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t06_memory-04cde0df23cd96ad",
+      "sha256": "2c8462d99e452ca31689b63d098c5fb7440060dc9b31c8701f4689afdc19b01b",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "7a0d74b57e5bd757b4e2b47fa97d499d2707b323c6ca1ba183940687465d2b66",
+      "inventory_after_sha256": "2c8462d99e452ca31689b63d098c5fb7440060dc9b31c8701f4689afdc19b01b",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t06_skill_context-2540ae88262301fc",
+      "sha256": "ec8d76dee58ce0374e45dabe6fc09dcd2bef847271ce9b65f3f2fc2b8591f0bf",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "c0a46cbd8ab29ef72fce1caaebf42a35c6c0ec5beb108dce266ce5c7c3885e90",
+      "inventory_after_sha256": "ec8d76dee58ce0374e45dabe6fc09dcd2bef847271ce9b65f3f2fc2b8591f0bf",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t06_skills-d9f0f86a8c5b1255",
+      "sha256": "b31946afa1c5121ff752c82ddde2de0bfd02d4c47f8be5e1bcd1ab335cd38861",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "9ef0ec9541c7d3cfbce4f6fc0f00f7734785d965520934bf6b8fe815a5c5e108",
+      "inventory_after_sha256": "b31946afa1c5121ff752c82ddde2de0bfd02d4c47f8be5e1bcd1ab335cd38861",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t07_knowledge-57ba864e3c5dd48b",
+      "sha256": "7ca8b75be45c2e464d67aa08b2cbc74c3178b500444f3896887c2a661c8b8509",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "6fd8b0046f830eca32c5e21d55d2554a6180ad1848e072b9b494c6167d5888f4",
+      "inventory_after_sha256": "7ca8b75be45c2e464d67aa08b2cbc74c3178b500444f3896887c2a661c8b8509",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t07_knowledge_tools-25f32e55d3b6f5af",
+      "sha256": "ffc92c383d196a3a1ad029eeaf983f33edfa0aab626dc6fd59ea30f2d51a8dbe",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "e531e5369a420bfa135407d23b4084eeb203952854acc2870bf91b0e4df39fae",
+      "inventory_after_sha256": "ffc92c383d196a3a1ad029eeaf983f33edfa0aab626dc6fd59ea30f2d51a8dbe",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/r06_t08_behavior_eval-3865546752edd2e0",
+      "sha256": "7298dd6512240fc9f0b82b5bc0cb6c216f4ccaf6ce3d01ac05ba28f832d98c17",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "1d779059534219e34659492dbc39e95beba4e79b9378729a8e4c0b839a04e6cb",
+      "inventory_after_sha256": "7298dd6512240fc9f0b82b5bc0cb6c216f4ccaf6ce3d01ac05ba28f832d98c17",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/recovery_crash_points-2333bcb4bb5d616e",
+      "sha256": "628e67662c7317721da755f2e404496317a61e514e387b3d4d75216584d755fd",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "d3099a33fa69a8a3b91d3178b0468f6823ee5c5e58538062541869f3d2f14e5f",
+      "inventory_after_sha256": "628e67662c7317721da755f2e404496317a61e514e387b3d4d75216584d755fd",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/recovery_startup_scan-12f0578f22f63caf",
+      "sha256": "8255b332d9998245c696e049fbc5d2e2192fb6d817d0c386cf0083e322a4bd97",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "23830040d58549cb8b81623757a09276d1a03879c1d2060b693489088d3bc176",
+      "inventory_after_sha256": "8255b332d9998245c696e049fbc5d2e2192fb6d817d0c386cf0083e322a4bd97",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/request_dedup-df9ac715e3845bf7",
+      "sha256": "fd58b2f58ea0a283eb5fb923b0203429147faec553a9dad30a7e6ec6599f26ab",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "fad8bc56e62737f63358497ac767997ff0fca3115e8aa4c230b7addb32f5e3fe",
+      "inventory_after_sha256": "fd58b2f58ea0a283eb5fb923b0203429147faec553a9dad30a7e6ec6599f26ab",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/request_id_canonicalization-b73a535cb4dffa05",
+      "sha256": "a3fd32466adc71aecb36aa3c4308c8fa95e5952a3f1f49040a56940ffd7d0c0d",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "26fb097f790ca8c08708d227718fdca07856670e6f0301e0559c603e8618ee2b",
+      "inventory_after_sha256": "a3fd32466adc71aecb36aa3c4308c8fa95e5952a3f1f49040a56940ffd7d0c0d",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/resource_limits-5dfe17507632bc9d",
+      "sha256": "8b583cbba2779652aa79a34a8390aeab3fc9eccd288de3a03f3ce06aac8160c4",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "a5d44342b0a46c573e4a964e480bb393662c83893ee19f8a1dea2ec232df1db1",
+      "inventory_after_sha256": "8b583cbba2779652aa79a34a8390aeab3fc9eccd288de3a03f3ce06aac8160c4",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/run_lifecycle-db982f1310f95692",
+      "sha256": "682b2976c4145797fd844220f508d235a682789c488e4bf5c20587ed9f24f696",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "e1b8ed5b2b52daa8d063f21b7db864af09f9d77d346058bdbe6ae09e9db98d55",
+      "inventory_after_sha256": "682b2976c4145797fd844220f508d235a682789c488e4bf5c20587ed9f24f696",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/service_health-26a0ec667b81601f",
+      "sha256": "85ffdc6b45b331da3d07279fb3a46b942b7e5d139f2d58487319dc1f511c2905",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "1e0e9eb7d9dde689bff18abc2925753029161f42e4b5c2197d6eb85f8d050a48",
+      "inventory_after_sha256": "85ffdc6b45b331da3d07279fb3a46b942b7e5d139f2d58487319dc1f511c2905",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/service_persistence-0922bbd370f90570",
+      "sha256": "9223ece74f2dc0282065b8f586d83fd04da488254af8041062e11f415e53753b",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "f55e3e580c952962d1dd3124ac942662909c7049728c091f60df04296ac9c065",
+      "inventory_after_sha256": "9223ece74f2dc0282065b8f586d83fd04da488254af8041062e11f415e53753b",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/session_serialization-059f8a48195b56bc",
+      "sha256": "ec312c81c76b45fd98801982a32abea90b484dd3fe682f3b8df9fa054bd191e2",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "1c5965424447e018a426f95911421071dbcc148373f10baf1e34326cd0a66958",
+      "inventory_after_sha256": "ec312c81c76b45fd98801982a32abea90b484dd3fe682f3b8df9fa054bd191e2",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/shutdown_coordinator-e57940e8efde1cdd",
+      "sha256": "02a8aa838fc15f03aff7100e16fac18d34563ea0c8188c4b34994836f8d29468",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "64efe6b22aebbc4652870f49f984764cd42117f38efb2b511e2fb5889fd49a9c",
+      "inventory_after_sha256": "02a8aa838fc15f03aff7100e16fac18d34563ea0c8188c4b34994836f8d29468",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/subagent_closeout-155dfebe8fca79e8",
+      "sha256": "46aaaae6f55bc6e56ade9b77c66e4b5e0fe161500229378fb1a0a01bef9dd673",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "cb70b13a2b5d52ceccb7a56823552787bb9694fd1e05c44332b754e9728b9d84",
+      "inventory_after_sha256": "46aaaae6f55bc6e56ade9b77c66e4b5e0fe161500229378fb1a0a01bef9dd673",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/subagent_lifecycle-b0faf18626b4d12d",
+      "sha256": "2eefaede9e7351c54ffe628c735530edfdd4b81c6420bf02c606160ccb9e5817",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "b18283e0a4b326d34799c56a7dc0916803e6a4c6b174c0537657ae2ed025c322",
+      "inventory_after_sha256": "2eefaede9e7351c54ffe628c735530edfdd4b81c6420bf02c606160ccb9e5817",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/subagent_permission_inheritance-217d129cf8d30e27",
+      "sha256": "5d00167bd88e49d644e994fbfad963e32c2db831ca6ff040e5473b953b37ae1e",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "01d1358d5a6a51ac06892a544f8dc43ae560f082a217c3b6957cb1739b982a87",
+      "inventory_after_sha256": "5d00167bd88e49d644e994fbfad963e32c2db831ca6ff040e5473b953b37ae1e",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/tls_web_login-26a1947b44a24568",
+      "sha256": "6fa3e3a5db5de33b6c1073b5c81ea036424a648116ab633830d42a4e33d7cf1d",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "94b7a3e392a441c322a2df1b72e13f779a3646be8042d0782d031fbf591f09a8",
+      "inventory_after_sha256": "6fa3e3a5db5de33b6c1073b5c81ea036424a648116ab633830d42a4e33d7cf1d",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/tool_receipt_unknown-ffddf8cd40b0e65d",
+      "sha256": "5eb3bf55bac15e38f3de773cc6d3f44516e1f14a4f7fd0d8fc5eaa933e29e63d",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "2a94cba430367facf2e5a09d182d255df86acac8f4cfc35656c0b012c90a61d2",
+      "inventory_after_sha256": "5eb3bf55bac15e38f3de773cc6d3f44516e1f14a4f7fd0d8fc5eaa933e29e63d",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/lingxi_spike-b71872c0b3c94ea6",
+      "sha256": "0d6c29738eb2fd84a8222f53a303c1c407e23f683c1086f697e996ec98a617f6",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "0d6c29738eb2fd84a8222f53a303c1c407e23f683c1086f697e996ec98a617f6",
+      "inventory_after_sha256": "0d6c29738eb2fd84a8222f53a303c1c407e23f683c1086f697e996ec98a617f6",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/spike_check_deps-6ac06b9c4ab300e8",
+      "sha256": "9549319ff9148204a2bb7d733e94a4db76a18ffa183061660ff139dac766815a",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "9549319ff9148204a2bb7d733e94a4db76a18ffa183061660ff139dac766815a",
+      "inventory_after_sha256": "9549319ff9148204a2bb7d733e94a4db76a18ffa183061660ff139dac766815a",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/spike_health-9c3b829dfaaac2a3",
+      "sha256": "e76b6988d930b38a723bc66594cdf5910712f42e042f798653f33d45cf773b12",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "e76b6988d930b38a723bc66594cdf5910712f42e042f798653f33d45cf773b12",
+      "inventory_after_sha256": "e76b6988d930b38a723bc66594cdf5910712f42e042f798653f33d45cf773b12",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/spike_mcp_handshake-e6cd35cd9e10b917",
+      "sha256": "79bb3f09c09c92e466f7d8cc26b4daf17c9f54474c43075ee431311f65b2662d",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "79bb3f09c09c92e466f7d8cc26b4daf17c9f54474c43075ee431311f65b2662d",
+      "inventory_after_sha256": "79bb3f09c09c92e466f7d8cc26b4daf17c9f54474c43075ee431311f65b2662d",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/spike_schema_validate-2a8d8962477f3eff",
+      "sha256": "39ae39039dc1e889676c3764461997bbd942329e860d946b153570d33c903593",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "39ae39039dc1e889676c3764461997bbd942329e860d946b153570d33c903593",
+      "inventory_after_sha256": "39ae39039dc1e889676c3764461997bbd942329e860d946b153570d33c903593",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/spike_sqlite_queue-fc62afa9ac78e2ae",
+      "sha256": "84111b282ec7f51366356cd96b9ea8f26a6132e38c3c5a413f0300817441df3d",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "84111b282ec7f51366356cd96b9ea8f26a6132e38c3c5a413f0300817441df3d",
+      "inventory_after_sha256": "84111b282ec7f51366356cd96b9ea8f26a6132e38c3c5a413f0300817441df3d",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/spike_tls_probe-3301bdc082118180",
+      "sha256": "bb124f9d9207f1bc6ca978350ee535f47e66eceb48044a692e16fd53b299f7b6",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "bb124f9d9207f1bc6ca978350ee535f47e66eceb48044a692e16fd53b299f7b6",
+      "inventory_after_sha256": "bb124f9d9207f1bc6ca978350ee535f47e66eceb48044a692e16fd53b299f7b6",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/lingxi_test_guard-21ee405834c342a5",
+      "sha256": "2de207a83642ea3171873034b2cf195dea2e153eb69294ecb4bdce8797db3049",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "2de207a83642ea3171873034b2cf195dea2e153eb69294ecb4bdce8797db3049",
+      "inventory_after_sha256": "2de207a83642ea3171873034b2cf195dea2e153eb69294ecb4bdce8797db3049",
+      "actual_before_unknown": true
+    },
+    {
+      "path": "<W09_WORKSPACE>/rust/target-w09-e01/debug/deps/xtask-06b22ce01067b44c",
+      "sha256": "ca723d83f38e593d46aa601d2781a59d5e1b399a42b8b0cf42624868d19c5112",
+      "actual_before_sha256": null,
+      "actual_after_sha256": null,
+      "cached_inventory_before_sha256": "ca723d83f38e593d46aa601d2781a59d5e1b399a42b8b0cf42624868d19c5112",
+      "inventory_after_sha256": "ca723d83f38e593d46aa601d2781a59d5e1b399a42b8b0cf42624868d19c5112",
+      "actual_before_unknown": true
+    }
+  ],
+  "runner_sha256": null,
+  "actual_test_binary_runs": null,
+  "actual_test_binary_starts": null,
+  "product_resource_directory": null,
+  "product_resource_anchor": null,
+  "runner_after_sha256": null,
+  "cargo_runner_file_sha256": null,
+  "preparation_failure": null,
+  "source_stability_basis": null,
+  "git_config_environment": null,
+  "private_excludes_sha256_before": null,
+  "private_excludes_sha256_after": null,
+  "disposition": null,
+  "cancel_reason": null,
+  "partial_actual_test_starts": null,
+  "partial_actual_test_ends": null,
+  "partial_test_result_blocks": null,
+  "nested_group_cleanup": null,
+  "nested_group_observed_gone": null,
+  "label": "workspace-frozen-20",
+  "record_sha256": "cb513940d971316bd7d57bca49c7a1cb3a7cf90175ae76871df20ddaa0c75250",
+  "log_sha256": "7ebb3b97eca3b65dca986e1f39d0097946e89e9e1e2262da32573e9f3e2db957",
+  "inputs_before_digest": "91c7160a6b710fceaa02f9173dd1013697d5c469a9ec447bfe1de6a41f100222",
+  "inputs_after_digest": "91c7160a6b710fceaa02f9173dd1013697d5c469a9ec447bfe1de6a41f100222",
+  "inputs_count": 4928,
+  "test_results": [
+    {
+      "result": "ok",
+      "passed": 119,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.16
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.03
+    },
+    {
+      "result": "ok",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.03
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.03
+    },
+    {
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.32
+    },
+    {
+      "result": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.36
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.03
+    },
+    {
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.04
+    },
+    {
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.08
+    },
+    {
+      "result": "ok",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.03
+    },
+    {
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.8
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.05
+    },
+    {
+      "result": "ok",
+      "passed": 21,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.11
+    },
+    {
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.01
+    },
+    {
+      "result": "ok",
+      "passed": 33,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 18,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.53
+    },
+    {
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.01
+    },
+    {
+      "result": "ok",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.51
+    },
+    {
+      "result": "ok",
+      "passed": 27,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.02
+    },
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.01
+    },
+    {
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.19
+    },
+    {
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.09
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.03
+    },
+    {
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.15
+    },
+    {
+      "result": "ok",
+      "passed": 18,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.29
+    },
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.29
+    },
+    {
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.06
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 122,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.03
+    },
+    {
+      "result": "ok",
+      "passed": 20,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 44,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.05
+    },
+    {
+      "result": "ok",
+      "passed": 25,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 387,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 8.04
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "FAILED",
+      "passed": 4,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.79
+    },
+    {
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.32
+    },
+    {
+      "result": "ok",
+      "passed": 24,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 9.26
+    },
+    {
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.19
+    },
+    {
+      "result": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.44
+    },
+    {
+      "result": "FAILED",
+      "passed": 6,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 5.18
+    },
+    {
+      "result": "ok",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.67
+    },
+    {
+      "result": "FAILED",
+      "passed": 6,
+      "failed": 2,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.83
+    },
+    {
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.79
+    },
+    {
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 3.33
+    },
+    {
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.61
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.23
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.14
+    },
+    {
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.32
+    },
+    {
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.21
+    },
+    {
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.26
+    },
+    {
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.81
+    },
+    {
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 39.59
+    },
+    {
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.21
+    },
+    {
+      "result": "FAILED",
+      "passed": 15,
+      "failed": 2,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 1.4
+    },
+    {
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 12.71
+    },
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 2.17
+    },
+    {
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.09
+    },
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.34
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.02
+    },
+    {
+      "result": "FAILED",
+      "passed": 5,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.6
+    },
+    {
+      "result": "ok",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 1.24
+    },
+    {
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 8.58
+    },
+    {
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.71
+    },
+    {
+      "result": "ok",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 3.87
+    },
+    {
+      "result": "ok",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 4.46
+    },
+    {
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 2.46
+    },
+    {
+      "result": "ok",
+      "passed": 19,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 1.87
+    },
+    {
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 300.7
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.32
+    },
+    {
+      "result": "ok",
+      "passed": 24,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 1.04
+    },
+    {
+      "result": "ok",
+      "passed": 38,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 3.83
+    },
+    {
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 1.05
+    },
+    {
+      "result": "ok",
+      "passed": 18,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 1.28
+    },
+    {
+      "result": "ok",
+      "passed": 21,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 10.01
+    },
+    {
+      "result": "ok",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 2.87
+    },
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.42
+    },
+    {
+      "result": "ok",
+      "passed": 17,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.31
+    },
+    {
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 3.85
+    },
+    {
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.51
+    },
+    {
+      "result": "FAILED",
+      "passed": 4,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.63
+    },
+    {
+      "result": "ok",
+      "passed": 15,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 2.22
+    },
+    {
+      "result": "ok",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.98
+    },
+    {
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 7.17
+    },
+    {
+      "result": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 8.45
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 333.56
+    },
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.55
+    },
+    {
+      "result": "ok",
+      "passed": 15,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 2.82
+    },
+    {
+      "result": "ok",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 1.37
+    },
+    {
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.13
+    },
+    {
+      "result": "ok",
+      "passed": 21,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.34
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.33
+    },
+    {
+      "result": "ok",
+      "passed": 26,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 2.59
+    },
+    {
+      "result": "ok",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 9.37
+    },
+    {
+      "result": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 4.04
+    },
+    {
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.08
+    },
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.16
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.13
+    },
+    {
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.08
+    },
+    {
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.32
+    },
+    {
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.19
+    },
+    {
+      "result": "ok",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 2.85
+    },
+    {
+      "result": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.15
+    },
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.43
+    },
+    {
+      "result": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.15
+    },
+    {
+      "result": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.12
+    },
+    {
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 40.8
+    },
+    {
+      "result": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 50.66
+    },
+    {
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.49
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.99
+    },
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.62
+    },
+    {
+      "result": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.24
+    },
+    {
+      "result": "FAILED",
+      "passed": 6,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 1.37
+    },
+    {
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 1.21
+    },
+    {
+      "result": "FAILED",
+      "passed": 11,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 1.13
+    },
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.23
+    },
+    {
+      "result": "FAILED",
+      "passed": 1,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.66
+    },
+    {
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.81
+    },
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.28
+    },
+    {
+      "result": "FAILED",
+      "passed": 7,
+      "failed": 1,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 5.36
+    },
+    {
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.2
+    },
+    {
+      "result": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.24
+    },
+    {
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 2.65
+    },
+    {
+      "result": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.57
+    },
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.06
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.31
+    },
+    {
+      "result": "ok",
+      "passed": 121,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 10.99
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 0.0
+    }
+  ],
+  "guard_armed_count": 186,
+  "complete_original_metadata": "commands/workspace-frozen-20/record.json retained locally",
+  "source_binding_matches_final": false,
+  "outcome_class": "ACTUAL_EXECUTION",
+  "shipping_binaries_before": {
+    "<W09_WORKSPACE>/rust/target-w09-e01/debug/lingxi-storage-inspect": "1fb4afde16e9a8c415c73afcc9b5895a249d65c40019e0c61480e0fd5b1b3975",
+    "<W09_WORKSPACE>/rust/target-w09-e01/debug/lingxi-protocol-gen": "f2e1605947d2bedc765710661f6d7cb594e0b5c1fd1d20f473f673a6e2e0975b",
+    "<W09_WORKSPACE>/rust/target-w09-e01/debug/lingxi-service": "894a25412418b7d7ad8b315bb2b9b5987e02aa7208a54c6be8bc002abac52c49"
+  },
+  "shipping_binaries_after": {
+    "<W09_WORKSPACE>/rust/target-w09-e01/debug/lingxi-storage-inspect": "ea591e4901ec91b72e88f755ba8bc800bbdb7f4e461650eb9069818ab40a186b",
+    "<W09_WORKSPACE>/rust/target-w09-e01/debug/lingxi-protocol-gen": "f2e1605947d2bedc765710661f6d7cb594e0b5c1fd1d20f473f673a6e2e0975b",
+    "<W09_WORKSPACE>/rust/target-w09-e01/debug/lingxi-service": "296741ed70bd81195200add505b76573a3240f79689cd462897d6c07550004f0"
+  }
+}

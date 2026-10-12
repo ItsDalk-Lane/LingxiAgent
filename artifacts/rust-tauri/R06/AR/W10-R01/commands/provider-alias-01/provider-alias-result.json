@@ -1,0 +1,11 @@
+{
+  "binary": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/rust/target-w10-r01/debug/lingxi-service",
+  "binary_sha256_before": "86680bfa80908d169f7cd4e306ef50407bff9bbd6a00fe9e259f574ad5189924",
+  "case": "New provider identity alpha→beta, same model/protocol/endpoint/dimensions, reload held first response; actual authenticated ingestion → real Gateway/Operation/Knowledge/SQLite",
+  "mock_boundary": "Only external loopback HTTP response",
+  "ready": "LINGXI_SERVICE_READY addr=127.0.0.1:60661 home=/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/artifacts/rust-tauri/R06/AR/W10-R01/commands/provider-alias-01/LOCAL_ONLY_NEVER_GIT/synthetic-home/provider-alias source=env",
+  "service_exit": 0,
+  "stub_thread_alive": false,
+  "binary_sha256_after": "86680bfa80908d169f7cd4e306ef50407bff9bbd6a00fe9e259f574ad5189924",
+  "cleanup": "service reaped; loopback listener closed; thread joined; sensitive home/config retained LOCAL_ONLY_NEVER_GIT"
+}

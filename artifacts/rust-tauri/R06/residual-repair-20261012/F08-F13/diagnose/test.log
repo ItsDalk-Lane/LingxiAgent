@@ -1,0 +1,15 @@
+
+running 1 test
+test f08_budget_refusal_keeps_raw_success_and_continues_with_readable_history ... FAILED
+
+failures:
+
+failures:
+    f08_budget_refusal_keeps_raw_success_and_continues_with_readable_history
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.10s
+
+
+thread 'f08_budget_refusal_keeps_raw_success_and_continues_with_readable_history' (12814524) panicked at crates/lingxi-service/tests/r06_ar_f08_projection.rs:662:5:
+assertion failed: error.contains("Tool success model projection exceeds the 32KiB budget")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

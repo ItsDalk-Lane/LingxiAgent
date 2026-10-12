@@ -1,0 +1,25 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.40s
+     Running tests/r06_ar_f02_file_restore.rs (rust/target/debug/deps/r06_ar_f02_file_restore-dc7bd6d0c16c0e4c)
+
+running 5 tests
+restore_http=200 receipt={"sessionId":"s","checkpoint":"A","turnInputMessageId":"user:run_000001a1296dd1b1_000001","newHeadMessageId":null,"resetMarkerId":"reset:s:1791696425420:3","restored":[],"conflicted":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-ar-f02-old-red-27730-1791696425075156000/workspace/doc.txt"],"skipped":[],"failed":[],"externalEffects":"not_rolled_back","fileRestoreReason":null}
+external_sentinel_expected=B actual=B
+receipt={"sessionId":"s","checkpoint":"A","turnInputMessageId":"user:run_000001a1296dd1a5_000001","newHeadMessageId":null,"resetMarkerId":"reset:s:1791696425400:3","restored":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-normal-27730-1791696425075136000/workspace/doc.txt"],"conflicted":[],"skipped":[],"failed":[],"externalEffects":"not_rolled_back","fileRestoreReason":null}
+receipt={"sessionId":"s","checkpoint":"A","turnInputMessageId":"user:run_000001a1296dd1b1_000001","newHeadMessageId":null,"resetMarkerId":"reset:s:1791696425434:3","restored":[],"conflicted":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-revoke-27730-1791696425075137000/workspace/doc.txt"],"skipped":[],"failed":[],"externalEffects":"not_rolled_back","fileRestoreReason":null}
+receipt={"sessionId":"s","checkpoint":"A","turnInputMessageId":"user:run_000001a1296dd1b1_000001","newHeadMessageId":null,"resetMarkerId":"reset:s:1791696425433:3","restored":[],"conflicted":[],"skipped":[],"failed":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-temp_write-27730-1791696425075136000/workspace/doc.txt"],"externalEffects":"not_rolled_back","fileRestoreReason":null}
+test ar_f02_c02_checkpoint_path_symlink_must_not_change_external_sentinel ... ok
+test ar_f02_c02_current_folder_revocation ... ok
+receipt={"sessionId":"s","checkpoint":"A","turnInputMessageId":"user:run_000001a1296dd1ab_000001","newHeadMessageId":null,"resetMarkerId":"reset:s:1791696425420:3","restored":[],"conflicted":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-content-27730-1791696425075140000/workspace/doc.txt"],"skipped":[],"failed":[],"externalEffects":"not_rolled_back","fileRestoreReason":null}
+receipt={"sessionId":"s","checkpoint":"A","turnInputMessageId":"user:run_000001a1296dd29a_000001","newHeadMessageId":null,"resetMarkerId":"reset:s:1791696425660:3","restored":[],"conflicted":[],"skipped":[],"failed":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-temp_sync-27730-1791696425445958000/workspace/doc.txt"],"externalEffects":"not_rolled_back","fileRestoreReason":null}
+receipt={"sessionId":"s","checkpoint":"A","turnInputMessageId":"user:run_000001a1296dd292_000001","newHeadMessageId":null,"resetMarkerId":"reset:s:1791696425687:3","restored":[],"conflicted":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-external-old-27730-1791696425437396000/workspace/doc.txt"],"skipped":[],"failed":[],"externalEffects":"not_rolled_back","fileRestoreReason":null}
+receipt={"sessionId":"s","checkpoint":"A","turnInputMessageId":"user:run_000001a1296dd2aa_000001","newHeadMessageId":null,"resetMarkerId":"reset:s:1791696425676:3","restored":[],"conflicted":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-identity-27730-1791696425537985000/workspace/doc.txt"],"skipped":[],"failed":[],"externalEffects":"not_rolled_back","fileRestoreReason":null}
+test ar_f02_c01_normal_restore_and_external_same_old_bytes_protected ... ok
+test ar_f02_c03_deterministic_external_content_and_identity_change ... ok
+receipt={"sessionId":"s","checkpoint":"A","turnInputMessageId":"user:run_000001a1296dd323_000001","newHeadMessageId":null,"resetMarkerId":"reset:s:1791696425780:3","restored":[],"conflicted":[],"skipped":[],"failed":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-before_replace-27730-1791696425670159000/workspace/doc.txt"],"externalEffects":"not_rolled_back","fileRestoreReason":null}
+receipt={"sessionId":"s","checkpoint":"A","turnInputMessageId":"user:run_000001a1296dd38a_000001","newHeadMessageId":null,"resetMarkerId":"reset:s:1791696425881:3","restored":[],"conflicted":[],"skipped":[],"failed":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-after_replace-27730-1791696425789231000/workspace/doc.txt"],"externalEffects":"not_rolled_back","fileRestoreReason":"write_may_have_occurred"}
+test ar_f02_c04_failure_stage_receipts_and_original_bytes ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.82s
+

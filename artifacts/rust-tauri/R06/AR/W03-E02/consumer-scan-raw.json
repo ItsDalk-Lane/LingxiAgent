@@ -1,0 +1,1087 @@
+{
+  "pattern": [
+    "impl(.*)StoragePort for",
+    "impl(.*)SessionBackend for",
+    "spawn_blocking_io\\(",
+    "spawn_blocking\\(",
+    "retain_blocking",
+    "retain_authorized_run_permit",
+    "session_admission\\(",
+    "spawn_linked",
+    "spawn_detached"
+  ],
+  "hits": [
+    {
+      "file": "rust/crates/lingxi-service/src/runs.rs",
+      "line": 839,
+      "source": "    pub(crate) fn with_session_admission(",
+      "sha256": "7c9640bd0b2a75a41d69abb1027db474fc7a10b964f24454c2c40dd8e9ecc372",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/runs.rs",
+      "line": 1112,
+      "source": "        let actual_gate = port.session_admission();",
+      "sha256": "7c9640bd0b2a75a41d69abb1027db474fc7a10b964f24454c2c40dd8e9ecc372",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/runs.rs",
+      "line": 1124,
+      "source": "                .load_session_admission(session_id)",
+      "sha256": "7c9640bd0b2a75a41d69abb1027db474fc7a10b964f24454c2c40dd8e9ecc372",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/runs.rs",
+      "line": 1168,
+      "source": "                        .retain_authorized_run_permit(",
+      "sha256": "7c9640bd0b2a75a41d69abb1027db474fc7a10b964f24454c2c40dd8e9ecc372",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/runs.rs",
+      "line": 1181,
+      "source": "                .load_session_admission(session_id)",
+      "sha256": "7c9640bd0b2a75a41d69abb1027db474fc7a10b964f24454c2c40dd8e9ecc372",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/runs.rs",
+      "line": 1817,
+      "source": "                .spawn_linked(",
+      "sha256": "7c9640bd0b2a75a41d69abb1027db474fc7a10b964f24454c2c40dd8e9ecc372",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/runs.rs",
+      "line": 3124,
+      "source": "                                    .spawn_linked(",
+      "sha256": "7c9640bd0b2a75a41d69abb1027db474fc7a10b964f24454c2c40dd8e9ecc372",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/runs.rs",
+      "line": 3477,
+      "source": "                                    .spawn_linked(",
+      "sha256": "7c9640bd0b2a75a41d69abb1027db474fc7a10b964f24454c2c40dd8e9ecc372",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/runs.rs",
+      "line": 3495,
+      "source": "                                    .spawn_linked(",
+      "sha256": "7c9640bd0b2a75a41d69abb1027db474fc7a10b964f24454c2c40dd8e9ecc372",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 6,
+      "source": "//! - **Linked children** (`spawn_linked`): a child task bound to a run id",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 27,
+      "source": "//! - **Detached background** (`spawn_detached`): owned and reaped the",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 276,
+      "source": "pub(crate) fn retain_blocking_run_permit(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 299,
+      "source": "pub(crate) fn retain_blocking_resource_permit(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 424,
+      "source": "    pub(crate) fn retain_authorized_run_permit(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 603,
+      "source": "    pub fn spawn_linked<F>(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 726,
+      "source": "    pub fn spawn_detached<F>(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1118,
+      "source": "            .spawn_linked(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1150,
+      "source": "            .spawn_linked(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1176,
+      "source": "            .spawn_detached(\"background:heartbeat\".to_string(), async move {",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1201,
+      "source": "            .spawn_linked(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1232,
+      "source": "            .spawn_linked(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1288,
+      "source": "            .spawn_linked(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1337,
+      "source": "            .spawn_linked(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1395,
+      "source": "            .spawn_linked(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1430,
+      "source": "            .spawn_linked(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1458,
+      "source": "            .spawn_linked(\"run_f\", &scope_a, \"a\".to_string(), async { 1 })",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1461,
+      "source": "            .spawn_linked(\"run_f\", &scope_b, \"b\".to_string(), async { 2 })",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1466,
+      "source": "                .spawn_linked(\"run_f\", &scope_c, \"c\".to_string(), async { 3 })",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1474,
+      "source": "                .spawn_linked(\"run_f\", &scope_c, \"c2\".to_string(), async { 3 })",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1514,
+      "source": "            .spawn_linked(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1574,
+      "source": "            .retain_authorized_run_permit(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1595,
+      "source": "            .spawn_linked(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1600,
+      "source": "                    assert!(retain_blocking_run_permit(&child_ctx)",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1620,
+      "source": "                        assert!(retain_blocking_run_permit(&bad).is_err());",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1622,
+      "source": "                    assert!(retain_blocking_resource_permit(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1629,
+      "source": "                    assert!(retain_blocking_resource_permit(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1636,
+      "source": "                    assert!(retain_blocking_resource_permit(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1650,
+      "source": "            .spawn_linked(",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1655,
+      "source": "                    assert!(retain_blocking_run_permit(&fake_ctx).is_err());",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "line": 1664,
+      "source": "            retain_blocking_run_permit(&ctx).unwrap().is_none(),",
+      "sha256": "35c0b3f0eb16667a542306f493db9f2c31be6012d374e1b0fb1a5462df9c04e5",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/session_admin.rs",
+      "line": 135,
+      "source": "            .session_admission()",
+      "sha256": "f070ad013c2339e5f84202174ec0eb04a98ce58c5406d7db2badb9a95bf35e07",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/background.rs",
+      "line": 328,
+      "source": "        .spawn_detached(format!(\"background_drive:{run_id}\"), async move {",
+      "sha256": "55189639a23a725c64950ba44d0e0a5663e5f6bd443a5ea10e0b8f8aed65ec59",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/background.rs",
+      "line": 348,
+      "source": "                .retain_authorized_run_permit(",
+      "sha256": "55189639a23a725c64950ba44d0e0a5663e5f6bd443a5ea10e0b8f8aed65ec59",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-kernel/src/ports.rs",
+      "line": 253,
+      "source": "    fn session_admission(",
+      "sha256": "18931ff4a4fcea405349dc76185b069a7cb1a83887dcbddc72195ee2c55aed8a",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-kernel/src/ports.rs",
+      "line": 258,
+      "source": "    fn load_session_admission(",
+      "sha256": "18931ff4a4fcea405349dc76185b069a7cb1a83887dcbddc72195ee2c55aed8a",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-kernel/src/ports.rs",
+      "line": 1446,
+      "source": "    impl StoragePort for FakePort {",
+      "sha256": "18931ff4a4fcea405349dc76185b069a7cb1a83887dcbddc72195ee2c55aed8a",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/sessionfiles.rs",
+      "line": 457,
+      "source": "        Arc::clone(self.db.session_admission())",
+      "sha256": "aba372575848d6956a678a5f0337d0b466fa1853808fe8ab524b7d92d7fd6643",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/admission_dedup_adversarial.rs",
+      "line": 237,
+      "source": "        impl StoragePort for $ty {",
+      "sha256": "598d0ec3eaa27ae1eeed77b47441bd791cb4364871b159303d0ada40cc505bf0",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/admission_dedup_adversarial.rs",
+      "line": 238,
+      "source": "            fn session_admission(",
+      "sha256": "598d0ec3eaa27ae1eeed77b47441bd791cb4364871b159303d0ada40cc505bf0",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/admission_dedup_adversarial.rs",
+      "line": 241,
+      "source": "                StoragePort::session_admission(self.inner.as_ref())",
+      "sha256": "598d0ec3eaa27ae1eeed77b47441bd791cb4364871b159303d0ada40cc505bf0",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/admission_dedup_adversarial.rs",
+      "line": 243,
+      "source": "            async fn load_session_admission(",
+      "sha256": "598d0ec3eaa27ae1eeed77b47441bd791cb4364871b159303d0ada40cc505bf0",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/admission_dedup_adversarial.rs",
+      "line": 247,
+      "source": "                self.inner.load_session_admission(session_id).await",
+      "sha256": "598d0ec3eaa27ae1eeed77b47441bd791cb4364871b159303d0ada40cc505bf0",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/admission_dedup_adversarial.rs",
+      "line": 616,
+      "source": "                .spawn_detached(format!(\"adv-c01-filler-{n}\"), async move {",
+      "sha256": "598d0ec3eaa27ae1eeed77b47441bd791cb4364871b159303d0ada40cc505bf0",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r05_t07_usage_trace.rs",
+      "line": 1346,
+      "source": "impl lingxi_kernel::ports::StoragePort for FailingLedgerPort {",
+      "sha256": "5accfc310a471d3847d511cd5d0b58189e5b59ee17c93c65494c0fd2f6f8147c",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r05_t07_usage_trace.rs",
+      "line": 1347,
+      "source": "    fn session_admission(&self) -> Option<Arc<lingxi_kernel::session_admission::SessionAdmission>> {",
+      "sha256": "5accfc310a471d3847d511cd5d0b58189e5b59ee17c93c65494c0fd2f6f8147c",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r05_t07_usage_trace.rs",
+      "line": 1348,
+      "source": "        lingxi_kernel::ports::StoragePort::session_admission(self.inner.as_ref())",
+      "sha256": "5accfc310a471d3847d511cd5d0b58189e5b59ee17c93c65494c0fd2f6f8147c",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r05_t07_usage_trace.rs",
+      "line": 1350,
+      "source": "    async fn load_session_admission(",
+      "sha256": "5accfc310a471d3847d511cd5d0b58189e5b59ee17c93c65494c0fd2f6f8147c",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r05_t07_usage_trace.rs",
+      "line": 1357,
+      "source": "        self.inner.load_session_admission(session_id).await",
+      "sha256": "5accfc310a471d3847d511cd5d0b58189e5b59ee17c93c65494c0fd2f6f8147c",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/filetools.rs",
+      "line": 2442,
+      "source": "            let retained = match crate::task_supervisor::retain_blocking_run_permit(&ctx) {",
+      "sha256": "05739e168b7275271fe78d2932fec5b10666e8a8e7fe434e881e3cebaa524d87",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/filetools.rs",
+      "line": 2452,
+      "source": "            let outcome = tokio::task::spawn_blocking(move || {",
+      "sha256": "05739e168b7275271fe78d2932fec5b10666e8a8e7fe434e881e3cebaa524d87",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/subagents.rs",
+      "line": 608,
+      "source": "        let gate = self.storage.session_admission();",
+      "sha256": "7edf1000c3f330f0507a54768b9b8b160acb0e0a4d983194d2925932f302fcab",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/subagents.rs",
+      "line": 835,
+      "source": "        let spawn_result = supervisor.task_supervisor().spawn_linked(",
+      "sha256": "7edf1000c3f330f0507a54768b9b8b160acb0e0a4d983194d2925932f302fcab",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/subagents.rs",
+      "line": 842,
+      "source": "                    .retain_authorized_run_permit(",
+      "sha256": "7edf1000c3f330f0507a54768b9b8b160acb0e0a4d983194d2925932f302fcab",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/lib.rs",
+      "line": 1400,
+      "source": "        .with_session_admission(Arc::clone(storage.session_admission()));",
+      "sha256": "f4d178f1192a53ce2fa45c4013001b626868522055682c9183be4c5d5e3d6b70",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-adapters/src/storage/queue.rs",
+      "line": 410,
+      "source": "            let joined = tokio::task::spawn_blocking(move || handle.join())",
+      "sha256": "705b588721103bb4a97ff66ac0eef43d1dc57ba1b2b9156692c05518107fd24c",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/session_tree.rs",
+      "line": 418,
+      "source": "            .session_admission()",
+      "sha256": "be0019d858513edb69ed2a702e5be4959bc9864bea16fdf45e58cc907e8699ff",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/session_tree.rs",
+      "line": 967,
+      "source": "            .session_admission()",
+      "sha256": "be0019d858513edb69ed2a702e5be4959bc9864bea16fdf45e58cc907e8699ff",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/session_tree.rs",
+      "line": 1115,
+      "source": "            .session_admission()",
+      "sha256": "be0019d858513edb69ed2a702e5be4959bc9864bea16fdf45e58cc907e8699ff",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+      "line": 117,
+      "source": "fn shared_session_admission(",
+      "sha256": "9cfd7f61515cde5205e33764b2d5564d71a4a4caad59016095b759aea2c7f51f",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+      "line": 153,
+      "source": "            admission: shared_session_admission(path)?,",
+      "sha256": "9cfd7f61515cde5205e33764b2d5564d71a4a4caad59016095b759aea2c7f51f",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+      "line": 253,
+      "source": "    pub fn session_admission(&self) -> &Arc<lingxi_kernel::session_admission::SessionAdmission> {",
+      "sha256": "9cfd7f61515cde5205e33764b2d5564d71a4a4caad59016095b759aea2c7f51f",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+      "line": 1349,
+      "source": "impl StoragePort for RunDatabase {",
+      "sha256": "9cfd7f61515cde5205e33764b2d5564d71a4a4caad59016095b759aea2c7f51f",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+      "line": 1350,
+      "source": "    fn session_admission(&self) -> Option<Arc<lingxi_kernel::session_admission::SessionAdmission>> {",
+      "sha256": "9cfd7f61515cde5205e33764b2d5564d71a4a4caad59016095b759aea2c7f51f",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+      "line": 1351,
+      "source": "        Some(Arc::clone(RunDatabase::session_admission(self)))",
+      "sha256": "9cfd7f61515cde5205e33764b2d5564d71a4a4caad59016095b759aea2c7f51f",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+      "line": 1353,
+      "source": "    async fn load_session_admission(",
+      "sha256": "9cfd7f61515cde5205e33764b2d5564d71a4a4caad59016095b759aea2c7f51f",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/resources.rs",
+      "line": 745,
+      "source": "    let bytes = match tokio::task::spawn_blocking(move || std::fs::read(read_path)).await {",
+      "sha256": "a38ca0dce4ba0b4bda2217b0b1a7a7110876b14945ac4c0ebb15f63bdf7f13da",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/sessions.rs",
+      "line": 346,
+      "source": "    fn session_admission(",
+      "sha256": "ce427b80baafd3f8b670dbf36ca381efa7f66b2f8794c77443bc544fafbf9cbd",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/sessions.rs",
+      "line": 531,
+      "source": "impl SessionBackend for RunDatabase {",
+      "sha256": "ce427b80baafd3f8b670dbf36ca381efa7f66b2f8794c77443bc544fafbf9cbd",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/sessions.rs",
+      "line": 551,
+      "source": "    fn session_admission(",
+      "sha256": "ce427b80baafd3f8b670dbf36ca381efa7f66b2f8794c77443bc544fafbf9cbd",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/sessions.rs",
+      "line": 554,
+      "source": "        Some(std::sync::Arc::clone(RunDatabase::session_admission(self)))",
+      "sha256": "ce427b80baafd3f8b670dbf36ca381efa7f66b2f8794c77443bc544fafbf9cbd",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/sessions.rs",
+      "line": 663,
+      "source": "        let storage_admission = backend.session_admission();",
+      "sha256": "ce427b80baafd3f8b670dbf36ca381efa7f66b2f8794c77443bc544fafbf9cbd",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/sessions.rs",
+      "line": 920,
+      "source": "            .retain_authorized_run_permit(",
+      "sha256": "ce427b80baafd3f8b670dbf36ca381efa7f66b2f8794c77443bc544fafbf9cbd",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/sessions.rs",
+      "line": 1213,
+      "source": "        match (self.storage_admission.clone(), port.session_admission()) {",
+      "sha256": "ce427b80baafd3f8b670dbf36ca381efa7f66b2f8794c77443bc544fafbf9cbd",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/sessions.rs",
+      "line": 1883,
+      "source": "    impl SessionBackend for MemoryBackend {",
+      "sha256": "ce427b80baafd3f8b670dbf36ca381efa7f66b2f8794c77443bc544fafbf9cbd",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/sessions.rs",
+      "line": 1962,
+      "source": "    impl StoragePort for FakePort {",
+      "sha256": "ce427b80baafd3f8b670dbf36ca381efa7f66b2f8794c77443bc544fafbf9cbd",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/sessions.rs",
+      "line": 2619,
+      "source": "        impl StoragePort for ParkingPort {",
+      "sha256": "ce427b80baafd3f8b670dbf36ca381efa7f66b2f8794c77443bc544fafbf9cbd",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/resourceio.rs",
+      "line": 850,
+      "source": "        crate::task_supervisor::retain_blocking_resource_permit(",
+      "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/resourceio.rs",
+      "line": 885,
+      "source": "                spawn_blocking_io(retained, move || inner.local_stat(&reference, &ctx)).await",
+      "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/resourceio.rs",
+      "line": 905,
+      "source": "                spawn_blocking_io(retained, move || inner.local_read(&reference, &ctx)).await",
+      "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/resourceio.rs",
+      "line": 921,
+      "source": "                spawn_blocking_io(retained, move || inner.local_list(&reference, &ctx)).await",
+      "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/resourceio.rs",
+      "line": 946,
+      "source": "                spawn_blocking_io(retained, move || {",
+      "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/resourceio.rs",
+      "line": 971,
+      "source": "                let result = spawn_blocking_io(retained, move || {",
+      "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/resourceio.rs",
+      "line": 1006,
+      "source": "                let result = spawn_blocking_io(retained, move || {",
+      "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/resourceio.rs",
+      "line": 1075,
+      "source": "                let result = spawn_blocking_io(retained, move || {",
+      "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/resourceio.rs",
+      "line": 1104,
+      "source": "                let result = spawn_blocking_io(retained, move || {",
+      "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/resourceio.rs",
+      "line": 1136,
+      "source": "                spawn_blocking_io(retained, move || inner.local_materialize(&reference, &ctx)).await",
+      "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/resourceio.rs",
+      "line": 1357,
+      "source": "        let content = tokio::task::spawn_blocking(move || std::fs::read(read_path))",
+      "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/resourceio.rs",
+      "line": 1459,
+      "source": "        let bytes = tokio::task::spawn_blocking(move || std::fs::read(read_path))",
+      "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/resourceio.rs",
+      "line": 1981,
+      "source": "    tokio::task::spawn_blocking(move || {",
+      "sha256": "f67706768ef8805b4e0f4f64f38cdc4a54728598022f8395382540d73389f903",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/management.rs",
+      "line": 1462,
+      "source": "        let account = match tokio::task::spawn_blocking(move || {",
+      "sha256": "c9402d83a16f3b0c4f6f193968b099fe29c6121968b337d6109dfeeb14c8c27d",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/management.rs",
+      "line": 1965,
+      "source": "        match tokio::task::spawn_blocking(move || hash_password(&input.password, &salt_for_hash))",
+      "sha256": "c9402d83a16f3b0c4f6f193968b099fe29c6121968b337d6109dfeeb14c8c27d",
+      "test_file": false
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
+      "line": 574,
+      "source": "        joins.push(tokio::task::spawn_blocking(move || {",
+      "sha256": "c14272566afcee269520ffef460eac0361fde8a54235466fc4315a37dc4fdb43",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
+      "line": 992,
+      "source": "        racers.push(tokio::task::spawn_blocking(move || {",
+      "sha256": "c14272566afcee269520ffef460eac0361fde8a54235466fc4315a37dc4fdb43",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/cancellation_tree.rs",
+      "line": 1225,
+      "source": "        .spawn_linked(",
+      "sha256": "d107a05d3f3b33f492a9be4e37d9c93e2566318abe4e285bba1f180fa0cf7eee",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/cancellation_tree.rs",
+      "line": 1251,
+      "source": "        .spawn_detached(\"background:heartbeat\".to_string(), async move {",
+      "sha256": "d107a05d3f3b33f492a9be4e37d9c93e2566318abe4e285bba1f180fa0cf7eee",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/recovery_crash_points.rs",
+      "line": 302,
+      "source": "impl StoragePort for GatedPort {",
+      "sha256": "fce24542bb3b16ce0dc182e777107039dc61cca048aa7dd1bb04177fc1849586",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/recovery_crash_points.rs",
+      "line": 303,
+      "source": "    fn session_admission(",
+      "sha256": "fce24542bb3b16ce0dc182e777107039dc61cca048aa7dd1bb04177fc1849586",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/recovery_crash_points.rs",
+      "line": 306,
+      "source": "        StoragePort::session_admission(self.inner.as_ref())",
+      "sha256": "fce24542bb3b16ce0dc182e777107039dc61cca048aa7dd1bb04177fc1849586",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/recovery_crash_points.rs",
+      "line": 308,
+      "source": "    async fn load_session_admission(",
+      "sha256": "fce24542bb3b16ce0dc182e777107039dc61cca048aa7dd1bb04177fc1849586",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/recovery_crash_points.rs",
+      "line": 312,
+      "source": "        self.inner.load_session_admission(session_id).await",
+      "sha256": "fce24542bb3b16ce0dc182e777107039dc61cca048aa7dd1bb04177fc1849586",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/cancel_terminal_race.rs",
+      "line": 287,
+      "source": "impl StoragePort for GatedStorage {",
+      "sha256": "b0f88125646a3ab212b28dbc74505fb27ae9a61d915a9e042d8488d4ce30d5fd",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/cancel_terminal_race.rs",
+      "line": 288,
+      "source": "    fn session_admission(",
+      "sha256": "b0f88125646a3ab212b28dbc74505fb27ae9a61d915a9e042d8488d4ce30d5fd",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/cancel_terminal_race.rs",
+      "line": 291,
+      "source": "        StoragePort::session_admission(self.inner.as_ref())",
+      "sha256": "b0f88125646a3ab212b28dbc74505fb27ae9a61d915a9e042d8488d4ce30d5fd",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/cancel_terminal_race.rs",
+      "line": 293,
+      "source": "    async fn load_session_admission(",
+      "sha256": "b0f88125646a3ab212b28dbc74505fb27ae9a61d915a9e042d8488d4ce30d5fd",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/cancel_terminal_race.rs",
+      "line": 297,
+      "source": "        self.inner.load_session_admission(session_id).await",
+      "sha256": "b0f88125646a3ab212b28dbc74505fb27ae9a61d915a9e042d8488d4ce30d5fd",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/request_id_canonicalization.rs",
+      "line": 283,
+      "source": "        impl StoragePort for $ty {",
+      "sha256": "c6ad7d26f97b0016dde0e64adb0ff8bccd0f540e00feb0f2ccf6d49bab561317",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/request_id_canonicalization.rs",
+      "line": 284,
+      "source": "            fn session_admission(",
+      "sha256": "c6ad7d26f97b0016dde0e64adb0ff8bccd0f540e00feb0f2ccf6d49bab561317",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/request_id_canonicalization.rs",
+      "line": 287,
+      "source": "                StoragePort::session_admission(self.inner.as_ref())",
+      "sha256": "c6ad7d26f97b0016dde0e64adb0ff8bccd0f540e00feb0f2ccf6d49bab561317",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/request_id_canonicalization.rs",
+      "line": 289,
+      "source": "            async fn load_session_admission(",
+      "sha256": "c6ad7d26f97b0016dde0e64adb0ff8bccd0f540e00feb0f2ccf6d49bab561317",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/request_id_canonicalization.rs",
+      "line": 293,
+      "source": "                self.inner.load_session_admission(session_id).await",
+      "sha256": "c6ad7d26f97b0016dde0e64adb0ff8bccd0f540e00feb0f2ccf6d49bab561317",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/request_id_canonicalization.rs",
+      "line": 1389,
+      "source": "                .spawn_detached(format!(\"c4-filler-{n}\"), async move {",
+      "sha256": "c6ad7d26f97b0016dde0e64adb0ff8bccd0f540e00feb0f2ccf6d49bab561317",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/admission_dedup_consistency.rs",
+      "line": 215,
+      "source": "        impl StoragePort for $ty {",
+      "sha256": "a86a0d8c3ddd342c46942423cff92cc22a1523e75823983cbbbb3bd33a57bfc0",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/admission_dedup_consistency.rs",
+      "line": 216,
+      "source": "            fn session_admission(",
+      "sha256": "a86a0d8c3ddd342c46942423cff92cc22a1523e75823983cbbbb3bd33a57bfc0",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/admission_dedup_consistency.rs",
+      "line": 219,
+      "source": "                StoragePort::session_admission(self.inner.as_ref())",
+      "sha256": "a86a0d8c3ddd342c46942423cff92cc22a1523e75823983cbbbb3bd33a57bfc0",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/admission_dedup_consistency.rs",
+      "line": 221,
+      "source": "            async fn load_session_admission(",
+      "sha256": "a86a0d8c3ddd342c46942423cff92cc22a1523e75823983cbbbb3bd33a57bfc0",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/admission_dedup_consistency.rs",
+      "line": 225,
+      "source": "                self.inner.load_session_admission(session_id).await",
+      "sha256": "a86a0d8c3ddd342c46942423cff92cc22a1523e75823983cbbbb3bd33a57bfc0",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/admission_dedup_consistency.rs",
+      "line": 601,
+      "source": "                .spawn_detached(format!(\"c01-filler-{n}\"), async move {",
+      "sha256": "a86a0d8c3ddd342c46942423cff92cc22a1523e75823983cbbbb3bd33a57bfc0",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/admission_dedup_consistency.rs",
+      "line": 617,
+      "source": "    // 拒绝来自 spawn_detached 的容量门）。",
+      "sha256": "a86a0d8c3ddd342c46942423cff92cc22a1523e75823983cbbbb3bd33a57bfc0",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/instance_lifecycle.rs",
+      "line": 178,
+      "source": "    let err = tokio::task::spawn_blocking(move || acquire(&layout))",
+      "sha256": "0eed3931c005bdbc5b5e8ac6c547876cffbd89604cb3d1e99d5f4e41d503b63a",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r05_t02_credentials.rs",
+      "line": 1943,
+      "source": "        joiners.push(tokio::task::spawn_blocking(move || {",
+      "sha256": "8a7f7f23e30aa22b23a51138d4ac2817e9dca78fa63889d4fa82dd82a0e35541",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/subagent_closeout.rs",
+      "line": 934,
+      "source": "        .spawn_linked(",
+      "sha256": "be74628bd47c4fea91c61294783188ab59ca00123237f1686ec6ddfd550c7d41",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/subagent_closeout.rs",
+      "line": 973,
+      "source": "        .spawn_linked(",
+      "sha256": "be74628bd47c4fea91c61294783188ab59ca00123237f1686ec6ddfd550c7d41",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/subagent_closeout.rs",
+      "line": 1222,
+      "source": "        .spawn_detached(\"background:sentinel\".to_string(), {",
+      "sha256": "be74628bd47c4fea91c61294783188ab59ca00123237f1686ec6ddfd550c7d41",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/subagent_closeout.rs",
+      "line": 1237,
+      "source": "            .spawn_detached(format!(\"background:boom-{i}\"), async move {",
+      "sha256": "be74628bd47c4fea91c61294783188ab59ca00123237f1686ec6ddfd550c7d41",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/subagent_closeout.rs",
+      "line": 1264,
+      "source": "        .spawn_detached(\"background:fresh\".to_string(), async { \"fresh\" })",
+      "sha256": "be74628bd47c4fea91c61294783188ab59ca00123237f1686ec6ddfd550c7d41",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs",
+      "line": 2502,
+      "source": "impl lingxi_kernel::ports::StoragePort for GatedStorage {",
+      "sha256": "1b9d52a5e88490ecdeca9e3d9fc5fa566954677da4d0dfeddda551053d7000f7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs",
+      "line": 2503,
+      "source": "    fn session_admission(&self) -> Option<Arc<lingxi_kernel::session_admission::SessionAdmission>> {",
+      "sha256": "1b9d52a5e88490ecdeca9e3d9fc5fa566954677da4d0dfeddda551053d7000f7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs",
+      "line": 2504,
+      "source": "        lingxi_kernel::ports::StoragePort::session_admission(self.inner.as_ref())",
+      "sha256": "1b9d52a5e88490ecdeca9e3d9fc5fa566954677da4d0dfeddda551053d7000f7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs",
+      "line": 2506,
+      "source": "    async fn load_session_admission(",
+      "sha256": "1b9d52a5e88490ecdeca9e3d9fc5fa566954677da4d0dfeddda551053d7000f7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs",
+      "line": 2513,
+      "source": "        self.inner.load_session_admission(session_id).await",
+      "sha256": "1b9d52a5e88490ecdeca9e3d9fc5fa566954677da4d0dfeddda551053d7000f7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+      "line": 867,
+      "source": "        second.session_admission(),",
+      "sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+      "line": 868,
+      "source": "        svc.boot.state.storage().session_admission()",
+      "sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+      "line": 1610,
+      "source": "    let gate = svc.boot.state.storage().session_admission();",
+      "sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+      "line": 1968,
+      "source": "        .session_admission()",
+      "sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+      "line": 2060,
+      "source": "        .session_admission()",
+      "sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+      "line": 2231,
+      "source": "            .session_admission()",
+      "sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+      "line": 2253,
+      "source": "        .session_admission()",
+      "sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+      "line": 2530,
+      "source": "        .session_admission()",
+      "sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+      "line": 2599,
+      "source": "            .session_admission()",
+      "sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+      "line": 2610,
+      "source": "        .session_admission()",
+      "sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+      "line": 2960,
+      "source": "        same_db.session_admission(),",
+      "sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+      "line": 2961,
+      "source": "        svc.boot.state.storage().session_admission()",
+      "sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+      "test_file": true
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r06_ar_f03_operations.rs",
+      "line": 3085,
+      "source": "        .spawn_linked(",
+      "sha256": "8910c13efa74609a54db890948caedb707b6bac4bde91bcb1a3406d5105e07d7",
+      "test_file": true
+    }
+  ],
+  "classification": "原始命中，不能把函数名/日志命中算作语义覆盖"
+}

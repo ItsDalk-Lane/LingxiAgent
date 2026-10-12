@@ -1,0 +1,135 @@
+{
+  "after": [
+    {
+      "dimensions": 2,
+      "key": "38d7cb493d8604c603533ec14f06f2c87f9e391253813147aec337b5c19eeec4",
+      "status": "ready",
+      "variant": "viv_507319cd90188e31e17f1ff25dc240b7",
+      "vector": "0000803F00000000"
+    },
+    {
+      "dimensions": 2,
+      "key": "0ac8dd305f2b3c910f5fdec62736fbfea44aef87786afd535f7e2460b2df2681",
+      "status": "ready",
+      "variant": "viv_51282e40c26e0c1d39263cfc19a7762d",
+      "vector": "0000803F00000000"
+    }
+  ],
+  "before": [
+    {
+      "dimensions": 2,
+      "key": "38d7cb493d8604c603533ec14f06f2c87f9e391253813147aec337b5c19eeec4",
+      "status": "ready",
+      "variant": "viv_507319cd90188e31e17f1ff25dc240b7",
+      "vector": "0000803F00000000"
+    }
+  ],
+  "rebuilt": {
+    "degraded": [],
+    "mode": "hybrid",
+    "searchedVectorVariants": [
+      {
+        "chunkIndexVariantId": "civ_cace549cc283372a1cc7dcd10f086bd3",
+        "chunkProfileHash": "0f9da6dad6bde4f5",
+        "dimensions": 2,
+        "parameterFingerprint": "e6c84e54b976a8c08eb4b3fa7c8fe34835a2beadd9f2ead039171befb88e5366",
+        "parseArtifactId": "kpa_6243c2a2d8db8f9e0a60e716",
+        "vectorIndexVariantId": "viv_51282e40c26e0c1d39263cfc19a7762d"
+      }
+    ]
+  },
+  "refused": {
+    "degraded": [
+      {
+        "detail": "vector variant missing or incompatible (model=model-a; dims=2); rebuild the notebook index",
+        "reason": "KNOWLEDGE_VECTOR_NOT_READY"
+      }
+    ],
+    "mode": "fts",
+    "searchedVectorVariants": []
+  },
+  "requests": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "# 资料\n\n来源隔离与模型身份必须一致。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:50023"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "来源隔离"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:50023"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "# 资料\n\n来源隔离与模型身份必须一致。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:50023"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "来源隔离"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:50023"
+    }
+  ],
+  "usage": [
+    {
+      "inputTokens": 5,
+      "model": "model-a",
+      "outcome": "succeeded",
+      "outputTokens": null,
+      "protocol": "openai-embeddings",
+      "provider": "embed",
+      "transportAttempts": 1,
+      "usageState": "partial"
+    },
+    {
+      "inputTokens": 5,
+      "model": "model-a",
+      "outcome": "succeeded",
+      "outputTokens": null,
+      "protocol": "openai-embeddings",
+      "provider": "embed",
+      "transportAttempts": 1,
+      "usageState": "partial"
+    },
+    {
+      "inputTokens": 5,
+      "model": "model-a",
+      "outcome": "succeeded",
+      "outputTokens": null,
+      "protocol": "openai-embeddings",
+      "provider": "embed",
+      "transportAttempts": 1,
+      "usageState": "partial"
+    },
+    {
+      "inputTokens": 5,
+      "model": "model-a",
+      "outcome": "succeeded",
+      "outputTokens": null,
+      "protocol": "openai-embeddings",
+      "provider": "embed",
+      "transportAttempts": 1,
+      "usageState": "partial"
+    }
+  ]
+}

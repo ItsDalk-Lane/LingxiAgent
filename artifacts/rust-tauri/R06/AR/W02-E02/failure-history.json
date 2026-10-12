@@ -1,0 +1,1073 @@
+{
+  "logs": [
+    {
+      "log": "check-attempt1.log",
+      "sha256": "79ea8bc94afdfea847a6185e582d37778c43f438a0cdf04487bbc5bf0c5685cf",
+      "test_summaries": [],
+      "raw_command_available": false,
+      "timing_available": false,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "check-attempt2.log",
+      "sha256": "d5b2a128ade786a2d146f420a48b1dac87eba654907b9d32bb4ff0afee237b5e",
+      "test_summaries": [],
+      "raw_command_available": false,
+      "timing_available": false,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "check-attempt3.log",
+      "sha256": "70fd535de41cf5a493cb35932a43296355fc7be97b0c08b1fdb9619f5b9b7615",
+      "test_summaries": [],
+      "raw_command_available": false,
+      "timing_available": false,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "check-attempt4.log",
+      "sha256": "f92252532882e7cb089b9d28046f4c5ed34c8f52e8c45898839f8220a0e4db92",
+      "test_summaries": [],
+      "raw_command_available": false,
+      "timing_available": false,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "check-attempt5.log",
+      "sha256": "cea21022c81a3bb5b8e02d80121314420ff443c71268cf4076d328064a248ee2",
+      "test_summaries": [],
+      "raw_command_available": false,
+      "timing_available": false,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "exchange-attempt1.log",
+      "sha256": "d6ead0366fd63206d827fac393a1d961c59296a791c57abfcabd20ec7876e97d",
+      "test_summaries": [
+        [
+          "FAILED",
+          "0",
+          "5",
+          "0"
+        ]
+      ],
+      "raw_command_available": false,
+      "timing_available": false,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "exchange-attempt2.log",
+      "sha256": "8a90a2db1e15857b40c84999d74791916569be2d31daa37dbc124f47c122c2da",
+      "test_summaries": [
+        [
+          "ok",
+          "5",
+          "0",
+          "0"
+        ]
+      ],
+      "raw_command_available": false,
+      "timing_available": false,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "final-attempt3.log",
+      "sha256": "51fb1d677ba20a2e6b8a1e4c89938cf8010ebace647a31d500844ff247c4964b",
+      "test_summaries": [
+        [
+          "FAILED",
+          "13",
+          "1",
+          "0"
+        ]
+      ],
+      "raw_command_available": false,
+      "timing_available": false,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "full-attempt1.log",
+      "sha256": "da3d4becada1f9f2e6eacbfe0ad99ab2bf7181aa605c9d537c4e02182a722847",
+      "test_summaries": [
+        [
+          "FAILED",
+          "8",
+          "1",
+          "0"
+        ]
+      ],
+      "raw_command_available": false,
+      "timing_available": false,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "new-attempt1.log",
+      "sha256": "693c558106286a2163936306b79443eeb4659ce22835dd14a813943f14ea960e",
+      "test_summaries": [
+        [
+          "FAILED",
+          "1",
+          "4",
+          "0"
+        ]
+      ],
+      "raw_command_available": false,
+      "timing_available": false,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "new-attempt2.log",
+      "sha256": "aa89484c348c27e723cc6896b4494efe5be317b40a666876c5c33a3e38c203c4",
+      "test_summaries": [
+        [
+          "ok",
+          "5",
+          "0",
+          "0"
+        ]
+      ],
+      "raw_command_available": false,
+      "timing_available": false,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "old-red.log",
+      "sha256": "86f9e7fc85d74fb245df44bde69e10b4d0c22a8024ed3205ca56f588e0ca2c0f",
+      "test_summaries": [
+        [
+          "FAILED",
+          "0",
+          "1",
+          "0"
+        ]
+      ],
+      "raw_command_available": false,
+      "timing_available": false,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt1-clippy-owned.log",
+      "sha256": "c5257823b5355077cbb7980420227cb069f1d1a7e166680f7a5a2310ce848591",
+      "test_summaries": [],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt1-final-selfcheck.log",
+      "sha256": "7ddf2416947685abc3aaa5d40d9195618164f44a7e6943f57c7dbb9228f29a26",
+      "test_summaries": [],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt1-noncanonical-selfcheck.log",
+      "sha256": "fa23ee1c7b551cd43ede361b9283e734b9838be22a2372d11d6fc89f0918a7d1",
+      "test_summaries": [],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt1-t03-t05-regression.log",
+      "sha256": "9ed182a5c49ae53b44d41eaa0316f765ac51f301a02357ba6094d2bf54b67a47",
+      "test_summaries": [],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt2-clippy-owned.log",
+      "sha256": "792a37069caa748cd5568092421904dc172110422afa02af61f845768d74a3b9",
+      "test_summaries": [],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt2-final-selfcheck.log",
+      "sha256": "396ce111d66a38f2ad1398a7c9dea093d268791481326a489f41e5ab8baed726",
+      "test_summaries": [
+        [
+          "ok",
+          "10",
+          "0",
+          "0"
+        ]
+      ],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt2-noncanonical-selfcheck.log",
+      "sha256": "69a1afecc7c84d6542fb2aff37e4644937284a00c93533643ddc211706726eef",
+      "test_summaries": [
+        [
+          "FAILED",
+          "2",
+          "8",
+          "0"
+        ]
+      ],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt2-t03-t05-regression.log",
+      "sha256": "8983c9301355961276d918001b2c9ad7abec3043ba159d2a870353e3ba49a1f5",
+      "test_summaries": [
+        [
+          "ok",
+          "10",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "13",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "7",
+          "0",
+          "0"
+        ],
+        [
+          "FAILED",
+          "11",
+          "1",
+          "0"
+        ]
+      ],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt3-clippy-owned.log",
+      "sha256": "c33bb23dac2293a6208a19a761fb5ae762054174af8cf544a7b2eb9c395f85dc",
+      "test_summaries": [],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt3-final-selfcheck.log",
+      "sha256": "19113a4cc199afe738bd20112bfd12405086368b64d299cce9572f61f88482c0",
+      "test_summaries": [
+        [
+          "ok",
+          "14",
+          "0",
+          "0"
+        ]
+      ],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt3-noncanonical-selfcheck.log",
+      "sha256": "703f00c3135146869378969e7dca746e330feac637565652773719f429eb7b54",
+      "test_summaries": [
+        [
+          "ok",
+          "14",
+          "0",
+          "0"
+        ]
+      ],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt3-t03-t05-regression.log",
+      "sha256": "0b881e0247cee171f7bdc1e913753aaf62dc80954c396c06213d9ab8c5e8ee40",
+      "test_summaries": [
+        [
+          "ok",
+          "10",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "13",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "3",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "7",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "2",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "5",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "12",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "5",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "13",
+          "0",
+          "0"
+        ]
+      ],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt4-adapter-store-regression.log",
+      "sha256": "bd2793e6118f706db1f5644f1a09b5f17545f815a9d304f834989edfd1b1afda",
+      "test_summaries": [
+        [
+          "ok",
+          "2",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "12",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "18",
+          "0",
+          "0"
+        ]
+      ],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt4-clippy-owned.log",
+      "sha256": "a4b9ba70cdf51593d646c632664002381df55925cf65db5062fc95cac3862add",
+      "test_summaries": [],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt4-final-selfcheck.log",
+      "sha256": "aeaeb2c13445758e7d3c9373d035308e879377d0016fe773d3a19c8c693a4363",
+      "test_summaries": [],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt4-noncanonical-selfcheck.log",
+      "sha256": "573b7dbf2e0e9c94b261e4e0a63f8f974ce9ede786c16ba8caa451050b80a5fc",
+      "test_summaries": [],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    },
+    {
+      "log": "runner-attempt4-t03-t05-regression.log",
+      "sha256": "9d6aaf4c9c505ea2919038505721d8342825dcadf32b5fccc319e21a971f8ed0",
+      "test_summaries": [
+        [
+          "ok",
+          "10",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "13",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "3",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "7",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "2",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "5",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "12",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "5",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "13",
+          "0",
+          "0"
+        ]
+      ],
+      "raw_command_available": true,
+      "timing_available": true,
+      "note": "非最终候选证据；0测试编译失败不得记行为红。早期单命令未在原日志写start/end，不伪造；runner日志由相应原json记录。"
+    }
+  ],
+  "runner_record_resolution": [
+    {
+      "raw_record": "runner-attempt1-command-results.json",
+      "actual_log": "runner-attempt1-final-selfcheck.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "final-selfcheck",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_ar_f02_file_restore",
+          "--",
+          "--nocapture"
+        ],
+        "start_time": "2026-10-11T05:33:45.064864+00:00",
+        "end_time": "2026-10-11T05:33:45.114666+00:00",
+        "exit_code": 101,
+        "lingxi_home": "/tmp/lingxi-w02-e02-final-selfcheck-0tl_otgv",
+        "test_count": 0,
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "7ddf2416947685abc3aaa5d40d9195618164f44a7e6943f57c7dbb9228f29a26",
+        "log": "final-selfcheck.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt1-command-results.json",
+      "actual_log": "runner-attempt1-noncanonical-selfcheck.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "noncanonical-selfcheck",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_ar_f02_file_restore",
+          "--",
+          "--nocapture"
+        ],
+        "start_time": "2026-10-11T05:33:45.115358+00:00",
+        "end_time": "2026-10-11T05:33:45.134876+00:00",
+        "exit_code": 101,
+        "lingxi_home": "/tmp/lingxi-w02-e02-noncanonical-selfcheck-gr9u35hk",
+        "test_count": 0,
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "fa23ee1c7b551cd43ede361b9283e734b9838be22a2372d11d6fc89f0918a7d1",
+        "log": "noncanonical-selfcheck.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt1-command-results.json",
+      "actual_log": "runner-attempt1-t03-t05-regression.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "t03-t05-regression",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_t03_session_tree",
+          "--test",
+          "r06_t05_session_files",
+          "--test",
+          "r06_t05_resources",
+          "--test",
+          "r06_t05_resourceio",
+          "--test",
+          "r06_t05_filehistory",
+          "--test",
+          "r04_t04_file_tools",
+          "--",
+          "--nocapture"
+        ],
+        "start_time": "2026-10-11T05:33:45.135437+00:00",
+        "end_time": "2026-10-11T05:33:45.154386+00:00",
+        "exit_code": 101,
+        "lingxi_home": "/tmp/lingxi-w02-e02-t03-t05-regression-09z5xkms",
+        "test_count": 0,
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "9ed182a5c49ae53b44d41eaa0316f765ac51f301a02357ba6094d2bf54b67a47",
+        "log": "t03-t05-regression.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt1-command-results.json",
+      "actual_log": "runner-attempt1-clippy-owned.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "clippy-owned",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "clippy",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "-p",
+          "lingxi-service",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "start_time": "2026-10-11T05:33:45.154912+00:00",
+        "end_time": "2026-10-11T05:33:45.350834+00:00",
+        "exit_code": 101,
+        "lingxi_home": "/tmp/lingxi-w02-e02-clippy-owned-gkopuxq5",
+        "test_count": 0,
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "c5257823b5355077cbb7980420227cb069f1d1a7e166680f7a5a2310ce848591",
+        "log": "clippy-owned.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt2-command-results.json",
+      "actual_log": "runner-attempt2-final-selfcheck.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "final-selfcheck",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_ar_f02_file_restore",
+          "--",
+          "--nocapture"
+        ],
+        "start_time": "2026-10-11T05:33:53.702767+00:00",
+        "end_time": "2026-10-11T05:34:23.201534+00:00",
+        "exit_code": 0,
+        "lingxi_home": "/tmp/lingxi-w02-e02-final-selfcheck-_bcktb36",
+        "test_count": 10,
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "396ce111d66a38f2ad1398a7c9dea093d268791481326a489f41e5ab8baed726",
+        "log": "final-selfcheck.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt2-command-results.json",
+      "actual_log": "runner-attempt2-noncanonical-selfcheck.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "noncanonical-selfcheck",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_ar_f02_file_restore",
+          "--",
+          "--nocapture"
+        ],
+        "start_time": "2026-10-11T05:34:23.202501+00:00",
+        "end_time": "2026-10-11T05:35:19.267969+00:00",
+        "exit_code": 101,
+        "lingxi_home": "/tmp/lingxi-w02-e02-noncanonical-selfcheck-mocapeg9",
+        "test_count": 10,
+        "passed": 2,
+        "failed": 8,
+        "ignored": 0,
+        "evidence_hash": "69a1afecc7c84d6542fb2aff37e4644937284a00c93533643ddc211706726eef",
+        "log": "noncanonical-selfcheck.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt2-command-results.json",
+      "actual_log": "runner-attempt2-t03-t05-regression.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "t03-t05-regression",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_t03_session_tree",
+          "--test",
+          "r06_t05_session_files",
+          "--test",
+          "r06_t05_resources",
+          "--test",
+          "r06_t05_resourceio",
+          "--test",
+          "r06_t05_filehistory",
+          "--test",
+          "r04_t04_file_tools",
+          "--",
+          "--nocapture"
+        ],
+        "start_time": "2026-10-11T05:35:19.268597+00:00",
+        "end_time": "2026-10-11T05:36:54.215869+00:00",
+        "exit_code": 101,
+        "lingxi_home": "/tmp/lingxi-w02-e02-t03-t05-regression-61e65fd0",
+        "test_count": 42,
+        "passed": 41,
+        "failed": 1,
+        "ignored": 0,
+        "evidence_hash": "8983c9301355961276d918001b2c9ad7abec3043ba159d2a870353e3ba49a1f5",
+        "log": "t03-t05-regression.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt2-command-results.json",
+      "actual_log": "runner-attempt2-clippy-owned.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "clippy-owned",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "clippy",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "-p",
+          "lingxi-service",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "start_time": "2026-10-11T05:36:54.216636+00:00",
+        "end_time": "2026-10-11T05:38:08.731299+00:00",
+        "exit_code": 101,
+        "lingxi_home": "/tmp/lingxi-w02-e02-clippy-owned-cjl5qrgy",
+        "test_count": 0,
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "792a37069caa748cd5568092421904dc172110422afa02af61f845768d74a3b9",
+        "log": "clippy-owned.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt3-command-results.json",
+      "actual_log": "runner-attempt3-final-selfcheck.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "final-selfcheck",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_ar_f02_file_restore",
+          "--",
+          "--nocapture"
+        ],
+        "start_time": "2026-10-11T05:47:58.916002+00:00",
+        "end_time": "2026-10-11T05:48:36.957547+00:00",
+        "exit_code": 0,
+        "lingxi_home": "/tmp/lingxi-w02-e02-final-selfcheck-5ja5ksl2",
+        "test_count": 14,
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "19113a4cc199afe738bd20112bfd12405086368b64d299cce9572f61f88482c0",
+        "log": "final-selfcheck.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt3-command-results.json",
+      "actual_log": "runner-attempt3-noncanonical-selfcheck.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "noncanonical-selfcheck",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_ar_f02_file_restore",
+          "--",
+          "--nocapture"
+        ],
+        "start_time": "2026-10-11T05:48:36.958367+00:00",
+        "end_time": "2026-10-11T05:48:39.527228+00:00",
+        "exit_code": 0,
+        "lingxi_home": "/tmp/lingxi-w02-e02-noncanonical-selfcheck-8c83r5me",
+        "test_count": 14,
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "703f00c3135146869378969e7dca746e330feac637565652773719f429eb7b54",
+        "log": "noncanonical-selfcheck.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt3-command-results.json",
+      "actual_log": "runner-attempt3-t03-t05-regression.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "t03-t05-regression",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "--no-fail-fast",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_t03_session_tree",
+          "--test",
+          "r06_t05_session_files",
+          "--test",
+          "r06_t05_resources",
+          "--test",
+          "r06_t05_resourceio",
+          "--test",
+          "r06_t05_filehistory",
+          "--test",
+          "r06_t05_fsread",
+          "--test",
+          "r06_t05_preview",
+          "--test",
+          "r06_t05_bridgemedia",
+          "--test",
+          "r04_t04_file_tools",
+          "--",
+          "--nocapture"
+        ],
+        "start_time": "2026-10-11T05:48:39.528001+00:00",
+        "end_time": "2026-10-11T05:53:21.371435+00:00",
+        "exit_code": 0,
+        "lingxi_home": "/tmp/lingxi-w02-e02-t03-t05-regression-ircgvbpf",
+        "test_count": 70,
+        "passed": 70,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "0b881e0247cee171f7bdc1e913753aaf62dc80954c396c06213d9ab8c5e8ee40",
+        "log": "t03-t05-regression.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt3-command-results.json",
+      "actual_log": "runner-attempt3-clippy-owned.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "clippy-owned",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "clippy",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "-p",
+          "lingxi-service",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "start_time": "2026-10-11T05:53:21.372068+00:00",
+        "end_time": "2026-10-11T05:53:28.201811+00:00",
+        "exit_code": 101,
+        "lingxi_home": "/tmp/lingxi-w02-e02-clippy-owned-lhwbjie_",
+        "test_count": 0,
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "c33bb23dac2293a6208a19a761fb5ae762054174af8cf544a7b2eb9c395f85dc",
+        "log": "clippy-owned.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt4-command-results.json",
+      "actual_log": "runner-attempt4-final-selfcheck.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "final-selfcheck",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_ar_f02_file_restore",
+          "--",
+          "--nocapture"
+        ],
+        "start_time": "2026-10-11T05:54:07.714286+00:00",
+        "end_time": "2026-10-11T05:54:19.631416+00:00",
+        "exit_code": 101,
+        "lingxi_home": "/tmp/lingxi-w02-e02-final-selfcheck-fcns_beh",
+        "test_count": 0,
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "aeaeb2c13445758e7d3c9373d035308e879377d0016fe773d3a19c8c693a4363",
+        "log": "final-selfcheck.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt4-command-results.json",
+      "actual_log": "runner-attempt4-noncanonical-selfcheck.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "noncanonical-selfcheck",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_ar_f02_file_restore",
+          "--",
+          "--nocapture"
+        ],
+        "start_time": "2026-10-11T05:54:19.632096+00:00",
+        "end_time": "2026-10-11T05:54:21.304927+00:00",
+        "exit_code": 101,
+        "lingxi_home": "/tmp/lingxi-w02-e02-noncanonical-selfcheck-1ss4ofrw",
+        "test_count": 0,
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "573b7dbf2e0e9c94b261e4e0a63f8f974ce9ede786c16ba8caa451050b80a5fc",
+        "log": "noncanonical-selfcheck.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt4-command-results.json",
+      "actual_log": "runner-attempt4-t03-t05-regression.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "t03-t05-regression",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "--no-fail-fast",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_t03_session_tree",
+          "--test",
+          "r06_t05_session_files",
+          "--test",
+          "r06_t05_resources",
+          "--test",
+          "r06_t05_resourceio",
+          "--test",
+          "r06_t05_filehistory",
+          "--test",
+          "r06_t05_fsread",
+          "--test",
+          "r06_t05_preview",
+          "--test",
+          "r06_t05_bridgemedia",
+          "--test",
+          "r04_t04_file_tools",
+          "--",
+          "--nocapture"
+        ],
+        "start_time": "2026-10-11T05:54:21.305526+00:00",
+        "end_time": "2026-10-11T05:57:09.304551+00:00",
+        "exit_code": 0,
+        "lingxi_home": "/tmp/lingxi-w02-e02-t03-t05-regression-ifuy7utn",
+        "test_count": 70,
+        "passed": 70,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "9d6aaf4c9c505ea2919038505721d8342825dcadf32b5fccc319e21a971f8ed0",
+        "log": "t03-t05-regression.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt4-command-results.json",
+      "actual_log": "runner-attempt4-adapter-store-regression.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "adapter-store-regression",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "--no-fail-fast",
+          "-p",
+          "lingxi-adapters",
+          "--test",
+          "session_tree_r06t03",
+          "--test",
+          "session_file_store",
+          "--test",
+          "migration_idempotency",
+          "--",
+          "--nocapture"
+        ],
+        "start_time": "2026-10-11T05:57:09.305141+00:00",
+        "end_time": "2026-10-11T06:00:01.712540+00:00",
+        "exit_code": 0,
+        "lingxi_home": "/tmp/lingxi-w02-e02-adapter-store-regression-4mghup2q",
+        "test_count": 32,
+        "passed": 32,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "bd2793e6118f706db1f5644f1a09b5f17545f815a9d304f834989edfd1b1afda",
+        "log": "adapter-store-regression.log"
+      }
+    },
+    {
+      "raw_record": "runner-attempt4-command-results.json",
+      "actual_log": "runner-attempt4-clippy-owned.log",
+      "hash_matches": true,
+      "command_record": {
+        "name": "clippy-owned",
+        "command": [
+          "/Users/study_superior/.cargo/bin/cargo",
+          "clippy",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-j8",
+          "-p",
+          "lingxi-service",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "start_time": "2026-10-11T06:00:01.713338+00:00",
+        "end_time": "2026-10-11T06:03:00.134776+00:00",
+        "exit_code": 0,
+        "lingxi_home": "/tmp/lingxi-w02-e02-clippy-owned-5pgtmqlo",
+        "test_count": 0,
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "evidence_hash": "a4b9ba70cdf51593d646c632664002381df55925cf65db5062fc95cac3862add",
+        "log": "clippy-owned.log"
+      }
+    }
+  ],
+  "missing_early_metadata": "早期原始日志未录绝对start/end或完整argv；保留原日志，不填造时间。old-red为1项真实行为失败，其它编译失败标0测试。"
+}

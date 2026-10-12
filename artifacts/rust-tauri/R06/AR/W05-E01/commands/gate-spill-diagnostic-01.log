@@ -1,0 +1,8 @@
+LINGXI_TEST_GUARD: armed (pid 88514, mem_limit=8192 MB, time_limit=600 s)
+
+running 2 tests
+test f05_c04_spill_write_failure_diagnoses_honestly_no_ghost_full_file ... ok
+test f05_c04_unwritable_spill_dir_reports_no_spill_kept ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

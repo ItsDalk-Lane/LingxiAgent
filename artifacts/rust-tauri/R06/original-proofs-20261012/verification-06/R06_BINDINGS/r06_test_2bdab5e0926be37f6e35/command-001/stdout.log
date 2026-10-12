@@ -1,0 +1,22 @@
+
+running 1 test
+test stage_files_gateway_only_delivers_real_authorized_session_files ... ok
+
+successes:
+
+---- stage_files_gateway_only_delivers_real_authorized_session_files stdout ----
+LINGXI_AUTH_REJECTED request_id="req-10062936f7c9898f1b9e929711a2bab5" method=GET [token] status=403 reason=insufficient_scope remote=127.0.0.1:60175
+LINGXI_AUTH_REJECTED request_id="req-0633f6b1f947e0de1886ff8190bf6721" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:60176
+LINGXI_AUTH_REJECTED request_id="req-ce8d88f5eab715bab2e78f5ee69dd763" method=GET [token] status=403 reason=insufficient_scope remote=127.0.0.1:60177
+LINGXI_AUTH_REJECTED request_id="req-6b8c9abfa9ed0bd40dd2be5a3b7cfa3f" method=HEAD [token] status=403 reason=insufficient_scope remote=127.0.0.1:60178
+LINGXI_AUTH_REJECTED request_id="req-1693c98a0b1931f4cbe2a18f19342e13" method=GET [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:60179
+非法非空可信ctx现状（不作为原无会话拒绝）：Success { result: ToolSuccess { content: [Text { text: "[SessionFile] {\"fileId\":\"sf_7ff385145611c56a\",\"filename\":\"delivered.txt\"}" }], resource_refs: [], truncated: false, status: None, content_digest: "b892b3e19c32011165e22705b222f0ea730586b89ad027cf3de3f97b4b83bb93" } }
+原无会话条件：actual=Success { result: ToolSuccess { content: [Text { text: "[SessionFile] {\"fileId\":\"sf_fc700609009f679b\",\"filename\":\"delivered.txt\"}" }], resource_refs: [], truncated: false, status: None, content_digest: "f4cfcd3c9264f2e6c095cd5aa19cfde859c98e6ff3243320c62c2b4bc001eb3e" } }; before=["4", "2", "2"]; after=["5", "3", "3"]; expect=Failed且无新增会话/文件/引用
+原无会话条件实际未满足：空身份普通Success且新增会话/文件/引用；原第三句必须GAP
+
+
+successes:
+    stage_files_gateway_only_delivers_real_authorized_session_files
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 6.17s
+

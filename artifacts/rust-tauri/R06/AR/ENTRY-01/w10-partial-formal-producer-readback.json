@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-11T09:56:00.713007+00:00",
+  "role": "ROOT_READ_PARTIAL_ACTUAL_PRODUCER_NOT_INDEPENDENT_ACCEPTANCE",
+  "workspace": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent",
+  "formal_stage_completion": "NOT_RUN_COMPLETION_STILL_RUNNING_NESTED_R04",
+  "owned5_current_equal_to_frozen": true,
+  "owned_freeze_sha": "e8de8a6ade3803ad59f484f27709f34c47412346b3c65f89c59514d9d1db4777",
+  "partial_R05_suite_producer": {
+    "schema": "lingxi.r05-stage-suite-results.v1",
+    "allSuitesOk": true,
+    "allCasesOk": true,
+    "suite_entries": 91,
+    "case_entries": 93,
+    "summary_sha": "b9fed3bc5d04b54cd568a888b4e6adf6384fe200275456c74b363321b7ac95f8",
+    "producer_json_sha": "d7626394ceea62b92c13e97571be576b0c30db4fa3903b3d40cf92224c6df007",
+    "scope": "R05 stage suite command partial result only; not whole formal R05/upstream/current R06 or F10 independent PASS"
+  },
+  "F10_C04": "BLOCKED_DEPENDENCY_F09",
+  "prior_root_probe": "wrong Path.parents index failed before hash check; no result claimed, corrected explicit workspace now",
+  "no_review_or_commit": true
+}

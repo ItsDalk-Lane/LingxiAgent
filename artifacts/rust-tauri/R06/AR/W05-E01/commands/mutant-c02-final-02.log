@@ -1,0 +1,18 @@
+LINGXI_TEST_GUARD: armed (pid 50561, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+
+thread 'c02_real_runtime_other_agent_child_has_its_own_persona' (6233568) panicked at crates/lingxi-service/tests/r06_ar_f05_cache.rs:709:5:
+assertion `left == right` failed: 合法不同助手子代理必须获得自己的材料，不能串人格或父私史
+  left: (true, false, false, true)
+ right: (true, true, true, true)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test c02_real_runtime_other_agent_child_has_its_own_persona ... FAILED
+
+failures:
+
+failures:
+    c02_real_runtime_other_agent_child_has_its_own_persona
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.13s
+

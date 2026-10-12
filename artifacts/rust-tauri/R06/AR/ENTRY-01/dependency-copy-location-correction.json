@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-11T11:38:45.258067+00:00",
+  "action_error": "Dependency cp ran despite preceding missing dispatch filename assertion; W03 node_modules was still a task-created link, causing new nested duplicate in main dependencies",
+  "exact_created_duplicate": "/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/node_modules",
+  "birthtime": 1791718611.7569337,
+  "proof_prior_three_task_CoW_copies_absent_nested_directory": [
+    "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/node_modules",
+    "/Users/study_superior/.codex/worktrees/r06-w09-execution/LingxiAgent/node_modules",
+    "/Users/study_superior/.codex/r06-isolated-checkouts/w01-first-review-source-01/node_modules"
+  ],
+  "original_top_level_entries_unchanged": true,
+  "original_dependency_lock_unchanged_sha256": "2080ceedcb622c779ab7b757aa281828b3bcfd97d839c4d793641c2bac85e528",
+  "cleanup_authority": "Remove only proven task-generated unnecessary duplicate; no original user data/file removal",
+  "pre_cleanup_settings_sha256": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3",
+  "source_product_modified": false,
+  "new_guardrail": "Every sequential dependent tool result must explicitly check exit before mutation; no unconditional cp after preparation failure",
+  "cleanup_complete": true,
+  "original_top_level_entries_match_prior_snapshot_after": true,
+  "user_settings_unchanged": true,
+  "git_index_empty": true
+}

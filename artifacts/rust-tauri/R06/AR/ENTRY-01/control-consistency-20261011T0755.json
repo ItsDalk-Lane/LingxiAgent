@@ -1,0 +1,23 @@
+{
+  "role": "ROOT_CONTROL_CONSISTENCY_NOT_PRODUCT_OR_STAGE_VERDICT",
+  "time_utc": "2026-10-11T07:54:46.705773+00:00",
+  "issue_count": 15,
+  "case_count": 60,
+  "unique_actor_ids": 20,
+  "closed_count": 1,
+  "open_count": 14,
+  "accepted_issue": [
+    "R06-AR-F08"
+  ],
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "remote_head_at_check": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "branch": "codex/rust-tauri-migration",
+  "index_empty": true,
+  "user_file_sha256": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3",
+  "scope": "strict JSON/IDs/counts/Git receipts only",
+  "product_checks": "NOT_RUN_BY_THIS_CONTROL_CHECK",
+  "stage_gate": "NOT_RUN",
+  "upstream_gates": "NOT_RUN_FINAL_COMBINED",
+  "current_status": "R06_NOT_ACCEPTED",
+  "extra_open_count": 12
+}

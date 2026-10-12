@@ -27,22 +27,181 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use rusqlite::Connection;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use lingxi_kernel::memory::{
-    build_compiled_memory_markdown, build_fact_search_text, build_fts_query, has_cjk,
-    normalize_compiled_section_body, normalize_compiled_week_section_body,
-    normalize_experience_category, sort_tenets, tenets_add_direct, tenets_add_proposal,
-    tenets_decide, tenets_remove, tenets_replace_pinned, validate_tenets_strict,
-    zero_result_diagnostic_terms, NewTenetInput, Tenet, TenetErrorCode, TenetStatus, TenetsFile,
-    TENETS_SCHEMA_VERSION, ZERO_RESULT_DIAGNOSTIC_MAX_TERMS,
+    NewTenetInput, TENETS_SCHEMA_VERSION, Tenet, TenetErrorCode, TenetStatus, TenetsFile,
+    ZERO_RESULT_DIAGNOSTIC_MAX_TERMS, build_compiled_memory_markdown, build_fact_search_text,
+    build_fts_query, has_cjk, normalize_compiled_section_body,
+    normalize_compiled_week_section_body, normalize_experience_category, sort_tenets,
+    tenets_add_direct, tenets_add_proposal, tenets_decide, tenets_remove, tenets_replace_pinned,
+    validate_tenets_strict, zero_result_diagnostic_terms,
 };
+
+/// 单个资料根的发布栅栏，嵌套和并行写者均计数；不保存历史代次。
+#[derive(Default)]
+pub struct ContextMaterialEpoch {
+    writers: std::sync::atomic::AtomicUsize,
+    revision: std::sync::atomic::AtomicU64,
+}
+impl ContextMaterialEpoch {
+    pub fn stable_revision(&self) -> Option<u64> {
+        use std::sync::atomic::Ordering::SeqCst;
+        let revision = self.revision.load(SeqCst);
+        (self.writers.load(SeqCst) == 0).then_some(revision)
+    }
+}
+
+/// Weak 索引在每次访问时回收，不会为已退出的服务保存资料根或版本历史。
+pub fn context_material_epoch(home: &Path) -> std::sync::Arc<ContextMaterialEpoch> {
+    use std::sync::{Arc, Mutex, OnceLock, Weak};
+    static ROOTS: OnceLock<Mutex<std::collections::HashMap<PathBuf, Weak<ContextMaterialEpoch>>>> =
+        OnceLock::new();
+    let key = home.canonicalize().unwrap_or_else(|_| home.to_path_buf());
+    let mut roots = ROOTS
+        .get_or_init(|| Mutex::new(std::collections::HashMap::new()))
+        .lock()
+        .expect("资料根发布索引锁");
+    roots.retain(|_, epoch| epoch.strong_count() != 0);
+    if let Some(epoch) = roots.get(&key).and_then(Weak::upgrade) {
+        return epoch;
+    }
+    let epoch = Arc::new(ContextMaterialEpoch::default());
+    roots.insert(key, Arc::downgrade(&epoch));
+    epoch
+}
+
+pub struct ContextMaterialMutation(std::sync::Arc<ContextMaterialEpoch>);
+impl ContextMaterialMutation {
+    pub fn for_home(home: &Path) -> Self {
+        use std::sync::atomic::Ordering::SeqCst;
+        let epoch = context_material_epoch(home);
+        epoch.writers.fetch_add(1, SeqCst);
+        epoch.revision.fetch_add(1, SeqCst);
+        Self(epoch)
+    }
+    pub fn for_path(path: &Path) -> Option<Self> {
+        let home = path
+            .ancestors()
+            .find(|p| {
+                p.file_name()
+                    .is_some_and(|n| n == "agents" || n == "user" || n == "skills")
+            })
+            .and_then(Path::parent)?;
+        Some(Self::for_home(home))
+    }
+}
+impl Drop for ContextMaterialMutation {
+    fn drop(&mut self) {
+        use std::sync::atomic::Ordering::SeqCst;
+        self.0.revision.fetch_add(1, SeqCst);
+        self.0.writers.fetch_sub(1, SeqCst);
+    }
+}
+
+/// 同一助手的编译、原则维护、dream修订和恢复共用排他门；不同助手互不阻塞。
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MemoryOperationKind {
+    Compile,
+    Maintenance,
+    Dream,
+    Restore,
+}
+type MemoryOperationHook = std::sync::Arc<dyn Fn(MemoryOperationKind) + Send + Sync>;
+#[derive(Default)]
+struct MemoryOperationState {
+    active: std::sync::Mutex<Option<MemoryOperationKind>>,
+    hook: std::sync::Mutex<Option<MemoryOperationHook>>,
+}
+fn memory_operation_state(memory_dir: &Path) -> std::sync::Arc<MemoryOperationState> {
+    use std::sync::{Arc, Mutex, OnceLock, Weak};
+    static STATES: OnceLock<Mutex<std::collections::HashMap<PathBuf, Weak<MemoryOperationState>>>> =
+        OnceLock::new();
+    let key = memory_dir
+        .canonicalize()
+        .unwrap_or_else(|_| memory_dir.to_path_buf());
+    let mut states = STATES
+        .get_or_init(|| Mutex::new(std::collections::HashMap::new()))
+        .lock()
+        .expect("助手记忆操作索引锁");
+    states.retain(|_, state| state.strong_count() > 0);
+    if let Some(state) = states.get(&key).and_then(Weak::upgrade) {
+        return state;
+    }
+    let state = Arc::new(MemoryOperationState::default());
+    states.insert(key, Arc::downgrade(&state));
+    state
+}
+struct MemoryOperationGuard(std::sync::Arc<MemoryOperationState>);
+impl Drop for MemoryOperationGuard {
+    fn drop(&mut self) {
+        *self.0.active.lock().expect("助手记忆操作状态锁") = None;
+    }
+}
+fn begin_memory_operation(
+    memory_dir: &Path,
+    kind: MemoryOperationKind,
+) -> Result<MemoryOperationGuard, MemoryError> {
+    let state = memory_operation_state(memory_dir);
+    {
+        let mut active = state.active.lock().expect("助手记忆操作状态锁");
+        if let Some(running) = *active {
+            return Err(MemoryError::Conflict {
+                code: if running == MemoryOperationKind::Dream {
+                    "dream_already_running"
+                } else {
+                    "dream_memory_busy"
+                }
+                .into(),
+                message: "该助手的记忆操作正在进行，请稍后重试".into(),
+            });
+        }
+        *active = Some(kind);
+    }
+    let guard = MemoryOperationGuard(state);
+    let hook = guard.0.hook.lock().expect("记忆操作时序探针锁").clone();
+    if let Some(hook) = hook {
+        hook(kind);
+    }
+    Ok(guard)
+}
+/// 可信宿主测试探针：真实操作取得锁后才调用；生产默认没有探针，HTTP不能配置。
+#[doc(hidden)]
+pub struct MemoryOperationTestHookGuard {
+    state: std::sync::Arc<MemoryOperationState>,
+    previous: Option<MemoryOperationHook>,
+}
+impl Drop for MemoryOperationTestHookGuard {
+    fn drop(&mut self) {
+        *self.state.hook.lock().expect("记忆操作时序探针锁") = self.previous.take();
+    }
+}
+#[doc(hidden)]
+pub fn memory_operation_test_hook(
+    memory_dir: &Path,
+    hook: MemoryOperationHook,
+) -> MemoryOperationTestHookGuard {
+    let state = memory_operation_state(memory_dir);
+    let previous = state.hook.lock().expect("记忆操作时序探针锁").replace(hook);
+    MemoryOperationTestHookGuard { state, previous }
+}
+
+pub fn dream_snapshot_hash(snapshot: &Value) -> Result<String, MemoryError> {
+    use sha2::{Digest, Sha256};
+    let bytes =
+        serde_json::to_vec(snapshot).map_err(|error| MemoryError::Store(error.to_string()))?;
+    Ok(Sha256::digest(bytes)
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect())
+}
 
 // ── shared file helpers ─────────────────────────────────────────────────────
 
 /// Atomic write: tmp file + rename (incumbent `shared/safe-fs.ts`
 /// atomicWriteSync semantics).
 pub fn atomic_write(path: &Path, content: &str) -> io::Result<()> {
+    let _publication = ContextMaterialMutation::for_path(path);
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)?;
     }
@@ -70,6 +229,7 @@ fn safe_read(path: &Path) -> String {
 }
 
 fn remove_if_exists(path: &Path) -> io::Result<()> {
+    let _publication = ContextMaterialMutation::for_path(path);
     match std::fs::remove_file(path) {
         Ok(()) => Ok(()),
         Err(err) if err.kind() == io::ErrorKind::NotFound => Ok(()),
@@ -849,7 +1009,7 @@ impl TenetsStore {
                 return Err(MemoryError::Conflict {
                     code: "TENET_STORE_READ_FAILED".into(),
                     message: format!("cannot read tenets store: {err}"),
-                })
+                });
             }
         };
         let value: Value = serde_json::from_str(&raw).map_err(|_| MemoryError::Conflict {
@@ -863,6 +1023,14 @@ impl TenetsStore {
     }
 
     pub fn write(&self, file: &TenetsFile) -> Result<(), MemoryError> {
+        let _operation = begin_memory_operation(
+            self.file_path.parent().expect("原则所属记忆目录"),
+            MemoryOperationKind::Maintenance,
+        )?;
+        self.write_unlocked(file)
+    }
+
+    fn write_unlocked(&self, file: &TenetsFile) -> Result<(), MemoryError> {
         let mut sorted = file.clone();
         sort_tenets(&mut sorted.tenets);
         let value = json!({
@@ -880,9 +1048,13 @@ impl TenetsStore {
         &self,
         mutate: impl FnOnce(&mut TenetsFile) -> Result<T, MemoryError>,
     ) -> Result<T, MemoryError> {
+        let _operation = begin_memory_operation(
+            self.file_path.parent().expect("原则所属记忆目录"),
+            MemoryOperationKind::Maintenance,
+        )?;
         let mut file = self.read_strict()?;
         let result = mutate(&mut file)?;
-        self.write(&file)?;
+        self.write_unlocked(&file)?;
         Ok(result)
     }
 
@@ -1066,6 +1238,17 @@ impl CompiledMemoryStore {
     /// existence baseline (ensureEditableFactsBaseline :869-903, summary
     /// watermark parts belong to the ticker and are absent here).
     pub fn read_sections(&self) -> Result<CompiledSections, MemoryError> {
+        let _operation = if !self.path("facts.md").exists() {
+            Some(begin_memory_operation(
+                &self.memory_dir,
+                MemoryOperationKind::Compile,
+            )?)
+        } else {
+            None
+        };
+        self.read_sections_unlocked()
+    }
+    fn read_sections_unlocked(&self) -> Result<CompiledSections, MemoryError> {
         std::fs::create_dir_all(&self.memory_dir).map_err(MemoryError::from)?;
         let facts_path = self.path("facts.md");
         if !facts_path.exists() {
@@ -1085,7 +1268,11 @@ impl CompiledMemoryStore {
 
     /// assemble (compile.ts:1054-1091).
     pub fn assemble(&self) -> Result<String, MemoryError> {
-        let sections = self.read_sections()?;
+        let _operation = begin_memory_operation(&self.memory_dir, MemoryOperationKind::Compile)?;
+        self.assemble_unlocked()
+    }
+    fn assemble_unlocked(&self) -> Result<String, MemoryError> {
+        let sections = self.read_sections_unlocked()?;
         let content = build_compiled_memory_markdown(
             &sections.facts,
             &sections.today,
@@ -1111,6 +1298,11 @@ impl CompiledMemoryStore {
     }
 
     fn write_section(&self, file: &str, body: &str) -> Result<String, MemoryError> {
+        let _operation = begin_memory_operation(&self.memory_dir, MemoryOperationKind::Compile)?;
+        self.write_section_unlocked(file, body)
+    }
+    fn write_section_unlocked(&self, file: &str, body: &str) -> Result<String, MemoryError> {
+        let _publication = ContextMaterialMutation::for_path(&self.memory_dir);
         let normalized = normalize_compiled_section_body(body);
         atomic_write(
             &self.path(file),
@@ -1121,7 +1313,7 @@ impl CompiledMemoryStore {
             },
         )
         .map_err(MemoryError::from)?;
-        self.assemble()?;
+        self.assemble_unlocked()?;
         Ok(normalized)
     }
 
@@ -1168,6 +1360,11 @@ impl CompiledMemoryStore {
     /// writeWeekDayEntry (compile.ts:849-866): only existing dates; then
     /// reassemble week.md + memory.md.
     pub fn write_week_day(&self, date: &str, body: &str) -> Result<String, MemoryError> {
+        let _operation = begin_memory_operation(&self.memory_dir, MemoryOperationKind::Compile)?;
+        self.write_week_day_unlocked(date, body)
+    }
+    fn write_week_day_unlocked(&self, date: &str, body: &str) -> Result<String, MemoryError> {
+        let _publication = ContextMaterialMutation::for_path(&self.memory_dir);
         if !is_valid_iso_date(date) {
             return Err(MemoryError::InvalidRequest(
                 "date must be YYYY-MM-DD".into(),
@@ -1185,13 +1382,17 @@ impl CompiledMemoryStore {
             &format!("{normalized}\n"),
         )
         .map_err(MemoryError::from)?;
-        self.assemble_week()?;
-        self.assemble()?;
+        self.assemble_week_unlocked()?;
+        self.assemble_unlocked()?;
         Ok(normalized)
     }
 
     /// assembleWeekFromDaily (compile.ts:586-611).
     pub fn assemble_week(&self) -> Result<String, MemoryError> {
+        let _operation = begin_memory_operation(&self.memory_dir, MemoryOperationKind::Compile)?;
+        self.assemble_week_unlocked()
+    }
+    fn assemble_week_unlocked(&self) -> Result<String, MemoryError> {
         let days = self.list_week_days()?;
         let blocks: Vec<String> = days.into_iter().map(|(_, body)| body).collect();
         let content = lingxi_kernel::memory::assemble_week_blocks(
@@ -1210,6 +1411,11 @@ impl CompiledMemoryStore {
 
     /// writeCompiledResetMarker (compiled-memory-state.ts:25-43).
     pub fn write_reset_marker(&self) -> Result<String, MemoryError> {
+        let _operation =
+            begin_memory_operation(&self.memory_dir, MemoryOperationKind::Maintenance)?;
+        self.write_reset_marker_unlocked()
+    }
+    fn write_reset_marker_unlocked(&self) -> Result<String, MemoryError> {
         let now = now_iso();
         let marker = json!({
             "compiledResetAt": now,
@@ -1228,9 +1434,30 @@ impl CompiledMemoryStore {
         value.get("compiledResetAt")?.as_str().map(str::to_string)
     }
 
+    pub fn reset_and_clear(&self) -> Result<(), MemoryError> {
+        let _operation =
+            begin_memory_operation(&self.memory_dir, MemoryOperationKind::Maintenance)?;
+        self.write_reset_marker_unlocked()?;
+        self.clear_artifacts_unlocked()
+    }
+
+    pub fn reset_and_clear_all_facts(&self, facts: &FactStore) -> Result<(), MemoryError> {
+        let _operation =
+            begin_memory_operation(&self.memory_dir, MemoryOperationKind::Maintenance)?;
+        self.write_reset_marker_unlocked()?;
+        facts.clear_all()?;
+        self.clear_artifacts_unlocked()
+    }
+
     /// clearCompiledMemoryArtifacts (compiled-memory-state.ts:45-57): empty
     /// the five files, remove fingerprints.
     pub fn clear_artifacts(&self) -> Result<(), MemoryError> {
+        let _operation =
+            begin_memory_operation(&self.memory_dir, MemoryOperationKind::Maintenance)?;
+        self.clear_artifacts_unlocked()
+    }
+    fn clear_artifacts_unlocked(&self) -> Result<(), MemoryError> {
+        let _publication = ContextMaterialMutation::for_path(&self.memory_dir);
         std::fs::create_dir_all(&self.memory_dir).map_err(MemoryError::from)?;
         for name in COMPILED_FILES {
             let path = self.path(name);
@@ -1243,6 +1470,12 @@ impl CompiledMemoryStore {
     /// migrateLegacyEditableFacts (compile.ts:905-955): idempotent read-time
     /// migration of alpha `editable-facts.md` into canonical `facts.md`.
     pub fn migrate_legacy_editable_facts(&self) -> Result<Value, MemoryError> {
+        if !self.path("editable-facts.md").exists() {
+            return Ok(json!({"migrated":false,"reason":"no-legacy-file"}));
+        }
+        let _operation =
+            begin_memory_operation(&self.memory_dir, MemoryOperationKind::Maintenance)?;
+        let _publication = ContextMaterialMutation::for_path(&self.memory_dir);
         let legacy = self.path("editable-facts.md");
         if !legacy.exists() {
             return Ok(json!({"migrated": false, "reason": "no-legacy-file"}));
@@ -1584,8 +1817,15 @@ impl DreamRevisionStore {
 
     /// snapshotDreamSections (revision-store.ts:80-90).
     pub fn snapshot_sections(&self) -> Result<Value, MemoryError> {
+        self.snapshot_sections_with_baseline(false)
+    }
+    fn snapshot_sections_with_baseline(&self, already_locked: bool) -> Result<Value, MemoryError> {
         let store = CompiledMemoryStore::new(&self.memory_dir, false);
-        let sections = store.read_sections()?;
+        let sections = if already_locked {
+            store.read_sections_unlocked()?
+        } else {
+            store.read_sections()?
+        };
         let week_days: Vec<Value> = store
             .list_week_days()?
             .into_iter()
@@ -1607,7 +1847,17 @@ impl DreamRevisionStore {
         kind: &str,
         restores_revision_id: Option<&str>,
     ) -> Result<Value, MemoryError> {
-        let before = self.snapshot_sections()?;
+        let _operation = begin_memory_operation(&self.memory_dir, MemoryOperationKind::Dream)?;
+        self.save_unlocked(run_id, trigger, kind, restores_revision_id)
+    }
+    fn save_unlocked(
+        &self,
+        run_id: &str,
+        trigger: &str,
+        kind: &str,
+        restores_revision_id: Option<&str>,
+    ) -> Result<Value, MemoryError> {
+        let before = self.snapshot_sections_with_baseline(true)?;
         let revision_id = format!(
             "{}-{}",
             now_iso().replace([':', '.'], "-"),
@@ -1695,28 +1945,50 @@ impl DreamRevisionStore {
     /// pending journal / rollback machinery is a registered ledger diff
     /// (single-process store, atomic writes).
     pub fn restore(&self, revision_id: &str) -> Result<Value, MemoryError> {
+        self.restore_if_current(revision_id, None)
+    }
+    pub fn restore_if_current(
+        &self,
+        revision_id: &str,
+        expected_current_hash: Option<&str>,
+    ) -> Result<Value, MemoryError> {
+        let _operation = begin_memory_operation(&self.memory_dir, MemoryOperationKind::Restore)?;
+        let _publication = ContextMaterialMutation::for_path(&self.memory_dir);
         let revision = self.read(revision_id)?;
-        let current = self.snapshot_sections()?;
+        let current = self.snapshot_sections_with_baseline(true)?;
+        let current_hash = dream_snapshot_hash(&current)?;
+        if expected_current_hash.is_some_and(|expected| expected != current_hash) {
+            return Err(MemoryError::Conflict {
+                code: "dream_memory_changed".into(),
+                message: "确认后记忆内容已经改变，请重新查看后再恢复".into(),
+            });
+        }
         if current == revision["before"] {
             return Ok(json!({
                 "restored": revision_id,
                 "unchanged": true,
             }));
         }
-        let pre = self.save(
+        let pre = self.save_unlocked(
             &format!("restore-{}", random_token_suffix()),
             "manual",
             "pre_restore",
             Some(revision_id),
         )?;
+        if dream_snapshot_hash(&self.snapshot_sections_with_baseline(true)?)? != current_hash {
+            return Err(MemoryError::Conflict {
+                code: "dream_memory_changed".into(),
+                message: "准备恢复时记忆内容已经改变，未覆盖当前正文".into(),
+            });
+        }
         let before = revision["before"].clone();
         let facts = before["facts"].as_str().unwrap_or_default();
         let today = before["today"].as_str().unwrap_or_default();
         let longterm = before["longterm"].as_str().unwrap_or_default();
         let store = CompiledMemoryStore::new(&self.memory_dir, false);
-        store.write_facts(facts)?;
-        store.write_today(today)?;
-        store.write_longterm(longterm)?;
+        store.write_section_unlocked("facts.md", facts)?;
+        store.write_section_unlocked("today.md", today)?;
+        store.write_section_unlocked("longterm.md", longterm)?;
         if let Some(days) = before["weekDays"].as_array() {
             let existing: std::collections::HashSet<String> = store
                 .list_week_days()?
@@ -1729,10 +2001,10 @@ impl DreamRevisionStore {
                 };
                 let body = day.get("body").and_then(Value::as_str).unwrap_or_default();
                 if existing.contains(date) {
-                    store.write_week_day(date, body)?;
+                    store.write_week_day_unlocked(date, body)?;
                 }
             }
-            store.assemble_week()?;
+            store.assemble_week_unlocked()?;
         }
         Ok(json!({
             "restored": revision_id,
@@ -1875,7 +2147,7 @@ impl PersonaFiles {
             _ => {
                 return Err(MemoryError::InvalidRequest(
                     "avatar must be png, jpeg or webp".into(),
-                ))
+                ));
             }
         };
         self.delete_avatar(agent_id)?;
@@ -1894,15 +2166,10 @@ impl PersonaFiles {
     }
 }
 
-// ── agent config.yaml subset patcher ────────────────────────────────────────
+// ── 助手配置的统一解析与更新 ────────────────────────────────────────
+#[path = "agent_config.rs"]
+pub mod config;
 
-/// Line-level config.yaml patcher for the boolean/list keys the Skill/Memory
-/// services own (`skills.enabled`, `skills.workspace_disabled`,
-/// `workspace_context.discover_project_skills`,
-/// `workspace_context.discover_compatible_project_skills`,
-/// `experience.enabled`, `memory.enabled`). Everything else in the file is
-/// preserved byte-for-byte (registered diff vs. the incumbent's full
-/// YAML re-dump — lib/memory/config-loader.ts:114-134).
 pub struct AgentConfigPatch;
 
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -1914,241 +2181,74 @@ pub struct AgentConfigFlags {
 }
 
 impl AgentConfigPatch {
-    pub fn read_flags(text: &str) -> AgentConfigFlags {
-        let mut flags = AgentConfigFlags::default();
-        let mut section = String::new();
-        for line in text.lines() {
-            let trimmed = line.trim_end();
-            if trimmed.is_empty() || trimmed.trim_start().starts_with('#') {
-                continue;
-            }
-            let indent = line.len() - line.trim_start().len();
-            let body = line.trim();
-            if indent == 0 {
-                section = body.strip_suffix(':').unwrap_or("").trim().to_string();
-                continue;
-            }
-            if indent > 2 {
-                continue;
-            }
-            let Some((key, value)) = body.split_once(':') else {
-                continue;
-            };
-            let value = value.trim();
-            let parsed = match value {
-                "true" => Some(true),
-                "false" => Some(false),
-                _ => None,
-            };
-            if let Some(parsed) = parsed {
-                match (section.as_str(), key.trim()) {
-                    ("memory", "enabled") => flags.memory_enabled = Some(parsed),
-                    ("experience", "enabled") => flags.experience_enabled = Some(parsed),
-                    ("workspace_context", "discover_project_skills") => {
-                        flags.discover_project_skills = Some(parsed)
-                    }
-                    ("workspace_context", "discover_compatible_project_skills") => {
-                        flags.discover_compatible_project_skills = Some(parsed)
-                    }
-                    _ => {}
-                }
-            }
-        }
-        flags
+    pub fn read_flags(text: &str) -> Result<AgentConfigFlags, MemoryError> {
+        config::AgentConfigDocument::parse(text)?.flags()
     }
 
-    pub fn read_skill_lists(text: &str) -> (Vec<String>, Vec<String>) {
-        let read_list = |lines: &[&str], wanted: &str| -> Vec<String> {
-            let mut out = Vec::new();
-            let mut in_skills = false;
-            let mut in_list = false;
-            for line in lines {
-                let trimmed = line.trim_end();
-                if trimmed.is_empty() || trimmed.trim_start().starts_with('#') {
-                    continue;
-                }
-                let indent = line.len() - line.trim_start().len();
-                let body = line.trim();
-                if indent == 0 {
-                    in_skills = body == "skills:";
-                    in_list = false;
-                    continue;
-                }
-                if !in_skills {
-                    continue;
-                }
-                if indent == 2 {
-                    in_list = body == format!("{wanted}:");
-                    continue;
-                }
-                if in_list {
-                    if let Some(item) = body.strip_prefix("- ") {
-                        let item = item.trim().trim_matches(['"', '\'']).to_string();
-                        if !item.is_empty() {
-                            out.push(item);
-                        }
-                    }
-                }
-            }
-            out
-        };
-        let lines: Vec<&str> = text.lines().collect();
-        let enabled = read_list(&lines, "enabled");
-        let workspace_disabled = read_list(&lines, "workspace_disabled");
-        (enabled, workspace_disabled)
-    }
-
-    /// Rewrites (or inserts) `section.key` with a block list of strings,
-    /// preserving all other lines. Empty list writes `key: []`.
-    fn upsert_string_list(text: &str, section: &str, key: &str, items: &[String]) -> String {
-        let mut out: Vec<String> = Vec::new();
-        let mut in_section = false;
-        let mut replaced = false;
-        let mut section_body_indent: Option<usize> = None;
-        let lines: Vec<&str> = text.lines().collect();
-        let mut skip_list = false;
-        for line in &lines {
-            let trimmed = line.trim_end();
-            let indent = line.len() - line.trim_start().len();
-            let body = line.trim();
-            if !trimmed.is_empty() && !body.starts_with('#') && indent == 0 {
-                in_section = body == format!("{section}:");
-                if in_section {
-                    section_body_indent = None;
-                }
-                skip_list = false;
-            }
-            if in_section && indent == 2 && !body.starts_with('#') {
-                if let Some((k, _)) = body.split_once(':') {
-                    if k.trim() == key {
-                        // replace the key line + its list items
-                        let rendered = if items.is_empty() {
-                            format!("  {key}: []")
-                        } else {
-                            let mut rendered = format!("  {key}:\n");
-                            for item in items {
-                                rendered.push_str(&format!(
-                                    "    - \"{}\"\n",
-                                    item.replace('"', "\\\"")
-                                ));
-                            }
-                            rendered.trim_end_matches('\n').to_string()
-                        };
-                        out.push(rendered);
-                        replaced = true;
-                        skip_list = true;
-                        continue;
-                    }
-                }
-            }
-            if skip_list {
-                // swallow deeper-indented list items of the replaced key
-                if trimmed.is_empty() || indent > 2 || (indent == 2 && body.starts_with("- ")) {
-                    continue;
-                }
-                skip_list = false;
-            }
-            out.push((*line).to_string());
-            let _ = &mut section_body_indent;
-        }
-        if !replaced {
-            if !out.is_empty() && !out.last().map(|l| l.trim().is_empty()).unwrap_or(true) {
-                out.push(String::new());
-            }
-            if items.is_empty() {
-                out.push(format!("{section}:"));
-                out.push(format!("  {key}: []"));
-            } else {
-                out.push(format!("{section}:"));
-                out.push(format!("  {key}:"));
-                for item in items {
-                    out.push(format!("    - \"{}\"", item.replace('"', "\\\"")));
-                }
-            }
-        }
-        let mut text = out.join("\n");
-        if !text.ends_with('\n') {
-            text.push('\n');
-        }
-        text
+    pub fn read_skill_lists(text: &str) -> Result<(Vec<String>, Vec<String>), MemoryError> {
+        config::AgentConfigDocument::parse(text)?.skill_lists()
     }
 
     pub fn write_skill_lists(
         text: &str,
         enabled: &[String],
         workspace_disabled: &[String],
-    ) -> String {
-        let patched = Self::upsert_string_list(text, "skills", "enabled", enabled);
-        Self::upsert_string_list(&patched, "skills", "workspace_disabled", workspace_disabled)
-    }
-
-    pub fn write_flags(text: &str, flags: &AgentConfigFlags) -> String {
-        let mut out = text.to_string();
-        let apply_bool = |text: &str, section: &str, key: &str, value: bool| -> String {
-            let lines: Vec<&str> = text.lines().collect();
-            let mut out: Vec<String> = Vec::new();
-            let mut in_section = false;
-            let mut replaced = false;
-            for line in lines {
-                let trimmed = line.trim_end();
-                let indent = line.len() - line.trim_start().len();
-                let body = line.trim();
-                if !trimmed.is_empty() && !body.starts_with('#') && indent == 0 {
-                    in_section = body == format!("{section}:");
-                }
-                if in_section && indent == 2 && !body.starts_with('#') {
-                    if let Some((k, _)) = body.split_once(':') {
-                        if k.trim() == key {
-                            out.push(format!("  {key}: {value}"));
-                            replaced = true;
-                            continue;
-                        }
-                    }
-                }
-                out.push(line.to_string());
-            }
-            if !replaced {
-                if !out.is_empty() && !out.last().map(|l| l.trim().is_empty()).unwrap_or(true) {
-                    out.push(String::new());
-                }
-                out.push(format!("{section}:"));
-                out.push(format!("  {key}: {value}"));
-            }
-            let mut joined = out.join("\n");
-            if !joined.ends_with('\n') {
-                joined.push('\n');
-            }
-            joined
-        };
-        if let Some(v) = flags.memory_enabled {
-            out = apply_bool(&out, "memory", "enabled", v);
-        }
-        if let Some(v) = flags.experience_enabled {
-            out = apply_bool(&out, "experience", "enabled", v);
-        }
-        if let Some(v) = flags.discover_project_skills {
-            out = apply_bool(&out, "workspace_context", "discover_project_skills", v);
-        }
-        if let Some(v) = flags.discover_compatible_project_skills {
-            out = apply_bool(
-                &out,
-                "workspace_context",
-                "discover_compatible_project_skills",
-                v,
+    ) -> Result<String, MemoryError> {
+        let mut doc = config::AgentConfigDocument::parse(text)?;
+        for (key, items) in [
+            ("enabled", enabled),
+            ("workspace_disabled", workspace_disabled),
+        ] {
+            doc.set(
+                "skills",
+                key,
+                serde_yaml_ng::Value::Sequence(
+                    items
+                        .iter()
+                        .cloned()
+                        .map(serde_yaml_ng::Value::String)
+                        .collect(),
+                ),
             );
         }
-        out
+        doc.render()
+    }
+
+    pub fn write_flags(text: &str, flags: &AgentConfigFlags) -> Result<String, MemoryError> {
+        let mut doc = config::AgentConfigDocument::parse(text)?;
+        for (section, key, value) in [
+            ("memory", "enabled", flags.memory_enabled),
+            ("experience", "enabled", flags.experience_enabled),
+            (
+                "workspace_context",
+                "discover_project_skills",
+                flags.discover_project_skills,
+            ),
+            (
+                "workspace_context",
+                "discover_compatible_project_skills",
+                flags.discover_compatible_project_skills,
+            ),
+        ] {
+            if let Some(value) = value {
+                doc.set(section, key, serde_yaml_ng::Value::Bool(value));
+            }
+        }
+        doc.render()
     }
 }
 
-/// Read + patch + atomically persist one agent's config.yaml.
+/// 先验证完整配置，再原子保存；失败不能覆盖原配置。
 pub fn patch_agent_config(
     config_path: &Path,
-    patch: impl FnOnce(&str) -> String,
+    patch: impl FnOnce(&str) -> Result<String, MemoryError>,
 ) -> Result<String, MemoryError> {
-    let text = std::fs::read_to_string(config_path)
+    let _publication = ContextMaterialMutation::for_path(config_path);
+    let text = config::read_config_text(config_path)
         .map_err(|err| MemoryError::Io(format!("read config: {err}")))?;
-    let patched = patch(&text);
+    config::AgentConfigDocument::parse(&text)?;
+    let patched = patch(&text)?;
+    config::AgentConfigDocument::parse(&patched)?;
     atomic_write(config_path, &patched).map_err(MemoryError::from)?;
     Ok(patched)
 }

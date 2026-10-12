@@ -1,0 +1,65 @@
+[
+  {
+    "original_probe": "artifacts/rust-tauri/R06/AR/W06-P03/reproduce-W06-R01/effects-probe.py",
+    "original_sha": "6acf0431ed55e59447dc9189f7ff6400431f97921f94b518260a0052875c03ce",
+    "new_probe": "artifacts/rust-tauri/R06/AR/W06-P03/final-family-R01/effects-probe.py",
+    "new_sha": "ce9c74b305a84cd18a3398f0dd04c4767154dc9f4a7120448bb3744fb37f65ab",
+    "only_change": "Exact final binary binding plus instrumentation: effective home/guard/child pid/exit/input SHA/supervised cleanup; fixture bytes and production requests unchanged."
+  },
+  {
+    "original_probe": "artifacts/rust-tauri/R06/AR/W06-P03/reproduce-W06-R01/probe.py",
+    "original_sha": "f1bb4c14ea92b22df8d681255cdfee46b6a0c53d5db660b928126e9aa5969972",
+    "new_probe": "artifacts/rust-tauri/R06/AR/W06-P03/final-family-R01/probe.py",
+    "new_sha": "5449ff8cebc620419d2a6bf3e17e2c77a05c8326f63f2dafaf59e2a4c7719e7d",
+    "only_change": "Exact final binary binding plus instrumentation: effective home/guard/child pid/exit/input SHA/supervised cleanup; fixture bytes and production requests unchanged."
+  },
+  {
+    "original_probe": "artifacts/rust-tauri/R06/AR/W06-P03/reproduce-W06-R01/family-probe.py",
+    "original_sha": "2c6227c95574fd3db36dc50a43b8f0b2b1d245c167e58e539a4f86bb5f071083",
+    "new_probe": "artifacts/rust-tauri/R06/AR/W06-P03/final-family-R01/family-probe.py",
+    "new_sha": "907de331a9880ccef8f3650d45886948caac24eafd039ce2cec0e5571688650e",
+    "only_change": "Exact final binary binding plus instrumentation: effective home/guard/child pid/exit/input SHA/supervised cleanup; fixture bytes and production requests unchanged."
+  },
+  {
+    "original_probe": "artifacts/rust-tauri/R06/AR/W06-P03/reproduce-W06-R02/effects-probe-v2.py",
+    "original_sha": "608489e16afeb33b0c753bca655cb0c7040a5ac080c89e42ce4444ede9eeb716",
+    "new_probe": "artifacts/rust-tauri/R06/AR/W06-P03/final-family-R02/effects-probe-v2.py",
+    "new_sha": "a0a6be92915b47a3a1e1482ca6204146b29b1c34de393cb678cacd499443beec",
+    "only_change": "require exact final binary environment; fixture and production operations unchanged"
+  },
+  {
+    "original_probe": "artifacts/rust-tauri/R06/AR/W06-P03/reproduce-W06-R02/semantic-check-v2.mjs",
+    "original_sha": "14f7a8efcf14f6fda7a71bd87234f24ac8a352d32a887d03e163e33bf613f26b",
+    "new_probe": "artifacts/rust-tauri/R06/AR/W06-P03/final-family-R02/semantic-check-v2.mjs",
+    "new_sha": "14f7a8efcf14f6fda7a71bd87234f24ac8a352d32a887d03e163e33bf613f26b",
+    "only_change": "no changes"
+  },
+  {
+    "original_probe": "artifacts/rust-tauri/R06/AR/W06-P03/reproduce-W06-R02/tagged-check-v2.py",
+    "original_sha": "e1c0ce40bee906866dab80d767ac392e81693efc3ef262f9f6c4e42539d7746c",
+    "new_probe": "artifacts/rust-tauri/R06/AR/W06-P03/final-family-R02/tagged-check-v2.py",
+    "new_sha": "e1c0ce40bee906866dab80d767ac392e81693efc3ef262f9f6c4e42539d7746c",
+    "only_change": "no changes"
+  },
+  {
+    "original_probe": "artifacts/rust-tauri/R06/AR/W06-P03/reproduce-W06-R02/additional-family-v2.py",
+    "original_sha": "fd2c8f70b17066452db6f0d7acecf17030684dde9a2d63a143b6d2712269d384",
+    "new_probe": "artifacts/rust-tauri/R06/AR/W06-P03/final-family-R02/additional-family-v2.py",
+    "new_sha": "43723d880d72e5d945b494a37340d1f62a232e5e406c6da0c0bd9fa4bb248d69",
+    "only_change": "require exact final binary environment; fixture and production operations unchanged"
+  },
+  {
+    "original_probe": "artifacts/rust-tauri/R06/AR/W06-P03/reproduce-W06-R02/tagged-value-v2.py",
+    "original_sha": "36cbb14885653db5e710f191c813c5dd1d80a3b73c7863fe60ab47ba495ec371",
+    "new_probe": "artifacts/rust-tauri/R06/AR/W06-P03/final-family-R02/tagged-value-v2.py",
+    "new_sha": "9d18f4294ef0725643a9da851959b68a8ac966ba93fe1696d16e9458e278b1c1",
+    "only_change": "require exact final binary environment; fixture and production operations unchanged"
+  },
+  {
+    "original_probe": "artifacts/rust-tauri/R06/AR/W06-P03/reproduce-W06-R02/probe-v2.py",
+    "original_sha": "72571cb1a16dcd74e2c0faba9b43747edd3f0fae62c81a4a1e4907e753ac11d4",
+    "new_probe": "artifacts/rust-tauri/R06/AR/W06-P03/final-family-R02/probe-v2.py",
+    "new_sha": "cf674ca662d2c1f531e50cc472dd04ff0215449acd8bed2641ac5c0f41ac97c0",
+    "only_change": "require exact final binary environment; fixture and production operations unchanged"
+  }
+]

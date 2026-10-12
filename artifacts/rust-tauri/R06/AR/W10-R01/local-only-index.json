@@ -1,0 +1,24 @@
+{
+  "policy": "LOCAL_ONLY_NEVER_GIT; explicit allowlist collection only, never git add evidence root recursively",
+  "excluded_roots": [
+    "LOCAL_ONLY_NEVER_GIT/**",
+    "commands/*/LOCAL_ONLY_NEVER_GIT/**",
+    "rust/target-w10-r01/**",
+    "legacy-directed-evidence-01/legacy-entry/e0-candidate-dirty.diff",
+    "legacy-directed-evidence-01/legacy-entry/f42-real-fd/**"
+  ],
+  "excluded_sensitive_probe_source": [
+    "provider-alias-probe.py",
+    "provider-alias-probe-preparation-01.py",
+    "seal-safe.py"
+  ],
+  "outside_evidence_owned_homes": "43 actual original-suite independent OS temp paths enumerated in old-suite-effective-homes-final.json; all home/config/DB files LOCAL_ONLY_NEVER_GIT, metadata only safe",
+  "retained_local_materials": [
+    "synthetic product data/credentials/signing private materials",
+    "mutant full source archive",
+    "candidate and mutant own non-symlink target",
+    "synthetic provider config"
+  ],
+  "cleanup": "all owned runtime processes exited/listeners closed/thread joined; retain reproducibility material only locally; legacy temporary mirrors removed",
+  "peak_rss_mib": null
+}

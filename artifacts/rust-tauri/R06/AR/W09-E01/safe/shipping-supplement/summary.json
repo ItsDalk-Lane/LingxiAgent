@@ -1,0 +1,36 @@
+{
+  "status": "EXECUTOR_SELF_CHECK_NOT_INDEPENDENT_PASS",
+  "records": [
+    {
+      "label": "warm-full-chain",
+      "record_sha256": "0c939d7cdbd7755b8e43df47d7c688292e71b0387cfccfe291f71f40d85414f0",
+      "exit": 0,
+      "no_recompile_proof": false
+    },
+    {
+      "label": "full-chain",
+      "record_sha256": "b5b18a77019fd76724d1384bdfb05d2ed13fa7729949b336e419354324e353bb",
+      "exit": 0,
+      "no_recompile_proof": true
+    },
+    {
+      "label": "warm-backup-recovery",
+      "record_sha256": "d688d9c55b089649e3f2720517e41503f18eac0c82f84814bc450a9a9e2a4c3a",
+      "exit": 0,
+      "no_recompile_proof": false
+    },
+    {
+      "label": "backup-restore",
+      "record_sha256": "c33159b31dbe3bfed53ac1344e42029c4c4fa8b8ebdaa2b85e1d314f78bf4873",
+      "exit": 0,
+      "no_recompile_proof": true
+    },
+    {
+      "label": "recovery-drill",
+      "record_sha256": "d4a6b9d1ca459826ab5883697687e9cf930703f806593f02c83f34a423124472",
+      "exit": 0,
+      "no_recompile_proof": true
+    }
+  ],
+  "old_direct_shipping_windows": "actual-before hash UNKNOWN; this new window does not backfill old metadata"
+}

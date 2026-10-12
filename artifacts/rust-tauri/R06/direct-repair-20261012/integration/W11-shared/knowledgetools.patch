@@ -1,0 +1,63 @@
+diff --git a/rust/crates/lingxi-service/src/knowledgetools.rs b/rust/crates/lingxi-service/src/knowledgetools.rs
+index 3bd38c525..b876ca50f 100644
+--- a/rust/crates/lingxi-service/src/knowledgetools.rs
++++ b/rust/crates/lingxi-service/src/knowledgetools.rs
+@@ -134,7 +134,7 @@ enum ToolKind {
+ }
+ 
+ impl KnowledgeTools {
+-    async fn run_search(&self, ctx: &RunContext, params: &Value) -> ToolOutcome {
++    async fn run_search(&self, ctx: &RunContext, call: &ToolCallId, params: &Value) -> ToolOutcome {
+         if let Err(outcome) = reject_unknown_params(
+             params,
+             &[
+@@ -193,13 +193,30 @@ impl KnowledgeTools {
+             section_keys: string_list(params, "sectionKeys"),
+             limit,
+         };
+-        let result = match self.knowledge.search_in_scope(&request).await {
++        let runtime = match crate::toolgateway::knowledge_runtime(ctx, call) {
++            Ok(runtime) => runtime,
++            Err(error) => return ToolOutcome::Failed { error },
++        };
++        let result = match self
++            .knowledge
++            .search_in_scope_owned(&request, &runtime)
++            .await
++        {
+             Ok(result) => result,
+             Err(error) => return knowledge_failed(&error),
+         };
+         // span 命中直接回读冻结原文（引文引用由程序签发）。
+         let mut hits: Vec<Value> = Vec::new();
+         for hit in &result.hits {
++            if let Err(error) = runtime.check() {
++                return ToolOutcome::Failed {
++                    error: lingxi_protocol::ProtocolError::new(
++                        error.code,
++                        error.message,
++                        error.retryable,
++                    ),
++                };
++            }
+             let mut item = json!({
+                 "sourceId": hit.source_id,
+                 "sourceName": hit.source_name,
+@@ -523,7 +540,7 @@ impl ToolExecutorPort for KnowledgeTools {
+     fn execute<'a>(
+         &'a self,
+         ctx: &'a RunContext,
+-        _call: &'a ToolCallId,
++        call: &'a ToolCallId,
+         request: &'a lingxi_kernel::ports::ToolRequest,
+     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ToolExecutionResult> + Send + 'a>> {
+         let params = args_of(request);
+@@ -540,7 +557,7 @@ impl ToolExecutorPort for KnowledgeTools {
+         });
+         Box::pin(async move {
+             let outcome = match kind {
+-                ToolKind::Search => executor.run_search(ctx, &params).await,
++                ToolKind::Search => executor.run_search(ctx, call, &params).await,
+                 ToolKind::Read => executor.run_read(ctx, &params).await,
+                 ToolKind::Grep => executor.run_grep(ctx, &params).await,
+                 ToolKind::Outline => executor.run_outline(ctx, &params).await,

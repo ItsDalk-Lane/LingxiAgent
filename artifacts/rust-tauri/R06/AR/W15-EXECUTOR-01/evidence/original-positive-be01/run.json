@@ -1,0 +1,77 @@
+{
+  "argv": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-j8",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r06_t08_behavior_eval",
+    "be01_direct_four_tools_reach_real_files",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "cwd": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/own.git",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "started": "2026-10-11T23:03:01.369743+00:00",
+  "effective_env": {
+    "HOME": "/Users/study_superior",
+    "LINGXI_HOME": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/home",
+    "TMPDIR": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/tmp",
+    "LINGXI_PRODUCT_DIR": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/own.git/lib",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target",
+    "LINGXI_TEST_GUARD": "1",
+    "TEST_TIME_LIMIT_SEC": "600",
+    "TEST_MEM_LIMIT_MB": "8192"
+  },
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "controller_seconds": 2700,
+  "process_seconds": 600,
+  "process_rss_mib": 8192,
+  "supervision": "external descendant PID sampling plus internal guard",
+  "controller_pid": 92546,
+  "ended": "2026-10-11T23:03:04.081186+00:00",
+  "elapsed_seconds": 2.719992457976332,
+  "exit_code": 0,
+  "guard_breaches": [],
+  "processes": [
+    {
+      "pid": 92546,
+      "ppid": 92543,
+      "argv": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo test --manifest-path rust/Cargo.toml --locked -j8 -p lingxi-service --test r06_t08_behavior_eval be01_direct_four_tools_reach_real_files -- --exact --nocapture",
+      "comm": "/Users/study_sup",
+      "first_seen_elapsed": 0.410050707985647,
+      "last_seen_elapsed": 2.6097578749759123,
+      "peak_rss_bytes": 101220352,
+      "limit_seconds": 600,
+      "controller": false
+    },
+    {
+      "pid": 92550,
+      "ppid": 92546,
+      "argv": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/r06_t08_behavior_eval-c42a2aaf03511ea7 be01_direct_four_tools_reach_real_files --exact --nocapture",
+      "comm": "/private/tmp/lin",
+      "first_seen_elapsed": 0.877514332998544,
+      "last_seen_elapsed": 2.6097578749759123,
+      "peak_rss_bytes": 13565952,
+      "limit_seconds": 600,
+      "controller": false
+    },
+    {
+      "pid": 92555,
+      "ppid": 92550,
+      "argv": "/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/lingxi-service --home /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/tmp/lingxi-r06t08-be01-home-92550-0 --config /private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/tmp/lingxi-r06t08-be01-cfg-92550-2/service.json --bind 127.0.0.1:0",
+      "comm": "/private/tmp/lin",
+      "first_seen_elapsed": 1.5059425409999676,
+      "last_seen_elapsed": 2.6097578749759123,
+      "peak_rss_bytes": 38830080,
+      "limit_seconds": 600,
+      "controller": false
+    }
+  ]
+}

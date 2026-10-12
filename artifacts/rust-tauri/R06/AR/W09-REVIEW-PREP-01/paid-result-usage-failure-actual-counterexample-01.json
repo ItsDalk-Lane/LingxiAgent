@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-11T15:17:57.981743+00:00",
+  "role": "ROOT_PARTIAL_INDEPENDENT_REVIEW_ACTUAL_READBACK_NOT_REVIEW_VERDICT",
+  "id": "R06-AR-F09-OBS-PAID-RESULT-USAGE-FAILURE-01",
+  "reviewer": "/root/ar_w09_reviewer_01",
+  "original_evidence": "/Users/study_superior/.codex/r06-isolated-checkouts/w09-first-review-source-01/artifacts/rust-tauri/R06/AR/W09-R01/safe/paid-usage-failure-probe.json",
+  "original_evidence_sha256": "5d5b470c86996345d6afb6bf2c8f605c9957c3746ab7ea59c97beefd72ecce7d",
+  "expected": "Successful paid embedding batch must not be discarded or silently retransmitted when durable usage insertion fails.",
+  "actual": "Synthetic model_call_usage insert trigger failure after successful second response loses final paid vector; authorized retry200 sends the same last block again.",
+  "counts": {
+    "planned": 65,
+    "original_paid_vectors": 64,
+    "after_failed_usage_vectors": 64,
+    "actual_global_HTTP": 3,
+    "final_vectors": 65,
+    "final_usage_rows": 2,
+    "same_final_block_sent_count": 2
+  },
+  "binary_before_sha256": "731fa88111d9083fef41ec6f241250d1d6923791c80a573ed19e926b498a75e8",
+  "binary_after_sha256": "731fa88111d9083fef41ec6f241250d1d6923791c80a573ed19e926b498a75e8",
+  "READY": "LINGXI_SERVICE_READY addr=127.0.0.1:50517 home=/Users/study_superior/.codex/r06-owned-review/w09-r01/home/paid-usage-failure-01 source=env",
+  "sigterm_exit": 0,
+  "candidate_mutated": false,
+  "mock_boundary": "Only loopback external provider; actual shipping service and both databases.",
+  "source_root_cause": "PENDING_REVIEWER_COMPLETE_SOURCE_TRACE",
+  "affected_checks": [
+    "F09-C02",
+    "F09-C03",
+    "F11",
+    "R05 operation usage"
+  ],
+  "status": "OPEN_ACTUAL_COUNTEREXAMPLE_REVIEW_STILL_IN_PROGRESS",
+  "completed_formal_Reviewer_FAIL_count_increment": false,
+  "no_real_paid_provider": true
+}

@@ -1,0 +1,39 @@
+{
+  "at": "2026-10-11T09:13:24.083696+00:00",
+  "role": "ROOT_READ_ONLY_PREPARATION_NOT_PRODUCT_FIX_OR_REVIEW",
+  "work_id": "R06-AR-W11",
+  "status": "SOURCE_INFERRED_NOT_RUN",
+  "source_sha256": {
+    "rust/crates/lingxi-service/src/knowledge.rs": "3f98131c88c8c1c1945a87752f1702d2cfb75ffdf2454e0d88d4554edbd3c370",
+    "rust/crates/lingxi-service/src/operations.rs": "bbb2054886f6e08093aeba416570ecadee866891db06e59a6d5406815b965639",
+    "rust/crates/lingxi-service/src/knowledgetools.rs": "657748b6bfc69b5f45ef59e9ad6d5111322f5c1727398f976a0ec11cbfd409a4",
+    "rust/crates/lingxi-kernel/src/ports.rs": "3f32e8c7c0a617d6bcb73ed11ab5eb468acfbb383ac844964a9ad52a75fa3936",
+    "rust/crates/lingxi-adapters/src/models/dispatch.rs": "877badc332ed687c59f183e0fe2097d4f19daef37858b3d61889791bcc74fef1",
+    "rust/crates/lingxi-adapters/src/storage/knowledge.rs": "13823120a29ca0f7767a845666c7584f56da825eec0d551bf5667e6e4f7fb347"
+  },
+  "observations": [
+    {
+      "entry": "GatewayKnowledgeEmbedder.embed",
+      "fact": "calls operations.embed(request,None,None); embed trait receives only texts/input_type; production tool Run context/job context/deadline cannot propagate",
+      "actual": "NOT_RUN"
+    },
+    {
+      "entry": "OperationService.embed",
+      "fact": "optional context usage sink does write rows; resolve credential awaits before deadline-bound quota and dispatch. No claim of no ledger, gap is real causal/session/Run ownership + end-to-end deadline",
+      "actual": "NOT_RUN"
+    },
+    {
+      "entry": "KnowledgeService ingest/query/resumption",
+      "required": "trusted currentRun principal/Agent/Session/Attempt/parenttool and absolute deadline/cancel; independent job durable root/budget explicit, no fabricated userRun; quota/credential/network/batch-write/completion late fencing; unknown usage not0",
+      "actual": "NOT_RUN"
+    }
+  ],
+  "cross_task_dependencies": {
+    "F10": "actual single dispatch route served identity new API under active isolated Executor; future Task must preserve actual identity invariants and rebind after semantic integration",
+    "F09": "crash-running not recovered already reported; full resumed-job attribution tests remain current required not closed by409",
+    "F13": "true chat selectedscope/currentRun wiring not done; method seed scope not complete normal tool chain evidence",
+    "F03": "owned foreground dropout cancellation/TaskSupervisor lease retention under repair; explicit detached background disconnect semantics distinct",
+    "F01": "history/Run start-notifier edits not yet accepted; no merge unreviewed source or mark stage green"
+  },
+  "test_preparation": "real loopback wire counts + actual usage rows + cancel tree + authoritative writes must cross-check. No mocked Gateway/OperationService/storage. Preserve positive control, actual old red, allC and originalT07/R05T05T07 shares; final new Reviewer and actual upstream regression."
+}

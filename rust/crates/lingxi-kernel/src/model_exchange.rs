@@ -36,7 +36,7 @@
 use lingxi_protocol::{ArgsDigest, ContentBlock, ModelCallId, ToolCallId, ToolSchemaDocument};
 
 use crate::ports::ToolOutcome;
-use crate::toolcatalog::{Availability, ToolRegistry};
+use crate::toolcatalog::ToolRegistry;
 
 /// One tool as declared to the provider. `target` is the host identity
 /// (the registry target id — what the journal, the gateway and the policy
@@ -114,27 +114,22 @@ impl ToolDeclarationSnapshot {
     /// loudly ([`ToolDeclarationError::WireNameConflict`]) instead of
     /// presenting an ambiguous mapping to the provider.
     pub fn from_registry(registry: &ToolRegistry) -> Result<Self, ToolDeclarationError> {
-        let snapshot = registry.snapshot();
+        Self::from_registry_with_activated_targets(registry, &std::collections::BTreeSet::new())
+    }
+
+    /// 仅当前可信任务选择激活额外工具；声明仍来自真实目录并保留完整说明、参数和代次。
+    pub fn from_registry_with_activated_targets(
+        registry: &ToolRegistry,
+        activated: &std::collections::BTreeSet<crate::toolcatalog::ToolTargetId>,
+    ) -> Result<Self, ToolDeclarationError> {
+        let (catalog_generation, tools) = registry.model_declaration_snapshot_with_activated_targets(activated);
         let mut declarations = Vec::new();
-        // Deterministic order: target id sort (snapshot order is the
-        // registry's BTreeMap iteration — already sorted by target id).
-        for tool in &snapshot.tools {
-            if tool.availability != Availability::Available {
-                continue;
-            }
-            let full = registry.describe_full(&tool.target_id).map_err(|_| {
-                ToolDeclarationError::WireNameConflict {
-                    // Unreachable in a consistent registry (the snapshot and
-                    // the describe read the same locked state); surfaced as a
-                    // loud build failure rather than a skipped tool.
-                    wire_name: tool.local_name.clone(),
-                    targets: vec![tool.target_id.as_str().to_string()],
-                }
-            })?;
+        for full in tools {
+            let tool = full.listing;
             declarations.push(ToolDeclaration {
                 target: tool.target_id.as_str().to_string(),
                 wire_name: sanitize_wire_name(&tool.local_name),
-                description: tool.display_name.clone(),
+                description: tool.description,
                 input_schema: full.input_schema,
             });
         }
@@ -177,9 +172,14 @@ impl ToolDeclarationSnapshot {
             }
         }
         Ok(Self {
-            catalog_generation: snapshot.catalog_generation,
+            catalog_generation,
             declarations,
         })
+    }
+
+    /// 宿主根据实际发出的声明铸造历史绑定；模型不能自报。
+    pub fn bind_target(&self, target: &str) -> Option<HistoricalToolDeclaration> {
+        self.declarations.iter().find(|d| d.target == target).map(|declaration| HistoricalToolDeclaration { execution: None, catalog_generation: self.catalog_generation, declaration: declaration.clone() })
     }
 
     /// Reverse lookup: the host target id a provider-facing wire name maps
@@ -192,17 +192,30 @@ impl ToolDeclarationSnapshot {
             .map(|declaration| declaration.target.as_str())
     }
 
-    /// Forward lookup: the wire name a host target was declared under in
-    /// THIS snapshot. An adapter re-rendering the exchange history (the
-    /// assistant turn's tool calls) uses THIS mapping; a target missing
-    /// from the current snapshot (the registry moved mid-run) is a loud
-    /// render failure, never a name guess.
+    /// 当前声明的名称查询。旧历史必须使用RequestedToolCall自身的可信绑定。
     pub fn wire_name_of_target(&self, target: &str) -> Option<&str> {
         self.declarations
             .iter()
             .find(|declaration| declaration.target == target)
             .map(|declaration| declaration.wire_name.as_str())
     }
+}
+
+/// 历史编码使用当时发送的可信声明，独立于当前执行权限。
+#[derive(Debug, Clone, PartialEq)]
+pub struct HistoricalToolDeclaration {
+    pub execution: Option<HistoricalToolExecution>,
+    pub catalog_generation: u64,
+    pub declaration: ToolDeclaration,
+}
+
+/// 目录入口与真实执行目标分别保存，避免重启时依赖当前目录猜测旧身份。
+#[derive(Debug, Clone, PartialEq)]
+pub struct HistoricalToolExecution {
+    pub target: String,
+    pub catalog_generation: u64,
+    pub arguments: serde_json::Value,
+    pub args_digest: ArgsDigest,
 }
 
 /// Provider-facing tool names must fit the strictest protocol face this
@@ -238,6 +251,7 @@ fn sanitize_wire_name(raw: &str) -> String {
 /// and so audit trails can join the two vocabularies.
 #[derive(Debug, Clone, PartialEq)]
 pub struct RequestedToolCall {
+    pub declaration_binding: Option<HistoricalToolDeclaration>,
     pub tool_call_id: ToolCallId,
     pub provider_call_id: Option<String>,
     pub target: String,
@@ -246,6 +260,12 @@ pub struct RequestedToolCall {
     pub arguments: crate::toolcatalog::EffectiveArguments,
     pub args_digest: ArgsDigest,
     pub args_summary: Option<String>,
+}
+
+impl RequestedToolCall {
+    pub fn historical_wire_name(&self) -> Option<&str> {
+        self.declaration_binding.as_ref().filter(|binding| binding.catalog_generation > 0 && binding.declaration.target == self.target).map(|binding| binding.declaration.wire_name.as_str())
+    }
 }
 
 /// The serving identity that produced one assistant turn (R05 RR1 F09).
@@ -277,6 +297,11 @@ impl TurnOrigin {
 /// One item of the run's prior model exchange, in the order it happened.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ExchangeItem {
+    /// 已完成用户回合，始终保持普通用户角色。
+    UserTurn { text: String },
+    /// 当前输入的位置；渲染器在这里插入submission，旧调用者无标记时仍沿原形状。
+    CurrentSubmission,
+
     /// One completed assistant turn: the model's content blocks (text /
     /// reasoning / provider-opaque, in the order they arrived — a mixed
     /// response keeps EVERY block) plus the tool calls it asked for.
@@ -387,6 +412,13 @@ pub struct InputImage {
 }
 
 impl ModelTurnInput {
+    /// 有历史恢复标记时，当前输入在其真实时序位置渲染。
+    pub fn has_submission_position(&self) -> bool {
+        self.prior
+            .iter()
+            .any(|item| matches!(item, ExchangeItem::CurrentSubmission))
+    }
+
     /// The first-turn shape: a bare submission, empty exchange, explicit
     /// tool snapshot, no deadline, no system prompt.
     pub fn first_turn(submission: impl Into<String>, tools: ToolDeclarationSnapshot) -> Self {

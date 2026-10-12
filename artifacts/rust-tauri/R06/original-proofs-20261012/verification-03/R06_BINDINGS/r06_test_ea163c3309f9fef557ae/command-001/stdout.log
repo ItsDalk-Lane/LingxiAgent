@@ -1,0 +1,25 @@
+
+running 1 test
+test subagent_close_and_reply_refusals_preserve_other_threads_and_sessions ... FAILED
+
+successes:
+
+successes:
+
+failures:
+
+---- subagent_close_and_reply_refusals_preserve_other_threads_and_sessions stdout ----
+
+thread 'subagent_close_and_reply_refusals_preserve_other_threads_and_sessions' (13369667) panicked at crates/lingxi-service/tests/r06_original_chat_proofs.rs:506:10:
+called `Result::unwrap()` on an `Err` value: Storage(Corrupted { detail: "model_history: 可信历史声明代次缺失" })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'subagent_close_and_reply_refusals_preserve_other_threads_and_sessions' (13369667) panicked at crates/lingxi-service/tests/r06_original_chat_proofs.rs:172:6:
+called `Result::unwrap()` on an `Err` value: Elapsed(())
+
+
+failures:
+    subagent_close_and_reply_refusals_preserve_other_threads_and_sessions
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 5.10s
+

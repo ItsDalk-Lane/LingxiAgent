@@ -1,0 +1,40 @@
+{
+  "workspace": "/private/tmp/lingxi-r06-w04-executor-01",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "status": "NOT_ACCEPTED_EXECUTOR_SNAPSHOT",
+  "files": {
+    "rust/crates/lingxi-service/src/stagefiles.rs": "a144c12f5fd8d5e0bcb8a97ec249cbef81a4db88595c7932005306b087e1dc07",
+    "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs": "3997aa643ff3151b2011c35bc66c1b67b2c0e845dd3a01e0f57f36bb8e44b600",
+    "rust/crates/lingxi-adapters/src/storage/canonical_message_store.rs": "517209277070025bdfecfdf473c55c97ee4b4564b69d207ff4c928f0a6a6b4a9",
+    "rust/crates/lingxi-adapters/src/storage/migrations.rs": "68d7147824860116919333f8c06acc785bc7b06e832f730eff6ee40a99f8d7ac",
+    "rust/crates/lingxi-adapters/src/storage/run_store.rs": "f576bc8bb8f9875836cec679c239a54a6d9f5bb5693410cd90a29ebf9f370060",
+    "rust/crates/lingxi-adapters/src/storage/session_admin.rs": "54b8758c337ecefcbd856a6b8936fff8f8f1815a4e4a58008d789b96264bc16c",
+    "rust/crates/lingxi-adapters/src/storage/session_files.rs": "62f9e7fc662cb65bebb11149a230d7998c9d14959c6b4e7cb620da47b0fe791c",
+    "rust/crates/lingxi-adapters/src/storage/session_tree.rs": "8d79c31ffa8f05399c5648261d09ddc94297b1490e47115e9d68d694f76f8c7e",
+    "rust/crates/lingxi-kernel/src/lib.rs": "dc2e4077818902d3cb23a7a8ca888a5a7d0a07b4123f2f1dc4348b05fcb42eb2",
+    "rust/crates/lingxi-service/src/filehistory.rs": "4381cf3dcd8d6d8ecc56c1a7c4a0ea1ecdb87f99282b922c23ded4858f9958cd",
+    "rust/crates/lingxi-service/src/history.rs": "86aff747bf46191508548c07eea406aecbba39c857c7380c4e512cba18f9d828",
+    "rust/crates/lingxi-service/src/history_projection.rs": "c5a58db61f8bd68f9ff0e4ca89ab7efc28e7b48e2455da8c6d1f850b297996a5",
+    "rust/crates/lingxi-service/src/lib.rs": "f8a623df0ad4ccf4c46263faff7ab7104c31db982284112a2d57a0dfc7366542",
+    "rust/crates/lingxi-service/src/resourceio.rs": "e601ae56074a0944fdccabc7b20199c232fc37e19d8c0399621ded91baf6d7e4",
+    "rust/crates/lingxi-service/src/resources.rs": "f863773a7686c9b9c71ad11de5813cf5e936937b76071cb6903c149724c682f6",
+    "rust/crates/lingxi-service/src/runs.rs": "4aca68384344338cba02d801f73fdb323a5833d77f89f1407bfa9c35fead2d72",
+    "rust/crates/lingxi-service/src/session_admin.rs": "8fab00d74346455e3bb78ebbb25a7971c2a266a7260b981b49ca893b49b82263",
+    "rust/crates/lingxi-service/src/session_tree.rs": "6a744d1613b9e6e2aa7975a592d4b6d54e911e57f4abcf8c2e7e42bc568e9838",
+    "rust/crates/lingxi-service/src/sessionfiles.rs": "c2a046d4fe418475e3557053a03342a17f4c209f6afd2448c8f96fa0b4c3c0b1"
+  },
+  "programs": {
+    "/private/tmp/lingxi-r06-w04-target-01/debug/lingxi-service": {
+      "retained_path": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/lingxi-service",
+      "sha256": "a4dbab0e45e9b90f3b6696d11aefcdbaf5364ffc9ab9f8f87530b80f5bfc1976",
+      "local_only": true
+    },
+    "/private/tmp/lingxi-r06-w04-target-01/debug/deps/r06_ar_f04_lifecycle-31b97a587e3bbda7": {
+      "retained_path": "/private/tmp/lingxi-r06-w04-evidence-01/snapshots/stable-f04-source-v4/r06_ar_f04_lifecycle-31b97a587e3bbda7",
+      "sha256": "2ef98a6d4d623f3985338e78f041570fd3b93e3fef98c37fffecab3286caea70",
+      "local_only": true
+    }
+  },
+  "patch_sha256": "e0a976774819e3923ca7cf8be34af6b34720ffa975a7a7397c2fb0a84ce0b9d8",
+  "new_files_note": "Patch covers tracked files; full frozen-source also includes all new untracked production/test files listed by manifest."
+}

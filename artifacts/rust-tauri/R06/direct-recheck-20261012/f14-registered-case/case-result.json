@@ -1,0 +1,94 @@
+{
+  "id": "R06-AR-F14-C01",
+  "status": "LOCAL_SUPPORTING_TESTS_PASS",
+  "localPassed": true,
+  "formalAcceptanceComplete": false,
+  "formalAcceptanceStatus": "BLOCKED_COMPLETE_BINDING_MISSING",
+  "supportingTests": [
+    {
+      "kind": "script",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r02_registry_consistency.py",
+        "--root",
+        "."
+      ],
+      "stdoutPattern": "^PASS: migrations\\.rs MIGRATIONS == registry \\(",
+      "timeoutSecs": 120,
+      "evidenceMeaning": "严格核对源码迁移与登记；真实数据库升级、inspector 和幂等恢复仍未由此命令证明"
+    }
+  ],
+  "commands": [
+    {
+      "binding": {
+        "kind": "script",
+        "argv": [
+          "python3",
+          "-B",
+          "scripts/rust-tauri/r02_registry_consistency.py",
+          "--root",
+          "."
+        ],
+        "stdoutPattern": "^PASS: migrations\\.rs MIGRATIONS == registry \\(",
+        "timeoutSecs": 120,
+        "evidenceMeaning": "严格核对源码迁移与登记；真实数据库升级、inspector 和幂等恢复仍未由此命令证明"
+      },
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r02_registry_consistency.py",
+        "--root",
+        "."
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "sourceBeforeSha256": "0d20e895cf5a34b7bc91050fde008fa6aa4de8315a3dd9dd6a89e0acb4e67224",
+      "exitCode": 0,
+      "timedOut": false,
+      "stdout": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f14-registered-case/command-001/stdout.log",
+      "stderr": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f14-registered-case/command-001/stderr.log",
+      "timeoutSecs": 120,
+      "syntheticEnvironment": {
+        "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f14-registered-case/command-001/runtime/home",
+        "TMPDIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f14-registered-case/command-001/runtime/tmp",
+        "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib",
+        "W01_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f14-registered-case/command-001/raw/w01_evidence",
+        "W09_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f14-registered-case/command-001/raw/w09_evidence",
+        "W10_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f14-registered-case/command-001/raw/w10_evidence",
+        "W11_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f14-registered-case/command-001/raw/w11_evidence",
+        "LINGXI_W03_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f14-registered-case/command-001/raw/lingxi_w03_evidence",
+        "LINGXI_F05_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f14-registered-case/command-001/raw/lingxi_f05_evidence",
+        "LINGXI_F08_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f14-registered-case/command-001/raw/lingxi_f08_evidence",
+        "R06_T08_RAW_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f14-registered-case/command-001/raw/t08",
+        "R06_T08_EVAL_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/f14-registered-case/command-001/raw/t08-evaluations.jsonl"
+      },
+      "actualArgv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-B",
+        "scripts/rust-tauri/r02_registry_consistency.py",
+        "--root",
+        "."
+      ],
+      "pid": 85334,
+      "elapsedSecs": 0.078,
+      "outputCheck": {
+        "valid": true,
+        "matchedExpectedScriptResult": true,
+        "reason": ""
+      },
+      "stdoutSha256": "da1c4b6420e3997a2868f163a1fe43d3e19da8f74ac06d5cdd8a7c74f784ebbb",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceAfterSha256": "0d20e895cf5a34b7bc91050fde008fa6aa4de8315a3dd9dd6a89e0acb4e67224",
+      "sourceStable": true,
+      "localPassed": true
+    }
+  ],
+  "commandsAttempted": 1,
+  "commandsExecuted": true,
+  "testsExecuted": false,
+  "completeSupportingExecution": true,
+  "sourceCandidateSha256": "0d20e895cf5a34b7bc91050fde008fa6aa4de8315a3dd9dd6a89e0acb4e67224",
+  "sourceStable": true,
+  "exitCode": 2,
+  "reason": "本次只反映实际支持命令；原完整逐断言正反行为与正式验收仍须独立证明。"
+}

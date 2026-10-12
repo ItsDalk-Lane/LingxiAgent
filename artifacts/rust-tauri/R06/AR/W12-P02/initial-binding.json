@@ -1,0 +1,64 @@
+{
+  "base": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+  "branch": "codex/rust-tauri-migration",
+  "owned": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/knowledge.rs",
+      "sha256": "a123a9e0b11e0a95f630c18f8e002c36889905364361eaa34e89bad22506db01",
+      "bytes": 121999
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/knowledge.rs",
+      "sha256": "3f98131c88c8c1c1945a87752f1702d2cfb75ffdf2454e0d88d4554edbd3c370",
+      "bytes": 125213
+    },
+    {
+      "path": "lib/knowledge/vector-index-adapter.ts",
+      "sha256": "4c74ef0a579de04195ac1b7612b398f5dc8d558c17eac83051b6f55b488b8877",
+      "bytes": 55844
+    },
+    {
+      "path": "lib/knowledge/knowledge-index-store.ts",
+      "sha256": "eca060010a31ffb6acac5e349fd6a8a72875c59db673bc797ce04e7ddb0862d6",
+      "bytes": 59220
+    },
+    {
+      "path": "lib/knowledge/ann-index-store.ts",
+      "sha256": "d18aace5c86d100e37e2f5932eb184044daabc4dec503800ec43a37264848404",
+      "bytes": 7816
+    },
+    {
+      "path": "lib/knowledge/vector-search-backend-factory.ts",
+      "sha256": "54aeefa97965fe574859085616cc74070405489cce5557c2f29abb406fb2d74d",
+      "bytes": 1535
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs",
+      "sha256": "f9790bf638769199b40af3b540cb34d2fa897c28e91b4cec0af91f9b09fe4b9b",
+      "bytes": 23546
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs",
+      "sha256": "bd4b3d7b711e20aac3e56e4ca87b632bb804e4f265eedd0bfd2be218ad0e17e0",
+      "bytes": 15557
+    },
+    {
+      "path": "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+      "sha256": "5eb1a93524ce4eabf542229f7c68e960b37b8062f908eaf29596721b8908b773",
+      "bytes": 13856
+    },
+    {
+      "path": "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+      "sha256": "9973a3161d4d4bf7cf7ed4f079fdd45b22b1616be69d7408c1054f2bebbd6f59",
+      "bytes": 5438
+    },
+    {
+      "path": "tests/r06-ar-f12-ann-cache-preservation.test.ts",
+      "sha256": "9b0b9219934632ff24af69e3a759ea7c35feffad5747a2114a066983f23ac791",
+      "bytes": 4141
+    }
+  ],
+  "cargo_lock_sha": "bd7c0082ca055cec4b0b3cdedb78a186a39270d0cef3b83651065bd9b2e3f3c1",
+  "user_settings": "PROTECTED_NOT_READ_OR_WRITTEN",
+  "previous_review": "PARTIAL_REVIEW_INTERRUPTED_NO_FINAL_VERDICT"
+}

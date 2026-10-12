@@ -1,0 +1,30 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running tests/subagent_closeout.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/subagent_closeout-f797c45f3d5211c3)
+W09_ACTUAL_TEST_BINARY_START {"binary": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/subagent_closeout-f797c45f3d5211c3", "argv": ["/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/subagent_closeout-f797c45f3d5211c3", "--test-threads=4"], "wrapper_pid": 98969, "process_group": 98925, "before_sha256": "a930c0ac60f4fe7a5da7ef2cab82ece1db843d18341b4daa189c88fbbdd25ce1", "before_at": "2026-10-11T14:36:06.830274+00:00", "guard_env": {"LINGXI_TEST_GUARD": "1", "TEST_TIME_LIMIT_SEC": "600", "TEST_MEM_LIMIT_MB": "8192"}, "product_dir": "<W09_WORKSPACE>/lib", "shipping_inventory_before": {"path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service", "sha256": "52b3947e119f13eb43bd19bbcd43b012a2f94c6649bc2ef42c74047fca8f108f"}, "case_receipts": null, "actual_graph_sink": null, "actual_graph_evidence_root": null, "effective_case_env": {"W09_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/case-formal-r05-final-59", "W10_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/w10-formal-r05-final-59"}}
+LINGXI_TEST_GUARD: armed (pid 98970, mem_limit=8192 MB, time_limit=600 s)
+
+running 8 tests
+test drain_expired_child_is_finally_reaped_after_its_actual_exit ... ok
+test panicking_background_exits_are_recorded_and_reaped_without_a_waiter ... ok
+test finished_background_drives_reap_both_registries ... ok
+test child_provider_panic_closes_out_and_the_thread_continues ... ok
+test late_and_duplicate_completions_cannot_corrupt_the_closeout ... ok
+test thread_registry_refusal_leaves_no_permanent_reservations ... ok
+test parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap ... ok
+test parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls ... FAILED
+
+failures:
+
+---- parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls stdout ----
+
+thread 'parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls' (7611115) panicked at crates/lingxi-service/tests/subagent_closeout.rs:297:9:
+timed out waiting for the child queues behind the parked parent turn
+
+
+failures:
+    parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls
+
+test result: FAILED. 7 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.24s
+
+W09_ACTUAL_TEST_BINARY_END {"binary": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/subagent_closeout-f797c45f3d5211c3", "argv": ["/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/subagent_closeout-f797c45f3d5211c3", "--test-threads=4"], "wrapper_pid": 98969, "process_group": 98925, "before_sha256": "a930c0ac60f4fe7a5da7ef2cab82ece1db843d18341b4daa189c88fbbdd25ce1", "before_at": "2026-10-11T14:36:06.830274+00:00", "guard_env": {"LINGXI_TEST_GUARD": "1", "TEST_TIME_LIMIT_SEC": "600", "TEST_MEM_LIMIT_MB": "8192"}, "product_dir": "<W09_WORKSPACE>/lib", "shipping_inventory_before": {"path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service", "sha256": "52b3947e119f13eb43bd19bbcd43b012a2f94c6649bc2ef42c74047fca8f108f"}, "case_receipts": null, "actual_graph_sink": null, "actual_graph_evidence_root": null, "effective_case_env": {"W09_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/case-formal-r05-final-59", "W10_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/w10-formal-r05-final-59"}, "actual_child_pid": 98970, "exit_code": 101, "actual_wait_reaped": true, "elapsed_seconds": 5.965398583008209, "after_sha256": "a930c0ac60f4fe7a5da7ef2cab82ece1db843d18341b4daa189c88fbbdd25ce1", "after_at": "2026-10-11T14:36:12.876225+00:00", "shipping_inventory_after": {"path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service", "sha256": "52b3947e119f13eb43bd19bbcd43b012a2f94c6649bc2ef42c74047fca8f108f"}, "binary_stable": true}
+error: test failed, to rerun pass `-p lingxi-service --test subagent_closeout`

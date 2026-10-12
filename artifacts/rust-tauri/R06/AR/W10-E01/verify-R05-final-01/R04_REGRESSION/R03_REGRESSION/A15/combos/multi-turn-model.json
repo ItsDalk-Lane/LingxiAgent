@@ -1,0 +1,11 @@
+{
+  "combo": "multi-turn-model",
+  "counts": {
+    "final_status": "completed",
+    "model_calls": 3,
+    "runs": 1,
+    "terminal_events": 1,
+    "tool_calls": 1
+  },
+  "schema": "lingxi.r03-t08-combo-counts.v1"
+}

@@ -1,0 +1,359 @@
+{
+  "id": "R06-EX-09",
+  "title": "知识检索策略与旧可达/撤回代码的裁决",
+  "original_requirements": [
+    {
+      "id": "R06-T07-S01",
+      "clause": "从当前knowledge routes/store/manager实测导入、分块、embedding、索引、检索、读取、来源引用、删除及配置流程；R00清单为范围。"
+    },
+    {
+      "id": "R06-T07-S03",
+      "clause": "记录embedding模型/维度/版本与索引参数；模型改变时检测不兼容并可重建，不把不同维度向量混查。"
+    },
+    {
+      "id": "R06-T07-S05",
+      "clause": "针对真实生产可达但与范围说明冲突的路径先登记证据，不自行恢复或删除；未决项阻断该功能的完整验收。"
+    }
+  ],
+  "r00_feature_ids": [
+    "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-CITATIONS-CI-E2AF86",
+    "F-D08-TOOL-TOOL-KNOWLEDGE-GREP-269958",
+    "F-D08-TOOL-TOOL-KNOWLEDGE-OUTLINE-5F5365",
+    "F-D08-TOOL-TOOL-KNOWLEDGE-READ-FBD4D4",
+    "F-D08-TOOL-TOOL-KNOWLEDGE-SEARCH-062844"
+  ],
+  "reported_gap": "T07 D7/D8/D13/R8: NFKC/jieba替换、结构信息、grain/rerank/coverage、regex子集需要原可达链对照。旧研究体系撤回，不能未经证明直接恢复，也不能把当前合法设置静默忽略。",
+  "deadline": "R06 阶段验收前：这里只要求当前核心/服务份额",
+  "status": "NOT_RUN",
+  "evidence_level": "SOURCE_ONLY",
+  "runtime_evidence": [],
+  "coverage_by_existing_f": "R06-AR-F15要求完整性，但F01-F14的具体修复不自动涵盖此行为；保留为extra，不改原F编号",
+  "production_paths": [
+    "rust/crates/lingxi-service/src/knowledge.rs",
+    "rust/crates/lingxi-adapters/src/storage/knowledge.rs"
+  ],
+  "proposed_real_checks": [
+    "先定位当前原调用链：活跃/历史/撤回分类逐条证据；有争议且影响现役结果阻塞而非自行删掉",
+    "有效rerank/grain/Unicode/regex输入通过真实工具检索到正确原文/引用；不支持显式拒绝/降级并说明，不报成功空结果"
+  ],
+  "legal_later_basis": [
+    {
+      "task_id": "R07-T05",
+      "original_goal": "保留原有输入输出与资源交付质量。",
+      "original_steps": [
+        "逐项迁移现役office/beautify/jimeng-cli/media等内置插件的manifest、启停、配置和工具操作；叶子操作从R00盘点展开。",
+        "文档解析与渲染允许成熟worker，调用仍经Rust工具/模型网关；文件与临时目录权限最小化。",
+        "正式接入R01选定PDF renderer，覆盖字体、分页、图片、失败清理与产物验证；不永久依赖旧Electron helper。",
+        "压缩包导入防路径穿越/符号链接/解压炸弹，文档内容不能控制宿主权限或任意下载执行。",
+        "对既有样本文档和产物做语义/视觉验收，输出差异不能只用文件存在证明通过。"
+      ]
+    },
+    {
+      "task_id": "R08-T04",
+      "original_goal": "转换数据时不丢身份、附件或不可解释内容。",
+      "original_steps": [
+        "按STORES清单读取旧JSONL、session manifest、文件sidecar、观测、配置、记忆、知识和插件数据，逐类确定复制/只读复用/转换策略。",
+        "转换到新运行/消息库时保留稳定ID/父子关系/trace与引用映射；缺失Run边界标legacy_unknown，不按单个assistant消息发明用户任务。",
+        "保留原始记录及不理解的字段；原始文件不可覆盖，必要协议签名/opaque块保留给后续模型使用但不直接展示。",
+        "导入支持批处理、进度、暂停/失败恢复、幂等重跑和checksum；遇损坏尾行/坏附件分别报告，不自动丢弃整会话。",
+        "历史同一数据集只选择一个权威读取路径，导入成功后不同时读取旧新记录导致重复。"
+      ]
+    }
+  ],
+  "current_vs_later": "仅保留R06现役检索/引用服务份额；撤回研究/覆盖规划器不恢复，全量历史数据迁移演练后续。",
+  "suggested_work_unit": {
+    "id": "R06-EX-W09",
+    "scope": "知识检索策略与旧可达/撤回代码的裁决",
+    "agent_policy": "一次性边界明确的工作单，主代理整合；不创建长期代理",
+    "prerequisites": [
+      "先核对原生产调用链与有效配置，再以当前真实服务/模型替身验证；不得mock被验收核心"
+    ],
+    "review_required": "全新审查者在实际候选上独立实验，资料核对不签关闭"
+  },
+  "r00_original_assertions": [
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-CITATIONS-CI-E2AF86",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "成功：执行“定位引用证据”后，返回引用、原文块、源与快照及 viewer URL/位置",
+        "拒绝/边界：缺 headingPath 时从章节 metadata 补齐；引用不可见/不存在错误；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-E2AF86A962D0",
+        "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-CITATIONS-CI-E2AF86",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户定位引用证据",
+        "then": "返回引用、原文块、源与快照及 viewer URL/位置",
+        "assertions": [
+          "成功：执行“定位引用证据”后，返回引用、原文块、源与快照及 viewer URL/位置",
+          "拒绝/边界：缺 headingPath 时从章节 metadata 补齐；引用不可见/不存在错误；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-TOOL-TOOL-KNOWLEDGE-GREP-269958",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "片段可回到同一来源",
+        "跨studio不可读",
+        "无匹配为空；越权studio/source或无效过滤拒绝。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-269958F82F8A",
+        "feature_id": "F-D08-TOOL-TOOL-KNOWLEDGE-GREP-269958",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "当前会话具备调用 knowledge_grep 的权限，且准备有效对象与无效/拒绝样本",
+        "when": "分别调用 knowledge_grep 的主要分支，并从会话、文件/状态或外部结果读回",
+        "then": "返回精确匹配片段、章节和可核来源引用，不修改知识。",
+        "assertions": [
+          "片段可回到同一来源",
+          "跨studio不可读",
+          "无匹配为空；越权studio/source或无效过滤拒绝。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "检验“检索引用可验证且不串来源”的横向边界，可与本入口的在会话冻结的知识范围内按词查正文共同执行；仍未逐项断言该结果。"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧场景检验“embedding变化不静默损坏”，未操作或核对本入口的在会话冻结的知识范围内按词查正文。"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-TOOL-TOOL-KNOWLEDGE-OUTLINE-5F5365",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "章节定位可用于knowledge_read",
+        "跨来源隔离",
+        "无来源或越权返回错误；空文档只返回空大纲。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-5F5365322CFF",
+        "feature_id": "F-D08-TOOL-TOOL-KNOWLEDGE-OUTLINE-5F5365",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "当前会话具备调用 knowledge_outline 的权限，且准备有效对象与无效/拒绝样本",
+        "when": "分别调用 knowledge_outline 的主要分支，并从会话、文件/状态或外部结果读回",
+        "then": "返回可导航章节与块范围，受本轮冻结scope约束。",
+        "assertions": [
+          "章节定位可用于knowledge_read",
+          "跨来源隔离",
+          "无来源或越权返回错误；空文档只返回空大纲。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "检验“检索引用可验证且不串来源”的横向边界，可与本入口的读取知识来源的章节大纲共同执行；仍未逐项断言该结果。"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧场景检验“embedding变化不静默损坏”，未操作或核对本入口的读取知识来源的章节大纲。"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-TOOL-TOOL-KNOWLEDGE-READ-FBD4D4",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "引用指向实际快照",
+        "同轮刷新仍读旧冻结版",
+        "来源不存在、超出scope或分页越界不泄漏其他来源。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-FBD4D4D29679",
+        "feature_id": "F-D08-TOOL-TOOL-KNOWLEDGE-READ-FBD4D4",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "当前会话具备调用 knowledge_read 的权限，且准备有效对象与无效/拒绝样本",
+        "when": "分别调用 knowledge_read 的主要分支，并从会话、文件/状态或外部结果读回",
+        "then": "返回冻结版本的正文与引用信息，供回答引用。",
+        "assertions": [
+          "引用指向实际快照",
+          "同轮刷新仍读旧冻结版",
+          "来源不存在、超出scope或分页越界不泄漏其他来源。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "检验“检索引用可验证且不串来源”的横向边界，可与本入口的按来源/块/页读取知识正文共同执行；仍未逐项断言该结果。"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧场景检验“embedding变化不静默损坏”，未操作或核对本入口的按来源/块/页读取知识正文。"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-TOOL-TOOL-KNOWLEDGE-SEARCH-062844",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "命中来源和引用可核",
+        "无能力不伪造命中",
+        "无索引/模型能力或无结果显式说明；跨studio来源不出现。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-062844EDA014",
+        "feature_id": "F-D08-TOOL-TOOL-KNOWLEDGE-SEARCH-062844",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "当前会话具备调用 knowledge_search 的权限，且准备有效对象与无效/拒绝样本",
+        "when": "分别调用 knowledge_search 的主要分支，并从会话、文件/状态或外部结果读回",
+        "then": "返回带来源标识的候选片段及相关度，供进一步读取。",
+        "assertions": [
+          "命中来源和引用可核",
+          "无能力不伪造命中",
+          "无索引/模型能力或无结果显式说明；跨studio来源不出现。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "检验“检索引用可验证且不串来源”的横向边界，可与本入口的语义/关键词检索授权知识来源共同执行；仍未逐项断言该结果。"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "检验“embedding变化不静默损坏”的横向边界，可与本入口的语义/关键词检索授权知识来源共同执行；仍未逐项断言该结果。"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    }
+  ],
+  "report_sources": [
+    "docs/rust-tauri/R06/R06-T07_REPORT.md"
+  ],
+  "triage": "原义务需真实实验与范围核对，未确证当前Bug；不得因本清单推定修复完成/无需验证",
+  "legacy_comparison_excerpt": [
+    {
+      "path": "lib/knowledge/rerank-policy.ts",
+      "line": 35,
+      "end_line": 64,
+      "original_source": "    maxDocuments: input.maxDocuments ?? KNOWLEDGE_RERANK_MAX_DOCS,\n  };\n  if (typeof policy.enabled !== \"boolean\" || typeof policy.marginGate !== \"boolean\"\n    || !Number.isFinite(policy.clearMargin) || policy.clearMargin < 0\n    || !Number.isSafeInteger(policy.deadlineMs) || policy.deadlineMs < 1\n    || !Number.isSafeInteger(policy.maxDocuments) || policy.maxDocuments < 1\n    || policy.maxDocuments > KNOWLEDGE_RERANK_MAX_DOCS) {\n    throw new KnowledgeError(\"KNOWLEDGE_INVALID_ARGUMENT\", \"Knowledge rerank policy is invalid\");\n  }\n  return policy;\n}\n\nexport const KNOWLEDGE_RERANK_DISABLED_POLICY = Object.freeze(normalizeKnowledgeRerankPolicy({ enabled: false }));\nexport const KNOWLEDGE_RERANK_ENABLED_POLICY = Object.freeze(normalizeKnowledgeRerankPolicy({ enabled: true }));\nexport const KNOWLEDGE_FAST_RERANK_POLICY = Object.freeze(normalizeKnowledgeRerankPolicy({\n  enabled: true,\n  marginGate: true,\n  deadlineMs: KNOWLEDGE_FAST_RERANK_DEADLINE_MS,\n}));\n\n/** 检索结果缓存只认规范化后的完整策略，避免不同重排语义复用同一份结果。 */\nexport function knowledgeRetrievalPolicyDigest(input: {\n  channel: \"fts\" | \"hybrid\";\n  rerankPolicy: KnowledgeRerankPolicy;\n}): string {\n  return crypto.createHash(\"sha256\").update(JSON.stringify({\n    version: 1,\n    channel: input.channel,\n    rerank: input.rerankPolicy,\n  })).digest(\"hex\");",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "path": "lib/knowledge/knowledge-manager.ts",
+      "line": 158,
+      "end_line": 171,
+      "original_source": "  embedTextsForModel?: ((request: KnowledgeIngestionEmbedRequest) => Promise<KnowledgeEmbeddingResult | null>) | null;\n  canEmbedWithModel?: ((modelRef: KnowledgeModelRef) => boolean) | null;\n  getModelConfigurationRevision?: (ref: KnowledgeModelRef) => string;\n  /**\n   * 查询侧 rerank 执行回调（v8：按笔记本显式引用路由）。配置类不可解析由\n   * engine 侧记日志并返回 null，检索显式降级 RRF 名次；请求级错误照常抛出。\n   */\n  rerankForModel?: ((request: {\n    runId: string;\n    query: string;\n    documents: string[];\n    topN: number;\n    signal?: AbortSignal;\n    modelRef: KnowledgeModelRef;",
+      "status": "SOURCE_ONLY"
+    }
+  ]
+}

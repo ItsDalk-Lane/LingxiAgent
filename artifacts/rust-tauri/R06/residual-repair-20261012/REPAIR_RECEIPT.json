@@ -1,0 +1,432 @@
+{
+  "schema": "lingxi.r06.six-finding-repair.v1",
+  "updatedAtUtc": "2026-10-12T07:05:04.244148+00:00",
+  "status": "FIVE_FINDINGS_FIXED_VERIFIED_ONE_PARTIALLY_IMPLEMENTED",
+  "taskComplete": false,
+  "sourceFinding": "artifacts/rust-tauri/R06/direct-recheck-20261012/CHECK_RESULTS.json",
+  "scope": "只处理用户指定3个功能问题和3类检查收尾问题，不扩展问题发现",
+  "findings": [
+    {
+      "id": "RECHECK-01",
+      "status": "FIXED_VERIFIED",
+      "change": "回退收据保存完整恢复记录，重复请求及完整重启保留同一结果；不重复改文件",
+      "evidence": "closing-validation/rewind/command.log"
+    },
+    {
+      "id": "RECHECK-02",
+      "status": "FIXED_VERIFIED",
+      "change": "3处旧检查适配现有数据结构；受影响四包全部测试编译通过，两个原供应商检查具名运行通过",
+      "evidence": [
+        "closing-validation/compile-all-affected/command.log",
+        "gate-real-controls-final/results.json"
+      ]
+    },
+    {
+      "id": "RECHECK-03",
+      "status": "FIXED_VERIFIED",
+      "change": "旧评测适配真实目录与正式资料选择；BE02常驻写文件和BE07本轮选资料后精确激活检索均保留原2次预算。原始HTTP、数据库、用量与引用字节核对通过，改预算/隐藏额外调用负控仍拒绝",
+      "evidence": [
+        "activation-evidence-check/actual-evidence-check.json",
+        "activation-boundary-final/results.json",
+        "activation-validation/results.json"
+      ],
+      "fullTenCaseEvaluationAudit": "NOT_RUN",
+      "oldFailedEvidencePreserved": true
+    },
+    {
+      "id": "RECHECK-04",
+      "status": "PARTIALLY_IMPLEMENTED_NOT_ACCEPTED",
+      "change": "补齐真实唯一执行绑定、C01迁移数据库凭证、C02实际R06汇总、C03原R05前序门禁、C04真实负控；取消机械固定false，增加逐原断言真实日志证据生产和严格同候选校验",
+      "verified": "当前专项结构、11项隔离负控、真实迁移检查和1条原义务两条原断言的7个真实测试通过；不能替代整阶段结果",
+      "requiredOriginalLeaves": 280,
+      "mappedAndExecutedOriginalLeaves": 1,
+      "unmappedOriginalLeaves": 279,
+      "formalStageAcceptance": "NOT_RUN",
+      "predecessorR05ToR02Closure": "NOT_RUN",
+      "evidence": [
+        "closing-validation/results.json",
+        "closing-validation/R06_LEAVES/leaf-cases.json",
+        "remaining-original-obligations.json"
+      ],
+      "remainingRequirement": "逐条补齐其余279条原义务的完整正反行为证明，并通过适用的真实阶段和前序门禁；不得将未绑定项改为延期或免验，不以套件PASS代替原断言"
+    },
+    {
+      "id": "RECHECK-05",
+      "status": "FIXED_VERIFIED",
+      "change": "合法自动重试只衔接同一任务下一次尝试的原冻结资料，旧句柄继续拒绝，主体/会话/代次不能扩大",
+      "evidence": "activation-validation/f13-retry/command.log"
+    },
+    {
+      "id": "RECHECK-06",
+      "status": "FIXED_VERIFIED",
+      "change": "超限结果显示明确失败，同时保留完整原始成功结果；当前任务和后续历史读取继续可用，严格读者不变",
+      "evidence": [
+        "closing-validation/f08-budget/command.log",
+        "closing-validation/f08-original-control/command.log"
+      ]
+    }
+  ],
+  "closingValidation": [
+    {
+      "label": "compile-all-affected",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "check",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-kernel",
+        "-p",
+        "lingxi-adapters",
+        "-p",
+        "lingxi-service",
+        "-p",
+        "xtask",
+        "--tests"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 0.429
+    },
+    {
+      "label": "rewind",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f02_file_restore",
+        "rewind_recovery_records_survive_request_replay_and_service_restart",
+        "--",
+        "--exact",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 2.663
+    },
+    {
+      "label": "f08-budget",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f08_projection",
+        "f08_budget_refusal_keeps_raw_success_and_continues_with_readable_history",
+        "--",
+        "--exact",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 2.341
+    },
+    {
+      "label": "f08-original-control",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f08_projection",
+        "f08_c03_loop_warning_multi_block_resource_reaches_next_wire_capped",
+        "--",
+        "--exact",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 0.392
+    },
+    {
+      "label": "F14-C01",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--case",
+        "R06-AR-F14-C01",
+        "--evidence",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/closing-validation/F14-C01-evidence"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 14.518
+    },
+    {
+      "label": "r06_test_1859167f8b5893d11da0",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_1859167f8b5893d11da0",
+        "--evidence",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/closing-validation/R06_BINDINGS/r06_test_1859167f8b5893d11da0"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 9.095
+    },
+    {
+      "label": "r06_test_2b6615db5aa9ff61836b",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_2b6615db5aa9ff61836b",
+        "--evidence",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/closing-validation/R06_BINDINGS/r06_test_2b6615db5aa9ff61836b"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 3.755
+    },
+    {
+      "label": "r06_test_44af26646c8f0cc1f41a",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_44af26646c8f0cc1f41a",
+        "--evidence",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/closing-validation/R06_BINDINGS/r06_test_44af26646c8f0cc1f41a"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 5.466
+    },
+    {
+      "label": "r06_test_452dbda28a35d43f020b",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_452dbda28a35d43f020b",
+        "--evidence",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/closing-validation/R06_BINDINGS/r06_test_452dbda28a35d43f020b"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 3.535
+    },
+    {
+      "label": "r06_test_7bedfc803a97b827c46d",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_7bedfc803a97b827c46d",
+        "--evidence",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/closing-validation/R06_BINDINGS/r06_test_7bedfc803a97b827c46d"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 3.232
+    },
+    {
+      "label": "r06_test_b65156e0f5b298e96488",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_b65156e0f5b298e96488",
+        "--evidence",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/closing-validation/R06_BINDINGS/r06_test_b65156e0f5b298e96488"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 12.275
+    },
+    {
+      "label": "r06_test_ba36986fd96e6c9c562c",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_ba36986fd96e6c9c562c",
+        "--evidence",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/closing-validation/R06_BINDINGS/r06_test_ba36986fd96e6c9c562c"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 3.551
+    },
+    {
+      "label": "leaf-producer",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--leaf-evidence",
+        "--binding-evidence",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/closing-validation/R06_BINDINGS",
+        "--evidence",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/closing-validation/R06_LEAVES"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 2.048
+    },
+    {
+      "label": "negative-controls",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 6.737
+    },
+    {
+      "label": "inputs-check",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--check",
+        "--evidence",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/closing-validation/inputs"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 0.134
+    },
+    {
+      "label": "map-gate-contract",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--bin",
+        "xtask",
+        "stage_map::map_tests::r06_registered_map_executes_checks_without_releasing_unproved_obligations",
+        "--",
+        "--exact",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "seconds": 1.166
+    }
+  ],
+  "knowledgeAndCatalogBoundaryValidation": [
+    {
+      "label": "f13-selection-boundary",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f13_submission",
+        "real_submission_freezes_selected_sources_and_rejects_old_or_foreign_scope",
+        "--",
+        "--exact",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "exactOnePassed": true,
+      "seconds": 2.842
+    },
+    {
+      "label": "f07-discovery",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f07_catalog",
+        "first_layer_c02_real_catalog_discovers_describes_dispatches_new_registration",
+        "--",
+        "--exact",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "exactOnePassed": true,
+      "seconds": 0.157
+    },
+    {
+      "label": "f07-description-boundary",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f07_catalog",
+        "on_demand_calls_require_this_run_description_and_current_generation",
+        "--",
+        "--exact",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "exactOnePassed": true,
+      "seconds": 0.142
+    }
+  ],
+  "unchangedStrictReadersAndGate": [
+    {
+      "path": "rust/crates/lingxi-service/src/hooks.rs",
+      "unchanged": true,
+      "sha256": "4736be444a0a8f73d8fbe9d9745290ee3779520931e91f149fe137685471968f"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/model_history.rs",
+      "unchanged": true,
+      "sha256": "9164546ce680e0aba6cff005e607fb6dc5c571c722c759844cd101803815a922"
+    },
+    {
+      "path": "rust/crates/xtask/src/verify.rs",
+      "unchanged": true,
+      "sha256": "fe7e9ee01814bdfdd10919ccf62c2d8143dd28424c91b554d0da3a8e41132802"
+    }
+  ],
+  "preservation": {
+    "priorRepairSources": 97,
+    "unchanged": 81,
+    "updatedWithinSixFindings": 16,
+    "removed": 0,
+    "manifest": "preserved-source-manifest.json"
+  },
+  "formalR06Completion": "NOT_ACCEPTED",
+  "commit": false,
+  "push": false,
+  "otherProblemDiscovery": false,
+  "standardReduced": false
+}

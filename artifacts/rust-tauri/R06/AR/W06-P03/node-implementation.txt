@@ -1,0 +1,127 @@
+// 保留成熟解析器提供的每一层标签与定义位置；Value 的自动解标签不能用于配置。
+#[derive(Debug, Clone, PartialEq)]
+struct ConfigNode {
+    value: NodeValue,
+    tag: Option<String>,
+    offset: Option<u64>,
+}
+#[derive(Debug, Clone, PartialEq)]
+enum NodeValue {
+    Scalar(Value),
+    Sequence(Vec<ConfigNode>),
+    Mapping(Vec<(ConfigNode, ConfigNode)>),
+}
+impl<'de> serde::Deserialize<'de> for ConfigNode {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let item = serde_saphyr::Spanned::<serde_saphyr::Tagged<NodeValue>>::deserialize(d)?;
+        Ok(Self { value: item.value.0, tag: item.value.1, offset: item.defined.span().byte_offset() })
+    }
+}
+impl<'de> serde::Deserialize<'de> for NodeValue {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        struct Visitor;
+        impl<'de> serde::de::Visitor<'de> for Visitor {
+            type Value = NodeValue;
+            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { f.write_str("a YAML configuration value") }
+            fn visit_unit<E: serde::de::Error>(self) -> Result<Self::Value,E> { Ok(NodeValue::Scalar(Value::Null)) }
+            fn visit_bool<E: serde::de::Error>(self,v:bool) -> Result<Self::Value,E> { Ok(NodeValue::Scalar(Value::Bool(v))) }
+            fn visit_i64<E: serde::de::Error>(self,v:i64) -> Result<Self::Value,E> { Ok(NodeValue::Scalar(Value::Number(v.into()))) }
+            fn visit_u64<E: serde::de::Error>(self,v:u64) -> Result<Self::Value,E> { Ok(NodeValue::Scalar(Value::Number(v.into()))) }
+            fn visit_f64<E: serde::de::Error>(self,v:f64) -> Result<Self::Value,E> { Ok(NodeValue::Scalar(Value::Number(v.into()))) }
+            fn visit_str<E: serde::de::Error>(self,v:&str) -> Result<Self::Value,E> { self.visit_string(v.to_string()) }
+            fn visit_string<E: serde::de::Error>(self,v:String) -> Result<Self::Value,E> { Ok(NodeValue::Scalar(Value::String(v))) }
+            fn visit_seq<A:serde::de::SeqAccess<'de>>(self,mut a:A) -> Result<Self::Value,A::Error> {
+                let mut values=Vec::new(); while let Some(v)=a.next_element()? { values.push(v); } Ok(NodeValue::Sequence(values))
+            }
+            fn visit_map<A:serde::de::MapAccess<'de>>(self,mut a:A) -> Result<Self::Value,A::Error> {
+                let mut values=Vec::new(); while let Some(v)=a.next_entry()? { values.push(v); } Ok(NodeValue::Mapping(values))
+            }
+        }
+        d.deserialize_any(Visitor)
+    }
+}
+impl serde::Serialize for ConfigNode {
+    fn serialize<S:serde::Serializer>(&self,s:S) -> Result<S::Ok,S::Error> {
+        serde::Serialize::serialize(&serde_saphyr::Tagged(&self.value,self.tag.clone()),s)
+    }
+}
+impl serde::Serialize for NodeValue {
+    fn serialize<S:serde::Serializer>(&self,s:S) -> Result<S::Ok,S::Error> {
+        match self {
+            Self::Scalar(value) => serde::Serialize::serialize(value,s),
+            Self::Sequence(values) => serde::Serialize::serialize(values,s),
+            Self::Mapping(values) => {
+                use serde::ser::SerializeMap;
+                let mut map=s.serialize_map(Some(values.len()))?;
+                for (key,value) in values { map.serialize_entry(key,value)?; }
+                map.end()
+            }
+        }
+    }
+}
+impl ConfigNode {
+    fn from_value(value:Value) -> Self {
+        let value=match value {
+            Value::Mapping(map) => NodeValue::Mapping(map.into_iter().map(|(k,v)|(Self::from_value(k),Self::from_value(v))).collect()),
+            Value::Sequence(seq) => NodeValue::Sequence(seq.into_iter().map(Self::from_value).collect()),
+            value => NodeValue::Scalar(value),
+        };
+        Self {value,tag:None,offset:None}
+    }
+    fn core_type(&self) -> Option<&str> { self.tag.as_deref().and_then(|tag| tag.strip_prefix("tag:yaml.org,2002:")) }
+    fn string(&self) -> Option<&str> {
+        if self.core_type().is_some_and(|tag|tag!="str") { return None; }
+        match &self.value {NodeValue::Scalar(Value::String(v))=>Some(v),_=>None}
+    }
+    fn boolean(&self) -> Option<bool> {
+        if self.core_type().is_some_and(|tag|tag!="bool") { return None; }
+        match &self.value {NodeValue::Scalar(Value::Bool(v))=>Some(*v),_=>None}
+    }
+    fn get(&self,key:&str) -> Option<&Self> {
+        match &self.value {NodeValue::Mapping(entries)=>entries.iter().find(|(k,_)|k.string()==Some(key)).map(|(_,v)|v),_=>None}
+    }
+    fn restore_and_validate(&mut self,timestamps:&BTreeSet<u64>) -> Result<(),MemoryError> {
+        if self.tag.is_none()&&self.offset.is_some_and(|offset|timestamps.contains(&offset)) {
+            self.tag=Some("tag:yaml.org,2002:timestamp".into());
+        }
+        match &mut self.value {
+            NodeValue::Sequence(values)=>for value in values.iter_mut() {value.restore_and_validate(timestamps)?;},
+            NodeValue::Mapping(values)=>for (key,value) in values.iter_mut() {key.restore_and_validate(timestamps)?;value.restore_and_validate(timestamps)?;},
+            _=>{}
+        }
+        match self.core_type() {
+            Some("binary")=>{
+                use base64::Engine;
+                let NodeValue::Scalar(Value::String(raw))=&self.value else {return Err(invalid("!!binary must be a scalar"));};
+                let compact:String=raw.chars().filter(|c|!c.is_ascii_whitespace()).collect();
+                base64::engine::general_purpose::STANDARD.decode(&compact).map_err(|_|invalid("invalid !!binary base64"))?;
+            },
+            Some("timestamp")=>{
+                let NodeValue::Scalar(Value::String(raw))=&self.value else {return Err(invalid("!!timestamp must be a scalar"));};
+                if !is_timestamp(raw) {return Err(invalid("invalid !!timestamp value"));}
+            },
+            Some("set")=>{
+                let NodeValue::Mapping(entries)=&self.value else {return Err(invalid("!!set must be a mapping"));};
+                if entries.iter().any(|(_,v)|!matches!(v.value,NodeValue::Scalar(Value::Null))) {return Err(invalid("!!set values must be null"));}
+            },
+            Some("omap"|"pairs")=>{
+                let NodeValue::Sequence(entries)=&self.value else {return Err(invalid("!!omap/!!pairs must be a sequence"));};
+                let mut keys=Vec::new();
+                for entry in entries {
+                    let NodeValue::Mapping(pair)=&entry.value else {return Err(invalid("!!omap/!!pairs entries must be mappings"));};
+                    if pair.len()!=1 {return Err(invalid("!!omap/!!pairs entries must have one key"));}
+                    if self.core_type()==Some("omap")&&keys.contains(&pair[0].0) {return Err(invalid("duplicate !!omap key"));}
+                    keys.push(pair[0].0.clone());
+                }
+            },
+            _=>{}
+        }
+        Ok(())
+    }
+}
+// 与现役 js-yaml DEFAULT_SCHEMA 的 timestamp resolver 完全相同，只处理解析器输出的单个标量。
+// 这不是对 YAML 源码做正则预处理；标签、引号、别名和层次仍由成熟解析器决定。
+fn is_timestamp(value:&str) -> bool {
+    static RE: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(||regex::Regex::new(r"^(?:[0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}(?:[Tt]|[ \t]+)[0-9]{1,2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]*)?(?:[ \t]*(?:Z|[-+][0-9]{1,2}(?::[0-9]{2})?))?)$").expect("固定现役时间戳模式"));
+    RE.is_match(value)
+}

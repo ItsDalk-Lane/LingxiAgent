@@ -642,6 +642,7 @@ async fn crash_child_boundary_harness() {
         run_hint: format!("{case_name}:{}", std::process::id()),
     });
     let submission = ExecuteSubmission {
+        knowledge: None,
         input: INPUT,
         request_id: Some(REQUEST_ID),
     };

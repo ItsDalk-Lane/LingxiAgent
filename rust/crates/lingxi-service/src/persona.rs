@@ -63,29 +63,31 @@ fn error_response(err: &MemoryError) -> Response {
     (status, Json(body)).into_response()
 }
 
-fn locale_of(state: &ServiceState, agent_id: &str) -> String {
+fn locale_of(state: &ServiceState, agent_id: &str) -> Result<String, MemoryError> {
     // config locale → prefs locale → en (shared chain with MemoryService).
     let home = state.memory().home().to_path_buf();
     let config_locale =
-        std::fs::read_to_string(home.join("agents").join(agent_id).join("config.yaml"))
-            .ok()
-            .and_then(|text| crate::context_compiler::scan_agent_config(&text).locale);
+        am::config::read_agent_config(&home.join("agents").join(agent_id).join("config.yaml"))?
+            .scan()?
+            .locale;
     let prefs_locale = crate::context_compiler::scan_preferences(
         am::read_json_file(&home.join("user").join("preferences.json")).as_ref(),
     )
     .locale;
-    config_locale
+    Ok(config_locale
         .filter(|l| !l.trim().is_empty())
         .or(prefs_locale.filter(|l| !l.trim().is_empty()))
-        .unwrap_or_else(|| "en".to_string())
+        .unwrap_or_else(|| "en".to_string()))
 }
 
-fn yuan_of(state: &ServiceState, agent_id: &str) -> String {
-    let home = state.memory().home().to_path_buf();
-    std::fs::read_to_string(home.join("agents").join(agent_id).join("config.yaml"))
-        .ok()
-        .and_then(|text| crate::context_compiler::scan_agent_config(&text).yuan)
-        .unwrap_or_else(|| "yuan".to_string())
+fn yuan_of(state: &ServiceState, agent_id: &str) -> Result<String, MemoryError> {
+    let home = state.memory().home();
+    Ok(
+        am::config::read_agent_config(&home.join("agents").join(agent_id).join("config.yaml"))?
+            .scan()?
+            .yuan
+            .unwrap_or_else(|| "yuan".to_string()),
+    )
 }
 
 macro_rules! persona_get_route {
@@ -98,8 +100,8 @@ macro_rules! persona_get_route {
             if let Err(err) = validate_agent_id(&agent_id) {
                 return error_response(&err);
             }
-            let locale = locale_of(&state, &agent_id);
-            let yuan = yuan_of(&state, &agent_id);
+            let locale = match locale_of(&state, &agent_id) { Ok(value) => value, Err(err) => return error_response(&err) };
+            let yuan = match yuan_of(&state, &agent_id) { Ok(value) => value, Err(err) => return error_response(&err) };
             match state.persona().store().resolve_persona(&agent_id, &yuan, &locale, $kind) {
                 Ok((content, from_template)) => {
                     Json(json!({ "content": content, "fromTemplate": from_template })).into_response()

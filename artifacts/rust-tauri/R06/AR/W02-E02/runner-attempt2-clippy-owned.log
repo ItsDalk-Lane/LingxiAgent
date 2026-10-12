@@ -1,0 +1,18 @@
+COMMAND ["/Users/study_superior/.cargo/bin/cargo", "clippy", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-service", "--all-targets", "--", "-D", "warnings"]
+ISOLATED_LINGXI_HOME /tmp/lingxi-w02-e02-clippy-owned-cjl5qrgy
+START 2026-10-11T05:36:54.216636+00:00
+    Blocking waiting for file lock on build directory
+    Checking lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0425]: cannot find value `canon` in this scope
+   --> crates/lingxi-service/src/session_tree.rs:758:65
+    |
+758 |                 let verdict = if self.file_safety.is_protected(&canon)
+    |                                                                 ^^^^^ not found in this scope
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `lingxi-service` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `lingxi-service` (lib test) due to 1 previous error

@@ -1,0 +1,36 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "deepseek",
+  "case": "level-enables-and-keeps-budget",
+  "model": {
+    "provider": "deepseek",
+    "baseUrl": "https://api.deepseek.com",
+    "id": "deepseek-reasoner",
+    "reasoning": true,
+    "api": "openai-completions"
+  },
+  "payload": {
+    "model": "deepseek-reasoner",
+    "messages": [],
+    "tool_choice": "auto",
+    "max_tokens": 8192
+  },
+  "options": {
+    "mode": "chat",
+    "reasoningLevel": "low"
+  },
+  "expected": {
+    "thinkingFormat": "deepseek",
+    "reasoningProfile": null,
+    "matched": "deepseek",
+    "result": {
+      "model": "deepseek-reasoner",
+      "messages": [],
+      "max_tokens": 8192,
+      "reasoning_effort": "low",
+      "thinking": {
+        "type": "enabled"
+      }
+    }
+  }
+}

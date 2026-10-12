@@ -1,0 +1,108 @@
+{"command": ["node", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-v3-oracle.mjs", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-v3-results.json", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-v3-typed-results.json"], "start": 1791707733.247097, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-extra-v3-oracle-aux428g7", "guard": "8192MB/600s"}
+[
+  [ 'upper-prefix-family', 'FAIL', undefined ],
+  [
+    'tag-scalar-0',
+    'FAIL',
+    'YAMLException: cannot resolve a node with !<tag:yaml.org,2002:null> explicit tag (2:21)\n' +
+      '\n' +
+      ' 1 | memory: {enabled: false}\n' +
+      ' 2 | future: !!null wrong\n' +
+      '-------------------------^'
+  ],
+  [
+    'tag-scalar-1',
+    'FAIL',
+    'YAMLException: cannot resolve a node with !<tag:yaml.org,2002:null> explicit tag (2:21)\n' +
+      '\n' +
+      ' 1 | memory: {enabled: false}\n' +
+      ' 2 | future: !!null false\n' +
+      '-------------------------^'
+  ],
+  [
+    'tag-scalar-2',
+    'FAIL',
+    'YAMLException: cannot resolve a node with !<tag:yaml.org,2002:null> explicit tag (2:17)\n' +
+      '\n' +
+      ' 1 | memory: {enabled: false}\n' +
+      ' 2 | future: !!null 7\n' +
+      '---------------------^'
+  ],
+  [ 'tag-scalar-3', 'PASS', undefined ],
+  [
+    'tag-scalar-4',
+    'FAIL',
+    'YAMLException: cannot resolve a node with !<tag:yaml.org,2002:int> explicit tag (2:19)\n' +
+      '\n' +
+      ' 1 | memory: {enabled: false}\n' +
+      ' 2 | future: !!int 0B10\n' +
+      '-----------------------^'
+  ],
+  [
+    'tag-scalar-5',
+    'FAIL',
+    'YAMLException: cannot resolve a node with !<tag:yaml.org,2002:int> explicit tag (2:19)\n' +
+      '\n' +
+      ' 1 | memory: {enabled: false}\n' +
+      ' 2 | future: !!int 0O17\n' +
+      '-----------------------^'
+  ],
+  [
+    'tag-scalar-6',
+    'FAIL',
+    'YAMLException: cannot resolve a node with !<tag:yaml.org,2002:int> explicit tag (2:19)\n' +
+      '\n' +
+      ' 1 | memory: {enabled: false}\n' +
+      ' 2 | future: !!int 0Xff\n' +
+      '-----------------------^'
+  ],
+  [
+    'tag-scalar-7',
+    'PASS',
+    'YAMLException: cannot resolve a node with !<tag:yaml.org,2002:float> explicit tag (2:21)\n' +
+      '\n' +
+      ' 1 | memory: {enabled: false}\n' +
+      ' 2 | future: !!float 0xFF\n' +
+      '-------------------------^'
+  ],
+  [
+    'tag-scalar-8',
+    'PASS',
+    'YAMLException: cannot resolve a node with !<tag:yaml.org,2002:float> explicit tag (2:22)\n' +
+      '\n' +
+      ' 1 | memory: {enabled: false}\n' +
+      ' 2 | future: !!float -0B10\n' +
+      '--------------------------^'
+  ],
+  [ 'tag-scalar-9', 'PASS', undefined ],
+  [
+    'tag-scalar-10',
+    'PASS',
+    'YAMLException: cannot resolve a node with !<tag:yaml.org,2002:int> explicit tag (2:19)\n' +
+      '\n' +
+      ' 1 | memory: {enabled: false}\n' +
+      ' 2 | future: !!int 12.0\n' +
+      '-----------------------^'
+  ]
+]
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert(rows.every(r=>r.status==='PASS'))
+
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-v3-oracle.mjs:23:215
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:633:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.16.0

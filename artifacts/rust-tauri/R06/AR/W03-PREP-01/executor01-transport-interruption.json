@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-11T11:33:47.910538+00:00",
+  "work_id": "R06-AR-W03",
+  "role": "Executor01",
+  "status": "TRANSPORT_ERROR_INCOMPLETE_SELF_CHECK_NOT_REVIEW_FAIL",
+  "error": "stream disconnected before completion: An error occurred while processing your request.",
+  "platform_request_id": "cefb069f-43e5-4c56-9cf3-ca582cef4cd5",
+  "not_Daybreak_access_block": true,
+  "whole06_has_start_no_final_record": true,
+  "partial_log_hashes": {
+    "run-start.json": "74ad74beb0e7cf61fded6c5cff8418908a87439dc33e0c604f86ef94ace8b970",
+    "stdout.log": "a7abbde6948ecfa83aeb8125d5a8843e6da768af50c1867165ed53a765c0d8f3",
+    "stderr.log": "e021a6032d96030c1dc848c0c9dce75ba6857a81b0c19cd36b9f935e421951b0"
+  },
+  "ps_matching_process_count": 0,
+  "process_lines": [],
+  "tool_session_8216": "Unknown process id",
+  "outcome": "INCOMPLETE_NOT_PASS; old Executor not reused; new empty-history continuation Executor needed to complete fresh source-bound self/adversarial checks and freeze before first Reviewer",
+  "source_not_mutated_by_root": true
+}

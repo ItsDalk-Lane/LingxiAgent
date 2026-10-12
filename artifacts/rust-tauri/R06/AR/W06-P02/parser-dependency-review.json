@@ -1,0 +1,58 @@
+{
+  "primary_sources": [
+    "https://docs.rs/serde-saphyr/1.3.0/serde_saphyr/",
+    "https://docs.rs/crate/serde-saphyr/1.3.0/source/src/de/options.rs",
+    "https://docs.rs/granit-parser/1.3.0/granit_parser/",
+    "https://docs.rs/crate/serde-saphyr/1.3.0/source/src/ser/quoting.rs"
+  ],
+  "pinned": [
+    "serde-saphyr =1.3.0",
+    "granit-parser =1.3.0"
+  ],
+  "removed_packages": [],
+  "added_packages": [
+    [
+      "annotate-snippets",
+      "0.12.16"
+    ],
+    [
+      "anstyle",
+      "1.0.14"
+    ],
+    [
+      "arraydeque",
+      "0.5.1"
+    ],
+    [
+      "encoding_rs_io",
+      "0.1.8"
+    ],
+    [
+      "granit-parser",
+      "1.3.0"
+    ],
+    [
+      "nohash-hasher",
+      "0.2.0"
+    ],
+    [
+      "serde-saphyr",
+      "1.3.0"
+    ],
+    [
+      "unicode-width",
+      "0.2.2"
+    ]
+  ],
+  "changed_existing_registry_packages": [],
+  "direct_workspace_change": [
+    [
+      "lingxi-adapters",
+      "0.0.0"
+    ]
+  ],
+  "serializer_literal_key_quote": true,
+  "source_validator": "granit events/anchors/sequence/mapping graph; validates relevant keys before serde-saphyr merge expansion; no input preprocessing",
+  "strict_tags": true,
+  "strict_booleans": true
+}

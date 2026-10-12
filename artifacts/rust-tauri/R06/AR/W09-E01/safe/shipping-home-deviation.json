@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-11T14:53:53.557759+00:00",
+  "owner": "R06-AR-W09-E01",
+  "original_supplement": "shipping-supplement",
+  "actual_OS_HOME_overridden": true,
+  "source_of_proof": "each original supplement record effective_environment.HOME",
+  "disposition": "ENVIRONMENT_DEVIATION_PRESERVED; original genuine result retained, not substituted for inherited OS HOME execution",
+  "new_supervisor": "LOCAL_ONLY_NEVER_GIT/shipping-supplement-inherited-home.py",
+  "new_policy": "OS HOME inherited, only product LINGXI_HOME and TMPDIR synthetic; installed toolchain caches explicit",
+  "old_supervisor_sha256": "74c49b0fda095e4161116365921a03a15fb22477b2eb98ffa2036f0859babcaf",
+  "formal59_unchanged": true,
+  "product_changes": "NONE"
+}

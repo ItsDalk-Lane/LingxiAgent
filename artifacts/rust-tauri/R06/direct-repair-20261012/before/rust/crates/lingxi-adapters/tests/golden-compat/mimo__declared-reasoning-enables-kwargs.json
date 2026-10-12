@@ -1,0 +1,32 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "mimo",
+  "case": "declared-reasoning-enables-kwargs",
+  "model": {
+    "provider": "mimo",
+    "id": "mimo-v7-pro",
+    "baseUrl": "https://xiaomimimo.com/v1",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "mimo-v7-pro",
+    "messages": []
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": "qwen-chat-template",
+    "reasoningProfile": "mimo-openai",
+    "matched": "mimo",
+    "result": {
+      "model": "mimo-v7-pro",
+      "messages": [],
+      "chat_template_kwargs": {
+        "enable_thinking": true,
+        "preserve_thinking": true
+      }
+    }
+  }
+}

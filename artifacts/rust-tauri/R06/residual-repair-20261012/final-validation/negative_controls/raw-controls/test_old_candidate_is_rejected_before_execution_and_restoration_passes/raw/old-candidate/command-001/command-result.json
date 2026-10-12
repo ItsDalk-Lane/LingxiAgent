@@ -1,0 +1,54 @@
+{
+  "binding": {
+    "kind": "script",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-B",
+      "scripts/rust-tauri/r02_registry_consistency.py",
+      "--root",
+      "."
+    ],
+    "stdoutPattern": "^PASS: migrations\\.rs MIGRATIONS == registry \\(",
+    "timeoutSecs": 30
+  },
+  "argv": [
+    "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+    "-B",
+    "scripts/rust-tauri/r02_registry_consistency.py",
+    "--root",
+    "."
+  ],
+  "cwd": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22",
+  "sourceBeforeSha256": "4ee9de8beb36e182c0472d7718955728d7de56741d9b9f1677cf329733c1a09b",
+  "exitCode": null,
+  "timedOut": false,
+  "stdout": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22/artifacts/old-candidate/command-001/stdout.log",
+  "stderr": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22/artifacts/old-candidate/command-001/stderr.log",
+  "timeoutSecs": 30,
+  "syntheticEnvironment": {
+    "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22/artifacts/old-candidate/command-001/runtime/home",
+    "TMPDIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22/artifacts/old-candidate/command-001/runtime/tmp",
+    "LINGXI_PRODUCT_DIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22/lib",
+    "W01_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22/artifacts/old-candidate/command-001/raw/w01_evidence",
+    "W09_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22/artifacts/old-candidate/command-001/raw/w09_evidence",
+    "W10_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22/artifacts/old-candidate/command-001/raw/w10_evidence",
+    "W11_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22/artifacts/old-candidate/command-001/raw/w11_evidence",
+    "LINGXI_W03_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22/artifacts/old-candidate/command-001/raw/lingxi_w03_evidence",
+    "LINGXI_F05_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22/artifacts/old-candidate/command-001/raw/lingxi_f05_evidence",
+    "LINGXI_F08_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22/artifacts/old-candidate/command-001/raw/lingxi_f08_evidence",
+    "R06_T08_RAW_OUT": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22/artifacts/old-candidate/command-001/raw/t08",
+    "R06_T08_EVAL_OUT": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-ft1glj22/artifacts/old-candidate/command-001/raw/t08-evaluations.jsonl"
+  },
+  "executionError": "开始下一命令前源码已改变",
+  "elapsedSecs": 0.0,
+  "outputCheck": {
+    "valid": false,
+    "matchedExpectedScriptResult": false,
+    "reason": "脚本没有产生登记的实际检查结论"
+  },
+  "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderrSha256": "5068e3b14c9bcc546ba74c2f33b8fc9eab528b4d77b9ee97a90108a285864133",
+  "sourceAfterSha256": "4ee9de8beb36e182c0472d7718955728d7de56741d9b9f1677cf329733c1a09b",
+  "sourceStable": false,
+  "localPassed": false
+}

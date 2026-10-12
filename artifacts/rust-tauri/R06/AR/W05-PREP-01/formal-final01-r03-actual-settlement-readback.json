@@ -1,0 +1,142 @@
+{
+  "at": "2026-10-11T14:19:32.816698+00:00",
+  "role": "ROOT_ACTUAL_PARTIAL_LAYER_READBACK_NOT_REVIEWER",
+  "source_record": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/verify-R05-final-01/R04_REGRESSION/R03_REGRESSION/verify-stage-result.json",
+  "source_record_sha256": "cd21c849c7679e3f32b4088426e8adbc420b7311f26972c6843059cd55812bd0",
+  "stage": "R03",
+  "overall": "FAIL",
+  "source_binding_stable": true,
+  "command_count": 15,
+  "counts": {
+    "FAIL": 3,
+    "PASS": 12
+  },
+  "commands": [
+    {
+      "key": "rust_test_workspace",
+      "status": "FAIL",
+      "actual_exit_code": 101,
+      "durationMs": 100862,
+      "timedOut": false,
+      "missingEvidence": []
+    },
+    {
+      "key": "a15_combo_and_leaves",
+      "status": "PASS",
+      "actual_exit_code": 0,
+      "durationMs": 53675,
+      "timedOut": false,
+      "missingEvidence": []
+    },
+    {
+      "key": "r02_storage_tx",
+      "status": "FAIL",
+      "actual_exit_code": 1,
+      "durationMs": 52119,
+      "timedOut": false,
+      "missingEvidence": [
+        "{EVIDENCE}/R02/A07_A08/s1-counts-after-stop.json",
+        "{EVIDENCE}/R02/A07_A08/s4-hashes-after.txt"
+      ]
+    },
+    {
+      "key": "r02_full_chain",
+      "status": "PASS",
+      "actual_exit_code": 0,
+      "durationMs": 50118,
+      "timedOut": false,
+      "missingEvidence": []
+    },
+    {
+      "key": "r02_backup_restore",
+      "status": "PASS",
+      "actual_exit_code": 0,
+      "durationMs": 54940,
+      "timedOut": false,
+      "missingEvidence": []
+    },
+    {
+      "key": "r02_recovery_drill",
+      "status": "PASS",
+      "actual_exit_code": 0,
+      "durationMs": 50388,
+      "timedOut": false,
+      "missingEvidence": []
+    },
+    {
+      "key": "rust_fmt",
+      "status": "PASS",
+      "actual_exit_code": 0,
+      "durationMs": 49246,
+      "timedOut": false,
+      "missingEvidence": []
+    },
+    {
+      "key": "rust_clippy",
+      "status": "PASS",
+      "actual_exit_code": 0,
+      "durationMs": 49801,
+      "timedOut": false,
+      "missingEvidence": []
+    },
+    {
+      "key": "check_contracts",
+      "status": "PASS",
+      "actual_exit_code": 0,
+      "durationMs": 49935,
+      "timedOut": false,
+      "missingEvidence": []
+    },
+    {
+      "key": "check_boundaries",
+      "status": "PASS",
+      "actual_exit_code": 0,
+      "durationMs": 46132,
+      "timedOut": false,
+      "missingEvidence": []
+    },
+    {
+      "key": "r02_auth_matrix",
+      "status": "PASS",
+      "actual_exit_code": 0,
+      "durationMs": 113938,
+      "timedOut": false,
+      "missingEvidence": []
+    },
+    {
+      "key": "r02_legacy_regression",
+      "status": "FAIL",
+      "actual_exit_code": 1,
+      "durationMs": 170456,
+      "timedOut": false,
+      "missingEvidence": []
+    },
+    {
+      "key": "a16_seed_mechanism",
+      "status": "PASS",
+      "actual_exit_code": 0,
+      "durationMs": 80623,
+      "timedOut": false,
+      "missingEvidence": []
+    },
+    {
+      "key": "repair_suites",
+      "status": "PASS",
+      "actual_exit_code": 0,
+      "durationMs": 74531,
+      "timedOut": false,
+      "missingEvidence": []
+    },
+    {
+      "key": "r02_events_matrix",
+      "status": "PASS",
+      "actual_exit_code": 0,
+      "durationMs": 68202,
+      "timedOut": false,
+      "missingEvidence": []
+    }
+  ],
+  "outer_R04_R05": "STILL_PENDING_THIS_OBSERVATION",
+  "task_acceptance": false,
+  "old_environment_failure": "Original legacy command source/copy disjointness failure; original result retained. New outside-TMPDIR run must be separately recorded after current chain settles."
+}

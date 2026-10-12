@@ -1,0 +1,10 @@
+{"command": ["npx", "vitest", "run", "tests/r06-ar-f12-vector-cache-preservation.test.ts", "tests/r06-ar-f12-fulltext-cache-preservation.test.ts", "tests/r06-ar-f12-ann-cache-preservation.test.ts", "--maxWorkers=1"], "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p02-ts-initial-01-s4kfjy5v", "start": 1791702272.530245}
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+
+ Test Files  3 passed (3)
+      Tests  25 passed (25)
+   Start at  15:04:35
+   Duration  6.50s (transform 78ms, setup 27ms, import 84ms, tests 6.21s, environment 0ms)
+

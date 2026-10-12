@@ -1,0 +1,41 @@
+{
+  "at": "2026-10-11T09:16:37.179603+00:00",
+  "role": "ROOT_READ_ONLY_PREPARATION_NOT_PRODUCT_FIX_OR_REVIEW",
+  "work_id": "R06-AR-W07",
+  "status": "SOURCE_INFERRED_NOT_RUN",
+  "source_sha256": {
+    "rust/crates/lingxi-kernel/src/model_exchange.rs": "ba9d8cb8d355ef080e6b49103fe418215bb2e0c92ef2fc9c9b0c5b7a7c27e53b",
+    "rust/crates/lingxi-kernel/src/toolcatalog.rs": "2b7505387b6b45aebc9ff7a0c836d49d24573df1d2de2e3137549eab5983ad1f",
+    "rust/crates/lingxi-service/src/runs.rs": "eca52e6151299a43d7386fb2056908a3d86afeadc1085cd3aa55dd35b5646a6e",
+    "rust/crates/lingxi-service/src/lib.rs": "39d114c237cecf12e2bdbb115f3df07f864d2218136db3662732503c4c53ea22",
+    "rust/crates/lingxi-service/src/knowledgetools.rs": "657748b6bfc69b5f45ef59e9ad6d5111322f5c1727398f976a0ec11cbfd409a4",
+    "rust/crates/lingxi-service/src/memorytools.rs": "0ef76b60c42a2335b63bbcb9c79c39add3b5d83bb92e9754f4d8fd239aaab0fc"
+  },
+  "observations": [
+    {
+      "entry": "ToolDeclarationSnapshot.from_registry",
+      "fact": "filters Available only; description uses snapshot display_name, despite full describe already obtained. Implementation comment callable+resident does not prove current production tool registrations are actually resident by original contract.",
+      "expected": "true original resident set plus needed infrastructure; dynamic currentRun activation and authorization. Full description/schema/name/generation consistent atomically; no mechanical four-total limit",
+      "actual": "NOT_RUN"
+    },
+    {
+      "entry": "RunSupervisor every turn",
+      "fact": "rebuilds snapshot live registry before midRun compaction; changes affect all protocol adapters and live turn, compaction tools input too",
+      "expected": "generation/description target stable; stale declarations cannot execute different meaning; failures explicit; no budget claim from static system string only",
+      "actual": "NOT_RUN"
+    },
+    {
+      "entry": "Service bootstrap memory/knowledge registrars",
+      "fact": "both registered production entries; full-family policy needed beyond knowledge alone",
+      "actual": "NOT_RUN"
+    }
+  ],
+  "dependencies": {
+    "F01": "actual restored histories/child wrapper modifies runs under execution. Future shared-source integration must preserve actual F08 projections and all normalized archive invariants",
+    "F03": "owned scope/true cancellation retains lease; currentRun activation cannot use wrong session/Run",
+    "F05": "current material freshness and transient activation must not be session-only cache",
+    "F13": "normal selected knowledge chat needs minted scope + necessary currentRun handles on actual modelwire, not global activation",
+    "EX02": "postcompaction enrichment/skillrecall original obligations unchanged"
+  },
+  "required_future_evidence": "actual default/chat selectedSource wire, discovery→describe→invoke→generation switch, five protocol descriptions, enable/disable/withdrawal positives+negatives, real request system+tools budget with measured/estimate distinction. No product tests run here."
+}

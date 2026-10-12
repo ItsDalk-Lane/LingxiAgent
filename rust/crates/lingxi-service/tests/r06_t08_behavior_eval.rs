@@ -40,6 +40,63 @@ use std::time::{Duration, Instant};
 use base64::Engine as _;
 use tokio::io::{AsyncBufReadExt as _, AsyncReadExt as _, AsyncWriteExt as _, BufReader};
 
+/// 仅保存合成运行的原始事实；凭证和完整资料根不进入可交付日志。
+fn emit_raw(kind: &str, value: serde_json::Value) {
+    let Ok(root) = std::env::var("R06_T08_RAW_OUT") else {
+        return;
+    };
+    use std::io::Write as _;
+    static LOCK: Mutex<()> = Mutex::new(());
+    let _lock = LOCK.lock().expect("raw evidence lock");
+    std::fs::create_dir_all(&root).expect("raw evidence directory");
+    let mut file = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(Path::new(&root).join("facts.jsonl"))
+        .expect("raw evidence file");
+    writeln!(file, "{}", serde_json::json!({"kind":kind,"value":value}))
+        .expect("raw evidence append");
+}
+
+/// 在启动前直接绑定实际将执行的文件；库存和后续采样不能替代它。
+fn executable_sha(path: &Path) -> String {
+    use sha2::Digest as _;
+    sha2::Sha256::digest(std::fs::read(path).expect("实际程序可读"))
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect()
+}
+
+/// 完整读取生产表；行来自真实数据库，报告不提供查询结果。
+fn sql_objects(db: &rusqlite::Connection, query: &str, run: &str) -> Vec<serde_json::Value> {
+    let mut statement = db.prepare(query).expect("生产事实查询");
+    let columns: Vec<String> = statement
+        .column_names()
+        .iter()
+        .map(|s| (*s).to_string())
+        .collect();
+    let mut cursor = statement.query([run]).expect("生产事实游标");
+    let mut objects = Vec::new();
+    while let Some(row) = cursor.next().expect("生产事实行") {
+        let mut object = serde_json::Map::new();
+        for (index, name) in columns.iter().enumerate() {
+            use rusqlite::types::ValueRef;
+            let value = match row.get_ref(index).expect("生产事实字段") {
+                ValueRef::Null => serde_json::Value::Null,
+                ValueRef::Integer(v) => serde_json::json!(v),
+                ValueRef::Real(v) => serde_json::json!(v),
+                ValueRef::Text(v) => serde_json::json!(std::str::from_utf8(v).expect("事实UTF8")),
+                ValueRef::Blob(v) => {
+                    serde_json::json!({"base64":base64::engine::general_purpose::STANDARD.encode(v)})
+                }
+            };
+            object.insert(name.clone(), value);
+        }
+        objects.push(serde_json::Value::Object(object));
+    }
+    objects
+}
+
 // ── 评分模型（A15 核心：四维分列，overall = AND，不混算） ──
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -55,11 +112,7 @@ impl TaskScore {
         self.tool_selection && self.schema_valid && self.semantic_params && self.task_complete
     }
     fn overall(&self) -> &'static str {
-        if self.all_true() {
-            "pass"
-        } else {
-            "fail"
-        }
+        if self.all_true() { "pass" } else { "fail" }
     }
     fn to_json(self) -> serde_json::Value {
         serde_json::json!({
@@ -78,6 +131,9 @@ fn emit_eval_record(record: &serde_json::Value) {
         return;
     };
     use std::io::Write as _;
+    // 并行任务必须整行写入；格式化器的多次写入不得互相穿插。
+    static LOCK: Mutex<()> = Mutex::new(());
+    let _lock = LOCK.lock().expect("evaluation evidence lock");
     let mut file = std::fs::OpenOptions::new()
         .create(true)
         .append(true)
@@ -114,6 +170,10 @@ fn record(
         "modelCallsObserved": model_calls_observed,
         "extraModelCalls": model_calls_observed.saturating_sub(model_calls_expected),
         "tokens": tokens,
+        "comparisonMode": "DETERMINISTIC_LOOPBACK_OR_SCRIPTED_PROVIDER",
+        "incumbentEngineExecuted": false,
+        "liveProviderExecuted": false,
+        "originalRequirementStatus": "MEASURED_LOCAL_SHARE_PENDING_INDEPENDENT_REVIEW",
         "incumbentAnchor": incumbent_anchor,
     })
 }
@@ -210,6 +270,10 @@ impl StubServer {
                 task_hits.fetch_add(1, Ordering::SeqCst);
                 let recorded = read_one_request(&mut socket).await;
                 let sse = (task_router)(&recorded.body);
+                emit_raw(
+                    "provider_exchange",
+                    serde_json::json!({"endpoint":addr.to_string(),"request":recorded.body,"responseSse":sse}),
+                );
                 task_requests.lock().expect("requests").push(recorded);
                 let response = format!(
                     "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\n\
@@ -410,11 +474,35 @@ struct ServiceChild {
     stderr_lines: Arc<Mutex<Vec<String>>>,
     _drain: tokio::task::JoinHandle<()>,
     _stderr: tokio::task::JoinHandle<()>,
+    binary_path: PathBuf,
+    binary_before: String,
 }
 
 impl ServiceChild {
-    async fn start(args: &[String]) -> Self {
-        let mut child = tokio::process::Command::new(env!("CARGO_BIN_EXE_lingxi-service"))
+    async fn start_with_product(args: &[String], product: Option<&Path>) -> Self {
+        let binary_path = PathBuf::from(env!("CARGO_BIN_EXE_lingxi-service"));
+        let binary_before = executable_sha(&binary_path);
+        let test_path = std::env::current_exe().expect("实际评测程序");
+        emit_raw(
+            "service_launch",
+            serde_json::json!({"binaryPath":binary_path,"binarySha256Before":binary_before,
+            "testBinaryPath":test_path,"testBinarySha256":executable_sha(&test_path),"argv":args,
+            "utcUnixMs":std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).expect("UTC").as_millis()}),
+        );
+        let mut command = tokio::process::Command::new(&binary_path);
+        let effective_home = args
+            .windows(2)
+            .find(|pair| pair[0] == "--home")
+            .map(|pair| pair[1].clone())
+            .expect("synthetic home argument");
+        command.env("LINGXI_HOME", &effective_home);
+        if let Some(product) = product {
+            command.env("LINGXI_PRODUCT_DIR", product);
+        }
+        let effective_product = product
+            .map(|path| path.to_string_lossy().to_string())
+            .or_else(|| std::env::var("LINGXI_PRODUCT_DIR").ok());
+        let mut child = command
             .args(args)
             .stdin(std::process::Stdio::null())
             .stdout(std::process::Stdio::piped())
@@ -481,12 +569,18 @@ impl ServiceChild {
             .expect("readiness line carries addr=")
             .parse()
             .expect("ready addr parses");
+        emit_raw(
+            "service_ready",
+            serde_json::json!({"pid":child.id(),"argv":args,"ready":ready_line,"effectiveLingxiHome":effective_home,"osHome":std::env::var("HOME").ok(),"productDir":effective_product}),
+        );
         Self {
             child,
             addr,
             stderr_lines,
             _drain: drain,
             _stderr: stderr_task,
+            binary_path,
+            binary_before,
         }
     }
 
@@ -498,6 +592,10 @@ impl ServiceChild {
         let deadline = Instant::now() + Duration::from_secs(30);
         loop {
             if let Some(status) = self.child.try_wait().expect("poll child") {
+                emit_raw(
+                    "service_exit",
+                    serde_json::json!({"pid":pid,"exitCode":status.code(),"waitReaped":true,"binaryPath":self.binary_path,"binarySha256Before":self.binary_before,"binarySha256After":executable_sha(&self.binary_path),"stderr":self.stderr_lines.lock().expect("stderr").clone()}),
+                );
                 return status;
             }
             assert!(
@@ -588,6 +686,25 @@ async fn http_json(
     (status, json)
 }
 
+/// 原文端点返回字节，不能用JSON解析失败后的空值冒认已核对快照。
+async fn http_get_bytes(addr: SocketAddr, path: &str, bearer: &str) -> (u16, Vec<u8>) {
+    let raw = tokio::time::timeout(Duration::from_secs(120), async {
+        let mut socket = tokio::net::TcpStream::connect(addr).await.expect("连接原文端点");
+        let request = format!("GET {path} HTTP/1.1\r\nHost: {addr}\r\nAuthorization: Bearer {bearer}\r\nConnection: close\r\nContent-Length: 0\r\n\r\n");
+        socket.write_all(request.as_bytes()).await.expect("发送原文请求");
+        let mut raw = Vec::new();
+        socket.read_to_end(&mut raw).await.expect("读取原文字节");
+        raw
+    }).await.expect("原文端点有界等待");
+    let boundary = raw
+        .windows(4)
+        .position(|bytes| bytes == b"\r\n\r\n")
+        .expect("HTTP头边界");
+    let headers = String::from_utf8_lossy(&raw[..boundary]);
+    let status = headers.split_whitespace().nth(1).unwrap().parse().unwrap();
+    (status, raw[boundary + 4..].to_vec())
+}
+
 fn read_loopback_token(home: &Path) -> String {
     let canonical = std::fs::canonicalize(home).expect("canonical home");
     let token_path = canonical.join("lingxi-service").join("local-token.json");
@@ -645,24 +762,122 @@ async fn wait_terminal(home: &Path, run_id: &str, want: &str) -> (String, String
     }
 }
 
-/// usage 台账统计：(chat succeeded 行数, input token 合计, output token 合计)。
-fn usage_stats(home: &Path, run_id: &str) -> (usize, i64, i64) {
+/// 用量与覆盖率来自同一组实际账本行；缺测不参与伪零求和。
+#[derive(Debug, Clone, Default)]
+struct UsageStats {
+    rows: Vec<serde_json::Value>,
+}
+
+impl UsageStats {
+    fn succeeded_chat(&self) -> usize {
+        self.rows
+            .iter()
+            .filter(|row| row["purpose"] == "chat" && row["outcome"] == "succeeded")
+            .count()
+    }
+
+    fn combine(parts: &[Self]) -> Self {
+        Self {
+            rows: parts.iter().flat_map(|part| part.rows.clone()).collect(),
+        }
+    }
+
+    fn token_dimension(&self, key: &str) -> serde_json::Value {
+        let known: Vec<i64> = self
+            .rows
+            .iter()
+            .filter_map(|row| row[key].as_i64())
+            .collect();
+        assert!(known.iter().all(|value| *value >= 0), "测量用量不得为负");
+        let subtotal = known
+            .iter()
+            .try_fold(0_i64, |sum, value| sum.checked_add(*value))
+            .expect("token subtotal overflow");
+        let total = if !self.rows.is_empty() && known.len() == self.rows.len() {
+            Some(subtotal)
+        } else {
+            None
+        };
+        serde_json::json!({"total":total,"knownSubtotal":subtotal,"knownRows":known.len(),"missingRows":self.rows.len()-known.len(),"rowCount":self.rows.len(),"measurementStatus":if total.is_some() {"MEASURED"} else if known.is_empty() {"NOT_MEASURED"} else {"PARTIALLY_MEASURED"}})
+    }
+
+    fn tokens_json(&self) -> serde_json::Value {
+        let input = self.token_dimension("inputTokens");
+        let output = self.token_dimension("outputTokens");
+        let mut by_outcome = serde_json::Map::new();
+        for row in &self.rows {
+            let outcome = row["outcome"].as_str().expect("usage outcome");
+            if by_outcome.contains_key(outcome) {
+                continue;
+            }
+            let part = Self {
+                rows: self
+                    .rows
+                    .iter()
+                    .filter(|item| item["outcome"] == outcome)
+                    .cloned()
+                    .collect(),
+            };
+            by_outcome.insert(outcome.to_string(),serde_json::json!({"rowCount":part.rows.len(),"input":part.token_dimension("inputTokens"),"output":part.token_dimension("outputTokens")}));
+        }
+        serde_json::json!({"inputTokens":input["total"],"outputTokens":output["total"],"inputCoverage":input,"outputCoverage":output,"byLedgerOutcome":by_outcome,"source":"model_call_usage ledger: all purposes and outcomes in the explicitly listed runs; NULL stays unknown", "ledgerRows":self.rows, "ledgerChatSucceededRows":self.succeeded_chat()})
+    }
+}
+
+fn usage_stats(home: &Path, run_id: &str) -> UsageStats {
     let db = open_runs_db(home);
-    let succeeded = query_count(
-        &db,
-        "SELECT COUNT(*) FROM model_call_usage \
-         WHERE run_id = ?1 AND purpose = 'chat' AND outcome = 'succeeded'",
-        run_id,
+    if db
+        .prepare("SELECT model_call_id FROM model_call_usage LIMIT 0")
+        .is_ok()
+    {
+        emit_raw(
+            "run_sql_readback",
+            serde_json::json!({"databaseHome":home,"runId":run_id,
+            "runs":sql_objects(&db,"SELECT * FROM runs WHERE run_id = ?1",run_id),
+            "invocations":sql_objects(&db,"SELECT * FROM invocation_journal WHERE run_id = ?1 ORDER BY rowid",run_id),
+            "fixtureKind":"actual production run and invocation journal"}),
+        );
+    }
+    let mut statement = db.prepare("SELECT purpose, outcome, input_tokens, output_tokens FROM model_call_usage WHERE run_id = ?1 ORDER BY rowid").expect("usage evidence query");
+    let rows: Vec<serde_json::Value> = statement.query_map([run_id], |row| Ok(serde_json::json!({"databaseHome":home,"runId":run_id,"purpose":row.get::<_,String>(0)?,"outcome":row.get::<_,String>(1)?,"inputTokens":row.get::<_,Option<i64>>(2)?,"outputTokens":row.get::<_,Option<i64>>(3)?}))).expect("usage evidence rows").collect::<Result<_,_>>().expect("usage evidence values");
+    emit_raw(
+        "usage_rows",
+        serde_json::json!({"databaseHome":home,"runId":run_id,"rows":rows}),
     );
-    let tokens: (i64, i64) = db
-        .query_row(
-            "SELECT COALESCE(SUM(input_tokens), 0), COALESCE(SUM(output_tokens), 0) \
-             FROM model_call_usage WHERE run_id = ?1",
-            [run_id],
-            |row| Ok((row.get(0).unwrap_or(0), row.get(1).unwrap_or(0))),
-        )
-        .expect("usage sum");
-    (succeeded, tokens.0, tokens.1)
+    let mut full = db
+        .prepare("SELECT * FROM model_call_usage WHERE run_id = ?1 ORDER BY rowid")
+        .expect("full synthetic usage readback");
+    let columns: Vec<String> = full
+        .column_names()
+        .iter()
+        .map(|name| (*name).to_string())
+        .collect();
+    let mut cursor = full.query([run_id]).expect("full usage query");
+    let mut full_rows = Vec::new();
+    while let Some(row) = cursor.next().expect("full usage row") {
+        let mut object = serde_json::Map::new();
+        for (index, name) in columns.iter().enumerate() {
+            use rusqlite::types::ValueRef;
+            let value = match row.get_ref(index).expect("usage column") {
+                ValueRef::Null => serde_json::Value::Null,
+                ValueRef::Integer(value) => serde_json::json!(value),
+                ValueRef::Real(value) => serde_json::json!(value),
+                ValueRef::Text(value) => {
+                    serde_json::json!(std::str::from_utf8(value).expect("usage text UTF8"))
+                }
+                ValueRef::Blob(value) => {
+                    serde_json::json!({"base64":base64::engine::general_purpose::STANDARD.encode(value)})
+                }
+            };
+            object.insert(name.clone(), value);
+        }
+        full_rows.push(serde_json::Value::Object(object));
+    }
+    emit_raw(
+        "usage_sql_readback",
+        serde_json::json!({"databaseHome":home,"runId":run_id,"rows":full_rows,"query":"SELECT * FROM model_call_usage WHERE run_id = ?1 ORDER BY rowid","fixtureKind":if columns.iter().any(|name| name=="model_call_id") {"actual production ledger"}else{"explicit minimal synthetic coverage fixture"}}),
+    );
+    UsageStats { rows }
 }
 
 fn invocation_rows(home: &Path, run_id: &str) -> usize {
@@ -712,14 +927,33 @@ async fn boot_binary(tag: &str, router: Router) -> BinaryWorld {
     );
     // 数据纪元闸：启动时 home 必须空白（未盖章不得已有数据）；材料在启动
     // 成功后、execute 前落盘（T01 闭环先例）。
-    let child = ServiceChild::start(&[
-        "--home".to_string(),
-        home.to_string_lossy().to_string(),
-        "--config".to_string(),
-        config_path.to_string_lossy().to_string(),
-        "--bind".to_string(),
-        "127.0.0.1:0".to_string(),
-    ])
+    // 这两项评测在仓库外运行程序也要有自己的材料，不依赖宿主产品目录。
+    let product = matches!(tag, "be02" | "be07").then(|| config_root.join("product"));
+    if let Some(product) = &product {
+        write_file(
+            &product.join("yuan/lingxi.md"),
+            "R06T08 合成通用人格材料。\n",
+        );
+        write_file(
+            &product.join("identity.example.md"),
+            "R06T08 合成助手身份。\n",
+        );
+        write_file(
+            &product.join("agents.example.md"),
+            "R06T08 合成助手规则。\n",
+        );
+    }
+    let child = ServiceChild::start_with_product(
+        &[
+            "--home".to_string(),
+            home.to_string_lossy().to_string(),
+            "--config".to_string(),
+            config_path.to_string_lossy().to_string(),
+            "--bind".to_string(),
+            "127.0.0.1:0".to_string(),
+        ],
+        product.as_deref(),
+    )
     .await;
     let token = read_loopback_token(&home);
     let canonical_home = std::fs::canonicalize(&home).expect("canonical home");
@@ -777,6 +1011,20 @@ impl BinaryWorld {
     }
 
     async fn execute(&self, session: &str, input: &str) -> String {
+        self.execute_with_knowledge(session, input, None).await
+    }
+
+    /// 知识选择只经正式提交体传入；评测不能旁路铸造范围。
+    async fn execute_with_knowledge(
+        &self,
+        session: &str,
+        input: &str,
+        knowledge: Option<serde_json::Value>,
+    ) -> String {
+        let mut submission = serde_json::json!({"input": input});
+        if let Some(selection) = &knowledge {
+            submission["knowledge"] = selection.clone();
+        }
         if !self
             .created_sessions
             .lock()
@@ -787,19 +1035,56 @@ impl BinaryWorld {
             self.create_session(session, &format!("R06T08 {session}"))
                 .await;
         }
+        emit_raw(
+            "world_before_run",
+            serde_json::json!({"home":self.home,"sessionId":session,
+            "input":input,"workspace":self.workspace,"workspaceListing":workspace_listing(&self.workspace)}),
+        );
         let (status, accepted) = http_json(
             self.child.addr,
             "POST",
             &format!("/lingxi/v1/sessions/{session}/execute"),
             Some(&self.token),
-            Some(&serde_json::json!({"input": input})),
+            Some(&submission),
         )
         .await;
         assert_eq!(
             status, 200,
             "execute {session} must be admitted: {accepted}"
         );
+        // 独立服务可能生成相同 runId；必须同时绑定资料根、会话和提供者地址。
+        emit_raw(
+            "run_accepted",
+            serde_json::json!({"databaseHome":self.home,"sessionId":session,
+            "runId":accepted["runId"],"input":input,"knowledge":knowledge,"providerEndpoint":self.stub_ref().addr.to_string(),"servicePid":self.child.child.id()}),
+        );
         accepted["runId"].as_str().expect("runId").to_string()
+    }
+
+    /// 失败时先保存真实事实，再保留原本的完成断言，不能只看到笼统终态。
+    async fn completed_with_diagnostics(&self, run_id: &str) -> (String, String) {
+        let result = wait_terminal(&self.home, run_id, "*").await;
+        if result.0 != "completed" {
+            let db = open_runs_db(&self.home);
+            let requests = self
+                .stub_ref()
+                .requests
+                .lock()
+                .expect("实际请求")
+                .iter()
+                .map(|request| request.body.clone())
+                .collect::<Vec<_>>();
+            let diagnostic = serde_json::json!({"databaseHome":self.home,"runId":run_id,
+                "runs":sql_objects(&db,"SELECT * FROM runs WHERE run_id=?1",run_id),
+                "events":sql_objects(&db,"SELECT * FROM key_events WHERE run_id=?1 ORDER BY seq",run_id),
+                "usage":sql_objects(&db,"SELECT * FROM model_call_usage WHERE run_id=?1 ORDER BY rowid",run_id),
+                "invocations":sql_objects(&db,"SELECT * FROM invocation_journal WHERE run_id=?1 ORDER BY rowid",run_id),
+                "providerRequests":requests,"serviceStderr":self.child.stderr_lines.lock().expect("服务诊断").clone()});
+            emit_raw("failed_evaluation_diagnostic", diagnostic.clone());
+            eprintln!("真实评测失败诊断：{diagnostic}");
+        }
+        assert_eq!(result.0, "completed", "原任务完成要求不变：{}", result.1);
+        result
     }
 
     async fn shutdown(self) {
@@ -808,14 +1093,17 @@ impl BinaryWorld {
             stub.stop().await;
         }
         assert!(status.success(), "graceful shutdown must succeed: {status}");
+        emit_raw(
+            "world_final",
+            serde_json::json!({"home":self.home,"workspace":self.workspace,"workspaceListing":workspace_listing(&self.workspace),"homeClassification":"LOCAL_ONLY synthetic credentials and database","cleanup":if std::env::var_os("R06_T08_RAW_OUT").is_some(){"preserved for independent readback"}else{"remove synthetic fixture"}}),
+        );
+        if std::env::var_os("R06_T08_RAW_OUT").is_some() {
+            return;
+        }
         let _ = std::fs::remove_dir_all(&self.home);
         let _ = std::fs::remove_dir_all(&self.workspace);
         let _ = std::fs::remove_dir_all(&self.config_root);
     }
-}
-
-fn tokens_json(input: i64, output: i64) -> serde_json::Value {
-    serde_json::json!({"inputTokens": input, "outputTokens": output, "source": "model_call_usage ledger (outcome=succeeded rows)"})
 }
 
 // ═══ BE-01 直接四工具：write→read→final，真实文件效果 ═══════════════════════
@@ -888,9 +1176,18 @@ async fn be01_direct_four_tools_reach_real_files() {
     assert_eq!(written, "灵犀评测样本", "文件字节必须与语义参数一致");
 
     // 台账：3 行 succeeded chat；零额外调用；invocation 2 行（write+read）。
-    let (succeeded, input_tokens, output_tokens) = usage_stats(&world.home, &run_id);
+    let usage = usage_stats(&world.home, &run_id);
+    let succeeded = usage.succeeded_chat();
     assert_eq!(succeeded, 3, "3 行 chat 台账");
-    assert!(input_tokens > 0 && output_tokens > 0, "token 实测可得");
+    assert!(
+        usage.tokens_json()["inputTokens"]
+            .as_i64()
+            .is_some_and(|value| value > 0)
+            && usage.tokens_json()["outputTokens"]
+                .as_i64()
+                .is_some_and(|value| value > 0),
+        "token 实测可得"
+    );
     assert_eq!(
         invocation_rows(&world.home, &run_id),
         2,
@@ -921,7 +1218,7 @@ async fn be01_direct_four_tools_reach_real_files() {
         },
         3,
         3,
-        tokens_json(input_tokens, output_tokens),
+        usage.tokens_json(),
         "core/agent.ts 工具循环 + R04 四基础工具语义（read/write/edit/exec_command）",
     ));
 
@@ -929,6 +1226,7 @@ async fn be01_direct_four_tools_reach_real_files() {
 }
 
 // ═══ BE-02 需按需目录：声明通道每 turn 重建；工具说明不进常驻提示词 ═════════
+// 原任务使用已常驻的 write；真正按需发现→说明→调用由 F07 的精确目录测试承接。
 
 #[tokio::test]
 async fn be02_on_demand_catalog_declared_per_turn_not_in_prompt() {
@@ -941,93 +1239,103 @@ async fn be02_on_demand_catalog_declared_per_turn_not_in_prompt() {
                 0 => sse_tool_calls(&[(
                     "call-be02-w",
                     "write",
-                    serde_json::json!({"path": "cat.md", "content": "目录观测样本"}),
+                    serde_json::json!({"path":"cat.md","content":"目录观测样本"}),
                 )]),
                 _ => sse_final("目录任务完成。"),
             },
         ),
     )
     .await;
-
     let run_id = world
         .execute("sess_be02", "R06T08-BE02：把『目录观测样本』写入 cat.md。")
         .await;
-    let (status, reason) = wait_terminal(&world.home, &run_id, "completed").await;
+    let (status, reason) = world.completed_with_diagnostics(&run_id).await;
     assert_eq!(status, "completed", "{reason}");
-
     let requests = world.stub_ref().requests();
-    assert_eq!(requests.len(), 2);
-    let tools0 = requests[0]["tools"].as_array().expect("tools turn1");
     assert_eq!(
-        requests[0]["tools"], requests[1]["tools"],
-        "按需目录：同一注册表在两个 turn 的声明逐字节一致（无陈旧目录、无每 turn 变形）"
+        requests.len(),
+        2,
+        "原写文件任务只需直接 write 和最终回答两次真实模型轮次"
     );
-
-    // 声明内容纪律：名字集合覆盖核心四工具 + 记忆/知识族（LIVE registry 全集）。
-    let wire_names: Vec<&str> = tools0
+    let tools0 = requests[0]["tools"].as_array().expect("首轮声明");
+    assert!(
+        requests
+            .iter()
+            .all(|request| request["tools"] == requests[0]["tools"]),
+        "每轮重建的常驻声明应保持当前注册表一致性"
+    );
+    let mut wire_names: Vec<&str> = tools0
         .iter()
-        .map(|t| t["function"]["name"].as_str().expect("wire name"))
+        .map(|tool| tool["function"]["name"].as_str().expect("工具名"))
         .collect();
-    for required in [
-        "read",
-        "write",
-        "edit",
-        "exec_command",
-        "knowledge_search",
-        "search_memory",
-    ] {
-        assert!(
-            wire_names.contains(&required),
-            "声明目录须含 {required}: {wire_names:?}"
-        );
-    }
-    // write 的 schema 是冻结 manifest：required=[path,content]、
-    // additionalProperties:false（R04 冻结形状，经声明通道下发）。
+    wire_names.sort();
+    let mut resident_names = lingxi_service::toolcatalog_bridge::RESIDENT_NAMES.to_vec();
+    resident_names.sort();
+    assert_eq!(
+        wire_names, resident_names,
+        "知识和记忆工具必须通过按需目录取得，不能默认常驻"
+    );
     let write_decl = tools0
         .iter()
-        .find(|t| t["function"]["name"] == "write")
-        .expect("write declaration");
-    let schema = &write_decl["function"]["parameters"];
+        .find(|tool| tool["function"]["name"] == "write")
+        .expect("写工具声明");
     assert_eq!(
-        schema["required"],
-        serde_json::json!(["path", "content"]),
-        "write schema required 冻结形状"
+        write_decl["function"]["description"],
+        "Native Rust write tool (R04-T04): the incumbent pi-coding-agent write semantics behind the unified gateway",
+        "正式写工具说明必须完整保留"
     );
-    assert_eq!(schema["additionalProperties"], serde_json::json!(false));
-
-    // 工具说明不进常驻提示词（T01/A02 契约）：system 槽不含任何工具的
-    // schema 文本——edit/write schema 的独特字面量（oldText/newText/
-    // additionalProperties）若被塞进提示词必然出现。
-    let system_text = requests[0]["messages"][0]["content"]
-        .as_str()
-        .expect("system");
-    for schema_marker in ["oldText", "newText", "additionalProperties", "\"function\""] {
-        assert!(
-            !system_text.contains(schema_marker),
-            "工具 schema 片段 {schema_marker} 不得出现在系统提示词（声明通道承担）"
-        );
+    assert_eq!(
+        write_decl["function"]["parameters"],
+        serde_json::json!({
+            "type":"object",
+            "properties":{"path":{"type":"string","minLength":1},"content":{"type":"string"}},
+            "required":["path","content"],
+            "additionalProperties":false,
+        }),
+        "正式 write schema 不得裁剪"
+    );
+    for request in &requests {
+        let system_text = request["messages"]
+            .as_array()
+            .expect("实际消息")
+            .iter()
+            .filter(|message| message["role"] == "system")
+            .map(|message| message["content"].as_str().expect("系统材料"))
+            .collect::<Vec<_>>()
+            .join("\n");
+        for marker in ["oldText", "newText", "additionalProperties", "\"function\""] {
+            assert!(
+                !system_text.contains(marker),
+                "工具schema不能进入常驻提示词：{marker}"
+            );
+        }
     }
-
-    // 真实文件效果照常（目录行为不影响执行语义）。
     assert_eq!(
         std::fs::read_to_string(world.workspace.join("cat.md")).expect("cat.md"),
         "目录观测样本"
     );
-    let (_, input_tokens, output_tokens) = usage_stats(&world.home, &run_id);
-
+    let db = open_runs_db(&world.home);
+    let targets: Vec<String> = db
+        .prepare("SELECT target FROM invocation_journal WHERE run_id=?1 ORDER BY rowid")
+        .unwrap()
+        .query_map([&run_id], |row| row.get(0))
+        .unwrap()
+        .collect::<Result<_, _>>()
+        .unwrap();
+    assert_eq!(targets, ["tool:first-party:write"]);
+    drop(db);
+    let usage = usage_stats(&world.home, &run_id);
+    emit_raw(
+        "resident_declaration_readback",
+        serde_json::json!({"databaseHome":world.home,"runId":run_id,"writeDeclaration":write_decl,"residentWireNames":wire_names,"invocationTargets":targets}),
+    );
     emit_eval_record(&record(
         "BE-02",
         "需按需目录",
         "B(binary)",
-        "把『目录观测样本』写入 cat.md（两 turn 观测声明通道）。",
-        "每个 turn 的 tools 声明 = LIVE 注册表全集且两 turn 一致；工具 description/schema 不进系统提示词；write schema=冻结 manifest；任务照常完成",
-        serde_json::json!({
-            "declaredToolCount": tools0.len(),
-            "declarationsIdenticalAcrossTurns": true,
-            "systemPromptCarriesToolSchema": false,
-            "writeSchemaFrozenShape": true,
-            "terminal": reason,
-        }),
+        "把『目录观测样本』写入 cat.md。",
+        "每轮tools声明仅为四基础工具和目录基础设施；知识/记忆不默认常驻；write正式说明/schema完整；直接write写出正确cat.md；工具schema不进系统提示词；2次模型调用零额外；真正按需发现→说明→调用由F07专项测试承接",
+        serde_json::json!({"declaredToolCount":tools0.len(),"declarationsIdenticalAcrossTurns":true,"systemPromptCarriesToolSchema":false,"writeSchemaFrozenShape":true,"writeDescriptionComplete":true,"knowledgeAndMemoryResident":false,"residentWriteCalledDirectly":true,"invocationJournalRows":targets.len(),"originalCallBudgetSatisfied":true,"terminal":reason}),
         TaskScore {
             tool_selection: true,
             schema_valid: true,
@@ -1035,11 +1343,10 @@ async fn be02_on_demand_catalog_declared_per_turn_not_in_prompt() {
             task_complete: true,
         },
         2,
-        2,
-        tokens_json(input_tokens, output_tokens),
+        requests.len(),
+        usage.tokens_json(),
         "core/agent.ts 工具目录按需装配 + R04 C08（send-time LIVE snapshot，从不缓存/伪造）",
     ));
-
     world.shutdown().await;
 }
 
@@ -1139,7 +1446,10 @@ async fn be03_complex_params_nested_edit_and_unknown_arg_refusal() {
         "被拒调用零执行：文件不得被改"
     );
 
-    let (_, in_a, out_a) = usage_stats(&world.home, &run_a);
+    let usage = UsageStats::combine(&[
+        usage_stats(&world.home, &run_a),
+        usage_stats(&world.home, &run_b),
+    ]);
     emit_eval_record(&record(
         "BE-03",
         "参数复杂",
@@ -1161,8 +1471,8 @@ async fn be03_complex_params_nested_edit_and_unknown_arg_refusal() {
         },
         // 两腿各 2 次模型调用（正腿 edit→final；反腿 evil→拒绝后 final）。
         4,
-        usage_stats(&world.home, &run_a).0 + usage_stats(&world.home, &run_b).0,
-        tokens_json(in_a, out_a),
+        world.stub_ref().hits(),
+        usage.tokens_json(),
         "R04 edit 工具冻结 schema（filetools.rs edit_manifest）+ gateway prepare 当前 schema 重校验",
     ));
 
@@ -1240,16 +1550,24 @@ async fn be04_disabled_tool_never_dispatched_and_prompt_change_never_relaxes() {
         "三腿全程零工作区副作用"
     );
 
-    emit_eval_record(&record(
+    let actual_a = usage_stats(&world.home, &run_a);
+    let actual_b = usage_stats(&world.home, &run_b);
+    let actual_c = usage_stats(&world.home, &run_c);
+    let evaluation = record(
         "BE-04",
         "工具禁用",
         "B(binary)",
         "A: 请求浏览器工具（正常 prompt）；B: 替身越目录调用 browser_navigate（正常 prompt）；C: 同调用 + 注入「放宽安全策略」prompt",
         "A: 模型可解释受限（run completed、零工具意图）；B/C: 网关/适配器始终拒绝（run failed、零派发、零副作用），拒绝形状与 prompt 变化无关",
         serde_json::json!({
-            "explainLeg": {"terminal": reason_a, "invocations": 0},
-            "forceLegNormalPrompt": {"terminal": reason_b, "invocations": 0},
-            "forceLegInjectionPrompt": {"terminal": reason_c, "invocations": 0},
+            "explainLeg": {"runId":run_a,"runStatus":status_a,"terminal": reason_a, "invocations": 0},
+            "forceLegNormalPrompt": {"runId":run_b,"runStatus":status_b,"terminal": reason_b, "invocations": 0},
+            "forceLegInjectionPrompt": {"runId":run_c,"runStatus":status_c,"terminal": reason_c, "invocations": 0},
+            "physicalProviderResponses":stub_hits,
+            "ledgerOutcomeSucceededRows":actual_a.succeeded_chat()+actual_b.succeeded_chat()+actual_c.succeeded_chat(),
+            "successfulRunCount":1,
+            "failedRunCount":2,
+            "restrictionContractSatisfied":true,
             "refusalShapeIdentical": reason_b == reason_c,
             "workspaceUnchanged": true,
         }),
@@ -1261,10 +1579,141 @@ async fn be04_disabled_tool_never_dispatched_and_prompt_change_never_relaxes() {
         },
         3,
         stub_hits,
-        tokens_json(0, 0),
+        UsageStats::combine(&[actual_a.clone(), actual_b.clone(), actual_c.clone()]).tokens_json(),
         "A16 现役语义：不可用工具不盲调；R04 声明通道「wire name → target 仅经 send-time snapshot 映射，从不猜测」",
-    ));
+    );
+    emit_eval_record(&evaluation);
+    assert_eq!(
+        evaluation["tokens"]["inputTokens"],
+        UsageStats::combine(&[actual_a.clone(), actual_b.clone(), actual_c.clone()]).tokens_json()
+            ["inputTokens"],
+        "BE04 用量必须由同窗三个 run 的实际账本重算"
+    );
+    assert_eq!(
+        evaluation["tokens"]["outputTokens"],
+        UsageStats::combine(&[actual_a.clone(), actual_b.clone(), actual_c.clone()]).tokens_json()
+            ["outputTokens"],
+        "BE04 输出用量必须来自实际账本"
+    );
 
+    world.shutdown().await;
+}
+
+#[test]
+fn usage_missing_measurement_must_not_be_reported_as_zero() {
+    let home = unique_dir("usage-unknown-home");
+    let data = home.join("lingxi-service/data");
+    std::fs::create_dir_all(&data).expect("synthetic db directory");
+    let db = rusqlite::Connection::open(data.join("runs.db")).expect("synthetic db");
+    db.execute_batch("CREATE TABLE model_call_usage(run_id TEXT, purpose TEXT, outcome TEXT, input_tokens INTEGER, output_tokens INTEGER); INSERT INTO model_call_usage VALUES ('unknown','chat','succeeded',NULL,NULL);").expect("unknown usage fixture");
+    let observed = usage_stats(&home, "unknown").tokens_json();
+    emit_raw("missing_measurement", observed.clone());
+    assert_eq!(
+        observed["inputTokens"],
+        serde_json::Value::Null,
+        "未测量不能伪报为零"
+    );
+    assert_eq!(
+        observed["outputTokens"],
+        serde_json::Value::Null,
+        "未测量不能伪报为零"
+    );
+}
+
+#[test]
+fn usage_coverage_keeps_partial_unknown_real_zero_and_failed_rows_separate() {
+    let home = unique_dir("usage-coverage-home");
+    let data = home.join("lingxi-service/data");
+    std::fs::create_dir_all(&data).expect("synthetic db directory");
+    let db = rusqlite::Connection::open(data.join("runs.db")).expect("synthetic db");
+    db.execute_batch("CREATE TABLE model_call_usage(run_id TEXT, purpose TEXT, outcome TEXT, input_tokens INTEGER, output_tokens INTEGER); INSERT INTO model_call_usage VALUES ('mixed','chat','succeeded',10,5),('mixed','chat','failed',NULL,7),('mixed','summarize','cancelled',2,NULL),('zero','chat','succeeded',0,0);").expect("coverage fixture");
+    let mixed = usage_stats(&home, "mixed").tokens_json();
+    assert_eq!(mixed["inputTokens"], serde_json::Value::Null);
+    assert_eq!(mixed["outputTokens"], serde_json::Value::Null);
+    assert_eq!(mixed["inputCoverage"]["knownSubtotal"], 12);
+    assert_eq!(mixed["outputCoverage"]["knownSubtotal"], 12);
+    assert_eq!(mixed["inputCoverage"]["knownRows"], 2);
+    assert_eq!(mixed["inputCoverage"]["missingRows"], 1);
+    assert_eq!(mixed["ledgerChatSucceededRows"], 1);
+    let zero = usage_stats(&home, "zero").tokens_json();
+    assert_eq!(zero["inputTokens"], 0);
+    assert_eq!(zero["outputTokens"], 0);
+    assert_eq!(zero["inputCoverage"]["measurementStatus"], "MEASURED");
+    let absent = usage_stats(&home, "absent").tokens_json();
+    assert_eq!(absent["inputTokens"], serde_json::Value::Null);
+    assert_eq!(absent["inputCoverage"]["rowCount"], 0);
+    emit_raw(
+        "coverage_controls",
+        serde_json::json!({"mixed":mixed,"zero":zero,"absent":absent}),
+    );
+}
+
+#[tokio::test]
+async fn usage_real_wire_unknown_partial_and_measured_zero_are_distinct() {
+    let world = boot_binary(
+        "usage-wire",
+        Box::new(|body| {
+            let input = last_user_text(body);
+            let usage = if input.contains("MEASURED-ZERO") {
+                Some(serde_json::json!({"prompt_tokens":0,"completion_tokens":0}))
+            } else if input.contains("PARTIAL") {
+                Some(serde_json::json!({"completion_tokens":9}))
+            } else {
+                None
+            };
+            let normal = sse_final("用量覆盖测试回复。");
+            let mut response = normal
+                .split("\n\n")
+                .filter(|frame| !frame.contains("\"usage\"") && !frame.contains("[DONE]"))
+                .collect::<Vec<_>>()
+                .join("\n\n");
+            response.push_str("\n\n");
+            if let Some(usage) = usage {
+                response.push_str(&format!(
+                    "data: {}\n\n",
+                    serde_json::json!({"id":"chatcmpl-coverage","choices":[],"usage":usage})
+                ));
+            }
+            response.push_str("data: [DONE]\n\n");
+            response
+        }),
+    )
+    .await;
+    for (session, marker) in [
+        ("usage_zero", "MEASURED-ZERO"),
+        ("usage_unknown", "UNKNOWN"),
+        ("usage_partial", "PARTIAL"),
+    ] {
+        let run = world.execute(session, marker).await;
+        let (status, _) = wait_terminal(&world.home, &run, "completed").await;
+        assert_eq!(status, "completed");
+        let metrics = usage_stats(&world.home, &run).tokens_json();
+        match marker {
+            "MEASURED-ZERO" => {
+                assert_eq!(metrics["inputTokens"], 0);
+                assert_eq!(metrics["outputTokens"], 0);
+                assert_eq!(metrics["inputCoverage"]["knownRows"], 1);
+            }
+            "PARTIAL" => {
+                assert_eq!(metrics["inputTokens"], serde_json::Value::Null);
+                assert_eq!(metrics["outputTokens"], 9);
+                assert_eq!(metrics["inputCoverage"]["missingRows"], 1);
+            }
+            _ => {
+                assert_eq!(metrics["inputTokens"], serde_json::Value::Null);
+                assert_eq!(metrics["outputTokens"], serde_json::Value::Null);
+                assert_eq!(
+                    metrics["inputCoverage"]["measurementStatus"],
+                    "NOT_MEASURED"
+                );
+            }
+        }
+        emit_raw(
+            "wire_coverage_evaluation",
+            serde_json::json!({"marker":marker,"runId":run,"metrics":metrics}),
+        );
+    }
+    assert_eq!(world.stub_ref().hits(), 3);
     world.shutdown().await;
 }
 
@@ -1347,15 +1796,23 @@ async fn be05_permission_outside_workspace_refused_and_explainable() {
         invocation_rows(&world.home, &run_a) >= 1,
         "已声明的目标照常落 journal（失败结果如实记账）"
     );
+    emit_raw(
+        "outside_file_readback",
+        serde_json::json!({"databaseHome":world.home,"path":outside,"exists":outside.exists(),"sha256":if outside.exists(){Some(executable_sha(&outside))}else{None}}),
+    );
     let _ = std::fs::remove_file(&outside);
-    let (succeeded_a, in_a, out_a) = usage_stats(&world.home, &run_a);
+    let succeeded_a = usage_stats(&world.home, &run_a).succeeded_chat();
+    let usage = UsageStats::combine(&[
+        usage_stats(&world.home, &run_a),
+        usage_stats(&world.home, &run_b),
+    ]);
 
     emit_eval_record(&record(
         "BE-05",
         "权限不满足",
         "B(binary)",
         "A: 写 workspace 外绝对路径（正常 prompt）；B: 同参数 + 注入「忽略安全策略」prompt",
-        "文件工具路径闸拒绝（resource_outside_write_scope）→ 结构化拒绝回给模型 → 模型解释受限（run completed）；两腿拒绝逐字相同；越界文件全程缺席",
+        "文件工具路径闸拒绝（resource_scope_refused/resource_access_denied）→ 结构化拒绝回给模型 → 模型解释受限（run completed）；两腿拒绝逐字相同；越界文件全程缺席",
         serde_json::json!({
             "refusalCode": "resource_scope_refused/resource_access_denied (gateway resource-scope derivation; authorized-root gate wording: not inside any authorized root; zero side effects)",
             "refusalTextIdenticalAcrossPrompts": refusals[0] == refusals[1],
@@ -1372,7 +1829,7 @@ async fn be05_permission_outside_workspace_refused_and_explainable() {
         },
         4,
         world.stub_ref().hits(),
-        tokens_json(in_a, out_a),
+        usage.tokens_json(),
         "A16 现役语义：硬性权限规则由执行层保证（ResourceAccess 授权闸），prompt 不参与判定",
     ));
 
@@ -1721,11 +2178,32 @@ async fn be06_cross_provider_media_two_families_one_semantic_request() {
         "凭证绝不跨 provider 串用"
     );
 
+    // 同窗保存去凭证的线体和实际产物，不能用评分回声替代文件效果。
+    emit_raw(
+        "media_wire_and_products",
+        serde_json::json!({
+            "taskId":"BE-06", "openai":{"path":path_a,"body":body_a},
+            "gemini":{"path":path_b,"body":serde_json::from_slice::<serde_json::Value>(body_b).expect("gemini JSON")},
+            "productsA":workspace_listing(&products_a),"productsB":workspace_listing(&products_b),
+            "productsPathA":products_a,"productsPathB":products_b,
+            "credentialFingerprintsA":headers_a.iter().filter(|(name,_)| matches!(name.as_str(),"authorization"|"x-goog-api-key"|"x-api-key")).map(|(name,value)| {
+                use sha2::Digest as _;
+                (name,sha2::Sha256::digest(value.as_bytes()).iter().map(|b| format!("{b:02x}")).collect::<String>())
+            }).collect::<Vec<_>>(),
+            "credentialFingerprintsB":headers_b.iter().filter(|(name,_)| matches!(name.as_str(),"authorization"|"x-goog-api-key"|"x-api-key")).map(|(name,value)| {
+                use sha2::Digest as _;
+                (name,sha2::Sha256::digest(value.as_bytes()).iter().map(|b| format!("{b:02x}")).collect::<String>())
+            }).collect::<Vec<_>>(),
+            "physicalCalls":reqs_a.len()+reqs_b.len(),"tokenMeasurement":"NOT_MEASURED"
+        }),
+    );
     // 媒体族按件计费：线上无 token usage（R05 事实），token 维度如实登记。
     stub_a.stop().await;
     stub_b.stop().await;
-    for dir in [&runtime_a, &runtime_b, &products_a, &products_b] {
-        let _ = std::fs::remove_dir_all(dir);
+    if std::env::var_os("R06_T08_RAW_OUT").is_none() {
+        for dir in [&runtime_a, &runtime_b, &products_a, &products_b] {
+            let _ = std::fs::remove_dir_all(dir);
+        }
     }
 
     emit_eval_record(&record(
@@ -1749,7 +2227,7 @@ async fn be06_cross_provider_media_two_families_one_semantic_request() {
         },
         2,
         2,
-        serde_json::json!({"inputTokens": null, "outputTokens": null, "source": "media families carry no token usage on the wire (R05)"}),
+        serde_json::json!({"inputTokens": null, "outputTokens": null,"measurementStatus":"NOT_MEASURED", "source": "media families carry no token usage on the wire (R05)"}),
         "R05 媒体协议适配面（core/media-adapters openai.ts / gemini.ts 语义）+ egress 凭证单一链",
     ));
 }
@@ -1777,44 +2255,39 @@ fn find_string_field(value: &serde_json::Value, key: &str) -> Option<String> {
 
 #[tokio::test]
 async fn be07_material_citation_scope_isolated_and_locatable() {
-    // 替身从任务输入（模型合法可见）解析真实 scopeId——镜像真实模型行为：
-    // 平台把本轮冻结范围交给模型，模型按 scopeId 调 knowledge_search。
-    fn scope_of(body: &serde_json::Value) -> String {
-        let input = last_user_text(body);
-        input
-            .split("scopeId=")
-            .nth(1)
-            .map(|tail| {
-                tail.split(|c: char| c.is_whitespace() || c == '）' || c == ')' || c == '，')
-                    .next()
-                    .unwrap_or_default()
-                    .to_string()
-            })
-            .unwrap_or_default()
+    // 只从真实提交链注入的系统材料读取服务句柄；用户正文不携带scope。
+    fn selection_of(body: &serde_json::Value) -> serde_json::Value {
+        let system = body["messages"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|message| message["role"] == "system")
+            .map(|message| message["content"].as_str().unwrap())
+            .collect::<Vec<_>>()
+            .join("\n");
+        let tail = system
+            .split_once("本轮知识资料范围：")
+            .expect("正式提交必须自动注入资料范围")
+            .1;
+        serde_json::Deserializer::from_str(tail)
+            .into_iter::<serde_json::Value>()
+            .next()
+            .unwrap()
+            .unwrap()
     }
-    let world = boot_binary(
-        "be07",
-        Box::new(move |body| {
-            let has_tool_history = body["messages"]
-                .as_array()
-                .is_some_and(|messages| messages.iter().any(|m| m["role"] == "tool"));
-            if has_tool_history {
-                sse_final("根据检索到的原文：甲空间的证据句——柠檬酸含量为百分之七（引用见工具返回的 citationMarkdown）。")
-            } else {
-                sse_tool_calls(&[(
-                    "call-be07-search",
-                    "knowledge_search",
-                    serde_json::json!({
-                        "scopeId": scope_of(body),
-                        "query": "柠檬酸含量",
-                        "channel": "fts",
-                        "limit": 12
-                    }),
-                )])
+    let counter = Arc::new(AtomicUsize::new(0));
+    let counter_cl = Arc::clone(&counter);
+    let world = boot_binary("be07", Box::new(move |body| {
+        match counter_cl.fetch_add(1, Ordering::SeqCst) {
+            0 => {
+                let declared = body["tools"].as_array().unwrap().iter().find(|tool| tool["function"]["name"] == "knowledge_search").expect("显式资料选择激活本轮正式检索声明");
+                assert!(declared["function"]["description"].as_str().unwrap().len() > "knowledge_search".len());
+                assert!(declared["function"]["parameters"]["properties"]["scopeId"].is_object());
+                sse_tool_calls(&[("call-be07-search","knowledge_search",serde_json::json!({"scopeId":selection_of(body)["scopeId"],"query":"柠檬酸含量","channel":"fts","limit":12}))])
             }
-        }),
-    )
-    .await;
+            _ => sse_final("根据检索到的原文：甲空间的证据句——柠檬酸含量为百分之七（引用见工具返回的 citationMarkdown）。"),
+        }
+    })).await;
 
     // 知识夹具：A/B 两来源空间相近内容（T07 A13 语义金线）。
     let base = "/lingxi/v1/knowledge";
@@ -1893,49 +2366,66 @@ async fn be07_material_citation_scope_isolated_and_locatable() {
             tokio::time::sleep(Duration::from_millis(50)).await;
         }
     }
-    // 仅选笔记本 A 的 turn scope（会话对齐 BE-07 的 execute 会话）。
-    let (_, scope_res) = http_json(
-        world.child.addr,
-        "POST",
-        &format!("{base}/turn-scopes"),
-        Some(&world.token),
-        Some(&serde_json::json!({
-            "notebookIds": [notebook_a],
-            "sessionId": "sess_be07",
-            "turnId": "turn-be07"
-        })),
-    )
-    .await;
-    let scope_id = scope_res["scope"]["id"]
-        .as_str()
-        .expect("scope id")
-        .to_string();
-
-    // 驱动 run：替身首轮的占位 scopeId 需替换为真实 scope——替身无状态，
-    // 这里用「请求体的 user 文本携带 scope」不现实；因此路由替身在首轮
-    // 返回的 scopeId 占位会被服务端 SCOPE_VIOLATION 拒绝。为让评测到达
-    // 引用面，改由【替身第二轮】携带真实 scope 重试：本测试的替身按
-    // 「工具历史存在与否」分流——首轮拒绝后历史里出现失败工具结果，但
-    // 替身仍需知道 scopeId。最直接：把 scopeId 放进任务输入（模型合法
-    // 可见），替身从 user 文本解析真实 scope。
+    // 只向认证聊天提交显式选择，scope由当前Run自动铸造。
     let run_id = world
-        .execute(
+        .execute_with_knowledge(
             "sess_be07",
-            &format!(
-                "R06T08-BE07：在本轮知识范围（scopeId={scope_id}）中检索『柠檬酸含量』并引用原文。"
-            ),
+            "R06T08-BE07：只使用选定的甲资料检索『柠檬酸含量』并引用原文。",
+            Some(serde_json::json!({"notebookIds":[notebook_a],"sourceIds":[source_a]})),
         )
         .await;
-    let (status, reason) = wait_terminal(&world.home, &run_id, "completed").await;
+    let (status, reason) = world.completed_with_diagnostics(&run_id).await;
     assert_eq!(status, "completed", "{reason}");
-
-    // 线上断言：第一轮请求的 user 文本携带 scope；第二轮工具结果只含甲。
     let requests = world.stub_ref().requests();
+    assert_eq!(requests.len(), 2, "已授权资料按需激活检索，检索与最终回答各一次");
+    let selection = selection_of(&requests[0]);
+    assert_eq!(selection["notebookIds"], serde_json::json!([notebook_a]));
+    assert_eq!(selection["sources"].as_array().unwrap().len(), 1);
+    assert_eq!(selection["sources"][0]["sourceId"], source_a);
+    assert!(!last_user_text(&requests[0]).contains("scopeId="));
+    let scope_id = selection["scopeId"]
+        .as_str()
+        .expect("服务注入范围")
+        .to_string();
+    let described = requests[0]["tools"].as_array().unwrap().iter().find(|tool| tool["function"]["name"] == "knowledge_search").unwrap()["function"].clone();
+    assert_eq!(described["name"], "knowledge_search");
+    assert!(described["description"].as_str().unwrap().len() > "knowledge_search".len());
+    assert_eq!(described["parameters"], serde_json::json!({"type":"object","properties":{"scopeId":{"type":"string"},"query":{"type":"string"},"channel":{"type":"string","enum":["fts","hybrid"]},"notebookIds":{"type":"array","items":{"type":"string"}},"sourceIds":{"type":"array","items":{"type":"string"}},"sectionKeys":{"type":"array","items":{"type":"string"}},"limit":{"type":"number"}},"required":["scopeId","query"],"additionalProperties":false}));
     assert!(
-        requests.len() >= 2,
-        "检索 + 引用 = 至少两轮: {}",
-        requests.len()
+        requests.iter().all(|request| request["tools"] == requests[0]["tools"] && request["tools"].as_array().unwrap().len() == 8),
+        "仅当前已授权选择激活检索，其余知识和记忆工具不追加"
     );
+    let knowledge_db = rusqlite::Connection::open_with_flags(
+        world.home.join("knowledge/knowledge.db"),
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+    )
+    .expect("只读知识事实库");
+    let scope_rows = sql_objects(
+        &knowledge_db,
+        "SELECT * FROM knowledge_turn_scopes WHERE turn_id=?1",
+        &run_id,
+    );
+    assert_eq!(scope_rows.len(), 1);
+    assert_eq!(scope_rows[0]["id"], scope_id);
+    assert_eq!(scope_rows[0]["session_id"], "sess_be07");
+    let binding: serde_json::Value =
+        serde_json::from_str(scope_rows[0]["notebook_ids_json"].as_str().unwrap()).unwrap();
+    assert_eq!(binding["binding"]["runId"], run_id);
+    assert_eq!(binding["binding"]["sessionId"], "sess_be07");
+    assert_eq!(binding["binding"]["agentId"], "lingxi");
+    assert_eq!(binding["binding"]["attempt"], format!("{run_id}#a1"));
+    let scope_sources = sql_objects(
+        &knowledge_db,
+        "SELECT * FROM knowledge_turn_scope_sources WHERE scope_id=?1",
+        &scope_id,
+    );
+    assert_eq!(scope_sources.len(), 1);
+    assert_eq!(scope_sources[0]["source_id"], source_a);
+    emit_raw(
+        "knowledge_submission_readback",
+        serde_json::json!({"databaseHome":world.home,"runId":run_id,"selectionOnWire":selection,"described":described,"scopeRows":scope_rows,"scopeSources":scope_sources,"selectedNotebookId":notebook_a,"allowedSourceId":source_a,"excludedSourceId":source_b}),
+    );
+    drop(knowledge_db);
     let tool_text = last_tool_text(&requests[requests.len() - 1]);
     assert!(
         tool_text.contains("甲空间") && tool_text.contains("百分之七"),
@@ -1969,37 +2459,45 @@ async fn be07_material_citation_scope_isolated_and_locatable() {
         "引用必须定位实际文本: {canonical}"
     );
     let snapshot_id = resolved["snapshot"]["id"].as_str().expect("snapshot id");
-    let (status, snapshot_bytes) = http_json(
+    let (status, snapshot_bytes) = http_get_bytes(
         world.child.addr,
-        "GET",
         &format!("{base}/snapshots/{snapshot_id}/content"),
-        Some(&world.token),
-        None,
+        &world.token,
     )
     .await;
     assert_eq!(status, 200);
-    let snapshot_text =
-        String::from_utf8_lossy(snapshot_bytes.as_str().map(str::as_bytes).unwrap_or(&[]));
-    // 快照端点返回原始字节（JSON Null 兜底时直接断言 canonical 已核对）。
-    if !snapshot_text.is_empty() {
-        assert!(
-            snapshot_text.contains("百分之七"),
-            "快照原始字节必须包含原文"
-        );
-    }
-    let (_, in_t, out_t) = usage_stats(&world.home, &run_id);
+    let snapshot_text = std::str::from_utf8(&snapshot_bytes).expect("合成原文UTF8");
+    assert!(
+        snapshot_text.contains(&canonical),
+        "HTTP快照字节必须包含准确引用原文"
+    );
+    assert!(snapshot_text.contains("百分之七") && !snapshot_text.contains("百分之九"));
+    assert_eq!(resolved["source"]["id"], source_a);
+    let span_text = find_string_field(&tool_json, "text").expect("实际检索引用原文");
+    assert_eq!(span_text, canonical, "工具原文与引用解析必须逐字一致");
+    emit_raw(
+        "citation_readback",
+        serde_json::json!({"databaseHome":world.home,"runId":run_id,"citation":resolved,"snapshotHttpStatus":status,"snapshotBytesBase64":base64::engine::general_purpose::STANDARD.encode(&snapshot_bytes),"toolSpanText":span_text,"scopeId":scope_id,"allowedSourceId":source_a,"excludedSourceId":source_b}),
+    );
+    let usage = usage_stats(&world.home, &run_id);
 
     emit_eval_record(&record(
         "BE-07",
         "资料引用",
         "B(binary)",
-        "在本轮知识范围（scopeId=A）中检索『柠檬酸含量』并引用原文（A/B 两空间相近内容）",
-        "knowledge_search 经 R04 网关真实执行：只返回允许来源（甲）；citationMarkdown/citationId 可经 HTTP 解析定位实际文本（canonical 一致、快照字节含原文）；scopeId 语义参数正确且由服务端逐次复核",
+        "通过正常聊天选择甲资料检索『柠檬酸含量』并引用原文（A/B 两空间相近内容）",
+        "认证execute显式选择甲资料并自动铸造当前Run范围；仅本轮激活完整检索声明，真实检索只返回甲；引用HTTP解析与快照字节一致、乙隔离；原2次预算通过",
         serde_json::json!({
             "onlyAllowedSource": true,
             "citationResolvable": true,
             "citationId": citation_id,
             "canonicalMatches": true,
+            "scopeMintedBySubmission": true,
+            "scopeBoundToCurrentRun": true,
+            "knowledgeToolResident": false,
+            "knowledgeSearchActivatedForSelection": true,
+            "descriptionSchemaVerified": true,
+            "originalCallBudgetSatisfied": true,
             "terminal": reason,
         }),
         TaskScore {
@@ -2010,7 +2508,7 @@ async fn be07_material_citation_scope_isolated_and_locatable() {
         },
         2,
         requests.len(),
-        tokens_json(in_t, out_t),
+        usage.tokens_json(),
         "T07 A13 现役金线（query-service.ts retrieve + citation 三要素）经 run 全链评测",
     ));
 
@@ -2019,12 +2517,12 @@ async fn be07_material_citation_scope_isolated_and_locatable() {
 
 // ═══ BE-08 子代理边界（S 层）：只读父 → 子代理越权写被真实边界拒绝 ══════════
 
+use lingxi_kernel::RunContext;
 use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
     ToolExecutorPort, ToolOutcome, ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
-use lingxi_kernel::RunContext;
 use lingxi_protocol::{
     ContentBlock, ErrorCode, ModelCallId, NormalizedMessage, ProtocolError, ToolCallId,
 };
@@ -2032,11 +2530,11 @@ use lingxi_service::context_compiler::{
     ContextCompilerService, FileContextMaterialSource, HostFacts,
 };
 use lingxi_service::filetools::{
-    register_core_file_tools, CoreFileTools, FileChangeLog, NoopChangeLog,
+    CoreFileTools, FileChangeLog, NoopChangeLog, register_core_file_tools,
 };
 use lingxi_service::toolgateway::ToolInvocationGateway;
 use lingxi_service::{
-    prepare_layout, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
+    HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState, prepare_layout,
 };
 
 fn owner_principal() -> lingxi_service::Principal {
@@ -2478,6 +2976,14 @@ async fn be08_subagent_boundary_readonly_child_write_refused_and_visibility_trim
         "结构化拒绝原因必须到达子代理模型: {refusal_text}"
     );
 
+    // 脚本化提供者只模拟模型响应；授权、记账和文件效果均来自真实服务链。
+    emit_raw(
+        "subagent_boundary",
+        serde_json::json!({"taskId":"BE-08","home":home,"workspace":workspace,
+        "childRunId":child_run_id,"childStatus":child_status,"dispatched":dispatched,
+        "capturedTurns":captured.iter().map(|(marker,prompt,input)|serde_json::json!({"marker":marker,"systemPrompt":prompt,"inputDebug":format!("{input:?}")})).collect::<Vec<_>>(),
+        "executorArrivals":*arrivals.arrivals.lock().expect("arrivals"),"workspaceListing":workspace_listing(&workspace)}),
+    );
     emit_eval_record(&record(
         "BE-08",
         "子代理边界",
@@ -2499,14 +3005,16 @@ async fn be08_subagent_boundary_readonly_child_write_refused_and_visibility_trim
         },
         4,
         captured.len(),
-        serde_json::json!({"source": "S-tier harness（脚本化替身无 usage 台账面）；工具/授权行为为评测对象"}),
+        serde_json::json!({"inputTokens":null,"outputTokens":null,"measurementStatus":"NOT_MEASURED","source": "S-tier harness（脚本化替身无 usage 台账面）；工具/授权行为为评测对象"}),
         "T06 A11 + R03-T06 衰减语义（authorize_child_tool）+ T01 子代理裁剪",
     ));
 
     state.storage().close().await.expect("close storage");
-    let _ = std::fs::remove_dir_all(&home);
-    let _ = std::fs::remove_dir_all(&product);
-    let _ = std::fs::remove_dir_all(&workspace);
+    if std::env::var_os("R06_T08_RAW_OUT").is_none() {
+        let _ = std::fs::remove_dir_all(&home);
+        let _ = std::fs::remove_dir_all(&product);
+        let _ = std::fs::remove_dir_all(&workspace);
+    }
 }
 
 // ═══ BE-09 不应调用工具：纯对话零工具意图 ═══════════════════════════════════
@@ -2546,7 +3054,8 @@ async fn be09_pure_conversation_never_invokes_tools() {
         baseline,
         "零工作区副作用"
     );
-    let (succeeded, in_t, out_t) = usage_stats(&world.home, &run_id);
+    let usage = usage_stats(&world.home, &run_id);
+    let succeeded = usage.succeeded_chat();
     assert_eq!(succeeded, 1);
 
     emit_eval_record(&record(
@@ -2569,7 +3078,7 @@ async fn be09_pure_conversation_never_invokes_tools() {
         },
         1,
         1,
-        tokens_json(in_t, out_t),
+        usage.tokens_json(),
         "现役工具纪律（platform.tool-discipline：无需要不调工具）+ T01 上下文装配不诱导工具",
     ));
 
@@ -2635,7 +3144,8 @@ async fn be10_schema_valid_but_semantically_wrong_scores_fail_not_mixed() {
     };
     assert!(!score.all_true(), "A15：schema 过不得把整体算成功");
     assert_eq!(score.overall(), "fail");
-    let (succeeded, in_t, out_t) = usage_stats(&world.home, &run_id);
+    let usage = usage_stats(&world.home, &run_id);
+    let succeeded = usage.succeeded_chat();
     assert_eq!(
         succeeded, 2,
         "run 层台账两行 succeeded——与任务失败并存（不混算的反例本身）"
@@ -2658,7 +3168,7 @@ async fn be10_schema_valid_but_semantically_wrong_scores_fail_not_mixed() {
         score,
         2,
         2,
-        tokens_json(in_t, out_t),
+        usage.tokens_json(),
         "05 验收协议 §6.3：schema 通过不等于参数语义正确；回答已写入不等于文件生成",
     ));
 

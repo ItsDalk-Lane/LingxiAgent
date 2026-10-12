@@ -1,0 +1,105 @@
+{
+  "preparation_readback_failure": "first read-only projection used nonexistent column operation; corrected against actual PRAGMA schema, no product mutation",
+  "db_path": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/artifacts/rust-tauri/R06/AR/W10-R01/commands/provider-alias-02/LOCAL_ONLY_NEVER_GIT/synthetic-home/provider-alias/lingxi-service/data/runs.db",
+  "ledger": [
+    {
+      "purpose": "embedding",
+      "origin": "operation",
+      "provider": "alpha",
+      "model": "same-model",
+      "protocol": "openai-embeddings",
+      "outcome": "succeeded",
+      "input_tokens": 320,
+      "output_tokens": null,
+      "usage_state": "partial",
+      "transport_attempts": 1,
+      "session_id": null,
+      "run_id": null,
+      "attempt": null,
+      "cause_ref": null
+    },
+    {
+      "purpose": "embedding",
+      "origin": "operation",
+      "provider": "beta",
+      "model": "same-model",
+      "protocol": "openai-embeddings",
+      "outcome": "succeeded",
+      "input_tokens": 320,
+      "output_tokens": null,
+      "usage_state": "partial",
+      "transport_attempts": 1,
+      "session_id": null,
+      "run_id": null,
+      "attempt": null,
+      "cause_ref": null
+    },
+    {
+      "purpose": "embedding",
+      "origin": "operation",
+      "provider": "beta",
+      "model": "same-model",
+      "protocol": "openai-embeddings",
+      "outcome": "succeeded",
+      "input_tokens": 320,
+      "output_tokens": null,
+      "usage_state": "partial",
+      "transport_attempts": 1,
+      "session_id": null,
+      "run_id": null,
+      "attempt": null,
+      "cause_ref": null
+    },
+    {
+      "purpose": "embedding",
+      "origin": "operation",
+      "provider": "beta",
+      "model": "same-model",
+      "protocol": "openai-embeddings",
+      "outcome": "succeeded",
+      "input_tokens": 320,
+      "output_tokens": null,
+      "usage_state": "partial",
+      "transport_attempts": 1,
+      "session_id": null,
+      "run_id": null,
+      "attempt": null,
+      "cause_ref": null
+    },
+    {
+      "purpose": "embedding",
+      "origin": "operation",
+      "provider": "beta",
+      "model": "same-model",
+      "protocol": "openai-embeddings",
+      "outcome": "succeeded",
+      "input_tokens": 130,
+      "output_tokens": null,
+      "usage_state": "partial",
+      "transport_attempts": 1,
+      "session_id": null,
+      "run_id": null,
+      "attempt": null,
+      "cause_ref": null
+    }
+  ],
+  "wire_count": 5,
+  "wire_input_sizes": [
+    64,
+    64,
+    64,
+    64,
+    26
+  ],
+  "assertions": {
+    "wire_ledger_count_equal": true,
+    "provider_sequence": [
+      "alpha",
+      "beta",
+      "beta",
+      "beta",
+      "beta"
+    ]
+  },
+  "mock_boundary": "external loopback responses only"
+}

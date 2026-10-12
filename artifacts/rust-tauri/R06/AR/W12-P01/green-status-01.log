@@ -1,0 +1,3 @@
+{"command": ["/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-green-probe-whie9hqi/status"], "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-green-status-01-pt3ppw7k", "start": 1791699980.5405262}
+LINGXI_TEST_GUARD: armed (pid 19145, mem_limit=8192 MB, time_limit=600 s)
+home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-green-status-01-pt3ppw7k result=Err(KnowledgeError { code: "KNOWLEDGE_SCHEMA_NEWER", message: "knowledge schema version 999 is newer than supported 1" }) before=building after=building schema=999

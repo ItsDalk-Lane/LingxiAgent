@@ -1,0 +1,44 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "deepseek",
+  "case": "off-level-disables-and-strips",
+  "model": {
+    "provider": "deepseek",
+    "baseUrl": "https://api.deepseek.com",
+    "id": "deepseek-reasoner",
+    "reasoning": true,
+    "api": "openai-completions"
+  },
+  "payload": {
+    "model": "deepseek-reasoner",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": "a",
+        "reasoning_content": "trace"
+      }
+    ],
+    "reasoning_effort": "high"
+  },
+  "options": {
+    "mode": "chat",
+    "reasoningLevel": "off"
+  },
+  "expected": {
+    "thinkingFormat": "deepseek",
+    "reasoningProfile": null,
+    "matched": "deepseek",
+    "result": {
+      "model": "deepseek-reasoner",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "a"
+        }
+      ],
+      "thinking": {
+        "type": "disabled"
+      }
+    }
+  }
+}

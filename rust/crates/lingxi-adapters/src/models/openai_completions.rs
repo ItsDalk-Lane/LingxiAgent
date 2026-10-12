@@ -423,9 +423,15 @@ pub fn render_chat_request(
             content: system.clone(),
         });
     }
-    messages.push(submission_user_message(input));
+    if !input.has_submission_position() {
+        messages.push(submission_user_message(input));
+    }
     for item in &input.prior {
         match item {
+            ExchangeItem::UserTurn { text } => messages.push(RequestMessage::User {
+                content: text.clone(),
+            }),
+            ExchangeItem::CurrentSubmission => messages.push(submission_user_message(input)),
             ExchangeItem::AssistantTurn {
                 content,
                 tool_calls,
@@ -468,9 +474,7 @@ pub fn render_chat_request(
                 let mut rendered_calls = Vec::with_capacity(tool_calls.len());
                 for call in tool_calls {
                     let wire_name =
-                        input
-                            .tools
-                            .wire_name_of_target(&call.target)
+                        call.historical_wire_name()
                             .ok_or_else(|| {
                                 ProtocolError::new(
                                     ErrorCode::InvalidMessage,
@@ -1319,6 +1323,7 @@ mod tests {
                 text: "reading".to_string(),
             }],
             tool_calls: vec![lingxi_kernel::model_exchange::RequestedToolCall {
+                declaration_binding: input.tools.bind_target(&request.target),
                 tool_call_id: ToolCallId::new("run-tc0001"),
                 provider_call_id: request.provider_call_id.clone(),
                 target: request.target.clone(),
@@ -1366,6 +1371,7 @@ mod tests {
             call: ModelCallId::new("mc-1"),
             content: Vec::new(),
             tool_calls: vec![lingxi_kernel::model_exchange::RequestedToolCall {
+                declaration_binding: input.tools.bind_target(&request.target),
                 tool_call_id: ToolCallId::new("run-tc0001"),
                 provider_call_id: request.provider_call_id.clone(),
                 target: request.target.clone(),

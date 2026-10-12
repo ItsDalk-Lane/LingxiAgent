@@ -1,0 +1,51 @@
+{
+  "at": "2026-10-11T13:34:19.218119+00:00",
+  "verification": "ROOT_ACTUAL_RAW_LOG_AND_METADATA_READBACK",
+  "command": "gate-workspace-final-01",
+  "metadata": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/commands/gate-workspace-final-01.json",
+  "metadata_sha256": "290c1170bf3aa2b054e60ed2b21ef95e4cb9c10f65d2c491c4f1a65eb87d3d2a",
+  "log": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/commands/gate-workspace-final-01.log",
+  "log_sha256": "ffcf3d7ac351977fc43f33b3509e3adb4cc2d9bcb194ad04eb10dd9ca2623d37",
+  "argv": [
+    "env",
+    "LINGXI_PRODUCT_DIR=/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/lib",
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--workspace",
+    "--locked",
+    "--no-fail-fast",
+    "-j8"
+  ],
+  "cwd": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01",
+  "actual_exit": 101,
+  "actual_duration_seconds": 1136.6473888329929,
+  "input_count": 68839,
+  "inputs_before_after_equal": true,
+  "guard": {
+    "timeSeconds": 600,
+    "memoryMiB": 8192,
+    "enabled": true
+  },
+  "time_guard_triggered": false,
+  "memory_guard_triggered": false,
+  "remaining_after_cleanup": [],
+  "remaining_observed_descendants": [],
+  "rss_peak_actual_as_recorded": 4066852864,
+  "raw_result_blocks": 146,
+  "raw_passed": 1868,
+  "raw_assertion_failed": 4,
+  "scope": "current command only; no Task/Step/A/leaf/Stage PASS",
+  "actual_execution_before_bin_binding": "NOT_DEDUCED_FROM_CARGO_BEFORE_INVENTORY",
+  "failed_test_names": [
+    "panicking_tool_child_is_supervised_and_the_run_settles_loudly",
+    "approval_wait_round_trips_approve_and_reject_legs",
+    "c01_actual_calls_keep_system_frozen_and_tools_live_after_revocation",
+    "r03_a01_three_model_calls_produce_exactly_one_task_terminal"
+  ],
+  "abnormal_targets_no_result_block": [
+    "tests/r04_rr1_f05_spill_failure.rs"
+  ],
+  "abnormal_target_pass_count": null
+}

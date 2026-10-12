@@ -1,0 +1,47 @@
+{
+  "at": "2026-10-11T13:37:39.273994+00:00",
+  "id": "R06-AR-F11-OBS-OPERATION-QUEUE-DEADLINE-01",
+  "primary_issue": "R06-AR-F11",
+  "original_requirement": [
+    "R05-T05",
+    "R05-T07",
+    "R06-T07"
+  ],
+  "status": "OBSERVED_FAILURE_ROOT_CAUSE_UNDETERMINED",
+  "verification": "ROOT_ACTUAL_RAW_LOG_AND_ORIGINAL_ASSERTION_READ",
+  "log": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/verify-R05-final-01/R05_SUITES/svc_r05_t07_rr1_usage_ledger.log",
+  "log_sha256": "53206c68712ea9e09eedd6fa38e5c90202c82ceed0261a0b5c21600b70d7a49e",
+  "test_source": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs",
+  "test_source_sha256": "395ac7a42923d4f85a22eff80fe571ab71dec0ddd225fe354c8f90379ecc9f5f",
+  "test": "rr1_f21_operation_queue_timeout_never_invents_an_http_attempt",
+  "actual": {
+    "elapsed_ms": 123,
+    "http_requests": 0,
+    "usage_rows": 1,
+    "transport_attempts": [
+      0
+    ],
+    "error_code": "BudgetExceeded",
+    "matched": 15,
+    "passed": 14,
+    "failed": 1
+  },
+  "expected": {
+    "deadline_ms": 25,
+    "elapsed_ms_less_than": 120,
+    "http_requests": 0,
+    "usage_rows": 1,
+    "transport_attempts": [
+      0
+    ]
+  },
+  "not_inferred": [
+    "production_root_cause",
+    "scheduler_load_root_cause",
+    "same_family_all_runs_fail",
+    "whole_formal_graph_final_exit"
+  ],
+  "required_next": "Fresh W11 Executor reproduce original threshold and source-current own deterministic counterexamples; preserve actual no-send accounting; do not widen threshold/delete original assertion or treat other green runs as erasure",
+  "formal_outer_status": "RUNNING_NOT_FINAL",
+  "no_task_pass": true
+}

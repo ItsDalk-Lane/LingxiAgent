@@ -1,0 +1,18 @@
+{
+  "status": "FAIL",
+  "error": "KeyError('finish')",
+  "command": [
+    "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/rust/target/debug/lingxi-service",
+    "--home",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w01-old-c01-02-7hjw1fh8/home",
+    "--config",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w01-old-c01-02-7hjw1fh8/config.json",
+    "--bind",
+    "127.0.0.1:0"
+  ],
+  "binary_before": "2af456ff2353d0a4bd243b059a22c73d4ffe174e5d1114b9b3ffbb099bd21b5d",
+  "binary_after": "2af456ff2353d0a4bd243b059a22c73d4ffe174e5d1114b9b3ffbb099bd21b5d",
+  "service_exit": 0,
+  "child_reaped": true,
+  "stderr": []
+}

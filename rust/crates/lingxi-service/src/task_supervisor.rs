@@ -53,7 +53,7 @@
 //! exactly the "无法确认停止" the taskbook requires; no false quiet is
 //! produced.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -243,6 +243,119 @@ pub struct TaskSupervisor {
     /// policy grace so a child's window and its owner's drain share ONE
     /// budget anchor.
     cooperative_grace: Duration,
+    run_permits: Mutex<HashMap<String, RunPermitBinding>>,
+    driving: Mutex<HashSet<String>>,
+}
+
+/// 登记只属于本次驱动；实际子任务另持强引用，退出前不会误放行。
+#[derive(Clone)]
+struct RunPermitBinding {
+    root_scope: Option<CancelScope>,
+    permit: Weak<lingxi_kernel::session_admission::SessionPermit>,
+    authorization: Option<(
+        lingxi_kernel::Principal,
+        String,
+        String,
+        crate::runs::DriveAuthorization,
+    )>,
+}
+// 只由真实 driver 注册事实创建；模型参数和公开上下文不能设置此任务局部事实。
+#[derive(Clone)]
+struct BlockingRunPermit {
+    valid_scope: bool,
+    run_id: String,
+    principal: lingxi_kernel::Principal,
+    session_id: String,
+    permit: Arc<lingxi_kernel::session_admission::SessionPermit>,
+}
+tokio::task_local! {
+    static BLOCKING_RUN_PERMIT: Option<BlockingRunPermit>;
+}
+
+/// 将真实任务的许可带入阻塞线程；其他 run/主体/会话不能借用。
+pub(crate) fn retain_blocking_run_permit(
+    ctx: &lingxi_kernel::RunContext,
+) -> Result<Option<Arc<lingxi_kernel::session_admission::SessionPermit>>, StorageError> {
+    BLOCKING_RUN_PERMIT
+        .try_with(|issued| {
+            let Some(issued) = issued else {
+                return Ok(None);
+            };
+            if !issued.valid_scope
+                || issued.run_id != ctx.run_id.as_str()
+                || issued.session_id != ctx.session_id.as_str()
+                || issued.principal != ctx.principal
+                || !issued.permit.covers(ctx.session_id.as_str())
+            {
+                return Err(StorageError::Conflict {
+                    detail: "blocking_run_permit_mismatch".into(),
+                });
+            }
+            Ok(Some(Arc::clone(&issued.permit)))
+        })
+        .unwrap_or(Ok(None))
+}
+/// ResourceIO 无公开 run 参数，只能继承当前真实任务局部认证事实，并核实际存储 Arc。
+pub(crate) fn retain_blocking_resource_permit(
+    principal_kind: &str,
+    principal_subject: &str,
+    session_id: &str,
+    gate: &Arc<lingxi_kernel::session_admission::SessionAdmission>,
+) -> Result<Option<Arc<lingxi_kernel::session_admission::SessionPermit>>, StorageError> {
+    BLOCKING_RUN_PERMIT
+        .try_with(|issued| {
+            let Some(issued) = issued else {
+                return Ok(None);
+            };
+            if !issued.valid_scope
+                || issued.principal.storage_kind() != principal_kind
+                || issued.principal.storage_subject() != principal_subject
+                || issued.session_id != session_id
+                || !issued.permit.covers(session_id)
+                || !issued.permit.belongs_to(gate)
+            {
+                return Err(StorageError::Conflict {
+                    detail: "blocking_resource_permit_mismatch".into(),
+                });
+            }
+            Ok(Some(Arc::clone(&issued.permit)))
+        })
+        .unwrap_or(Ok(None))
+}
+/// 同一驱动身份只能进入一次，退出自动释放，不污染持久重放事实。
+pub(crate) struct DriverClaim {
+    supervisor: Arc<TaskSupervisor>,
+    run_id: String,
+}
+impl Drop for DriverClaim {
+    fn drop(&mut self) {
+        self.supervisor
+            .driving
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .remove(&self.run_id);
+    }
+}
+pub(crate) struct RunPermitRegistration {
+    supervisor: Weak<TaskSupervisor>,
+    run_id: String,
+    permit: Arc<lingxi_kernel::session_admission::SessionPermit>,
+}
+impl Drop for RunPermitRegistration {
+    fn drop(&mut self) {
+        if let Some(supervisor) = self.supervisor.upgrade() {
+            let mut bindings = supervisor
+                .run_permits
+                .lock()
+                .unwrap_or_else(|p| p.into_inner());
+            if bindings
+                .get(&self.run_id)
+                .is_some_and(|bound| bound.permit.ptr_eq(&Arc::downgrade(&self.permit)))
+            {
+                bindings.remove(&self.run_id);
+            }
+        }
+    }
 }
 
 impl Default for TaskSupervisor {
@@ -268,11 +381,179 @@ impl TaskSupervisor {
             tasks: Mutex::new(HashMap::new()),
             next_id: AtomicU64::new(1),
             cooperative_grace,
+            run_permits: Mutex::new(HashMap::new()),
+            driving: Mutex::new(HashSet::new()),
         }
+    }
+
+    /// run身份由真实会话受理/子任务分配产生，禁止借用别的会话许可。
+    pub(crate) fn retain_run_permit(
+        self: &Arc<Self>,
+        run_id: &str,
+        session_id: &str,
+        permit: Arc<lingxi_kernel::session_admission::SessionPermit>,
+    ) -> Result<RunPermitRegistration, StorageError> {
+        if !permit.covers(session_id) {
+            return Err(StorageError::Conflict {
+                detail: "session_permit_scope_mismatch".into(),
+            });
+        }
+        let mut bindings = self.run_permits.lock().unwrap_or_else(|p| p.into_inner());
+        bindings.retain(|_, binding| binding.permit.strong_count() > 0);
+        if bindings.contains_key(run_id) {
+            return Err(StorageError::Conflict {
+                detail: "run_permit_already_bound".into(),
+            });
+        }
+        bindings.insert(
+            run_id.into(),
+            RunPermitBinding {
+                root_scope: None,
+                permit: Arc::downgrade(&permit),
+                authorization: None,
+            },
+        );
+        Ok(RunPermitRegistration {
+            supervisor: Arc::downgrade(self),
+            run_id: run_id.into(),
+            permit,
+        })
+    }
+
+    /// 只有真实受理路径可以发出继承证明，公开驱动参数不能伪造此登记。
+    pub(crate) fn retain_authorized_run_permit(
+        self: &Arc<Self>,
+        run_id: &str,
+        session_id: &str,
+        agent_id: &str,
+        principal: &lingxi_kernel::Principal,
+        authorization: &crate::runs::DriveAuthorization,
+        permit: Arc<lingxi_kernel::session_admission::SessionPermit>,
+    ) -> Result<RunPermitRegistration, StorageError> {
+        let registration = self.retain_run_permit(run_id, session_id, permit)?;
+        self.run_permits
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .get_mut(run_id)
+            .expect("registered binding")
+            .authorization = Some((
+            principal.clone(),
+            session_id.into(),
+            agent_id.into(),
+            authorization.clone(),
+        ));
+        Ok(registration)
+    }
+    /// 绑定 driver 实际登记的取消根，不能凭相同标签取得后台工作许可。
+    pub(crate) fn bind_run_scope(
+        &self,
+        run_id: &str,
+        root: &CancelScope,
+    ) -> Result<(), StorageError> {
+        let mut bindings = self.run_permits.lock().unwrap_or_else(|p| p.into_inner());
+        let binding = bindings.get_mut(run_id).ok_or(StorageError::Conflict {
+            detail: "run_permit_missing".into(),
+        })?;
+        if binding
+            .root_scope
+            .as_ref()
+            .is_some_and(|prior| !prior.same_scope(root))
+        {
+            return Err(StorageError::Conflict {
+                detail: "run_permit_scope_mismatch".into(),
+            });
+        }
+        binding.root_scope = Some(root.clone());
+        Ok(())
+    }
+    pub(crate) fn authorized_permit(
+        &self,
+        run_id: &str,
+        session_id: &str,
+        agent_id: &str,
+        principal: &lingxi_kernel::Principal,
+        authorization: &crate::runs::DriveAuthorization,
+        gate: &Arc<lingxi_kernel::session_admission::SessionAdmission>,
+    ) -> Result<Option<Arc<lingxi_kernel::session_admission::SessionPermit>>, StorageError> {
+        let bindings = self.run_permits.lock().unwrap_or_else(|p| p.into_inner());
+        let Some(binding) = bindings.get(run_id) else {
+            return Ok(None);
+        };
+        let permit = binding.permit.upgrade().ok_or(StorageError::Conflict {
+            detail: "run_permit_expired".into(),
+        })?;
+        if !permit.covers(session_id)
+            || !permit.belongs_to(gate)
+            || binding.authorization.as_ref()
+                != Some(&(
+                    principal.clone(),
+                    session_id.into(),
+                    agent_id.into(),
+                    authorization.clone(),
+                ))
+        {
+            return Err(StorageError::Conflict {
+                detail: "run_permit_authorization_mismatch".into(),
+            });
+        }
+        Ok(Some(permit))
+    }
+    pub(crate) fn parent_run_permit(
+        &self,
+        run_id: &str,
+        session_id: &str,
+        agent_id: &str,
+        principal: &lingxi_kernel::Principal,
+        gate: &Arc<lingxi_kernel::session_admission::SessionAdmission>,
+    ) -> Result<Option<Arc<lingxi_kernel::session_admission::SessionPermit>>, StorageError> {
+        let bindings = self.run_permits.lock().unwrap_or_else(|p| p.into_inner());
+        let Some(binding) = bindings.get(run_id) else {
+            return Ok(None);
+        };
+        let permit = binding.permit.upgrade().ok_or(StorageError::Conflict {
+            detail: "parent_run_permit_expired".into(),
+        })?;
+        let valid = binding
+            .authorization
+            .as_ref()
+            .is_some_and(|(owner, sid, agent, _)| {
+                owner == principal && sid == session_id && agent == agent_id
+            });
+        if !valid || !permit.covers(session_id) || !permit.belongs_to(gate) {
+            return Err(StorageError::Conflict {
+                detail: "parent_run_permit_mismatch".into(),
+            });
+        }
+        Ok(Some(permit))
+    }
+
+    pub(crate) fn claim_driver(
+        self: &Arc<Self>,
+        run_id: &str,
+    ) -> Result<DriverClaim, StorageError> {
+        if !self
+            .driving
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .insert(run_id.into())
+        {
+            return Err(StorageError::Conflict {
+                detail: "run_driver_already_active".into(),
+            });
+        }
+        Ok(DriverClaim {
+            supervisor: Arc::clone(self),
+            run_id: run_id.into(),
+        })
     }
 
     pub fn cap(&self) -> usize {
         self.cap
+    }
+
+    /// 阻塞收尾复用同一监督器的原清理期限。
+    pub(crate) fn cooperative_grace(&self) -> Duration {
+        self.cooperative_grace
     }
 
     fn register(
@@ -335,6 +616,46 @@ impl TaskSupervisor {
         F: Future + Send + 'static,
         F::Output: Send + 'static,
     {
+        self.spawn_linked_with_settlement(run_id, scope, label, false, fut)
+    }
+
+    /// 已持久化计费意图的工具沿原取消树收尾，使用原清理期限而非脱离监督。
+    pub(crate) fn spawn_linked_with_settlement<F>(
+        self: &Arc<Self>,
+        run_id: &str,
+        scope: &CancelScope,
+        label: String,
+        settle_call: bool,
+        fut: F,
+    ) -> Result<ChildHandle<F::Output>, SpawnRejected>
+    where
+        F: Future + Send + 'static,
+        F::Output: Send + 'static,
+    {
+        let (retained_permit, blocking_permit) = {
+            let bindings = self.run_permits.lock().unwrap_or_else(|p| p.into_inner());
+            let binding = bindings.get(run_id);
+            let retained = binding.and_then(|binding| binding.permit.upgrade());
+            let blocking = binding.and_then(|binding| {
+                let (principal, session_id, _, _) = binding.authorization.as_ref()?;
+                let valid_scope = binding
+                    .root_scope
+                    .as_ref()
+                    .is_some_and(|root| scope.descends_from(root));
+                let permit = binding.permit.upgrade()?;
+                if !permit.covers(session_id) {
+                    return None;
+                }
+                Some(BlockingRunPermit {
+                    valid_scope,
+                    run_id: run_id.into(),
+                    principal: principal.clone(),
+                    session_id: session_id.clone(),
+                    permit,
+                })
+            });
+            (retained, blocking)
+        };
         let kind = TaskKind::from(scope.kind());
         let (id, entry) = self.register(label, kind, Some(run_id.to_string()))?;
         let (tx, rx) = tokio::sync::oneshot::channel();
@@ -342,8 +663,10 @@ impl TaskSupervisor {
         let task_entry = Arc::clone(&entry);
         let grace = self.cooperative_grace;
         let join = tokio::spawn(async move {
-            let mut fut = Box::pin(fut);
-            if !matches!(kind, TaskKind::ChildRun) {
+            // StopUnconfirmed只是停止请求，真正工作退出前继续持权。
+            let _retained_permit = retained_permit;
+            let mut fut = Box::pin(BLOCKING_RUN_PERMIT.scope(blocking_permit, fut));
+            if !matches!(kind, TaskKind::ChildRun) && !settle_call {
                 // CALL-level: the scope's cancellation drops the child at
                 // its await point (biased — cancel wins ties).
                 tokio::select! {
@@ -408,6 +731,42 @@ impl TaskSupervisor {
             .handle
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(join);
+        Ok(ChildHandle {
+            id,
+            entry,
+            supervisor: Arc::downgrade(self),
+            rx,
+        })
+    }
+
+    /// 阻塞系统调用必须登记实际 closure；取消等待者不算物理作业退出。
+    /// 原 drain/abort 会如实保留无法确认项，只有 closure 真退出才记完成。
+    pub(crate) fn spawn_blocking_owned<T, F>(
+        self: &Arc<Self>,
+        run_id: Option<String>,
+        label: String,
+        work: F,
+    ) -> Result<ChildHandle<T>, SpawnRejected>
+    where
+        T: Send + 'static,
+        F: FnOnce() -> T + Send + 'static,
+    {
+        let kind = if run_id.is_some() {
+            TaskKind::ToolCall
+        } else {
+            TaskKind::Background
+        };
+        let (id, entry) = self.register(label, kind, run_id)?;
+        let (tx, rx) = tokio::sync::oneshot::channel();
+        let task_entry = Arc::clone(&entry);
+        let join = tokio::task::spawn_blocking(move || {
+            let exit = match std::panic::catch_unwind(std::panic::AssertUnwindSafe(work)) {
+                Ok(value) => SupervisedPoll::Completed(value),
+                Err(payload) => SupervisedPoll::Panicked(panic_message_of(&payload)),
+            };
+            deliver_supervised_exit(&task_entry, tx, exit);
+        });
+        *entry.handle.lock().unwrap_or_else(|p| p.into_inner()) = Some(join);
         Ok(ChildHandle {
             id,
             entry,
@@ -1172,6 +1531,195 @@ mod tests {
                 .spawn_linked("run_f", &scope_c, "c2".to_string(), async { 3 })
                 .is_ok(),
             "reaped entries free their slot"
+        );
+    }
+}
+
+#[cfg(all(test, unix))]
+mod session_permit_fault_tests {
+    use super::*;
+    use std::io::{Read, Write};
+    use std::sync::atomic::{AtomicBool, Ordering};
+
+    /// 真实同步I/O不让出线程时，停止请求不等于工作已经退出。
+    #[tokio::test(flavor = "multi_thread", worker_threads = 3)]
+    async fn r06_f03_actual_blocking_io_retains_permit_until_exit() {
+        let gate = Arc::new(lingxi_kernel::session_admission::SessionAdmission::default());
+        let permit = Arc::new(gate.try_acquire(&["alpha"], 8).unwrap());
+        let supervisor = Arc::new(TaskSupervisor::new(8));
+        let binding = supervisor
+            .retain_run_permit("owned-run", "alpha", permit.clone())
+            .unwrap();
+        assert!(supervisor
+            .retain_run_permit("wrong-session", "beta", permit.clone())
+            .is_err());
+        let root = CancelScope::run_root("owned-run");
+        let scope = root.child("blocking-io".into(), ScopeKind::ToolCall);
+        let (mut reader, mut writer) = std::os::unix::net::UnixStream::pair().unwrap();
+        let entered = Arc::new(AtomicBool::new(false));
+        let actual_entered = entered.clone();
+        let path = std::env::temp_dir().join(format!(
+            "lingxi-w03-late-io-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let actual_path = path.clone();
+        let child = supervisor
+            .spawn_linked(
+                "owned-run",
+                &scope,
+                "actual blocking I/O".into(),
+                async move {
+                    actual_entered.store(true, Ordering::SeqCst);
+                    let mut byte = [0u8; 1];
+                    reader.read_exact(&mut byte).unwrap();
+                    std::fs::write(actual_path, byte).unwrap();
+                },
+            )
+            .unwrap();
+        let deadline = std::time::Instant::now() + Duration::from_secs(5);
+        while !entered.load(Ordering::SeqCst) {
+            assert!(std::time::Instant::now() < deadline);
+            tokio::time::sleep(Duration::from_millis(1)).await;
+        }
+        root.cancel("actual cancellation");
+        let report = supervisor
+            .drain_run(
+                "owned-run",
+                CancelBudget::new(std::time::Instant::now(), Duration::from_millis(15)),
+            )
+            .await;
+        assert!(
+            !report.unconfirmed.is_empty(),
+            "blocking work is honestly unconfirmed"
+        );
+        // 模拟驱动已经返回：登记和父许可都释放，实际任务仍必须阻挡新写者。
+        drop(binding);
+        drop(permit);
+        assert!(gate.is_busy("alpha"));
+        assert!(gate.try_acquire(&["alpha"], 8).is_err());
+        let independent = gate.try_acquire(&["beta"], 8).unwrap();
+        drop(independent);
+        assert!(!path.exists(), "late write is still parked");
+        writer.write_all(b"x").unwrap();
+        let _ = child.wait().await;
+        while gate.is_busy("alpha") {
+            assert!(std::time::Instant::now() < deadline);
+            tokio::time::sleep(Duration::from_millis(1)).await;
+        }
+        assert_eq!(std::fs::read(&path).unwrap(), b"x");
+        let next = gate.try_acquire(&["alpha"], 8).unwrap();
+        drop(next);
+        std::fs::remove_file(path).unwrap();
+    }
+    #[tokio::test]
+    async fn r06_f03_blocking_certificate_rejects_wrong_context_scope_and_gate() {
+        use lingxi_kernel::{Principal, RunContext};
+        use lingxi_protocol::{AttemptId, RunId, SessionId};
+        let gate = Arc::new(lingxi_kernel::session_admission::SessionAdmission::default());
+        let other_gate = Arc::new(lingxi_kernel::session_admission::SessionAdmission::default());
+        let permit = Arc::new(gate.try_acquire(&["alpha"], 8).unwrap());
+        let supervisor = Arc::new(TaskSupervisor::new(8));
+        let authorization = crate::runs::DriveAuthorization::user_submission(
+            None,
+            lingxi_kernel::subagent::SessionPermissionMode::Operate,
+        );
+        let binding = supervisor
+            .retain_authorized_run_permit(
+                "certificate-run",
+                "alpha",
+                "lingxi",
+                &Principal::LocalUser,
+                &authorization,
+                permit.clone(),
+            )
+            .unwrap();
+        let root = CancelScope::run_root("certificate-run");
+        supervisor.bind_run_scope("certificate-run", &root).unwrap();
+        let ctx = RunContext {
+            principal: Principal::LocalUser,
+            session_id: SessionId::new("alpha"),
+            run_id: RunId::new("certificate-run"),
+            attempt: AttemptId::new("certificate-attempt"),
+            generation: 1,
+        };
+        let child_ctx = ctx.clone();
+        let actual_gate = gate.clone();
+        let child = supervisor
+            .spawn_linked(
+                "certificate-run",
+                &root.child("real-tool".into(), ScopeKind::ToolCall),
+                "real certificate".into(),
+                async move {
+                    assert!(retain_blocking_run_permit(&child_ctx)
+                        .unwrap()
+                        .unwrap()
+                        .belongs_to(&actual_gate));
+                    for bad in [
+                        RunContext {
+                            run_id: RunId::new("another-run"),
+                            ..child_ctx.clone()
+                        },
+                        RunContext {
+                            session_id: SessionId::new("beta"),
+                            ..child_ctx.clone()
+                        },
+                        RunContext {
+                            principal: Principal::WebSession {
+                                account_id: "foreign".into(),
+                            },
+                            ..child_ctx.clone()
+                        },
+                    ] {
+                        assert!(retain_blocking_run_permit(&bad).is_err());
+                    }
+                    assert!(retain_blocking_resource_permit(
+                        "local_user",
+                        "user_local",
+                        "alpha",
+                        &other_gate
+                    )
+                    .is_err());
+                    assert!(retain_blocking_resource_permit(
+                        "local_user",
+                        "user_local",
+                        "beta",
+                        &actual_gate
+                    )
+                    .is_err());
+                    assert!(retain_blocking_resource_permit(
+                        "web_session",
+                        "foreign",
+                        "alpha",
+                        &actual_gate
+                    )
+                    .is_err());
+                },
+            )
+            .unwrap();
+        child.wait().await.unwrap();
+        let fake = CancelScope::run_root("certificate-run");
+        let fake_ctx = ctx.clone();
+        let wrong = supervisor
+            .spawn_linked(
+                "certificate-run",
+                &fake.child("real-tool".into(), ScopeKind::ToolCall),
+                "fake scope".into(),
+                async move {
+                    assert!(retain_blocking_run_permit(&fake_ctx).is_err());
+                },
+            )
+            .unwrap();
+        wrong.wait().await.unwrap();
+        drop(binding);
+        drop(permit);
+        assert!(!gate.is_busy("alpha"));
+        assert!(
+            retain_blocking_run_permit(&ctx).unwrap().is_none(),
+            "真正没有 issued 才保留兼容直接调用边界"
         );
     }
 }

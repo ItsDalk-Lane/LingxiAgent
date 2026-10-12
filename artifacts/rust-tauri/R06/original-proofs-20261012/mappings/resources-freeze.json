@@ -1,0 +1,40 @@
+{
+  "state": "FROZEN_FOR_CENTRAL_EXECUTION",
+  "mapping": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/resources.json",
+  "mappingSha256": "68fc475c1493b3b120225a860a849ad08c6d098cd9e50f328904db4cc80197c0",
+  "suite": "rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs",
+  "suiteSha256": "1aa5ca0ab059c6e24998c4d5b070092218b7850dc4ca5ec607b90c15d568db01",
+  "counts": {
+    "items": 57,
+    "READY": 25,
+    "GAP": 32,
+    "assertions": 143,
+    "readyAssertions": 83,
+    "thenGapItems": 17
+  },
+  "namedTestCount": 9,
+  "lastTwoScopeIds": [
+    "R00-T02-LA-F9277C29D570",
+    "R00-T02-LA-1CD1C31CCF44"
+  ],
+  "productsModified": false,
+  "cargoExecuted": false,
+  "runtimeStatus": "NOT_RUN_BY_THIS_AGENT",
+  "originalThenAssertionsDueAndLocationsChecked": true,
+  "mainReviewAmendment": "保留1CD下载/权限和原Then；按最新主审真正空ctx补证暂GAP，观测PASS不能释放该原子句。",
+  "agentFreezeMappingSha256": "68fc475c1493b3b120225a860a849ad08c6d098cd9e50f328904db4cc80197c0",
+  "latestScopeIds": [
+    "R00-T02-LA-238267978DDA",
+    "R00-T02-LA-2FB382A137FC",
+    "R00-T02-LA-4173A08A51CC",
+    "R00-T02-LA-45627E4F8173",
+    "R00-T02-LA-ADB6B0580864",
+    "R00-T02-LA-AF18F5CEA14F",
+    "R00-T02-LA-BDE3AC44D79C",
+    "R00-T02-LA-CAA876503B1B",
+    "R00-T02-LA-CC738012B6EE",
+    "R00-T02-LA-D6509017C382",
+    "R00-T02-LA-EE18A57F7348"
+  ],
+  "newResourceTestsAdded": 0
+}

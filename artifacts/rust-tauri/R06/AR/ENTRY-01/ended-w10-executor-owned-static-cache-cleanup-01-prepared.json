@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-11T14:27:19.978405+00:00",
+  "before_receipt": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w10-executor-owned-static-cache-cleanup-01-before.json",
+  "before_receipt_sha256": "6586e780c262e66905cd19692fcdfa9324724ca29846f9ff2d781ba5b022f240",
+  "status": "PREPARED_ONLY_NO_DELETE_YET",
+  "files": 70189,
+  "logical_bytes": 15474764188,
+  "protected_executables": 394,
+  "source_and_lock_unchanged": true
+}

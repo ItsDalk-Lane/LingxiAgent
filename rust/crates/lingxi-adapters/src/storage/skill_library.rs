@@ -657,14 +657,22 @@ pub fn list_seeded_skill_names(seed_dir: &Path) -> Vec<String> {
 pub fn collect_enabled_skills_of_other_agents(
     agents_root: &Path,
     exclude_agent_id: &str,
-) -> std::collections::HashSet<String> {
+) -> Result<std::collections::HashSet<String>, MemoryError> {
     let mut used = std::collections::HashSet::new();
-    let Ok(entries) = std::fs::read_dir(agents_root) else {
-        return used;
+    let entries = match std::fs::read_dir(agents_root) {
+        Ok(entries) => entries,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(used),
+        Err(err) => return Err(MemoryError::Io(err.to_string())),
     };
-    for entry in entries.flatten() {
+    for entry in entries {
+        let entry = entry.map_err(|err| MemoryError::Io(err.to_string()))?;
         let name = entry.file_name().to_string_lossy().to_string();
-        if name == exclude_agent_id || !entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+        if name == exclude_agent_id
+            || !entry
+                .file_type()
+                .map_err(|err| MemoryError::Io(err.to_string()))?
+                .is_dir()
+        {
             continue;
         }
         let agent_dir = agents_root.join(&name);
@@ -672,15 +680,15 @@ pub fn collect_enabled_skills_of_other_agents(
             continue;
         }
         let config_path = agent_dir.join("config.yaml");
-        if !config_path.exists() {
-            continue;
-        }
-        if let Ok(text) = std::fs::read_to_string(&config_path) {
-            let (enabled, _) = super::agent_memory::AgentConfigPatch::read_skill_lists(&text);
-            used.extend(enabled);
-        }
+        let text = match super::agent_memory::config::read_config_text(&config_path) {
+            Ok(text) => text,
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => continue,
+            Err(err) => return Err(MemoryError::Io(err.to_string())),
+        };
+        let (enabled, _) = super::agent_memory::AgentConfigPatch::read_skill_lists(&text)?;
+        used.extend(enabled);
     }
-    used
+    Ok(used)
 }
 
 // ── bundles (skill-bundles/store.ts) ────────────────────────────────────────
@@ -799,6 +807,29 @@ impl BundlesStore {
         }
     }
 
+    /// 删除前不能把损坏或读失败的组合资料当空表，避免随后保存抹掉用户内容。
+    pub fn load_checked(&self) -> Result<Vec<Value>, MemoryError> {
+        let raw = match std::fs::read_to_string(&self.file_path) {
+            Ok(raw) => raw,
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
+            Err(err) => return Err(MemoryError::Io(format!("read skill bundles: {err}"))),
+        };
+        if raw.trim().is_empty() {
+            return Ok(Vec::new());
+        }
+        let value: Value = serde_json::from_str(&raw)
+            .map_err(|err| MemoryError::InvalidRequest(format!("invalid skill bundles: {err}")))?;
+        let bundles = value
+            .get("bundles")
+            .and_then(Value::as_array)
+            .ok_or_else(|| {
+                MemoryError::InvalidRequest(
+                    "invalid skill bundles: bundles must be an array".into(),
+                )
+            })?;
+        Ok(bundles.iter().map(normalize_bundle).collect())
+    }
+
     pub fn save(&self, bundles: &[Value]) -> Result<(), MemoryError> {
         let normalized: Vec<Value> = bundles.iter().map(normalize_bundle).collect();
         let value = json!({"schemaVersion": BUNDLE_SCHEMA_VERSION, "bundles": normalized});
@@ -903,7 +934,7 @@ impl BundlesStore {
     }
 
     pub fn remove_skills(&self, names: &[String]) -> Result<Vec<Value>, MemoryError> {
-        let bundles = self.load();
+        let bundles = self.load_checked()?;
         let updated: Vec<Value> = bundles
             .into_iter()
             .map(|b| {

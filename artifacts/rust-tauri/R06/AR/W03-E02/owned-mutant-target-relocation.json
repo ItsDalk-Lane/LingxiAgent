@@ -1,0 +1,61 @@
+[
+  {
+    "original_path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02-mutant-native",
+    "retained_path": "/private/tmp/lingxi-w03-e02-owned-mutant-targets-wg6v2g84/target-w03-e02-mutant-native",
+    "closed_owned_group": true,
+    "executed_bin_before_after": [
+      {
+        "argv": [
+          "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02-mutant-native/debug/deps/r06_ar_f03_operations-8d2771cb1654c80c",
+          "actual_native_",
+          "--nocapture",
+          "--test-threads=1"
+        ],
+        "cwd": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/mutant-native-source/rust/crates/lingxi-service",
+        "actual_binary": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02-mutant-native/debug/deps/r06_ar_f03_operations-8d2771cb1654c80c",
+        "before_execution_sha256": "59ced9f753e945898cc9613f5cafe811fe9474b8a430acd9681461442fb30c70",
+        "started": 1791721596.280709,
+        "actual_home": "/private/tmp/lingxi-w03-e02-mutant-native-final-01-3bo5a3u9/synthetic-home",
+        "tmpdir": "/private/tmp/lingxi-w03-e02-mutant-native-final-01-3bo5a3u9/",
+        "runner_sha256": "3a34aa638c15151711b3433497d44c17805e4959c56ca1abb12410318ad079e4",
+        "completed": true,
+        "child_pid": 38255,
+        "raw_exit_code": 101,
+        "finished": 1791721597.462462,
+        "after_execution_sha256": "59ced9f753e945898cc9613f5cafe811fe9474b8a430acd9681461442fb30c70",
+        "same_binary_bytes": true
+      }
+    ],
+    "action": "精确保留本轮自有编译输出；不删除，不回填运行记录"
+  },
+  {
+    "original_path": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02-mutant-resourceio",
+    "retained_path": "/private/tmp/lingxi-w03-e02-owned-mutant-targets-wg6v2g84/target-w03-e02-mutant-resourceio",
+    "closed_owned_group": true,
+    "executed_bin_before_after": [
+      {
+        "argv": [
+          "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02-mutant-resourceio/debug/deps/r06_ar_f03_operations-8d2771cb1654c80c",
+          "actual_resourceio_owned_write_cancel_retains_until_fifo_exit",
+          "--exact",
+          "--nocapture",
+          "--test-threads=1"
+        ],
+        "cwd": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/artifacts/rust-tauri/R06/AR/W03-E02/mutant-resourceio-source/rust/crates/lingxi-service",
+        "actual_binary": "/Users/study_superior/.codex/r06-isolated-checkouts/w03-execution-source-02/rust/target-w03-e02-mutant-resourceio/debug/deps/r06_ar_f03_operations-8d2771cb1654c80c",
+        "before_execution_sha256": "218e23a2bfc4f6d66845b08539a4617b5da44cd78abc990ef79a429cd947bfbc",
+        "started": 1791721639.634503,
+        "actual_home": "/private/tmp/lingxi-w03-e02-mutant-resourceio-final-01-wnj3xvbk/synthetic-home",
+        "tmpdir": "/private/tmp/lingxi-w03-e02-mutant-resourceio-final-01-wnj3xvbk/",
+        "runner_sha256": "3a34aa638c15151711b3433497d44c17805e4959c56ca1abb12410318ad079e4",
+        "completed": true,
+        "child_pid": 51389,
+        "raw_exit_code": 101,
+        "finished": 1791721640.7181172,
+        "after_execution_sha256": "218e23a2bfc4f6d66845b08539a4617b5da44cd78abc990ef79a429cd947bfbc",
+        "same_binary_bytes": true
+      }
+    ],
+    "action": "精确保留本轮自有编译输出；不删除，不回填运行记录"
+  }
+]

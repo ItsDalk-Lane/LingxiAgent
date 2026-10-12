@@ -1,0 +1,97 @@
+{
+  "family": "openai-responses",
+  "case": "tool_roundtrip",
+  "route": {"provider": "responses-golden", "model": "gpt-responses-golden"},
+  "input": {
+    "submission": "读取两个文件并写出合并结果",
+    "tools": [
+      {
+        "target": "tool:first-party:read",
+        "wire_name": "read",
+        "description": "Read a file 读取文件",
+        "schema": {"type": "object", "properties": {"path": {"type": "string"}}, "required": ["path"]}
+      },
+      {
+        "target": "tool:first-party:write",
+        "wire_name": "write",
+        "description": "Write a file 写入文件",
+        "schema": {"type": "object", "properties": {"content": {"type": "string"}, "path": {"type": "string"}}, "required": ["path", "content"]}
+      }
+    ],
+    "prior": [
+      {
+        "assistant": {
+          "call": "mc-golden-1",
+          "content": [
+            {"reasoning": "检索计划"},
+            {"opaque": {"provider": "openai-responses", "data": {"type": "reasoning", "id": "rs_hist_1", "summary": [{"type": "summary_text", "text": "检索计划"}], "encrypted_content": "enc-hist-1"}}},
+            {"text": "开始读取"}
+          ],
+          "tool_calls": [
+            {"seq": 1, "provider_call_id": "call_读取-α-0001", "target": "tool:first-party:read", "arguments": {"path": "/tmp/a.md"}},
+            {"seq": 2, "provider_call_id": "call_读取-β-0002", "target": "tool:first-party:read", "arguments": {"path": "/tmp/b.md"}},
+            {"seq": 3, "provider_call_id": "call_写入-0003", "target": "tool:first-party:write", "arguments": {"content": "m", "path": "/tmp/out.md"}}
+          ]
+        }
+      },
+      {
+        "tool_result": {
+          "seq": 1,
+          "provider_call_id": "call_读取-α-0001",
+          "outcome": {
+            "kind": "success_full",
+            "text": "A 内容",
+            "resource_refs": [{"id": "res-golden-b", "kind": "session_file", "name": "a.md", "uri": "file:///tmp/a.md"}],
+            "truncated": true,
+            "status": {"stop_unconfirmed": {"handle": "proc-golden-9", "detail": "wait timed out 超时"}}
+          }
+        }
+      },
+      {
+        "tool_result": {
+          "seq": 2,
+          "provider_call_id": "call_读取-β-0002",
+          "outcome": {"kind": "unknown", "reason": "gone"}
+        }
+      },
+      {
+        "tool_result": {
+          "seq": 3,
+          "provider_call_id": "call_写入-0003",
+          "outcome": {"kind": "failed", "code": "forbidden", "message": "denied"}
+        }
+      }
+    ]
+  },
+  "wire_mode": "sse",
+  "expected_request": {
+    "model": "gpt-responses-golden",
+    "input": [
+      {"type": "message", "role": "user", "content": [{"type": "input_text", "text": "读取两个文件并写出合并结果"}]},
+      {"type": "reasoning", "id": "rs_hist_1", "summary": [{"type": "summary_text", "text": "检索计划"}], "encrypted_content": "enc-hist-1"},
+      {"type": "message", "role": "assistant", "content": [{"type": "output_text", "text": "开始读取"}]},
+      {"type": "function_call", "call_id": "call_读取-α-0001", "name": "read", "arguments": "{\"path\":\"/tmp/a.md\"}"},
+      {"type": "function_call", "call_id": "call_读取-β-0002", "name": "read", "arguments": "{\"path\":\"/tmp/b.md\"}"},
+      {"type": "function_call", "call_id": "call_写入-0003", "name": "write", "arguments": "{\"content\":\"m\",\"path\":\"/tmp/out.md\"}"},
+      {"type": "function_call_output", "call_id": "call_读取-α-0001", "output": "A 内容\n[resource: a.md]\n[process stop unconfirmed (handle: proc-golden-9): wait timed out 超时]\n[result truncated at the tool's bound]"},
+      {"type": "function_call_output", "call_id": "call_读取-β-0002", "output": "tool outcome could not be determined: gone"},
+      {"type": "function_call_output", "call_id": "call_写入-0003", "output": "tool error [forbidden]: denied"}
+    ],
+    "stream": true,
+    "tools": [
+      {"type": "function", "name": "read", "description": "Read a file 读取文件", "parameters": {"type": "object", "properties": {"path": {"type": "string"}}, "required": ["path"]}},
+      {"type": "function", "name": "write", "description": "Write a file 写入文件", "parameters": {"type": "object", "properties": {"content": {"type": "string"}, "path": {"type": "string"}}, "required": ["path", "content"]}}
+    ]
+  },
+  "response_wire": {
+    "sse_frames": [
+      "{\"type\":\"response.output_text.delta\",\"delta\":\"增量忽略\"}",
+      "{\"type\":\"response.completed\",\"response\":{\"id\":\"resp_rt\",\"status\":\"completed\",\"output\":[{\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"output_text\",\"text\":\"处理完毕。\"}]}],\"usage\":{\"input_tokens\":512,\"output_tokens\":20}}}"
+    ]
+  },
+  "expected_turn": {
+    "kind": "final",
+    "content": [{"text": "处理完毕。"}],
+    "usage": {"input_tokens": 512, "output_tokens": 20}
+  }
+}

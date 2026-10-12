@@ -251,6 +251,7 @@ async fn submit_background(
     request_id: &str,
 ) -> Result<lingxi_service::ExecuteAccepted, SessionExecuteError> {
     let submission = ExecuteSubmission {
+        knowledge: None,
         input,
         request_id: Some(request_id),
     };

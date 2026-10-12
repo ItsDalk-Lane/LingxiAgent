@@ -1,0 +1,48 @@
+{"command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-adapters", "--test", "r06_ar_f06_config_preservation", "--", "--nocapture"], "start": 1791701980.723083, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-green-adapter-01-scshitjq", "guard": "8192MB/600s"}
+ Downloading crates ...
+  Downloaded encoding_rs_io v0.1.8
+  Downloaded nohash-hasher v0.2.0
+  Downloaded arraydeque v0.5.1
+  Downloaded annotate-snippets v0.12.16
+  Downloaded unicode-width v0.2.2
+  Downloaded granit-parser v1.3.0
+  Downloaded serde-saphyr v1.3.0
+   Compiling serde_core v1.0.229
+   Compiling num-traits v0.2.19
+   Compiling unicode-width v0.2.2
+   Compiling arraydeque v0.5.1
+   Compiling anstyle v1.0.14
+   Compiling encoding_rs_io v0.1.8
+   Compiling nohash-hasher v0.2.0
+   Compiling granit-parser v1.3.0
+   Compiling annotate-snippets v0.12.16
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling serde-saphyr v1.3.0
+   Compiling schemars v1.2.2
+   Compiling serde_urlencoded v0.7.1
+   Compiling serde_yaml_ng v0.10.0
+   Compiling reqwest v0.13.5
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 45s
+     Running tests/r06_ar_f06_config_preservation.rs (rust/target/debug/deps/r06_ar_f06_config_preservation-cbfbb2fff0c5a669)
+LINGXI_TEST_GUARD: armed (pid 86359, mem_limit=8192 MB, time_limit=600 s)
+
+running 8 tests
+test c03_aliases_and_merge_keys_follow_standard_yaml_semantics ... ok
+test c03_duplicate_sensitive_keys_and_nested_keys_fail_before_writing ... ok
+test p02_true_merge_precedence_explicit_tags_and_overridden_sources_remain_checked ... ok
+test p01_string_key_alias_merge_controls_and_unknown_values_survive_patch ... ok
+p02_literal_key="<<" input="\"<<\": 7\nagent: {\"<<\": {name: 不得提升}}\nmemory: {\"<<\": {enabled: false}}\nexperience: {\"<<\": {enabled: true}}\nskills: {\"<<\": {enabled: [shared]}}\nworkspace_context: {\"<<\": {discover_project_skills: false}}\nfuture: {\"<<\": {marker: keep}, other: value}\n" persisted="\"<<\": 7\nagent:\n  \"<<\":\n    name: 不得提升\nmemory:\n  \"<<\":\n    enabled: false\n  enabled: false\nexperience:\n  \"<<\":\n    enabled: true\nskills:\n  \"<<\":\n    enabled:\n    - shared\n  enabled:\n  - new\n  workspace_disabled: []\nworkspace_context:\n  \"<<\":\n    discover_project_skills: false\nfuture:\n  \"<<\":\n    marker: keep\n  other: value\n"
+test c04_updates_preserve_all_unknown_nested_values_and_escaped_lists ... ok
+p02_literal_key='<<' input="'<<': 7\nagent: {'<<': {name: 不得提升}}\nmemory: {'<<': {enabled: false}}\nexperience: {'<<': {enabled: true}}\nskills: {'<<': {enabled: [shared]}}\nworkspace_context: {'<<': {discover_project_skills: false}}\nfuture: {'<<': {marker: keep}, other: value}\n" persisted="\"<<\": 7\nagent:\n  \"<<\":\n    name: 不得提升\nmemory:\n  \"<<\":\n    enabled: false\n  enabled: false\nexperience:\n  \"<<\":\n    enabled: true\nskills:\n  \"<<\":\n    enabled:\n    - shared\n  enabled:\n  - new\n  workspace_disabled: []\nworkspace_context:\n  \"<<\":\n    discover_project_skills: false\nfuture:\n  \"<<\":\n    marker: keep\n  other: value\n"
+test p01_all_owned_key_types_and_merge_sources_reject_before_defaults_and_patch ... ok
+test p02_unknown_tags_reject_all_positions_and_preserve_original_bytes ... ok
+p02_literal_key=!!str << input="!!str <<: 7\nagent: {!!str <<: {name: 不得提升}}\nmemory: {!!str <<: {enabled: false}}\nexperience: {!!str <<: {enabled: true}}\nskills: {!!str <<: {enabled: [shared]}}\nworkspace_context: {!!str <<: {discover_project_skills: false}}\nfuture: {!!str <<: {marker: keep}, other: value}\n" persisted="\"<<\": 7\nagent:\n  \"<<\":\n    name: 不得提升\nmemory:\n  \"<<\":\n    enabled: false\n  enabled: false\nexperience:\n  \"<<\":\n    enabled: true\nskills:\n  \"<<\":\n    enabled:\n    - shared\n  enabled:\n  - new\n  workspace_disabled: []\nworkspace_context:\n  \"<<\":\n    discover_project_skills: false\nfuture:\n  \"<<\":\n    marker: keep\n  other: value\n"
+p02_literal_key=!<tag:yaml.org,2002:str> << input="!<tag:yaml.org,2002:str> <<: 7\nagent: {!<tag:yaml.org,2002:str> <<: {name: 不得提升}}\nmemory: {!<tag:yaml.org,2002:str> <<: {enabled: false}}\nexperience: {!<tag:yaml.org,2002:str> <<: {enabled: true}}\nskills: {!<tag:yaml.org,2002:str> <<: {enabled: [shared]}}\nworkspace_context: {!<tag:yaml.org,2002:str> <<: {discover_project_skills: false}}\nfuture: {!<tag:yaml.org,2002:str> <<: {marker: keep}, other: value}\n" persisted="\"<<\": 7\nagent:\n  \"<<\":\n    name: 不得提升\nmemory:\n  \"<<\":\n    enabled: false\n  enabled: false\nexperience:\n  \"<<\":\n    enabled: true\nskills:\n  \"<<\":\n    enabled:\n    - shared\n  enabled:\n  - new\n  workspace_disabled: []\nworkspace_context:\n  \"<<\":\n    discover_project_skills: false\nfuture:\n  \"<<\":\n    marker: keep\n  other: value\n"
+test p02_literal_merge_keys_and_supported_tags_survive_repeated_updates ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

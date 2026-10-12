@@ -1,0 +1,24 @@
+[package]
+name = "lingxi-test-guard"
+description = "Test-only memory/wall-clock guard for the Lingxi Rust workspace: a pre-main hook (ctor) arms a sampling monitor in EVERY test process built with the `test-guard` feature, so a runaway test aborts the owning test binary instead of exhausting the machine (R06-T06 incident protection). Never part of a production build: the feature is enabled exclusively through dev-dependencies."
+version = "0.0.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+# Explicit test-support crate (not a product module): registered in
+# docs/rust-tauri/R01/DEPENDENCY_RULES.json (module_registry, kind
+# test-infrastructure) and reachable only through the `test-guard` feature
+# edge declared by the crates under test.
+#
+#   - libc 0.2.189: ALREADY a locked member (direct dependency of
+#     lingxi-browser-spike); reused at the same version — no new version.
+#     Used for task_info(MACH_TASK_BASIC_INFO).resident_size on macOS and
+#     sysconf(_SC_PAGESIZE) on Linux.
+#   - ctor 0.8.0: the single NEW third-party crate this guard adds (pinned
+#     in rust/Cargo.lock). Mature, maintained by mmastrac; provides the
+#     pre-main `.init_array` hook that installs the monitor before the
+#     libtest harness starts.
+[dependencies]
+libc = "0.2.189"
+ctor = "0.8.0"

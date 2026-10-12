@@ -1,0 +1,956 @@
+{
+  "schema": "lingxi.r06.w06.p03.family-matrix.v1",
+  "rc_matrix_sha256": "6a3b71a6bcc8bd1c8bb5d3ead4e1a44848ff484952f4ec8f3ffd8bf58df2453d",
+  "root_causes": [
+    {
+      "id": "RC01",
+      "title": "逐行解析和缺字段默认混淆",
+      "original_requirement_ids": [
+        "F06-REPAIR-01/02/03/04",
+        "C01/C02/C03/C04",
+        "T01-S01/S04",
+        "T06-S01/S03"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-service/src/context_compiler.rs:381,388,628",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:176"
+      ],
+      "all_affected_path_ids": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "existing_counterexample_evidence": [
+        "W06-E01/logs/old-positive.log",
+        "W06-E01/logs/old-red.log",
+        "W06-R01/logs/old-control.log"
+      ],
+      "reproduction_status": "HISTORICAL_EXECUTED_NOT_REEXECUTED_BY_RC01",
+      "P02_handled_source_facts": [
+        "all found Rust consumers use complete parser;no old configuration line scanning found"
+      ],
+      "still_required": [
+        "retain unified parse before defaults; ordinary unsupported/damaged/IO errors explicit"
+      ],
+      "minimum_complete_repair": [
+        "retain unified parse before defaults; ordinary unsupported/damaged/IO errors explicit"
+      ],
+      "normal_controls_and_new_boundary_checks": [
+        "old normal block control vs flow false",
+        "name # escapes CRLF/BOM/Unicode",
+        "missing/empty/partial and current config.example"
+      ],
+      "must_rerun": [
+        "F06-C01",
+        "F06-C02",
+        "F06-C03",
+        "F06-C04",
+        "all historical R01/R02/P02 effective counterexamples",
+        "original77",
+        "fmt",
+        "workspace/all-targets clippy -D warnings",
+        "contracts",
+        "boundaries",
+        "affected cross-F then final stage/upstream closure"
+      ],
+      "RC01_business_verdict": null,
+      "status": "ROOT_CAUSE_SOURCE_ONLY_REQUIRES_NEW_REPAIR_PROOF",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "actual": "history-old-scanner.json: 1 positive/2 behavior reds; history-old-scanner exact extracted baseSHA; final real wire block/flow/quoted name/defaults no scanner",
+        "evidence": "final-four-c.json",
+        "independent_review": "NOT_RUN_NEW_REVIEWER_REQUIRED",
+        "original_scope": "完整原义务不由P03验收，原owner/deadline保持"
+      }
+    },
+    {
+      "id": "RC02",
+      "title": "非字符串键、重复身份与被覆盖merge源旁路",
+      "original_requirement_ids": [
+        "F06-REPAIR-01/02/04",
+        "C01/C03/C04",
+        "T01-S01/S04",
+        "T06-S02/S03"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:43,112,157"
+      ],
+      "all_affected_path_ids": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "existing_counterexample_evidence": [
+        "W06-R01/results.json#findings",
+        "W06-R01/probe-results.json",
+        "W06-R01/family-probe-results.json",
+        "W06-R01/effects-probe-results.json"
+      ],
+      "reproduction_status": "HISTORICAL_EXECUTED_NOT_REEXECUTED_BY_RC01",
+      "P02_handled_source_facts": [
+        "source graph checks root/owned keys and all merge sources before normalized value consumption"
+      ],
+      "still_required": [
+        "same parser key resolution/tag/style/source validator must agree; preserve legal unknown inner structure"
+      ],
+      "minimum_complete_repair": [
+        "same parser key resolution/tag/style/source validator must agree; preserve legal unknown inner structure"
+      ],
+      "normal_controls_and_new_boundary_checks": [
+        "all root+owned sensitive keys sequences/maps/numeric/bool/null explicitly rejected",
+        "duplicate sensitive fields/sections and mixed canonical keys",
+        "alias string key/undefined/recursive;hidden overridden source",
+        "deep unknown nonstring keys roundtrip"
+      ],
+      "must_rerun": [
+        "F06-C01",
+        "F06-C02",
+        "F06-C03",
+        "F06-C04",
+        "all historical R01/R02/P02 effective counterexamples",
+        "original77",
+        "fmt",
+        "workspace/all-targets clippy -D warnings",
+        "contracts",
+        "boundaries",
+        "affected cross-F then final stage/upstream closure"
+      ],
+      "RC01_business_verdict": null,
+      "status": "ROOT_CAUSE_SOURCE_ONLY_REQUIRES_NEW_REPAIR_PROOF",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "actual": "Historical R01 binary recomputed all15SHA+ac78 binary; complex root/owned keys and overridden merge value types reject before defaults/write; alias str keys kept",
+        "evidence": "final-family-R01, final-four-c.json",
+        "independent_review": "NOT_RUN_NEW_REVIEWER_REQUIRED",
+        "original_scope": "完整原义务不由P03验收，原owner/deadline保持"
+      }
+    },
+    {
+      "id": "RC03",
+      "title": "普通字符串<<误当merge，保存改变层级",
+      "original_requirement_ids": [
+        "F06-REPAIR-01/03/04",
+        "C03/C04",
+        "T01-S01/S03/S04",
+        "T06-S01/S02/S03"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:51,185,283"
+      ],
+      "all_affected_path_ids": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "existing_counterexample_evidence": [
+        "W06-R02/semantic-check-results-v2.json",
+        "W06-R02/probe-results-v2.json",
+        "W06-R02/additional-family-results-v2.json",
+        "W06-R02/effects-probe-results-v2.json"
+      ],
+      "reproduction_status": "HISTORICAL_EXECUTED_18_FAILURES_OF_105_ASSERTIONS",
+      "P02_handled_source_facts": [
+        "granit real style/tag merge identity;serde-saphyr merge;serializer quoted literal <<"
+      ],
+      "still_required": [
+        "prove same semantics parse→all consumers→each writer→reload;not reject legal literal key or disable all true merges"
+      ],
+      "minimum_complete_repair": [
+        "prove same semantics parse→all consumers→each writer→reload;not reject legal literal key or disable all true merges"
+      ],
+      "normal_controls_and_new_boundary_checks": [
+        "quoted single/double/!!str/verbatim URI/alias <<",
+        "plain true merge/!!merge/%TAG split/multiple sources priority/explicit override",
+        "mixed literal+merge distinct; future nested layer preserved",
+        "experience 403 default versus actual merge200"
+      ],
+      "must_rerun": [
+        "F06-C01",
+        "F06-C02",
+        "F06-C03",
+        "F06-C04",
+        "all historical R01/R02/P02 effective counterexamples",
+        "original77",
+        "fmt",
+        "workspace/all-targets clippy -D warnings",
+        "contracts",
+        "boundaries",
+        "affected cross-F then final stage/upstream closure"
+      ],
+      "RC01_business_verdict": null,
+      "status": "ROOT_CAUSE_SOURCE_ONLY_REQUIRES_NEW_REPAIR_PROOF",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "actual": "Historical R02 semantic18/105 failure reexecuted; true merge+literal quoted/!!str/alias/%TAG distinguish, immutable unknown nested data",
+        "evidence": "final-family-R02/semantic-check-results-v2.json, final-four-c.json",
+        "independent_review": "NOT_RUN_NEW_REVIEWER_REQUIRED",
+        "original_scope": "完整原义务不由P03验收，原owner/deadline保持"
+      }
+    },
+    {
+      "id": "RC04",
+      "title": "标签身份擦除以及库已知本地别名不同于现役schema",
+      "original_requirement_ids": [
+        "F06-REPAIR-01/02/04",
+        "C03/C04",
+        "T01-S01/S04",
+        "T06-S01/S03"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:55,83,84,185",
+        "serde-saphyr-1.3.0/src/de/tags.rs:118",
+        "serde-saphyr-1.3.0/src/de/live_events.rs:551",
+        "serde-saphyr-1.3.0/src/de/deserializer.rs:763"
+      ],
+      "all_affected_path_ids": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "existing_counterexample_evidence": [
+        "W06-R02/tagged-value-results-v2.json",
+        "W06-R02/tagged-check-results-v2.json",
+        "W06-RC01/incumbent-typed-oracle.json"
+      ],
+      "reproduction_status": "R02_CUSTOM_TAG_HISTORICAL_15_FAILURES;NEW_LOCAL_TAG_CURRENT_RUST_SOURCE_INFERRED_ONLY",
+      "P02_handled_source_facts": [
+        "reject_unsupported_tags true rejects !custom ordinary;standard core tags preliminary tests"
+      ],
+      "still_required": [
+        "strict option does not reject library-recognized !bool/!str/!map/!int aliases; source graph ignores value tags;validate resolved source tags against current schema before coercion at all locations without custom language"
+      ],
+      "minimum_complete_repair": [
+        "strict option does not reject library-recognized !bool/!str/!map/!int aliases; source graph ignores value tags;validate resolved source tags against current schema before coercion at all locations without custom language"
+      ],
+      "normal_controls_and_new_boundary_checks": [
+        "memory: {enabled: !bool true}",
+        "agent: {name: !str 姓名}",
+        "memory: !map {enabled: false}",
+        "local tag values in skill list and hidden override source;new binary wire/Gateway/preflight",
+        "standard!!bool/!!str/!!map/!!seq normal controls and %TAG/verbatim/non-specific! accepted"
+      ],
+      "must_rerun": [
+        "F06-C01",
+        "F06-C02",
+        "F06-C03",
+        "F06-C04",
+        "all historical R01/R02/P02 effective counterexamples",
+        "original77",
+        "fmt",
+        "workspace/all-targets clippy -D warnings",
+        "contracts",
+        "boundaries",
+        "affected cross-F then final stage/upstream closure"
+      ],
+      "RC01_business_verdict": null,
+      "status": "ROOT_CAUSE_SOURCE_ONLY_REQUIRES_NEW_REPAIR_PROOF",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "actual": "P03 red-types-delete-01 local alias true accepted+type erasure; current exact whitelist validates mature event tag namespace/shape; local !bool/str/map/int/seq and custom reject",
+        "evidence": "final-four-c.json, final-family-R02/tagged-check-results-v2.json",
+        "independent_review": "NOT_RUN_NEW_REVIEWER_REQUIRED",
+        "original_scope": "完整原义务不由P03验收，原owner/deadline保持"
+      }
+    },
+    {
+      "id": "RC05",
+      "title": "公共Value与serializer兼容不等于原类型/未知语义保真",
+      "original_requirement_ids": [
+        "F06-REPAIR-01/02/04",
+        "C03/C04",
+        "T06-S03",
+        "common-unknown-config-protection"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:190,214,240,283",
+        "serde-saphyr-1.3.0/src/de/deserializer.rs:526,763",
+        "serde_yaml_ng-0.10.0/src/value/de.rs:55",
+        "serde_yaml_ng-0.10.0/src/value/ser.rs:17"
+      ],
+      "all_affected_path_ids": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "existing_counterexample_evidence": [
+        "W06-R02/semantic-check-results-v2.json",
+        "W06-RC01/incumbent-typed-oracle.json"
+      ],
+      "reproduction_status": "LITERAL_UNKNOWN_HISTORY_EXECUTED;BINARY_AND_OTHER_TYPED_CURRENT_RUST_SOURCE_INFERRED_NOT_RUN",
+      "P02_handled_source_facts": [
+        "ordinary unknown scalar/map/list null data and literal keys preserved in preliminary tests"
+      ],
+      "still_required": [
+        "!!binary decoded UTF8 string can bypass sensitive string validation and change future unknown semantic type;plain timestamps treated string versus incumbentDate;typed supported versus loud unsupported explicitly distinguish; prove Value/serializer semantics rather than comparisons of erased Values"
+      ],
+      "minimum_complete_repair": [
+        "!!binary decoded UTF8 string can bypass sensitive string validation and change future unknown semantic type;plain timestamps treated string versus incumbentDate;typed supported versus loud unsupported explicitly distinguish; prove Value/serializer semantics rather than comparisons of erased Values"
+      ],
+      "normal_controls_and_new_boundary_checks": [
+        "future: {data: !!binary SGVsbG8=} read→flagsPATCH→listsPATCH→reload→js-yaml typed equality",
+        "agent.name/locale/skills.enabled members tagged binary must not coerce into valid string",
+        "UTF8/nonUTF8 binary,implicit/explicit timestamp,!!set/omap/pairs with exact accept/reject expectation",
+        "unknown nested sequence/map/numeric keys;positive/signed leadingzero largeint finite/nonfinite;string multilinechomping Unicode",
+        "comments/format normalization allowed;type/layer silently lost forbidden"
+      ],
+      "must_rerun": [
+        "F06-C01",
+        "F06-C02",
+        "F06-C03",
+        "F06-C04",
+        "all historical R01/R02/P02 effective counterexamples",
+        "original77",
+        "fmt",
+        "workspace/all-targets clippy -D warnings",
+        "contracts",
+        "boundaries",
+        "affected cross-F then final stage/upstream closure"
+      ],
+      "RC01_business_verdict": null,
+      "status": "ROOT_CAUSE_SOURCE_ONLY_REQUIRES_NEW_REPAIR_PROOF",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "actual": "P03 initial actual erasure reds, typed numeric actual original oracle red, standard binary noncanonical actual red; mature nodes+Tagged serializer preserve unknown typed data; bounded scalar schema adapter aligned original loadConfig/saveConfig js-yaml4.3.1",
+        "evidence": "final-incumbent-typed.json",
+        "independent_review": "NOT_RUN_NEW_REVIEWER_REQUIRED",
+        "original_scope": "完整原义务不由P03验收，原owner/deadline保持"
+      }
+    },
+    {
+      "id": "RC06",
+      "title": "副作用之后解析失败及吞错造成收据不实",
+      "original_requirement_ids": [
+        "F06-REPAIR-02/04",
+        "C03/C04",
+        "T06-S03/S05",
+        "common-tool-result-contract"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-service/src/memorytools.rs:496,513,572",
+        "rust/crates/lingxi-service/src/skills.rs:709,736,743,774"
+      ],
+      "all_affected_path_ids": [
+        "P06",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "existing_counterexample_evidence": [
+        "W06-P02/logs/red-install-gateway-02.log",
+        "W06-P02/logs/initial-four-c-01.log"
+      ],
+      "reproduction_status": "INSTALL_HISTORICAL_EXECUTED3BADTAG_FAIL;SCRUB_SOURCE_INFERRED_NOT_RUN",
+      "P02_handled_source_facts": [
+        "install preflight full config validation;enable Err returns explicit installed-but-enabling-failed"
+      ],
+      "still_required": [
+        "synthetic verify late config/I/O failure after actual install; source delete-before-scrub invalid peer must not be reported zero effects; read_dir/entry/bundle swallowed failures classify. Validate preventable config failure before destructive work or honest partial-effect receipts; retain EX03 full install formats OPEN"
+      ],
+      "minimum_complete_repair": [
+        "synthetic verify late config/I/O failure after actual install; source delete-before-scrub invalid peer must not be reported zero effects; read_dir/entry/bundle swallowed failures classify. Validate preventable config failure before destructive work or honest partial-effect receipts; retain EX03 full install formats OPEN"
+      ],
+      "normal_controls_and_new_boundary_checks": [
+        "normal local install+enabled and no lost unknown values",
+        "invalid source config preflight zeroinstall/config unchanged",
+        "deterministic config changes while install review waits,or write fault after installation→disk real partial receipt",
+        "delete normal control/malformed peer/IO/bundle scrub failure exact skill and config state",
+        "preview must not mutate or delete"
+      ],
+      "must_rerun": [
+        "F06-C01",
+        "F06-C02",
+        "F06-C03",
+        "F06-C04",
+        "all historical R01/R02/P02 effective counterexamples",
+        "original77",
+        "fmt",
+        "workspace/all-targets clippy -D warnings",
+        "contracts",
+        "boundaries",
+        "affected cross-F then final stage/upstream closure"
+      ],
+      "RC01_business_verdict": null,
+      "status": "ROOT_CAUSE_SOURCE_ONLY_REQUIRES_NEW_REPAIR_PROOF",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "actual": "Old Gateway real normal green/bad config installs+false enabled receipts red; current before-install validation, late-write exact installed=true Failed; delete bad peers/bundles before effect, latewrite honest partial error; stranger bytes unchanged",
+        "evidence": "final-four-c.json",
+        "independent_review": "NOT_RUN_NEW_REVIEWER_REQUIRED",
+        "original_scope": "完整原义务不由P03验收，原owner/deadline保持"
+      }
+    },
+    {
+      "id": "RC07",
+      "title": "前置图先全量分配，后置成熟预算无法保护它",
+      "original_requirement_ids": [
+        "F06-REPAIR-01/02",
+        "common-error-resource-boundary"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:43,157,185,289",
+        "serde-saphyr-1.3.0/src/de/budget.rs:113,269",
+        "granit-parser-1.3.0/src/options.rs:67"
+      ],
+      "all_affected_path_ids": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "existing_counterexample_evidence": [],
+      "reproduction_status": "SOURCE_INFERRED_NO_RESOURCE_ATTACK_RUN",
+      "P02_handled_source_facts": [
+        "serde budget exists defaults depth64/event1m/node250k/scalar64MiB;granit collection depth255;alias replay graph no cloning"
+      ],
+      "still_required": [
+        "read_to_string and preflight Vec/sourcegraph lacks byte/event/node/scalar budgets before serde;do not assert unbounded nesting (255 exists);place finite validated limits before first allocation and at both stages"
+      ],
+      "minimum_complete_repair": [
+        "read_to_string and preflight Vec/sourcegraph lacks byte/event/node/scalar budgets before serde;do not assert unbounded nesting (255 exists);place finite validated limits before first allocation and at both stages"
+      ],
+      "normal_controls_and_new_boundary_checks": [
+        "normal wide/deep/alias within current configuration needs",
+        "overbound bytes/events/nodes/depth/anchors/merges/replay return clearerror,no mutation/wire/install;guard retained",
+        "wide shallow stream to exercise firststage vs secondstage limits",
+        "reader-only256MiB limit not a from_str guarantee"
+      ],
+      "must_rerun": [
+        "F06-C01",
+        "F06-C02",
+        "F06-C03",
+        "F06-C04",
+        "all historical R01/R02/P02 effective counterexamples",
+        "original77",
+        "fmt",
+        "workspace/all-targets clippy -D warnings",
+        "contracts",
+        "boundaries",
+        "affected cross-F then final stage/upstream closure"
+      ],
+      "RC01_business_verdict": null,
+      "status": "ROOT_CAUSE_SOURCE_ONLY_REQUIRES_NEW_REPAIR_PROOF",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "actual": "Before entry byte budget, event/node/scalar/alias/anchor counters before vector push; graph expansions protected; mature parser flow/block64; broad normal2000+aliases preserve; sparse file256MiB+1 fails before read; depth/expansion trueHTTP zero wire and Gateway zero install/proposals",
+        "evidence": "final-four-c.json",
+        "independent_review": "NOT_RUN_NEW_REVIEWER_REQUIRED",
+        "original_scope": "完整原义务不由P03验收，原owner/deadline保持"
+      }
+    },
+    {
+      "id": "RC08",
+      "title": "写回后重采集与会话缓存失效混淆",
+      "original_requirement_ids": [
+        "F05-C01/C02/C03/C04",
+        "T01-S03",
+        "T06-S01/S03"
+      ],
+      "source_anchors": [
+        "rust/crates/lingxi-service/src/context_compiler.rs:782,812,818,851",
+        "rust/crates/lingxi-service/src/memory.rs:128",
+        "rust/crates/lingxi-service/src/skills.rs:348"
+      ],
+      "all_affected_path_ids": [
+        "P01",
+        "P02",
+        "P03",
+        "P05",
+        "P06",
+        "P07"
+      ],
+      "existing_counterexample_evidence": [
+        "W06-P02/logs/initial-four-c-01.log",
+        "W06-P02/results.json#attempts_classification"
+      ],
+      "reproduction_status": "F05_HISTORICAL_CURRENT_SHARED_WORKTREE_EXECUTED_FAIL",
+      "P02_handled_source_facts": [
+        "new-session save/reread preliminary test for F06 only"
+      ],
+      "still_required": [
+        "F05 stays OPEN/STALE;no blanket freeze exemption;new session cannot close nextRun dynamic behavior;coordinate real nextRun wire/observation final integration with F05 owner"
+      ],
+      "minimum_complete_repair": [
+        "F05 stays OPEN/STALE;no blanket freeze exemption;new session cannot close nextRun dynamic behavior;coordinate real nextRun wire/observation final integration with F05 owner"
+      ],
+      "normal_controls_and_new_boundary_checks": [
+        "same sessionRun1→patch or skilltoggle→Run2 actualwire/new snapshot oldrun unchanged",
+        "new sessionreload is positive configurationroundtrip only",
+        "no crossprincipal/agent cache reuse;remainingF05 tests original owner"
+      ],
+      "must_rerun": [
+        "F06-C01",
+        "F06-C02",
+        "F06-C03",
+        "F06-C04",
+        "all historical R01/R02/P02 effective counterexamples",
+        "original77",
+        "fmt",
+        "workspace/all-targets clippy -D warnings",
+        "contracts",
+        "boundaries",
+        "affected cross-F then final stage/upstream closure"
+      ],
+      "RC01_business_verdict": null,
+      "status": "ROOT_CAUSE_SOURCE_ONLY_REQUIRES_NEW_REPAIR_PROOF",
+      "P03": {
+        "status": "OPEN_STALE_OTHER_OWNER_F05",
+        "actual": "Same-session prompt cache failure preserved from P02 initial-four-c-01. New-session reload only demonstrates F06 saved parser; no cache fix/waiver.",
+        "evidence": "W06-P02/initial-four-c-01.json",
+        "independent_review": "NOT_RUN_NEW_REVIEWER_REQUIRED",
+        "original_scope": "完整原义务不由P03验收，原owner/deadline保持"
+      }
+    }
+  ],
+  "paths": [
+    {
+      "id": "P01",
+      "entry": "authenticated execute → SessionStore → RunSupervisor → drive_run",
+      "source": [
+        "rust/crates/lingxi-service/src/lib.rs:1514",
+        "rust/crates/lingxi-service/src/runs.rs:1166",
+        "rust/crates/lingxi-service/src/context_compiler.rs:381,388,628,805"
+      ],
+      "chain": [
+        "config file",
+        "AgentConfigDocument.parse",
+        "scan",
+        "gather",
+        "ContextArtifact",
+        "actual provider wire",
+        "observation"
+      ],
+      "owned_fields": [
+        "locale",
+        "agent.name",
+        "agent.yuan",
+        "memory.enabled"
+      ],
+      "default": "memory=true,locale→preferences→en,name=Lingxi,yuan=lingxi only after valid missing",
+      "write": "MemoryService.patch_flags or SkillService writers",
+      "reload": "compiled_for_run cache may bypass all reads; F05 OPEN",
+      "historical_actual": "E01 flow/name; R01 compound memory; R02 literal/tag memory/name wire",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "evidence": [
+          "final-four-c.json",
+          "final-family-R01/probe-results.json",
+          "final-family-R02/probe-results-v2.json"
+        ],
+        "expected": "原配置语义、敏感类型、默认、错误与副作用边界保持；不以本份额签整Task"
+      }
+    },
+    {
+      "id": "P02",
+      "entry": "gather → scan_roster other agents",
+      "source": [
+        "rust/crates/lingxi-service/src/context_compiler.rs:569,594"
+      ],
+      "chain": [
+        "peer config file",
+        "parse_agent_material",
+        "scan",
+        "roster material",
+        "provider wire"
+      ],
+      "owned_fields": [
+        "agent.name"
+      ],
+      "default": "peer name→directory id, no invalid parse default",
+      "write": "per-agent config writer",
+      "reload": "new gather required; F05 context lifecycle separate",
+      "historical_actual": "R01 complex agent/name current-agent fallback; peer roster malformed config not separately run",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "evidence": [
+          "final-four-c.json",
+          "final-family-R01/effects-probe-results.json",
+          "final-family-R02/effects-probe-results-v2.json"
+        ],
+        "expected": "原配置语义、敏感类型、默认、错误与副作用边界保持；不以本份额签整Task"
+      }
+    },
+    {
+      "id": "P03",
+      "entry": "MemoryService locale/compiled store/health/config flags GET/PATCH",
+      "source": [
+        "rust/crates/lingxi-service/src/memory.rs:62,117,128,325,1202,1257",
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs:1911,1945,1970"
+      ],
+      "chain": [
+        "read",
+        "full parse",
+        "scan/flags",
+        "HTTP status",
+        "patch old+candidate validation",
+        "atomic write",
+        "GET/new gather"
+      ],
+      "owned_fields": [
+        "locale",
+        "memory.enabled",
+        "experience.enabled",
+        "workspace_context.discover_project_skills",
+        "workspace_context.discover_compatible_project_skills"
+      ],
+      "default": "memory/project=true;experience/compatible=false",
+      "historical_actual": "flags/patch errors, R02 literal future changes; I/O and original-byte controls exist",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "evidence": [
+          "final-four-c.json",
+          "final-family-R02/semantic-check-results-v2.json",
+          "final-incumbent-typed.json"
+        ],
+        "expected": "原配置语义、敏感类型、默认、错误与副作用边界保持；不以本份额签整Task"
+      }
+    },
+    {
+      "id": "P04",
+      "entry": "experience GET/PUT and feedback",
+      "source": [
+        "rust/crates/lingxi-service/src/memory.rs:1024,1054,1150"
+      ],
+      "chain": [
+        "read_flags",
+        "full parse",
+        "experience gate",
+        "experience file read/write",
+        "HTTP receipt"
+      ],
+      "owned_fields": [
+        "experience.enabled",
+        "all globally validated fields"
+      ],
+      "default": "experience=false; feedback current business semantics distinct",
+      "historical_actual": "R02 literal experience HTTP200 and nonce vs expected403; PUT/feedback local tag new cases NOT_RUN",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "evidence": [
+          "final-four-c.json: GET/PUT/feedback bad configs no file effect; legacy experience controls",
+          "final-family-R02/additional-family-results-v2.json"
+        ],
+        "expected": "原配置语义、敏感类型、默认、错误与副作用边界保持；不以本份额签整Task"
+      }
+    },
+    {
+      "id": "P05",
+      "entry": "persona routes → locale_of/yuan_of → fallback templates",
+      "source": [
+        "rust/crates/lingxi-service/src/persona.rs:70,86,103"
+      ],
+      "chain": [
+        "read config",
+        "parse/scan",
+        "resolve locale/yuan",
+        "template or user override",
+        "HTTP"
+      ],
+      "owned_fields": [
+        "locale",
+        "agent.yuan",
+        "agent.name global validation"
+      ],
+      "default": "locale preferences/en, persona yuan default existing code yuan; gather yuan default lingxi preserved distinct existing behavior",
+      "historical_actual": "ordinary/invalid config persona tests; new local/binary tags NOT_RUN",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "evidence": [
+          "final-four-c.json: gather strings/name/yuan/locale + real identity errors",
+          "final-regression.json: persona bounds/agent isolation"
+        ],
+        "expected": "原配置语义、敏感类型、默认、错误与副作用边界保持；不以本份额签整Task"
+      }
+    },
+    {
+      "id": "P06",
+      "entry": "skills list/runtime selection/full set/single enable/disable/bundle enable",
+      "source": [
+        "rust/crates/lingxi-service/src/skills.rs:326,348,370,426,452,1535"
+      ],
+      "chain": [
+        "read config",
+        "full validation",
+        "lists+flags",
+        "workspace policy",
+        "runtime visible intersection",
+        "write lists",
+        "atomic write",
+        "reread/catalog"
+      ],
+      "owned_fields": [
+        "skills.enabled",
+        "skills.workspace_disabled",
+        "workspace_context.discover_project_skills",
+        "workspace_context.discover_compatible_project_skills"
+      ],
+      "default": "lists empty,standard discovery=true,compatible=false;management absent agent404 distinct runtime empty list",
+      "historical_actual": "R01 discovery compound wire; R02 literal project wire;ordinary regression enabled/override; new local tag enable/disable NOT_RUN",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "evidence": [
+          "final-four-c.json: adapter write_skill_lists + actual install enable + corrupt PUT/PATCH routes",
+          "final-regression.json: service skills bundles-set/whitelist/overrides/read-only"
+        ],
+        "expected": "原配置语义、敏感类型、默认、错误与副作用边界保持；不以本份额签整Task"
+      }
+    },
+    {
+      "id": "P07",
+      "entry": "compiled_for_run SkillMaterialPort → runtime_skill_catalog",
+      "source": [
+        "rust/crates/lingxi-service/src/lib.rs:1514",
+        "rust/crates/lingxi-service/src/skills.rs:941",
+        "rust/crates/lingxi-service/src/context_compiler.rs:835"
+      ],
+      "chain": [
+        "read_agent_config",
+        "parse full document",
+        "lists+flags",
+        "resolve runtime selection",
+        "filter disable_model_invocation",
+        "artifact render",
+        "wire"
+      ],
+      "owned_fields": [
+        "skills.*",
+        "workspace_context.*"
+      ],
+      "default": "validated missing config empty list/original policy;F07 actual declaration scope still OPEN",
+      "historical_actual": "P01/R02 project/unknown config wire; only catalog portion, not F07 full tools wire",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "evidence": [
+          "final-four-c.json: workspace toggles/literal keys truewire",
+          "final-regression.json: runtime catalog ownership"
+        ],
+        "expected": "原配置语义、敏感类型、默认、错误与副作用边界保持；不以本份额签整Task"
+      }
+    },
+    {
+      "id": "P08",
+      "entry": "cleanup-preview → compute_orphan_skills → collect peer enabled references",
+      "source": [
+        "rust/crates/lingxi-service/src/skills.rs:782,807,1573",
+        "rust/crates/lingxi-adapters/src/storage/skill_library.rs:658,683"
+      ],
+      "chain": [
+        "current config list",
+        "candidate user pool",
+        "peer live configs excluding tombstones",
+        "read_skill_lists full parse",
+        "shared reference filter",
+        "HTTP preview"
+      ],
+      "owned_fields": [
+        "skills.enabled",
+        "all globally validated fields"
+      ],
+      "default": "missing peer config skip;I/O/parse error propagated; no destructive preview",
+      "historical_actual": "R01 bad compound peer shared skill falsely orphan;R02 literal peer wrong retention;P02 unknown-tag peer reject intermediate",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "evidence": [
+          "final-family-R01/effects-probe-results.json",
+          "final-family-R02/effects-probe-results-v2.json",
+          "final-four-c.json: cleanup-preview with malformedpeer"
+        ],
+        "expected": "原配置语义、敏感类型、默认、错误与副作用边界保持；不以本份额签整Task"
+      }
+    },
+    {
+      "id": "P09",
+      "entry": "DELETE skill → scrub references across agents/bundles",
+      "source": [
+        "rust/crates/lingxi-service/src/skills.rs:709,736,743,759,764,774"
+      ],
+      "chain": [
+        "current list validation",
+        "remove directory",
+        "peer config parse",
+        "filtered lists render",
+        "atomic config writes",
+        "bundle removal",
+        "HTTP receipt"
+      ],
+      "owned_fields": [
+        "skills.enabled",
+        "skills.workspace_disabled",
+        "all globally validated fields"
+      ],
+      "known_bypasses": [
+        "read_dir Err→Ok(empty)",
+        "entries.flatten drops entry errors",
+        "file_type error→false",
+        "bundle remove result ignored"
+      ],
+      "default": "missing agent config skipped; distinguish genuinely absent vs I/O error",
+      "historical_actual": "NOT_RUN deletion; source-confirmed sequencing delete before parse peer",
+      "minimal_requirement": "synthetic normal deletion and malformed peer/control; validate before known preventable deletion or provide actual partial side-effect receipt; unrelated package lifecycle stays EX03 OPEN",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "evidence": [
+          "final-four-c.json: actual DELETE 7 families, stranger original bytes, corrupt peer/bundle beforeeffect, partial cleanup error after actual deletion"
+        ],
+        "expected": "原配置语义、敏感类型、默认、错误与副作用边界保持；不以本份额签整Task",
+        "current_chain": [
+          "full current and peer configuration preflight",
+          "checked bundle read",
+          "actual remove directory",
+          "reread/atomic scrub writes",
+          "checked bundle save",
+          "honest success/partial effect error"
+        ]
+      }
+    },
+    {
+      "id": "P10",
+      "entry": "ToolInvocationGateway → tenet_propose",
+      "source": [
+        "rust/crates/lingxi-service/src/memorytools.rs:343",
+        "rust/crates/lingxi-service/src/memorytools.rs:595"
+      ],
+      "chain": [
+        "trusted bound agent",
+        "read_flags/full parse",
+        "master switch",
+        "tenet store",
+        "ToolOutcome/receipt"
+      ],
+      "owned_fields": [
+        "memory.enabled",
+        "all globally validated fields"
+      ],
+      "default": "valid absent=true;paused explanation success with no mutation,parse error Failed",
+      "historical_actual": "ordinary false paused zero proposals;invalid/compound/merge error zero proposals;P02 !custom test intermediate; local aliases/binary new NOT_RUN",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "evidence": [
+          "final-four-c.json: true Gateway tenet_propose, paused/non-string/unsupported/depth zero pending"
+        ],
+        "expected": "原配置语义、敏感类型、默认、错误与副作用边界保持；不以本份额签整Task"
+      }
+    },
+    {
+      "id": "P11",
+      "entry": "ToolInvocationGateway → install_skill → install review → enable_for_agent",
+      "source": [
+        "rust/crates/lingxi-service/src/memorytools.rs:447,496,513,572",
+        "rust/crates/lingxi-service/src/skills.rs:611,656"
+      ],
+      "chain": [
+        "bound agent",
+        "config preflight",
+        "skill review/install",
+        "reread config",
+        "write enabled list",
+        "atomic write",
+        "success or partial-effect Failed"
+      ],
+      "owned_fields": [
+        "all full-parse fields",
+        "skills.enabled",
+        "skills.workspace_disabled"
+      ],
+      "historical_actual": "P02 red-install-gateway-02 real3badtag installed=true but claims enabled; P02 preflight new intermediate green",
+      "minimal_requirement": "preflight rejection zero disk install; after-install config change/read or write error actual installed preserved/no enabled false claim;receipt and actual config/skil file checked",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "evidence": [
+          "final-four-c.json: true Gateway install badconfig zero installed, afterwritefault actualinstalled Failed correctreceipt"
+        ],
+        "expected": "原配置语义、敏感类型、默认、错误与副作用边界保持；不以本份额签整Task"
+      }
+    },
+    {
+      "id": "P12",
+      "entry": "AgentConfigPatch direct adapter read/write and patch_agent_config",
+      "source": [
+        "rust/crates/lingxi-adapters/src/storage/agent_memory.rs:1911,1920,1945,1970",
+        "rust/crates/lingxi-adapters/src/storage/agent_config.rs:272,283,289"
+      ],
+      "chain": [
+        "read old config",
+        "full parse/type validation",
+        "set owned field only",
+        "mature serialization",
+        "candidate validation where patch uses it",
+        "atomic write",
+        "same parser reload",
+        "incumbent YAML oracle"
+      ],
+      "owned_fields": [
+        "all fields"
+      ],
+      "historical_actual": "E01 unknown ordinary preservation;R02 literal future value loss;P02 save new-session intermediate",
+      "minimal_requirement": "all writer paths same semantic guarantee even direct SkillService/MemoryTools atomic writes;unknown typed data retention and errors before writes",
+      "P03": {
+        "status": "SELF_CHECK_PASS_ON_FROZEN_CANDIDATE",
+        "evidence": [
+          "final-four-c.json: adapter original file preservation, unknowntyped writeflag/list reparse",
+          "final-incumbent-typed.json: actual original TS load/save/load equality"
+        ],
+        "expected": "原配置语义、敏感类型、默认、错误与副作用边界保持；不以本份额签整Task"
+      }
+    }
+  ],
+  "current_status": "READY_FOR_INDEPENDENT_REREVIEW",
+  "independent_review": "NOT_RUN",
+  "original_full_scope": "OPEN_REQUIRED_BY_ORIGINAL_OWNER_DEADLINE",
+  "final_candidate": "W06-CANDIDATE-03",
+  "final_binding": "binding-after-final.json"
+}

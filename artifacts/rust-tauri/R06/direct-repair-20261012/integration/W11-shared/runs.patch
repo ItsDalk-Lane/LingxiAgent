@@ -1,0 +1,57 @@
+diff --git a/rust/crates/lingxi-service/src/runs.rs b/rust/crates/lingxi-service/src/runs.rs
+index 428b38c11..0c33122fe 100644
+--- a/rust/crates/lingxi-service/src/runs.rs
++++ b/rust/crates/lingxi-service/src/runs.rs
+@@ -2080,6 +2080,9 @@ impl RunSupervisor {
+                     break RunFinish::CompletedWithFinal { message };
+                 }
+                 lingxi_kernel::ports::ProviderTurn::ToolRequests { requests, content } => {
++                    // 工具继承刚完成的真实模型调用期限；下一次模型调用才重新开预算。
++                    let tool_deadline =
++                        call_deadline.expect("logical model call established its budget");
+                     // R05-T05: the turn RESOLVED (the conversation moves to
+                     // tool execution) — the next loop iteration is a new
+                     // logical model call with a fresh total budget.
+@@ -3296,6 +3299,14 @@ impl RunSupervisor {
+                         );
+                         let tool_ctx = ctx.clone();
+                         let exec_call_id = call_id.clone();
++                        let trusted_lifetime = crate::toolgateway::TrustedToolLifetime {
++                            cancel: tool_scope.clone(),
++                            deadline_unix_ms: tool_deadline,
++                            budget_ms: u64::try_from(
++                                self.model_call_tuning.total_budget.as_millis(),
++                            )
++                            .expect("validated model budget"),
++                        };
+                         let tool_child = match tool_gateway.as_ref() {
+                             Some(gateway) => {
+                                 let gateway = Arc::clone(gateway);
+@@ -3305,13 +3316,24 @@ impl RunSupervisor {
+                                     .handle
+                                     .clone();
+                                 self.tasks
+-                                    .spawn_linked(
++                                    .spawn_linked_with_settlement(
+                                         run_id.as_str(),
+                                         &tool_scope,
+                                         format!("tool_call:{}", call_id.as_str()),
++                                        prepared.as_ref().is_some_and(|plan| {
++                                            plan.local_name == "knowledge_search"
++                                                && matches!(&plan.origin, lingxi_kernel::toolcatalog::ToolOrigin::FirstParty)
++                                        }),
+                                         async move {
+-                                            gateway
+-                                                .execute_prepared(&tool_ctx, &exec_call_id, &handle)
++                                            crate::toolgateway::TOOL_LIFETIME
++                                                .scope(
++                                                    trusted_lifetime,
++                                                    gateway.execute_prepared(
++                                                        &tool_ctx,
++                                                        &exec_call_id,
++                                                        &handle,
++                                                    ),
++                                                )
+                                                 .await
+                                         },
+                                     )

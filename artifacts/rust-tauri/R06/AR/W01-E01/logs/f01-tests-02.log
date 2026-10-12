@@ -1,0 +1,40 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r06_ar_f01_history.rs (rust/target/debug/deps/r06_ar_f01_history-369cc4500f952c90)
+LINGXI_TEST_GUARD: armed (pid 86404, mem_limit=8192 MB, time_limit=600 s)
+
+running 4 tests
+{"case": "c01", "status": "PASS", "checks": ["C01 actual wire roles/order/current once/session isolation/UI no archive duplicates", "legacy plain user/assistant history restored without guessed run"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c01-F01-c710c5be83638b88cd50e635aaa53d22-evidence.json"}
+
+test f01_c01_real_authenticated_history_and_isolation ... ok
+{"case": "c03", "status": "FAIL", "checks": [], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c03-F01-8d5f32d13c1b9f8795f0ae33d0023253-evidence.json"}
+
+
+thread 'f01_c03_projected_tools_opaque_origins_corruption' (3030093) panicked at crates/lingxi-service/tests/r06_ar_f01_history.rs:11:5:
+{"case": "c03", "status": "FAIL", "checks": [], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c03-F01-8d5f32d13c1b9f8795f0ae33d0023253-evidence.json"}
+
+Traceback (most recent call last):
+  File "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/rust/crates/lingxi-service/tests/fixtures/r06_ar_f01_probe.py", line 98, in <module>
+    globals()[CASE]();status='PASS'
+    ~~~~~~~~~~~~~~~^^
+  File "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/rust/crates/lingxi-service/tests/fixtures/r06_ar_f01_probe.py", line 71, in c03
+    f.reply=reply;f.run('读取合成文件');assert len(f.wire)==2;first_result=[m for m in msgs(f.wire[-1]) if m['role']=='tool'][0];assert len(first_result['content'].encode())<=32768 and middle not in first_result['content'] and first_result['tool_call_id']=='provider_tool_1';f.stop();f.start();f.run('使用刚才工具的结果');w=f.wire[-1];results=[m for m in msgs(w) if m['role']=='tool'];assert len(results)==1 and results[0]==first_result;assert not has(w,middle);events=f.sql("SELECT event_type,payload_json FROM key_events WHERE event_type='tool_call_completed'");assert any(middle in p for _,p in events),events;assert sum(1 for _,p in f.sql("SELECT event_type,payload_json FROM key_events") if 'provider_tool_1' in p and 'tool_call_started' in p)==1;checks.append('C03 real read raw complete/F08 projection only/restart IDs/no re-execution')
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test f01_c03_projected_tools_opaque_origins_corruption ... FAILED
+{"case": "c02", "status": "PASS", "checks": ["C02 fork mutually exclusive nonce/restart/rewind old suffix absent", "fork archive survives real source delete without source Run FK"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c02-F01-adb496a4c4ddee99941396d7219304bd-evidence.json"}
+
+test f01_c02_fork_restart_retry_rewind_source_delete ... ok
+{"case": "c04", "status": "PASS", "checks": ["C04 multiple actual Runs trigger summary; version+retained suffix survive restart; all authoritative originals immutable", "summary failure no fake successful version/all prior originals survive restart"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/c04-F01-3e9eec373e127964b49039e878203204-evidence.json"}
+
+test f01_c04_cross_run_compaction_failure_restart ... ok
+
+failures:
+
+failures:
+    f01_c03_projected_tools_opaque_origins_corruption
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.97s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_f01_history`

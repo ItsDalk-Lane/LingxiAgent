@@ -1,0 +1,497 @@
+[
+  {
+    "tag": "binary-numeric-schema-green",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "binary-numeric-schema-green.json",
+    "owned_digest": "59cfb2230b22c8517f7208677aed9a485d3ec7baccbc648d173383bbd7a273a0",
+    "evidence": "logs/binary-numeric-schema-green.log"
+  },
+  {
+    "tag": "binary-schema-boundary-red",
+    "exit_code": 101,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "binary-schema-boundary-red.json",
+    "owned_digest": "06de3496e9856c2c6eddfc144fb1ab469cb415b4d0cb837178c927ee9676fe25",
+    "evidence": "logs/binary-schema-boundary-red.log"
+  },
+  {
+    "tag": "compile-node-01",
+    "exit_code": 101,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "compile-node-01.json",
+    "owned_digest": "2cad60a0d44717b2d7d9c474edd4ddc0c625efd7d4b9f99827bb556a5c3f2971",
+    "evidence": "logs/compile-node-01.log"
+  },
+  {
+    "tag": "compile-node-02",
+    "exit_code": 101,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "compile-node-02.json",
+    "owned_digest": "48cf1a1a7bc96aa65b356c8be49d3be0bd4fe284cba50150d619ae6842e32e44",
+    "evidence": "logs/compile-node-02.log"
+  },
+  {
+    "tag": "compile-node-03",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "compile-node-03.json",
+    "owned_digest": "2f08aff723f0d587f1d6baf934d5a8c6caf940bf3361f8d112c27f7c0924a8be",
+    "evidence": "logs/compile-node-03.log"
+  },
+  {
+    "tag": "compile-old-gateway-02",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "compile-old-gateway-02.json",
+    "owned_digest": "d35bda6f3b6776f32f1d5ba3d96bd39f5c6ad91aa7f36ac2a7affe3f6b65f0db",
+    "evidence": "logs/compile-old-gateway-02.log"
+  },
+  {
+    "tag": "compile-old-gateway",
+    "exit_code": 1,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "compile-old-gateway.json",
+    "owned_digest": "d35bda6f3b6776f32f1d5ba3d96bd39f5c6ad91aa7f36ac2a7affe3f6b65f0db",
+    "evidence": "logs/compile-old-gateway.log"
+  },
+  {
+    "tag": "delete-wire-01",
+    "exit_code": 101,
+    "status": "FIXTURE_EXPECTATION_CORRECTED_WITH_ACTUAL_REDS_RETAINED",
+    "interpretation": "新测试期待409，但产品既有Conflict契约映射500；按实际契约校正，后续真实partial-code/文件断言保留",
+    "run_record": "delete-wire-01.json",
+    "owned_digest": "d5d6433577110b0a4b03c3ae0099df5e51950b419cd31b02b709c6db58f43758",
+    "evidence": "logs/delete-wire-01.log"
+  },
+  {
+    "tag": "delete-wire-02",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "delete-wire-02.json",
+    "owned_digest": "c85a9669c164120d92421f4f79de69bf620a38eb833e0723616983d34da17362",
+    "evidence": "logs/delete-wire-02.log"
+  },
+  {
+    "tag": "final-boundaries",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-boundaries.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-boundaries.log"
+  },
+  {
+    "tag": "final-clippy",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-clippy.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-clippy.log"
+  },
+  {
+    "tag": "final-contracts",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-contracts.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-contracts.log"
+  },
+  {
+    "tag": "final-fmt",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-fmt.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-fmt.log"
+  },
+  {
+    "tag": "final-four-c",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-four-c.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-four-c.log"
+  },
+  {
+    "tag": "final-incumbent-typed",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-incumbent-typed.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-incumbent-typed.log"
+  },
+  {
+    "tag": "final-r01-contract",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-r01-contract.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-r01-contract.log"
+  },
+  {
+    "tag": "final-r01-effects-probe",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-r01-effects-probe.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-r01-effects-probe.log"
+  },
+  {
+    "tag": "final-r01-family-probe",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-r01-family-probe.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-r01-family-probe.log"
+  },
+  {
+    "tag": "final-r01-probe",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-r01-probe.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-r01-probe.log"
+  },
+  {
+    "tag": "final-r02-additional-family-v2",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-r02-additional-family-v2.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-r02-additional-family-v2.log"
+  },
+  {
+    "tag": "final-r02-effects-probe-v2",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-r02-effects-probe-v2.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-r02-effects-probe-v2.log"
+  },
+  {
+    "tag": "final-r02-probe-v2",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-r02-probe-v2.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-r02-probe-v2.log"
+  },
+  {
+    "tag": "final-r02-semantic",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-r02-semantic.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-r02-semantic.log"
+  },
+  {
+    "tag": "final-r02-tagcheck",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-r02-tagcheck.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-r02-tagcheck.log"
+  },
+  {
+    "tag": "final-r02-tagged-value-v2",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-r02-tagged-value-v2.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-r02-tagged-value-v2.log"
+  },
+  {
+    "tag": "final-regression",
+    "exit_code": 0,
+    "status": "FINAL_EXACT_PASS",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "final-regression.json",
+    "owned_digest": "c25cf6dc2678336df62c9c5a06ebc7113200377e1a45d9c339d2ffca17a530ad",
+    "evidence": "logs/final-regression.log"
+  },
+  {
+    "tag": "green-types-delete-01",
+    "exit_code": 101,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "green-types-delete-01.json",
+    "owned_digest": "2354dfb8f105a72dead09f452c4b1ae76a4a56a1d396f798bd969b43cf4287ca",
+    "evidence": "logs/green-types-delete-01.log"
+  },
+  {
+    "tag": "green-types-delete-02",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "green-types-delete-02.json",
+    "owned_digest": "fcf73341c32e03e5e9a202f741d0ef3d2340d901081e175e965de2e5c96893d3",
+    "evidence": "logs/green-types-delete-02.log"
+  },
+  {
+    "tag": "history-additional-family-v2",
+    "exit_code": 0,
+    "status": "HISTORY_RED_OR_CONTROL_COLLECTOR",
+    "interpretation": "历史采集exit0不表示其中产品语义通过；以原结果断言为准",
+    "run_record": "history-additional-family-v2.json",
+    "owned_digest": "86c9150eee2791d14fa865bdb74567db29eca988ad5a870957d29cb6e97f6a51",
+    "evidence": "logs/history-additional-family-v2.log"
+  },
+  {
+    "tag": "history-effects-probe-v2",
+    "exit_code": 0,
+    "status": "HISTORY_RED_OR_CONTROL_COLLECTOR",
+    "interpretation": "历史采集exit0不表示其中产品语义通过；以原结果断言为准",
+    "run_record": "history-effects-probe-v2.json",
+    "owned_digest": "86c9150eee2791d14fa865bdb74567db29eca988ad5a870957d29cb6e97f6a51",
+    "evidence": "logs/history-effects-probe-v2.log"
+  },
+  {
+    "tag": "history-old-install-gateway",
+    "exit_code": 101,
+    "status": "HISTORY_RED_OR_CONTROL_COLLECTOR",
+    "interpretation": "历史采集exit0不表示其中产品语义通过；以原结果断言为准",
+    "run_record": "history-old-install-gateway.json",
+    "owned_digest": "d35bda6f3b6776f32f1d5ba3d96bd39f5c6ad91aa7f36ac2a7affe3f6b65f0db",
+    "evidence": "logs/history-old-install-gateway.log"
+  },
+  {
+    "tag": "history-old-scanner",
+    "exit_code": 101,
+    "status": "HISTORY_RED_OR_CONTROL_COLLECTOR",
+    "interpretation": "历史采集exit0不表示其中产品语义通过；以原结果断言为准",
+    "run_record": "history-old-scanner.json",
+    "owned_digest": "0416f46ad98e5f668bef5a8ebcf71ddb309e04b031294f3db4f549ef93178080",
+    "evidence": "logs/history-old-scanner.log"
+  },
+  {
+    "tag": "history-probe-v2",
+    "exit_code": 0,
+    "status": "HISTORY_RED_OR_CONTROL_COLLECTOR",
+    "interpretation": "历史采集exit0不表示其中产品语义通过；以原结果断言为准",
+    "run_record": "history-probe-v2.json",
+    "owned_digest": "86c9150eee2791d14fa865bdb74567db29eca988ad5a870957d29cb6e97f6a51",
+    "evidence": "logs/history-probe-v2.log"
+  },
+  {
+    "tag": "history-r01-01",
+    "exit_code": 0,
+    "status": "HISTORY_RED_OR_CONTROL_COLLECTOR",
+    "interpretation": "历史采集exit0不表示其中产品语义通过；以原结果断言为准",
+    "run_record": "history-r01-01.json",
+    "owned_digest": "86c9150eee2791d14fa865bdb74567db29eca988ad5a870957d29cb6e97f6a51",
+    "evidence": "logs/history-r01-01.log"
+  },
+  {
+    "tag": "history-r01-effects",
+    "exit_code": 0,
+    "status": "HISTORY_RED_OR_CONTROL_COLLECTOR",
+    "interpretation": "历史采集exit0不表示其中产品语义通过；以原结果断言为准",
+    "run_record": "history-r01-effects.json",
+    "owned_digest": "86c9150eee2791d14fa865bdb74567db29eca988ad5a870957d29cb6e97f6a51",
+    "evidence": "logs/history-r01-effects.log"
+  },
+  {
+    "tag": "history-r01-family",
+    "exit_code": 0,
+    "status": "HISTORY_RED_OR_CONTROL_COLLECTOR",
+    "interpretation": "历史采集exit0不表示其中产品语义通过；以原结果断言为准",
+    "run_record": "history-r01-family.json",
+    "owned_digest": "86c9150eee2791d14fa865bdb74567db29eca988ad5a870957d29cb6e97f6a51",
+    "evidence": "logs/history-r01-family.log"
+  },
+  {
+    "tag": "history-semantic-v2",
+    "exit_code": 1,
+    "status": "HISTORY_RED_OR_CONTROL_COLLECTOR",
+    "interpretation": "历史采集exit0不表示其中产品语义通过；以原结果断言为准",
+    "run_record": "history-semantic-v2.json",
+    "owned_digest": "a0f27bde50b33d8abb85e8bdccec642bce266b054a895f34f661ab551cc0d2be",
+    "evidence": "logs/history-semantic-v2.log"
+  },
+  {
+    "tag": "history-tagcheck-v2",
+    "exit_code": 1,
+    "status": "HISTORY_RED_OR_CONTROL_COLLECTOR",
+    "interpretation": "历史采集exit0不表示其中产品语义通过；以原结果断言为准",
+    "run_record": "history-tagcheck-v2.json",
+    "owned_digest": "a0f27bde50b33d8abb85e8bdccec642bce266b054a895f34f661ab551cc0d2be",
+    "evidence": "logs/history-tagcheck-v2.log"
+  },
+  {
+    "tag": "history-tagged-value-v2",
+    "exit_code": 0,
+    "status": "HISTORY_RED_OR_CONTROL_COLLECTOR",
+    "interpretation": "历史采集exit0不表示其中产品语义通过；以原结果断言为准",
+    "run_record": "history-tagged-value-v2.json",
+    "owned_digest": "86c9150eee2791d14fa865bdb74567db29eca988ad5a870957d29cb6e97f6a51",
+    "evidence": "logs/history-tagged-value-v2.log"
+  },
+  {
+    "tag": "intermediate-four-c-01",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "intermediate-four-c-01.json",
+    "owned_digest": "86c9150eee2791d14fa865bdb74567db29eca988ad5a870957d29cb6e97f6a51",
+    "evidence": "logs/intermediate-four-c-01.log"
+  },
+  {
+    "tag": "main-clippy-01",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "main-clippy-01.json",
+    "owned_digest": "073d533984b77937a6f243efd8745fce453ea146ec16e0fe19fbdad48bec566d",
+    "evidence": "logs/main-clippy-01.log"
+  },
+  {
+    "tag": "main-consumers-01",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "main-consumers-01.json",
+    "owned_digest": "0416f46ad98e5f668bef5a8ebcf71ddb309e04b031294f3db4f549ef93178080",
+    "evidence": "logs/main-consumers-01.log"
+  },
+  {
+    "tag": "main-four-c-02",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "main-four-c-02.json",
+    "owned_digest": "d35bda6f3b6776f32f1d5ba3d96bd39f5c6ad91aa7f36ac2a7affe3f6b65f0db",
+    "evidence": "logs/main-four-c-02.log"
+  },
+  {
+    "tag": "prefreeze-clippy-02",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "prefreeze-clippy-02.json",
+    "owned_digest": "32e9aedf60a41dd867110da4169e98e14688032878c305c33b0bcdfc9b51478b",
+    "evidence": "logs/prefreeze-clippy-02.log"
+  },
+  {
+    "tag": "prefreeze-clippy-03",
+    "exit_code": 101,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "prefreeze-clippy-03.json",
+    "owned_digest": "11d5a9cd89573dfc6e5d7bea5889fe2485655b60972b4be9b47932034470d0b8",
+    "evidence": "logs/prefreeze-clippy-03.log"
+  },
+  {
+    "tag": "prefreeze-fmt-02",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "prefreeze-fmt-02.json",
+    "owned_digest": "32e9aedf60a41dd867110da4169e98e14688032878c305c33b0bcdfc9b51478b",
+    "evidence": "logs/prefreeze-fmt-02.log"
+  },
+  {
+    "tag": "prefreeze-fmt",
+    "exit_code": 1,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "prefreeze-fmt.json",
+    "owned_digest": "d35bda6f3b6776f32f1d5ba3d96bd39f5c6ad91aa7f36ac2a7affe3f6b65f0db",
+    "evidence": "logs/prefreeze-fmt.log"
+  },
+  {
+    "tag": "prefreeze-four-c-01",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "prefreeze-four-c-01.json",
+    "owned_digest": "d35bda6f3b6776f32f1d5ba3d96bd39f5c6ad91aa7f36ac2a7affe3f6b65f0db",
+    "evidence": "logs/prefreeze-four-c-01.log"
+  },
+  {
+    "tag": "prefreeze-four-c-02",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "prefreeze-four-c-02.json",
+    "owned_digest": "11d5a9cd89573dfc6e5d7bea5889fe2485655b60972b4be9b47932034470d0b8",
+    "evidence": "logs/prefreeze-four-c-02.log"
+  },
+  {
+    "tag": "red-types-delete-01",
+    "exit_code": 101,
+    "status": "FIXTURE_EXPECTATION_CORRECTED_WITH_ACTUAL_REDS_RETAINED",
+    "interpretation": "最初假设unknown标准扩展允许拒绝不成立，实际erasure/local标签/delete红成立；parent要求保兼容后补原读取器正对照",
+    "run_record": "red-types-delete-01.json",
+    "owned_digest": "022afc9febd7b78bfb50621f0bf2e3aa57b134fb709d802d2752d8a210bf468a",
+    "evidence": "logs/red-types-delete-01.log"
+  },
+  {
+    "tag": "typed-incumbent-03",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "typed-incumbent-03.json",
+    "owned_digest": "60b30d2532d39260e930cfd411a9efcbb594ea84cdf3a6a34d5f335777e109cc",
+    "evidence": "logs/typed-incumbent-03.log"
+  },
+  {
+    "tag": "typed-incumbent-04",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "typed-incumbent-04.json",
+    "owned_digest": "59cfb2230b22c8517f7208677aed9a485d3ec7baccbc648d173383bbd7a273a0",
+    "evidence": "logs/typed-incumbent-04.log"
+  },
+  {
+    "tag": "typed-numbers-01",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "typed-numbers-01.json",
+    "owned_digest": "a8a70e58d17c8eb973e0e62cfdcba2dcfb7ee60937cc6b2448f350f419025b22",
+    "evidence": "logs/typed-numbers-01.log"
+  },
+  {
+    "tag": "typed-numbers-02",
+    "exit_code": 101,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "typed-numbers-02.json",
+    "owned_digest": "9d6303a244148f413c8da5e8da98e6a33178734381c51ec3ee7c3f1e2767ce82",
+    "evidence": "logs/typed-numbers-02.log"
+  },
+  {
+    "tag": "typed-numbers-03",
+    "exit_code": 0,
+    "status": "INTERMEDIATE_STALE_NOT_FINAL_PROOF",
+    "interpretation": "仅final-绑定本次冻结候选；其余保留实际失败/修正/重试历史",
+    "run_record": "typed-numbers-03.json",
+    "owned_digest": "60b30d2532d39260e930cfd411a9efcbb594ea84cdf3a6a34d5f335777e109cc",
+    "evidence": "logs/typed-numbers-03.log"
+  }
+]

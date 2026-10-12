@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-11T09:38:25.923844+00:00",
+  "owned": [
+    {
+      "path": "rust/crates/lingxi-service/src/knowledge.rs",
+      "sha256": "0d9fd6679e7681b42bde359657b7a78bd9bc4862c01da2f5c96a1d3f7e439cef"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/operations.rs",
+      "sha256": "da58f7822cc80e05af0893995e3ade915c8901967ae718bb74d8f979590167ce"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/knowledge.rs",
+      "sha256": "1adbc82ca36805080b9297a6337322fd0858c1fb24a700af185d19b8ae4e5944"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/operations/embedding.rs",
+      "sha256": "c3692626e3bbc5df1d5d91cc0dded2371093775868effb739146733d9a08026b"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs",
+      "sha256": "0d37fb59194f41ec3d3af867c65e8259ca2b7a7be862f22219e5b14e29d35bed"
+    }
+  ],
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "policy": "No more owned source edits; formal stage will bind these actual inputs. Evidence may append only after stage finishes; no independent PASS."
+}

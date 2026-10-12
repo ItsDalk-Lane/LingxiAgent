@@ -1,0 +1,22 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r06_ar_f02_file_restore.rs (rust/target/debug/deps/r06_ar_f02_file_restore-dc7bd6d0c16c0e4c)
+
+running 1 test
+restore_http=200 receipt={"sessionId":"s","checkpoint":"A","turnInputMessageId":"user:run_000001a12966ecb4_000001","newHeadMessageId":null,"resetMarkerId":"reset:s:1791695973562:3","restored":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t03-svc-ar-f02-ws-26456-1791695973554789000/doc.txt"],"conflicted":[],"skipped":[],"failed":[],"externalEffects":"not_rolled_back"}
+external_sentinel_expected=B actual=A
+
+thread 'ar_f02_c02_checkpoint_path_symlink_must_not_change_external_sentinel' (2210749) panicked at crates/lingxi-service/tests/r06_ar_f02_file_restore.rs:394:5:
+assertion `left == right` failed: 恢复不得沿检查点路径链接覆盖外部文件
+  left: "A"
+ right: "B"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ar_f02_c02_checkpoint_path_symlink_must_not_change_external_sentinel ... FAILED
+
+failures:
+
+failures:
+    ar_f02_c02_checkpoint_path_symlink_must_not_change_external_sentinel
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_f02_file_restore`

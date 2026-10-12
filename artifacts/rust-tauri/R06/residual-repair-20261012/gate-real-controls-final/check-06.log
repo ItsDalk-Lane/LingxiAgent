@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running unittests src/main.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/xtask-867339680434b6d3)
+
+running 1 test
+test candidate::tests::a_changed_checkpoint_cannot_be_erased_by_restoring_final_bytes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 121 filtered out; finished in 0.40s
+

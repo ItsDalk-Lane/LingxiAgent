@@ -1,0 +1,66 @@
+[
+  {
+    "label": "missing-original",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-3u1s1v1t/scripts/rust-tauri/r06_stage_inputs.py",
+      "--root",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-3u1s1v1t",
+      "--check",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-3u1s1v1t/artifacts/01-missing-original"
+    ],
+    "exitCode": 1,
+    "stdout": "R06 输入拒绝：279项原义务证明登记缺失、重复或扩大范围\n",
+    "stderr": ""
+  },
+  {
+    "label": "rewritten-original",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-3u1s1v1t/scripts/rust-tauri/r06_stage_inputs.py",
+      "--root",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-3u1s1v1t",
+      "--check",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-3u1s1v1t/artifacts/02-rewritten-original"
+    ],
+    "exitCode": 1,
+    "stdout": "R06 输入拒绝：R00-T02-LA-00C88B996AA0 原断言或证明状态不合法\n",
+    "stderr": ""
+  },
+  {
+    "label": "rewritten-original-outcome",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-3u1s1v1t/scripts/rust-tauri/r06_stage_inputs.py",
+      "--root",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-3u1s1v1t",
+      "--check",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-3u1s1v1t/artifacts/03-rewritten-original-outcome"
+    ],
+    "exitCode": 1,
+    "stdout": "R06 输入拒绝：R00-T02-LA-00C88B996AA0 原断言或证明状态不合法\n",
+    "stderr": ""
+  },
+  {
+    "label": "restored-positive",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-B",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-3u1s1v1t/scripts/rust-tauri/r06_stage_inputs.py",
+      "--root",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-3u1s1v1t",
+      "--check",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/closing/negative-controls/command-001/runtime/tmp/lingxi-f14-inputs-3u1s1v1t/artifacts/04-restored-positive"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

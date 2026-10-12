@@ -1,0 +1,379 @@
+{
+  "at": "2026-10-11T23:28:34.509570+00:00",
+  "role": "ROOT_MECHANICAL_EXACT_FROZEN_SOURCE_RECOVERY_NOT_REPAIR_OR_REVIEW",
+  "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "original_candidate_file_sha256": "3f42526a7bc1b6100271f071360253a8fe4f27c523c8e4dc0477bdde09fc1a84",
+  "original_manifest_sha256": "2b25cd68db5ab5a5565d23bda4ac7dd3145fb6126715f9ebb35bad883e98c494",
+  "original_patch_sha256": "bc3f84f761a13d9c65abbe88f943537a4299e897beff793fec95acb4b390b39c",
+  "base_rows": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/anthropic_messages.rs",
+      "baseGitBlob": "e08bea33cf56534f9d8e8e68123db213b4baf06f",
+      "base_sha256": "99de1a7f1b32d771795f508863999af42c483c5067eb8f4eccc54427655946d0"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/google_generative_ai.rs",
+      "baseGitBlob": "0bc05331bc39467058dbcd942d61e3d9d4be85d6",
+      "base_sha256": "03b73726d63fa238dc9268b0203f9fb1307b2e2413d9b868a91e2edb2f9db6ac"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+      "baseGitBlob": "056607cdf583ed823a94b13df69c9a01689b8a9c",
+      "base_sha256": "aa111c999f819428793275977309a0b09ce9f4702b35666d7de0ab6694874e36"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/openai_responses.rs",
+      "baseGitBlob": "3464816045e15d14b82af0d7fc544ea05815a069",
+      "base_sha256": "b3ec3131e0f5ec07fb329a2a7f5476bb43ca9523511e0887f0e8895ba43e9c7d"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_tree.rs",
+      "baseGitBlob": "cccee80a598647cc5f59bd11276c88043d84afd8",
+      "base_sha256": "f8a39409a788224f6b48ccb96feba91bca85442926cbe2f39e22a942ff7a8642"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/compaction.rs",
+      "baseGitBlob": "6ba38e00b0f15a981066807e4bab2b3c78d04b3a",
+      "base_sha256": "2543cc55a8fbac28d292b2dd82d678c81af0b630e2d60384a03a8f45a85c99d7"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/model_exchange.rs",
+      "baseGitBlob": "1d965d1e0f4279202e4fdb57e91bcfdcdaf32292",
+      "base_sha256": "ba9d8cb8d355ef080e6b49103fe418215bb2e0c92ef2fc9c9b0c5b7a7c27e53b"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/background.rs",
+      "baseGitBlob": "c4ada22df584286d6981c5f9130725af78581b3c",
+      "base_sha256": "1e642710a45e4e4360f34ed5588f16eb847ae74bd2a66cabb0b6f8e972db69a5"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/compaction.rs",
+      "baseGitBlob": "e7ff79661b83b9eb7f28e37732b6b6772088d6dc",
+      "base_sha256": "b9998034d64da2754047cb65f441d4bf62ef1a1d6ddcb70dd28ad632847233c8"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/history_projection.rs",
+      "baseGitBlob": "3e1cba2e538a60855c9f24153215987998bccdda",
+      "base_sha256": "fe6469f38b4ae5eb1eaf8e0edcecd663c7035d4df1bafa2197ef9e15c1f85d08"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "baseGitBlob": "ad069016af8705bcf259638adc90a9e1bf1c7e9f",
+      "base_sha256": "abb05a164499956657395906134d20beafbb277547e794d277ed26c3986ef82c"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/recovery.rs",
+      "baseGitBlob": "6d200f2815b93acb2b30ec91ae37b997a33cacf2",
+      "base_sha256": "37a268ac26b368e27fac3e81a173f6d29a4d2789603259df2968a4a72be79e45"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "baseGitBlob": "428b38c119884077dde38ad47419448ad96ec234",
+      "base_sha256": "eca52e6151299a43d7386fb2056908a3d86afeadc1085cd3aa55dd35b5646a6e"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_tree.rs",
+      "baseGitBlob": "c377c2089e71b11051848f50216e5993bffc831a",
+      "base_sha256": "fc78deada94cdfc8f013979cc4ce52ef342e75fd9bc91117110958f926370838"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/sessions.rs",
+      "baseGitBlob": "396f3716c1a512ae6d27c98b9e7b11a55930eb83",
+      "base_sha256": "61d032f1d3407f973360738c150c03ac49d780efc79afec49bf5e9ff6ab83c4f"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs",
+      "baseGitBlob": "9eb0ef34ac46b9a66bc561536bf5b1235d6de208",
+      "base_sha256": "4fea974469f36cfd93fcadaa8d24afea08a299ae5e4933a44a69bfbdbf6b3fbc"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r05_t05_timeouts.rs",
+      "baseGitBlob": "16e46adfd03f2ec414da94e6a970893550f1aff9",
+      "base_sha256": "2e04ede798f96d344a09812afbf1f29808e9b26294b1bde87f7c8d6d4d0334e0"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r05_t08_closed_loop.rs",
+      "baseGitBlob": "5464609c18a891f97eabb0df5e97b1549063c15b",
+      "base_sha256": "d53c0f50dce304eb62460c206cb2d38b78ad4d524dcb6f1706df489f7b7a258b"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r05_t08_resources.rs",
+      "baseGitBlob": "aecb9273fe48f985bf53406f7caea6b37d3ea21f",
+      "base_sha256": "23b03f56bef900fc0563b3348596e61437995f7c05cc25a5173455f11a23e33f"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
+      "baseGitBlob": "ee7593150f4231c77c9022caec19159abaf12a4f",
+      "base_sha256": "a018e0c8aad3109f4f0dd919be5bcbbdd206221a640c268bba2631848662677b"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "baseGitBlob": "8c6b91934b2eed41101e19bbe8f10b7cea8a0754",
+      "base_sha256": "ddee34a73c75cdf619c2a7139ab744c00993bd4352ae62081378cc40dba835a1"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/subagent_closeout.rs",
+      "baseGitBlob": "33ff8fcaa7054e4697bcea2b604f7fd0e82c7b10",
+      "base_sha256": "be74628bd47c4fea91c61294783188ab59ca00123237f1686ec6ddfd550c7d41"
+    }
+  ],
+  "actual_commands": [
+    {
+      "argv": [
+        "git",
+        "apply",
+        "--check",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/candidate.diff.patch"
+      ],
+      "cwd": "/private/tmp/r06-w01-exact-patch-recovery-01",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "apply",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/candidate.diff.patch"
+      ],
+      "cwd": "/private/tmp/r06-w01-exact-patch-recovery-01",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "rows": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/anthropic_messages.rs",
+      "sha256": "16ac690a81016d918d2384f0a3ec5e7f0fa0b6e16868333b01c1e4b45839fbff",
+      "bytes": 78424,
+      "new": false,
+      "baseGitBlob": "e08bea33cf56534f9d8e8e68123db213b4baf06f",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-adapters/src/models/anthropic_messages.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/google_generative_ai.rs",
+      "sha256": "4c08f805f5775b6655e2260f0444a396c37a83b6c61318f982ba6c4563b418f7",
+      "bytes": 67624,
+      "new": false,
+      "baseGitBlob": "0bc05331bc39467058dbcd942d61e3d9d4be85d6",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-adapters/src/models/google_generative_ai.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+      "sha256": "21ce89966b3612d48d1418029584cb6ce6cd80f355734fee449a3ccfd8e5ebdc",
+      "bytes": 72953,
+      "new": false,
+      "baseGitBlob": "056607cdf583ed823a94b13df69c9a01689b8a9c",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-adapters/src/models/openai_completions.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/openai_responses.rs",
+      "sha256": "18bff2e76a378549781eeb20cd70bd1fd746a49489309398fda4ee892c8d8cd2",
+      "bytes": 57289,
+      "new": false,
+      "baseGitBlob": "3464816045e15d14b82af0d7fc544ea05815a069",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-adapters/src/models/openai_responses.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_tree.rs",
+      "sha256": "715ad2e25c63488efc116aa1c5e4b4f2bdcd62e559f6d0813dd13aa691e4e58d",
+      "bytes": 59115,
+      "new": false,
+      "baseGitBlob": "cccee80a598647cc5f59bd11276c88043d84afd8",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-adapters/src/storage/session_tree.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/compaction.rs",
+      "sha256": "7a48f525711438e6e7359322241cccb19054ee9562caa514de191f028729caf7",
+      "bytes": 52999,
+      "new": false,
+      "baseGitBlob": "6ba38e00b0f15a981066807e4bab2b3c78d04b3a",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-kernel/src/compaction.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/model_exchange.rs",
+      "sha256": "495448ea96ea504da6ed5ec4793d12f9af984497dc4765f57484c0de2a3cab59",
+      "bytes": 48148,
+      "new": false,
+      "baseGitBlob": "1d965d1e0f4279202e4fdb57e91bcfdcdaf32292",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-kernel/src/model_exchange.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/background.rs",
+      "sha256": "49ad8c0a618f8e05fda5b569494dc8b6d5a8a6921e30341a6b424a5ef5d212ec",
+      "bytes": 17398,
+      "new": false,
+      "baseGitBlob": "c4ada22df584286d6981c5f9130725af78581b3c",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/src/background.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/compaction.rs",
+      "sha256": "282d6a779d2963ac0354722170bf63f180518e4796375a8c11e1c10e2ef0a67d",
+      "bytes": 49999,
+      "new": false,
+      "baseGitBlob": "e7ff79661b83b9eb7f28e37732b6b6772088d6dc",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/src/compaction.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/history_projection.rs",
+      "sha256": "ee50f0eacd4146572a4a12c88ce380cdc00212aabbfacb3f7feebb17c5b437fc",
+      "bytes": 41372,
+      "new": false,
+      "baseGitBlob": "3e1cba2e538a60855c9f24153215987998bccdda",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/src/history_projection.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "sha256": "bcff2c9880c187c92f99c8ba4237fed0c4e349319c784aaf908a16d3716dc60b",
+      "bytes": 285975,
+      "new": false,
+      "baseGitBlob": "ad069016af8705bcf259638adc90a9e1bf1c7e9f",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/src/lib.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/model_history.rs",
+      "sha256": "1e9aa6ca3c90e61d5363a6edf21501ee6593f12d44da81c5fc426004bfa9339e",
+      "bytes": 61518,
+      "new": true,
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/src/model_history.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/recovery.rs",
+      "sha256": "202f27ef84d42651b1bfc3c77f14177db9fa627da74f17bb82a6048569362cee",
+      "bytes": 17919,
+      "new": false,
+      "baseGitBlob": "6d200f2815b93acb2b30ec91ae37b997a33cacf2",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/src/recovery.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "sha256": "82f9f4a0855cce20c4b177bf1bffc82573b882aa249aef8c20aaae380a031041",
+      "bytes": 241636,
+      "new": false,
+      "baseGitBlob": "428b38c119884077dde38ad47419448ad96ec234",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/src/runs.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_tree.rs",
+      "sha256": "ca43b0982ba9a72f4f41e80ddbe9be7467480bb66302caf7eb6952c16a639a25",
+      "bytes": 37587,
+      "new": false,
+      "baseGitBlob": "c377c2089e71b11051848f50216e5993bffc831a",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/src/session_tree.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/sessions.rs",
+      "sha256": "df232aa3e31a3f1e826406ba19218cfa67e4d12f1890f41a9bcff33af397a6a7",
+      "bytes": 109987,
+      "new": false,
+      "baseGitBlob": "396f3716c1a512ae6d27c98b9e7b11a55930eb83",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/src/sessions.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/fixtures/r06_ar_f01_probe.py",
+      "sha256": "c31cdf0c83794c1382e55d92c57c6c04773c9b883479d31ba1944065bff46203",
+      "bytes": 39756,
+      "new": true,
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/tests/fixtures/r06_ar_f01_probe.py"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs",
+      "sha256": "e11638f3a946e56d167db84a9513b615e99ba0b8f8550c986ae1cb41afc3db66",
+      "bytes": 94245,
+      "new": false,
+      "baseGitBlob": "9eb0ef34ac46b9a66bc561536bf5b1235d6de208",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r05_t05_timeouts.rs",
+      "sha256": "b6ec403860e040de63c0c7ea90b6c2c3f453304719b4980a5b71a3885227795c",
+      "bytes": 31511,
+      "new": false,
+      "baseGitBlob": "16e46adfd03f2ec414da94e6a970893550f1aff9",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/tests/r05_t05_timeouts.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r05_t08_closed_loop.rs",
+      "sha256": "20da8e15735c19171dcf0f35e8f2efb6072a5dfb202b5c0212dbc9b03a37e85c",
+      "bytes": 94370,
+      "new": false,
+      "baseGitBlob": "5464609c18a891f97eabb0df5e97b1549063c15b",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/tests/r05_t08_closed_loop.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r05_t08_resources.rs",
+      "sha256": "cb2ec8040ed1bcf1db7f45b2f54cc265b71975c35fcaff2049a0505cbc97d8d5",
+      "bytes": 70542,
+      "new": false,
+      "baseGitBlob": "aecb9273fe48f985bf53406f7caea6b37d3ea21f",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/tests/r05_t08_resources.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f01_history.rs",
+      "sha256": "462ed1c4c7e3bd5eca1f6ab48b923e2d8dd1f6e5b33aad10a38e7972ccadeb14",
+      "bytes": 39848,
+      "new": true,
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/tests/r06_ar_f01_history.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
+      "sha256": "731134d6176282d867eaf89099cd30e4e75b599ac5a9ce1f2aea218bc0438ca0",
+      "bytes": 95810,
+      "new": false,
+      "baseGitBlob": "ee7593150f4231c77c9022caec19159abaf12a4f",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/tests/r06_t02_compaction.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "sha256": "c205a1d707ecb67364c7cbf3ae2c9831eecbfe13e30acffea85e803d22760efa",
+      "bytes": 62995,
+      "new": false,
+      "baseGitBlob": "8c6b91934b2eed41101e19bbe8f10b7cea8a0754",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/tests/r06_t03_session_tree.rs"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/subagent_closeout.rs",
+      "sha256": "d494c14ca77a9f487cb37fe585131796c95429191915dc9aeaabc3f51cabeaf9",
+      "bytes": 50177,
+      "new": false,
+      "baseGitBlob": "33ff8fcaa7054e4697bcea2b604f7fd0e82c7b10",
+      "recovery_method": "original SHA-bound patch applied to exact base Git object",
+      "recovered_source": "/private/tmp/r06-w01-exact-patch-recovery-01/rust/crates/lingxi-service/tests/subagent_closeout.rs"
+    }
+  ],
+  "owned_count": 25,
+  "all_current_bytes_equal_original_frozen_SHA": true,
+  "main_runtime_products_modified": false,
+  "original_runtime_or_binary_evidence_reconstructed": false,
+  "tests": "NOT_RUN",
+  "independent_review_status": "PREVIOUS_PLATFORM_INTERRUPTION_STILL_BLOCKED_NO_RETRY",
+  "accepted": false,
+  "R07_started": false,
+  "prior_helper_exit": 1,
+  "prior_helper_cause": "read-only safety precheck assumed all25 sections have diff --git header; actual exact original patch22 tracked diff headers plus3 standard new-file unified headers; failed before destination creation; final validates every25 output path and exact full-file frozenSHA"
+}

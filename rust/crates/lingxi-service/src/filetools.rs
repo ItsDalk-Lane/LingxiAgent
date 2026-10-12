@@ -459,7 +459,7 @@ pub(crate) mod fsio {
                     Component::RootDir | Component::Prefix(_) => {}
                     Component::Normal(name) => {
                         let cname = os_to_c(name);
-                        let next = io_error_fd(unsafe {
+                        let next_result = io_error_fd(unsafe {
                             libc::openat(
                                 fd,
                                 cname.as_ptr().cast(),
@@ -468,11 +468,12 @@ pub(crate) mod fsio {
                                     | libc::O_NOFOLLOW
                                     | libc::O_CLOEXEC,
                             )
-                        })?;
+                        });
                         let _ = unsafe { libc::close(fd) };
-                        fd = next;
+                        fd = next_result?;
                     }
                     Component::CurDir | Component::ParentDir => {
+                        let _ = unsafe { libc::close(fd) };
                         return Err(io::Error::other(
                             "canonical paths never carry `.`/`..` components",
                         ));
@@ -480,6 +481,42 @@ pub(crate) mod fsio {
                 }
             }
             Ok(DirFd { fd })
+        }
+
+        /// 核对当前路径仍指向持有的目录，避免目录改名后的授权漂移。
+        pub fn same_directory(&self, path: &Path) -> io::Result<bool> {
+            let other = Self::open(path)?;
+            let mut a: libc::stat = unsafe { std::mem::zeroed() };
+            let mut b: libc::stat = unsafe { std::mem::zeroed() };
+            if unsafe { libc::fstat(self.fd, &mut a) } != 0
+                || unsafe { libc::fstat(other.fd, &mut b) } != 0
+            {
+                return Err(io::Error::last_os_error());
+            }
+            Ok(a.st_dev == b.st_dev && a.st_ino == b.st_ino)
+        }
+
+        /// 服务状态子目录只在持有的父目录内创建；打开时不跟随替换后的链接。
+        pub fn child_directory(&self, name: &OsStr, create: bool) -> io::Result<Self> {
+            let name = os_to_c(name);
+            if create && unsafe { libc::mkdirat(self.fd, name.as_ptr().cast(), 0o700) } != 0 {
+                let error = io::Error::last_os_error();
+                if error.kind() != io::ErrorKind::AlreadyExists {
+                    return Err(error);
+                }
+            }
+            let fd = io_error_fd(unsafe {
+                libc::openat(
+                    self.fd,
+                    name.as_ptr().cast(),
+                    libc::O_RDONLY | libc::O_DIRECTORY | libc::O_NOFOLLOW | libc::O_CLOEXEC,
+                )
+            })?;
+            let child = Self { fd };
+            if create {
+                self.sync_checked()?;
+            }
+            Ok(child)
         }
 
         /// Opens the FINAL component read-only without following a
@@ -547,7 +584,7 @@ pub(crate) mod fsio {
                         self.fd,
                         cname.as_ptr().cast(),
                         libc::O_WRONLY | libc::O_CREAT | libc::O_EXCL | libc::O_CLOEXEC,
-                        0o644,
+                        0o600,
                     )
                 });
                 match fd {
@@ -565,6 +602,54 @@ pub(crate) mod fsio {
                     Err(err) => return Err(err),
                 }
             }
+        }
+
+        /// 原子交换同时保留被替换对象；不支持的平台明确拒绝危险替换。
+        pub fn exchange_within(&self, a: &OsStr, b: &OsStr) -> io::Result<()> {
+            let a = os_to_c(a);
+            let b = os_to_c(b);
+            #[cfg(target_os = "macos")]
+            let rc = unsafe {
+                libc::renameatx_np(
+                    self.fd,
+                    a.as_ptr().cast(),
+                    self.fd,
+                    b.as_ptr().cast(),
+                    libc::RENAME_SWAP,
+                )
+            };
+            #[cfg(target_os = "linux")]
+            let rc = unsafe {
+                libc::renameat2(
+                    self.fd,
+                    a.as_ptr().cast(),
+                    self.fd,
+                    b.as_ptr().cast(),
+                    libc::RENAME_EXCHANGE,
+                )
+            };
+            #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+            return Err(io::Error::new(
+                io::ErrorKind::Unsupported,
+                "atomic exchange is unavailable",
+            ));
+            #[cfg(any(target_os = "macos", target_os = "linux"))]
+            if rc != 0 {
+                return Err(io::Error::last_os_error());
+            }
+            Ok(())
+        }
+
+        /// 新文件只在目标仍不存在时发布，不能覆盖窗口内的外部文件。
+        pub fn publish_new(&self, from: &OsStr, to: &OsStr) -> io::Result<()> {
+            let a = os_to_c(from);
+            let b = os_to_c(to);
+            if unsafe { libc::linkat(self.fd, a.as_ptr().cast(), self.fd, b.as_ptr().cast(), 0) }
+                != 0
+            {
+                return Err(io::Error::last_os_error());
+            }
+            Ok(())
         }
 
         /// Atomically renames `from` → `to` WITHIN this directory.
@@ -589,10 +674,21 @@ pub(crate) mod fsio {
 
         /// Applies the original file's permission bits to the temp file
         /// so an atomic replace does not silently chmod the target.
-        pub fn apply_mode(file: &std::fs::File, mode: u32) {
+        pub fn apply_mode(file: &std::fs::File, mode: u32) -> io::Result<()> {
             use std::os::unix::io::AsRawFd;
             // # Safety: the fd is borrowed for the call only.
-            unsafe { libc::fchmod(file.as_raw_fd(), mode as libc::mode_t) };
+            if unsafe { libc::fchmod(file.as_raw_fd(), mode as libc::mode_t) } != 0 {
+                return Err(io::Error::last_os_error());
+            }
+            Ok(())
+        }
+
+        /// 持久化错误须由调用者区分提交前失败与提交后未知。
+        pub fn sync_checked(&self) -> io::Result<()> {
+            if unsafe { libc::fsync(self.fd) } != 0 {
+                return Err(io::Error::last_os_error());
+            }
+            Ok(())
         }
 
         /// Best-effort durability of a completed rename.
@@ -689,6 +785,18 @@ pub(crate) mod fsio {
             })
         }
 
+        pub fn same_directory(&self, path: &Path) -> io::Result<bool> {
+            Ok(self.dir.canonicalize()? == path.canonicalize()?)
+        }
+
+        /// 无安全子目录句柄的平台拒绝写入可信状态，不假装已建立同等边界。
+        pub fn child_directory(&self, _name: &OsStr, _create: bool) -> io::Result<Self> {
+            Err(io::Error::new(
+                io::ErrorKind::Unsupported,
+                "safe service state directory handle is unavailable",
+            ))
+        }
+
         pub fn open_file_nofollow(&self, name: &OsStr) -> Option<io::Result<std::fs::File>> {
             let target = self.dir.join(name);
             match std::fs::symlink_metadata(&target) {
@@ -742,6 +850,17 @@ pub(crate) mod fsio {
             }
         }
 
+        pub fn exchange_within(&self, _a: &OsStr, _b: &OsStr) -> io::Result<()> {
+            Err(io::Error::new(
+                io::ErrorKind::Unsupported,
+                "safe recovery requires atomic exchange",
+            ))
+        }
+
+        pub fn publish_new(&self, from: &OsStr, to: &OsStr) -> io::Result<()> {
+            std::fs::hard_link(self.dir.join(from), self.dir.join(to))
+        }
+
         pub fn rename_within(&self, from: &OsStr, to: &OsStr) -> io::Result<()> {
             std::fs::rename(self.dir.join(from), self.dir.join(to))
         }
@@ -750,9 +869,17 @@ pub(crate) mod fsio {
             let _ = std::fs::remove_file(self.dir.join(name));
         }
 
-        pub fn apply_mode(_file: &std::fs::File, _mode: u32) {
+        pub fn apply_mode(_file: &std::fs::File, _mode: u32) -> io::Result<()> {
             // Windows permission bits are ACL-based; the std fallback
             // keeps the temp file's default ACL. Registered form.
+            Ok(())
+        }
+
+        pub fn sync_checked(&self) -> io::Result<()> {
+            Err(io::Error::new(
+                io::ErrorKind::Unsupported,
+                "directory durability is unverified on this platform",
+            ))
         }
 
         pub fn sync(&self) {
@@ -1285,6 +1412,7 @@ pub struct FileTools {
     clock: Arc<dyn ServiceClock>,
     mutations: std::sync::Mutex<MutationLocks>,
     mutation_hook: std::sync::Mutex<Option<MutationTestHook>>,
+    file_safety: std::sync::OnceLock<Arc<crate::file_safety::FileSafety>>,
 }
 
 /// The directory handle + final component of one authorized target.
@@ -1386,7 +1514,13 @@ impl FileTools {
             clock,
             mutations: std::sync::Mutex::new(MutationLocks::default()),
             mutation_hook: std::sync::Mutex::new(None),
+            file_safety: std::sync::OnceLock::new(),
         }
+    }
+
+    /// 组合根共享应用写入的来源证明。
+    pub fn set_file_safety(&self, safety: Arc<crate::file_safety::FileSafety>) {
+        let _ = self.file_safety.set(safety);
     }
 
     /// Installs the test-only mutation seam (see [`MutationTestHook`]).
@@ -1878,6 +2012,102 @@ impl FileTools {
         )
     }
 
+    #[allow(clippy::too_many_arguments)]
+    fn finish_safe_mutation(
+        &self,
+        safety: &crate::file_safety::FileSafety,
+        ctx: &RunContext,
+        raw_path: &str,
+        scope: &ResourceScope,
+        existed: bool,
+        before: Option<(FileIdentity, Option<String>)>,
+        new_bytes: &[u8],
+        success_text: String,
+    ) -> ToolOutcome {
+        let session = ctx.session_id.to_string();
+        let witness = crate::file_safety::witness_scope(
+            ctx.principal.storage_kind(),
+            &ctx.principal.storage_subject(),
+            &session,
+        );
+        let authorize = || {
+            self.authorize(ctx, raw_path, ResourceOp::Write)
+                .map(|s| s == *scope)
+                .unwrap_or(false)
+        };
+        let result = if existed {
+            crate::file_safety::Snapshot::read(&scope.path).and_then(|snapshot| {
+                if let Some(bound) = &before {
+                    let identity = snapshot.identity;
+                    if !identity_matches(&identity, bound)
+                        || bound
+                            .1
+                            .as_ref()
+                            .map(|hash| *hash != hex(&Sha256::digest(&snapshot.bytes)))
+                            .unwrap_or(false)
+                    {
+                        return Err(crate::file_safety::WriteError::Conflict);
+                    }
+                }
+                safety.replace(&witness, &scope.path, &snapshot, new_bytes, authorize)
+            })
+        } else {
+            safety.create(&witness, &scope.path, new_bytes, authorize)
+        };
+        if let Err(error) = result {
+            let code = if matches!(error, crate::file_safety::WriteError::Conflict) {
+                ErrorCode::Conflict
+            } else {
+                ErrorCode::UpstreamUnavailable
+            };
+            return failed(code, error.to_string());
+        }
+        let Some(after) = FileFingerprint::stat(&scope.path) else {
+            return failed(
+                ErrorCode::Internal,
+                "write_may_have_occurred: result unavailable".into(),
+            );
+        };
+        let after_version = FileVersion {
+            size_bytes: after.size,
+            sha256_hex: Some(hex(&Sha256::digest(new_bytes))),
+            mtime_unix_ms: system_time_ms(after.modified),
+        };
+        self.changes.record(FileModificationRecord {
+            path: scope.path.clone(),
+            operation: if existed {
+                FileChangeOperation::Modified
+            } else {
+                FileChangeOperation::Created
+            },
+            before: before.map(|(identity, digest)| FileVersion {
+                size_bytes: identity.size,
+                sha256_hex: digest,
+                mtime_unix_ms: system_time_ms(identity.modified),
+            }),
+            after: after_version.clone(),
+            at_unix_ms: self.clock.now_unix_ms(),
+        });
+        self.freshness
+            .observe_mutation(&session, &scope.path, after);
+        let resource_ref = ResourceRef {
+            resource_id: ResourceId::new(format!("file:{}", scope.path.display())),
+            kind: ResourceKind::Artifact,
+            display_name: scope
+                .path
+                .file_name()
+                .map(|n| n.to_string_lossy().into_owned()),
+            uri: Some(format!("file://{}", scope.path.display())),
+            digest: after_version.sha256_hex.map(|hex| ContentDigest {
+                algorithm: "sha256".into(),
+                canonicalization: "raw-bytes".into(),
+                hex,
+            }),
+            size_bytes: Some(after_version.size_bytes),
+        };
+        text_success(success_text, false, vec![resource_ref])
+    }
+
     // ── the shared atomic swap ──────────────────────────────────────────────
 
     /// Writes `new_bytes` through a same-directory temp file and ONE
@@ -1898,6 +2128,18 @@ impl FileTools {
         new_bytes: &[u8],
         success_text: String,
     ) -> ToolOutcome {
+        if let Some(safety) = self.file_safety.get() {
+            return self.finish_safe_mutation(
+                safety,
+                ctx,
+                raw_path,
+                scope,
+                existed,
+                before,
+                new_bytes,
+                success_text,
+            );
+        }
         let session = ctx.session_id.to_string();
         let random_hex = crate::auth::hex_random_public(8).unwrap_or_else(|_| {
             // Entropy failure must not become a GUESSABLE temp name: fall
@@ -1949,12 +2191,17 @@ impl FileTools {
             }
         }
         // Preserve the original permission bits across the replace.
+        #[cfg(unix)]
         if write_error.is_none() {
             if let Some((before_identity, _)) = &before {
-                DirFd::apply_mode(&temp_file, before_identity.mode);
+                if let Err(error) = DirFd::apply_mode(&temp_file, before_identity.mode) {
+                    write_error = Some(failed(
+                        ErrorCode::UpstreamUnavailable,
+                        format!("permission copy failed before replacement: {error}"),
+                    ));
+                }
             }
         }
-        drop(temp_file);
         if let Some(outcome) = write_error {
             return outcome; // the guard unlinks the temp file
         }
@@ -2023,7 +2270,7 @@ impl FileTools {
                 FinalOpen::Missing => {
                     // Deleted in the window: creating it back is a normal
                     // outcome (the incumbent's last-writer-wins write).
-                    existed_now = false;
+                    return failed(ErrorCode::Conflict, format!("{FILE_CHANGED_DURING_MUTATION}: target was deleted; current user decision is preserved"));
                 }
             }
         }
@@ -2058,6 +2305,23 @@ impl FileTools {
             sha256_hex: Some(hex(&Sha256::digest(new_bytes))),
             mtime_unix_ms: system_time_ms(after.modified),
         };
+        if let Some(safety) = self.file_safety.get() {
+            if let Err(error) = safety.record_written(
+                &crate::file_safety::witness_scope(
+                    ctx.principal.storage_kind(),
+                    &ctx.principal.storage_subject(),
+                    &session,
+                ),
+                &scope.path,
+                &temp_file,
+                new_bytes,
+            ) {
+                return failed(
+                    ErrorCode::Internal,
+                    format!("file write occurred; witness unavailable: {error}"),
+                );
+            }
+        }
         self.changes.record(FileModificationRecord {
             path: scope.path.clone(),
             operation: if existed_now {
@@ -2433,22 +2697,29 @@ impl ToolExecutorPort for CoreFileExecutor {
         _call: &'a ToolCallId,
         request: &'a ToolRequest,
     ) -> Pin<Box<dyn std::future::Future<Output = ToolExecutionResult> + Send + 'a>> {
-        // Blocking filesystem work runs on the blocking pool; everything
-        // the closure needs is cloned out of the borrowed inputs. If the
-        // surrounding task is dropped at the await point, an in-flight
-        // mutation completes detached — the journal's
-        // `started`-without-receipt window classifies recovery as
-        // UNKNOWN (the R03 contract), never as success.
+        // 等待 future 取消后阻塞池仍会继续实际文件作业；许可必须随 closure 真正退出。
         let tools = Arc::clone(&self.tools);
         let kind = self.kind;
         let ctx = ctx.clone();
         let args = request.arguments.as_value().clone();
         Box::pin(async move {
+            let retained = match crate::task_supervisor::retain_blocking_run_permit(&ctx) {
+                Ok(permit) => permit,
+                Err(err) => {
+                    return ToolExecutionResult::of_ctx(
+                        &ctx,
+                        failed(ErrorCode::Conflict, err.to_string()),
+                    )
+                }
+            };
             let work_ctx = ctx.clone();
-            let outcome = tokio::task::spawn_blocking(move || match kind {
-                FileToolKind::Read => tools.run_read(&work_ctx, &args),
-                FileToolKind::Write => tools.run_write(&work_ctx, &args),
-                FileToolKind::Edit => tools.run_edit(&work_ctx, &args),
+            let outcome = tokio::task::spawn_blocking(move || {
+                let _retained_permit = retained;
+                match kind {
+                    FileToolKind::Read => tools.run_read(&work_ctx, &args),
+                    FileToolKind::Write => tools.run_write(&work_ctx, &args),
+                    FileToolKind::Edit => tools.run_edit(&work_ctx, &args),
+                }
             })
             .await
             .unwrap_or_else(|join_err| {

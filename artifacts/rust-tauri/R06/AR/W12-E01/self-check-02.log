@@ -1,0 +1,77 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.90s
+     Running tests/knowledge_store_r06t07.rs (rust/target/debug/deps/knowledge_store_r06t07-60406ec468abc31a)
+
+running 9 tests
+test identity_algorithms_are_deterministic_and_frozen ... ok
+test vector_store_dimension_gate_refuses_mixed_search ... ok
+test index_store_fingerprint_gate_and_fts_search ... ok
+test research_engine_tables_are_absent_from_the_new_store ... ok
+test citation_roundtrip_and_offsets ... ok
+test schema_newer_fails_loud ... ok
+test ingestion_job_lifecycle_and_delete_wins ... ok
+test facts_store_crud_membership_and_turn_scope_freeze ... ok
+test cache_corruption_resets_only_the_cache_file ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/r06_ar_f12_cache_preservation.rs (rust/target/debug/deps/r06_ar_f12_cache_preservation-12406c3bb45b46a5)
+
+running 12 tests
+test c02_io_child ... ok
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/reset-27625-1791696406123200000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/unowned-27625-1791696406123160000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/active-27625-1791696406123167000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/quarantine-27625-1791696406123154000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/future-wal-27625-1791696406123055000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/symlink-27625-1791696406123053000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/knowledge_index.db-27625-1791696406123054000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/permission-27625-1791696406123070000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/io-limit-27625-1791696406123058000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/positive-27625-1791696406123176000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/locked-27625-1791696406123129000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/sentinel-27625-1791696406124279000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/wal-corrupt-27625-1791696406124739000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/hardlink-27625-1791696406125298000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/sentinel-27625-1791696406125389000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/symlink-27625-1791696406126579000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/sentinel-27625-1791696406127541000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/hardlink-27625-1791696406128378000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/sentinel-27625-1791696406128599000
+test adversarial_symlink_and_hardlink_never_touch_external_target ... ok
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/knowledge_vector.db-27625-1791696406131807000
+test c01_future_schema_preserves_sentinel_in_both_caches ... ok
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/unowned-27625-1791696406209840000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/active-27625-1791696406210032000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/wal-corrupt-27625-1791696406210352000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/future-wal-27625-1791696406230898000
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/permission-27625-1791696406236831000
+I/O child status=exit status: 0 stdout=
+running 1 test
+test c02_io_child ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.00s
+
+ stderr=
+test reset_and_delete_artifact_keep_live_inode_and_other_source_index ... ok
+test c04_active_production_store_blocks_corruption_quarantine ... ok
+test c03_unknown_corruption_and_wal_never_auto_rebuild ... ok
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/io-limit-27625-1791696406264728000
+test c01_future_wal_live_writer_preserves_all_bytes ... ok
+test positive_normal_cache_open_and_reopen ... ok
+test c02_permission_errors_preserve_cache ... ok
+I/O child status=exit status: 0 stdout=
+running 1 test
+test c02_io_child ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.01s
+
+ stderr=
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/quarantine-27625-1791696406311884000
+test c02_actual_io_limit_preserves_original ... ok
+test c03_owned_corruption_quarantines_only_one_cache_and_preserves_sources_and_vectors ... ok
+synthetic knowledge root=/tmp/lingxi-w12-self2-wmpIrO/locked-27625-1791696411619837000
+test c02_sqlite_exclusive_lock_refuses_without_removal ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.83s
+

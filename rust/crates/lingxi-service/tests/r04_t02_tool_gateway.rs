@@ -630,6 +630,7 @@ async fn subagent_run(harness: &Harness, session: &str, tier: ToolAccessTier) ->
     let run_id = RunDatabase::allocate_run_id(harness.state.storage(), NOW_MS)
         .expect("allocate child run id");
     let authorization = DriveAuthorization {
+        knowledge_selection: None,
         lineage: RunLineage {
             parent_run_id: None,
             origin: RunOrigin::Subagent,
@@ -775,6 +776,7 @@ async fn r04_a03_allow_group_is_identical_across_all_entries() {
     .await;
     let session = "sess_local_alpha";
     let submission = ExecuteSubmission {
+        knowledge: None,
         input: "background probe",
         request_id: Some("req-a03-bg"),
     };
@@ -848,6 +850,7 @@ async fn r04_a03_deny_group_unconfigured_policy_refuses_every_entry() {
     let harness = harness_with(Arc::new(FailClosedPolicy), None, script(target)).await;
     let session = "sess_local_alpha";
     let submission = ExecuteSubmission {
+        knowledge: None,
         input: "background probe",
         request_id: Some("req-a03-deny-bg"),
     };
@@ -1908,6 +1911,7 @@ async fn subagent_run_legacy(
     let run_id = RunDatabase::allocate_run_id(legacy.state.storage(), NOW_MS)
         .expect("allocate child run id");
     let authorization = DriveAuthorization {
+        knowledge_selection: None,
         lineage: RunLineage {
             parent_run_id: None,
             origin: RunOrigin::Subagent,

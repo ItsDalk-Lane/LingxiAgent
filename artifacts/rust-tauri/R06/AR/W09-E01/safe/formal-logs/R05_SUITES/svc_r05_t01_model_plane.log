@@ -1,0 +1,34 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running tests/r05_t01_model_plane.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t01_model_plane-69462c0b2fb16347)
+W09_ACTUAL_TEST_BINARY_START {"binary": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t01_model_plane-69462c0b2fb16347", "argv": ["/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t01_model_plane-69462c0b2fb16347", "--test-threads=2"], "wrapper_pid": 64698, "process_group": 57282, "before_sha256": "a9b1d46f784ab40b9e55030b972539223c6781268ec6e3dce09d5d9d9f2757ee", "before_at": "2026-10-11T13:53:58.728570+00:00", "guard_env": {"LINGXI_TEST_GUARD": "1", "TEST_TIME_LIMIT_SEC": "600", "TEST_MEM_LIMIT_MB": "8192"}, "product_dir": "<W09_WORKSPACE>/lib", "shipping_inventory_before": {"path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service", "sha256": "52b3947e119f13eb43bd19bbcd43b012a2f94c6649bc2ef42c74047fca8f108f"}, "case_receipts": null, "actual_graph_sink": null, "actual_graph_evidence_root": null, "effective_case_env": {"W09_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/case-formal-r05-final-59", "W10_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/w10-formal-r05-final-59"}}
+LINGXI_TEST_GUARD: armed (pid 64700, mem_limit=8192 MB, time_limit=600 s)
+
+running 24 tests
+test c03_no_model_plane_is_the_explicit_unconfigured_outcome ... ok
+test c02_full_chain_real_wiring_real_tool_real_result ... ok
+test c04_same_model_id_different_providers_never_cross_wire ... ok
+test c05_in_flight_call_keeps_its_snapshot_and_cancel_is_unaffected ... ok
+test c05_reload_through_management_surface_swaps_atomically ... ok
+test c05_reload_without_a_configured_plane_is_a_loud_404 ... ok
+test rr1_f01_f02::f01_control_no_capability_needs_still_dispatches ... ok
+test rr1_f01_f02::f01_declared_image_capability_sends_the_image_payload ... ok
+test rr1_f01_f02::f01_declared_tools_capability_sends_the_tools_payload ... ok
+test rr1_f01_f02::f01_explicitly_unsupported_tools_capability_makes_zero_requests ... ok
+test rr1_f01_f02::f01_keyless_local_model_with_declared_tools_works ... ok
+test rr1_f01_f02::f01_reload_removing_the_declaration_or_binding_refuses_new_calls ... ok
+test rr1_f01_f02::f01_same_model_id_across_providers_and_auxiliary_slot_follow_the_route ... ok
+test rr1_f01_f02::f01_undeclared_image_capability_makes_zero_requests ... ok
+test rr1_f01_f02::f01_undeclared_tools_capability_makes_zero_requests ... ok
+test rr1_f01_f02::f02_kept_seed_serves_both_generations ... ok
+test c06_unsupported_family_makes_zero_requests ... ok
+test rr1_f01_f02::f02_old_route_never_resolves_new_generation_material ... ok
+test rr1_f01_f02::f02_key_only_rotation_safe_failure_then_new_call_uses_new_key ... ok
+test rr1_f01_f02::f02_removed_provider_old_route_is_not_configured ... ok
+test rr1_f01_f02::f02_resolve_dispatch_freezes_compat_and_capabilities_with_the_route ... ok
+test rr1_f01_f02::f02_unrelated_provider_reload_is_isolated_per_provider ... ok
+test rr1_f01_f02::f02_reload_during_401_never_sends_new_key_to_old_endpoint ... ok
+test rr1_f29::f29_management_reload_during_inflight_401_never_leaks_the_new_key ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.60s
+
+W09_ACTUAL_TEST_BINARY_END {"binary": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t01_model_plane-69462c0b2fb16347", "argv": ["/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t01_model_plane-69462c0b2fb16347", "--test-threads=2"], "wrapper_pid": 64698, "process_group": 57282, "before_sha256": "a9b1d46f784ab40b9e55030b972539223c6781268ec6e3dce09d5d9d9f2757ee", "before_at": "2026-10-11T13:53:58.728570+00:00", "guard_env": {"LINGXI_TEST_GUARD": "1", "TEST_TIME_LIMIT_SEC": "600", "TEST_MEM_LIMIT_MB": "8192"}, "product_dir": "<W09_WORKSPACE>/lib", "shipping_inventory_before": {"path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service", "sha256": "52b3947e119f13eb43bd19bbcd43b012a2f94c6649bc2ef42c74047fca8f108f"}, "case_receipts": null, "actual_graph_sink": null, "actual_graph_evidence_root": null, "effective_case_env": {"W09_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/case-formal-r05-final-59", "W10_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/w10-formal-r05-final-59"}, "actual_child_pid": 64700, "exit_code": 0, "actual_wait_reaped": true, "elapsed_seconds": 2.4924984999961453, "after_sha256": "a9b1d46f784ab40b9e55030b972539223c6781268ec6e3dce09d5d9d9f2757ee", "after_at": "2026-10-11T13:54:01.299535+00:00", "shipping_inventory_after": {"path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service", "sha256": "52b3947e119f13eb43bd19bbcd43b012a2f94c6649bc2ef42c74047fca8f108f"}, "binary_stable": true}

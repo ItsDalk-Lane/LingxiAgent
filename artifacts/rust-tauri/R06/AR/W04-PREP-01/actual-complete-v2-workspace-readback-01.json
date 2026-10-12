@@ -1,0 +1,67 @@
+{
+  "at": "2026-10-12T01:07:21.188551+00:00",
+  "role": "ROOT_READ_ONLY_ACTUAL_EXECUTOR_RECORD_CHECK_NOT_REVIEWER",
+  "inputs": [
+    {
+      "path": "/private/tmp/lingxi-r06-w04-evidence-01/logs/final-workspace-regression-02.json",
+      "sha256": "81e59bb1c096b1a08ece0a51b0105ef904b31f6d3a24e20a512dffde9ba0d2e4",
+      "bytes": 210823
+    },
+    {
+      "path": "/private/tmp/lingxi-r06-w04-evidence-01/logs/final-workspace-regression-02-summary.json",
+      "sha256": "60227fa5da29f82373017b9e19ed29f53929fdfbcb1586d5371f3802d8d276ed",
+      "bytes": 1498
+    },
+    {
+      "path": "/private/tmp/lingxi-r06-w04-evidence-01/logs/final-fork-mutation-red-01.json",
+      "sha256": "e419324b93c9275ba4872b25c891f8c526253f612cc2e99179e371e6031d1c81",
+      "bytes": 75140
+    }
+  ],
+  "workspace": {
+    "actual_exit": 101,
+    "start": 1791765922.563923,
+    "end": 1791766991.4825711,
+    "elapsed_seconds": 1068.9186482429504,
+    "counts_recomputed_from_actual_log": {
+      "summary_count": 147,
+      "ok": 1873,
+      "FAILED": 9
+    },
+    "failures": [
+      "v9_is_the_supported_tip_with_expected_name",
+      "v7_to_v9_chain_preserves_prior_data_and_creates_new_tables",
+      "subagent_timeout_settles_a_parked_quota_wait",
+      "panicking_tool_child_is_supervised_and_the_run_settles_loudly",
+      "approval_wait_round_trips_approve_and_reject_legs",
+      "r04_a12_filesystem_write_isolation_holds_with_real_sentinels",
+      "worker_sandbox_binding_denies_out_of_boundary_writes",
+      "r03_a01_three_model_calls_produce_exactly_one_task_terminal",
+      "parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls"
+    ],
+    "source_before_after_equal": true,
+    "runner_before_after_equal": true,
+    "sampled_child_count": 182,
+    "child_limits": "600sec/8192MiB",
+    "guard_breach": null,
+    "controller_limit_seconds": 2700,
+    "controller_RSS_samples": 0,
+    "controller_peak_RSS": null,
+    "controller_missing_RSS_preserved": true,
+    "program_file_inventory_count": 140,
+    "program_inventory_is_not_startup_binding": true,
+    "child_binary_binding_moment": "first_seen sampling; not falsely relabelled pre-start",
+    "physical_child_wait": "NOT_INDEPENDENTLY_WAITED_BY_ROOT; final PID closure pending executor freeze"
+  },
+  "isolated_fork_mutation": {
+    "actual_exit": 101,
+    "pid": 25010,
+    "binary_before_after_sha256": "29e9cc6725fc8ef7c1db5fa68695577daa08fe43db94431369e3cadc8a7b9083",
+    "guard_breach": null,
+    "full_source_before_after_equal": true
+  },
+  "original_R05_seven_chain": "IN_PROGRESS_ACTOR_REPORT_NOT_STAGE_PASS",
+  "task_acceptance": "NONE",
+  "formal_stage": "NOT_RUN",
+  "R07_started": false
+}

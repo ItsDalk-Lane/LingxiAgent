@@ -1,0 +1,10 @@
+{
+  "intent": "调用意图；不能等于已发送。",
+  "transport_attempt": "真正poll execute时增加；前一刻取消不增加。journal/execute跨崩溃仍未知。",
+  "requestCount": "confirmed_or_possibly_sent_excluding_known_not_sent；保守可能已发送，扣除证明连接前失败；不能等于server wire/accepted。",
+  "pendingRequestCount": "已登记transport但未见headers/connect结果的未知状态，不是physically_sent证明。",
+  "headers": "只证明到达下界，不证明向量已提交或usage完整。",
+  "connect_error": "保原A10 retryable，transport1/request0/serverwire0；Unknown token字段保持null。",
+  "SIGKILL": "真实wire4/持久usage row3、previous unknown1；F11调用账目缺未知row仍OPEN，作业计数不充当usage。",
+  "restart": "已登记计数延续，不重复扣除known-not-sent；未知保持未知，不能以计数为由盲重发。"
+}

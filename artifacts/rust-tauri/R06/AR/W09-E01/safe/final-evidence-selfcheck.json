@@ -1,0 +1,17 @@
+{
+  "status": "READY_FOR_INDEPENDENT_REVIEW_NOT_ACCEPTED",
+  "at": "2026-10-11T14:58:04.845464+00:00",
+  "candidate_full_build_inputs": 5027,
+  "source_product_union13_owned11_dep5_overlap3": true,
+  "all_input_and_product_SHA_current": true,
+  "lock_current": true,
+  "common_info_exclude_unchanged": true,
+  "private_excludes_SHA_current": true,
+  "whole142_actual_internal_guards": true,
+  "formal297_program_windows_292_tests_289_builtin3gap": true,
+  "new3_probe_external_guard_only": true,
+  "new3_shipping_inherited_os_HOME": true,
+  "safe_sensitive_material_scan": "no literal credential values/private keys/real user path; plain-language Bearer <REDACTED> are definitions, not credentials",
+  "mandatory_workspace_and_three_formal_stages": "FAIL preserved; no independent PASS",
+  "preparation_and_QA_errors": "packaging KeyError and original3 guard absence retained; missing old inventories UNKNOWN"
+}

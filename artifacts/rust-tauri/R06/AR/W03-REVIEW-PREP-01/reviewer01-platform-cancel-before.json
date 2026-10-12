@@ -1,0 +1,75 @@
+{
+  "at": "2026-10-11T14:33:32.225744+00:00",
+  "actor": "/root/ar_w03_reviewer_01",
+  "status": "PLATFORM_INTERRUPTED_REVIEW_INCOMPLETE_SUPERVISED_CANCEL_REQUESTED",
+  "platform_reason": "This content was flagged for possible cybersecurity risk. Apply for Daybreak access before retrying.",
+  "daybreak_enabled": "UNKNOWN_NOT_CONFIRMED_ENABLED",
+  "no_retry": true,
+  "no_completed_review_verdict": true,
+  "monitor_pid": 54491,
+  "owned_descendants_before": [
+    {
+      "pid": 54491,
+      "ppid": 23291,
+      "pgid": 54491,
+      "command": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python artifacts/rust-tauri/R06/AR/W03-R01/run_guard.py formal-r05-01 20400 /Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -j8 --target-dir /private/tmp/lingxi-w03-r01-1d66t3nh/formal-target -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R06/AR/W03-R01/formal-r05-01-gate"
+    },
+    {
+      "pid": 54742,
+      "ppid": 54491,
+      "pgid": 54742,
+      "command": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/study_superior/.codex/r06-isolated-checkouts/w03-first-review-source-01/artifacts/rust-tauri/R06/AR/W03-R01/bin_runner.py /private/tmp/lingxi-w03-r01-1d66t3nh/formal-target/debug/xtask verify-stage R05 --evidence artifacts/rust-tauri/R06/AR/W03-R01/formal-r05-01-gate"
+    },
+    {
+      "pid": 54899,
+      "ppid": 54742,
+      "pgid": 54742,
+      "command": "/private/tmp/lingxi-w03-r01-1d66t3nh/formal-target/debug/xtask verify-stage R05 --evidence artifacts/rust-tauri/R06/AR/W03-R01/formal-r05-01-gate"
+    },
+    {
+      "pid": 57322,
+      "ppid": 54899,
+      "pgid": 57322,
+      "command": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo test --manifest-path rust/Cargo.toml --workspace --locked"
+    },
+    {
+      "pid": 70880,
+      "ppid": 57322,
+      "pgid": 57322,
+      "command": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/study_superior/.codex/r06-isolated-checkouts/w03-first-review-source-01/artifacts/rust-tauri/R06/AR/W03-R01/bin_runner.py /private/tmp/lingxi-w03-r01-1d66t3nh/formal-target/debug/deps/background_steering-d58f6578a9a664ce"
+    },
+    {
+      "pid": 70917,
+      "ppid": 70880,
+      "pgid": 57322,
+      "command": "/private/tmp/lingxi-w03-r01-1d66t3nh/formal-target/debug/deps/background_steering-d58f6578a9a664ce"
+    }
+  ],
+  "monitor_paths": [
+    {
+      "monitor": "/private/tmp/lingxi-w03-r01-monitor-formal-r05-01-b7jbuqz8",
+      "run_start_sha256": "1908bab5904a9536d8be9e9e7014973ab91ee868a3ee4a44cd1545103b38b66b",
+      "start": 1791728531.832,
+      "actual_argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "run",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-j8",
+        "--target-dir",
+        "/private/tmp/lingxi-w03-r01-1d66t3nh/formal-target",
+        "-p",
+        "xtask",
+        "--",
+        "verify-stage",
+        "R05",
+        "--evidence",
+        "artifacts/rust-tauri/R06/AR/W03-R01/formal-r05-01-gate"
+      ]
+    }
+  ],
+  "signal": "SIGTERM_TO_EXACT_OWN_MONITOR_WITH_EXISTING_HANDLER",
+  "no_name_based_kill": true,
+  "actual_formal_final": "PENDING_CANCEL_SETTLEMENT"
+}

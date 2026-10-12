@@ -1,0 +1,2 @@
+{"command": ["/Users/study_superior/.cargo/bin/cargo", "clippy", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-adapters", "-p", "lingxi-service", "--all-targets", "--", "-D", "warnings"], "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-clippy-01-ho8kjuc8", "start": 1791701185.522667}
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.47s

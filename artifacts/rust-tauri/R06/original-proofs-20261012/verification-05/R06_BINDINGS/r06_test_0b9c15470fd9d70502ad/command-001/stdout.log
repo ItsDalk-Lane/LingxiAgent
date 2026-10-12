@@ -1,0 +1,22 @@
+
+running 1 test
+test reply_validations_refuse_unknown_threads_loudly ... FAILED
+
+successes:
+
+successes:
+
+failures:
+
+---- reply_validations_refuse_unknown_threads_loudly stdout ----
+
+thread 'reply_validations_refuse_unknown_threads_loudly' (13519160) panicked at crates/lingxi-service/tests/subagent_lifecycle.rs:522:14:
+the parent settles with the recorded refusal: Storage(Corrupted { detail: "model_history: 可信历史声明代次缺失" })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    reply_validations_refuse_unknown_threads_loudly
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.10s
+

@@ -1,0 +1,160 @@
+{
+  "start": 1791707416.6315541,
+  "end": 1791707418.155286,
+  "binary": "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent/rust/target/debug/lingxi-service",
+  "records": [
+    {
+      "patch": [
+        400,
+        {
+          "error": "invalid agent config.yaml: unsupported YAML tag or tagged node type"
+        }
+      ],
+      "config_after_patch": "memory: {enabled: !custom true}\n",
+      "name": "unsupported-bool-tag",
+      "yaml": "memory: {enabled: !custom true}\n",
+      "expected_memory": null,
+      "actual_flags": [
+        400,
+        {
+          "error": "invalid agent config.yaml: unsupported YAML tag or tagged node type"
+        }
+      ],
+      "execute": [
+        200,
+        {
+          "runId": "run_000001a12a1588b6_000001",
+          "runCount": 1
+        }
+      ],
+      "terminal": [
+        "failed",
+        "failed.provider_error"
+      ],
+      "provider_request": [],
+      "matches_expectation": true,
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-unsupported-bool-tag-pct_u1pd/home",
+      "home_source": "CLI and env both synthetic",
+      "config_unchanged_before_patch": true,
+      "binary_sha256": "e2675cbe9b6102bfff1a2cf63166c18a7c96f263fe1e2cd030b3adcf0f402b17",
+      "ready": "LINGXI_SERVICE_READY addr=127.0.0.1:64152 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-unsupported-bool-tag-pct_u1pd/home source=cli",
+      "child_exit_code": 0,
+      "command": [
+        "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent/rust/target/debug/lingxi-service",
+        "--home",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-unsupported-bool-tag-pct_u1pd/home",
+        "--config",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-unsupported-bool-tag-pct_u1pd/service.json",
+        "--bind",
+        "127.0.0.1:0"
+      ],
+      "start_time": 1791707416.636526,
+      "end_time": 1791707416.809881,
+      "pid": 74183,
+      "fixture_removed": true,
+      "guard_armed": true
+    },
+    {
+      "patch": [
+        400,
+        {
+          "error": "invalid agent config.yaml: unsupported YAML tag or tagged node type"
+        }
+      ],
+      "config_after_patch": "memory: {enabled: false}\nagent: {name: !custom LITERAL-TAG-NAME}\n",
+      "name": "unsupported-string-tag",
+      "yaml": "memory: {enabled: false}\nagent: {name: !custom LITERAL-TAG-NAME}\n",
+      "expected_memory": null,
+      "actual_flags": [
+        400,
+        {
+          "error": "invalid agent config.yaml: unsupported YAML tag or tagged node type"
+        }
+      ],
+      "execute": [
+        200,
+        {
+          "runId": "run_000001a12a158af4_000001",
+          "runCount": 1
+        }
+      ],
+      "terminal": [
+        "failed",
+        "failed.provider_error"
+      ],
+      "provider_request": [],
+      "matches_expectation": true,
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-unsupported-string-tag-1w6t7ael/home",
+      "home_source": "CLI and env both synthetic",
+      "config_unchanged_before_patch": true,
+      "binary_sha256": "e2675cbe9b6102bfff1a2cf63166c18a7c96f263fe1e2cd030b3adcf0f402b17",
+      "ready": "LINGXI_SERVICE_READY addr=127.0.0.1:64157 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-unsupported-string-tag-1w6t7ael/home source=cli",
+      "child_exit_code": 0,
+      "command": [
+        "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent/rust/target/debug/lingxi-service",
+        "--home",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-unsupported-string-tag-1w6t7ael/home",
+        "--config",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-unsupported-string-tag-1w6t7ael/service.json",
+        "--bind",
+        "127.0.0.1:0"
+      ],
+      "start_time": 1791707417.14428,
+      "end_time": 1791707417.389333,
+      "pid": 74227,
+      "fixture_removed": true,
+      "guard_armed": true
+    },
+    {
+      "patch": [
+        400,
+        {
+          "error": "invalid agent config.yaml: unsupported YAML tag or tagged node type"
+        }
+      ],
+      "config_after_patch": "memory: !custom {enabled: true}\n",
+      "name": "unsupported-section-tag",
+      "yaml": "memory: !custom {enabled: true}\n",
+      "expected_memory": null,
+      "actual_flags": [
+        400,
+        {
+          "error": "invalid agent config.yaml: unsupported YAML tag or tagged node type"
+        }
+      ],
+      "execute": [
+        200,
+        {
+          "runId": "run_000001a12a158cb0_000001",
+          "runCount": 1
+        }
+      ],
+      "terminal": [
+        "failed",
+        "failed.provider_error"
+      ],
+      "provider_request": [],
+      "matches_expectation": true,
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-unsupported-section-tag-7no8j0wl/home",
+      "home_source": "CLI and env both synthetic",
+      "config_unchanged_before_patch": true,
+      "binary_sha256": "e2675cbe9b6102bfff1a2cf63166c18a7c96f263fe1e2cd030b3adcf0f402b17",
+      "ready": "LINGXI_SERVICE_READY addr=127.0.0.1:64164 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-unsupported-section-tag-7no8j0wl/home source=cli",
+      "child_exit_code": 0,
+      "command": [
+        "/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent/rust/target/debug/lingxi-service",
+        "--home",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-unsupported-section-tag-7no8j0wl/home",
+        "--config",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-review-unsupported-section-tag-7no8j0wl/service.json",
+        "--bind",
+        "127.0.0.1:0"
+      ],
+      "start_time": 1791707417.6503592,
+      "end_time": 1791707417.832781,
+      "pid": 74442,
+      "fixture_removed": true,
+      "guard_armed": true
+    }
+  ]
+}

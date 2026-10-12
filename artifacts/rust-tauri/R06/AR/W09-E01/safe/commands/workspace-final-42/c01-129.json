@@ -1,0 +1,1665 @@
+{
+  "job": {
+    "artifactId": "kpa_6ccec3f17e0c0f956c5e7f3d",
+    "attempt": 1,
+    "cancelledAt": null,
+    "chunkerConfigId": "8b93f0aa4fa689af",
+    "createdAt": "2026-10-11T13:26:54.211Z",
+    "embeddingStats": {
+      "abandonedStaleVariantId": null,
+      "actualWrittenChunkCount": 129,
+      "attempt": 1,
+      "callAttemptCount": 3,
+      "checkpointVariantId": "viv_10f3ad850575fed9322fb13ee561b51c",
+      "chunksNewlyEmbedded": 129,
+      "chunksResumedFromCheckpoint": 0,
+      "chunksReusedFromReadyVariant": 0,
+      "confirmedResponseRequestCount": 3,
+      "failedCallCount": 0,
+      "failedRequestCount": 0,
+      "failedTransportAttemptCount": 0,
+      "knownNotSentAttemptCount": 0,
+      "model": {
+        "dimensions": 2,
+        "key": "95feca488a221756920b6e78391bbf9b730e1c571f1a7ab14afeb96a9a8aeec2",
+        "modelId": "model-a",
+        "parameterFingerprint": "15fdd3dacc08bc4130bdfc58b86ad1b62de885ef69dad1c58abd96a208cb42d8",
+        "protocol": "openai-embeddings",
+        "provider": "embed"
+      },
+      "pendingCallIntentCount": 0,
+      "pendingRequestCount": 0,
+      "plannedChunkCount": 129,
+      "previousKnownNotSentAttemptCount": 0,
+      "previousRequestCount": 0,
+      "previousTransportAttemptCount": 0,
+      "requestCount": 3,
+      "requestCountSemantics": "confirmed_or_possibly_sent_excluding_known_not_sent",
+      "resetStaleVectors": false,
+      "successfulRequestCount": 3,
+      "transportAttemptCount": 3,
+      "unknownRequestsFromPreviousAttempt": 0,
+      "unknownSentRequestCount": 0
+    },
+    "error": null,
+    "id": "kjob_0fcfe9d93b313fa5b43a64ec",
+    "notebookId": "knb_03e769a1ef38ed10128b8459",
+    "phase": "done",
+    "progressDone": 129,
+    "progressTotal": 129,
+    "sourceId": "ksrc_82d91a2a46817175f9415609",
+    "status": "done",
+    "updatedAt": "2026-10-11T13:26:54.239Z"
+  },
+  "ledger": [
+    {
+      "input_tokens": 320,
+      "model": "model-a",
+      "model_call_id": "op-embedding-1791725214233-0",
+      "outcome": "succeeded",
+      "provider": "embed",
+      "transport_attempts": 1,
+      "usage_state": "partial"
+    },
+    {
+      "input_tokens": 320,
+      "model": "model-a",
+      "model_call_id": "op-embedding-1791725214236-1",
+      "outcome": "succeeded",
+      "provider": "embed",
+      "transport_attempts": 1,
+      "usage_state": "partial"
+    },
+    {
+      "input_tokens": 5,
+      "model": "model-a",
+      "model_call_id": "op-embedding-1791725214238-2",
+      "outcome": "succeeded",
+      "provider": "embed",
+      "transport_attempts": 1,
+      "usage_state": "partial"
+    }
+  ],
+  "plan": [
+    {
+      "chunk_id": "chunk_32ddcc5e7608c790d86d3ad5c748ab5d",
+      "ordinal": 0,
+      "text": "Chapter 0000 W09唯一章节\n\n唯一计划块0000的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_893d01b6994affdbb214383cd564965c",
+      "ordinal": 1,
+      "text": "Chapter 0001 W09唯一章节\n\n唯一计划块0001的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_cef1b0ed6d65c24f69cd7dca1a695db6",
+      "ordinal": 2,
+      "text": "Chapter 0002 W09唯一章节\n\n唯一计划块0002的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_122fd45cde2dd796d05143a7f386b447",
+      "ordinal": 3,
+      "text": "Chapter 0003 W09唯一章节\n\n唯一计划块0003的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_1331c377f527f87a20059ad86c81c171",
+      "ordinal": 4,
+      "text": "Chapter 0004 W09唯一章节\n\n唯一计划块0004的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_12b375022ab92768e0d5beac96f0d21e",
+      "ordinal": 5,
+      "text": "Chapter 0005 W09唯一章节\n\n唯一计划块0005的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_eec3b2cc321753dbf8b15e415c9ef324",
+      "ordinal": 6,
+      "text": "Chapter 0006 W09唯一章节\n\n唯一计划块0006的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_de0af5bdb4241dd859a08f9b252b85c6",
+      "ordinal": 7,
+      "text": "Chapter 0007 W09唯一章节\n\n唯一计划块0007的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_b2fe9723c9cdb9d87d7caedd4510f007",
+      "ordinal": 8,
+      "text": "Chapter 0008 W09唯一章节\n\n唯一计划块0008的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_8e914a36e216f245834f09d07482d1ce",
+      "ordinal": 9,
+      "text": "Chapter 0009 W09唯一章节\n\n唯一计划块0009的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_2a4d564fd41094ebb02e88d722eaf169",
+      "ordinal": 10,
+      "text": "Chapter 0010 W09唯一章节\n\n唯一计划块0010的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_c8d1eb6344e55f85fca93394a067e7fc",
+      "ordinal": 11,
+      "text": "Chapter 0011 W09唯一章节\n\n唯一计划块0011的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_36b7a263fc53375bbb44aed7665097bb",
+      "ordinal": 12,
+      "text": "Chapter 0012 W09唯一章节\n\n唯一计划块0012的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_0de6e66207af3de262287b3f0b425222",
+      "ordinal": 13,
+      "text": "Chapter 0013 W09唯一章节\n\n唯一计划块0013的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_20eb8e889bbea54efe9b95cf2ddf1571",
+      "ordinal": 14,
+      "text": "Chapter 0014 W09唯一章节\n\n唯一计划块0014的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_ce378f4150a16cd48e5fd355f24a5c67",
+      "ordinal": 15,
+      "text": "Chapter 0015 W09唯一章节\n\n唯一计划块0015的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_0d3e79d0cdddaf0ff5b3bfa8f26af9d2",
+      "ordinal": 16,
+      "text": "Chapter 0016 W09唯一章节\n\n唯一计划块0016的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_328e17ab8aa53bc4ec2fca03353cdfde",
+      "ordinal": 17,
+      "text": "Chapter 0017 W09唯一章节\n\n唯一计划块0017的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_8d8638ca656df0662d285154265fb2da",
+      "ordinal": 18,
+      "text": "Chapter 0018 W09唯一章节\n\n唯一计划块0018的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_c73951451c32ecfc636c93d88abc9301",
+      "ordinal": 19,
+      "text": "Chapter 0019 W09唯一章节\n\n唯一计划块0019的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_a15630426e64463df120e6f04f79e37c",
+      "ordinal": 20,
+      "text": "Chapter 0020 W09唯一章节\n\n唯一计划块0020的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_630da92547267952f06289ddd1d10c2e",
+      "ordinal": 21,
+      "text": "Chapter 0021 W09唯一章节\n\n唯一计划块0021的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_08b94a71bcb3e1f8374565d5e68386bb",
+      "ordinal": 22,
+      "text": "Chapter 0022 W09唯一章节\n\n唯一计划块0022的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_49f50d27327eeb8c2538529a46295911",
+      "ordinal": 23,
+      "text": "Chapter 0023 W09唯一章节\n\n唯一计划块0023的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_2dec2522844556e62699f761faf0ea2d",
+      "ordinal": 24,
+      "text": "Chapter 0024 W09唯一章节\n\n唯一计划块0024的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_2058833995b9ad57310649e3493d29e0",
+      "ordinal": 25,
+      "text": "Chapter 0025 W09唯一章节\n\n唯一计划块0025的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_9395a6cef793eb629a45a8aa4b00cf0c",
+      "ordinal": 26,
+      "text": "Chapter 0026 W09唯一章节\n\n唯一计划块0026的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_d8a6710edc7a5bd85cba1d31cf5b6338",
+      "ordinal": 27,
+      "text": "Chapter 0027 W09唯一章节\n\n唯一计划块0027的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_d66b856918ee38709f8e9624bf45081a",
+      "ordinal": 28,
+      "text": "Chapter 0028 W09唯一章节\n\n唯一计划块0028的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_883dd34b6549ceeb039dfec9d51144bc",
+      "ordinal": 29,
+      "text": "Chapter 0029 W09唯一章节\n\n唯一计划块0029的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_a04c1921046cdc3b814e5b2c3c962976",
+      "ordinal": 30,
+      "text": "Chapter 0030 W09唯一章节\n\n唯一计划块0030的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_6c84cffabbd4eb2dd3a86cf846047d8b",
+      "ordinal": 31,
+      "text": "Chapter 0031 W09唯一章节\n\n唯一计划块0031的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_6e95d5d290f1cf19befe0d2e5fa34860",
+      "ordinal": 32,
+      "text": "Chapter 0032 W09唯一章节\n\n唯一计划块0032的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_34dd2c4a76f9e7467b1cdfd16d874ff6",
+      "ordinal": 33,
+      "text": "Chapter 0033 W09唯一章节\n\n唯一计划块0033的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_17a3ea9e1ad90ab511ea78f9c588a683",
+      "ordinal": 34,
+      "text": "Chapter 0034 W09唯一章节\n\n唯一计划块0034的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_4a4d7a81c0eaa69e25dec0c93c362635",
+      "ordinal": 35,
+      "text": "Chapter 0035 W09唯一章节\n\n唯一计划块0035的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_fb8e003de96d1c9808b14de837b096a6",
+      "ordinal": 36,
+      "text": "Chapter 0036 W09唯一章节\n\n唯一计划块0036的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_6a5580dd112edf5f3a3743be2f593c61",
+      "ordinal": 37,
+      "text": "Chapter 0037 W09唯一章节\n\n唯一计划块0037的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_918687996f2228f582a16f59ef3b28f4",
+      "ordinal": 38,
+      "text": "Chapter 0038 W09唯一章节\n\n唯一计划块0038的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_679295e99ba5a0581d604ecff9af2b0a",
+      "ordinal": 39,
+      "text": "Chapter 0039 W09唯一章节\n\n唯一计划块0039的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_b4d21e9c138cc833dda1abe2a08fce2b",
+      "ordinal": 40,
+      "text": "Chapter 0040 W09唯一章节\n\n唯一计划块0040的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_b4abb8dfb6f5bb920feabc9436f60371",
+      "ordinal": 41,
+      "text": "Chapter 0041 W09唯一章节\n\n唯一计划块0041的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_eb253795e0c8fddcb8f384bad01086d2",
+      "ordinal": 42,
+      "text": "Chapter 0042 W09唯一章节\n\n唯一计划块0042的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_7ec7378bd56db95b98c159101d388f20",
+      "ordinal": 43,
+      "text": "Chapter 0043 W09唯一章节\n\n唯一计划块0043的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_87289e7494b579724fea79f677de807c",
+      "ordinal": 44,
+      "text": "Chapter 0044 W09唯一章节\n\n唯一计划块0044的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_9ceba781cea50e3bd934f4a25a92d96c",
+      "ordinal": 45,
+      "text": "Chapter 0045 W09唯一章节\n\n唯一计划块0045的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_a500226e2dec73129e92562b49016d3b",
+      "ordinal": 46,
+      "text": "Chapter 0046 W09唯一章节\n\n唯一计划块0046的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_1dfa590008b9e1667ed0e1d1ae222142",
+      "ordinal": 47,
+      "text": "Chapter 0047 W09唯一章节\n\n唯一计划块0047的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_4a2c81c6cdd97d956e24da39f7230a87",
+      "ordinal": 48,
+      "text": "Chapter 0048 W09唯一章节\n\n唯一计划块0048的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_71960a2ca6d5a47379116d3ac9ae4825",
+      "ordinal": 49,
+      "text": "Chapter 0049 W09唯一章节\n\n唯一计划块0049的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_9da00b37146447106167ff135bb408e0",
+      "ordinal": 50,
+      "text": "Chapter 0050 W09唯一章节\n\n唯一计划块0050的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_c42dcc2eac26fd1d5cc9994038ff52ac",
+      "ordinal": 51,
+      "text": "Chapter 0051 W09唯一章节\n\n唯一计划块0051的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_0a9f34b34c3cb7bcdcba8d3162d365ba",
+      "ordinal": 52,
+      "text": "Chapter 0052 W09唯一章节\n\n唯一计划块0052的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_1acd1dd5c5e104c17c892344a525bcd3",
+      "ordinal": 53,
+      "text": "Chapter 0053 W09唯一章节\n\n唯一计划块0053的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_ed83a29fa084290a81492cff8025f99c",
+      "ordinal": 54,
+      "text": "Chapter 0054 W09唯一章节\n\n唯一计划块0054的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_2ca13b975ce5a3dd54c241cb33dea31a",
+      "ordinal": 55,
+      "text": "Chapter 0055 W09唯一章节\n\n唯一计划块0055的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_df6e62a6c9533ac5edf70904fbc05b21",
+      "ordinal": 56,
+      "text": "Chapter 0056 W09唯一章节\n\n唯一计划块0056的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_7b34b21739f08480b724cdcf90014e0f",
+      "ordinal": 57,
+      "text": "Chapter 0057 W09唯一章节\n\n唯一计划块0057的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_79893faeb68704d39174865107b0726d",
+      "ordinal": 58,
+      "text": "Chapter 0058 W09唯一章节\n\n唯一计划块0058的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_daa0b80ddb0b69bb0625cbf3440bf612",
+      "ordinal": 59,
+      "text": "Chapter 0059 W09唯一章节\n\n唯一计划块0059的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_f1c84daa92b6b9dc40ef144709ff6f9a",
+      "ordinal": 60,
+      "text": "Chapter 0060 W09唯一章节\n\n唯一计划块0060的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_43c4543313785853d2f91c6ff4f4c6c1",
+      "ordinal": 61,
+      "text": "Chapter 0061 W09唯一章节\n\n唯一计划块0061的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_569c28838474684b0e4d1e3c82ca1a84",
+      "ordinal": 62,
+      "text": "Chapter 0062 W09唯一章节\n\n唯一计划块0062的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_9ce6db7b21cf16c038360f76b143a6ea",
+      "ordinal": 63,
+      "text": "Chapter 0063 W09唯一章节\n\n唯一计划块0063的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_69e029eb8df80f63f4ebc6e5dd51e25d",
+      "ordinal": 64,
+      "text": "Chapter 0064 W09唯一章节\n\n唯一计划块0064的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_e31bfe62d3fb0b77081ebea4988cb8a3",
+      "ordinal": 65,
+      "text": "Chapter 0065 W09唯一章节\n\n唯一计划块0065的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_465a58e8fc9004a0649f841acae03795",
+      "ordinal": 66,
+      "text": "Chapter 0066 W09唯一章节\n\n唯一计划块0066的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_4d17e577291ab6ab1cbce80d7c4a14dc",
+      "ordinal": 67,
+      "text": "Chapter 0067 W09唯一章节\n\n唯一计划块0067的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_ff9e6a336e4cfb62476c10ba31218da1",
+      "ordinal": 68,
+      "text": "Chapter 0068 W09唯一章节\n\n唯一计划块0068的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_d6b495a018c8fbd441ed9895aa806907",
+      "ordinal": 69,
+      "text": "Chapter 0069 W09唯一章节\n\n唯一计划块0069的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_2f6518888d74277e493788d997bb2576",
+      "ordinal": 70,
+      "text": "Chapter 0070 W09唯一章节\n\n唯一计划块0070的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_26ecf9cb298b14f983e4a09e07a19ff8",
+      "ordinal": 71,
+      "text": "Chapter 0071 W09唯一章节\n\n唯一计划块0071的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_01f48e8a756c6dc113b7c76cc5576e3a",
+      "ordinal": 72,
+      "text": "Chapter 0072 W09唯一章节\n\n唯一计划块0072的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_fbc5b8a530297bb4022b1d002425cd5e",
+      "ordinal": 73,
+      "text": "Chapter 0073 W09唯一章节\n\n唯一计划块0073的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_4f2c99791a4c27ca8d0ec772ab05d7e2",
+      "ordinal": 74,
+      "text": "Chapter 0074 W09唯一章节\n\n唯一计划块0074的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_02939ea7fb15b1203d3d853f1df2fb6e",
+      "ordinal": 75,
+      "text": "Chapter 0075 W09唯一章节\n\n唯一计划块0075的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_adce4818d9168cfd292b749de3eaad93",
+      "ordinal": 76,
+      "text": "Chapter 0076 W09唯一章节\n\n唯一计划块0076的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_5f08448197e97f214f29aeb5385b42a4",
+      "ordinal": 77,
+      "text": "Chapter 0077 W09唯一章节\n\n唯一计划块0077的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_6b914867ca68bf412a8675a7d31f87cb",
+      "ordinal": 78,
+      "text": "Chapter 0078 W09唯一章节\n\n唯一计划块0078的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_052350784b31c73ab58c02181910ea7f",
+      "ordinal": 79,
+      "text": "Chapter 0079 W09唯一章节\n\n唯一计划块0079的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_58d3f82d45e6a879741bb1db0d7e9fef",
+      "ordinal": 80,
+      "text": "Chapter 0080 W09唯一章节\n\n唯一计划块0080的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_7ba025b7a757db4b465c2afc5bf71a6c",
+      "ordinal": 81,
+      "text": "Chapter 0081 W09唯一章节\n\n唯一计划块0081的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_78f9f169ab9f454947c31f2294aefc51",
+      "ordinal": 82,
+      "text": "Chapter 0082 W09唯一章节\n\n唯一计划块0082的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_52824d53334962d53885813cd5ccd78f",
+      "ordinal": 83,
+      "text": "Chapter 0083 W09唯一章节\n\n唯一计划块0083的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_82053768abaf54384a5c668cac229423",
+      "ordinal": 84,
+      "text": "Chapter 0084 W09唯一章节\n\n唯一计划块0084的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_e876d099ea0c64c2554c3bc7cf76ca7e",
+      "ordinal": 85,
+      "text": "Chapter 0085 W09唯一章节\n\n唯一计划块0085的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_e5a1efafee83ea3757a06fec18c74ed5",
+      "ordinal": 86,
+      "text": "Chapter 0086 W09唯一章节\n\n唯一计划块0086的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_5408d5d671b0663461b97c8f738d3a40",
+      "ordinal": 87,
+      "text": "Chapter 0087 W09唯一章节\n\n唯一计划块0087的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_105318c80aaa769a4b5648159339c78a",
+      "ordinal": 88,
+      "text": "Chapter 0088 W09唯一章节\n\n唯一计划块0088的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_a72dcfa63ed07294d7db544c92506628",
+      "ordinal": 89,
+      "text": "Chapter 0089 W09唯一章节\n\n唯一计划块0089的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_17ef33b18cf17b3e01ac89937ee6339b",
+      "ordinal": 90,
+      "text": "Chapter 0090 W09唯一章节\n\n唯一计划块0090的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_47d492120d842db5cb89457098466e39",
+      "ordinal": 91,
+      "text": "Chapter 0091 W09唯一章节\n\n唯一计划块0091的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_b0285cc73c0677444cdc8e67874feb6a",
+      "ordinal": 92,
+      "text": "Chapter 0092 W09唯一章节\n\n唯一计划块0092的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_95af64aa449c79678c9b481064388f08",
+      "ordinal": 93,
+      "text": "Chapter 0093 W09唯一章节\n\n唯一计划块0093的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_fc6be0c1f0ddf7edd8545d7937e14db4",
+      "ordinal": 94,
+      "text": "Chapter 0094 W09唯一章节\n\n唯一计划块0094的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_084b3ea054631f01aa465ff619c781f8",
+      "ordinal": 95,
+      "text": "Chapter 0095 W09唯一章节\n\n唯一计划块0095的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_a6625695166cce299f0a69e78210e939",
+      "ordinal": 96,
+      "text": "Chapter 0096 W09唯一章节\n\n唯一计划块0096的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_74b0b0fa5db46c018d5535b9abc745fb",
+      "ordinal": 97,
+      "text": "Chapter 0097 W09唯一章节\n\n唯一计划块0097的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_cde8e701ee86b5799229896955c63bf6",
+      "ordinal": 98,
+      "text": "Chapter 0098 W09唯一章节\n\n唯一计划块0098的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_880eea474c1e6d16afecc82457b317c9",
+      "ordinal": 99,
+      "text": "Chapter 0099 W09唯一章节\n\n唯一计划块0099的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_f1f672a4ea1b3bee92e57accd39cb794",
+      "ordinal": 100,
+      "text": "Chapter 0100 W09唯一章节\n\n唯一计划块0100的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_8a3f96338550a2b899b198e6b70df61c",
+      "ordinal": 101,
+      "text": "Chapter 0101 W09唯一章节\n\n唯一计划块0101的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_4e8949c142a00ed347f0aacac2e1daeb",
+      "ordinal": 102,
+      "text": "Chapter 0102 W09唯一章节\n\n唯一计划块0102的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_f00de158253a506e20ee1446f7f4af7f",
+      "ordinal": 103,
+      "text": "Chapter 0103 W09唯一章节\n\n唯一计划块0103的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_35256c06dba7be2f2d7b05f760011eb4",
+      "ordinal": 104,
+      "text": "Chapter 0104 W09唯一章节\n\n唯一计划块0104的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_e196141b5633067ff90d1e7335c40bbd",
+      "ordinal": 105,
+      "text": "Chapter 0105 W09唯一章节\n\n唯一计划块0105的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_b18490cf5230e3ad2ecf4352d784f80c",
+      "ordinal": 106,
+      "text": "Chapter 0106 W09唯一章节\n\n唯一计划块0106的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_3d48089098136a81c637a367ec73fd34",
+      "ordinal": 107,
+      "text": "Chapter 0107 W09唯一章节\n\n唯一计划块0107的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_7e60f5751c6647fbaafbeb1ed009fc16",
+      "ordinal": 108,
+      "text": "Chapter 0108 W09唯一章节\n\n唯一计划块0108的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_3b02e6ff9756c3765677296302d4f24f",
+      "ordinal": 109,
+      "text": "Chapter 0109 W09唯一章节\n\n唯一计划块0109的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_c11eeddd0193f466c30bf0cbe672d90b",
+      "ordinal": 110,
+      "text": "Chapter 0110 W09唯一章节\n\n唯一计划块0110的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_a6d20bd20bb2eb0b37a9dd572716c498",
+      "ordinal": 111,
+      "text": "Chapter 0111 W09唯一章节\n\n唯一计划块0111的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_c5b302d2c4775350a1c9394b35c8ebbd",
+      "ordinal": 112,
+      "text": "Chapter 0112 W09唯一章节\n\n唯一计划块0112的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_538fc6650e47554e7a0c88c27386d16a",
+      "ordinal": 113,
+      "text": "Chapter 0113 W09唯一章节\n\n唯一计划块0113的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_d01a354298cf6247dc24e9a7de2f771c",
+      "ordinal": 114,
+      "text": "Chapter 0114 W09唯一章节\n\n唯一计划块0114的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_6b111975349203251f1748a0b7ae9230",
+      "ordinal": 115,
+      "text": "Chapter 0115 W09唯一章节\n\n唯一计划块0115的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_f6bc1fbc590693155977cb0852b29cde",
+      "ordinal": 116,
+      "text": "Chapter 0116 W09唯一章节\n\n唯一计划块0116的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_6b3fb360e0015cb4954f26e885705e46",
+      "ordinal": 117,
+      "text": "Chapter 0117 W09唯一章节\n\n唯一计划块0117的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_0e2f8a10ba510b3049aca51b08d1bedd",
+      "ordinal": 118,
+      "text": "Chapter 0118 W09唯一章节\n\n唯一计划块0118的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_7da481b06fe89cedcb9ef0d06e599cd6",
+      "ordinal": 119,
+      "text": "Chapter 0119 W09唯一章节\n\n唯一计划块0119的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_49e07a87e153476ee257318f083e78ba",
+      "ordinal": 120,
+      "text": "Chapter 0120 W09唯一章节\n\n唯一计划块0120的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_ace54405a8fa149e62363df6a829166d",
+      "ordinal": 121,
+      "text": "Chapter 0121 W09唯一章节\n\n唯一计划块0121的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_bbf4b8a806f60b96a89bb19d1fd78d2b",
+      "ordinal": 122,
+      "text": "Chapter 0122 W09唯一章节\n\n唯一计划块0122的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_bd6cf54847fa072afc9d9833e4b5f72e",
+      "ordinal": 123,
+      "text": "Chapter 0123 W09唯一章节\n\n唯一计划块0123的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_8f83576a641a60a9f5f02c4a9df4c0ed",
+      "ordinal": 124,
+      "text": "Chapter 0124 W09唯一章节\n\n唯一计划块0124的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_be3bdde93c81cf66e88d8b20d65b487c",
+      "ordinal": 125,
+      "text": "Chapter 0125 W09唯一章节\n\n唯一计划块0125的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_0423ab1cf4519f428467a29de78f7ce2",
+      "ordinal": 126,
+      "text": "Chapter 0126 W09唯一章节\n\n唯一计划块0126的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_747235dc11e8d460c9bf459a7a34f6b6",
+      "ordinal": 127,
+      "text": "Chapter 0127 W09唯一章节\n\n唯一计划块0127的独立合成资料。"
+    },
+    {
+      "chunk_id": "chunk_c487040e10ff7320905c57e373894901",
+      "ordinal": 128,
+      "text": "Chapter 0128 W09唯一章节\n\n唯一计划块0128的独立合成资料。"
+    }
+  ],
+  "ready": "LINGXI_SERVICE_READY addr=127.0.0.1:50598 home=<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/workspace-final-42/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w09-exact-129-88157-1791725214118403000 source=env",
+  "requests": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "Chapter 0000 W09唯一章节\n\n唯一计划块0000的独立合成资料。",
+          "Chapter 0001 W09唯一章节\n\n唯一计划块0001的独立合成资料。",
+          "Chapter 0002 W09唯一章节\n\n唯一计划块0002的独立合成资料。",
+          "Chapter 0003 W09唯一章节\n\n唯一计划块0003的独立合成资料。",
+          "Chapter 0004 W09唯一章节\n\n唯一计划块0004的独立合成资料。",
+          "Chapter 0005 W09唯一章节\n\n唯一计划块0005的独立合成资料。",
+          "Chapter 0006 W09唯一章节\n\n唯一计划块0006的独立合成资料。",
+          "Chapter 0007 W09唯一章节\n\n唯一计划块0007的独立合成资料。",
+          "Chapter 0008 W09唯一章节\n\n唯一计划块0008的独立合成资料。",
+          "Chapter 0009 W09唯一章节\n\n唯一计划块0009的独立合成资料。",
+          "Chapter 0010 W09唯一章节\n\n唯一计划块0010的独立合成资料。",
+          "Chapter 0011 W09唯一章节\n\n唯一计划块0011的独立合成资料。",
+          "Chapter 0012 W09唯一章节\n\n唯一计划块0012的独立合成资料。",
+          "Chapter 0013 W09唯一章节\n\n唯一计划块0013的独立合成资料。",
+          "Chapter 0014 W09唯一章节\n\n唯一计划块0014的独立合成资料。",
+          "Chapter 0015 W09唯一章节\n\n唯一计划块0015的独立合成资料。",
+          "Chapter 0016 W09唯一章节\n\n唯一计划块0016的独立合成资料。",
+          "Chapter 0017 W09唯一章节\n\n唯一计划块0017的独立合成资料。",
+          "Chapter 0018 W09唯一章节\n\n唯一计划块0018的独立合成资料。",
+          "Chapter 0019 W09唯一章节\n\n唯一计划块0019的独立合成资料。",
+          "Chapter 0020 W09唯一章节\n\n唯一计划块0020的独立合成资料。",
+          "Chapter 0021 W09唯一章节\n\n唯一计划块0021的独立合成资料。",
+          "Chapter 0022 W09唯一章节\n\n唯一计划块0022的独立合成资料。",
+          "Chapter 0023 W09唯一章节\n\n唯一计划块0023的独立合成资料。",
+          "Chapter 0024 W09唯一章节\n\n唯一计划块0024的独立合成资料。",
+          "Chapter 0025 W09唯一章节\n\n唯一计划块0025的独立合成资料。",
+          "Chapter 0026 W09唯一章节\n\n唯一计划块0026的独立合成资料。",
+          "Chapter 0027 W09唯一章节\n\n唯一计划块0027的独立合成资料。",
+          "Chapter 0028 W09唯一章节\n\n唯一计划块0028的独立合成资料。",
+          "Chapter 0029 W09唯一章节\n\n唯一计划块0029的独立合成资料。",
+          "Chapter 0030 W09唯一章节\n\n唯一计划块0030的独立合成资料。",
+          "Chapter 0031 W09唯一章节\n\n唯一计划块0031的独立合成资料。",
+          "Chapter 0032 W09唯一章节\n\n唯一计划块0032的独立合成资料。",
+          "Chapter 0033 W09唯一章节\n\n唯一计划块0033的独立合成资料。",
+          "Chapter 0034 W09唯一章节\n\n唯一计划块0034的独立合成资料。",
+          "Chapter 0035 W09唯一章节\n\n唯一计划块0035的独立合成资料。",
+          "Chapter 0036 W09唯一章节\n\n唯一计划块0036的独立合成资料。",
+          "Chapter 0037 W09唯一章节\n\n唯一计划块0037的独立合成资料。",
+          "Chapter 0038 W09唯一章节\n\n唯一计划块0038的独立合成资料。",
+          "Chapter 0039 W09唯一章节\n\n唯一计划块0039的独立合成资料。",
+          "Chapter 0040 W09唯一章节\n\n唯一计划块0040的独立合成资料。",
+          "Chapter 0041 W09唯一章节\n\n唯一计划块0041的独立合成资料。",
+          "Chapter 0042 W09唯一章节\n\n唯一计划块0042的独立合成资料。",
+          "Chapter 0043 W09唯一章节\n\n唯一计划块0043的独立合成资料。",
+          "Chapter 0044 W09唯一章节\n\n唯一计划块0044的独立合成资料。",
+          "Chapter 0045 W09唯一章节\n\n唯一计划块0045的独立合成资料。",
+          "Chapter 0046 W09唯一章节\n\n唯一计划块0046的独立合成资料。",
+          "Chapter 0047 W09唯一章节\n\n唯一计划块0047的独立合成资料。",
+          "Chapter 0048 W09唯一章节\n\n唯一计划块0048的独立合成资料。",
+          "Chapter 0049 W09唯一章节\n\n唯一计划块0049的独立合成资料。",
+          "Chapter 0050 W09唯一章节\n\n唯一计划块0050的独立合成资料。",
+          "Chapter 0051 W09唯一章节\n\n唯一计划块0051的独立合成资料。",
+          "Chapter 0052 W09唯一章节\n\n唯一计划块0052的独立合成资料。",
+          "Chapter 0053 W09唯一章节\n\n唯一计划块0053的独立合成资料。",
+          "Chapter 0054 W09唯一章节\n\n唯一计划块0054的独立合成资料。",
+          "Chapter 0055 W09唯一章节\n\n唯一计划块0055的独立合成资料。",
+          "Chapter 0056 W09唯一章节\n\n唯一计划块0056的独立合成资料。",
+          "Chapter 0057 W09唯一章节\n\n唯一计划块0057的独立合成资料。",
+          "Chapter 0058 W09唯一章节\n\n唯一计划块0058的独立合成资料。",
+          "Chapter 0059 W09唯一章节\n\n唯一计划块0059的独立合成资料。",
+          "Chapter 0060 W09唯一章节\n\n唯一计划块0060的独立合成资料。",
+          "Chapter 0061 W09唯一章节\n\n唯一计划块0061的独立合成资料。",
+          "Chapter 0062 W09唯一章节\n\n唯一计划块0062的独立合成资料。",
+          "Chapter 0063 W09唯一章节\n\n唯一计划块0063的独立合成资料。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:50597"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "Chapter 0064 W09唯一章节\n\n唯一计划块0064的独立合成资料。",
+          "Chapter 0065 W09唯一章节\n\n唯一计划块0065的独立合成资料。",
+          "Chapter 0066 W09唯一章节\n\n唯一计划块0066的独立合成资料。",
+          "Chapter 0067 W09唯一章节\n\n唯一计划块0067的独立合成资料。",
+          "Chapter 0068 W09唯一章节\n\n唯一计划块0068的独立合成资料。",
+          "Chapter 0069 W09唯一章节\n\n唯一计划块0069的独立合成资料。",
+          "Chapter 0070 W09唯一章节\n\n唯一计划块0070的独立合成资料。",
+          "Chapter 0071 W09唯一章节\n\n唯一计划块0071的独立合成资料。",
+          "Chapter 0072 W09唯一章节\n\n唯一计划块0072的独立合成资料。",
+          "Chapter 0073 W09唯一章节\n\n唯一计划块0073的独立合成资料。",
+          "Chapter 0074 W09唯一章节\n\n唯一计划块0074的独立合成资料。",
+          "Chapter 0075 W09唯一章节\n\n唯一计划块0075的独立合成资料。",
+          "Chapter 0076 W09唯一章节\n\n唯一计划块0076的独立合成资料。",
+          "Chapter 0077 W09唯一章节\n\n唯一计划块0077的独立合成资料。",
+          "Chapter 0078 W09唯一章节\n\n唯一计划块0078的独立合成资料。",
+          "Chapter 0079 W09唯一章节\n\n唯一计划块0079的独立合成资料。",
+          "Chapter 0080 W09唯一章节\n\n唯一计划块0080的独立合成资料。",
+          "Chapter 0081 W09唯一章节\n\n唯一计划块0081的独立合成资料。",
+          "Chapter 0082 W09唯一章节\n\n唯一计划块0082的独立合成资料。",
+          "Chapter 0083 W09唯一章节\n\n唯一计划块0083的独立合成资料。",
+          "Chapter 0084 W09唯一章节\n\n唯一计划块0084的独立合成资料。",
+          "Chapter 0085 W09唯一章节\n\n唯一计划块0085的独立合成资料。",
+          "Chapter 0086 W09唯一章节\n\n唯一计划块0086的独立合成资料。",
+          "Chapter 0087 W09唯一章节\n\n唯一计划块0087的独立合成资料。",
+          "Chapter 0088 W09唯一章节\n\n唯一计划块0088的独立合成资料。",
+          "Chapter 0089 W09唯一章节\n\n唯一计划块0089的独立合成资料。",
+          "Chapter 0090 W09唯一章节\n\n唯一计划块0090的独立合成资料。",
+          "Chapter 0091 W09唯一章节\n\n唯一计划块0091的独立合成资料。",
+          "Chapter 0092 W09唯一章节\n\n唯一计划块0092的独立合成资料。",
+          "Chapter 0093 W09唯一章节\n\n唯一计划块0093的独立合成资料。",
+          "Chapter 0094 W09唯一章节\n\n唯一计划块0094的独立合成资料。",
+          "Chapter 0095 W09唯一章节\n\n唯一计划块0095的独立合成资料。",
+          "Chapter 0096 W09唯一章节\n\n唯一计划块0096的独立合成资料。",
+          "Chapter 0097 W09唯一章节\n\n唯一计划块0097的独立合成资料。",
+          "Chapter 0098 W09唯一章节\n\n唯一计划块0098的独立合成资料。",
+          "Chapter 0099 W09唯一章节\n\n唯一计划块0099的独立合成资料。",
+          "Chapter 0100 W09唯一章节\n\n唯一计划块0100的独立合成资料。",
+          "Chapter 0101 W09唯一章节\n\n唯一计划块0101的独立合成资料。",
+          "Chapter 0102 W09唯一章节\n\n唯一计划块0102的独立合成资料。",
+          "Chapter 0103 W09唯一章节\n\n唯一计划块0103的独立合成资料。",
+          "Chapter 0104 W09唯一章节\n\n唯一计划块0104的独立合成资料。",
+          "Chapter 0105 W09唯一章节\n\n唯一计划块0105的独立合成资料。",
+          "Chapter 0106 W09唯一章节\n\n唯一计划块0106的独立合成资料。",
+          "Chapter 0107 W09唯一章节\n\n唯一计划块0107的独立合成资料。",
+          "Chapter 0108 W09唯一章节\n\n唯一计划块0108的独立合成资料。",
+          "Chapter 0109 W09唯一章节\n\n唯一计划块0109的独立合成资料。",
+          "Chapter 0110 W09唯一章节\n\n唯一计划块0110的独立合成资料。",
+          "Chapter 0111 W09唯一章节\n\n唯一计划块0111的独立合成资料。",
+          "Chapter 0112 W09唯一章节\n\n唯一计划块0112的独立合成资料。",
+          "Chapter 0113 W09唯一章节\n\n唯一计划块0113的独立合成资料。",
+          "Chapter 0114 W09唯一章节\n\n唯一计划块0114的独立合成资料。",
+          "Chapter 0115 W09唯一章节\n\n唯一计划块0115的独立合成资料。",
+          "Chapter 0116 W09唯一章节\n\n唯一计划块0116的独立合成资料。",
+          "Chapter 0117 W09唯一章节\n\n唯一计划块0117的独立合成资料。",
+          "Chapter 0118 W09唯一章节\n\n唯一计划块0118的独立合成资料。",
+          "Chapter 0119 W09唯一章节\n\n唯一计划块0119的独立合成资料。",
+          "Chapter 0120 W09唯一章节\n\n唯一计划块0120的独立合成资料。",
+          "Chapter 0121 W09唯一章节\n\n唯一计划块0121的独立合成资料。",
+          "Chapter 0122 W09唯一章节\n\n唯一计划块0122的独立合成资料。",
+          "Chapter 0123 W09唯一章节\n\n唯一计划块0123的独立合成资料。",
+          "Chapter 0124 W09唯一章节\n\n唯一计划块0124的独立合成资料。",
+          "Chapter 0125 W09唯一章节\n\n唯一计划块0125的独立合成资料。",
+          "Chapter 0126 W09唯一章节\n\n唯一计划块0126的独立合成资料。",
+          "Chapter 0127 W09唯一章节\n\n唯一计划块0127的独立合成资料。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:50597"
+    },
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "Chapter 0128 W09唯一章节\n\n唯一计划块0128的独立合成资料。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:50597"
+    }
+  ],
+  "vectors": [
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_32ddcc5e7608c790d86d3ad5c748ab5d",
+      "ordinal": 0,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_893d01b6994affdbb214383cd564965c",
+      "ordinal": 1,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_cef1b0ed6d65c24f69cd7dca1a695db6",
+      "ordinal": 2,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_122fd45cde2dd796d05143a7f386b447",
+      "ordinal": 3,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_1331c377f527f87a20059ad86c81c171",
+      "ordinal": 4,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_12b375022ab92768e0d5beac96f0d21e",
+      "ordinal": 5,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_eec3b2cc321753dbf8b15e415c9ef324",
+      "ordinal": 6,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_de0af5bdb4241dd859a08f9b252b85c6",
+      "ordinal": 7,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_b2fe9723c9cdb9d87d7caedd4510f007",
+      "ordinal": 8,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_8e914a36e216f245834f09d07482d1ce",
+      "ordinal": 9,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_2a4d564fd41094ebb02e88d722eaf169",
+      "ordinal": 10,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_c8d1eb6344e55f85fca93394a067e7fc",
+      "ordinal": 11,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_36b7a263fc53375bbb44aed7665097bb",
+      "ordinal": 12,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0de6e66207af3de262287b3f0b425222",
+      "ordinal": 13,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_20eb8e889bbea54efe9b95cf2ddf1571",
+      "ordinal": 14,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_ce378f4150a16cd48e5fd355f24a5c67",
+      "ordinal": 15,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0d3e79d0cdddaf0ff5b3bfa8f26af9d2",
+      "ordinal": 16,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_328e17ab8aa53bc4ec2fca03353cdfde",
+      "ordinal": 17,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_8d8638ca656df0662d285154265fb2da",
+      "ordinal": 18,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_c73951451c32ecfc636c93d88abc9301",
+      "ordinal": 19,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_a15630426e64463df120e6f04f79e37c",
+      "ordinal": 20,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_630da92547267952f06289ddd1d10c2e",
+      "ordinal": 21,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_08b94a71bcb3e1f8374565d5e68386bb",
+      "ordinal": 22,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_49f50d27327eeb8c2538529a46295911",
+      "ordinal": 23,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_2dec2522844556e62699f761faf0ea2d",
+      "ordinal": 24,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_2058833995b9ad57310649e3493d29e0",
+      "ordinal": 25,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_9395a6cef793eb629a45a8aa4b00cf0c",
+      "ordinal": 26,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_d8a6710edc7a5bd85cba1d31cf5b6338",
+      "ordinal": 27,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_d66b856918ee38709f8e9624bf45081a",
+      "ordinal": 28,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_883dd34b6549ceeb039dfec9d51144bc",
+      "ordinal": 29,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_a04c1921046cdc3b814e5b2c3c962976",
+      "ordinal": 30,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_6c84cffabbd4eb2dd3a86cf846047d8b",
+      "ordinal": 31,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_6e95d5d290f1cf19befe0d2e5fa34860",
+      "ordinal": 32,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_34dd2c4a76f9e7467b1cdfd16d874ff6",
+      "ordinal": 33,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_17a3ea9e1ad90ab511ea78f9c588a683",
+      "ordinal": 34,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_4a4d7a81c0eaa69e25dec0c93c362635",
+      "ordinal": 35,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_fb8e003de96d1c9808b14de837b096a6",
+      "ordinal": 36,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_6a5580dd112edf5f3a3743be2f593c61",
+      "ordinal": 37,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_918687996f2228f582a16f59ef3b28f4",
+      "ordinal": 38,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_679295e99ba5a0581d604ecff9af2b0a",
+      "ordinal": 39,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_b4d21e9c138cc833dda1abe2a08fce2b",
+      "ordinal": 40,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_b4abb8dfb6f5bb920feabc9436f60371",
+      "ordinal": 41,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_eb253795e0c8fddcb8f384bad01086d2",
+      "ordinal": 42,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_7ec7378bd56db95b98c159101d388f20",
+      "ordinal": 43,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_87289e7494b579724fea79f677de807c",
+      "ordinal": 44,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_9ceba781cea50e3bd934f4a25a92d96c",
+      "ordinal": 45,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_a500226e2dec73129e92562b49016d3b",
+      "ordinal": 46,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_1dfa590008b9e1667ed0e1d1ae222142",
+      "ordinal": 47,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_4a2c81c6cdd97d956e24da39f7230a87",
+      "ordinal": 48,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_71960a2ca6d5a47379116d3ac9ae4825",
+      "ordinal": 49,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_9da00b37146447106167ff135bb408e0",
+      "ordinal": 50,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_c42dcc2eac26fd1d5cc9994038ff52ac",
+      "ordinal": 51,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0a9f34b34c3cb7bcdcba8d3162d365ba",
+      "ordinal": 52,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_1acd1dd5c5e104c17c892344a525bcd3",
+      "ordinal": 53,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_ed83a29fa084290a81492cff8025f99c",
+      "ordinal": 54,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_2ca13b975ce5a3dd54c241cb33dea31a",
+      "ordinal": 55,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_df6e62a6c9533ac5edf70904fbc05b21",
+      "ordinal": 56,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_7b34b21739f08480b724cdcf90014e0f",
+      "ordinal": 57,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_79893faeb68704d39174865107b0726d",
+      "ordinal": 58,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_daa0b80ddb0b69bb0625cbf3440bf612",
+      "ordinal": 59,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_f1c84daa92b6b9dc40ef144709ff6f9a",
+      "ordinal": 60,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_43c4543313785853d2f91c6ff4f4c6c1",
+      "ordinal": 61,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_569c28838474684b0e4d1e3c82ca1a84",
+      "ordinal": 62,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_9ce6db7b21cf16c038360f76b143a6ea",
+      "ordinal": 63,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_69e029eb8df80f63f4ebc6e5dd51e25d",
+      "ordinal": 64,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_e31bfe62d3fb0b77081ebea4988cb8a3",
+      "ordinal": 65,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_465a58e8fc9004a0649f841acae03795",
+      "ordinal": 66,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_4d17e577291ab6ab1cbce80d7c4a14dc",
+      "ordinal": 67,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_ff9e6a336e4cfb62476c10ba31218da1",
+      "ordinal": 68,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_d6b495a018c8fbd441ed9895aa806907",
+      "ordinal": 69,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_2f6518888d74277e493788d997bb2576",
+      "ordinal": 70,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_26ecf9cb298b14f983e4a09e07a19ff8",
+      "ordinal": 71,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_01f48e8a756c6dc113b7c76cc5576e3a",
+      "ordinal": 72,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_fbc5b8a530297bb4022b1d002425cd5e",
+      "ordinal": 73,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_4f2c99791a4c27ca8d0ec772ab05d7e2",
+      "ordinal": 74,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_02939ea7fb15b1203d3d853f1df2fb6e",
+      "ordinal": 75,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_adce4818d9168cfd292b749de3eaad93",
+      "ordinal": 76,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_5f08448197e97f214f29aeb5385b42a4",
+      "ordinal": 77,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_6b914867ca68bf412a8675a7d31f87cb",
+      "ordinal": 78,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_052350784b31c73ab58c02181910ea7f",
+      "ordinal": 79,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_58d3f82d45e6a879741bb1db0d7e9fef",
+      "ordinal": 80,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_7ba025b7a757db4b465c2afc5bf71a6c",
+      "ordinal": 81,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_78f9f169ab9f454947c31f2294aefc51",
+      "ordinal": 82,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_52824d53334962d53885813cd5ccd78f",
+      "ordinal": 83,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_82053768abaf54384a5c668cac229423",
+      "ordinal": 84,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_e876d099ea0c64c2554c3bc7cf76ca7e",
+      "ordinal": 85,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_e5a1efafee83ea3757a06fec18c74ed5",
+      "ordinal": 86,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_5408d5d671b0663461b97c8f738d3a40",
+      "ordinal": 87,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_105318c80aaa769a4b5648159339c78a",
+      "ordinal": 88,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_a72dcfa63ed07294d7db544c92506628",
+      "ordinal": 89,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_17ef33b18cf17b3e01ac89937ee6339b",
+      "ordinal": 90,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_47d492120d842db5cb89457098466e39",
+      "ordinal": 91,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_b0285cc73c0677444cdc8e67874feb6a",
+      "ordinal": 92,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_95af64aa449c79678c9b481064388f08",
+      "ordinal": 93,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_fc6be0c1f0ddf7edd8545d7937e14db4",
+      "ordinal": 94,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_084b3ea054631f01aa465ff619c781f8",
+      "ordinal": 95,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_a6625695166cce299f0a69e78210e939",
+      "ordinal": 96,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_74b0b0fa5db46c018d5535b9abc745fb",
+      "ordinal": 97,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_cde8e701ee86b5799229896955c63bf6",
+      "ordinal": 98,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_880eea474c1e6d16afecc82457b317c9",
+      "ordinal": 99,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_f1f672a4ea1b3bee92e57accd39cb794",
+      "ordinal": 100,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_8a3f96338550a2b899b198e6b70df61c",
+      "ordinal": 101,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_4e8949c142a00ed347f0aacac2e1daeb",
+      "ordinal": 102,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_f00de158253a506e20ee1446f7f4af7f",
+      "ordinal": 103,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_35256c06dba7be2f2d7b05f760011eb4",
+      "ordinal": 104,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_e196141b5633067ff90d1e7335c40bbd",
+      "ordinal": 105,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_b18490cf5230e3ad2ecf4352d784f80c",
+      "ordinal": 106,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_3d48089098136a81c637a367ec73fd34",
+      "ordinal": 107,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_7e60f5751c6647fbaafbeb1ed009fc16",
+      "ordinal": 108,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_3b02e6ff9756c3765677296302d4f24f",
+      "ordinal": 109,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_c11eeddd0193f466c30bf0cbe672d90b",
+      "ordinal": 110,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_a6d20bd20bb2eb0b37a9dd572716c498",
+      "ordinal": 111,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_c5b302d2c4775350a1c9394b35c8ebbd",
+      "ordinal": 112,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_538fc6650e47554e7a0c88c27386d16a",
+      "ordinal": 113,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_d01a354298cf6247dc24e9a7de2f771c",
+      "ordinal": 114,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_6b111975349203251f1748a0b7ae9230",
+      "ordinal": 115,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_f6bc1fbc590693155977cb0852b29cde",
+      "ordinal": 116,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_6b3fb360e0015cb4954f26e885705e46",
+      "ordinal": 117,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0e2f8a10ba510b3049aca51b08d1bedd",
+      "ordinal": 118,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_7da481b06fe89cedcb9ef0d06e599cd6",
+      "ordinal": 119,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_49e07a87e153476ee257318f083e78ba",
+      "ordinal": 120,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_ace54405a8fa149e62363df6a829166d",
+      "ordinal": 121,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_bbf4b8a806f60b96a89bb19d1fd78d2b",
+      "ordinal": 122,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_bd6cf54847fa072afc9d9833e4b5f72e",
+      "ordinal": 123,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_8f83576a641a60a9f5f02c4a9df4c0ed",
+      "ordinal": 124,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_be3bdde93c81cf66e88d8b20d65b487c",
+      "ordinal": 125,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_0423ab1cf4519f428467a29de78f7ce2",
+      "ordinal": 126,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_747235dc11e8d460c9bf459a7a34f6b6",
+      "ordinal": 127,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    },
+    {
+      "bytes": "0000803F00000000",
+      "chunk_id": "chunk_c487040e10ff7320905c57e373894901",
+      "ordinal": 128,
+      "vector_index_variant_id": "viv_10f3ad850575fed9322fb13ee561b51c"
+    }
+  ]
+}

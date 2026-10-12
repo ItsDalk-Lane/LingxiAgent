@@ -314,7 +314,7 @@ pub const TOTAL_SYSTEM_TOKEN_BUDGET: u32 = 25_068;
 
 // ─── 编译输入（材料由 service 层 ContextMaterialSource 采集） ───
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct RosterEntry {
     pub id: String,
     pub name: String,
@@ -322,13 +322,13 @@ pub struct RosterEntry {
     pub summary: Option<String>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ProjectContextFile {
     pub path: String,
     pub content: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SkillCatalogEntry {
     pub name: String,
     pub description: String,
@@ -337,7 +337,7 @@ pub struct SkillCatalogEntry {
 
 /// 一次编译的全部材料。所有字段由调用方（service）从磁盘/配置采集；
 /// kernel 不接触文件系统，保持纯确定性。
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ContextCompileInput {
     /// BCP-47 locale；以 "zh" 开头走中文文案（同现役 resolveLocale 判定）。
     pub locale: String,

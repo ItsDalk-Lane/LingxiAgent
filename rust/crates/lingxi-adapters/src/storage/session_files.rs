@@ -12,8 +12,9 @@
 //!   workspace_hash 分桶 + rel_path 版本序列；仅文本策略文件（service 层
 //!   执行策略，本层如实存取）。
 //!
-//! 本模块只做存取与约束，不做策略：注册去重由唯一索引兜底
-//! （同 owner 同 source_key 响亮冲突），冷度/保留策略在 service 层。
+//! 注册去重由唯一索引兜底（同 owner 同 source_key 响亮冲突）。
+//! 服务层给定冷度和托管根；涉及真实字节的提交在同一队列、事务和物理租约内
+//! 保护有效引用，并保留删除失败时的持久清扫身份。
 
 use lingxi_kernel::ports::StorageError;
 use rusqlite::OptionalExtension;
@@ -490,8 +491,15 @@ pub async fn insert_session_file(
 ) -> Result<(), StorageError> {
     let row = row.clone();
     db.queue()
-        .submit(move |conn| {
-            conn.execute(
+        .submit(move |conn| insert_file_on_connection(conn, &row))
+        .await
+}
+
+pub(crate) fn insert_file_on_connection(
+    conn: &rusqlite::Connection,
+    row: &SessionFileRow,
+) -> Result<(), StorageError> {
+    conn.execute(
                 &format!(
                     "INSERT INTO session_files ({FILE_COLS}) VALUES \
                      (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19,?20,?21,?22)"
@@ -522,9 +530,7 @@ pub async fn insert_session_file(
                 ],
             )
             .map_err(map_err)?;
-            Ok(())
-        })
-        .await
+    Ok(())
 }
 
 pub async fn get_session_file(
@@ -797,9 +803,16 @@ pub async fn insert_ref(db: &RunDatabase, refr: &SessionFileRefRow) -> Result<()
     let refr = refr.clone();
     db.queue()
         .submit(move |conn| {
+            let target:Option<(String,String,String,String)>=conn.query_row("SELECT f.real_path,f.status,s.owner_user_id,s.agent_id FROM session_files f JOIN sessions s ON s.session_id=f.owner_session_id WHERE f.file_id=?1",[&refr.file_id],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?))).optional().map_err(map_err)?;
+            let subject:Option<(String,String)>=conn.query_row("SELECT owner_user_id,agent_id FROM sessions WHERE session_id=?1",[&refr.session_id],|r|Ok((r.get(0)?,r.get(1)?))).optional().map_err(map_err)?;
+            if let Some((path,status,owner,agent))=target {
+                if status!="available"||!std::path::Path::new(&path).exists(){return Err(invalid("reference payload missing".into()));}
+                if let Some((subject,subject_agent))=subject {if owner!=subject||agent!=subject_agent{return Err(invalid("cross_subject_file_reference".into()));}}
+            }
             conn.execute(
                 "INSERT INTO session_file_refs (file_id, session_id, message_id, ref_kind, created_at_ms) \
-                 VALUES (?1, ?2, ?3, ?4, ?5)",
+                 SELECT ?1, ?2, ?3, ?4, ?5 WHERE NOT EXISTS \
+                 (SELECT 1 FROM session_file_refs WHERE file_id=?1 AND session_id=?2 AND message_id IS ?3 AND ref_kind=?4)",
                 rusqlite::params![
                     refr.file_id,
                     refr.session_id,
@@ -812,6 +825,44 @@ pub async fn insert_ref(db: &RunDatabase, refr: &SessionFileRefRow) -> Result<()
             Ok(())
         })
         .await
+}
+
+/// 整批交付引用同事务提交，正式租约由执行器移入队列，直到物理提交退出。
+pub async fn insert_stage_refs(
+    db: &RunDatabase,
+    session_id: &str,
+    file_ids: Vec<String>,
+    message_id: &str,
+    now: u64,
+    lease: tokio::sync::OwnedRwLockReadGuard<()>,
+) -> Result<(), StorageError> {
+    let session_id = session_id.to_string();
+    let message_id = message_id.to_string();
+    db.queue().submit(move |conn| {
+        let _lease = lease;
+        let tx = conn.unchecked_transaction().map_err(map_err)?;
+        for file_id in file_ids {
+            let file: Option<(String, String, String)> = tx.query_row(
+                "SELECT owner_session_id,real_path,status FROM session_files WHERE file_id=?1",
+                [&file_id], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            ).optional().map_err(map_err)?;
+            let Some((owner, path, status)) = file else {
+                return Err(invalid(format!("session_file_reference_missing:{file_id}")));
+            };
+            if owner != session_id {
+                return Err(invalid(format!("session_file_reference_not_owned:{file_id}")));
+            }
+            if status != "available" || !std::path::Path::new(&path).exists() {
+                return Err(invalid(format!("session_file_reference_missing:{file_id}")));
+            }
+            tx.execute(
+                "INSERT INTO session_file_refs(file_id,session_id,message_id,ref_kind,created_at_ms) SELECT ?1,?2,?3,'stage',?4 WHERE NOT EXISTS (SELECT 1 FROM session_file_refs WHERE file_id=?1 AND session_id=?2 AND message_id=?3 AND ref_kind='stage')",
+                rusqlite::params![file_id,session_id,message_id,now as i64],
+            ).map_err(map_err)?;
+        }
+        touch_on_connection(&tx, &session_id, now)?;
+        tx.commit().map_err(map_err)
+    }).await
 }
 
 pub async fn list_refs_for_session(
@@ -1199,6 +1250,602 @@ pub async fn prune_file_history(
                 pruned += 1;
             }
             Ok(pruned)
+        })
+        .await
+}
+
+fn add_identity(
+    ordered: &mut Vec<String>,
+    seen: &mut std::collections::HashSet<String>,
+    value: &str,
+) {
+    let trimmed = value.trim();
+    if !trimmed.is_empty() && seen.insert(trimmed.to_string()) {
+        ordered.push(trimmed.to_string());
+    }
+}
+
+fn collect_identities(
+    value: &serde_json::Value,
+    ordered: &mut Vec<String>,
+    seen: &mut std::collections::HashSet<String>,
+) {
+    match value {
+        serde_json::Value::String(text) => collect_from_text(text, ordered, seen),
+        serde_json::Value::Array(items) => {
+            for item in items {
+                collect_identities(item, ordered, seen);
+            }
+        }
+        serde_json::Value::Object(map) => {
+            collect_from_object(map, ordered, seen);
+            for item in map.values() {
+                collect_identities(item, ordered, seen);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn collect_from_object(
+    map: &serde_json::Map<String, serde_json::Value>,
+    ordered: &mut Vec<String>,
+    seen: &mut std::collections::HashSet<String>,
+) {
+    let get_str = |key: &str| map.get(key).and_then(serde_json::Value::as_str);
+    let explicit_type = matches!(get_str("type"), Some("session_file") | Some("session-file"))
+        || matches!(get_str("kind"), Some("session_file") | Some("session-file"));
+    let file_id = get_str("fileId").map(str::trim).filter(|s| !s.is_empty());
+    if let Some(file_id) = file_id {
+        add_identity(ordered, seen, file_id);
+    }
+    if explicit_type && file_id.is_none() {
+        if let Some(id) = get_str("id") {
+            add_identity(ordered, seen, id);
+        }
+    }
+    let has_path = get_str("filePath").is_some() || get_str("realPath").is_some();
+    if file_id.is_some() || explicit_type || has_path {
+        if let Some(p) = get_str("filePath") {
+            add_identity(ordered, seen, p);
+        }
+        if let Some(p) = get_str("realPath") {
+            add_identity(ordered, seen, p);
+        }
+        if file_id.is_some() || explicit_type {
+            if let Some(p) = get_str("path") {
+                add_identity(ordered, seen, p);
+            }
+        }
+    }
+}
+
+/// 文本标记扫描（SESSION_FILE_MARKER_RE / ATTACHED_MEDIA_MARKER_RE 的
+/// 手写等价，无 regex 依赖）：
+/// - `[SessionFile]\s+(\{[^\r\n]*\})`：`{` 到本行最后一个 `}`，JSON 解析
+///   失败按现役 catch 静默跳过（可见文本不是授权引用）。
+/// - `\[attached_(?:image|video|audio):\s*([^\]]+)\]`：捕获到 `]` 前。
+fn collect_from_text(
+    text: &str,
+    ordered: &mut Vec<String>,
+    seen: &mut std::collections::HashSet<String>,
+) {
+    let has_session_file_marker = text.contains("[SessionFile]");
+    if has_session_file_marker {
+        let mut rest = text;
+        while let Some(pos) = rest.find("[SessionFile]") {
+            rest = &rest[pos + "[SessionFile]".len()..];
+            let trimmed_start = rest.len() - rest.trim_start().len();
+            rest = &rest[trimmed_start..];
+            if !rest.starts_with('{') {
+                continue;
+            }
+            // \{[^\r\n]*\} 贪婪：本行内最后一个 }。
+            let line_end = rest.find(['\r', '\n']).unwrap_or(rest.len());
+            let line = &rest[..line_end];
+            if let Some(close) = line.rfind('}') {
+                let candidate = &line[..=close];
+                if let Ok(serde_json::Value::Object(map)) =
+                    serde_json::from_str::<serde_json::Value>(candidate)
+                {
+                    collect_from_object(&map, ordered, seen);
+                }
+                rest = &rest[close + 1..];
+            } else {
+                break;
+            }
+        }
+    }
+    // 现役：hasSessionFileMarker || hasAttachedMediaMarker 时扫媒体标记
+    // （含 [SessionFile] 的文本也会扫 attached_）。
+    if has_session_file_marker || text.contains("[attached_") {
+        let mut rest = text;
+        while let Some(pos) = rest.find("[attached_") {
+            rest = &rest[pos + "[attached_".len()..];
+            let kind_ok = rest.starts_with("image:")
+                || rest.starts_with("video:")
+                || rest.starts_with("audio:");
+            if !kind_ok {
+                continue;
+            }
+            let Some(colon) = rest.find(':') else {
+                break;
+            };
+            rest = &rest[colon + 1..];
+            let skipped = rest.len() - rest.trim_start().len();
+            rest = &rest[skipped..];
+            match rest.find(']') {
+                Some(end) => {
+                    let captured = rest[..end].to_string();
+                    add_identity(ordered, seen, &captured);
+                    rest = &rest[end + 1..];
+                }
+                None => break,
+            }
+        }
+    }
+}
+
+/// 活动只前进；时钟回退不会把近期会话变冷。
+pub(crate) fn touch_on_connection(
+    conn: &rusqlite::Connection,
+    session_id: &str,
+    now: u64,
+) -> Result<(), StorageError> {
+    conn.execute("UPDATE sessions SET last_activity_unix_ms=MAX(COALESCE(last_activity_unix_ms,0),?2) WHERE session_id=?1", rusqlite::params![session_id,now as i64]).map_err(map_err)?;
+    Ok(())
+}
+
+pub(crate) fn files_on_connection(
+    conn: &rusqlite::Connection,
+    session_id: &str,
+) -> Result<Vec<SessionFileRow>, StorageError> {
+    let mut stmt = conn
+        .prepare(&format!(
+            "SELECT {FILE_COLS} FROM session_files WHERE owner_session_id=?1"
+        ))
+        .map_err(map_err)?;
+    let rows = stmt
+        .query_map([session_id], read_raw_file_row)
+        .map_err(map_err)?;
+    rows.map(|row| decode_raw_file_row(row.map_err(map_err)?))
+        .collect()
+}
+
+pub fn reference_identities(value: &serde_json::Value) -> Vec<String> {
+    let mut ids = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+    collect_identities(value, &mut ids, &mut seen);
+    ids
+}
+
+/// 消息和引用同事务登记。只解析当前会话的身份，不将另一会话的旧别名提升为授权。
+pub(crate) fn sync_message_refs(
+    conn: &rusqlite::Connection,
+    session_id: &str,
+    message_id: &str,
+    content: &str,
+    now: u64,
+) -> Result<(), StorageError> {
+    let value: serde_json::Value = match serde_json::from_str(content) {
+        Ok(value) => value,
+        Err(error) => {
+            // 原历史允许原样文字；只有明确宣称结构化附件的损坏输入才拒绝。
+            let structured = content.trim_start().starts_with(['{', '[']);
+            let declares_file = [
+                "\"fileId\"",
+                "\"filePath\"",
+                "\"realPath\"",
+                "\"session_file\"",
+                "\"session-file\"",
+            ]
+            .iter()
+            .any(|key| content.contains(key));
+            if structured && declares_file {
+                return Err(invalid(format!(
+                    "malformed_session_file_reference: {error}"
+                )));
+            }
+            serde_json::Value::String(content.to_string())
+        }
+    };
+    let ids = reference_identities(&value);
+    if ids.is_empty() {
+        return touch_on_connection(conn, session_id, now);
+    }
+    let files = files_on_connection(conn, session_id)?;
+    for identity in ids {
+        let file = files.iter().find(|r| {
+            r.file_id == identity
+                || r.legacy_file_ids.contains(&identity)
+                || r.file_path == identity
+                || r.real_path == identity
+                || r.legacy_file_paths.contains(&identity)
+        });
+        let Some(file) = file else {
+            return Err(invalid(format!(
+                "session_file_reference_not_owned:{identity}"
+            )));
+        };
+        if file.status != SessionFileStatus::Available
+            || !std::path::Path::new(&file.real_path).exists()
+        {
+            return Err(invalid(format!(
+                "session_file_reference_missing:{}",
+                file.file_id
+            )));
+        }
+        conn.execute("INSERT INTO session_file_refs (file_id,session_id,message_id,ref_kind,created_at_ms) SELECT ?1,?2,?3,'message_marker',?4 WHERE NOT EXISTS (SELECT 1 FROM session_file_refs WHERE file_id=?1 AND session_id=?2 AND message_id=?3)",rusqlite::params![file.file_id,session_id,message_id,now as i64]).map_err(map_err)?;
+    }
+    touch_on_connection(conn, session_id, now)
+}
+
+/// 文件副本与分支消息属于同一提交。失败只补偿本次新建的副本，不触碰源文件。
+#[derive(Default)]
+pub(crate) struct ForkCopies {
+    paths: Vec<std::path::PathBuf>,
+    committed: bool,
+}
+impl ForkCopies {
+    pub(crate) fn commit(&mut self) {
+        self.committed = true;
+    }
+}
+impl Drop for ForkCopies {
+    fn drop(&mut self) {
+        if !self.committed {
+            for path in &self.paths {
+                let result = if path.is_dir() {
+                    std::fs::remove_dir_all(path)
+                } else {
+                    std::fs::remove_file(path)
+                };
+                if let Err(err) = result {
+                    if err.kind() != std::io::ErrorKind::NotFound {
+                        tracing::error!("fork 文件补偿失败: {err}");
+                    }
+                }
+            }
+        }
+    }
+}
+
+pub(crate) fn fork_files_on_connection(
+    conn: &rusqlite::Connection,
+    source: &str,
+    target: &str,
+    retained: &[String],
+    home: &std::path::Path,
+    now: u64,
+    copies: &mut ForkCopies,
+) -> Result<(), StorageError> {
+    let files = files_on_connection(conn, source)?;
+    let owner = format!("id:{target}");
+    let hash = sha256_hex(owner.as_bytes());
+    let dest_dir = home.join("session-files").join(&hash[..24]);
+    let mut used = std::collections::HashSet::new();
+    for mut file in files {
+        let reachable = retained.iter().any(|id| {
+            file.file_id == *id
+                || file.legacy_file_ids.contains(id)
+                || file.file_path == *id
+                || file.real_path == *id
+                || file.legacy_file_paths.contains(id)
+        });
+        if !reachable {
+            continue;
+        }
+        let old_id = file.file_id.clone();
+        let old_path = file.file_path.clone();
+        let old_real = file.real_path.clone();
+        if file.status != SessionFileStatus::Available || !std::path::Path::new(&old_real).exists()
+        {
+            return Err(invalid(format!("fork_attachment_missing:{old_id}")));
+        }
+        if file.storage_kind == StorageKind::ManagedCache {
+            let name = std::path::Path::new(&file.filename)
+                .file_name()
+                .ok_or_else(|| invalid("fork filename invalid".into()))?
+                .to_string_lossy()
+                .to_string();
+            let mut n = 0;
+            let mut dest = dest_dir.join(format!("{old_id}-{name}"));
+            while dest.exists() || !used.insert(dest.clone()) {
+                n += 1;
+                dest = dest_dir.join(format!("{old_id}-{n}-{name}"));
+            }
+            std::fs::create_dir_all(&dest_dir).map_err(|e| invalid(e.to_string()))?;
+            copies.paths.push(dest.clone());
+            copy_fork_payload(std::path::Path::new(&old_real), &dest)?;
+            file.file_path = dest.to_string_lossy().into();
+            file.real_path = file.file_path.clone();
+        }
+        let canonical =
+            std::fs::canonicalize(&file.real_path).map_err(|e| invalid(e.to_string()))?;
+        file.identity_key = canonical.to_string_lossy().into();
+        #[cfg(windows)]
+        {
+            file.identity_key = file.identity_key.to_lowercase();
+        }
+        let identity = serde_json::json!([
+            owner,
+            file.source_key.as_deref().unwrap_or(&file.identity_key)
+        ])
+        .to_string();
+        file.file_id = format!("sf_{}", &sha256_hex(identity.as_bytes())[..16]);
+        file.owner_key = owner.clone();
+        file.owner_session_id = target.into();
+        if !file.legacy_file_ids.contains(&old_id) {
+            file.legacy_file_ids.push(old_id);
+        }
+        for old in [old_path, old_real] {
+            if !file.legacy_file_paths.contains(&old) {
+                file.legacy_file_paths.push(old);
+            }
+        }
+        file.registered_at_ms = now;
+        file.updated_at_ms = now;
+        insert_file_on_connection(conn, &file)?;
+    }
+    touch_on_connection(conn, target, now)
+}
+
+fn copy_fork_payload(
+    source: &std::path::Path,
+    target: &std::path::Path,
+) -> Result<(), StorageError> {
+    let meta = std::fs::symlink_metadata(source).map_err(|e| invalid(e.to_string()))?;
+    if meta.file_type().is_symlink() {
+        return Err(invalid("fork symlink payload refused".into()));
+    }
+    if meta.is_dir() {
+        std::fs::create_dir(target).map_err(|e| invalid(e.to_string()))?;
+        for entry in std::fs::read_dir(source).map_err(|e| invalid(e.to_string()))? {
+            let entry = entry.map_err(|e| invalid(e.to_string()))?;
+            copy_fork_payload(&entry.path(), &target.join(entry.file_name()))?;
+        }
+    } else if meta.is_file() {
+        let mut out = std::fs::OpenOptions::new()
+            .create_new(true)
+            .write(true)
+            .open(target)
+            .map_err(|e| invalid(e.to_string()))?;
+        let mut input = std::fs::File::open(source).map_err(|e| invalid(e.to_string()))?;
+        std::io::copy(&mut input, &mut out).map_err(|e| invalid(e.to_string()))?;
+        out.sync_all().map_err(|e| invalid(e.to_string()))?;
+    } else {
+        return Err(invalid("fork payload is not a file or directory".into()));
+    }
+    Ok(())
+}
+
+pub type MaintenanceObserver = std::sync::Arc<dyn Fn(&str) + Send + Sync>;
+
+/// 跨会话保护实际被删除的名字及已交付目录后代；符号链接由真实规范路径归一。
+/// 独立硬链接仍有自己的可读名字，删除无引用的托管名字不会抽走它的字节。
+fn referenced_payload_paths(
+    conn: &rusqlite::Connection,
+) -> Result<Vec<(std::path::PathBuf, bool)>, StorageError> {
+    let mut stmt = conn.prepare("SELECT real_path,file_path FROM session_files f WHERE EXISTS (SELECT 1 FROM session_file_refs r WHERE r.file_id=f.file_id) OR EXISTS (SELECT 1 FROM runs t WHERE t.session_id=f.owner_session_id AND t.status IN ('running','queued','waiting_approval','cancelling'))").map_err(map_err)?;
+    let rows = stmt
+        .query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)))
+        .map_err(map_err)?;
+    let mut paths = Vec::new();
+    for row in rows {
+        let (real, stored) = row.map_err(map_err)?;
+        let path = std::path::PathBuf::from(if real.is_empty() { stored } else { real });
+        let canonical = match std::fs::canonicalize(&path) {
+            Ok(path) => path,
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => path,
+            Err(err) => {
+                return Err(invalid(format!(
+                    "referenced payload inspection failed: {err}"
+                )))
+            }
+        };
+        let is_directory = match std::fs::metadata(&canonical) {
+            Ok(metadata) => metadata.is_dir(),
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => false,
+            Err(err) => {
+                return Err(invalid(format!(
+                    "referenced payload type inspection failed: {err}"
+                )))
+            }
+        };
+        paths.push((canonical, is_directory));
+    }
+    Ok(paths)
+}
+
+fn deletion_would_remove_reference(
+    candidate: &std::path::Path,
+    referenced: &[(std::path::PathBuf, bool)],
+) -> bool {
+    #[cfg(windows)]
+    let normalized_candidate = std::path::PathBuf::from(candidate.to_string_lossy().to_lowercase());
+    #[cfg(windows)]
+    let candidate = normalized_candidate.as_path();
+    referenced.iter().any(|(path, is_directory)| {
+        #[cfg(windows)]
+        let normalized_path = std::path::PathBuf::from(path.to_string_lossy().to_lowercase());
+        #[cfg(windows)]
+        let path = &normalized_path;
+        // 回收目录不得抽走被引子项；已交付真实目录也保护其实际托管子项。
+        path.starts_with(candidate) || (*is_directory && candidate.starts_with(path))
+    })
+}
+
+/// 在单写队列内从引用检查一直执行到实际删除；中途取消调用者不会拆开窗口。
+pub async fn cleanup_cold_payloads(
+    db: &RunDatabase,
+    root: std::path::PathBuf,
+    cutoff: u64,
+    now: u64,
+    observer: Option<MaintenanceObserver>,
+) -> Result<(Vec<String>, usize), StorageError> {
+    let lease = db.file_payload_leases().write_owned().await;
+    let timeout = db.options().busy_timeout_ms;
+    db.queue().submit(move|conn|{
+        let _lease=lease;
+        super::run_store::with_write_txn(conn,timeout,|conn|{
+        let mut stmt=conn.prepare(&format!("SELECT {FILE_COLS} FROM session_files WHERE storage_kind='managed_cache' AND status!='expired' AND (NOT EXISTS (SELECT 1 FROM sessions s WHERE s.session_id=session_files.owner_session_id) OR owner_session_id IN (SELECT session_id FROM sessions WHERE last_activity_unix_ms IS NOT NULL AND last_activity_unix_ms<?1 AND lifecycle!='deleted'))")).map_err(map_err)?;
+        let rows=stmt.query_map([cutoff as i64],read_raw_file_row).map_err(map_err)?;
+        let files:Vec<SessionFileRow>=rows.map(|r|decode_raw_file_row(r.map_err(map_err)?)).collect::<Result<_,_>>()?;
+        drop(stmt);
+        let referenced = referenced_payload_paths(conn)?;
+        let root=std::fs::canonicalize(&root).unwrap_or(root);
+        let mut expired=Vec::new();let mut deleted=0;
+        for file in files {
+            // 冷会话的历史引用也有效。只有真正无引用的可重建缓存才回收。
+            let refs:i64=conn.query_row("SELECT COUNT(*) FROM session_file_refs WHERE file_id=?1",[&file.file_id],|r|r.get(0)).map_err(map_err)?;
+            let active:i64=conn.query_row("SELECT COUNT(*) FROM runs WHERE session_id=?1 AND status IN ('running','queued','waiting_approval','cancelling')",[&file.owner_session_id],|r|r.get(0)).map_err(map_err)?;
+            if refs>0||active>0{continue;}
+            if let Some(observer)=&observer { observer(&file.file_id); }
+            let path=std::path::PathBuf::from(if file.real_path.is_empty(){&file.file_path}else{&file.real_path});
+            let canonical=std::fs::canonicalize(&path).unwrap_or_else(|_|path.clone());
+            if !canonical.starts_with(&root)||canonical==root{return Err(invalid("managed cache target outside root".into()));}
+            if deletion_would_remove_reference(&canonical,&referenced){continue;}
+            // 父目录的符号链接不能将删除带出所有权根。
+            let parent=path.parent().ok_or_else(||invalid("cache target has no parent".into()))?;
+            let parent=std::fs::canonicalize(parent).map_err(|e|invalid(e.to_string()))?;
+            if !parent.starts_with(&root){return Err(invalid("managed cache parent outside root".into()));}
+            match std::fs::symlink_metadata(&path) {
+                Ok(meta)=>{
+                    if meta.file_type().is_symlink(){return Err(invalid("managed cache symlink refused".into()));}
+                    let result=if meta.is_dir(){std::fs::remove_dir_all(&path)}else{std::fs::remove_file(&path)};
+                    result.map_err(|e|invalid(format!("cache removal failed: {e}")))?;deleted+=1;
+                }
+                Err(e) if e.kind()==std::io::ErrorKind::NotFound=>{},
+                Err(e)=>return Err(invalid(e.to_string())),
+            }
+            conn.execute("UPDATE session_files SET status='expired',expires_at_ms=?2,updated_at_ms=?2 WHERE file_id=?1",rusqlite::params![file.file_id,now as i64]).map_err(map_err)?;
+            // 会话已删的托管身份只在字节删除和登记成功后移除，失败时保留可恢复凭据。
+            let orphan: bool = conn.query_row("SELECT NOT EXISTS (SELECT 1 FROM sessions WHERE session_id=?1)",[&file.owner_session_id],|r|r.get(0)).map_err(map_err)?;
+            if orphan {
+                conn.execute("DELETE FROM session_file_aliases WHERE canonical_file_id=?1",[&file.file_id]).map_err(map_err)?;
+                conn.execute("DELETE FROM session_files WHERE file_id=?1",[&file.file_id]).map_err(map_err)?;
+            }
+            expired.push(file.file_id);
+        }
+        Ok((expired,deleted))
+        })
+    }).await
+}
+
+/// 运行期的真实活动单调前进；历史导入的原 upsert 接口保留显式历史时刻。
+pub async fn record_current_activity(
+    db: &RunDatabase,
+    session_id: &str,
+    now: u64,
+) -> Result<(), StorageError> {
+    let sid = session_id.to_string();
+    db.queue().submit(move|conn|{
+        conn.execute("INSERT INTO sessions (session_id,agent_id,owner_user_id,title,created_at_unix_ms,last_activity_unix_ms) VALUES (?1,'agent','user_local','',?2,?2) ON CONFLICT(session_id) DO UPDATE SET last_activity_unix_ms=MAX(COALESCE(sessions.last_activity_unix_ms,0),?2)",rusqlite::params![sid,now as i64]).map_err(map_err)?;Ok(())
+    }).await
+}
+
+/// 兼容调用也通过同一个事务复制；租约随实际队列任务到退出。
+pub async fn fork_file_subset(
+    db: &RunDatabase,
+    source: String,
+    target: String,
+    retained: Vec<String>,
+    home: std::path::PathBuf,
+    now: u64,
+) -> Result<Vec<String>, StorageError> {
+    let lease = db.file_payload_leases().read_owned().await;
+    let timeout = db.options().busy_timeout_ms;
+    db.queue().submit(move|conn|{
+        let _lease=lease;
+        let mut copies=ForkCopies::default();
+        let ids=super::run_store::with_write_txn(conn,timeout,|conn|{
+            fork_files_on_connection(conn,&source,&target,&retained,&home,now,&mut copies)?;
+            let files=files_on_connection(conn,&target)?;
+            for file in &files {
+                conn.execute("INSERT INTO session_file_refs (file_id,session_id,ref_kind,created_at_ms) SELECT ?1,?2,'import',?3 WHERE NOT EXISTS (SELECT 1 FROM session_file_refs WHERE file_id=?1 AND session_id=?2 AND message_id IS NULL AND ref_kind='import')",rusqlite::params![file.file_id,target,now as i64]).map_err(map_err)?;
+            }
+            Ok(files.into_iter().map(|f|f.file_id).collect())
+        })?;
+        copies.commit();Ok(ids)
+    }).await
+}
+
+/// 托管字节和登记在实际写队列同一闭包内完成，调用者取消不拆开二者。
+pub async fn register_owned_blob(
+    db: &RunDatabase,
+    row: SessionFileRow,
+    bytes: Vec<u8>,
+    lease: tokio::sync::OwnedRwLockReadGuard<()>,
+) -> Result<SessionFileRow, StorageError> {
+    let timeout = db.options().busy_timeout_ms;
+    db.queue()
+        .submit(move |conn| {
+            let _lease = lease;
+            let mut copies = ForkCopies::default();
+            let stored = super::run_store::with_write_txn(conn, timeout, |conn| {
+                let existing = files_on_connection(conn, &row.owner_session_id)?
+                    .into_iter()
+                    .find(|f| f.source_key == row.source_key);
+                if let Some(file) = &existing {
+                    if std::path::Path::new(&file.real_path).exists() {
+                        if file.status == SessionFileStatus::Missing
+                            && file.storage_kind == StorageKind::ManagedCache
+                        {
+                            // 已有可信托管名字的合法恢复不扩大所有权，先亲验请求字节一致。
+                            use std::io::Read as _;
+                            let input = std::fs::File::open(&file.real_path).map_err(|e| invalid(e.to_string()))?;
+                            let mut restored = Vec::new();
+                            input.take((bytes.len() as u64).saturating_add(1)).read_to_end(&mut restored).map_err(|e| invalid(e.to_string()))?;
+                            if restored == bytes {
+                                conn.execute("UPDATE session_files SET status='available',expires_at_ms=NULL,updated_at_ms=?2 WHERE file_id=?1", rusqlite::params![file.file_id,row.updated_at_ms as i64]).map_err(map_err)?;
+                                touch_on_connection(conn, &row.owner_session_id, row.updated_at_ms)?;
+                                let mut file = file.clone();
+                                file.status = SessionFileStatus::Available;
+                                file.expires_at_ms = None;
+                                file.updated_at_ms = row.updated_at_ms;
+                                return Ok(file);
+                            }
+                        }
+                        if file.status != SessionFileStatus::Available {
+                            return Err(invalid("unavailable_blob_payload_still_exists".into()));
+                        }
+                        touch_on_connection(conn, &row.owner_session_id, row.updated_at_ms)?;
+                        return Ok(file.clone());
+                    }
+                }
+                let mut row = row;
+                if let Some(file) = &existing {
+                    // 真正重新创建副本才可恢复过期身份；旧引用和别名继续指向同一个 id。
+                    row.file_id = file.file_id.clone();
+                    row.registered_at_ms = file.registered_at_ms;
+                    row.legacy_file_ids = file.legacy_file_ids.clone();
+                    row.legacy_file_paths = file.legacy_file_paths.clone();
+                    for path in [&file.file_path, &file.real_path] {
+                        if !row.legacy_file_paths.contains(path) {
+                            row.legacy_file_paths.push(path.clone());
+                        }
+                    }
+                }
+                let path = std::path::PathBuf::from(&row.real_path);
+                let parent = path.parent().ok_or_else(|| invalid("blob parent missing".into()))?;
+                std::fs::create_dir_all(parent).map_err(|e| invalid(e.to_string()))?;
+                let mut file = std::fs::OpenOptions::new().create_new(true).write(true).open(&path).map_err(|e| invalid(e.to_string()))?;
+                copies.paths.push(path);
+                std::io::Write::write_all(&mut file, &bytes).map_err(|e| invalid(e.to_string()))?;
+                file.sync_all().map_err(|e| invalid(e.to_string()))?;
+                if existing.is_some() {
+                    let changed = conn.execute("UPDATE session_files SET identity_key=?2,file_path=?3,real_path=?4,storage_kind='managed_cache',status='available',label=?5,filename=?6,mime=?7,size_bytes=?8,mtime_ms=?9,is_directory=0,file_kind=?10,origin=?11,updated_at_ms=?12,expires_at_ms=NULL,legacy_file_ids_json=?13,legacy_file_paths_json=?14 WHERE file_id=?1 AND owner_session_id=?15 AND source_key=?16",rusqlite::params![row.file_id,row.identity_key,row.file_path,row.real_path,row.label,row.filename,row.mime,row.size_bytes as i64,row.mtime_ms as i64,row.file_kind.wire(),row.origin.wire(),row.updated_at_ms as i64,serde_json::to_string(&row.legacy_file_ids).map_err(|e|invalid(e.to_string()))?,serde_json::to_string(&row.legacy_file_paths).map_err(|e|invalid(e.to_string()))?,row.owner_session_id,row.source_key]).map_err(map_err)?;
+                    if changed != 1 {
+                        return Err(invalid("owned_blob_recovery_identity_changed".into()));
+                    }
+                } else {
+                    insert_file_on_connection(conn, &row)?;
+                }
+                touch_on_connection(conn, &row.owner_session_id, row.updated_at_ms)?;
+                Ok(row)
+            })?;
+            copies.commit();
+            Ok(stored)
         })
         .await
 }

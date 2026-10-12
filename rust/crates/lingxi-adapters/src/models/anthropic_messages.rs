@@ -399,28 +399,55 @@ pub fn render_messages_request(
     // submission as the parts shape (text first, then `image` base64
     // blocks — the incumbent `convertContentForApi` anthropic mapping);
     // a text-only turn keeps the bare-string content byte-identically.
-    if input.images.is_empty() {
-        messages.push(serde_json::json!({
-            "role": "user",
-            "content": input.submission,
-        }));
-    } else {
-        let mut content = Vec::with_capacity(input.images.len() + 1);
-        content.push(serde_json::json!({"type": "text", "text": input.submission}));
-        for image in &input.images {
-            content.push(serde_json::json!({
-                "type": "image",
-                "source": {
-                    "type": "base64",
-                    "media_type": image.mime,
-                    "data": super::image_base64(image),
-                },
+    if !input.has_submission_position() {
+        if input.images.is_empty() {
+            messages.push(serde_json::json!({
+                "role": "user",
+                "content": input.submission,
             }));
+        } else {
+            let mut content = Vec::with_capacity(input.images.len() + 1);
+            content.push(serde_json::json!({"type": "text", "text": input.submission}));
+            for image in &input.images {
+                content.push(serde_json::json!({
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": image.mime,
+                        "data": super::image_base64(image),
+                    },
+                }));
+            }
+            messages.push(serde_json::json!({"role": "user", "content": content}));
         }
-        messages.push(serde_json::json!({"role": "user", "content": content}));
     }
     for item in &input.prior {
         match item {
+            ExchangeItem::UserTurn { text } => {
+                messages.push(serde_json::json!({"role":"user","content":text}))
+            }
+            ExchangeItem::CurrentSubmission => {
+                if input.images.is_empty() {
+                    messages.push(serde_json::json!({
+                        "role": "user",
+                        "content": input.submission,
+                    }));
+                } else {
+                    let mut content = Vec::with_capacity(input.images.len() + 1);
+                    content.push(serde_json::json!({"type": "text", "text": input.submission}));
+                    for image in &input.images {
+                        content.push(serde_json::json!({
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": image.mime,
+                                "data": super::image_base64(image),
+                            },
+                        }));
+                    }
+                    messages.push(serde_json::json!({"role": "user", "content": content}));
+                }
+            }
             ExchangeItem::AssistantTurn {
                 content,
                 tool_calls,
@@ -435,9 +462,7 @@ pub fn render_messages_request(
                 let mut blocks = render_assistant_blocks(content);
                 for call in tool_calls {
                     let wire_name =
-                        input
-                            .tools
-                            .wire_name_of_target(&call.target)
+                        call.historical_wire_name()
                             .ok_or_else(|| {
                                 invalid(format!(
                                     "exchange history names tool target {:?}, which the current \
@@ -1462,6 +1487,7 @@ mod tests {
             .expect("effective")
             .with_provider_call_id(id);
             lingxi_kernel::model_exchange::RequestedToolCall {
+                declaration_binding: snapshot.bind_target(&request.target),
                 tool_call_id: ToolCallId::new(format!("run-tc{seq:04}")),
                 provider_call_id: request.provider_call_id.clone(),
                 target: request.target.clone(),
@@ -1470,7 +1496,7 @@ mod tests {
                 args_summary: None,
             }
         };
-        let mut input = ModelTurnInput::first_turn("read both", snapshot);
+        let mut input = ModelTurnInput::first_turn("read both", snapshot.clone());
         input.prior.push(ExchangeItem::AssistantTurn {
             call: ModelCallId::new("mc-1"),
             content: vec![ContentBlock::Text {
@@ -1574,6 +1600,7 @@ mod tests {
             call: call.clone(),
             content: content.clone(),
             tool_calls: vec![lingxi_kernel::model_exchange::RequestedToolCall {
+                declaration_binding: input.tools.bind_target(&requests[0].target),
                 tool_call_id: ToolCallId::new("run-tc0001"),
                 provider_call_id: requests[0].provider_call_id.clone(),
                 target: requests[0].target.clone(),

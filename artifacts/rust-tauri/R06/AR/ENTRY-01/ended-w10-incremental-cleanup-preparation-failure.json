@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-11T13:15:11.809579+00:00",
+  "status": "PREPARATION_FAIL_NO_DELETION",
+  "actual_exit": 1,
+  "actual_error": "AssertionError: rust/crates/lingxi-adapters/src/models/embedding.rs",
+  "root_cause": "Root guessed embedding path; actual source path is models/operations/embedding.rs. Guard stopped before cache inventory, before receipt and before rmtree.",
+  "cache_still_present": true,
+  "cleanup_before_receipt_created": false,
+  "next": "Correct exact known path then rerun the full ownership, no-process, lsof, source and executable protection checks; no old result inherited."
+}

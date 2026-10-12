@@ -15,15 +15,15 @@ use std::sync::{Arc, Mutex};
 
 use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
-    ProviderDescriptor, ProviderTurn, ProviderTurnResult, TurnDeltaSink, TurnProviderPort,
+    ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, TurnDeltaSink,
+    TurnProviderPort,
 };
-use lingxi_kernel::subagent::{RunLineage, RunOrigin, ToolAccessTier};
 use lingxi_protocol::{ContentBlock, NormalizedMessage};
 use lingxi_service::context_compiler::{
     scan_agent_config, scan_preferences, ContextCompileFailure, ContextCompilerService,
     ContextMaterialSource, FileContextMaterialSource, HostFacts, MaterialQuery,
 };
-use lingxi_service::runs::{DriveAuthorization, RunGrant};
+use lingxi_service::runs::DriveAuthorization;
 use lingxi_service::{
     prepare_layout, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
     LOCAL_OWNER_USER_ID,
@@ -153,13 +153,13 @@ fn gather(
 fn scan_agent_config_reads_supported_keys() {
     let scan = scan_agent_config(
         "# comment\nlocale: zh-CN  # trailing comment\nagent:\n  name: \"灵犀\"  # bot\n  yuan: 'butter'\nmemory:\n  enabled: false\nother:\n  name: ignored\n",
-    );
+    ).unwrap();
     assert_eq!(scan.locale.as_deref(), Some("zh-CN"));
     assert_eq!(scan.agent_name.as_deref(), Some("灵犀"));
     assert_eq!(scan.yuan.as_deref(), Some("butter"));
     assert_eq!(scan.memory_enabled, Some(false));
     // 未知段里的同名字段不得串扰。
-    let scan = scan_agent_config("other:\n  name: wrong\nagent:\n  yuan: ming\n");
+    let scan = scan_agent_config("other:\n  name: wrong\nagent:\n  yuan: ming\n").unwrap();
     assert_eq!(scan.agent_name, None);
     assert_eq!(scan.yuan.as_deref(), Some("ming"));
 }
@@ -439,27 +439,32 @@ fn fixture_service(tag: &str) -> (PathBuf, PathBuf, Arc<ContextCompilerService>)
 }
 
 #[test]
-fn compiled_for_run_freezes_per_session_and_shape() {
+fn compiled_for_run_freezes_only_returned_artifact_and_preserves_shape() {
     let (home, product, service) = fixture_service("cache");
     let a = service
         .compiled_for_run("sess_a", "lingxi", false, NOW_MS)
         .expect("compile a");
-    let b = service
-        .compiled_for_run("sess_a", "lingxi", false, NOW_MS + 60_000)
-        .expect("compile b");
-    assert!(
-        Arc::ptr_eq(&a, &b),
-        "同一会话同一形态的重复编译必须返回同一份冻结 artifact"
+    let frozen = a.render().to_string();
+    write(
+        &home.join("agents/lingxi/identity.md"),
+        "DYNAMIC_PERSONA_NEW",
     );
+    let b = service
+        .compiled_for_run("sess_a", "lingxi", false, NOW_MS)
+        .expect("compile b");
+    assert!(!Arc::ptr_eq(&a, &b), "下一 Run 必须重新采集材料");
+    assert!(b.render().contains("DYNAMIC_PERSONA_NEW"));
+    assert_eq!(a.render(), frozen, "已经取得的运行快照不能被后续修改覆盖");
     let sub = service
         .compiled_for_run("sess_a", "lingxi", true, NOW_MS)
         .expect("compile subagent shape");
-    assert!(!Arc::ptr_eq(&a, &sub), "子代理形态是另一份缓存条目");
-    // 观测读面：主形态优先；未知会话无观测。
-    let view = service
-        .observation_for_session("sess_a")
-        .expect("observation");
-    assert_eq!(view["forSubagent"], Value::Bool(false));
+    assert!(!Arc::ptr_eq(&a, &sub));
+    assert_eq!(sub.observation()["forSubagent"], Value::Bool(true));
+    assert_eq!(b.observation()["forSubagent"], Value::Bool(false));
+    assert!(
+        service.observation_for_session("sess_a").is_none(),
+        "未发送的编译不能冒充实际请求观测"
+    );
     assert!(service.observation_for_session("sess_unknown").is_none());
     let _ = std::fs::remove_dir_all(&home);
     let _ = std::fs::remove_dir_all(&product);
@@ -737,7 +742,7 @@ async fn sent_system_prompt_is_byte_identical_to_observed_artifact() {
 }
 
 #[tokio::test]
-async fn session_freeze_spans_runs_and_turns() {
+async fn run_freeze_spans_turns_and_next_run_refreshes_material() {
     let script = vec![
         ProviderTurn::Continue {
             process_note: "thinking".to_string(),
@@ -746,7 +751,13 @@ async fn session_freeze_spans_runs_and_turns() {
         final_turn("done again"),
     ];
     let booted = boot_with_fixtures("freeze", script).await;
-    for input in ["第一句", "第二句"] {
+    for (index, input) in ["第一句", "第二句"].into_iter().enumerate() {
+        if index == 1 {
+            write(
+                &booted.layout_home.join("agents/lingxi/identity.md"),
+                "NEXT_RUN_PERSONA",
+            );
+        }
         booted
             .state
             .sessions()
@@ -770,7 +781,11 @@ async fn session_freeze_spans_runs_and_turns() {
         Some(first),
         "同一 run 的 turn 间冻结"
     );
-    assert_eq!(prompts[2].as_deref(), Some(first), "同一会话跨 run 冻结");
+    assert!(
+        prompts[2].as_deref().unwrap().contains("NEXT_RUN_PERSONA"),
+        "同会话下一 Run 读取已保存的新材料"
+    );
+    assert!(!first.contains("NEXT_RUN_PERSONA"));
     teardown(&booted).await;
 }
 
@@ -792,46 +807,111 @@ async fn subagent_run_sends_trimmed_context_and_observation_prefers_main() {
         )
         .await
         .expect("main run drives");
-    let run_id =
+    // 正常公开 driver 不装上下文编译器，真实形成 beta 父任务，不改变原 beta 仅子视图缓存的检查。
+    let parent_provider = RecordingProvider::new(vec![final_turn("parent completed")]);
+    let parent_driver = lingxi_service::runs::RunSupervisor::new(
+        Some(parent_provider.clone()),
+        None,
+        lingxi_service::runs::RunDriveLimits::default(),
+        lingxi_service::quotas::QuotaManager::new(lingxi_service::quotas::QuotaLimits::default()),
+        lingxi_service::cancel::CancelPolicy::default(),
+        None,
+        None,
+    )
+    .unwrap();
+    let parent_id =
         lingxi_adapters::storage::RunDatabase::allocate_run_id(booted.state.storage(), NOW_MS)
-            .expect("allocate run id");
-    let authorization = DriveAuthorization {
-        lineage: RunLineage {
-            parent_run_id: None,
-            origin: RunOrigin::Subagent,
-            source_message_id: None,
-            cause_id: None,
-        },
-        grant: RunGrant::Subagent {
-            tier: ToolAccessTier::Operate,
-        },
-        session_mode: lingxi_kernel::subagent::SessionPermissionMode::Operate,
-    };
-    let finish = booted
-        .state
-        .runs()
+            .unwrap();
+    let finish = parent_driver
         .drive_run(
             booted.state.storage().as_ref(),
             booted.state.events(),
             &lingxi_kernel::Principal::LocalUser,
             "sess_local_beta",
             "lingxi",
-            &run_id,
-            "child task",
+            &parent_id,
+            "beta parent",
             1,
             NOW_MS,
             None,
             None,
-            authorization,
+            DriveAuthorization::user_submission(
+                None,
+                lingxi_kernel::subagent::SessionPermissionMode::Operate,
+            ),
             None,
-            "sess_local_beta::subagent::thread-t01",
+            "sess_local_beta",
         )
         .await
-        .expect("subagent run drives");
-    assert!(
-        matches!(finish, lingxi_kernel::RunFinish::CompletedWithFinal { .. }),
-        "子代理 run 应完成: {finish:?}"
+        .expect("真实 Full 父任务");
+    assert!(matches!(
+        finish,
+        lingxi_kernel::RunFinish::CompletedWithFinal { .. }
+    ));
+    assert_eq!(
+        parent_provider.prompts().len(),
+        1,
+        "独立外部供应商父任务恰一次；总模型请求为三次"
     );
+    assert!(
+        booted
+            .state
+            .storage()
+            .load_invocation_journal(&lingxi_protocol::RunId::new(parent_id.clone()))
+            .await
+            .unwrap()
+            .is_empty(),
+        "父任务零工具调用"
+    );
+    let child = booted
+        .state
+        .subagents()
+        .dispatch_child(
+            lingxi_service::subagents::ParentRunFacts {
+                principal: lingxi_kernel::Principal::LocalUser,
+                session_id: "sess_local_beta".into(),
+                agent_id: "lingxi".into(),
+                parent_run_id: lingxi_protocol::RunId::new(parent_id.clone()),
+                parent_scope: lingxi_service::cancel::CancelScope::run_root(&parent_id),
+                source_model_call: lingxi_protocol::ModelCallId::new(format!("{parent_id}-mc0001")),
+                cause_tool_call: lingxi_protocol::ToolCallId::new(format!("{parent_id}-tc0001")),
+                now_ms: NOW_MS,
+            },
+            lingxi_kernel::ports::DelegationRequest {
+                task: "child task".into(),
+                access: Some(lingxi_kernel::subagent::AccessRequest::Write),
+                label: None,
+                agent_id: None,
+                model: None,
+                thread_id: None,
+            },
+        )
+        .await
+        .expect("正式 Runtime 创建 beta 子任务");
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(10);
+    while !booted
+        .state
+        .subagents()
+        .threads_of("sess_local_beta")
+        .iter()
+        .any(|t| {
+            t.thread_id == child.thread_id
+                && !t.busy
+                && t.last_run_status.as_deref() == Some("completed")
+        })
+    {
+        assert!(std::time::Instant::now() < deadline, "真实子任务结算");
+        tokio::time::sleep(std::time::Duration::from_millis(5)).await;
+    }
+    let lineage = booted
+        .state
+        .storage()
+        .load_run_lineage(&lingxi_protocol::RunId::new(child.child_run_id.clone()))
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(lineage.parent_run_id.unwrap().as_str(), parent_id);
+    eprintln!("W03 context actual beta parent={parent_id} child={} parent_model_calls=1 booted_model_calls=2 total=3", child.child_run_id);
 
     let prompts = booted.provider.prompts();
     assert_eq!(prompts.len(), 2);

@@ -1,0 +1,28 @@
+{
+  "baseline": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+  "product_state": "unmodified production scanner at actual run time before product edits",
+  "positive": {
+    "test": "positive_block_disabled_real_request",
+    "exit_code": 0,
+    "passed": 1,
+    "failed": 0,
+    "log": "logs/old-positive.log"
+  },
+  "negative": {
+    "tests": [
+      "c01_flow_disabled_real_request",
+      "c02_quoted_hash_gather_preserved"
+    ],
+    "exit_code": 101,
+    "passed": 0,
+    "failed": 2,
+    "log": "logs/old-red.log",
+    "failure_class": "real behavior contract mismatch, not compilation/zero match"
+  },
+  "equivalent_replay_fixture": "artifacts/rust-tauri/R06/AR/W06-E01/equivalent-old-three-tests.rs",
+  "fixture_sha256": "eb8733869804113b168bba3ddf2ee2af98497c2073fcf82e01b3d12bf4c8fc83",
+  "fixture_note": "从冻结当前文件提取最初三个等效契约/真实入口帮助Reviewer重现；是事后构造的等效夹具，不冒充旧运行字节快照；旧实际运行日志全部保留。",
+  "guard": "8192MB/600s",
+  "mock_boundary": "RecordingProvider仅模型外部应答，配置gather/run实做",
+  "original_start_end": "NOT_CAPTURED_BY_UNIFIED_RUNNER; do not invent"
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "tag": "f05-context-publish",
+    "binary": "r06_ar_f05_cache-5dfa2c062357e0c4",
+    "test": "c04_actual_acquisition_publish_barrier_never_sends_mixed_material",
+    "returncode": 0,
+    "log": "artifacts/rust-tauri/R06/direct-recheck-20261012/f05-context-publish.log"
+  },
+  {
+    "tag": "f05-identity",
+    "binary": "r06_ar_f05_cache-5dfa2c062357e0c4",
+    "test": "c02_actor_owner_and_reader_remain_distinct_on_the_same_session",
+    "returncode": 0,
+    "log": "artifacts/rust-tauri/R06/direct-recheck-20261012/f05-identity.log"
+  },
+  {
+    "tag": "f06-legal-yaml",
+    "binary": "r06_ar_f06_config-c702cd77027f5f82",
+    "test": "c02_c03_standard_semantics_and_fail_closed_gather",
+    "returncode": 0,
+    "log": "artifacts/rust-tauri/R06/direct-recheck-20261012/f06-legal-yaml.log"
+  },
+  {
+    "tag": "f07-history",
+    "binary": "r06_ar_f07_catalog-68184434dffc6eec",
+    "test": "first_layer_c04_withdrawal_updates_current_declarations_preserves_old_five_protocol_pairs",
+    "returncode": 0,
+    "log": "artifacts/rust-tauri/R06/direct-recheck-20261012/f07-history.log"
+  }
+]

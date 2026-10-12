@@ -1,0 +1,131 @@
+{
+  "at": "2026-10-12T01:11:55.936151+00:00",
+  "role": "ROOT_CONTROL_AND_READONLY_FILE_AVAILABILITY_ONLY",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "original_user_setting_unchanged": true,
+  "actual_index_empty": true,
+  "all_original_register_bytes_unchanged": true,
+  "issues": 15,
+  "base_checks_unique": 60,
+  "unique_actors": 37,
+  "original_obligation_records": 1234,
+  "extra_template_applicability": [
+    {
+      "id": "R06-EX-W01",
+      "leaves": 4,
+      "assertions": 8,
+      "spec_sha256": "725580c062bb5f853b1aab33dbe17df4fc754831f3ef323707dba92875588e9c",
+      "template_sha256": "23acb32ffb32a97035b0cce0eb0e6e82824e9e5b25e8250d983f91dc89f9a03b"
+    },
+    {
+      "id": "R06-EX-W02",
+      "leaves": 9,
+      "assertions": 20,
+      "spec_sha256": "296eb1dbdca6872d86a6e101d3abd8d91395c8802dd095c73247d5fc91f964fe",
+      "template_sha256": "42d5e668507d3c080d9de79cca75f5db4e97c44b88e38206de4b71827e5bbc0b"
+    },
+    {
+      "id": "R06-EX-W03",
+      "leaves": 32,
+      "assertions": 79,
+      "spec_sha256": "24911976402a28a371c1ea1a9da80986b3e5556d7dd4b5b18a12adb47b3b02ad",
+      "template_sha256": "566652f3e559a8034d1968e2deb48ecbe61324459f4afe5b502b18ce975d6c7c"
+    },
+    {
+      "id": "R06-EX-W04",
+      "leaves": 5,
+      "assertions": 10,
+      "spec_sha256": "55b193c92aab93bd9289bfd352d942b8b85fe1356c3f63d9d8d76879d4c4af1d",
+      "template_sha256": "470942ae20b351e4d8ca8427312e226c9682afac010307df37886658f16fc9a7"
+    },
+    {
+      "id": "R06-EX-W05",
+      "leaves": 5,
+      "assertions": 10,
+      "spec_sha256": "b26b094817a7f8bba52aa1ddf48a8c0883c2a8232951b78587681601044146e8",
+      "template_sha256": "e20f20b9d65596106af4809cea60d031a84f3507645ad110846fd10b40900ad2"
+    },
+    {
+      "id": "R06-EX-W06",
+      "leaves": 7,
+      "assertions": 19,
+      "spec_sha256": "4db1f3ba6876b375f2fdcba01640416da0cc341e1d7f6918ff2391f9418acce1",
+      "template_sha256": "379a5568093d388152d5648dafe4ca1aa9afaf5f21609d757c39ce25ad20965c"
+    },
+    {
+      "id": "R06-EX-W07",
+      "leaves": 6,
+      "assertions": 12,
+      "spec_sha256": "f2e4edffa8e71036df78b997bf0eecc3a1d06e3205b814e031a68fae2e3754be",
+      "template_sha256": "097e1f4f6e78b56e733602d89483c6563f184df1218c5d2558487cfa6590b33e"
+    },
+    {
+      "id": "R06-EX-W08",
+      "leaves": 7,
+      "assertions": 14,
+      "spec_sha256": "81629231aa975678eac2e90a91f65b558482465bd77e1095822719e3b6946b34",
+      "template_sha256": "76812dc03ebe21b8b06cb6464084038ef983b5faff2e94ca30a7c9d0b15237f5"
+    },
+    {
+      "id": "R06-EX-W09",
+      "leaves": 5,
+      "assertions": 14,
+      "spec_sha256": "85074b70bfb25841710581a2bb1349ccf929edc556172419030caa4e2e5b8c87",
+      "template_sha256": "53831d1d4bc3c99c5cad5ccafef465b0cee86a2be7969d37d406372028f453fd"
+    },
+    {
+      "id": "R06-EX-W10",
+      "leaves": 19,
+      "assertions": 53,
+      "spec_sha256": "74b0f3a62a816e70831cc2297e2e5f0801596ca1610f31388dfc858e9596748a",
+      "template_sha256": "ff957ad3337629c65de9b8f5300dcccbc8e0751acbe89d8e2e4e150c8737b507"
+    },
+    {
+      "id": "R06-EX-W11",
+      "leaves": 54,
+      "assertions": 106,
+      "spec_sha256": "b4442ed133e29e1f936d3039b9e2aebb46ac779deb1ab9729d43bc2277c58377",
+      "template_sha256": "346019e8922c08539235c3e7ad774d20c1b25e2a0904fac2d9dd49817e9a0084"
+    },
+    {
+      "id": "R06-EX-W12",
+      "leaves": 28,
+      "assertions": 70,
+      "spec_sha256": "776d10e721e55d56fd5832a8d4d891bee5628e04c055a2af938924bb3f215449",
+      "template_sha256": "a4313b278aee53879770f9cb22612cd53b2a92ed6bbbac223c600f34870930c6"
+    }
+  ],
+  "latest_source_availability": [
+    {
+      "id": "R06-AR-F05",
+      "at": "2026-10-12T01:11:55.936151+00:00",
+      "exact_owned_source_files": 10,
+      "evidence": "artifacts/rust-tauri/R06/AR/W05-CANDIDATE-RECOVERY-01/manifest.json",
+      "acceptance": "NONE",
+      "historical_review_or_platform_stop_unchanged": true,
+      "status": "OPEN_EXACT_SOURCE_RECOVERED_REQUIRES_FRESH_INTEGRATION_AND_REVIEW"
+    },
+    {
+      "id": "R06-AR-F07",
+      "at": "2026-10-12T01:11:55.936151+00:00",
+      "exact_owned_source_files": null,
+      "evidence": "artifacts/rust-tauri/R06/AR/W07-PREP-01",
+      "acceptance": "NONE",
+      "historical_review_or_platform_stop_unchanged": true,
+      "status": "OPEN_FINAL_SOURCE_LOST_FRESH_EXECUTOR02_PREPARED_NOT_DISPATCHED"
+    },
+    {
+      "id": "R06-AR-F09",
+      "at": "2026-10-12T01:11:55.936151+00:00",
+      "exact_owned_source_files": 13,
+      "evidence": "artifacts/rust-tauri/R06/AR/W09-CANDIDATE-RECOVERY-01/manifest.json",
+      "acceptance": "NONE",
+      "historical_review_or_platform_stop_unchanged": true,
+      "status": "BLOCKED_PLATFORM_INDEPENDENT_REVIEW_EXACT_SOURCE_RECOVERED_ACTIVE_W11_UNACCEPTED_DEPENDENCY"
+    }
+  ],
+  "checks_status": "PASS_CONTROL_CONSISTENCY_ONLY_NOT_PRODUCT_ACCEPTANCE",
+  "task_or_stage_new_acceptance": "NONE",
+  "formal_stage": "NOT_RUN",
+  "R07_started": false
+}

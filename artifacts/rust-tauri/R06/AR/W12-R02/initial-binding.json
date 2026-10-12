@@ -1,0 +1,64 @@
+{
+  "head": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
+  "status": " M lib/knowledge/ann-index-store.ts\n M lib/knowledge/knowledge-index-store.ts\n M lib/knowledge/vector-index-adapter.ts\n M lib/knowledge/vector-search-backend-factory.ts\n M rust/crates/lingxi-adapters/src/storage/knowledge.rs\n M rust/crates/lingxi-service/src/knowledge.rs\n?? artifacts/rust-tauri/R06/AR/\n?? docs/rust-tauri/R06/repair-current/\n?? rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs\n?? rust/crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs\n?? tests/r06-ar-f12-ann-cache-preservation.test.ts\n?? tests/r06-ar-f12-fulltext-cache-preservation.test.ts\n?? tests/r06-ar-f12-vector-cache-preservation.test.ts\n",
+  "files": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/knowledge.rs",
+      "sha256": "a123a9e0b11e0a95f630c18f8e002c36889905364361eaa34e89bad22506db01"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/knowledge.rs",
+      "sha256": "3f98131c88c8c1c1945a87752f1702d2cfb75ffdf2454e0d88d4554edbd3c370"
+    },
+    {
+      "path": "lib/knowledge/vector-index-adapter.ts",
+      "sha256": "4c74ef0a579de04195ac1b7612b398f5dc8d558c17eac83051b6f55b488b8877"
+    },
+    {
+      "path": "lib/knowledge/knowledge-index-store.ts",
+      "sha256": "eca060010a31ffb6acac5e349fd6a8a72875c59db673bc797ce04e7ddb0862d6"
+    },
+    {
+      "path": "lib/knowledge/ann-index-store.ts",
+      "sha256": "d18aace5c86d100e37e2f5932eb184044daabc4dec503800ec43a37264848404"
+    },
+    {
+      "path": "lib/knowledge/vector-search-backend-factory.ts",
+      "sha256": "54aeefa97965fe574859085616cc74070405489cce5557c2f29abb406fb2d74d"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs",
+      "sha256": "f9790bf638769199b40af3b540cb34d2fa897c28e91b4cec0af91f9b09fe4b9b"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs",
+      "sha256": "bd4b3d7b711e20aac3e56e4ca87b632bb804e4f265eedd0bfd2be218ad0e17e0"
+    },
+    {
+      "path": "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+      "sha256": "5eb1a93524ce4eabf542229f7c68e960b37b8062f908eaf29596721b8908b773"
+    },
+    {
+      "path": "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+      "sha256": "9973a3161d4d4bf7cf7ed4f079fdd45b22b1616be69d7408c1054f2bebbd6f59"
+    },
+    {
+      "path": "tests/r06-ar-f12-ann-cache-preservation.test.ts",
+      "sha256": "9b0b9219934632ff24af69e3a759ea7c35feffad5747a2114a066983f23ac791"
+    },
+    {
+      "path": "rust/Cargo.lock",
+      "sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b"
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "sha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37"
+    }
+  ],
+  "aggregate": "332d136324fe20b0b70f9ed326c9d32217b3b51132057563ffa97185b1e0d154",
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)"
+}

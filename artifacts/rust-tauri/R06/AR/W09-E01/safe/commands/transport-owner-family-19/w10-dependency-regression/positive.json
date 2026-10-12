@@ -1,0 +1,89 @@
+{
+  "home": "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/commands/transport-owner-family-19/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w10-positive-17748-1791721312036300000",
+  "job": {
+    "artifactId": "kpa_8446f1c6cebbeda0127e5924",
+    "attempt": 1,
+    "cancelledAt": null,
+    "chunkerConfigId": "8b93f0aa4fa689af",
+    "createdAt": "2026-10-11T12:21:52.483Z",
+    "embeddingStats": {
+      "abandonedStaleVariantId": null,
+      "actualWrittenChunkCount": 1,
+      "attempt": 1,
+      "callAttemptCount": 1,
+      "checkpointVariantId": "viv_060c8e7a917362b13b962ab85b84fb31",
+      "chunksNewlyEmbedded": 1,
+      "chunksResumedFromCheckpoint": 0,
+      "chunksReusedFromReadyVariant": 0,
+      "confirmedResponseRequestCount": 1,
+      "failedCallCount": 0,
+      "failedRequestCount": 0,
+      "failedTransportAttemptCount": 0,
+      "knownNotSentAttemptCount": 0,
+      "model": {
+        "dimensions": 2,
+        "key": "ec2c08d535d6a937df6bbca492c4993c1d5c81a0dcc465f6add917650af1aee4",
+        "modelId": "model-a",
+        "parameterFingerprint": "86d540a52e2026b6be18ab309a577545c5b98b0af0371d0f5e5b4bb35993c1b5",
+        "protocol": "openai-embeddings",
+        "provider": "embed"
+      },
+      "pendingCallIntentCount": 0,
+      "pendingRequestCount": 0,
+      "plannedChunkCount": 1,
+      "previousKnownNotSentAttemptCount": 0,
+      "previousRequestCount": 0,
+      "previousTransportAttemptCount": 0,
+      "requestCount": 1,
+      "requestCountSemantics": "confirmed_or_possibly_sent_excluding_known_not_sent",
+      "resetStaleVectors": false,
+      "successfulRequestCount": 1,
+      "transportAttemptCount": 1,
+      "unknownRequestsFromPreviousAttempt": 0,
+      "unknownSentRequestCount": 0
+    },
+    "error": null,
+    "id": "kjob_993eb241bf9edc45cd1ee2ae",
+    "notebookId": "knb_7e0f09d5704ca31e77bc7575",
+    "phase": "done",
+    "progressDone": 1,
+    "progressTotal": 1,
+    "sourceId": "ksrc_614aed0fa64697558311c5d4",
+    "status": "done",
+    "updatedAt": "2026-10-11T12:21:52.498Z"
+  },
+  "ready": "127.0.0.1:54025",
+  "requests": [
+    {
+      "body": {
+        "encoding_format": "float",
+        "input": [
+          "# 资料\n\n来源隔离与模型身份必须一致。"
+        ],
+        "model": "model-a"
+      },
+      "endpoint": "127.0.0.1:54009"
+    }
+  ],
+  "usage": [
+    {
+      "inputTokens": 5,
+      "model": "model-a",
+      "outcome": "succeeded",
+      "outputTokens": null,
+      "protocol": "openai-embeddings",
+      "provider": "embed",
+      "transportAttempts": 1,
+      "usageState": "partial"
+    }
+  ],
+  "vectors": [
+    {
+      "dimensions": 2,
+      "key": "ec2c08d535d6a937df6bbca492c4993c1d5c81a0dcc465f6add917650af1aee4",
+      "status": "ready",
+      "variant": "viv_060c8e7a917362b13b962ab85b84fb31",
+      "vector": "0000803F00000000"
+    }
+  ]
+}

@@ -55,6 +55,7 @@ fn requested_call(seq: u32, target: &str) -> RequestedToolCall {
     .expect("effective arguments")
     .with_provider_call_id(format!("call_{seq:04}"));
     RequestedToolCall {
+        declaration_binding: None,
         tool_call_id: ToolCallId::new(format!("tc{seq:04}")),
         provider_call_id: request.provider_call_id.clone(),
         target: request.target.clone(),
@@ -1207,6 +1208,7 @@ fn file_call(seq: u32, wire: &str, path: &str) -> RequestedToolCall {
     .expect("effective arguments")
     .with_provider_call_id(format!("fc{seq:04}"));
     RequestedToolCall {
+        declaration_binding: None,
         tool_call_id: ToolCallId::new(format!("ftc{seq:04}")),
         provider_call_id: request.provider_call_id.clone(),
         target: request.target.clone(),

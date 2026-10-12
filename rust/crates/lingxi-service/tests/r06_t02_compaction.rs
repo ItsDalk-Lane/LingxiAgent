@@ -359,6 +359,7 @@ fn assistant_turn(seq: u32, text: &str, with_call: bool) -> ExchangeItem {
             .expect("arguments")
             .with_provider_call_id(format!("pc{seq:04}"));
             vec![RequestedToolCall {
+                declaration_binding: read_snapshot().bind_target(&request.target),
                 tool_call_id: ToolCallId::new(format!("tc{seq:04}")),
                 provider_call_id: request.provider_call_id,
                 target: request.target,
@@ -1442,6 +1443,8 @@ impl TurnProviderPort for ScriptedUsageProvider {
                 .prior
                 .iter()
                 .map(|item| match item {
+                    ExchangeItem::UserTurn { .. } => "historical_user",
+                    ExchangeItem::CurrentSubmission => "current_submission",
                     ExchangeItem::AssistantTurn { .. } => "assistant",
                     ExchangeItem::ToolResult { .. } => "tool_result",
                     ExchangeItem::CompactionSummary { .. } => "compaction_summary",

@@ -1,0 +1,44 @@
+[
+  {
+    "suite": "r06_ar_f02_file_restore",
+    "name": "rewind_recovery_records_survive_request_replay_and_service_restart",
+    "exitCode": 0,
+    "elapsedSeconds": 2.32
+  },
+  {
+    "suite": "r06_ar_f13_submission",
+    "name": "real_http_500_retry_advances_only_attempt_and_preserves_frozen_sources",
+    "exitCode": 0,
+    "elapsedSeconds": 0.84
+  },
+  {
+    "suite": "r06_ar_f08_projection",
+    "name": "f08_budget_refusal_keeps_raw_success_and_continues_with_readable_history",
+    "exitCode": 0,
+    "elapsedSeconds": 2.21
+  },
+  {
+    "suite": "r06_ar_f13_submission",
+    "name": "real_submission_freezes_selected_sources_and_rejects_old_or_foreign_scope",
+    "exitCode": 0,
+    "elapsedSeconds": 0.31
+  },
+  {
+    "suite": "r06_ar_f14_migration_receipts",
+    "name": "c01_fresh_database_receipts_equal_registry_and_inspector",
+    "exitCode": 101,
+    "elapsedSeconds": 2.79
+  },
+  {
+    "suite": "r06_ar_f14_migration_receipts",
+    "name": "c01_v7_upgrade_preserves_receipts_and_restarts_are_idempotent",
+    "exitCode": 101,
+    "elapsedSeconds": 0.27
+  },
+  {
+    "suite": "r06_ar_f14_migration_receipts",
+    "name": "c01_v8_upgrade_preserves_receipts_and_restarts_are_idempotent",
+    "exitCode": 101,
+    "elapsedSeconds": 0.25
+  }
+]

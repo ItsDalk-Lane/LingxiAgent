@@ -1,0 +1,24 @@
+F-D08-C-RESEARCH-LEDGER | 
+F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-DELETE-01E1E3 | 执行“删除知识笔记本”后核对：删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误 / 失败、冲突或拒绝时核对返回的状态与实际副作用一致
+F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-IMPORT-3D9932 | 执行“导入目录到知识笔记本”后核对：登记来源并启动受控入库；返回导入状态或权限、解析错误 / 失败、冲突或拒绝时核对返回的状态与实际副作用一致
+F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-PATCH-763C55 | 执行“重命名知识笔记本”后核对：名称写入知识库并返回更新后的笔记本；失败时不报告成功 / 失败、冲突或拒绝时核对返回的状态与实际副作用一致
+F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-READ-E84EEE | 执行“查看知识笔记本”后核对：返回当前笔记本资料；失败时返回具体错误 / 失败、冲突或拒绝时核对返回的状态与实际副作用一致
+F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-SOURCE-210C79 | 执行“添加笔记本来源”后核对：登记新来源并返回入库任务或明确错误 / 失败、冲突或拒绝时核对返回的状态与实际副作用一致
+F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-SOURCE-B0386D | 执行“查看笔记本来源”后核对：返回当前来源列表，不导入新资料 / 失败、冲突或拒绝时核对返回的状态与实际副作用一致
+F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-POST-66C538 | 执行“创建知识笔记本”后核对：校验名称并写入当前工作空间知识库，返回新笔记本或错误 / 失败、冲突或拒绝时核对返回的状态与实际副作用一致
+F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-READ-BB1F5E | 执行“查看知识笔记本列表”后核对：返回当前工作空间的笔记本、有效分块配置和导入摘要 / 失败、冲突或拒绝时核对返回的状态与实际副作用一致
+F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-CITATIONS-CI-E2AF86 | 成功：执行“定位引用证据”后，返回引用、原文块、源与快照及 viewer URL/位置 / 拒绝/边界：缺 headingPath 时从章节 metadata 补齐；引用不可见/不存在错误；不应错误扩大写入或披露范围
+F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-INGESTION-RE-76E2F5 | 成功：执行“查看摄入任务”后，返回指定 studio 的 jobs/counts 和不可达源文件状态 / 拒绝/边界：query.notebookId/sourceId 可筛选；studio 身份隔离；不应错误扩大写入或披露范围
+F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-8A6247 | 成功：执行“重试知识源摄入”后，失败任务重新入队并唤醒；无任务兜底新建任务 / 拒绝/边界：最新任务非 failed 返回 409；已删源不可重试；不应错误扩大写入或披露范围
+F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-C12CD3 | 成功：执行“从笔记本移除源引用”后，移除该 notebook 对源的 membership，返回 membership；不等同删除源物理文件 / 拒绝/边界：studio/notebook/source 约束；失败不应删除共享源；不应错误扩大写入或披露范围
+F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-DB95BA | 成功：执行“刷新本地文件知识源”后，重新抓取文件形成最新快照/解析物，返回 changed；变化后重建摄入 / 拒绝/边界：仅 local owner；文件未变 changed=false；不可访问报错；不应错误扩大写入或披露范围
+F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-F49D5F | 成功：执行“修改笔记本摄入与模型设置”后，更新笔记本 config；分块或嵌入模型变化触发全量重建 / 拒绝/边界：body 经 validateSettingsBody；数值范围/模型引用由 store 校验；不应错误扩大写入或披露范围
+F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-PARSE-ARTIFA-251147 | 成功：执行“查看分块卡片”后，返回 chunkerConfigId 与有序 chunks / 拒绝/边界：studio 身份限定；id 不存在错误；不应错误扩大写入或披露范围
+F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-PARSE-ARTIFA-618978 | 成功：执行“查看解析块”后，返回解析产物的 blocks / 拒绝/边界：studio 身份限定；id 不存在错误；不应错误扩大写入或披露范围
+F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-SNAPSHOTS-SN-23AB8E | 成功：执行“读取冻结原文”后，返回原文快照字节与安全响应头，HTML 以 text/plain 呈现 / 拒绝/边界：studio 隔离；HTML 禁止执行脚本，CSP sandbox/nosniff；不应错误扩大写入或披露范围
+F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-SOURCES-ID-D-928337 | 成功：执行“永久删除知识源”后，取消活跃摄入、清理索引变体及物理痕迹，返回 cancelledJobs/purge / 拒绝/边界：活跃 turn 冻结引用时 409；delete wins 阻止并发 reingest；不应错误扩大写入或披露范围
+F-D08-TOOL-TOOL-KNOWLEDGE-GREP-269958 | 片段可回到同一来源 / 跨studio不可读 / 无匹配为空；越权studio/source或无效过滤拒绝。
+F-D08-TOOL-TOOL-KNOWLEDGE-MANAGE-1AA3F1 | 每动作核实际来源或队列状态 / remove不直接删共享源 / 越权/拒绝不改库 / 无批准、跨studio ID、无效action/kind/路径报错，不变更他人库；后台索引失败要单列状态。
+F-D08-TOOL-TOOL-KNOWLEDGE-OUTLINE-5F5365 | 章节定位可用于knowledge_read / 跨来源隔离 / 无来源或越权返回错误；空文档只返回空大纲。
+F-D08-TOOL-TOOL-KNOWLEDGE-READ-FBD4D4 | 引用指向实际快照 / 同轮刷新仍读旧冻结版 / 来源不存在、超出scope或分页越界不泄漏其他来源。
+F-D08-TOOL-TOOL-KNOWLEDGE-SEARCH-062844 | 命中来源和引用可核 / 无能力不伪造命中 / 无索引/模型能力或无结果显式说明；跨studio来源不出现。

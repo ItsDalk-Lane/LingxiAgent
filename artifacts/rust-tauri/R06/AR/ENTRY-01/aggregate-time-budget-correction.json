@@ -1,0 +1,118 @@
+{
+  "at": "2026-10-11T09:48:29.816963+00:00",
+  "role": "ROOT_CORRECTION_OF_ORCHESTRATOR_OUTER_BUDGET_NOT_PRODUCT_GATE_REPAIR",
+  "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "source": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_maps/R05.json",
+  "source_sha": "a1e4942356f7c6f897cd51f85e26ad474692836db2e3817951e72cd2be797798",
+  "original_default_timeout_seconds": 1200,
+  "commands": [
+    {
+      "key": "rust_fmt",
+      "timeout_seconds": 300,
+      "argv": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--all",
+        "--",
+        "--check"
+      ]
+    },
+    {
+      "key": "rust_clippy",
+      "timeout_seconds": 1200,
+      "argv": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    {
+      "key": "rust_test_workspace",
+      "timeout_seconds": 2400,
+      "argv": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--workspace",
+        "--locked"
+      ]
+    },
+    {
+      "key": "check_contracts",
+      "timeout_seconds": 900,
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r01-t02-check-generated.sh"
+      ]
+    },
+    {
+      "key": "check_boundaries",
+      "timeout_seconds": 600,
+      "argv": [
+        "python3",
+        "-B",
+        "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+      ]
+    },
+    {
+      "key": "r05_stage_suites",
+      "timeout_seconds": 3600,
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r05_t08_stage_suites.sh",
+        "{EVIDENCE}/R05_SUITES"
+      ]
+    },
+    {
+      "key": "r04_regression_gate",
+      "timeout_seconds": 10800,
+      "argv": [
+        "cargo",
+        "run",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-stage",
+        "R04",
+        "--evidence",
+        "{EVIDENCE}/R04_REGRESSION"
+      ]
+    }
+  ],
+  "serialized_declared_timeout_total_seconds": 19800,
+  "actual_error": "Root imposed an additional aggregate 600-second external runner cap on serialized formal stage, shorter than original command budgets; prior outer cap termination is incomplete execution, not product verdict",
+  "old_evidence_unchanged": [
+    "W03-E01/workspace04",
+    "W03-E01/formalR05-01",
+    "W10-E01/verify-R05-final-01 if actual outer termination occurs"
+  ],
+  "correction": "Honor each original stage timeout and a bounded aggregate budget covering original sequential commands plus startup/cleanup. Whole workspace outer budget matches original 2400-second command; test binary defaults remain 600 seconds and 8192MiB. No changes to test guard code, test env disable flags, stage maps, required cases or scope. Never continue current running command with changed configuration. Preserve all actual prior failures/interruption logs.",
+  "test_guard_unchanged": {
+    "time_seconds": 600,
+    "memory_mib": 8192,
+    "no_disable": true
+  },
+  "stage_verdict": "NOT_RUN_COMPLETION",
+  "R06_ACCEPTED": false,
+  "clarifications": [
+    {
+      "at": "2026-10-11T09:52:12.739703+00:00",
+      "source": "W10 executor actual runner clarification",
+      "fact": "W10 run.py imposes no aggregate outer600 kill/timeout; it preserves child TEST_TIME_LIMIT_SEC600/8192 defaults and formal command already exceeds10min alive. W10 is not counted as actual outer-cap failure. Conditional old_evidence statement must not be read as an observed termination.",
+      "W10_formal_status": "running; final result NOT_RUN_COMPLETION until actual handoff"
+    }
+  ]
+}

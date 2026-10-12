@@ -1,0 +1,10 @@
+{"command": ["node", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/oracle.mjs"], "start": 1791700773.2855082, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-incumbent-oracle-3n3xgwug", "guard": "8192MB/600s"}
+{"name":"merge-control","yaml":"d: &d {enabled: false}\nmemory: {<<: *d}\n","incumbent":{"d":{"enabled":false},"memory":{"enabled":false}}}
+{"name":"sequence-root","yaml":"? [memory]\n: {enabled: false}\n","incumbent":{"memory":{"enabled":false}}}
+{"name":"sequence-field","yaml":"memory: {? [enabled]: false}\n","incumbent":{"memory":{"enabled":false}}}
+{"name":"quoted-literal-owned","yaml":"memory: {\"<<\": {enabled: false}}\n","incumbent":{"memory":{"<<":{"enabled":false}}}}
+{"name":"explicit-string-merge-owned","yaml":"memory: {!!str <<: {enabled: false}}\n","incumbent":{"memory":{"<<":{"enabled":false}}}}
+{"name":"quoted-literal-root-scalar","yaml":"memory: {enabled: false}\n\"<<\": 7\n","incumbent":{"memory":{"enabled":false},"<<":7}}
+{"name":"quoted-literal-unknown-nested","yaml":"memory: {enabled: false}\nfuture: {\"<<\": {marker: keep}, other: value}\n","incumbent":{"memory":{"enabled":false},"future":{"<<":{"marker":"keep"},"other":"value"}}}
+{"name":"double-nested-merge-source","yaml":"a: &a {? [enabled]: false}\nb: &b {<<: *a}\nmemory: {<<: *b, enabled: false}\n","incumbent":{"a":{"enabled":false},"b":{"enabled":false},"memory":{"enabled":false}}}
+{"name":"unknown-complex-inner","yaml":"memory: {enabled: false, future: {? [enabled]: true}}\n","incumbent":{"memory":{"enabled":false,"future":{"enabled":true}}}}

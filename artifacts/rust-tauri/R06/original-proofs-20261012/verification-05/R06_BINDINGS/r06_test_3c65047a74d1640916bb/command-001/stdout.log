@@ -1,0 +1,18 @@
+
+running 1 test
+test resource_metadata_ticket_and_content_head_are_owner_bound ... ok
+
+successes:
+
+---- resource_metadata_ticket_and_content_head_are_owner_bound stdout ----
+LINGXI_AUTH_REJECTED request_id="req-22479b038456cc2dee5e05c965d2dd19" method=GET [token] status=403 reason=insufficient_scope remote=127.0.0.1:55364
+LINGXI_AUTH_REJECTED request_id="req-ef103edf037aa0f868919f5562d72757" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:55365
+LINGXI_AUTH_REJECTED request_id="req-19a922ec5f3d070e0ad842ffdbb94b9a" method=GET [token] status=403 reason=insufficient_scope remote=127.0.0.1:55366
+LINGXI_AUTH_REJECTED request_id="req-397fe7f1d273786c07a51902d9e8383c" method=HEAD [token] status=403 reason=insufficient_scope remote=127.0.0.1:55368
+
+
+successes:
+    resource_metadata_ticket_and_content_head_are_owner_bound
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 6.11s
+

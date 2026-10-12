@@ -1,0 +1,37 @@
+{
+  "at": "2026-10-11T15:11:34.981276+00:00",
+  "role": "ROOT_ENDED_OWNED_GENERATED_STATIC_CACHE_ONLY",
+  "owner": "/root/ar_w05_executor_01",
+  "before_record": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w05-executor-owned-static-cache-cleanup-01-before.json",
+  "before_record_sha256": "7ca551da2f263ecd8ad3004e0ace08daea30f3e0067f02f6b4ab45486d6ff339",
+  "deleted_non_executable_generated_files": 160727,
+  "deleted_logical_bytes": 35412916558,
+  "all_eligible_native_git_ignored": true,
+  "source_target_overlap": 0,
+  "protected_actual_program_count": 301,
+  "all_actual_programs_SHA_unchanged": true,
+  "protected_all_X_OK_count": 1234,
+  "all_X_OK_SHA_unchanged": true,
+  "candidate_product_count": 10,
+  "all_candidate_products_SHA_unchanged": true,
+  "freeze_record_SHA_unchanged": true,
+  "actual_lsof_before_mutation": [
+    {
+      "target": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/rust/target-w05-e01",
+      "exit": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "target": "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/rust/target-w05-e01-mutant",
+      "exit": 1,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "free_before_bytes": 20260089856,
+  "free_after_bytes": 33735856128,
+  "observed_free_change_not_exclusive_cleanup_due_to_concurrent_work": true,
+  "safe_evidence_homes_DB_bins_user_files_not_removed": true,
+  "actual_behavior_acceptance": false
+}

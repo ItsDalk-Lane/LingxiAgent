@@ -1,0 +1,904 @@
+{
+  "count": 37,
+  "items": [
+    {
+      "id": "R00-T02-LA-041F938C351F",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-REVI-041F93",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "将所选修订内容恢复到当前记忆并返回结果",
+      "r00Assertions": [
+        "成功：执行“恢复记忆修订”后，将所选修订内容恢复到当前记忆并返回结果",
+        "拒绝/边界：settings.write；revision 不存在 404；内容已变化/忙时冲突，失败 500；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-04EE57C5D2BF",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-TENETS-POST-04EE57",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "写入 active 原则并发 tenets-changed；重复返回 duplicate",
+      "r00Assertions": [
+        "成功：执行“直接新增原则”后，写入 active 原则并发 tenets-changed；重复返回 duplicate",
+        "拒绝/边界：content 必须非空；priority 可选；数量限制 409；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-04F4C81BCBB7",
+      "featureId": "F-D07-ROUTE_BEHAVIOR-BEHAVIOR-CONFIG-MEMORIES-IMPORT-POST-04F4C8",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "将兼容 v1/v2 的事实写入指定 Agent 记忆库，返回实际导入条数或错误",
+      "r00Assertions": [
+        "执行“导入记忆事实”后核对：将兼容 v1/v2 的事实写入指定 Agent 记忆库，返回实际导入条数或错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-0779DAF64B03",
+      "featureId": "F-D07-TOOL-TOOL-UNPIN-MEMORY-0779DA",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "按精确ID或关键词模糊匹配删除一个或多个active条目，返回removedCount与已删除项。",
+      "r00Assertions": [
+        "仅匹配的active条目被移除",
+        "关键词多命中数量准确",
+        "其他Agent不受影响",
+        "空库/无匹配不删除；关键词可能命中多项，需review权限和删除范围确认。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-1418E279D6FE",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-MEMORIES-COMPILED-TODAY-P-1418E2",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "写 today 节并同步 memory.md",
+      "r00Assertions": [
+        "成功时核对：写 today 节并同步 memory.md",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-1685D5E08812",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-AUTOLEAR-1685D5",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "保存enabled 等自动学习开关并返回新状态",
+      "r00Assertions": [
+        "成功：执行“更新自动学习偏好”后，保存enabled 等自动学习开关并返回新状态",
+        "拒绝/边界：engine.getAutolearnPreferences/setAutolearnPreferences；PUT 接受 autolearn 包裹或扁平 patch；无效 body/平台拒绝；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-1CE6A92200DB",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-REVI-1CE6A9",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回修订内容及现读当前编译快照",
+      "r00Assertions": [
+        "成功：执行“对比记忆修订”后，返回修订内容及现读当前编译快照",
+        "拒绝/边界：revision 不存在 404；current 每次实时快照；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-1CFB84CEB4F8",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-TENETS-READ-1CFB84",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回该助手全部原则和状态",
+      "r00Assertions": [
+        "成功：执行“列出助手原则”后，返回该助手全部原则和状态",
+        "拒绝/边界：助手不存在 404；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-245D72DD4CEA",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-FEED-245D72",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "写入经验分类记录；返回 added/duplicate 与 experienceEnabled，暂停经验也允许显式反馈",
+      "r00Assertions": [
+        "成功：执行“对消息做赞/踩反馈”后，写入经验分类记录；返回 added/duplicate 与 experienceEnabled，暂停经验也允许显式反馈",
+        "拒绝/边界：rating=up/down 进不同分类；重复不新增；excerpt 必填并截断；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-38AD68BFB5B3",
+      "featureId": "F-D07-TOOL-TOOL-TENET-PROPOSE-38AD68",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "生成当前Agent的pending原则提案，用户另行批准后才生效；会话得到tenetId和pending状态。",
+      "r00Assertions": [
+        "提案为pending且未即时生效",
+        "批准/拒绝后状态准确",
+        "其他Agent不受影响",
+        "无效内容、重复/拒绝或跨Agent路径不得更改已有原则。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-396F817018F6",
+      "featureId": "F-D07-ROUTE_BEHAVIOR-BEHAVIOR-CONFIG-MEMORIES-DELETE-396F81",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "清空事实库与整理产物并留下重置标记；失败返回错误",
+      "r00Assertions": [
+        "执行“清除当前 Agent 全部记忆”后核对：清空事实库与整理产物并留下重置标记；失败返回错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-3C8CE915255E",
+      "featureId": "F-D07-ROUTE_BEHAVIOR-BEHAVIOR-EXPERIMENTS-EXPERIMENTS-MEMORY-CACHE-SN-3C8CE9",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "校验 settings.write 范围后删除当前 Agent 观察记录，返回 deleted 状态",
+      "r00Assertions": [
+        "执行“删除记忆缓存观察记录”后核对：校验 settings.write 范围后删除当前 Agent 观察记录，返回 deleted 状态",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-4338B197B6DF",
+      "featureId": "F-D07-TOOL-TOOL-PIN-MEMORY-4338B1",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "先做PII脱敏，再新增立即生效的user_direct条目；重复内容返回已存在。",
+      "r00Assertions": [
+        "新条目立即进入当前Agent上下文",
+        "敏感字段已脱敏",
+        "其他Agent不受影响",
+        "内容无效、容量错误或跨Agent范围不写；不能把脱敏前个人信息落盘。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-476AB8B09402",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-MEMORIES-COMPILED-FACTS-P-476AB8",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "写 facts.md 并同步 memory.md，返回归一化内容",
+      "r00Assertions": [
+        "成功时核对：写 facts.md 并同步 memory.md，返回归一化内容",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-506A6F6005C1",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-MEMORIES-COMPILED-READ-506A6F",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回 Markdown/sections，首次可迁移旧事实文件",
+      "r00Assertions": [
+        "成功时核对：返回 Markdown/sections，首次可迁移旧事实文件",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-53B672CBEA46",
+      "featureId": "F-D07-ROUTE_BEHAVIOR-BEHAVIOR-CONFIG-MEMORIES-COMPILED-DELETE-53B672",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "清理编译记忆与总结来源并留下重置标记；原始事实库不按此接口清空",
+      "r00Assertions": [
+        "执行“清除整理后的记忆产物”后核对：清理编译记忆与总结来源并留下重置标记；原始事实库不按此接口清空",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-628005EDFF37",
+      "featureId": "F-D07-TOOL-TOOL-CONTEXT-NOTES-628005",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "read返回文本；write/append写入会话专属笔记，下次读取内容一致。",
+      "r00Assertions": [
+        "追加只增新块",
+        "重开会话读回",
+        "超限不覆盖旧值",
+        "无会话、空写入和16KiB上限返回错误，不改既有笔记。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-7432B00DEC94",
+      "featureId": "F-D07-TOOL-TOOL-SEARCH-MEMORY-7432B0",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回匹配事实、时间/标签和检索状态；可选跨频道依配置。",
+      "r00Assertions": [
+        "Agent隔离",
+        "状态区分无命中与未检索",
+        "模型不可用、超时/无覆盖时明确标降级或空结果，不把未检索当无事实。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-7563265D4241",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PINNED-PUT-756326",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "删除不在新名单的 active 原则（含模型提议项），新增缺项为 user_direct active，发 agent-updated",
+      "r00Assertions": [
+        "成功：执行“整体替换置顶原则”后，删除不在新名单的 active 原则（含模型提议项），新增缺项为 user_direct active，发 agent-updated",
+        "拒绝/边界：pins 数组；空数组删除全部 active；同正文去重；非 active 保留；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-76EE734926B4",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-REVI-76EE73",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回指定助手修订清单",
+      "r00Assertions": [
+        "成功：执行“列出记忆修订”后，返回指定助手修订清单",
+        "拒绝/边界：ticker 不可用 503；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-7D05B144AE21",
+      "featureId": "F-D07-TOOL-TOOL-RECALL-EXPERIENCE-7D05B1",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回匹配经验及路径，不改记忆文件。",
+      "r00Assertions": [
+        "命中来自当前Agent",
+        "无写入",
+        "无记录/跨Agent时为空，不泄露其他Agent经验。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-822AADC2B605",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-TENET-REJECT-822AAD",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "提案被拒，不进入 active 原则",
+      "r00Assertions": [
+        "成功：拒绝原则提案后，提案被拒，不进入 active 原则",
+        "边界：approve=false；不存在或限制触发错误；拒绝时目标状态不变"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-89F253FD3567",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-TENET-APPROVE-89F253",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "提案变 active，可进入助手原则与提示词",
+      "r00Assertions": [
+        "成功：批准原则提案后，提案变 active，可进入助手原则与提示词",
+        "边界：approve 缺省/true；不存在或限制触发错误；拒绝时目标状态不变"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-90975187F446",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-MEMORIES-COMPILED-WEEK-DA-909751",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "写 week.md 并同步 memory.md",
+      "r00Assertions": [
+        "成功时核对：写 week.md 并同步 memory.md",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-99900EB5ACC9",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-TENETS-TENETID--99900E",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "从 tenets 存储删除指定项并广播 tenets-changed",
+      "r00Assertions": [
+        "成功：执行“删除原则”后，从 tenets 存储删除指定项并广播 tenets-changed",
+        "拒绝/边界：不存在 404；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-A17D742E55B7",
+      "featureId": "F-D07-TOOL-TOOL-RECORD-EXPERIENCE-A17D74",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "经验文档和索引出现新内容，后续recall可读。",
+      "r00Assertions": [
+        "写后可召回",
+        "Agent之间隔离",
+        "无效类别/写入失败/跨Agent拒绝，不破坏旧经验。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-A9AD4C7F76AE",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-RUNS-A9AD4C",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "启动一次手动 dream，返回 202 与运行信息",
+      "r00Assertions": [
+        "成功：执行“手动触发记忆整理”后，启动一次手动 dream，返回 202 与运行信息",
+        "拒绝/边界：settings.write；记忆关闭/忙/已有运行返回 409；ticker 不可用 503；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-AD0384FBE1F2",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-EXPERIMENTS-EXPERIMENTS-MEMORY-C-AD0384",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回指定智能体 observation",
+      "r00Assertions": [
+        "成功时核对：返回指定智能体 observation",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-B45ECEC543C6",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEMORY-DREAM-MEMORIES-DREAM-STAT-B45ECE",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回指定助手 ticker 当前状态",
+      "r00Assertions": [
+        "成功：执行“查看记忆整理状态”后，返回指定助手 ticker 当前状态",
+        "拒绝/边界：ticker 不可用 503；助手不存在 404；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-C3FB70F9925E",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-AUTOLEAR-C3FB70",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回enabled 等自动学习开关，不改动设置",
+      "r00Assertions": [
+        "成功：执行“读取自动学习偏好”后，返回enabled 等自动学习开关，不改动设置",
+        "拒绝/边界：engine.getAutolearnPreferences/setAutolearnPreferences；PUT 接受 autolearn 包裹或扁平 patch；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-C75BF9A4D143",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-MEMORIES-EXPORT-READ-C75BF9",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回版本、时间和 facts JSON",
+      "r00Assertions": [
+        "成功时核对：返回版本、时间和 facts JSON",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-C8380CD5D08B",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "经验开启时合并 experience 分类文档；无文件给空正文，暂停则 403",
+      "r00Assertions": [
+        "成功：执行“读取助手经验”后，经验开启时合并 experience 分类文档；无文件给空正文，暂停则 403",
+        "拒绝/边界：experience.enabled 为 false 时拒绝；空文档返回空字符串；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-D38F6F02EDD7",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-MEMORIES-COMPILED-LONGTER-D38F6F",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "写 longterm 节并同步 memory.md",
+      "r00Assertions": [
+        "成功时核对：写 longterm 节并同步 memory.md",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-D47D375E578B",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PINNED-READ-D47D37",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "仅返回 tenets.json 中 active 项的正文",
+      "r00Assertions": [
+        "成功：执行“读取置顶原则”后，仅返回 tenets.json 中 active 项的正文",
+        "拒绝/边界：仅 active；其他状态不可见；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-DCF0836C3A16",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-PUT-DCF083",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "按 # 标题同步 experience 分类及索引并刷新助手；空内容会清空分类",
+      "r00Assertions": [
+        "成功：执行“整体更新经验分类文档”后，按 # 标题同步 experience 分类及索引并刷新助手；空内容会清空分类",
+        "拒绝/边界：经验暂停 403；content 为字符串；非法分类 400；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-EA26288DA2DB",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-MEMORIES-READ-EA2628",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "从指定智能体 facts.db 导出全部事实",
+      "r00Assertions": [
+        "成功时核对：从指定智能体 facts.db 导出全部事实",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    },
+    {
+      "id": "R00-T02-LA-FD94F19E734D",
+      "featureId": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-MEMORIES-COMPILED-WEEK-DA-FD94F1",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R06-T06"
+      ],
+      "r00ExecutionStageIds": [
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回指定智能体 days",
+      "r00Assertions": [
+        "成功时核对：返回指定智能体 days",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+    }
+  ]
+}

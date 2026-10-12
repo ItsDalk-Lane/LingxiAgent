@@ -53,6 +53,13 @@ reqwest = { version = "0.13.5", features = ["json", "form", "socks"] }
 rusqlite = { version = "0.40.2", features = ["bundled", "backup"] }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
+# R06-AR-F06：真正解析 YAML，避免合法配置被逐行扫描静默误读。
+serde_yaml_ng = "=0.10.0"
+# 保留键样式与标签，标准合并与严格标签检查共用同一 YAML 解析器。
+serde-saphyr = "=1.3.0"
+granit-parser = "=1.3.0"
+# 与现役配置 schema 使用相同的标量时间戳判定；不预处理 YAML 文本。
+regex = "=1.13.1"
 sha2 = "0.11.0"
 # R02-T06: `time` feature flag added for the backup-while-writing
 # integration test's head-start sleep (same locked tokio 1.53.1; the flag

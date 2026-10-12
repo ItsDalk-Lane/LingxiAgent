@@ -1,0 +1,1219 @@
+# 灵犀 R06：问题清单、修复总控与逐项自检／独立对抗性验收提示词
+
+版本：2026-10-11。适用仓库：`ItsDalk-Lane/LingxiAgent`。被审分支：`codex/rust-tauri-migration`。
+
+被审提交：`2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d`。R06 阶段开始基线：`c9cca6020e0990016ee0d14af406766370849a7a`。
+
+**本次审查结论：R06_NOT_ACCEPTED。** 仓库最新进度记录声称 ACCEPTED，但以下生产行为缺口和门禁遗漏足以推翻“已按原计划完整完成R06”的结论。不得启动R07来代替修复这些R06到期义务。
+
+**证据边界：本次为固定提交上的源码、调用链、测试实现及已归档验收记录审查。审查环境没有Cargo/Rust工具链，本次未运行Rust项目测试、未执行文中破坏性反例、未修改或推送仓库。** 下文“源码确认”不等于“已在运行环境复现”；每项反例都必须由执行智能体在隔离环境实际运行。仓库阶段报告中的1862 passed / 0 failed是原报告的执行结果，不是本次重新跑出的成绩。
+
+本文件可整体交给具备真实子代理和代码执行能力的编码智能体。它包含15项问题、60项编号基础验收、自检规则、独立审查提示词、原阶段覆盖要求、提交/推送边界与最终放行公式。所有基础检查初始为NOT_RUN，不能直接改为PASS。
+
+“无遗留”定义为：本文件全部已确认问题、原R06所有到期必需行为、修复期间新发现的真实同族缺陷和受影响回归均完成有效闭环。不承诺有限测试可以证明所有未知输入永远没有错误。
+
+## 1. 总控角色与授权
+
+你是R06修复总控，不是长期执行代理或长期审查代理。你的职责是读取原规格、冻结基线、拆派本文件的任务、收集证据、创建全新独立Reviewer、驱动修复循环以及按有效授权精确交付Git。
+
+每个修复Task必须是**全新子代理**；同一Task每次修复和每次验收也必须是**全新子代理**。不得复用最初执行者继续修、不得复用Reviewer复审、不得用一个实现代理或一个审查代理处理整个阶段。需要真正的新实例/新会话，不是同一聊天改称号。子代理只通过版本化源码、规格、报告与证据交接，不依赖上一代理聊天记忆。
+
+本次执行目标只到R06修复、独立验收与交接；完成后停止于R07入口。沿用用户已明确给出的同分支逐Task提交、推送授权时，总控可在每Task独立PASS后commit/push；任何不明确的外部授权必须列明，不得假定已发布授权。禁止force push、改写历史、直接写main、PR合并、tag/release、真实用户数据迁移、真实联系人外发、未经明确授权的付费服务调用。
+
+你现在收到的是修复任务，不是让你再次只写一份计划。立即执行可确定的隔离工作；只有真实环境/权限/资料阻塞才停止对应链，不能以困难或多轮失败代替修复。
+
+## 2. 需求权威与开始资料
+
+优先级：本次用户明确要求和本修复任务 → 原2026-09-23 R00—R11任务书与共同契约 → 2026-10-08 R06执行提示词的适用细化 → 经原需求支持的ADR → 仓库执行报告/叶图/自写裁决。实现者的“已申报”“归R07”“PASS”本身不具有减少用户功能要求的效力。
+
+定位并读取原任务书目录，真实名称以磁盘为准：
+
+`01_通用执行约束.md`、`02_目标架构与强制契约.md`、`03_功能与所有权矩阵.md`、`04_阶段依赖与接口交接.md`、`05_验收与性能协议.md`、`06_风险、技术决策与退出条件.md`、`R06_上下文、会话语义、记忆与知识库.md`、`91_交付与独立验收模板.md`以及`stage-index.json/task-catalog.json/acceptance-catalog.json`。
+
+读取仓库：`docs/rust-tauri/R06/`全部当前报告/进度/叶图/交接、`artifacts/rust-tauri/R06/STAGE-REVIEW-R1/STAGE_REVIEW.md`、本阶段所有Task Review、R00功能/验收/Pi替换账本、R03/R04/R05交接与正式门禁。阅读实际存在的AGENTS.md及局部规范，不虚构不存在的约束。
+
+原材料暂缺时，本文件已给出明确修复问题与原R06核心要求，继续可确定工作并登记缺失。确实无法判断某条关键产品契约时，精确列出SPEC_GAP，不能冒称已读文件；也不能为普通实现细节反复等待非程序员裁决。
+
+### 原R06八Task及16个基础验收必须全部保留
+
+| 原Task | 核心交付 | 原基础验收 |
+|---|---|---|
+| R06-T01 | 上下文编译器、同源请求/观测、短提示词与按需工具材料 | A01请求/观测同源；A02提示词不暗增 |
+| R06-T02 | 上下文预算、压缩、工具对保护、失败保留原历史 | A03压缩后工具对完整；A04摘要失败不破坏会话 |
+| R06-T03 | 会话树、fork/retry/rewind及可恢复文件操作 | A05 fork不串写；A06 rewind保护外部修改 |
+| R06-T04 | 规范化消息、历史/重连/导出一致、分页定位 | A07实时/重开语义一致；A08长历史分页不重复全扫 |
+| R06-T05 | SessionFile/Resource、stage/materialize、旧ID、引用和清理 | A09旧附件引用可读；A10清理不误删交付 |
+| R06-T06 | 人格、记忆、Skills、审核/权限边界及Pi hook替换 | A11 Agent记忆隔离；A12技能审核与执行边界有效 |
+| R06-T07 | 现役知识导入/索引/检索/读取/引用/版本/恢复 | A13引用可验证且不串源；A14 embedding变化不静默损坏 |
+| R06-T08 | 工具行为评测、语义维度分离、上下文交接 | A15 schema合法不等于参数正确；A16能力/权限不足不能盲调 |
+
+上表不替代原Task完整Steps。所有R00映射到R06的到期叶子也必须复核，不能只跑16个样例。不要按历史测试数量或叶图比例凑完成数字。
+
+## 3. 已有有效实现、合法后续与不应扩大的范围
+
+本阶段已有Rust上下文/压缩/会话/资源/记忆/技能/知识模块，也有真实测试和独立报告；本任务不是推倒重做。保留R02—R05的单一运行状态机、凭证、工具网关、规范化事件和用量账本，针对实际根因修复。
+
+合法后续仍可保持：未经授权的真实模型/OAuth/账单验证（按原登记最迟R10）、尚未完成的目标OS原生验证（按原登记R09/R10）、完整Electron客户端切换和Tauri宿主（R08/R09），以及原需求明确属于R07的其它业务。测试使用loopback替身不等于LIVE验证。
+
+不能借上述延期让本文件列出的当前服务行为缺失继续存在。也不恢复已撤回独立知识研究引擎、本地模型管理系统或强制子代理目录；不重做React布局，不新增微服务，不私自更换产品人格。某项旧评审标为LOW/OBS不意味着可以违背数据/权限/行为契约。
+
+## 4. 问题登记方法
+
+下面每个F-ID都是本轮新增命名空间`R06-AR-Fxx`，不覆盖旧轮F01等历史编号。每项包括：源码事实、后果、修复项目、四个基础自检和独立反例要求。
+
+源码行号是被审提交定位提示，实施HEAD变化时重新定位函数；事实依据为本文件列出的固定SHA内容。测试代码、平台、版本、fixture和结果必须写入独立结果目录，原问题清单保持不可冒充已执行的规格。
+
+
+## R06-AR-F01｜新 Run 没有加载当前会话分支的历史上下文
+
+严重度：HIGH。原Task：R06-T01, R06-T02, R06-T03, R06-T04。证据类型：SOURCE_CONFIRMED。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+正式 execute 路由仅将 request.input 传给 ExecuteSubmission；SessionStore 随后把该输入交给 drive_run。drive_run 虽写入用户消息并编译 system prompt，却以 Vec::new() 初始化 exchange。发送时 prior=exchange.clone()，这份 exchange 只包含本 Run 后续产生的交换，并未从当前分支加载之前的用户回合、助手回复与工具交换。数据库历史读取和 fork 的存在，不能补上这条模型请求链。
+
+同一会话下一次提问、重启后续问、fork 后第一次提问以及 rewind 后再问，都可能不携带应继承的历史。只测一个 Run 内多次模型调用，或只测试历史接口能返回数据，无法发现这个缺口。
+
+### 必须修复的内容
+
+1. 建立统一的运行上下文历史读取入口，按认证主体、Agent、Session 和有效 branch head 读取权威历史；先明确当前用户输入何时落库，防止重复加入。
+2. 历史必须保留协议所需的角色、工具请求/结果配对、宿主和供应商调用身份、不透明签名及来源绑定。不得只把 UI 导出的最终正文当作完整模型历史。
+3. fork/retry/rewind 必须选择正确的有效分支；旧分支、未确认副作用和其它会话不得混入。跨供应商不能重放不兼容 opaque 状态。
+4. 将上下文压缩版本、摘要和保留后缀接入同一恢复路径；保留原始权威记录。重启后的历史加载只读，不得重新执行模型或工具。
+5. 同时检查 foreground/background/child 的实际调用链；需要继承父上下文的子代理只能继承授权裁剪后的材料。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F01-C01｜同一会话第二个用户回合确实携带第一回合**
+
+执行：真实 Rust 二进制＋认证 HTTP＋loopback 模型：第一回合写入运行时随机 nonce；第二回合只询问该 nonce，不在第二次 input 中复述。捕获第二回合首个模型请求。
+
+通过条件：请求中存在合法第一回合与当前输入各一次；没有其它会话内容；不能由替身响应或测试代码预先拼接历史取得通过。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F01-C02｜重启与分支上下文选择**
+
+执行：建立 A 会话多轮历史，在中段 fork 为 B；A/B 各新增互斥 nonce，重启后分别继续，随后 rewind B 再问。
+
+通过条件：请求只含相应有效分支；共同祖先可见，分叉后的对侧内容不可见；rewind 被排除的后缀不再参与；重启未增加旧工具执行次数。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F01-C03｜完整工具交换及供应商 opaque 结构恢复**
+
+执行：产生带工具请求、结果和协议特有签名的多轮记录；跨 Run 继续，并另测换供应商和损坏关联。
+
+通过条件：调用与结果成对且身份一致；支持的 opaque 状态来源正确，不支持重放明确处理；损坏记录不被伪装成正常对话。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F01-C04｜长会话压缩和取消后的恢复**
+
+执行：跨多个用户 Run 累积历史至预算边界，压缩后再启动新 Run；分别取消和注入摘要失败、服务重启。
+
+通过条件：模型上下文遵守预算和有效分支；原始历史可查；摘要失败不覆盖历史；无已完成工具重放、旧结果污染或当前输入重复。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+审查真正 HTTP 请求到 provider 的载荷，而非只读历史 JSON。
+
+临时在隔离副本恢复 exchange=Vec::new() 的旧行为，C01/C02 必须变红，证明测试没有绕过生产入口。
+
+### 固定源码依据
+
+- `rust/crates/lingxi-service/src/lib.rs`，约4630-4700行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/lib.rs#L4630-L4700`。
+- `rust/crates/lingxi-service/src/sessions.rs`，约695-785行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/sessions.rs#L695-L785`。
+- `rust/crates/lingxi-service/src/runs.rs`，约1150-1230行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/runs.rs#L1150-L1230`。
+- `rust/crates/lingxi-service/src/runs.rs`，约1330-1520行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/runs.rs#L1330-L1520`。
+
+
+## R06-AR-F02｜rewind/retry 直接按检查点路径写文件，缺少当前授权与原子防冲突边界
+
+严重度：CRITICAL_PATH_RISK。原Task：R06-T03, R06-T05。证据类型：SOURCE_CONFIRMED_RISK; exploit requires runtime verification。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+restore_checkpoint_files 读取检查点记录的 file_path，std::fs::read 后按哈希决定 Restore，再 std::fs::write 同一路径并复读。函数只接收 storage/session/checkpoint，不接收当前 ResourceAccess 授权；写入不是临时文件＋安全替换，且读、判断、写之间没有文件身份锁定。读写会跟随可变符号链接。现有注释宣称 failed 不覆盖现状，但 std::fs::write 失败前可能已截断或部分写入。
+
+检查点创建后撤权、路径或祖先被换成符号链接、检查与写入之间发生外部编辑，都存在越界覆盖或覆盖用户新内容的风险。哈希曾出现过不等于当前仍有权限，也不证明这一次修改来自应用。此处未在本次审查环境实际执行破坏性反例。
+
+### 必须修复的内容
+
+1. 使 rewind/retry 的文件恢复经共享 ResourceAccess 与当前授权，逐文件重验规范化目标、符号链接/重解析点、授权撤销和主体范围；不得只信创建检查点时的授权。
+2. 采用平台适用的安全打开、文件身份/版本比较、同目录临时写入与原子替换方案；将读到写之间的竞态纳入契约，不依赖裸字符串路径或一次哈希检查。
+3. 在持久化检查点前完整验证可恢复内容与来源；恢复时区分已达目标、确证可恢复、外部冲突、未能确认与失败。不要把“任意旧检查点见过同一字节”当作外部编辑不存在的充分证据。
+4. 写入失败、磁盘满、取消和服务崩溃要保留原文件或如实报告可能部分发生的副作用，不能声称 failed 就等于零写入。
+5. 复核所有会写回文件的 restore/rewind/retry/filehistory 路径，复用同一安全原语，避免仅修一个 HTTP 入口。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F02-C01｜正常恢复与外部编辑保护**
+
+执行：真实临时工作区建立检查点 A、应用变更 B；恢复 A；另一路由在检查点后由测试外部进程写入 C。
+
+通过条件：A/B 的有证据应用修改可安全恢复；外部 C 保留且返回冲突；逐文件收据与字节事实一致。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F02-C02｜符号链接与撤权反例**
+
+执行：检查点创建后，将文件或祖先改为指向工作区外哨兵的链接；外部文件可故意放入已见证版本字节。再测试撤销目录授权。
+
+通过条件：越界与撤权后的恢复被拒；外部哨兵字节不变；POSIX symlink 与目标平台对应重解析点均按真实环境记录结果。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F02-C03｜检查到写入竞态**
+
+执行：使用确定性屏障在恢复完成读取/哈希判断后暂停，外部进程修改内容或替换文件身份，再继续恢复。
+
+通过条件：不得覆盖刚发生的外部修改；旧文件/新文件身份变化可被识别并返回冲突，不能用 sleep 偶然通过。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F02-C04｜部分写入、磁盘满和崩溃**
+
+执行：在临时写、同步、替换前后注入失败；对多文件恢复中途取消或强制停止服务。
+
+通过条件：原文件不被无声截断；已发生与未发生操作可区分；恢复收据诚实，重启不盲目重做未知写操作。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+亲自从生产恢复入口构造越界路径反例，不能只单测 canonicalize。
+
+检查错误分支返回 failed 时磁盘是否已改变，检查所有写回家族而非单函数。
+
+### 固定源码依据
+
+- `rust/crates/lingxi-service/src/session_tree.rs`，约238-308行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/session_tree.rs#L238-L308`。
+- `rust/crates/lingxi-service/src/session_tree.rs`，约433-595行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/session_tree.rs#L433-L595`。
+
+
+## R06-AR-F03｜fork/retry/rewind 与正常执行缺乏统一会话操作互斥
+
+严重度：HIGH。原Task：R06-T03。证据类型：SOURCE_CONFIRMED; concurrency schedule not executed here。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+SessionService 的 fork/retry/rewind 接收调用方给出的 busy: bool，先 if busy，再跨多个 await 读取历史、恢复文件、重置分支与发布事件。它自身没有覆盖整项业务操作的会话 lease。现有任务评审也登记了 R2-F-01，并允许“修复或仅申报”收口。
+
+两个请求都在检查时看到 idle，并不保证之后不会同时修改分支。SQLite 单次事务串行不能代替跨读取、文件写和状态重置的业务互斥。可能出现回退期间新 Run 开始、重置覆盖新分支头、事件与状态不一致。
+
+### 必须修复的内容
+
+1. 统一会话变更准入：fork/retry/rewind、execute、archive/delete 及其它改变分支的操作共用明确的 lease/队列/版本比较规则。
+2. 获得操作权后再读取状态，持有至关键持久化与收据完成；锁不能是全局网络等待锁。多会话操作规定锁顺序，避免死锁。
+3. 把 lifecycle/branch revision/权限快照一并纳入检查，解决“检查后变更”；重复请求必须明确幂等或冲突。
+4. 关键状态修改与事件保证可恢复的一致性；检查 state 提交成功而事件写失败的窗口，不通过重新创建任务补事件。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F03-C01｜回退与新执行竞争**
+
+执行：两个认证请求通过屏障同时在同一会话尝试 rewind 与 execute。
+
+通过条件：按冻结语义仅一个进入或被正确排队；另一个明确 Busy/Conflict；模型请求、分支头和文件结果一致。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F03-C02｜同类并发与多会话并行**
+
+执行：同会话同时 retry/fork/rewind，并对独立会话执行慢模型任务。
+
+通过条件：同会话不存在丢更新或混合重置；独立会话不被全局锁拖住；无死锁和永久 Busy。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F03-C03｜中断释放与重复重放**
+
+执行：操作持有 lease 时取消、注入存储错误和重启；以同一 requestId 重试。
+
+通过条件：lease 正确释放或恢复；未知副作用不重做，已完成操作不重复，忙状态不永久残留。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F03-C04｜状态与事件的失败窗口**
+
+执行：在 branch/fork 状态持久化与对应关键事件提交窗口注入失败。
+
+通过条件：客户端不收到与实际状态相矛盾的假成功；重启能查询真实完成度，不能多建分支。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+以屏障驱动两个真实请求，不能只把 busy=true 传给函数证明互斥。
+
+审查数据库锁与业务 lease 是否混淆，及文件恢复是否仍落在保护窗口外。
+
+### 固定源码依据
+
+- `rust/crates/lingxi-service/src/session_tree.rs`，约351-595行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/session_tree.rs#L351-L595`。
+- `docs/rust-tauri/R06/R06_PROGRESS.json`，约225-365行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/docs/rust-tauri/R06/R06_PROGRESS.json#L225-L365`。
+
+
+## R06-AR-F04｜SessionFile 的活动、分支继承与引用登记仍未接通生产链
+
+严重度：HIGH。原Task：R06-T03, R06-T05。证据类型：SOURCE_AND_REGISTERED_FINDING_CONFIRMED。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+R06_PROGRESS 明确登记三组原语生产零调用点：mark_session_activity/touch_last_activity、fork_session_files、collect_reference_identities/insert_reference。登记的实际后果分别为启动清扫恒 no-op、fork 后旧 sf_ 身份 404、引用保护主要只覆盖导入 refs。阶段收口把接线归到 R07，并未实现 R06-T05 要求的真实行为。
+
+用户可见的历史附件和新分支文件引用不可靠；“不会误删”可能只是根本不清理。只在测试中直接调用这些原语，不能证明正式消息、分支和清理生命周期成立。
+
+### 必须修复的内容
+
+1. 在真实 Run/Session 活动处写活动时间；定义活动含义、并发更新及时间回退规则，与清理调度一致。
+2. 在正式 fork 服务提交链中继承文件与旧 ID 别名，结合 retained branch 计算引用；校验多次 fork 的别名唯一性和主体范围，禁止靠全局别名暴露其它分支文件。
+3. 把用户附件、工具产物、最终消息及历史引用纳入规范化登记；对被保护消息新增/修改/分支/删除时维护引用闭包。
+4. 把清理、删除和文件回退接入上述真实事实，区分权威文件与可重建缓存，不能把全部文件标永久引用来逃避清理。
+5. 检查 NoopChangeLog 等正式接线是否掏空文件历史承诺；仅修本阶段实际依赖，不强制同时重写所有外围渲染器。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F04-C01｜正式 fork 后旧附件仍可打开**
+
+执行：经真实入口创建/上传附件并产生消息，fork 保留该消息；通过新分支请求旧 sf_ ID。
+
+通过条件：相应授权范围内可读取正确字节；父分支仍可用；不相关主体或会话请求相同 ID 被拒绝。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F04-C02｜清理真的发生但不误删交付**
+
+执行：可控时钟推进过期，保留被消息引用的材料与一个未引用缓存，再执行正式清理流程。
+
+通过条件：未引用且满足策略的缓存被清理；被引用交付可读；不是通过冷度信号永久缺失使所有清理 no-op。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F04-C03｜引用与分支删除竞态**
+
+执行：相同资源被多个分支引用；并发删除一支、创建另一支引用和清理。
+
+通过条件：剩余合法引用可读；不会跨会话泄漏，也不会检查后删掉刚被引用的文件。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F04-C04｜导入、失败与恢复一致**
+
+执行：导入旧 sidecar 后追加新产物，注入注册中断/文件缺失并重启。
+
+通过条件：旧/新 ID 与实际文件、引用和权限一致；不存在的文件不登记成成功交付，重复恢复不制造重复身份。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+沿正式服务入口检查三组函数的真实调用点，不接受只有单元测试调用。
+
+检查清理的阳性样本必须真的删除一个合规缓存，否则“未误删”不足以证明完整实现。
+
+### 固定源码依据
+
+- `docs/rust-tauri/R06/R06_PROGRESS.json`，约225-244行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/docs/rust-tauri/R06/R06_PROGRESS.json#L225-L244`。
+- `docs/rust-tauri/R06/R06_REPORT.md`，约50-81行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/docs/rust-tauri/R06/R06_REPORT.md#L50-L81`。
+- `rust/crates/lingxi-service/src/lib.rs`，约1250-1270行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/lib.rs#L1250-L1270`。
+
+
+## R06-AR-F05｜上下文缓存没有配置失效、完整身份和生命周期回收
+
+严重度：HIGH。原Task：R06-T01, R06-T06。证据类型：SOURCE_CONFIRMED; cross-agent exploitation not claimed。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+ContextCompilerService 仅以 (session_id, for_subagent) 为键，把编译结果永久放入 HashMap；命中直接返回，材料、Skills 和设置不重新读取。该实现没有失效、删除或淘汰入口，键中没有 agent_id、主体或材料代次。observations 读取的也是这个缓存。当前跨 Agent 利用链未被本次验证，但同一会话材料变更和无界缓存是实际实现性质。
+
+应在后续 Run 生效的记忆、人格或 Skills 变更可能长期不可见；观测不能代表新设置。大量会话产生的缓存没有回收路径。只说明“会话冻结”不能替代对动态字段生效时机和资源上限的明确约定。
+
+### 必须修复的内容
+
+1. 先按现役契约区分允许按会话冻结的静态段与需要在下一 Run 生效的动态材料，逐字段记录，而不是把全部内容笼统永久冻结。
+2. 建立包含真实主体/Agent/Session/子代理形态/材料与配置代次的明确缓存身份，或使用可证明等价的运行快照索引；当前 Run 的快照不可中途漂移。
+3. 把 persona/memory/Skills 配置修改、撤销、会话删除和服务生命周期接入失效/回收；增加有界缓存和可观察的淘汰策略。
+4. 观测端点应定位实际发出请求的 run/snapshot，不能临时重新编译后声称与已发请求相同；并发编译只能发布一个确定版本。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F05-C01｜下一 Run 的动态材料生效**
+
+执行：同一会话完成 Run1，修改应按原契约生效的人格/记忆或技能启停，再发 Run2，捕获实际请求与观测。
+
+通过条件：Run1 快照不改写；Run2 使用正确新代次；保留的静态会话冻结有明确依据；启停工具的执行授权仍独立复核。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F05-C02｜不同身份缓存隔离**
+
+执行：经可信宿主测试入口，以不同主体/Agent 使用可能碰撞的 session 字符串和同形态请求。
+
+通过条件：缓存不会复用其它身份材料；本测试不假装当前产品已开放任意 agent_id，但公共编译端口不能含跨身份陷阱。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F05-C03｜删除与大量会话资源上限**
+
+执行：反复创建、使用、归档/删除会话，超过缓存配置上限。
+
+通过条件：缓存大小有界，删除后无未授权的旧观测；需要回读时从合法持久化快照恢复，不伪造旧请求。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F05-C04｜并发编译和更新**
+
+执行：两个编译请求在材料读取与发布之间并发修改材料/代次，使用屏障固定时序。
+
+通过条件：实际发出请求的 snapshotId、内容摘要与可查观测一致；没有先请求用A、观测却只展示B的混合状态。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+不要仅检查新增 invalidate 函数存在，要逐个检查真实修改入口调用它。
+
+不把“请求模板没变”当作用户材料没变，核对 cache key、清理和观测三方。
+
+### 固定源码依据
+
+- `rust/crates/lingxi-service/src/context_compiler.rs`，约831-950行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/context_compiler.rs#L831-L950`。
+- `rust/crates/lingxi-service/src/context_compiler.rs`，约695-774行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/context_compiler.rs#L695-L774`。
+
+
+## R06-AR-F06｜行扫描 YAML 会静默误读合法配置，甚至把关闭的记忆恢复为默认开启
+
+严重度：HIGH。原Task：R06-T01, R06-T06。证据类型：SOURCE_CONFIRMED; concrete inputs derived from parser。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+scan_agent_config 使用逐行 section/key 扫描，clean_value 在处理引号前先按“ #”切断。它不理解 flow mapping、完整 YAML 引号/转义/层次语义；gather 在 memory.enabled 未识别时 unwrap_or(true)。因此合法的 memory: { enabled: false } 不会得到 false；带引号的名称如 "Agent #1" 会被错误截断。代码把它登记为子集实现，但没有对未支持的合法格式响亮拒绝。
+
+用户原配置无需语义变化，仅换等价 YAML 写法就可能改变开关、名称、语言或人格选择。配置解析是业务语义，不是可以凭“已登记差异”忽略的展示问题。
+
+### 必须修复的内容
+
+1. 复用或建立单一真正的配置解析/归一化入口，支持现役允许的 YAML 语义；依赖需按现有锁定版本和官方接口验证，不为简单读取自造另一套不完整语言。
+2. 区分文件缺失允许默认、字段缺失允许默认、语法损坏/不支持类型必须报错；不得把解析失败当默认开启。
+3. 引号内 #、转义、flow/block mapping、嵌套层级、CRLF/BOM/Unicode 和明确布尔值都做等价性测试。
+4. 所有使用同类行扫描读取安全/记忆/人格开关的地方一起排查，保持未知兼容字段而不整体覆盖配置。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F06-C01｜等价 YAML 不改变记忆开关**
+
+执行：同一配置分别使用 block mapping 与 memory: { enabled: false }，经真正材料采集和模型请求执行。
+
+通过条件：两种合法写法都关闭相应记忆注入行为；不得 fallback 为 true；与现役配置定义一致。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F06-C02｜引号、注释和转义保真**
+
+执行：名称包含 #、引号转义、中文和冒号；加入行外注释、CRLF/BOM。
+
+通过条件：解析后的字符串与标准语义一致；行外注释忽略，字符串内部内容保留。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F06-C03｜嵌套同名键与异常类型**
+
+执行：在 unrelated 子对象放 name/enabled，并分别输入无效语法、错误类型、重复敏感键。
+
+通过条件：不会误把深层键当 agent/memory 直接字段；非法输入明确诊断，不悄悄启用功能。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F06-C04｜默认值与老配置兼容**
+
+执行：缺文件、空配置、部分配置和现役脱敏样本分别加载。
+
+通过条件：允许默认的情况按原行为，损坏和不支持不被混同；用户配置没有被解析后重写丢字段。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+必须经生产 gather/请求捕获验证开关，而非测试新解析器但生产仍调用旧扫描器。
+
+将 flow mapping 恢复为旧扫描逻辑的变异副本应命中必需反例。
+
+### 固定源码依据
+
+- `rust/crates/lingxi-service/src/context_compiler.rs`，约372-452行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/context_compiler.rs#L372-L452`。
+- `rust/crates/lingxi-service/src/context_compiler.rs`，约695-774行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/context_compiler.rs#L695-L774`。
+
+
+## R06-AR-F07｜新知识工具被无条件常驻声明，供应商侧 description 还被替换为名称
+
+严重度：HIGH。原Task：R06-T01, R06-T06, R06-T07, R06-T08。证据类型：SOURCE_CONFIRMED; some mechanism inherited from R05。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+五个 knowledge 工具 manifest 均设置 Availability::Available，正式 bootstrap 无条件注册到模型工具目录。ToolDeclarationSnapshot::from_registry 只按 Available 过滤，发送全部符合者；组装 declaration 时使用 description: tool.display_name.clone()，而不是完整 manifest.description。知识工具的详细使用说明因而没有按预期到达供应商。
+
+普通对话也可能承担不需要的知识工具 schema 开销，偏离按需目录约束；模型缺少真实使用说明，参数和调用选择的准确性无法用“schema 存在”证明。本问题包含前序机制在 R06 新工具接入中暴露的依赖缺陷，不声称全部首次由 R06 引入。
+
+### 必须修复的内容
+
+1. 明确注册、可调用、常驻、按需激活四个概念，按原产品目录规则选择当前模型应见的声明；不能把可用等同常驻。
+2. 保留四基础常驻工具及原契约确有需要的发现/描述/调度入口，不强行将总 schema 数机械压成4；其它工具按会话来源和授权按需激活。
+3. 供应商工具说明从真实完整描述生成，名称、schema、generation 与执行目标一致；同名不同来源仍需明确映射。
+4. 复核 memory/Skills 及其它新接入家族的同类注册和描述问题；不要只修 knowledge 一族。
+5. 行为评估统计完整实际请求中的 system＋tools 开销，不能只测静态 prompt 字符串。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F07-C01｜普通对话首个请求的真实声明集合**
+
+执行：使用默认服务配置、未选择知识来源的普通对话，捕获首个实际供应商请求。
+
+通过条件：声明集合严格等于冻结常驻集合＋明确必要基础设施；不能无条件多出全部知识/记忆工具；工具预算按实际 wire 内容计算。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F07-C02｜发现到激活到执行完整链**
+
+执行：真实目录入口查找知识工具，读取说明并调用；期间切换目录代次。
+
+通过条件：模型得到真实描述和schema，调用对应相同目标；过期声明不能执行不同语义工具；不是后台提前声明所有工具。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F07-C03｜描述不退化为工具名**
+
+执行：给每个协议族发送带独特参数约束说明的工具声明，捕获请求。
+
+通过条件：description 包含对应正式说明，不是 display_name；名称/schema/说明版本一致，跨协议不丢重要信息。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F07-C04｜启停、来源切换与权限不变**
+
+执行：工具激活后禁用或撤销来源，再通过直接/按需路径调用，并运行固定参数正确性评测。
+
+通过条件：网关在全部适用路径拒绝，模型输入不误称仍可执行；合法路径不退化，schema正确与参数语义正确分开计分。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+检查真实 wire tools 数组，不能用 system prompt 中没有说明来证明按需加载。
+
+构造 Available 但非 resident 工具作为反例；把 description 改回名称必须使测试失败。
+
+### 固定源码依据
+
+- `rust/crates/lingxi-service/src/knowledgetools.rs`，约26-58行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/knowledgetools.rs#L26-L58`。
+- `rust/crates/lingxi-service/src/knowledgetools.rs`，约558-737行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/knowledgetools.rs#L558-L737`。
+- `rust/crates/lingxi-kernel/src/model_exchange.rs`，约109-153行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-kernel/src/model_exchange.rs#L109-L153`。
+- `rust/crates/lingxi-service/src/lib.rs`，约1300-1328行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/lib.rs#L1300-L1328`。
+
+
+## R06-AR-F08｜工具结果出现警告时丢弃已截断内容，却仍标记 truncated
+
+严重度：HIGH。原Task：R06-T02, R06-T06。证据类型：SOURCE_CONFIRMED。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+tool_result_guard 返回 warnings、guarded_content 和 any_truncated。runs.rs 的成功结果分支在 warnings 非空时，把警告与原始 result.content 拼接；只有 warnings 为空才使用 guarded_content。随后无论哪条路径都设置 truncated |= any_truncated。于是有注入警告或循环警告时，32KiB 截断结果被丢弃，原长文本仍进入模型。
+
+越需要警告的大结果越可能绕过预算保护；实际模型输入与 truncated 元数据矛盾，容易造成上下文膨胀、成本增加及压缩策略失真。该缺陷由分支逻辑直接确定，本次未执行 Rust 测试。
+
+### 必须修复的内容
+
+1. 警告应组合到已经守卫处理后的内容，而非原始内容；核对所有结果类型和 warning 家族。
+2. 明确单块与总工具结果预算，警告本身也占预算；保持工具结果身份、资源引用和必要截断说明。
+3. 将权威原始结果与发给模型的受限投影区分，日志/usage/截断标志必须对应各自真实内容；不删原始证据冒充模型已见全部内容。
+4. 错误结果若按既有规则不截断，保持明确独立契约；不能无依据在本修复中改变所有错误展示行为。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F08-C01｜无警告大结果**
+
+执行：通过真实工具执行器返回超过32KiB的文本，捕获下一模型请求。
+
+通过条件：输入使用规定头尾窗口与截断说明，truncated 与实际一致。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F08-C02｜注入警告大结果**
+
+执行：同一大文本加入会触发既有扫描器的测试文字，在被截断中段加入唯一标记。
+
+通过条件：警告可见、长文本仍被正确截断、中段标记不随原始整块泄入请求；不能只检查 truncated=true。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F08-C03｜循环警告与多内容块**
+
+执行：触发循环/失败序列警告，返回多个文本块及资源块。
+
+通过条件：所有需要守卫的成功内容受预算约束；资源身份保留；warning 分支不恢复原大块。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F08-C04｜原始归档与模型投影对账**
+
+执行：记录原始工具结果、模型实际投影、截断元数据和后续历史查询。
+
+通过条件：各自来源明确且可核验；未把被截内容伪装成模型已读取，失败结果语义无无关回归。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+独立检查 warning 非空和为空两条实际分支，必须抓到下一次 wire 请求。
+
+在隔离副本把 guarded_content 改回原 result.content，C02 必须变红。
+
+### 固定源码依据
+
+- `rust/crates/lingxi-service/src/hooks.rs`，约183-250行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/hooks.rs#L183-L250`。
+- `rust/crates/lingxi-service/src/runs.rs`，约1268-1330行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/runs.rs#L1268-L1330`。
+
+
+## R06-AR-F09｜知识摄入首批 embedding 重复执行，进度与费用计数不真实
+
+严重度：HIGH。原Task：R06-T07。证据类型：SOURCE_CONFIRMED。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+摄入用 chunks.chunks(64).peekable()，通过 batches.peek().copied() 得到首批，先调用 embed 并写入；之后 for batch in batches 又从首批开始，首批被再次提交。newly_embedded 也重复累加。后续存储 upsert 可能覆盖重复向量，隐藏了重复请求。当前流程声明 chunksResumedFromCheckpoint=0，并未按已有向量缺口进行真正续嵌。
+
+对新建非空索引，完整执行时实际请求数比一次遍历多1；首次64个以内的块会重复请求。例如65块理应2批，却变成3次。用户可能承担重复成本，进度超过实际块数；保留了失败前的向量不等于重试会复用它们。
+
+### 必须修复的内容
+
+1. 首批探测必须消费迭代器或直接使用已经建立的批次结果，保证每个计划块在同一成功构建中只提交一次。
+2. 统一块、请求、重试、实际成功写入、从检查点复用等统计；不要通过去掉计数或调整expected掩盖重复调用。
+3. 按原契约实现失败后可验证的缺口续嵌；既有有效向量确实复用，模型/来源不兼容时另起新variant而非混用。
+4. 明确已ready快速路径是否真的需要一次有成本的维度探测，能安全复用身份时避免多余请求；确需探测则单独准确记账，不宣称零调用。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F09-C01｜批次边界精确计数**
+
+执行：loopback embedding 接口分别摄入1/64/65/128/129个可区分块，记录请求内容与调用次数。
+
+通过条件：新建成功路径请求数等于实际计划的ceil(N/64)（除明确独立且有据的其它操作），每个块只出现一次；新嵌入数量恰为N。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F09-C02｜失败后缺口恢复**
+
+执行：在第二或第三批故障，保存前批向量后重启并恢复。
+
+通过条件：已经确认且兼容的块不重复收费式请求；只补缺口，结果完整；恢复统计与原始请求相等。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F09-C03｜进度和完成条件**
+
+执行：对65块记录每次进度，另返回数量不足、错误维度和异常数据。
+
+通过条件：进度不超过总量；缺失或无效向量不使variant标ready；请求次数与账本一致。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F09-C04｜已完成索引复用**
+
+执行：同来源同模型重跑，再改变内容或模型重新摄入。
+
+通过条件：同一有效结果按明确规则复用；变化导致明确新建或重建；不把复用与新嵌入重复计数。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+审查原始 HTTP 请求和逐块ID，不只检查最终数据库行数，upsert会掩盖重复。
+
+用peek旧实现作为隔离变异，边界计数测试必须拒绝。
+
+### 固定源码依据
+
+- `rust/crates/lingxi-service/src/knowledge.rs`，约1845-2005行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/knowledge.rs#L1845-L2005`。
+
+
+## R06-AR-F10｜embedding 身份解析与实际请求不同步，后续批次身份被忽略
+
+严重度：HIGH。原Task：R06-T07, R05-T01。证据类型：SOURCE_CONFIRMED_RACE_RISK。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+GatewayKnowledgeEmbedder 先独立解析 route，随后 OperationService::embed 内部再次 resolve route；返回身份却使用外层先前解析的 provider/model/protocol。配置在两个解析之间变化时，真实响应可能来自B而身份写成A。摄入后续批次使用 Ok((_identity, vectors))，忽略其身份，只沿首批variant写入；维度相同的换模型不会由维度检查发现。
+
+不同嵌入空间的向量可能被写入同一模型标签或variant，检索返回貌似正常但语义错误的结果。仅测试“维度改变时降级”不足以验证供应商、模型、配置代次保持一致。
+
+### 必须修复的内容
+
+1. 实际 dispatch 与返回的 served identity 必须同源：使用一次解析的不可变路由快照，或让 OperationService 返回真正处理请求的身份和代次；禁止事后用另一次配置读取贴标签。
+2. 按整个构建任务固定嵌入身份，或在发现身份变动时安全停止旧构建并开启新variant；每一批都核验provider/model/protocol/dimensions及必要参数指纹。
+3. 同维度不同模型也必须隔离；同ID但影响嵌入含义的配置变化应有兼容判断。
+4. 检查查询向量身份、索引变体选择、重启续嵌和并发reload全链，不能只保护首次摄入。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F10-C01｜两次解析之间reload**
+
+执行：使用确定性屏障在外层 route 解析后、OperationService 实际解析/发送前切换模型。
+
+通过条件：实际请求端、响应身份、usage记录与variant归属一致；不得出现B结果贴A标签。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F10-C02｜同维度不同模型的跨批变化**
+
+执行：首批使用A，第二批切换到同维度但向量空间明显不同的B。
+
+通过条件：旧variant不混入B向量；按明确策略拒绝、完成固定A或新建B，不能仅凭维度相等通过。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F10-C03｜查询时模型变化与旧索引**
+
+执行：A索引完成后切B查询，分别保持和改变维度，并在查询请求中途reload。
+
+通过条件：只检索身份兼容的variant，或明确降级/要求重建；所有searchedVectorVariants可与真实请求对账。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F10-C04｜中断后恢复身份检查**
+
+执行：摄入中断后改变模型配置并重启，尝试续跑旧job。
+
+通过条件：不会复用不兼容已写向量；旧产物保留可解释，新构建身份准确，不静默覆盖。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+使用同维度模型反例，不能只用维度不同来证明身份铁律。
+
+对比真实发送的endpoint/model、响应身份、数据库variant和usage四方。
+
+### 固定源码依据
+
+- `rust/crates/lingxi-service/src/knowledge.rs`，约110-185行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/knowledge.rs#L110-L185`。
+- `rust/crates/lingxi-service/src/knowledge.rs`，约1930-1955行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/knowledge.rs#L1930-L1955`。
+- `rust/crates/lingxi-service/src/operations.rs`，约970-1001行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/operations.rs#L970-L1001`。
+
+
+## R06-AR-F11｜知识库嵌入丢弃调用期限和会话/Run 归属
+
+严重度：HIGH。原Task：R06-T07, R05-T05, R05-T07。证据类型：SOURCE_CONFIRMED; cancellation consequences require runtime checks。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+KnowledgeEmbedder::embed 的接口没有携带调用上下文，生产实现固定 operations.embed(request, None, None)。OperationService 的第二、三参数分别是 deadline_unix_ms 和 OperationCallContext。现有 usage sink 在 context=None 时仍会写账，但 session_id/run_id/attempt/cause_ref 均为空。因此不能说完全没有账；真实缺陷是运行内检索与后台摄入被同样当作无归属operation根，调用期限没有从上层传播。
+
+用户任务中发生的检索嵌入难以对账到所属会话/工具；父任务预算和取消是否贯穿排队、网络、写回无从由现接口保证。后台摄入可以独立运行，但也需要真实job身份与自己的预算，不能借此为Run内调用抹掉归属。
+
+### 必须修复的内容
+
+1. 把可信主体、Agent/Session/Run/Attempt、parent tool/job、绝对deadline和取消范围通过Knowledge调用上下文传播，禁止接受模型参数自报身份。
+2. 运行内检索继承父范围；独立摄入使用服务铸造的稳定job身份和显式预算。两类不能全部传None。
+3. 将等待配额、凭证解析、请求、批处理、向量写入和job完成的迟到栅栏贯通；取消后不新增后续请求或悄悄标ready。
+4. 保留成功、失败、超时、取消/未知次数的真实usage归属，不能把unknown记0；涉及共享R05接口时同步修复所有消费者。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F11-C01｜运行内检索usage归属**
+
+执行：通过真实模型工具调用触发hybrid检索和embedding，读取真实账本。
+
+通过条件：记录可关联对应Session/Run/Attempt/Tool；不是session-less operation，额度和用量只计真实调用一次。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F11-C02｜独立摄入job归属**
+
+执行：通过授权摄入入口建立后台job，重启恢复后继续。
+
+通过条件：job身份稳定可审计，记录明确独立根与预算；不伪装成某个用户Run，也不丢掉可核验的job来源。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F11-C03｜配额等待与网络期间取消/超时**
+
+执行：在permit等待、凭证等待、网络流和批间写回处使用屏障取消父任务或耗尽deadline。
+
+通过条件：所属等待退出；无新的后续批次；已发生调用如实结算，延迟响应不复活取消job或污染其它任务。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F11-C04｜共享配额与迟到结果**
+
+执行：全局model permit=1时组合主模型→知识工具→embedding，并在结算处重放响应。
+
+通过条件：无嵌套死锁、permit泄漏和重复usage；取消/终态后不新增不可解释写入。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+同时验证Run内和独立后台两条链；不能只证明OperationService有可选context字段。
+
+从原始HTTP计数、usage查询、取消树和数据库写入交叉核实，缺环境的真实网络验证不得伪造。
+
+### 固定源码依据
+
+- `rust/crates/lingxi-service/src/knowledge.rs`，约36-185行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/knowledge.rs#L36-L185`。
+- `rust/crates/lingxi-service/src/operations.rs`，约280-348行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/operations.rs#L280-L348`。
+- `rust/crates/lingxi-service/src/operations.rs`，约970-1000行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/operations.rs#L970-L1000`。
+
+
+## R06-AR-F12｜知识缓存库遇到任意打开错误就删除，包括更高版本数据库
+
+严重度：HIGH。原Task：R06-T07。证据类型：SOURCE_CONFIRMED。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+KnowledgeIndexStore::open 和 KnowledgeVectorStore::open 对任何 try_open Err 都执行remove_file数据库及wal/shm后重建。try_open包含check_user_version，所以“schema比当前程序新”也进入删库分支。既有评审已识别这个问题，但将它列LOW并允许仅补台账。
+
+误启动较旧程序、权限/锁/I/O异常都可能触发不必要或危险的删除尝试；向量结果需要重新生成，可能损失计算成本和恢复依据。可重建缓存不代表任何错误都能安全删除，更不等于版本过新是损坏。
+
+### 必须修复的内容
+
+1. 按错误类型区分schema过新、权限、锁冲突、磁盘/I/O错误与被明确验证的可重建损坏；前几类保留原件并响亮拒绝或按授权只读降级。
+2. 重建只作用于确认属于本程序、当前无活跃写者且确实可重建的缓存；必要时先隔离/备份，处理WAL一致性和remove失败，不连删错误对象。
+3. 保持原文事实库与付费向量的保护语义；不要为了让启动成功清空全部knowledge目录。
+4. 复核全文其它“open失败→remove/reset”同族路径，迁移/降级窗口必须有明确旧版本拒写规则。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F12-C01｜schema过新保留原件**
+
+执行：在两类缓存分别构造user_version大于当前支持值的合法库并放入哨兵行；通过生产open或启动入口打开。
+
+通过条件：明确拒绝/安全降级，原库与必要wal/shm数据不被删除或降级重建；逐文件/逻辑快照可对账。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F12-C02｜权限、锁与I/O错误**
+
+执行：分别制造不可写目录、锁占用、可控I/O或空间失败。
+
+通过条件：不进入无差别删库；返回可诊断类别；原有内容保留，不能通过宽松默认值伪造成功。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F12-C03｜真正可重建损坏的受控恢复**
+
+执行：用独立合成缓存制造明确损坏，保留完整可恢复原文。
+
+通过条件：按限定策略隔离并重建，原始资料不变；重建状态/成本准确，失败也不破坏唯一可用副本。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F12-C04｜新旧版本与并发进程**
+
+执行：一个实例持有缓存写入，另一个或旧版本尝试打开；再演练重启恢复。
+
+通过条件：单写者/版本保护生效，不删除活跃库文件；未来版本不是自动损坏。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+亲查schema-newer分支在错误分类中的位置，不接受只补一行“可能重建”的说明。
+
+复核两类缓存同根因都修复，原始字节/行数证据优先于日志“reset successful”。
+
+### 固定源码依据
+
+- `rust/crates/lingxi-adapters/src/storage/knowledge.rs`，约1863-1900行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-adapters/src/storage/knowledge.rs#L1863-L1900`。
+- `rust/crates/lingxi-adapters/src/storage/knowledge.rs`，约2334-2372行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-adapters/src/storage/knowledge.rs#L2334-L2372`。
+- `docs/rust-tauri/R06/R06_PROGRESS.json`，约275-290行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/docs/rust-tauri/R06/R06_PROGRESS.json#L275-L290`。
+
+
+## R06-AR-F13｜知识范围由方法级测试构造，正常聊天提交未完成来源选择到工具上下文的闭环
+
+严重度：HIGH。原Task：R06-T01, R06-T07。证据类型：SOURCE_AND_REVIEW_DISCLOSURE_CONFIRMED。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+知识工具search/read等强制要求scopeId并按session复核；但阶段审查明确披露chat提交自动建KnowledgeContext/冻结scope及材料注入未接线，归到R07/R08。正式execute路由只构造 input/request_id，没有消费用户选择来源并把服务铸造scope交给当前Run的实现。方法级调用create_turn_scope并不能替代真实提交链。
+
+用户已选择来源的提问无法仅靠现有正式Rust聊天链自动获得可靠scope；“工具有检索功能”不等于“用户选择→Agent检索→引用”可用。UI搬迁可留R08，但R06承诺的服务/上下文语义不能用UI尚未迁移作为通用延期理由。
+
+### 必须修复的内容
+
+1. 实现最小完整的Rust提交语义：验证用户显式选择的笔记本/来源，服务侧冻结本轮范围和资料版本，绑定当前主体/会话/Run，再向模型提供必要的范围句柄与来源摘要。
+2. 按原产品实际schema选择扩展字段或兼容映射；不要求本次完成整个React/Tauri界面重写，也不强制将全文或固定100块预塞入prompt。
+3. 知识工具每次执行验证当前Run/来源scope、成员权限与版本约束；旧scope、其它会话scope和模型自造scope不得扩大当前选择。
+4. 范围和引用进入规范化记录，重启后只读恢复准确；检索结果是资料，不提升为系统指令；缺证据/冲突明确表达。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F13-C01｜真实聊天选择单来源**
+
+执行：经真实二进制认证聊天提交选择A笔记本，B含更诱人的冲突答案；模型替身仅根据实际收到的scope调用检索。
+
+通过条件：服务自动给出合法scope；检索/读取/引用只来自A；测试不能在旁路手工铸造scope后塞给模型冒充正式提交。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F13-C02｜多笔记本与下一轮切换**
+
+执行：选A+B提问，再同会话只选B；尝试复用上一轮scope和A的sourceId。
+
+通过条件：新Run按当前选择构造正确范围；旧句柄不能扩大新轮范围；共享来源不重复或丢引用。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F13-C03｜伪造与撤权**
+
+执行：另一主体、另一会话、模型伪造scopeId，以及提交后发生来源撤权/删除的场景。
+
+通过条件：按明确冻结内容与实时授权规则拒绝越权；不能仅因scopeId存在就允许；无跨主体资料泄露。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F13-C04｜原文引用、无证据与恢复**
+
+执行：通过真实工具检索支持、矛盾、缺失资料，生成程序可核对引用；重启再读历史。
+
+通过条件：每条引用能定位当时允许的真实版本；缺证据不伪造，原始关系恢复而不重新执行检索或模型任务。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+入口必须是日常聊天提交，而不是直接KnowledgeService方法或测试私有种子。
+
+把scope自动接线移除后C01必须失败；不能仅检查工具注册存在。
+
+### 固定源码依据
+
+- `artifacts/rust-tauri/R06/STAGE-REVIEW-R1/STAGE_REVIEW.md`。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/artifacts/rust-tauri/R06/STAGE-REVIEW-R1/STAGE_REVIEW.md`。
+- `rust/crates/lingxi-service/src/knowledgetools.rs`，约75-205行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/knowledgetools.rs#L75-L205`。
+- `rust/crates/lingxi-service/src/lib.rs`，约4648-4690行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-service/src/lib.rs#L4648-L4690`。
+
+
+## R06-AR-F14｜R06 未纳入正式阶段门禁，前序迁移登记已与源码不一致
+
+严重度：HIGH。原Task：R06-T08, R02-T04。证据类型：SOURCE_CONFIRMED_GATE_GAP; no script run claimed。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+stage_maps目录只有R02/R03/R04/R05，没有R06。阶段审查明确只跑workspace和定向套件等，未跑verify-stage链。当前migrations.rs的MIGRATIONS已含v8/v9，而R02-T04_STORAGE_REGISTRY仍止于v7；既有r02_registry_consistency.py明确要求集合、名称和SQL摘要完全相等，不是子集。按它自身的规则，v8/v9缺项属于失败条件。
+
+1862个Cargo测试通过不能证明脚本级R02存储门禁或R05嵌套回归仍通过。前序R05曾修过同类迁移登记缺项，这次因没有完整门禁再次漏出。一个手写PASS汇总无法保证本阶段所有必需断言被实际执行。
+
+### 必须修复的内容
+
+1. 首先原样运行现有纯Python登记校验记录真实失败；按真实SQL和inspector收据追加v8/v9及实际新增后续版本，不改历史迁移SQL，不把相等比较降成子集。
+2. 沿现有xtask机制注册R06阶段图、生成/镜像输入、场景→具体测试→实际命令映射和候选绑定；或仅在有等价、可验证且获准方案时复用已有接口，不能新增总是成功的verify-stage外壳。
+3. 纳入原R06-A01—A16、全部本阶段到期叶份额、本次F01—F15的60项基础检查和后续真实新增缺陷；合法延期必须标明确未完成。
+4. 运行完整受影响前序R05→R04→R03→R02链，包括脚本/数据库指纹与源码绑定；修复变化导致的固定计数、生成器和兼容输入须同步，不能降低检查力。
+5. 使用隔离变异验证门禁真的会因丢场景、错误绑定、空筛选、旧证据、缺迁移失败；正对照和还原都保存。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F14-C01｜迁移登记与真实库一致**
+
+执行：运行原r02_registry_consistency.py，并用真实新库与旧v7/v8库升级后inspector读回；修复前后各留证据。
+
+通过条件：源码迁移表、登记表和数据库收据的版本/名称/SQL摘要严格相同；v1-v7不被改写；重复启动幂等。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F14-C02｜R06正式门禁真实执行**
+
+执行：在全新证据目录运行已接入的verify-stage R06，核验所有required场景到具体执行。
+
+通过条件：实际命令非空且均正常结算，required无skip/缺证据，候选绑定稳定，图与结果双向无遗漏；不是读取手填PASS。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F14-C03｜完整前序回归**
+
+执行：对最终候选运行受影响R05正式门禁及其前序闭包，保留每层结果与脚本退出码。
+
+通过条件：每层必需范围均有效PASS；不能拿cargo workspace绿色替代脚本门禁；环境缺失如实BLOCKED而非PASS。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F14-C04｜门禁负向电池**
+
+执行：在隔离副本分别删除必需场景/迁移行、错绑用例、将筛选改成0匹配、篡改证据摘要、复用旧候选结果、伪造后移期限。
+
+通过条件：每种变异都非零退出并点名缺口；恢复后正对照绿。若某种变异未命中，门禁本身尚未通过。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+审查者独立运行正式门禁，不仅阅读执行者日志；来源绑定与最终提交内容核对。
+
+任何test guard触发、host kill或环境失败不能算通过；不使用孤儿化进程规避执行环境的终止控制。
+
+### 固定源码依据
+
+- `rust/crates/xtask/src/stage_maps`。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/tree/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/xtask/src/stage_maps`。
+- `docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json`。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json`。
+- `scripts/rust-tauri/r02_registry_consistency.py`，约1-155行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/scripts/rust-tauri/r02_registry_consistency.py#L1-L155`。
+- `rust/crates/lingxi-adapters/src/storage/migrations.rs`，约595-620行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/rust/crates/lingxi-adapters/src/storage/migrations.rs#L595-L620`。
+- `artifacts/rust-tauri/R06/STAGE-REVIEW-R1/STAGE_REVIEW.md`。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/artifacts/rust-tauri/R06/STAGE-REVIEW-R1/STAGE_REVIEW.md`。
+
+
+## R06-AR-F15｜以“已申报”代替关闭必需行为，且部分评测数值没有测量依据
+
+严重度：MEDIUM_TO_HIGH。原Task：R06-T08, R06-T01, R06-T03, R06-T05, R06-T07。证据类型：EVIDENCE_AND_SCOPE_CONTROL_GAP。本轮审查未做运行复现。
+
+### 已确认的问题与影响
+
+现有阶段审查把若干必需功能缺口处理为“修复或申报归属二选一”，并据此接受阶段；登记不等于实现。R06_PROGRESS还记录BE-04 token硬编码0/0、T05叶#44 implemented与mount/url成功面不符、部分叶没有明确后续阶段或旧测试名等。R06_REPORT保留READY_FOR_REVIEW快照，而新账本已ACCEPTED；这类历史允许保留，但当前放行依据需唯一、明确。
+
+完成数字与原始用户行为之间脱节；后续Agent容易继承虚假的“完整实现”、未测成本或错绑用例。并非所有deferred都非法：原有UI换壳、授权LIVE和目标OS验证可以依法延期，不能一概重做。
+
+### 必须修复的内容
+
+1. 从原Task、A-ID及R00原始行为出发重新核对R06叶图；逐项判断完整实现、当前份额完成、合法后续、现阶段缺失，不按期望比例凑139/65/172。
+2. 对本次明确的F01—F14以及旧评审所有未决项逐一给出真实修复证据或不适用的原需求依据；本阶段必需行为不能因总控一条“归R07”获得豁免。
+3. BE-04等数值以实际记录计算，未测标null/NOT_MEASURED；固定模型替身评测、旧引擎真实对照、真实模型采样三者分开，不互相冒充。
+4. 保留原FAIL/PASS历史不覆写，追加本轮推翻/复验状态；当前唯一状态绑定明确候选、scope、未决集合、独立审查和真实Git回执。
+5. 每个已关闭项至少有正向证明与可使错误重现的反向检测；纯日志汇总、函数名命中和单纯数量不等于语义证据。
+
+### 修复完成后的逐项自检与对抗性自检
+
+**R06-AR-F15-C01｜叶图与原始语义重核**
+
+执行：复核全部本阶段叶及旧review未决项，特别抽查implemented、share和deferred三类，逐条引用原任务条款。
+
+通过条件：无本阶段缺失行为被通过改阶段/改标签掩盖；真实UI或LIVE延期仍保留明确owner、截止及未完成状态。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F15-C02｜行为指标从证据重算**
+
+执行：从实际captured request/usage/eval_records重算BE-04及其它token、调用次数、schema/参数/结果维度。
+
+通过条件：所有已测值可复算；未测不是0；负对照BE-10等继续正确判错，不把task failure误计模型成功。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F15-C03｜错误映射与虚报控制**
+
+执行：在隔离副本把机制echo/握手用例错绑到完整业务断言，把missing改deferred但不给原范围依据，再删除一个负对照。
+
+通过条件：核验能点名拒绝或独立审查直接判FAIL；不能只靠表格格式正确放行。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+**R06-AR-F15-C04｜最终状态与证据一致**
+
+执行：核对最终代码、所有issue/scenario结果、当前状态文档、历史快照、提交与远端回执。
+
+通过条件：当前放行真值唯一，历史明确时间范围；无未执行写PASS，无source-only写亲跑，无未提交写已推送。
+
+必留证据：真实命令/退出码、候选SHA与有效输入摘要、平台与替身边界、关键原始请求/数据库/文件断言，以及失败注入或正对照的结果。当前状态：NOT_RUN。
+
+### 全新独立Reviewer必须追加的攻击点
+
+Reviewer不能凭“已登记”免除代码必需义务，也不能要求为合法后期范围提前实现整套UI。
+
+扫描旧review中的MEDIUM/LOW/OBS，按违反的契约而不是标签决定是否阻断；未知风险如实保留。
+
+### 固定源码依据
+
+- `docs/rust-tauri/R06/R06_PROGRESS.json`，约225-365行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/docs/rust-tauri/R06/R06_PROGRESS.json#L225-L365`。
+- `docs/rust-tauri/R06/R06_REPORT.md`，约50-130行。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/docs/rust-tauri/R06/R06_REPORT.md#L50-L130`。
+- `artifacts/rust-tauri/R06/STAGE-REVIEW-R1/STAGE_REVIEW.md`。固定来源：`https://github.com/ItsDalk-Lane/LingxiAgent/blob/2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d/artifacts/rust-tauri/R06/STAGE-REVIEW-R1/STAGE_REVIEW.md`。
+
+
+## 5. 组织修复，不允许只修第一个报错
+
+### 5.1 进入修复前的ENTRY检查
+
+总控记录真实工作区、branch、HEAD、remote、所有既有未提交修改、工具链/lock、可用磁盘和测试资源限额。使用独立LINGXI_HOME并证明实际生效；生产目录放只读哨兵。不得为了跑测试对用户真实home进行复制、改名、删除、清理。
+
+先在不修改需求和代码的条件下运行能够运行的现有低成本检查，尤其`r02_registry_consistency.py`，把本轮基线真实结果存档。不要预写它失败或通过；本审查给出的是源码推导，实际执行端必须记真实日志。
+
+建立：`docs/rust-tauri/R06/repair-current/AR_ISSUE_MATRIX.json`、`AR_PROGRESS.json`、`AR_HANDOFF.md`及对应的独立证据根。保存原全部历史。已有原R06 ACCEPTED改为带时间、被本轮推翻原因的历史状态；当前修复状态为NOT_ACCEPTED，不删除历史记录。
+
+### 5.2 工作单元与顺序
+
+每个F-ID对应一个一次性修复Task `R06-AR-Wxx`，例如W02修F02。推荐顺序：
+
+`W02 → W03 → W12 → W01 → W05 → W06 → W07 → W08 → W09 → W10 → W11 → W13 → W04 → W15 → W14 → FINAL-R06`
+
+先止住文件/数据风险，再补上下文和知识链，最后收口映射和全门禁。依实际接口可在有证据的依赖图上调整顺序，不能少做、合并成一个长期Agent或只完成前几个问题。需要某前置时先处理前置，不让两个写代理同时改同一源码、锁文件或数据库。
+
+一项修复涉及另一F-ID的公共代码时，登记影响和重跑义务；不能因为“那是另一个Task”留下同根因旁路。后续Task修改公共契约，先前结果按影响标STALE并复跑。最终Stage审查重新核验全部集成。
+
+### 5.3 固定循环
+
+`NEW EXECUTOR → 逐项自检 → 对抗性自检 → NEW INDEPENDENT REVIEWER → PASS则精确交付；FAIL则NEW REPAIR → NEW REVIEWER`
+
+审查者发现的所有同根因问题应一次汇总。连续两轮同族失败时，创建全新的ROOT-CAUSE代理做全路径分析，形成完整修复矩阵再派新Repair。不得设“达到三轮自动算通过”，也不得为追求永远完美无限增加与任务无关需求。
+
+BLOCKED与FAIL分开。实现难、测试失败、发现新代码缺陷不是跳过理由。缺真实凭证、目标OS或授权且当前关卡确需它，才记精确BLOCKED；已获原规格允许的延期保留owner/截止而不改成PASS。
+
+## 6. 派发给每个全新执行代理的完整模板
+
+```text
+你是LingxiAgent R06修复的一次性执行代理，只负责{WORK_ID}/{FINDING_ID}。
+你不是总控、不是独立Reviewer，完成后不接下一个任务。
+
+必须读取本完整修复提示词、该F-ID全部源码事实/修复要求/四项C-ID、关联原R06 Task全部Steps与A-ID、原始R00行为、当前真实源码和所有上游/消费者，以及先前依赖Task有效交接。
+研究SHA不是强制回退点。先记录实际HEAD、candidate范围、原始用户修改和隔离home；不reset/clean，不改真实数据。
+
+执行：
+1. 从真正生产入口追踪该问题，区分本提示词的源码事实和你本机实际复现；先保存一个正常正对照。
+2. 对源码确认的错误建立正确契约断言，在未修代码上取得行为失败证据。安全反例只用合成临时文件和loopback服务。编译失败、脚本未运行、测试0匹配不算“旧代码红”。
+3. 若初始反例不成立，继续核对前置与调用链；发现事实已由新提交修复，应给源码与运行证据，不凭主观意见改需求或删案例。真正证伪交全新Reviewer裁决。
+4. 找根因并扫描同族全部路径，完成最小完整修复，接通生产调用，处理错误、权限、取消、存储和旧数据边界。
+5. 第一层逐项自检：对当前F-ID全部C-ID、原Task Steps/交付物/A-ID和影响范围逐项填“期待/实际/证据/状态”，不得留一个“总体通过”代替。
+6. 第二层对抗性自检：你自己作为攻击者构造权限伪造、竞态、错误注入、边界输入、重启等本Task相关反例；核对测试没有mock掉被测对象。至少做一个能重新暴露旧根因的隔离变异或等效旧版本红/新版本绿对照。
+7. 跑关联回归，保留全部失败和重试记录。不要只保存最后一次绿，不删除/改松原断言，不改变原始到期范围，不虚报平台/LIVE。
+8. 检查真正发给模型的数据、真实文件/数据库/进程结果；源码存在和mock回包不是行为证明。
+9. 输出实现差异、所有自检结果、同族扫描、未验证、影响/STALE清单及候选摘要。状态只可READY_FOR_INDEPENDENT_REVIEW。
+
+禁止commit/push/发布；Git由总控在独立PASS后处理。不能自签独立验收。完成后结束该子代理。
+```
+
+## 7. 全新独立验收代理模板
+
+```text
+你是{WORK_ID}/{FINDING_ID}第{ROUND}轮的全新独立对抗性Reviewer。
+你没有参与该Task的任何执行、修复或前一轮审查；不继承实现者聊天上下文。
+
+读取原需求和完整F-ID/C-ID，再独立读真实diff、生产入口、调用者和测试。实现者报告仅作线索，不作结论。
+
+必须执行第三层验收：
+A. 逐项检查每个原Task Step/交付物/A-ID和本F-ID四个C-ID。每一项都有真实执行/源码推断/未验证的明确区分。
+B. 从真正业务入口亲自复跑全部当前C-ID；至少额外提出一个实现者自检没有直接展示的同族反例。隔离外部响应可以mock，当前被验的编译器、网关、状态机、存储和消息组装不能mock。
+C. 复核“旧红→新绿”的旧红确实为契约错误，而非不编译/少依赖/空测试；隔离变异应能被正确测试抓住。
+D. 逐项核对实际请求、实际数据/文件、收据、权限、版本及资源清理；不要只看日志里写PASS。
+E. 检查是否将当前到期功能改名share/deferred、将调用未接线写成已完成、将机制echo/握手错绑完整业务、将未测指标写0。
+F. 检查对其它F-ID与R02—R05的影响，列出必须重跑的范围。没有新增风险的内容不无限扩大成新产品任务。
+G. 候选绑定必须与你亲验的文件内容一致。新的产品/测试/配置变更使受影响PASS失效。
+
+每个发现写：ID、违反的原条款、源码位置、复现条件、实际/期待、根因、全部同族路径、修复要求、必须重跑的C-ID。
+一次报告全部找到的阻断与同族问题，不只报第一个。
+
+只有当前所有必需项实际满足且无未关闭问题，输出VERDICT: PASS；否则FAIL。真正外部环境缺失则BLOCKED并精确说明，不将注册为延期等同通过。
+你不得修改产品或测试实现；仅可在独立证据位置保存测试输出、探针和审查报告。完成后结束子代理。
+```
+
+## 8. 全新修复代理模板
+
+```text
+你是{WORK_ID}第{ROUND}轮验收失败后的全新修复代理，不是原执行者或Reviewer。
+读取原Task、本F-ID、全部历史finding和当前源码，不只读最新报错行。
+先重现全部真实失败，合并根因，搜索所有同族生产路径，形成问题→修复→测试的完整矩阵。
+修复真实原因，不删断言、不catch后假成功、不把FAILED换成NOT_APPLICABLE、不自改范围。
+完成后重新执行当前Task全套逐项自检和对抗性自检，以及受影响回归；不是只验证Reviewer点名的一个样例。
+交付每个finding的关闭证据及当前候选摘要，状态READY_FOR_INDEPENDENT_REREVIEW；不得commit/push。
+总控必须再创建全新的Reviewer，不复用上一轮。你完成后立即结束。
+```
+
+## 9. 逐项结果格式与自动检查
+
+每个F-ID至少登记：`original_requirement/source_path/observed_fact/reproduction_status/root_cause/all_affected_paths/repair_commits/self_check/adversarial_self_check/independent_review/remaining_scope/status`。
+
+每个C-ID的每一次运行登记：`candidate_sha/working_tree_digest/toolchain/lock_hash/fixture_hash/platform/command/start_time/end_time/exit_code/test_count/expected/observed/mock_boundary/evidence_hash/status`。
+
+每项必须经历三层，不能省略任何一层：
+
+| 检查层 | 谁执行 | 必须做什么 | 不能替代为 |
+|---|---|---|---|
+| 逐项自检 | 本Task执行/修复代理 | 核对所有修复条目与C-ID、原Steps/A-ID，实际运行正常和错误路径 | 一句“测试已通过” |
+| 对抗性自检 | 同一执行/修复代理 | 主动制造越界、竞态、异常、空筛选或旧根因变异，证明保护能失败关闭 | 只再跑同一正例 |
+| 独立对抗性审查 | 全新空历史Reviewer | 独立读源码、亲跑C-ID、补自己的反例并核对范围/证据 | 实现者切换角色自签PASS |
+
+本包JSON是规格，初始NOT_RUN。另建工程结果，不将规格一键改绿。JSON严格拒绝重复键，ID唯一、需求/任务/测试/证据双向映射不缺失。条件未适用须写原授权依据，不得用于豁免本文件的60个离线基础检查。
+
+每次后续改动影响已PASS项时标STALE并重跑；不能让历史绿灯永久有效。source-only audit不等于亲跑。一个正确的失败负对照通过，是指测试准确断言了预期拒绝，不是程序实际失败却写测试PASS。
+
+## 10. 正式自检命令与阶段验收
+
+以下命令从实际仓库根运行。工具链以当前已锁定版本为准，先验证rustup/cargo实际选中版本，不能无理由升级/降级来绕过错误。构建并发沿项目已有安全约束，默认不超过`-j 8`；保留测试资源guard，不把guard触发当PASS。
+
+### 10.1 已存在的检查
+
+```bash
+python3 scripts/rust-tauri/r02_registry_consistency.py
+cargo fmt --manifest-path rust/Cargo.toml --all -- --check
+cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -j 8 -- -D warnings
+cargo test --manifest-path rust/Cargo.toml --workspace --locked --no-fail-fast -j 8
+cargo run --manifest-path rust/Cargo.toml --locked -j 8 -p xtask -- check-contracts
+cargo run --manifest-path rust/Cargo.toml --locked -j 8 -p xtask -- check-boundaries
+cargo run --manifest-path rust/Cargo.toml --locked -j 8 -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R06/AR/<独立且全新的运行目录>/verify-R05
+```
+
+`<...>`由总控替换为真实唯一目录，不把尖括号原样传给shell。核对嵌套门禁、脚本、指纹登记、数据库升级及需要的Node依赖准备；不只运行Rust单测子集。旧npm/封印限制如实区分已有历史与本轮新增回归，不扩大豁免、不改旧seal为假新坐标。
+
+### 10.2 本轮F14必须新接通，当前被审提交没有的R06门禁
+
+```bash
+cargo run --manifest-path rust/Cargo.toml --locked -j 8 -p xtask -- verify-stage R06 --evidence artifacts/rust-tauri/R06/AR/<独立且全新的运行目录>/verify-R06
+```
+
+本命令**当前不是已存在并已通过的能力**。先正确接通阶段图、生产者、镜像与绑定，再执行。它必须覆盖原16A、到期叶份额、60C和新增真实问题，不能仅列一个手填JSON或grep测试名。
+
+### 10.3 门禁错误不能美化
+
+任何必需命令非零、测试0匹配、guard触发、被宿主终止、结果缺失、候选漂移、额外未登记skip，都不能标PASS。单独重跑一个失败用例绿不能自动抹掉完整门禁红；定位原因后给最终候选取得有效新鲜门禁结果。
+
+使用宿主明确支持的可监督长时执行/会话能力，记录真实exit并遵守取消。禁止通过隐藏孤儿进程、移除父子归属、逃避宿主终止控制来获得“无人能停止”的测试任务。资源不足按范围清理自己可再生成缓存并保留证据；不清理用户文件或未知资料。
+
+## 11. 最终全新阶段Reviewer
+
+全部15个修复Task完成独立PASS后，创建`STAGE-REVIEWER-R06-AR-R1`，不得由任一Task执行者、修复者、Task审查者充当。
+
+其Prompt必须完整包含：
+
+```text
+你是R06修复后的全新阶段级独立审查者。本轮任务不是统计15个PASS，而是证明它们组合后满足原R06完整要求。
+读取原Task全Steps/A-ID、R00到期语义、F01—F15/60C、最新代码/所有review/依赖变化；不要相信原R06 ACCEPTED记录。
+亲自运行完整R06正式门禁、受影响R05→R04→R03→R02闭包、锁定构建/契约/边界/工作区测试，保留每层原始结果。
+逐条复核60C和原16A映射；特别亲做两用户Run历史、fork后真实附件、rewind外部文件哨兵、警告大结果实际payload、同维度模型切换、schema-newer不删库、真实聊天来源scope。
+检查跨任务相互破坏：新历史加载是否破坏压缩/签名/取消/usage；资源和分支事务是否造成锁泄漏；来源scope与缓存版本是否一致；按需声明是否影响协议工具对恢复；embedding取消是否丢账。
+核对全部旧review未决项，当前必需项没有“只申报归属”关闭；合法后期义务不误报完成。
+阶段结论只能是R06_ACCEPTED、R06_NOT_ACCEPTED或R06_BLOCKED，并提供完整剩余集合。未亲跑与未验证必须明确。
+发现问题一次汇总根因和全影响矩阵。你不能修改产品代码。结束后不复用。
+```
+
+Stage FAIL则新建STAGE-REPAIR，再新建STAGE-REVIEWER-R2，全量重新判断。不能只检查上轮问题，也不能因修复轮次增加而降低标准。
+
+## 12. 候选冻结、提交、推送与证据体积
+
+每个Task独立PASS后，总控核对实际源码/测试/配置与Reviewer候选一致，运行diff检查，精确暂存本Task相关文件/必要证据。不能无脑git add -A，不能混入初始用户修改、.vscode、node_modules、target或临时个人数据。
+
+提交信息例如：`fix(rust-tauri): R06-AR-F08 preserve tool-result cap on warnings`。沿用户授权推送`codex/rust-tauri-migration`并回读远端确认。无强推、无squash旧历史。网络/权限/远端冲突不能通过强制覆盖解决。
+
+提交成功但push失败标COMMITTED_NOT_PUSHED，不进入下一项正式DONE。仅回执/证据索引收口不改变运行行为；产品/测试语义/配置改变使相关审查过期，需全新复核。
+
+保存足以复现的原始输入、运行命令、必要日志与摘要，不复制整套源码/.git/构建缓存到每轮证据树。当前运行自己的输出目录可通过已有安全规则排除出绑定输入，不能扩大全仓忽略规则掩盖源码变化。避免自引用hash和“把文档自身未来commit写进文档”的死循环；用独立交付回执关联最终提交与被测候选。
+
+## 13. 最终放行公式
+
+只有全部成立才能写`R06_ACCEPTED — READY_FOR_R07`：
+
+1. F01—F15全部通过有效闭环；修复中新发现的真实当前范围问题也已关闭。
+2. 60个基础C-ID、原R06-A01—A16、原Task完整Steps及本阶段到期叶份额均具备有效证据，不是只有测试数量。
+3. 每Task完成逐项自检、对抗性自检和全新独立审查，失败后确实重新启用新修复者/审查者。
+4. 正常聊天跨Run/重启/分支继承模型历史；资源引用和知识范围经真实入口接通。
+5. 文件恢复授权/冲突保护、上下文预算/警告截断、embedding身份/批次/归属、缓存版本保护均符合上述反例。
+6. v8/v9及实际新增迁移登记与代码/真实库一致；R06正式门禁及受影响前序闭包真实通过。
+7. 没有靠删除功能、修改到期归属、空过滤、减少断言、吞错或未测记0获得绿灯。
+8. 最终全新阶段Reviewer亲跑PASS，结果绑定最终行为候选；后续仅回执差异有明确说明。
+9. 当前报告、交接、状态、Git和远端回读一致；历史失败保留；真实未授权LIVE/后续OS/UI义务如实列明。
+10. 所有本轮授权修改已精确交付，初始用户修改未丢失/误提交。没有执行R07。
+
+如任何当前必需项FAIL/BLOCKED/STALE/NOT_RUN，不能写全完成。存在合法LIVE递延不等于所有项目未完成，但必须限定为已允许的离线阶段范围，不冒称全产品/真实账户已通过。
+
+## 14. 最终交付与停止
+
+交付：原问题→根因→改动→C-ID→三层验收→commit→远端的完整映射；当前真实命令与原始日志；最终R06门禁及R05依赖闭包；数据与安全结果；旧review每条处置；合法后续义务与R07输入。
+
+最终摘要必须包含：`audited_base / final_head / remote_head / issue_count / closed_count / open_count / self_check / adversarial_self_check / independent_review / stage_gate / upstream_gates / deferred_live_platform / remaining_scope / final_status`。
+
+全部满足后停止于R07入口；不要自动开展R07。仍阻塞时精确列F-ID/C-ID、实证原因、需要的外部条件和已保护的数据，不承诺后台继续或后续自动交付。

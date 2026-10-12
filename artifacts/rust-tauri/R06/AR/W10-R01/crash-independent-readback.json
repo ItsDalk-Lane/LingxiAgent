@@ -1,0 +1,63 @@
+{
+  "case": "C04 actual SIGKILL running→same effective home restart changed model→formal reingest",
+  "home": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/artifacts/rust-tauri/R06/AR/W10-R01/commands/c-all-01/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w10-crash-running-19033-1791715684583325000",
+  "db": "/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/artifacts/rust-tauri/R06/AR/W10-R01/commands/c-all-01/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w10-crash-running-19033-1791715684583325000/lingxi-service/data/runs.db",
+  "physical_requests": 2,
+  "usage_rows": [
+    {
+      "model_call_id": "op-embedding-1791715686010-0",
+      "provider": "embed",
+      "model": "model-a",
+      "purpose": "embedding",
+      "outcome": "succeeded",
+      "usage_state": "partial",
+      "input_tokens": 320,
+      "output_tokens": null,
+      "transport_attempts": 1,
+      "session_id": null,
+      "run_id": null,
+      "attempt": null,
+      "cause_ref": null
+    }
+  ],
+  "readyA": "LINGXI_SERVICE_READY addr=127.0.0.1:59492 home=/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/artifacts/rust-tauri/R06/AR/W10-R01/commands/c-all-01/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w10-crash-running-19033-1791715684583325000 source=env",
+  "readyB": "LINGXI_SERVICE_READY addr=127.0.0.1:59497 home=/Users/study_superior/.codex/r06-isolated-checkouts/stage-source-preparation-01/artifacts/rust-tauri/R06/AR/W10-R01/commands/c-all-01/LOCAL_ONLY_NEVER_GIT/synthetic-home/lingxi-r06-ar-w10-crash-running-19033-1791715684583325000 source=env",
+  "exitA": "signal: 9 (SIGKILL)",
+  "resume_http_status": 409,
+  "resume_receipt": {
+    "error": "KNOWLEDGE_CONFLICT",
+    "message": "Only failed ingestion jobs can be retried"
+  },
+  "jobs": {
+    "counts": {
+      "done": 0,
+      "failed": 0,
+      "pending_embedding": 0,
+      "queued": 0,
+      "running": 1
+    },
+    "jobs": [
+      {
+        "artifactId": "kpa_f0ae9e8ebfbfd583e4480e27",
+        "attempt": 1,
+        "cancelledAt": null,
+        "chunkerConfigId": "8b93f0aa4fa689af",
+        "createdAt": "2026-10-11T10:48:05.812Z",
+        "embeddingStats": null,
+        "error": null,
+        "id": "kjob_bbb3a459e0540341cbba768d",
+        "notebookId": "knb_bbbe45836b0c02b4778c2fb9",
+        "phase": "embed",
+        "progressDone": 64,
+        "progressTotal": 89,
+        "sourceId": "ksrc_3bb496e1418e8ed230c81ff8",
+        "status": "running",
+        "updatedAt": "2026-10-11T10:48:06.012Z"
+      }
+    ]
+  },
+  "paid_rows_unchanged": true,
+  "required_complete_recovery": "FAIL: restarted job remains running and route returns 409; no new B variant",
+  "settlement": "FAIL_F11: second physically sent call has no ledger row; unknown must not mean zero",
+  "source_evidence": "commands/c-all-01/crash-running.json"
+}

@@ -1,0 +1,9 @@
+{"command": ["python3", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/final-family-R01/probe.py"], "start": 1791707394.736278, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-r01-probe-9724ata6", "guard": "8192MB/600s"}
+merge-sequence True 200 ('completed', 'completed.with_final')
+explicit-bool True 200 ('completed', 'completed.with_final')
+quoted-key True 200 ('completed', 'completed.with_final')
+nonstring-root-key True 400 ('failed', 'failed.provider_error')
+nonstring-sensitive-key True 400 ('failed', 'failed.provider_error')
+invalid-merge True 400 ('failed', 'failed.provider_error')
+typed-string-bool True 400 ('failed', 'failed.provider_error')
+unknown-retain True 200 ('completed', 'completed.with_final')

@@ -1,0 +1,78 @@
+lib/knowledge/vector-search-backend-factory.ts:17:    catch {
+lib/knowledge/vector-search-backend-factory.ts:25:  } catch {
+lib/knowledge/knowledge-manager.ts:319:        } catch {
+lib/knowledge/knowledge-manager.ts:381:      catch (error) { if (isKnowledgeError(error) && error.code === "KNOWLEDGE_NOT_FOUND") return false; throw error; }
+lib/knowledge/knowledge-manager.ts:394:          } catch (error) {
+lib/knowledge/knowledge-manager.ts:399:      } catch (error) {
+lib/knowledge/knowledge-manager.ts:415:      } catch (error) {
+lib/knowledge/knowledge-manager.ts:434:          } catch (error) {
+lib/knowledge/knowledge-manager.ts:441:      } catch (error) {
+lib/knowledge/knowledge-manager.ts:545:    } catch (error) {
+lib/knowledge/knowledge-manager.ts:619:      } catch (error) {
+lib/knowledge/knowledge-manager.ts:629:      } catch (error) {
+lib/knowledge/knowledge-manager.ts:640:      } catch (error) {
+lib/knowledge/knowledge-manager.ts:650:    } catch (error) {
+lib/knowledge/knowledge-manager.ts:702:      } catch (error) {
+lib/knowledge/knowledge-manager.ts:751:      } catch (error) {
+lib/knowledge/knowledge-manager.ts:758:      } catch (error) {
+lib/knowledge/knowledge-manager.ts:792:    } catch (error) {
+lib/knowledge/knowledge-manager.ts:966:    } catch (error) {
+lib/knowledge/knowledge-manager.ts:968:      await fs.promises.rm(temporaryPath, { force: true }).catch(() => {});
+lib/knowledge/knowledge-manager.ts:969:      if (published) await fs.promises.rm(snapshotPath, { force: true }).catch(() => {});
+lib/knowledge/knowledge-manager.ts:970:      await fs.promises.rmdir(sourceDirectory).catch(() => {});
+lib/knowledge/knowledge-manager.ts:990:    const stats = await fs.promises.lstat(input.dirPath).catch(() => null);
+lib/knowledge/knowledge-manager.ts:1078:      } catch (error) {
+lib/knowledge/knowledge-manager.ts:1143:    } catch (error) {
+lib/knowledge/knowledge-manager.ts:1144:      await fs.promises.rm(temporaryPath, { force: true }).catch(() => {});
+lib/knowledge/knowledge-manager.ts:1145:      if (published) await fs.promises.rm(snapshotPath, { force: true }).catch(() => {});
+lib/knowledge/knowledge-manager.ts:1146:      await fs.promises.rmdir(sourceDirectory).catch(() => {});
+lib/knowledge/knowledge-manager.ts:1266:      } catch (error) {
+lib/knowledge/knowledge-manager.ts:1290:    } catch (error) {
+lib/knowledge/knowledge-manager.ts:1291:      await fs.promises.rm(temporaryPath, { force: true }).catch(() => {});
+lib/knowledge/knowledge-manager.ts:1292:      if (published && !committed) await fs.promises.rm(snapshotPath, { force: true }).catch(() => {});
+lib/knowledge/knowledge-manager.ts:1312:    } catch {
+lib/knowledge/knowledge-manager.ts:1450:    } catch (error) {
+lib/knowledge/knowledge-manager.ts:1451:      await fs.promises.rm(artifactTemporaryPath, { force: true }).catch(() => {});
+lib/knowledge/knowledge-manager.ts:1452:      if (published) await fs.promises.rm(artifactPath, { force: true }).catch(() => {});
+lib/knowledge/knowledge-manager.ts:1466:      } catch {
+lib/knowledge/knowledge-manager.ts:1515:      } catch {
+lib/knowledge/knowledge-manager.ts:1567:    } catch (error) {
+lib/knowledge/knowledge-manager.ts:1568:      await fs.promises.rm(processedTemporaryPath, { force: true }).catch(() => {});
+lib/knowledge/knowledge-manager.ts:1569:      if (published) await fs.promises.rm(processedOutputPath, { force: true }).catch(() => {});
+lib/knowledge/knowledge-manager.ts:1576:      } catch {
+lib/knowledge/knowledge-manager.ts:1648:      throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge chunk index variant is not ready");
+lib/knowledge/ann-index-store.ts:24:    throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "ANN identity is invalid");
+lib/knowledge/ann-index-store.ts:63:    } catch (error) { db.close(); throw error; }
+lib/knowledge/ann-index-store.ts:74:      throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "ANN metadata is corrupt");
+lib/knowledge/ann-index-store.ts:86:      throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "ANN build metadata is invalid");
+lib/knowledge/ann-index-store.ts:103:      .run(this.now(), vectorIndexVariantId).changes !== 1) throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "ANN build is not active");
+lib/knowledge/knowledge-query-service.ts:507:          throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Ready Knowledge source produced no searchable chunks");
+lib/knowledge/knowledge-query-service.ts:518:      } catch (error) {
+lib/knowledge/knowledge-query-service.ts:522:        } catch {
+lib/knowledge/knowledge-query-service.ts:531:    } catch (error) {
+lib/knowledge/knowledge-query-service.ts:534:      if (!isKnowledgeError(error) || error.code !== "KNOWLEDGE_INDEX_INVALID") throw error;
+lib/knowledge/knowledge-query-service.ts:535:      this.deps.indexStore.reset();
+lib/knowledge/knowledge-query-service.ts:547:    if (!owner) throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Metadata source artifact is missing");
+lib/knowledge/knowledge-query-service.ts:663:    } catch (error) {
+lib/knowledge/knowledge-query-service.ts:674:   * 损坏（KNOWLEDGE_INDEX_INVALID）不在此判定——由检索执行处的自愈路径处理。
+lib/knowledge/knowledge-query-service.ts:714:   * 损坏自愈（§十三 exception recovery）：search/读 chunk 抛 KNOWLEDGE_INDEX_INVALID
+lib/knowledge/knowledge-query-service.ts:737:    } catch (error) {
+lib/knowledge/knowledge-query-service.ts:742:      if (!isKnowledgeError(error) || error.code !== "KNOWLEDGE_INDEX_INVALID") throw error;
+lib/knowledge/knowledge-query-service.ts:743:      this.deps.indexStore.reset();
+lib/knowledge/knowledge-query-service.ts:763:    } catch (error) {
+lib/knowledge/knowledge-query-service.ts:803:    deadline.catch(() => {});
+lib/knowledge/knowledge-query-service.ts:804:    attempt.catch(() => {});
+lib/knowledge/knowledge-query-service.ts:861:      throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Indexed Knowledge artifact has no ready chunk variant to embed");
+lib/knowledge/knowledge-query-service.ts:866:      throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Indexed Knowledge artifact has no chunks to embed");
+lib/knowledge/knowledge-query-service.ts:985:    } catch (error) {
+lib/knowledge/knowledge-query-service.ts:989:      if (!isKnowledgeError(error) || error.code !== "KNOWLEDGE_INDEX_INVALID") throw error;
+lib/knowledge/knowledge-query-service.ts:990:      vectorIndex.rebuild();
+lib/knowledge/knowledge-query-service.ts:1003:  // KNOWLEDGE_INDEX_INVALID 损坏自愈（reset/rebuild，§十三 exception recovery）。
+lib/knowledge/knowledge-query-service.ts:1124:    } catch (error) {
+lib/knowledge/knowledge-query-service.ts:1175:        } catch (error) {
+lib/knowledge/knowledge-query-service.ts:1178:          if (!isKnowledgeError(error) || error.code !== "KNOWLEDGE_INDEX_INVALID") throw error;
+lib/knowledge/knowledge-query-service.ts:1179:          this.deps.indexStore.reset();
+lib/knowledge/knowledge-query-service.ts:1270:    } catch (error) {
+lib/knowledge/knowledge-query-service.ts:1272:      if (this.deps.vectorSearchBackend || !isKnowledgeError(error) || error.code !== "KNOWLEDGE_INDEX_INVALID") {
+lib/knowledge/knowledge-query-service.ts:1296:      vectorIndex!.rebuild();
+lib/knowledge/knowledge-query-service.ts:1331:          throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge vector index references an unknown chunk");

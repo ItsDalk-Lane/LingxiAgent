@@ -1,0 +1,8 @@
+{
+  "actual_db": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-05/R06_BINDINGS/r06_test_ba36986fd96e6c9c562c/command-001/runtime/tmp/lingxi-r06t03-svc-busy-22531-1791802657508570000/lingxi-service/data/runs.db",
+  "actual_home": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-05/R06_BINDINGS/r06_test_ba36986fd96e6c9c562c/command-001/runtime/tmp/lingxi-r06t03-svc-busy-22531-1791802657508570000",
+  "case_tag": "busy",
+  "home_source": "Cli",
+  "provider_boundary": "确定性响应替身；原生产 Run 与 SQLite 未替换",
+  "ready_address": "127.0.0.1:56863"
+}

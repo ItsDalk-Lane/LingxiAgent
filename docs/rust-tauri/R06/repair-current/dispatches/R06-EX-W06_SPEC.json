@@ -1,0 +1,484 @@
+{
+  "id": "R06-EX-06",
+  "title": "记忆检索及经验工具的可达生产分支",
+  "original_requirements": [
+    {
+      "id": "R06-T06-S01",
+      "clause": "迁移现役记忆事实/摘要/信条/梦境等实际流程的数据访问与调度调用；业务状态和模型调用由Rust负责。"
+    },
+    {
+      "id": "R06-T06-S02",
+      "clause": "按Agent隔离记忆查询与写入；现役知识内容/外装技能材料均按来源和权限进入上下文。"
+    },
+    {
+      "id": "R06-T06-S04",
+      "clause": "Pi extensions实际使用的hooks逐项迁入Rust扩展ports或受控worker；不能让扩展重新调用旧Agent loop。"
+    }
+  ],
+  "r00_feature_ids": [
+    "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+    "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-FEED-245D72",
+    "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-PUT-DCF083",
+    "F-D21-TOOL-TOOL-LEARN-LESSON-771296",
+    "F-D07-TOOL-TOOL-RECALL-EXPERIENCE-7D05B1",
+    "F-D07-TOOL-TOOL-RECORD-EXPERIENCE-A17D74",
+    "F-D07-TOOL-TOOL-SEARCH-MEMORY-7432B0"
+  ],
+  "reported_gap": "memorytools.rs semantic_status恒not_configured；需核对配置有效时的原语义检索，以及record/recall/lesson是否真实注册与调用。不是要求凭空新增嵌入功能。",
+  "deadline": "R06 阶段验收前：这里只要求当前核心/服务份额",
+  "status": "NOT_RUN",
+  "evidence_level": "SOURCE_ONLY",
+  "runtime_evidence": [],
+  "coverage_by_existing_f": "R06-AR-F15要求完整性，但F01-F14的具体修复不自动涵盖此行为；保留为extra，不改原F编号",
+  "production_paths": [
+    "rust/crates/lingxi-service/src/memorytools.rs",
+    "rust/crates/lingxi-service/src/runs.rs"
+  ],
+  "proposed_real_checks": [
+    "明确配置可用/不可用两分支：有权A真实调用search_memory，依据配置得到语义结果或明确可解释降级；不得永恒未配置",
+    "真实工具轮record/recall与启用lesson写入有权助手，B拒绝；来源和检索事实可核"
+  ],
+  "legal_later_basis": [
+    {
+      "task_id": "R07-T08",
+      "original_goal": "设置页不是迁移后的空壳。",
+      "original_steps": [
+        "迁移Agent管理、provider/model管理、权限、偏好、语言、工具启停、设备管理、角色卡/技能包等真实API。",
+        "配置变更采用版本/并发检查及原子写入；影响运行中的凭证/权限/工具配置时按generation或快照策略生效。",
+        "保留未知但兼容的配置字段与用户定制，不把旧配置读成默认值后整体覆盖。",
+        "导入导出按白名单保留人格/头像/可选记忆/Skills及必要元信息，默认不外带秘密。"
+      ]
+    }
+  ],
+  "current_vs_later": "管理界面和更广扩展外层后续；R00只列R06的experience/search_memory及R06已采用的记忆业务当前必需。",
+  "suggested_work_unit": {
+    "id": "R06-EX-W06",
+    "scope": "记忆检索及经验工具的可达生产分支",
+    "agent_policy": "一次性边界明确的工作单，主代理整合；不创建长期代理",
+    "prerequisites": [
+      "先核对原生产调用链与有效配置，再以当前真实服务/模型替身验证；不得mock被验收核心"
+    ],
+    "review_required": "全新审查者在实际候选上独立实验，资料核对不签关闭"
+  },
+  "r00_original_assertions": [
+    {
+      "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "成功：执行“读取助手经验”后，经验开启时合并 experience 分类文档；无文件给空正文，暂停则 403",
+        "拒绝/边界：experience.enabled 为 false 时拒绝；空文档返回空字符串；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-C8380CD5D08B",
+        "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户读取助手经验",
+        "then": "经验开启时合并 experience 分类文档；无文件给空正文，暂停则 403",
+        "assertions": [
+          "成功：执行“读取助手经验”后，经验开启时合并 experience 分类文档；无文件给空正文，暂停则 403",
+          "拒绝/边界：experience.enabled 为 false 时拒绝；空文档返回空字符串；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-FEED-245D72",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "成功：执行“对消息做赞/踩反馈”后，写入经验分类记录；返回 added/duplicate 与 experienceEnabled，暂停经验也允许显式反馈",
+        "拒绝/边界：rating=up/down 进不同分类；重复不新增；excerpt 必填并截断；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-245D72DD4CEA",
+        "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-FEED-245D72",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户对消息做赞/踩反馈",
+        "then": "写入经验分类记录；返回 added/duplicate 与 experienceEnabled，暂停经验也允许显式反馈",
+        "assertions": [
+          "成功：执行“对消息做赞/踩反馈”后，写入经验分类记录；返回 added/duplicate 与 experienceEnabled，暂停经验也允许显式反馈",
+          "拒绝/边界：rating=up/down 进不同分类；重复不新增；excerpt 必填并截断；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-PUT-DCF083",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "成功：执行“整体更新经验分类文档”后，按 # 标题同步 experience 分类及索引并刷新助手；空内容会清空分类",
+        "拒绝/边界：经验暂停 403；content 为字符串；非法分类 400；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-DCF0836C3A16",
+        "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-PUT-DCF083",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户整体更新经验分类文档",
+        "then": "按 # 标题同步 experience 分类及索引并刷新助手；空内容会清空分类",
+        "assertions": [
+          "成功：执行“整体更新经验分类文档”后，按 # 标题同步 experience 分类及索引并刷新助手；空内容会清空分类",
+          "拒绝/边界：经验暂停 403；content 为字符串；非法分类 400；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D21-TOOL-TOOL-LEARN-LESSON-771296",
+      "task_ids": [
+        "R06-T06",
+        "R07-T08"
+      ],
+      "assertions": [
+        "技能文件存在且内容可读",
+        "风险未确认时不写",
+        "索引与Agent启用状态一致",
+        "缺上下文、同名冲突或写入失败不生成伪课程；安全审核失败需用户明确接受和一次性token才可继续。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-771296A194E0",
+        "feature_id": "F-D21-TOOL-TOOL-LEARN-LESSON-771296",
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "given": "当前会话具备调用 learn_lesson 的权限，且准备有效对象与无效/拒绝样本",
+        "when": "分别调用 learn_lesson 的主要分支，并从会话、文件/状态或外部结果读回",
+        "then": "审核后把课程/技能文档写入Agent技能区，可在后续会话检索。",
+        "assertions": [
+          "技能文件存在且内容可读",
+          "风险未确认时不写",
+          "索引与Agent启用状态一致",
+          "缺上下文、同名冲突或写入失败不生成伪课程；安全审核失败需用户明确接受和一次性token才可继续。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧场景检验“Agent记忆不串用”，未操作或核对本入口的将当前经验沉淀为受审技能课题。"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "检验“技能审核和执行边界仍有效”的横向边界，可与本入口的将当前经验沉淀为受审技能课题共同执行；仍未逐项断言该结果。"
+          },
+          {
+            "acceptance_id": "R07-A15",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧场景检验“编辑模型不丢其他字段”，未操作或核对本入口的将当前经验沉淀为受审技能课题。"
+          },
+          {
+            "acceptance_id": "R07-A16",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧场景检验“导出不泄密”，未操作或核对本入口的将当前经验沉淀为受审技能课题。"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "execution_owner": "Rust Skill/Config＋解析worker",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D07-TOOL-TOOL-RECALL-EXPERIENCE-7D05B1",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "命中来自当前Agent",
+        "无写入",
+        "无记录/跨Agent时为空，不泄露其他Agent经验。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-7D05B144AE21",
+        "feature_id": "F-D07-TOOL-TOOL-RECALL-EXPERIENCE-7D05B1",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "当前会话具备调用 recall_experience 的权限，且准备有效对象与无效/拒绝样本",
+        "when": "分别调用 recall_experience 的主要分支，并从会话、文件/状态或外部结果读回",
+        "then": "返回匹配经验及路径，不改记忆文件。",
+        "assertions": [
+          "命中来自当前Agent",
+          "无写入",
+          "无记录/跨Agent时为空，不泄露其他Agent经验。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "检验“Agent记忆不串用”的横向边界，可与本入口的检索Agent经验文档共同执行；仍未逐项断言该结果。"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧场景检验“技能审核和执行边界仍有效”，未操作或核对本入口的检索Agent经验文档。"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D07-TOOL-TOOL-RECORD-EXPERIENCE-A17D74",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "写后可召回",
+        "Agent之间隔离",
+        "无效类别/写入失败/跨Agent拒绝，不破坏旧经验。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-A17D742E55B7",
+        "feature_id": "F-D07-TOOL-TOOL-RECORD-EXPERIENCE-A17D74",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "当前会话具备调用 record_experience 的权限，且准备有效对象与无效/拒绝样本",
+        "when": "分别调用 record_experience 的主要分支，并从会话、文件/状态或外部结果读回",
+        "then": "经验文档和索引出现新内容，后续recall可读。",
+        "assertions": [
+          "写后可召回",
+          "Agent之间隔离",
+          "无效类别/写入失败/跨Agent拒绝，不破坏旧经验。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "检验“Agent记忆不串用”的横向边界，可与本入口的写入或更新Agent经验共同执行；仍未逐项断言该结果。"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧场景检验“技能审核和执行边界仍有效”，未操作或核对本入口的写入或更新Agent经验。"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D07-TOOL-TOOL-SEARCH-MEMORY-7432B0",
+      "task_ids": [
+        "R06-T06"
+      ],
+      "assertions": [
+        "Agent隔离",
+        "状态区分无命中与未检索",
+        "模型不可用、超时/无覆盖时明确标降级或空结果，不把未检索当无事实。"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-7432B00DEC94",
+        "feature_id": "F-D07-TOOL-TOOL-SEARCH-MEMORY-7432B0",
+        "task_ids": [
+          "R06-T06"
+        ],
+        "given": "当前会话具备调用 search_memory 的权限，且准备有效对象与无效/拒绝样本",
+        "when": "分别调用 search_memory 的主要分支，并从会话、文件/状态或外部结果读回",
+        "then": "返回匹配事实、时间/标签和检索状态；可选跨频道依配置。",
+        "assertions": [
+          "Agent隔离",
+          "状态区分无命中与未检索",
+          "模型不可用、超时/无覆盖时明确标降级或空结果，不把未检索当无事实。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A11",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "检验“Agent记忆不串用”的横向边界，可与本入口的在当前Agent事实库检索记忆共同执行；仍未逐项断言该结果。"
+          },
+          {
+            "acceptance_id": "R06-A12",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧场景检验“技能审核和执行边界仍有效”，未操作或核对本入口的在当前Agent事实库检索记忆。"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T06"
+        ],
+        "execution_owner": "Rust Memory",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    }
+  ],
+  "report_sources": [
+    "docs/rust-tauri/R06/R06-T06_REPORT.md"
+  ],
+  "triage": "原义务需真实实验与范围核对，未确证当前Bug；不得因本清单推定修复完成/无需验证",
+  "legacy_comparison_excerpt": [
+    {
+      "path": "lib/memory/memory-search.ts",
+      "line": 165,
+      "end_line": 222,
+      "original_source": "            seenIds.add(r.id);\n            results.push({ ...r, source: \"tag\" });\n          }\n        }\n\n        // 策略 2：全文 + 语义混合（标签结果不足 3 条时）\n        // 语义路径由 engine 注入的 embedQuery 闭包驱动；未接线/未配置/超时/\n        // 零覆盖时按旧版 FTS 单路走，状态显式进 details（禁静默降级）。\n        let semanticStatus: MemorySemanticStatus = \"not_configured\";\n        if (results.length < 3 && params.query) {\n          const ftsResults = factStore.searchFullText(params.query, 10);\n\n          let semanticRows: any[] = [];\n          if (typeof opts.embedQuery === \"function\") {\n            let embedResult: MemoryEmbedQuery | null = null;\n            try {\n              embedResult = await opts.embedQuery(params.query);\n            } catch {\n              embedResult = { status: \"timeout\" };\n            }\n            if (embedResult?.status === \"ok\") {\n              const coverage = factStore.embeddingCoverage(embedResult.modelKey);\n              if (coverage.embedded === 0) {\n                semanticStatus = \"skipped_no_coverage\";\n              } else {\n                semanticStatus = \"used\";\n                semanticRows = factStore\n                  .semanticSearch(embedResult.modelKey, embedResult.vector, 15)\n                  .filter((r) => visibleInScope(r));\n              }\n            } else if (embedResult?.status === \"unavailable\") {\n              semanticStatus = embedResult.reason === \"unresolvable\"\n                ? \"unavailable_unresolvable\"\n                : \"unavailable_no_model\";\n            } else {\n              semanticStatus = \"skipped_timeout\";\n            }\n          }\n\n          if (semanticRows.length > 0) {\n            // RRF 融合：FTS 与语义两路排名 → 统一顺序；命中两路的标 semantic+fts\n            const ftsById = new Map(ftsResults.filter(visibleInScope).map((r) => [r.id, r]));\n            const semById = new Map(semanticRows.map((r) => [r.id, r]));\n            const fused = rrfFuse([\n              [...ftsById.keys()],\n              [...semById.keys()],\n            ]);\n            for (const [id] of fused) {\n              if (seenIds.has(id)) continue;\n              const fromFts = ftsById.has(id);\n              const fromSem = semById.has(id);\n              const row = fromSem ? semById.get(id) : ftsById.get(id);\n              if (!row) continue;\n              seenIds.add(id);\n              results.push({\n                ...row,\n                source: fromFts && fromSem ? \"semantic+fts\" : fromSem ? \"semantic\" : \"fts\",\n              });",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "path": "core/agent.ts",
+      "line": 566,
+      "end_line": 571,
+      "original_source": "    log(`  [agent] 7. 创建工具...`);\n    this._memorySearchTool = createMemorySearchTool(this._factStore, {\n      // 语义检索闭包：engine 解析 memory.embedding_model 并嵌入查询文本；\n      // 未配置时闭包返回 unavailable，工具侧显式走 FTS 单路并留痕。\n      embedQuery: (query: string) => this._embedMemoryQuery(query),\n    });",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "path": "core/agent.ts",
+      "line": 1057,
+      "end_line": 1065,
+      "original_source": "  /** search_memory 语义闭包：engine 侧解析 memory.embedding_model → 查询向量 + model_key */\n  async _embedMemoryQuery(query: string) {\n    const engine = this._cb?.getEngine?.();\n    if (typeof engine?.embedMemoryQuery !== \"function\") {\n      return { status: \"unavailable\", reason: \"no_model\" };\n    }\n    return engine.embedMemoryQuery(this.id, query);\n  }\n",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "path": "core/agent.ts",
+      "line": 590,
+      "end_line": 594,
+      "original_source": "    });\n    this._experienceTools = createExperienceTools(this.agentDir, {\n      isEnabled: () => this._experienceEnabled === true,\n    });\n",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "path": "core/agent.ts",
+      "line": 1184,
+      "end_line": 1204,
+      "original_source": "    const memoryEnabled = typeof forceMemoryEnabled === \"boolean\"\n      ? forceMemoryEnabled\n      : this.memoryEnabled;\n    const experienceEnabled = typeof forceExperienceEnabled === \"boolean\"\n      ? forceExperienceEnabled\n      : this.experienceEnabled;\n    const memTools = memoryEnabled ? [\n      this._memorySearchTool,\n      ...this._pinnedMemoryTools,\n      this._tenetProposeTool,\n    ].filter(Boolean) : [];\n    const experienceTools = experienceEnabled ? this._experienceTools : [];\n    const computerUseTools = this._isComputerUseCandidateForThisAgent()\n      ? [this._getComputerUseTool()]\n      : [];\n    const channelTools = (this._cb?.isChannelsEnabled?.() ?? false)\n      ? [this._channelTool]\n      : [];\n    const learnCfg = this._cb?.getLearnSkills?.() || this._config?.capabilities?.learn_skills || {};\n    const installSkillTools = learnCfg.enabled === true\n      ? [this._installSkillTool, this._learnLessonTool]",
+      "status": "SOURCE_ONLY"
+    }
+  ]
+}

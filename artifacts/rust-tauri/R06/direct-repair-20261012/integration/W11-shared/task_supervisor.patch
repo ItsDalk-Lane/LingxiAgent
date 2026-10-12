@@ -1,0 +1,91 @@
+diff --git a/rust/crates/lingxi-service/src/task_supervisor.rs b/rust/crates/lingxi-service/src/task_supervisor.rs
+index f63f54aef..290a83b09 100644
+--- a/rust/crates/lingxi-service/src/task_supervisor.rs
++++ b/rust/crates/lingxi-service/src/task_supervisor.rs
+@@ -275,6 +275,11 @@ impl TaskSupervisor {
+         self.cap
+     }
+ 
++    /// 阻塞收尾复用同一监督器的原清理期限。
++    pub(crate) fn cooperative_grace(&self) -> Duration {
++        self.cooperative_grace
++    }
++
+     fn register(
+         &self,
+         label: String,
+@@ -331,6 +336,22 @@ impl TaskSupervisor {
+         label: String,
+         fut: F,
+     ) -> Result<ChildHandle<F::Output>, SpawnRejected>
++    where
++        F: Future + Send + 'static,
++        F::Output: Send + 'static,
++    {
++        self.spawn_linked_with_settlement(run_id, scope, label, false, fut)
++    }
++
++    /// 已持久化计费意图的工具沿原取消树收尾，使用原清理期限而非脱离监督。
++    pub(crate) fn spawn_linked_with_settlement<F>(
++        self: &Arc<Self>,
++        run_id: &str,
++        scope: &CancelScope,
++        label: String,
++        settle_call: bool,
++        fut: F,
++    ) -> Result<ChildHandle<F::Output>, SpawnRejected>
+     where
+         F: Future + Send + 'static,
+         F::Output: Send + 'static,
+@@ -343,7 +364,7 @@ impl TaskSupervisor {
+         let grace = self.cooperative_grace;
+         let join = tokio::spawn(async move {
+             let mut fut = Box::pin(fut);
+-            if !matches!(kind, TaskKind::ChildRun) {
++            if !matches!(kind, TaskKind::ChildRun) && !settle_call {
+                 // CALL-level: the scope's cancellation drops the child at
+                 // its await point (biased — cancel wins ties).
+                 tokio::select! {
+@@ -416,6 +437,42 @@ impl TaskSupervisor {
+         })
+     }
+ 
++    /// 阻塞系统调用必须登记实际 closure；取消等待者不算物理作业退出。
++    /// 原 drain/abort 会如实保留无法确认项，只有 closure 真退出才记完成。
++    pub(crate) fn spawn_blocking_owned<T, F>(
++        self: &Arc<Self>,
++        run_id: Option<String>,
++        label: String,
++        work: F,
++    ) -> Result<ChildHandle<T>, SpawnRejected>
++    where
++        T: Send + 'static,
++        F: FnOnce() -> T + Send + 'static,
++    {
++        let kind = if run_id.is_some() {
++            TaskKind::ToolCall
++        } else {
++            TaskKind::Background
++        };
++        let (id, entry) = self.register(label, kind, run_id)?;
++        let (tx, rx) = tokio::sync::oneshot::channel();
++        let task_entry = Arc::clone(&entry);
++        let join = tokio::task::spawn_blocking(move || {
++            let exit = match std::panic::catch_unwind(std::panic::AssertUnwindSafe(work)) {
++                Ok(value) => SupervisedPoll::Completed(value),
++                Err(payload) => SupervisedPoll::Panicked(panic_message_of(&payload)),
++            };
++            deliver_supervised_exit(&task_entry, tx, exit);
++        });
++        *entry.handle.lock().unwrap_or_else(|p| p.into_inner()) = Some(join);
++        Ok(ChildHandle {
++            id,
++            entry,
++            supervisor: Arc::downgrade(self),
++            rx,
++        })
++    }
++
+     /// Spawns one DETACHED background task: supervised (owner = `None`,
+     /// recoverable handle, exit result) but linked to NO cancellation
+     /// scope — run cancellations never touch it (R03-A06). Panics are

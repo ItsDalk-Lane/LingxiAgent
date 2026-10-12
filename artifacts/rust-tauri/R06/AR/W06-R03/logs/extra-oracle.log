@@ -1,0 +1,45 @@
+{"command": ["node", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-oracle.mjs", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-v2-results.json", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-typed-results.json"], "start": 1791707485.001913, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-extra-oracle-njklwxgx", "guard": "8192MB/600s"}
+[
+  [ 'scalar-schema-extra', 'FAIL', undefined ],
+  [ 'dual-merge-tag-extra', 'PASS', undefined ],
+  [
+    'unknown-null-bad-extra',
+    'PASS',
+    'YAMLException: cannot resolve a node with !<tag:yaml.org,2002:null> explicit tag (2:21)\n' +
+      '\n' +
+      ' 1 | memory: {enabled: false}\n' +
+      ' 2 | future: !!null wrong\n' +
+      '-------------------------^'
+  ],
+  [
+    'unknown-bool-bad-extra',
+    'PASS',
+    'YAMLException: cannot resolve a node with !<tag:yaml.org,2002:bool> explicit tag (2:19)\n' +
+      '\n' +
+      ' 1 | memory: {enabled: false}\n' +
+      ' 2 | future: !!bool YES\n' +
+      '-----------------------^'
+  ],
+  [ 'redefined-anchor-extra', 'PASS', undefined ]
+]
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert(rows.every(r=>r.status==='PASS'))
+
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-oracle.mjs:23:215
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:633:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.16.0

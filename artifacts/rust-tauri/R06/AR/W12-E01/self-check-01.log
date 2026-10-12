@@ -1,0 +1,73 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.59s
+     Running tests/r06_ar_f12_cache_preservation.rs (rust/target/debug/deps/r06_ar_f12_cache_preservation-12406c3bb45b46a5)
+
+running 12 tests
+test c02_io_child ... ok
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/reset-27132-1791696263337999000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/permission-27132-1791696263337866000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/io-limit-27132-1791696263337882000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/active-27132-1791696263337964000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/locked-27132-1791696263337876000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/future-wal-27132-1791696263337838000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/positive-27132-1791696263338344000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/knowledge_index.db-27132-1791696263337862000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/unowned-27132-1791696263337943000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/symlink-27132-1791696263337839000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/quarantine-27132-1791696263338045000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/sentinel-27132-1791696263339814000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/hardlink-27132-1791696263341783000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/sentinel-27132-1791696263341997000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/wal-corrupt-27132-1791696263343170000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/symlink-27132-1791696263343759000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/sentinel-27132-1791696263344573000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/hardlink-27132-1791696263345796000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/sentinel-27132-1791696263346056000
+test adversarial_symlink_and_hardlink_never_touch_external_target ... ok
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/knowledge_vector.db-27132-1791696263348000000
+test c01_future_schema_preserves_sentinel_in_both_caches ... ok
+
+thread 'c04_active_production_store_blocks_corruption_quarantine' (2223422) panicked at crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:219:42:
+called `Result::unwrap_err()` on an `Ok` value: ()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test c04_active_production_store_blocks_corruption_quarantine ... FAILED
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/future-wal-27132-1791696263425594000
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/permission-27132-1791696263427923000
+test reset_and_delete_artifact_keep_live_inode_and_other_source_index ... ok
+I/O child status=exit status: 0 stdout=
+running 1 test
+test c02_io_child ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.00s
+
+ stderr=
+
+thread 'c03_unknown_corruption_and_wal_never_auto_rebuild' (2223421) panicked at crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:204:44:
+called `Result::unwrap_err()` on an `Ok` value: ()
+test c03_unknown_corruption_and_wal_never_auto_rebuild ... FAILED
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/io-limit-27132-1791696263468949000
+test c01_future_wal_live_writer_preserves_all_bytes ... ok
+test positive_normal_cache_open_and_reopen ... ok
+test c02_permission_errors_preserve_cache ... ok
+I/O child status=exit status: 0 stdout=
+running 1 test
+test c02_io_child ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.00s
+
+ stderr=
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/quarantine-27132-1791696263517221000
+test c02_actual_io_limit_preserves_original ... ok
+test c03_owned_corruption_quarantines_only_one_cache_and_preserves_sources_and_vectors ... ok
+synthetic knowledge root=/tmp/lingxi-w12-new-RAjA43/locked-27132-1791696268759001000
+test c02_sqlite_exclusive_lock_refuses_without_removal ... ok
+
+failures:
+
+failures:
+    c03_unknown_corruption_and_wal_never_auto_rebuild
+    c04_active_production_store_blocks_corruption_quarantine
+
+test result: FAILED. 10 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.84s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r06_ar_f12_cache_preservation`

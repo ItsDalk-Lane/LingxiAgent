@@ -1,0 +1,29 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "codex-responses",
+  "case": "clean-payload-passes-through",
+  "model": {
+    "provider": "openai-codex",
+    "id": "gpt-5.3-codex",
+    "baseUrl": "https://chatgpt.com/backend-api",
+    "api": "openai-codex-responses"
+  },
+  "payload": {
+    "model": "gpt-5.3-codex",
+    "input": [],
+    "store": false
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": null,
+    "reasoningProfile": null,
+    "matched": "codex-responses",
+    "result": {
+      "model": "gpt-5.3-codex",
+      "input": [],
+      "store": false
+    }
+  }
+}

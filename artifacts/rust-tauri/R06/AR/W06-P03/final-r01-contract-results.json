@@ -1,0 +1,280 @@
+{
+  "status": "PASS",
+  "case_count": 16,
+  "records": [
+    {
+      "source": "probe-results.json",
+      "case": "merge-sequence",
+      "expected": {
+        "flags_status": 200,
+        "terminal": "completed",
+        "wire_count": 1,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 200,
+        "terminal": "completed",
+        "wire_count": 1,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "probe-results.json",
+      "case": "explicit-bool",
+      "expected": {
+        "flags_status": 200,
+        "terminal": "completed",
+        "wire_count": 1,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 200,
+        "terminal": "completed",
+        "wire_count": 1,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "probe-results.json",
+      "case": "quoted-key",
+      "expected": {
+        "flags_status": 200,
+        "terminal": "completed",
+        "wire_count": 1,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 200,
+        "terminal": "completed",
+        "wire_count": 1,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "probe-results.json",
+      "case": "nonstring-root-key",
+      "expected": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "probe-results.json",
+      "case": "nonstring-sensitive-key",
+      "expected": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "probe-results.json",
+      "case": "invalid-merge",
+      "expected": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "probe-results.json",
+      "case": "typed-string-bool",
+      "expected": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "probe-results.json",
+      "case": "unknown-retain",
+      "expected": {
+        "flags_status": 200,
+        "terminal": "completed",
+        "wire_count": 1,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 200,
+        "terminal": "completed",
+        "wire_count": 1,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "family-probe-results.json",
+      "case": "complex-agent-key",
+      "expected": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "family-probe-results.json",
+      "case": "complex-name-key",
+      "expected": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "family-probe-results.json",
+      "case": "complex-discovery-key",
+      "expected": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "family-probe-results.json",
+      "case": "canonical-duplicate",
+      "expected": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "effects-probe-results.json",
+      "case": "orphan-block-control",
+      "expected": {
+        "flags_status": 200,
+        "terminal": "completed",
+        "wire_count": 1,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 200,
+        "terminal": "completed",
+        "wire_count": 1,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "effects-probe-results.json",
+      "case": "orphan-complex-peer",
+      "expected": {
+        "flags_status": 200,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 200,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "effects-probe-results.json",
+      "case": "project-block-control",
+      "expected": {
+        "flags_status": 200,
+        "terminal": "completed",
+        "wire_count": 1,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 200,
+        "terminal": "completed",
+        "wire_count": 1,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "source": "effects-probe-results.json",
+      "case": "project-complex-key",
+      "expected": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "actual": {
+        "flags_status": 400,
+        "terminal": "failed",
+        "wire_count": 0,
+        "config_unchanged": true
+      },
+      "status": "PASS"
+    }
+  ],
+  "contract": "复杂敏感键明确拒绝；旧脚本的默认值匹配标记只保留原始历史，不作为当前正确性的判据。真实配置、HTTP、wire、SQLite终态均逐项对账。",
+  "mock_boundary": "仅外部模型loopback，业务入口不mock"
+}

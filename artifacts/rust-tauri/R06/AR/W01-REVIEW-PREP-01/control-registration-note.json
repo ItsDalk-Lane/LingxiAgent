@@ -1,0 +1,7 @@
+{
+  "role": "ROOT_CONTROL_PREPARATION",
+  "initial_attempt": "TypeError list indexed with str; no file written",
+  "correction": "use existing list schema and append work_id entry",
+  "product_test": "NOT_RUN",
+  "reviewer": "NOT_CREATED"
+}

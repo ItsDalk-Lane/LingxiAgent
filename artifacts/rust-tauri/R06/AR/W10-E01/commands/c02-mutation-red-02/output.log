@@ -1,0 +1,23 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.32s
+     Running tests/r06_ar_w10_embedding_identity.rs (rust/target/debug/deps/r06_ar_w10_embedding_identity-a492dffe06646973)
+LINGXI_TEST_GUARD: armed (pid 27900, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+W10 c02: 原始请求与数据库收据已写入独立证据
+
+thread 'c02_same_dimension_reload_never_poisons_first_variant' (3857390) panicked at crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs:485:5:
+assertion `left == right` failed: changed space must refuse old build
+  left: String("done")
+ right: "failed"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test c02_same_dimension_reload_never_poisons_first_variant ... FAILED
+
+failures:
+
+failures:
+    c02_same_dimension_reload_never_poisons_first_variant
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.47s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_w10_embedding_identity`

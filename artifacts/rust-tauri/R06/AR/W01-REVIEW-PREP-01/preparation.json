@@ -1,0 +1,15 @@
+{
+  "role": "ROOT_PREPARATION_NOT_REVIEW_VERDICT",
+  "time_utc": "2026-10-11T07:57:53.769602+00:00",
+  "work_id": "R06-AR-W01",
+  "workspace": "/Users/study_superior/.codex/worktrees/r06-w02-baseline/LingxiAgent",
+  "reused_attachment": "unused clean r06-w02-baseline, no prior product or AR evidence",
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "product_candidate": "NOT_COPIED_PENDING_EXECUTOR_FREEZE",
+  "reviewer": "NOT_CREATED",
+  "owned_target_exists": false,
+  "owned_target_not_symlink": true,
+  "original_lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "protected_settings": "NOT_COPIED",
+  "blocked_W02_W12_review_retry": false
+}

@@ -1,0 +1,1331 @@
+[
+  {
+    "command": "old-service-01",
+    "test_pids": [
+      "20360",
+      "20361",
+      "24926"
+    ],
+    "actual_synthetic_roots": [
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13scope-24926-1791715947123864000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13scope-24926-1791715947123864000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13scope-24926-1791715947123864000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13scope-24926-1791715947123864000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13scope-24926-1791715947123864000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-noresearch-20361-1791715835506053000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-noresearch-20361-1791715835506053000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-noresearch-20361-1791715835506053000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-noresearch-20361-1791715835506053000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-noresearch-20361-1791715835506053000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-fileimport-bin-20361-1791715794940998000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13inject-24926-1791716027383286000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13inject-24926-1791716027383286000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13inject-24926-1791716027383286000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13inject-24926-1791716027383286000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13inject-24926-1791716027383286000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-manage-cfg-24926-1791716087654943000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-crud-20361-1791715835329431000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-crud-20361-1791715835329431000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-crud-20361-1791715835329431000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-crud-20361-1791715835329431000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-crud-20361-1791715835329431000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06ops-chain-products-20360-10",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06ops-c12b-products-20360-8",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-readgrep-cfg-24926-1791716168116885000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06ops-chain-products-20360-4",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-scopeviol-cfg-24926-1791716228384464000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13scope-cfg-24926-1791715947124554000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06ops-c03-20360-2",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-a14-b-cfg-20361-1791715754737995000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-ingest-20361-1791715794949264000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-ingest-20361-1791715794949264000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-ingest-20361-1791715794949264000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-ingest-20361-1791715794949264000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-ingest-20361-1791715794949264000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13cite-24926-1791715876789119000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13cite-24926-1791715876789119000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13cite-24926-1791715876789119000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13cite-24926-1791715876789119000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13cite-24926-1791715876789119000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-ingest-cfg-20361-1791715794949616000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06ops-chain-rt-20360-0",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-pending-b-cfg-20361-1791715815139176000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06ops-chain-rt-20360-9",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06ops-chain-products-20360-12",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-scopeviol-24926-1791716228383776000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-scopeviol-24926-1791716228383776000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-scopeviol-24926-1791716228383776000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-scopeviol-24926-1791716228383776000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-scopeviol-24926-1791716228383776000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-a14-a-cfg-20361-1791715734471933000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-pending-20361-1791715815049828000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-pending-20361-1791715815049828000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-pending-20361-1791715815049828000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-pending-20361-1791715815049828000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-pending-20361-1791715815049828000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-fileimport-20361-1791715794882509000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-fileimport-20361-1791715794882509000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-fileimport-20361-1791715794882509000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-fileimport-20361-1791715794882509000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-fileimport-20361-1791715794882509000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-semantics-20361-1791715835426946000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-semantics-20361-1791715835426946000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-semantics-20361-1791715835426946000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-semantics-20361-1791715835426946000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-settings-20361-1791715835575367000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-settings-20361-1791715835575367000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-settings-20361-1791715835575367000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-settings-20361-1791715835575367000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-settings-20361-1791715835575367000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-a14-20361-1791715734470265000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-a14-20361-1791715734470265000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-a14-20361-1791715734470265000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-a14-20361-1791715734470265000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-a14-20361-1791715734470265000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-citation-20361-1791715794812124000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-citation-20361-1791715794812124000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-citation-20361-1791715794812124000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-citation-20361-1791715794812124000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-citation-20361-1791715794812124000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-freeze-20361-1791715875931004000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-freeze-20361-1791715875931004000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-freeze-20361-1791715875931004000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-freeze-20361-1791715875931004000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06ops-chain-products-20360-1",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-fileimport-docs-20361-1791715794941566000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06ops-chain-products-20360-6",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06ops-chain-rt-20360-11",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-snapshot-20361-1791715875863398000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-snapshot-20361-1791715875863398000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-snapshot-20361-1791715875863398000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-snapshot-20361-1791715875863398000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-snapshot-20361-1791715875863398000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13cite-cfg-24926-1791715876790792000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-a13inject-cfg-24926-1791716027383591000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-knowledge-settings-cfg-20361-1791715835575710000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-manage-24926-1791716087654638000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-manage-24926-1791716087654638000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-manage-24926-1791716087654638000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-manage-24926-1791716087654638000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-manage-24926-1791716087654638000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06ops-chain-rt-20360-5",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06ops-c12b-rt-20360-7",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06ops-chain-rt-20360-3",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": []
+      },
+      {
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-readgrep-24926-1791716168116249000",
+        "classification": "LOCAL_ONLY_NEVER_GIT_SYNTHETIC_OWNED_TEMP_HOME",
+        "dbs": [
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-readgrep-24926-1791716168116249000/knowledge/knowledge.db",
+            "user_version": 1,
+            "tables": [
+              "notebooks",
+              "notebook_config",
+              "sources",
+              "notebook_sources",
+              "content_snapshots",
+              "parse_artifacts",
+              "knowledge_blocks",
+              "knowledge_citations",
+              "ingestion_jobs",
+              "knowledge_turn_scopes",
+              "knowledge_turn_scope_sources"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-readgrep-24926-1791716168116249000/knowledge/knowledge_index.db",
+            "user_version": 1,
+            "tables": [
+              "chunk_index_variants",
+              "knowledge_chunks",
+              "knowledge_chunks_fts",
+              "knowledge_chunks_fts_data",
+              "knowledge_chunks_fts_idx",
+              "knowledge_chunks_fts_docsize",
+              "knowledge_chunks_fts_config",
+              "knowledge_sections"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-readgrep-24926-1791716168116249000/knowledge/knowledge_vector.db",
+            "user_version": 1,
+            "tables": [
+              "vector_index_variants",
+              "chunk_vectors"
+            ]
+          },
+          {
+            "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06t07-ktools-readgrep-24926-1791716168116249000/lingxi-service/data/runs.db",
+            "user_version": 9,
+            "tables": [
+              "schema_migrations",
+              "sessions",
+              "runs",
+              "run_attempts",
+              "invocations",
+              "key_events",
+              "stale_result_audit",
+              "sqlite_sequence",
+              "invocation_journal",
+              "run_lineage",
+              "model_call_usage",
+              "session_branch_heads",
+              "checkpoints",
+              "checkpoint_file_versions",
+              "file_checkpoints",
+              "messages",
+              "session_files",
+              "session_file_aliases",
+              "session_file_refs",
+              "file_history_snapshots"
+            ]
+          }
+        ]
+      }
+    ],
+    "environment_boundary": "Incumbent tests build explicit ServiceConfig.data_home from OS temp_dir and HomeSource::Cli; external LINGXI_HOME is not the effective data_home. Source and actual DB paths match. No real user home. No READY log manufactured; startup uses actual run ready channel."
+  },
+  {
+    "command": "old-adapters-01",
+    "test_pids": [
+      "24271",
+      "24272"
+    ],
+    "actual_synthetic_roots": [],
+    "environment_boundary": "Incumbent tests build explicit ServiceConfig.data_home from OS temp_dir and HomeSource::Cli; external LINGXI_HOME is not the effective data_home. Source and actual DB paths match. No real user home. No READY log manufactured; startup uses actual run ready channel."
+  }
+]

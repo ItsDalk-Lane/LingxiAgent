@@ -1,0 +1,7 @@
+{"command": ["python3", "artifacts/rust-tauri/R06/AR/W06-P02/effects-probe-v2.py"], "start": 1791701719.790696, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-red-effects-nz7yk711", "guard": "8192MB/600s"}
+orphan-block-control True 200 ('completed', 'completed.with_final')
+orphan-complex-peer True 200 ('failed', 'failed.provider_error')
+project-block-control True 200 ('completed', 'completed.with_final')
+project-complex-key True 400 ('failed', 'failed.provider_error')
+project-literal-merge True 200 ('completed', 'completed.with_final')
+orphan-literal-peer True 200 ('completed', 'completed.with_final')

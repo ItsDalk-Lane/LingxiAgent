@@ -1,0 +1,9 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/own.git/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.59s
+     Running tests/cancel_link_inheritance.rs (/private/tmp/lingxi-r06-ar-w15-e01-20261012T065826/target/debug/deps/cancel_link_inheritance-08448da4c28c598d)
+LINGXI_TEST_GUARD: armed (pid 70489, mem_limit=8192 MB, time_limit=600 s)
+
+thread 'subagent_timeout_settles_a_parked_quota_wait' (9307327) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:387:9:
+timed out waiting for the child queues behind the parked parent turn
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p lingxi-service --test cancel_link_inheritance`

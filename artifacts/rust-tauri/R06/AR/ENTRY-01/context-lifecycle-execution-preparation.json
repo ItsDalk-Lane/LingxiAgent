@@ -1,0 +1,37 @@
+{
+  "time_utc": "2026-10-11T08:35:04.895307+00:00",
+  "role": "ROOT_READ_ONLY_PREPARATION_NOT_TEST_OR_FIX",
+  "work_id": "R06-AR-W05",
+  "status": "SOURCE_CONFIRMED_F05_RUNTIME_FAILURE_HISTORICAL_OWNER_OPEN",
+  "source_sha256": "f9966fc1ce49e81c2717f85208844182eb8caf34eb6e68cd002adb11ecc258b0",
+  "entry_paths": [
+    "context_compiler.rs:807 compiled_for_run",
+    "runs.rs:1166 drive_run context compilation",
+    "lib.rs:4486 prompt observation",
+    "context_compiler.rs:799 set_skill_materials",
+    "memory.rs and skills.rs mutations",
+    "persona.rs mutation and per-agent profile files",
+    "session_admin/session_tree lifecycle/delete"
+  ],
+  "facts": [
+    "cache key(sessionId,forSubagent) lacks principal/Agent/run/config-generation/material fingerprint",
+    "cache hit skips current gather, skill catalog and parse validation",
+    "cache has no current cap/eviction/delete invalidation",
+    "observation picks latest cached main/subagent shape with no actual run generation binding"
+  ],
+  "required_real_checks": [
+    "same session Run1 -> memory/persona/Skills change -> Run2 actual provider prompt and observation; Run1 snapshot immutable",
+    "Agent/subject boundary and two same session labels in independent homes",
+    "restarted request shares lifecycle deadline and proper compilation failure does not reuse stale acceptable prompt",
+    "many sessions/deletion/tombstones bounded cache/read-only rejected leakage",
+    "full original compiler identity/digest/context segments A01/A02 retained, original session-freeze test may need genuine lifecycle-contract alignment with stronger dynamic-current-Run checks"
+  ],
+  "previous_runtime_red": "artifacts/rust-tauri/R06/AR/W06-P02/initial-four-c-01.json",
+  "related_open": [
+    "F06 parser/read-save semantics independently failing R03; cache repair cannot waive parser type errors",
+    "F01 restored prior model history must retain each Run context timing rather than substitute current compiled prompt for old snapshot",
+    "F07 dynamic tool declaration and F13 knowledgeSources current scoped changes need real nextRun snapshot integration",
+    "full original leaves remain required; template registration not complete evidence"
+  ],
+  "execution_state": "NOT_DISPATCHED_NO_PRODUCT_CHANGE"
+}

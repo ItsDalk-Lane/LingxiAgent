@@ -1,0 +1,75 @@
+{"command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-adapters", "--test", "r06_ar_f06_config_preservation", "--no-run"], "start": 1791704428.160131, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-compile-node-01-x7hqme3l", "guard": "8192MB/600s"}
+   Compiling serde_core v1.0.229
+   Compiling tokio v1.53.1
+   Compiling serde v1.0.229
+   Compiling memchr v2.8.3
+   Compiling indexmap v2.14.2
+   Compiling tracing-core v0.1.36
+   Compiling rustls v0.23.45
+   Compiling futures-task v0.3.34
+   Compiling serde_json v1.0.151
+   Compiling tracing v0.1.44
+   Compiling futures-util v0.3.34
+   Compiling digest v0.11.3
+   Compiling futures-channel v0.3.34
+   Compiling sha2 v0.11.0
+   Compiling sha1 v0.11.0
+   Compiling aho-corasick v1.1.5
+   Compiling log v0.4.34
+   Compiling regex-automata v0.4.18
+   Compiling serde-saphyr v1.3.0
+   Compiling tokio-util v0.7.19
+   Compiling tower v0.5.3
+   Compiling h2 v0.4.19
+   Compiling tower-http v0.6.11
+   Compiling serde_urlencoded v0.7.1
+   Compiling schemars v1.2.2
+   Compiling regex v1.13.1
+   Compiling tokio-rustls v0.26.5
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling serde_yaml_ng v0.10.0
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling hyper v1.11.1
+   Compiling hyper-util v0.1.21
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.13.5
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+error: expected type, found keyword `static`
+   --> crates/lingxi-adapters/src/storage/agent_config.rs:167:55
+    |
+167 |     Scalar { key: Option<String>, merge: bool, kind: &static str },
+    |     ------ while parsing this struct                  ^^^^^^ expected type
+
+error: expected `}`, found `,`
+   --> crates/lingxi-adapters/src/storage/agent_config.rs:271:19
+    |
+271 |                 ..,
+    |                 --^
+    |                 | |
+    |                 | expected `}`
+    |                 | help: remove this comma
+    |                 `..` must be at the end and cannot have a trailing comma
+
+error[E0308]: mismatched types
+   --> crates/lingxi-adapters/src/storage/agent_config.rs:191:55
+    |
+191 |                 let kind = scalar_kind(&value, style, tag.as_ref())?;
+    |                            -----------                ^^^^^^^^^^^^ expected `Option<&Tag>`, found `Option<&Cow<'_, Tag>>`
+    |                            |
+    |                            arguments to this function are incorrect
+    |
+    = note: expected enum `std::option::Option<&granit_parser::Tag>`
+               found enum `std::option::Option<&Cow<'_, granit_parser::Tag>>`
+note: function defined here
+   --> crates/lingxi-adapters/src/storage/agent_config.rs:316:4
+    |
+316 | fn scalar_kind(value:&str,style:ScalarStyle,tag:Option<&granit_parser::Tag>)->Result<&'static str,MemoryError> {
+    |    ^^^^^^^^^^^                              -------------------------------
+help: try using `.map(|v| &**v)` to convert `std::option::Option<&Cow<'_, granit_parser::Tag>>` to `std::option::Option<&granit_parser::Tag>`
+    |
+191 |                 let kind = scalar_kind(&value, style, tag.as_ref().map(|v| &**v))?;
+    |                                                                   ++++++++++++++
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `lingxi-adapters` (lib) due to 3 previous errors

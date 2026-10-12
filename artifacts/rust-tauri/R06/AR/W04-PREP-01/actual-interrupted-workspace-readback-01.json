@@ -1,0 +1,37 @@
+{
+  "at": "2026-10-12T00:31:48.931469+00:00",
+  "id": "R06-W04-ACTUAL-INTERRUPTED-WORKSPACE-READBACK-01",
+  "role": "ROOT_READ_ONLY_EXISTING_ACTUAL_WINDOW",
+  "source_record": "/private/tmp/lingxi-r06-w04-evidence-01/logs/final-workspace-regression-01.json",
+  "source_record_sha256": "0c0758a974a66e1ac3da961f7b2b7d933d964cb57e123d6a6661044dcd92fe7b",
+  "source_log_sha256": "b5654bf1aadd539bb004399664a10513cfb85e7966e66f63571b8cd3f3dddaf1",
+  "exit_code": -15,
+  "elapsed_seconds": 659.5041198730469,
+  "breach": "actual child PID600/8192 guard breach 30270",
+  "controller_budget_secs": 2700,
+  "actual_child_business_guard": {
+    "command": "/private/tmp/lingxi-r06-w04-target-01/debug/deps/late_result_fence-b1ac2f3978f180b9",
+    "first_seen": 1791764310.512501,
+    "rss_peak_kib": 29360,
+    "samples": 1880,
+    "limit_secs": 600,
+    "limit_mib": 8192,
+    "actual_executable_first_seen_sha256": "1e61fb0646e6d5f6eed26da8c0033f43f820133cc4bb66dd09ea66df3c85a863",
+    "actual_executable_after_sha256": "1e61fb0646e6d5f6eed26da8c0033f43f820133cc4bb66dd09ea66df3c85a863"
+  },
+  "source_before_after_equal": true,
+  "completed_result_summaries": 59,
+  "actual_completed_failure_lines": [
+    "test duplicate_out_of_order_and_delayed_results_fence_exactly_once ... FAILED",
+    "test v9_is_the_supported_tip_with_expected_name ... FAILED",
+    "test v7_to_v9_chain_preserves_prior_data_and_creates_new_tables ... FAILED",
+    "test subagent_timeout_settles_a_parked_quota_wait ... FAILED",
+    "test approval_wait_round_trips_approve_and_reject_legs ... FAILED",
+    "test panicking_tool_child_is_supervised_and_the_run_settles_loudly ... FAILED",
+    "test r03_a07_driver_fences_stale_tagged_model_result_loudly ... FAILED"
+  ],
+  "status": "ACTUAL_GUARD_TERMINATED_INCOMPLETE_NOT_PASS",
+  "new_source_change_requires_rerun": true,
+  "acceptance": "NONE",
+  "R07_started": false
+}

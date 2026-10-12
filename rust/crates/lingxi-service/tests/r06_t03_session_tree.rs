@@ -70,6 +70,18 @@ impl TurnProviderPort for ScriptedProvider {
         _input: &'a ModelTurnInput,
         _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        if let Ok(root) = std::env::var("LINGXI_W03_EVIDENCE") {
+            use std::io::Write as _;
+            let mut evidence = std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(PathBuf::from(root).join(format!(
+                    "original-t03-provider-{}.jsonl",
+                    std::process::id()
+                )))
+                .unwrap();
+            writeln!(evidence,"{}",serde_json::json!({"call_id":call.to_string(),"input_submission":_input.submission,"input_system_prompt":_input.system_prompt,"input_turn":_input.turn,"full_actual_provider_input_debug":format!("{_input:?}")})).unwrap();
+        }
         let step = self.script.lock().unwrap().pop_front();
         let ctx_at_issue = ctx.clone();
         let call_id = call.to_string();
@@ -128,6 +140,9 @@ fn synthetic_home(tag: &str) -> PathBuf {
 async fn start_server(tag: &str, provider: Arc<ScriptedProvider>) -> TestServer {
     let home = synthetic_home(tag);
     let layout = prepare_layout(&home).expect("prepare layout");
+    let home = home.canonicalize().unwrap();
+    let workspace = home.join("workspace");
+    std::fs::create_dir_all(&workspace).unwrap();
     let config = ServiceConfig {
         bind_addr: "127.0.0.1:0".parse().expect("static loopback addr"),
         data_home: home.clone(),
@@ -140,6 +155,7 @@ async fn start_server(tag: &str, provider: Arc<ScriptedProvider>) -> TestServer 
         &layout,
         ServiceDeps {
             turn_provider: Some(provider as Arc<dyn TurnProviderPort>),
+            workspace_root: Some(workspace),
             ..ServiceDeps::default()
         },
     )
@@ -166,6 +182,10 @@ async fn start_server(tag: &str, provider: Arc<ScriptedProvider>) -> TestServer 
         Ok(addr) => addr,
         Err(err) => panic!("readiness: {err}; service result: {:?}", handle.await),
     };
+    if let Ok(root) = std::env::var("LINGXI_W03_EVIDENCE") {
+        std::fs::write(PathBuf::from(root).join(format!("original-t03-ready-{}.json",addr.port())),
+            serde_json::to_vec_pretty(&serde_json::json!({"case_tag":tag,"actual_home":home,"home_source":"Cli","ready_address":addr.to_string(),"actual_db":state.storage().db_path(),"provider_boundary":"确定性响应替身；原生产 Run 与 SQLite 未替换"})).unwrap()).unwrap();
+    }
     TestServer {
         addr,
         home,
@@ -188,7 +208,12 @@ impl TestServer {
             .expect("server shuts down within timeout")
             .expect("server task join")
             .expect("clean serve result");
-        let _ = std::fs::remove_dir_all(&self.home);
+        if let Ok(root) = std::env::var("LINGXI_W03_EVIDENCE") {
+            std::fs::write(PathBuf::from(root).join(format!("original-t03-exit-{}.json",self.addr.port())),
+                serde_json::to_vec_pretty(&serde_json::json!({"actual_home":self.home,"actual_db":self.state.storage().db_path(),"actual_serve_task_exited":true,"home_retained_local_only":true})).unwrap()).unwrap();
+        } else {
+            let _ = std::fs::remove_dir_all(&self.home);
+        }
     }
 
     async fn post(&self, path: &str, body: &str) -> (u16, String) {
@@ -363,6 +388,46 @@ async fn create_session(server: &TestServer, session_id: &str, title: &str) {
     assert_eq!(status, 201, "create session {session_id}: {body}");
 }
 
+// 内部全链必须包含专档；逐字段验证，不能用过滤隐藏复制或重绑错误。
+async fn assert_model_archive(
+    server: &TestServer,
+    session: &str,
+    source_session: &str,
+    run: &str,
+) -> serde_json::Value {
+    let rows =
+        lingxi_adapters::storage::session_tree::list_all_messages(server.state.storage(), session)
+            .await
+            .unwrap();
+    let row = rows
+        .iter()
+        .find(|row| row.message_id == format!("model-history:{run}:1"))
+        .expect("完整模型档案");
+    assert_eq!(row.entry_type, "lingxi-model-exchange-v1");
+    assert_eq!(row.run_id, None, "专档不持有源Run删除外键");
+    let mut body: serde_json::Value = serde_json::from_str(&row.content_json).unwrap();
+    assert_eq!(body["schema"], "lingxi-model-exchange-v1");
+    assert_eq!(body["sourceRun"], run);
+    assert_eq!(body["sourceSession"], source_session);
+    assert_eq!(body["boundSession"], session);
+    let session_row =
+        lingxi_adapters::storage::session_tree::get_session_row(server.state.storage(), session)
+            .await
+            .unwrap()
+            .unwrap();
+    assert_eq!(body["owner"], session_row.owner_user_id);
+    let facts = server.state.storage().query_one_text("SELECT json_object('kind',owner_kind,'subject',owner_subject) FROM runs WHERE run_id=?1", vec![run.into()]).await.unwrap().unwrap();
+    let facts: serde_json::Value = serde_json::from_str(&facts).unwrap();
+    assert_eq!(body["actorKind"], facts["kind"]);
+    assert_eq!(body["actorSubject"], facts["subject"]);
+    let digest = body.as_object_mut().unwrap().remove("digest").unwrap();
+    assert_eq!(
+        digest,
+        lingxi_protocol::canon::sha256_hex(&lingxi_protocol::canon::canonical_json_bytes(&body))
+    );
+    body
+}
+
 // ──────────────────────────────────────────── A05：fork 不串写
 
 #[tokio::test]
@@ -384,11 +449,13 @@ async fn fork_copies_history_with_stable_ids_and_writes_stay_independent() {
         before,
         vec![
             format!("user:{run1}"),
+            format!("model-history:{run1}:1"),
             format!("{run1}-final"),
             format!("user:{}", _run2),
+            format!("model-history:{_run2}:1"),
             format!("{_run2}-final"),
         ],
-        "两轮后分支 = user1/final1/user2/final2"
+        "两轮后内部全分支 = user1/archive1/final1/user2/archive2/final2"
     );
 
     // 在 final1 处 fork（fork 点 = 边界消息）。
@@ -413,10 +480,26 @@ async fn fork_copies_history_with_stable_ids_and_writes_stay_independent() {
     let forked = server.branch_ids("fork_sess").await;
     assert_eq!(
         forked,
-        vec![format!("user:{run1}"), fork_point.clone()],
+        vec![
+            format!("user:{run1}"),
+            format!("model-history:{run1}:1"),
+            fork_point.clone()
+        ],
         "fork 复制 root→boundary 且保留消息 ID（createBranchedSession）"
     );
 
+    let source_archive = assert_model_archive(&server, "src_sess", "src_sess", &run1).await;
+    let mut fork_archive = assert_model_archive(&server, "fork_sess", "src_sess", &run1).await;
+    fork_archive["boundSession"] = serde_json::json!("src_sess");
+    assert_eq!(
+        source_archive, fork_archive,
+        "fork仅精确重绑会话，原主体/模型payload保留"
+    );
+    assert_model_archive(&server, "src_sess", "src_sess", &_run2).await;
+    assert!(
+        !forked.contains(&format!("model-history:{_run2}:1")),
+        "fork不能复制源后缀专档"
+    );
     // 各自追加：源写 run_a3、fork 写 run_b1，互不可见。
     let run_a3 = server.execute("src_sess", "q3").await;
     let run_b1 = server.execute("fork_sess", "b1").await;
@@ -609,9 +692,20 @@ async fn retry_resets_branch_and_new_run_never_overwrites_old() {
     let branch = server.branch_ids("s").await;
     assert_eq!(
         branch,
-        vec![format!("user:{run1}"), format!("{run1}-final"), marker_id],
+        vec![
+            format!("user:{run1}"),
+            format!("model-history:{run1}:1"),
+            format!("{run1}-final"),
+            marker_id
+        ],
         "重置后分支 = 保留段 + reset 标记"
     );
+    assert_model_archive(&server, "s", "s", &run1).await;
+    assert!(
+        !branch.contains(&format!("model-history:{run2}:1")),
+        "retry不能恢复被移除后缀专档"
+    );
+    assert_model_archive(&server, "s", "s", &run2).await;
     let all =
         lingxi_adapters::storage::session_tree::list_all_messages(server.state.storage(), "s")
             .await
@@ -702,7 +796,7 @@ async fn retry_file_rollback_contract_matches_incumbent() {
         ScriptStep::Final("a3".into()),
     ]);
     let server = start_server("retry-rollback", provider).await;
-    let work = synthetic_home("retry-rollback-files");
+    let work = server.home.join("workspace").join("retry-rollback-files");
     std::fs::create_dir_all(&work).unwrap();
     let work = std::fs::canonicalize(&work).unwrap();
     let file_w = work.join("w.txt");
@@ -771,7 +865,7 @@ async fn retry_file_rollback_contract_matches_incumbent() {
     // 重提交为 run3，然后建两个检查点：cp-old 记录 w=v-before；系统侧把 w
     // 改成 v-after-model 并把 x=x1 一起被 cp-new 见证（同回合输入锚点）。
     let run3 = server.execute("s", "q2").await;
-    std::fs::write(&file_w, "v-before").unwrap();
+    app_write(&server, "s", &file_w, "v-before").await;
     let (status, body) = server
         .post(
             "/lingxi/v1/sessions/s/checkpoints",
@@ -784,7 +878,7 @@ async fn retry_file_rollback_contract_matches_incumbent() {
         )
         .await;
     assert_eq!(status, 200, "cp-old: {body}");
-    std::fs::write(&file_w, "v-after-model").unwrap();
+    app_write(&server, "s", &file_w, "v-after-model").await;
     std::fs::write(&file_x, "x1").unwrap();
     let (status, body) = server
         .post(
@@ -800,7 +894,7 @@ async fn retry_file_rollback_contract_matches_incumbent() {
     assert_eq!(status, 200, "cp-new: {body}");
 
     // w 回到见证过的旧版本（restored 输入）；x 被外部修改（conflicted）。
-    std::fs::write(&file_w, "v-before").unwrap();
+    app_write(&server, "s", &file_w, "v-before").await;
     std::fs::write(&file_x, "x-user-edit").unwrap();
     let (status, body) = server
         .post(
@@ -848,7 +942,9 @@ async fn retry_file_rollback_contract_matches_incumbent() {
         "retry 分支重置不受文件冲突影响"
     );
 
-    let _ = std::fs::remove_dir_all(&work);
+    if std::env::var_os("LINGXI_W03_EVIDENCE").is_none() {
+        let _ = std::fs::remove_dir_all(&work);
+    }
     server.stop_and_clean().await;
 }
 
@@ -869,7 +965,7 @@ async fn rewind_restores_content_with_per_file_verdicts_and_branch_rewinds() {
     let server = start_server("rewind-a06", provider).await;
 
     // ── 场景 1：外部修改 → conflicted，用户文件保留，分支照常回移。
-    let work1 = synthetic_home("rewind-s1");
+    let work1 = server.home.join("workspace").join("rewind-s1");
     std::fs::create_dir_all(&work1).unwrap();
     let work1 = std::fs::canonicalize(&work1).unwrap();
     let file_a = work1.join("a.txt");
@@ -958,7 +1054,7 @@ async fn rewind_restores_content_with_per_file_verdicts_and_branch_rewinds() {
     );
 
     // ── 场景 2：文件在检查点后被删除 = 外部修改 → conflicted，绝不悄悄重建。
-    let work2 = synthetic_home("rewind-s2");
+    let work2 = server.home.join("workspace").join("rewind-s2");
     std::fs::create_dir_all(&work2).unwrap();
     let work2 = std::fs::canonicalize(&work2).unwrap();
     let file_d = work2.join("d.txt");
@@ -1007,7 +1103,7 @@ async fn rewind_restores_content_with_per_file_verdicts_and_branch_rewinds() {
     assert!(!file_d.exists(), "被删文件不悄悄重建");
 
     // ── 场景 3：见证版本 → restored 真实写回存档字节；未改动 → skipped。
-    let work3 = synthetic_home("rewind-s3");
+    let work3 = server.home.join("workspace").join("rewind-s3");
     std::fs::create_dir_all(&work3).unwrap();
     let work3 = std::fs::canonicalize(&work3).unwrap();
     let file_b = work3.join("b.txt");
@@ -1041,7 +1137,7 @@ async fn rewind_restores_content_with_per_file_verdicts_and_branch_rewinds() {
         )
         .await;
     assert_eq!(status, 200, "s3 cp-v1: {body}");
-    std::fs::write(&file_b, "v2").unwrap();
+    app_write(&server, "s3", &file_b, "v2").await;
     let (status, body) = server
         .post(
             "/lingxi/v1/sessions/s3/checkpoints",
@@ -1107,9 +1203,15 @@ async fn rewind_restores_content_with_per_file_verdicts_and_branch_rewinds() {
     );
     assert_eq!(std::fs::read_to_string(&file_c).unwrap(), "same");
 
-    let _ = std::fs::remove_dir_all(&work1);
-    let _ = std::fs::remove_dir_all(&work2);
-    let _ = std::fs::remove_dir_all(&work3);
+    if std::env::var_os("LINGXI_W03_EVIDENCE").is_none() {
+        let _ = std::fs::remove_dir_all(&work1);
+    }
+    if std::env::var_os("LINGXI_W03_EVIDENCE").is_none() {
+        let _ = std::fs::remove_dir_all(&work2);
+    }
+    if std::env::var_os("LINGXI_W03_EVIDENCE").is_none() {
+        let _ = std::fs::remove_dir_all(&work3);
+    }
     server.stop_and_clean().await;
 }
 
@@ -1118,8 +1220,8 @@ async fn rewind_restores_content_with_per_file_verdicts_and_branch_rewinds() {
 async fn checkpoint_file_paths_outside_authorized_folders_are_403() {
     let provider = ScriptedProvider::new(vec![ScriptStep::Final("a1".into())]);
     let server = start_server("ckpt-gate", provider).await;
-    let allowed = synthetic_home("ckpt-allowed");
-    let outside = synthetic_home("ckpt-outside");
+    let allowed = server.home.join("workspace").join("ckpt-allowed");
+    let outside = server.home.join("ckpt-outside");
     std::fs::create_dir_all(&allowed).unwrap();
     std::fs::create_dir_all(&outside).unwrap();
     let outside_file = std::fs::canonicalize(&outside).unwrap().join("secret.txt");
@@ -1151,8 +1253,12 @@ async fn checkpoint_file_paths_outside_authorized_folders_are_403() {
         )
         .await;
     assert_eq!(status, 403, "越出授权目录 → 403: {body}");
-    let _ = std::fs::remove_dir_all(&allowed);
-    let _ = std::fs::remove_dir_all(&outside);
+    if std::env::var_os("LINGXI_W03_EVIDENCE").is_none() {
+        let _ = std::fs::remove_dir_all(&allowed);
+    }
+    if std::env::var_os("LINGXI_W03_EVIDENCE").is_none() {
+        let _ = std::fs::remove_dir_all(&outside);
+    }
     server.stop_and_clean().await;
 }
 
@@ -1232,7 +1338,7 @@ async fn checkpoint_crud_matches_incumbent_shape() {
 async fn checkpoint_latest_overwrite_with_file_paths_replaces_atomically() {
     let provider = ScriptedProvider::new(vec![ScriptStep::Final("a1".into())]);
     let server = start_server("ckpt-latest-files", provider).await;
-    let work = synthetic_home("ckpt-latest-files-dir");
+    let work = server.home.join("workspace").join("ckpt-latest-files-dir");
     std::fs::create_dir_all(&work).unwrap();
     let work = std::fs::canonicalize(&work).unwrap();
     let file1 = work.join("f1.txt");
@@ -1348,7 +1454,9 @@ async fn checkpoint_latest_overwrite_with_file_paths_replaces_atomically() {
             "f1 不应出现在收据 {key} 栏: {body}"
         );
     }
-    let _ = std::fs::remove_dir_all(&work);
+    if std::env::var_os("LINGXI_W03_EVIDENCE").is_none() {
+        let _ = std::fs::remove_dir_all(&work);
+    }
     server.stop_and_clean().await;
 }
 
@@ -1607,4 +1715,10 @@ async fn cross_principal_tree_access_is_403() {
         );
     }
     server.stop_and_clean().await;
+}
+
+/// 应用修改必须走真实写入口；直接磁盘写入仅用于外部修改反例。
+async fn app_write(server: &TestServer, session: &str, path: &std::path::Path, content: &str) {
+    let(status,body)=server.post("/lingxi/v1/resource-io/write",&serde_json::json!({"sessionId":session,"resource":{"kind":"local-file","path":path},"content":content}).to_string()).await;
+    assert_eq!(status, 200, "app write: {body}");
 }

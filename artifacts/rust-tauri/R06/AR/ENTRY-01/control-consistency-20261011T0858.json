@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-11T08:56:43.114895+00:00",
+  "role": "ROOT_CONTROL_INTEGRITY_NOT_PRODUCT_TEST_OR_REVIEW",
+  "issues": 15,
+  "cases": 60,
+  "unique_agents": 22,
+  "closed": 1,
+  "open": 14,
+  "head": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "index_empty": true,
+  "protected_user_setting_sha256": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3",
+  "disk_free_GiB": 263.48,
+  "F06_review": "actual platform interrupted; drafted FAIL preserved partial no completed manifest/handoff",
+  "R06": "NOT_ACCEPTED",
+  "R07_started": false
+}

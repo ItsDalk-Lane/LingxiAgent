@@ -1,0 +1,100 @@
+[
+  {
+    "tag": "compile",
+    "exitCode": 0,
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "check",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--tests",
+      "-p",
+      "lingxi-service",
+      "-p",
+      "lingxi-adapters",
+      "-p",
+      "lingxi-kernel",
+      "-p",
+      "xtask"
+    ],
+    "elapsedSeconds": 0.85
+  },
+  {
+    "tag": "be02",
+    "exitCode": 0,
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_t08_behavior_eval",
+      "be02_on_demand_catalog_declared_per_turn_not_in_prompt",
+      "--",
+      "--exact",
+      "--nocapture"
+    ],
+    "elapsedSeconds": 5.0
+  },
+  {
+    "tag": "f07_directory",
+    "exitCode": 0,
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_ar_f07_catalog",
+      "first_layer_c02_real_catalog_discovers_describes_dispatches_new_registration",
+      "--",
+      "--exact",
+      "--nocapture"
+    ],
+    "elapsedSeconds": 0.99
+  },
+  {
+    "tag": "f14_c01",
+    "exitCode": 0,
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/rust-tauri/r06_stage_inputs.py",
+      "--case",
+      "R06-AR-F14-C01",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/final-validation/F14-C01"
+    ],
+    "elapsedSeconds": 11.36
+  },
+  {
+    "tag": "inputs",
+    "exitCode": 0,
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/rust-tauri/r06_stage_inputs.py",
+      "--check",
+      "--evidence",
+      "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/final-validation/R06_INPUTS"
+    ],
+    "elapsedSeconds": 0.13
+  },
+  {
+    "tag": "negative_controls",
+    "exitCode": 0,
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py"
+    ],
+    "elapsedSeconds": 6.96
+  }
+]

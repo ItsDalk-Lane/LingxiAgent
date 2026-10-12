@@ -57,6 +57,10 @@ pub fn project_history(input: &ProjectionInput<'_>) -> Vec<HistoryItem> {
 
     let mut items = Vec::new();
     for message in input.messages {
+        // 模型档案仅供协议恢复，正文/工具卡仍由原统一投影产生。
+        if message.entry_type == crate::model_history::ENTRY_TYPE {
+            continue;
+        }
         match classify_message(message) {
             MessageClass::ResetMarker => items.push(project_reset_marker(message)),
             MessageClass::UserAnchor(run_id) => {
@@ -681,6 +685,66 @@ fn parse_normalized_message(
             )
         })?;
     Ok((normalized, legacy_fields))
+}
+
+/// 无消息失败只以真实运行终态展示，挂在持久分支锚后；不制造消息或模型上下文。
+/// 页外锚和没有可证明锚的旧运行均不补造；调用方只传本页命中的锚。
+pub fn project_history_with_audits(
+    input: &ProjectionInput<'_>,
+    audit_anchors: &[(String, Option<String>)],
+) -> Vec<HistoryItem> {
+    fn message_id(item: &HistoryItem) -> Option<&str> {
+        match item {
+            HistoryItem::UserMessage { message_id, .. }
+            | HistoryItem::FinalMessage { message_id, .. }
+            | HistoryItem::ResetMarker { message_id, .. }
+            | HistoryItem::LegacyRaw { message_id, .. } => Some(message_id),
+            _ => None,
+        }
+    }
+    let buckets = bucket_events(input.events);
+    let mut audits: HashMap<Option<String>, Vec<(u64, HistoryItem)>> = HashMap::new();
+    for (run_id, anchor) in audit_anchors {
+        let Some(bucket) = buckets.get(run_id) else {
+            continue;
+        };
+        if bucket.has_fmc {
+            continue;
+        }
+        if let Some((status, reason, seq)) = &bucket.terminal {
+            audits.entry(anchor.clone()).or_default().push((
+                *seq,
+                HistoryItem::RunTerminal {
+                    run_id: run_id.clone(),
+                    status: *status,
+                    terminal_reason: reason.clone(),
+                    event_seq: *seq,
+                },
+            ));
+        }
+    }
+    for group in audits.values_mut() {
+        group.sort_by_key(|(seq, _)| *seq);
+    }
+    let projected = project_history(input);
+    let mut out = Vec::new();
+    if let Some(root) = audits.remove(&None) {
+        out.extend(root.into_iter().map(|(_, item)| item));
+    }
+    let mut current_anchor: Option<String> = None;
+    for item in projected {
+        if let Some(id) = message_id(&item) {
+            if let Some(group) = current_anchor.take().and_then(|a| audits.remove(&Some(a))) {
+                out.extend(group.into_iter().map(|(_, item)| item));
+            }
+            current_anchor = Some(id.to_owned());
+        }
+        out.push(item);
+    }
+    if let Some(group) = current_anchor.and_then(|a| audits.remove(&Some(a))) {
+        out.extend(group.into_iter().map(|(_, item)| item));
+    }
+    out
 }
 
 #[cfg(test)]

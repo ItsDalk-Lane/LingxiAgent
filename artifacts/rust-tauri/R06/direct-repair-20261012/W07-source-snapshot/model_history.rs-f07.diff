@@ -1,0 +1,101 @@
+--- artifacts/rust-tauri/R06/AR/W01-CANDIDATE-RECOVERY-01/frozen-source/rust/crates/lingxi-service/src/model_history.rs	2026-10-12 07:28:34
++++ /private/tmp/lingxi-r06-w07-executor-02/rust/crates/lingxi-service/src/model_history.rs	2026-10-12 12:20:39
+@@ -424,9 +424,19 @@
+                             _ => None,
+                         })
+                         .ok_or_else(|| corrupt("projection lacks authoritative request"))?;
+-                    if str_field(projection, "target")? != requested.target {
++                    let expected_target = requested.declaration_binding.as_ref().and_then(|b| b.execution.as_ref()).map(|e| e.target.as_str()).unwrap_or(requested.target.as_str());
++                    if str_field(projection, "target")? != expected_target {
+                         return Err(corrupt("projection target/request disagreement"));
+                     }
++                    if let Some(execution) = requested.declaration_binding.as_ref().and_then(|b| b.execution.as_ref()) {
++                        if self.storage.load_run(&lingxi_protocol::RunId::new(source_run)).await?.is_some() {
++                            let journal = self.storage.load_invocation_journal(&lingxi_protocol::RunId::new(source_run)).await?;
++                            let actual = journal.iter().find(|entry| entry.journal_id == host_id).ok_or_else(|| corrupt("目录执行原始journal缺失"))?;
++                            if actual.target != execution.target || actual.args_digest != execution.args_digest.hex {
++                                return Err(corrupt("目录执行身份与journal不一致"));
++                            }
++                        }
++                    }
+                     let projected = projected_tool_item(projection)?;
+                     if !requested.arguments.digest_matches(&requested.args_digest) {
+                         if !is_argument_refusal(&projected, requested) {
+@@ -871,7 +881,27 @@
+         .map(|x| x.join("\n"))
+ }
+ 
+-pub fn encode_item(item: &ExchangeItem) -> Result<Value, StorageError> {
++pub fn encode_declaration_binding(binding: &lingxi_kernel::model_exchange::HistoricalToolDeclaration) -> Value {
++    let d = &binding.declaration;
++    json!({"catalogGeneration":binding.catalog_generation,"declaration":{"target":d.target,"wireName":d.wire_name,"description":d.description,"inputSchema":d.input_schema},"execution":binding.execution.as_ref().map(|e|json!({"target":e.target,"catalogGeneration":e.catalog_generation,"arguments":e.arguments,"argsDigest":e.args_digest}))})
++}
++fn decode_declaration_binding(v: &Value) -> Result<lingxi_kernel::model_exchange::HistoricalToolDeclaration, StorageError> {
++    use lingxi_kernel::model_exchange::{HistoricalToolDeclaration, HistoricalToolExecution, ToolDeclaration};
++    let generation = v["catalogGeneration"].as_u64().filter(|g| *g > 0).ok_or_else(|| corrupt("可信历史声明代次缺失"))?;
++    let d = &v["declaration"];
++    let declaration = ToolDeclaration { target: str_field(d,"target")?.into(), wire_name: str_field(d,"wireName")?.into(), description: str_field(d,"description")?.into(), input_schema: decode(&d["inputSchema"])? };
++    if declaration.wire_name.is_empty() || declaration.wire_name.len() > 64 || !declaration.wire_name.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-') { return Err(corrupt("历史声明名称非法")); }
++    let execution = if v["execution"].is_null() { None } else {
++        let e = &v["execution"];
++        let arguments = EffectiveArguments::from_value(e["arguments"].clone(), &SchemaBudget::default()).map_err(|error| corrupt(error.to_string()))?;
++        let args_digest = decode(&e["argsDigest"])?;
++        if declaration.target != "tool:first-party:mcp_call" || !arguments.digest_matches(&args_digest) { return Err(corrupt("目录历史执行绑定非法")); }
++        Some(HistoricalToolExecution { target: str_field(e,"target")?.into(), catalog_generation: e["catalogGeneration"].as_u64().filter(|g|*g>0).ok_or_else(||corrupt("目录历史执行代次缺失"))?, arguments: arguments.as_value().clone(), args_digest })
++    };
++    Ok(HistoricalToolDeclaration { catalog_generation: generation, declaration, execution })
++}
++
++fn encode_item(item: &ExchangeItem) -> Result<Value, StorageError> {
+     Ok(match item {
+         ExchangeItem::UserTurn { text } => json!({"kind":"user","text":text}),
+         ExchangeItem::AssistantTurn {
+@@ -880,7 +910,7 @@
+             tool_calls,
+             origin,
+         } => {
+-            json!({"kind":"assistant","call":call.as_str(),"content":content,"calls":tool_calls.iter().map(|c|json!({"id":c.tool_call_id.as_str(),"providerId":c.provider_call_id,"target":c.target,"arguments":c.arguments.as_value(),"digest":c.args_digest,"summary":c.args_summary})).collect::<Vec<_>>(),"origin":origin.as_ref().map(|o|json!({"provider":o.provider,"model":o.model}))})
++            json!({"kind":"assistant","call":call.as_str(),"content":content,"calls":tool_calls.iter().map(|c|json!({"id":c.tool_call_id.as_str(),"providerId":c.provider_call_id,"target":c.target,"arguments":c.arguments.as_value(),"digest":c.args_digest,"summary":c.args_summary,"declarationBinding":c.declaration_binding.as_ref().map(encode_declaration_binding)})).collect::<Vec<_>>(),"origin":origin.as_ref().map(|o|json!({"provider":o.provider,"model":o.model}))})
+         }
+         ExchangeItem::ToolResult {
+             tool_call_id,
+@@ -967,7 +997,12 @@
+                     .map_err(|e| corrupt(e.to_string()))?;
+                     let digest: ArgsDigest = decode(&c["digest"])?;
+                     // 原声明摘要保留；拒绝记录须在完整请求/结果及真实journal配对后核准。
++                    let declaration_binding = decode_declaration_binding(&c["declarationBinding"])?;
++                    if declaration_binding.catalog_generation == 0 || declaration_binding.declaration.target != str_field(c, "target")? {
++                        return Err(corrupt("历史声明来源与调用目标不一致"));
++                    }
+                     Ok(RequestedToolCall {
++                        declaration_binding: Some(declaration_binding),
+                         tool_call_id: ToolCallId::new(str_field(c, "id")?),
+                         provider_call_id: decode(&c["providerId"])?,
+                         target: str_field(c, "target")?.into(),
+@@ -1301,5 +1336,26 @@
+             1
+         );
+         assert!(encode_item(&ExchangeItem::CurrentSubmission).is_err());
++    }
++    #[test]
++    fn first_layer_f07_historical_declaration_and_dispatch_codec_preserves_both_identities() {
++        use lingxi_kernel::model_exchange::{HistoricalToolDeclaration, HistoricalToolExecution, ToolDeclaration};
++        let arguments = EffectiveArguments::from_value(json!({"tool":"future_tool","arguments":{"path":"synthetic"}}),&SchemaBudget::default()).unwrap();
++        let effective = EffectiveArguments::from_value(json!({"path":"synthetic"}),&SchemaBudget::default()).unwrap();
++        let item = ExchangeItem::AssistantTurn { call: ModelCallId::new("run-mc1"), content: vec![], origin: None, tool_calls: vec![RequestedToolCall {
++            tool_call_id: ToolCallId::new("run-tc1"), provider_call_id: Some("provider-call".into()), target:"tool:first-party:mcp_call".into(), args_digest:arguments.digest(), arguments, args_summary:None,
++            declaration_binding:Some(HistoricalToolDeclaration { catalog_generation:8, declaration:ToolDeclaration { target:"tool:first-party:mcp_call".into(),wire_name:"mcp_call".into(),description:"当时真实说明".into(),input_schema:lingxi_protocol::ToolSchemaDocument{dialect:"json-schema/2020-12".into(),schema:json!({"type":"object"})}},execution:Some(HistoricalToolExecution {target:"tool:first-party:future_tool".into(),catalog_generation:8,args_digest:effective.digest(),arguments:effective.as_value().clone()}) }),
++        }] };
++        let wire = encode_item(&item).unwrap(); assert_eq!(decode_item(&wire).unwrap(), item);
++        assert_eq!(wire["calls"][0]["target"],"tool:first-party:mcp_call");
++        assert_eq!(wire["calls"][0]["declarationBinding"]["execution"]["target"],"tool:first-party:future_tool");
+     }
++    #[test]
++    fn adversarial_f07_missing_or_forged_historical_binding_is_loudly_rejected() {
++        let base=json!({"kind":"assistant","call":"run-mc1","content":[],"origin":null,"calls":[{"id":"run-tc1","providerId":"p1","target":"tool:first-party:read","arguments":{"path":"synthetic"},"digest":EffectiveArguments::from_value(json!({"path":"synthetic"}),&SchemaBudget::default()).unwrap().digest(),"summary":null}]});
++        assert!(decode_item(&base).is_err());
++        let mut forged=base.clone();forged["calls"][0]["declarationBinding"]=json!({"catalogGeneration":8,"declaration":{"target":"tool:first-party:other","wireName":"read","description":"伪造目标","inputSchema":{"dialect":"json-schema/2020-12","schema":{"type":"object"}}},"execution":null});
++        assert!(decode_item(&forged).is_err());
++    }
++
+ }

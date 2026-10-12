@@ -1,0 +1,46 @@
+   Compiling tokio v1.53.1
+   Compiling tracing-core v0.1.36
+   Compiling rustls v0.23.45
+   Compiling futures-task v0.3.34
+   Compiling indexmap v2.14.2
+   Compiling serde v1.0.229
+   Compiling futures-channel v0.3.34
+   Compiling sha1 v0.11.0
+   Compiling futures-util v0.3.34
+   Compiling sha2 v0.11.0
+   Compiling log v0.4.34
+   Compiling tracing v0.1.44
+   Compiling schemars v1.2.2
+   Compiling serde_urlencoded v0.7.1
+   Compiling lingxi-protocol v0.0.0 (<W09_WORKSPACE>/rust/crates/lingxi-protocol)
+   Compiling tokio-util v0.7.19
+   Compiling tower v0.5.3
+   Compiling tower-http v0.6.11
+   Compiling h2 v0.4.19
+   Compiling tokio-rustls v0.26.5
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling lingxi-kernel v0.0.0 (<W09_WORKSPACE>/rust/crates/lingxi-kernel)
+   Compiling hyper v1.11.1
+   Compiling hyper-util v0.1.21
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.13.5
+   Compiling lingxi-adapters v0.0.0 (<W09_WORKSPACE>/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.81s
+     Running tests/r06_ar_w09_vector_integrity.rs (rust/target-w09-e01/debug/deps/r06_ar_w09_vector_integrity-b783ce9456276b1f)
+LINGXI_TEST_GUARD: armed (pid 11095, mem_limit=8192 MB, time_limit=600 s)
+
+running 7 tests
+test transport_observations_preserve_connect_retryability_and_unpolled_cancellation ... ok
+test exact_plan_rejects_wrong_ids_even_when_count_and_ordinals_match ... ok
+test malformed_batches_and_corrupt_checkpoints_are_refused ... ok
+test mid_batch_write_failure_rolls_back_every_new_row_and_preserves_paid_bytes ... ok
+
+thread 'storage_close_callback_error_and_panic_are_explicit_and_database_is_still_reaped' (6052633) panicked at crates/lingxi-adapters/tests/r06_ar_w09_vector_integrity.rs:227:21:
+W09 injected close callback panic
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test storage_close_callback_error_and_panic_are_explicit_and_database_is_still_reaped ... ok
+test storage_close_is_once_and_concurrent_waiters_and_cancelled_waiter_keep_actual_join ... ok
+test storage_close_keeps_both_callback_error_and_real_pinned_wal_checkpoint_failure ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+

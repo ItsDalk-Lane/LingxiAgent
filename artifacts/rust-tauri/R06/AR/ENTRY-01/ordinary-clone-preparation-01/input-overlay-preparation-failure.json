@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-11T10:36:30.874026+00:00",
+  "status": "PREPARATION_FAILURE_NOT_BEHAVIOR_TEST",
+  "error": "existing accepted F08 repair-current/deliveries directory in pristine clone caused assertion on fourth input directory, after own products and first three immutable inputs copied",
+  "source_workspaces_changed": false,
+  "Gate_RUN": false,
+  "next": "verify equal bytes of previously copied inputs; overlay exact input files preserving accepted existing delivery directory; then separate dependency copy"
+}

@@ -1,0 +1,124 @@
+{
+  "at": "2026-10-11T09:40:36.823217+00:00",
+  "role": "ROOT_CONTROL_INTEGRITY_NOT_REVIEWER",
+  "w03_reds": [
+    {
+      "case": "public-entry-red-01",
+      "actual_matching_tests": 2,
+      "exit_code": 101,
+      "source_before_after_equal": true,
+      "external_before_after_equal": true,
+      "lock_sha": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f03_operations",
+        "public_",
+        "--locked",
+        "-j8"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent",
+      "guard": {
+        "rss_mib": 8192,
+        "seconds": 600,
+        "parent_monitor": "ps descendant RSS sum every 0.5s; TERM/KILL/reap owned group"
+      },
+      "start_time": 1791710874.031615,
+      "end_time": 1791710895.0090492,
+      "remaining_owned_group_pids": [],
+      "evidence_hashes": {
+        "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W03-E01/public-entry-red-01/run.json": "2822de7d67901ef62cc4562438dde9cd63d17b95ea12c7dde9deecef94a9800b",
+        "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W03-E01/public-entry-red-01/stdout.log": "35a1412aba1a7dc47c2f0b22a89c08f6d73ee0d052502b84fdc7df215dc9693a",
+        "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W03-E01/public-entry-red-01/stderr.log": "57f96745b13e3583c2ece271da3b0d6c4ce9f371796586bf93d88e24a80c2c26",
+        "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W03-E01/public-entry-red-01/public-direct-busy.json": "123664a312c915ee241075136b435e579cb39e8ba04e85bcbfb4d4b0ec360428",
+        "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W03-E01/public-entry-red-01/public-mixed-storage.json": "9eb08be6ae68f2ce11479346304497a5aaf88446b975bfc0ee9ef9d694e31b89"
+      },
+      "rss_measured": {
+        "sampled_max_descendant_kib": 848992,
+        "sampling_seconds": 0.5
+      },
+      "scope": "Root read and integrity check of executor actual business-red evidence; not independent acceptance",
+      "sensitive_home": "retained locally by executor, excluded from delivery"
+    },
+    {
+      "case": "tombstone-red-01",
+      "actual_matching_tests": 1,
+      "exit_code": 101,
+      "source_before_after_equal": true,
+      "external_before_after_equal": true,
+      "lock_sha": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_ar_f03_operations",
+        "unknown_file_effect_survives_storage_failure_restart_and_replay",
+        "--locked",
+        "-j8",
+        "--",
+        "--exact"
+      ],
+      "cwd": "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent",
+      "guard": {
+        "rss_mib": 8192,
+        "seconds": 600,
+        "parent_monitor": "ps descendant RSS sum every 0.5s; TERM/KILL/reap owned group"
+      },
+      "start_time": 1791710929.222293,
+      "end_time": 1791710947.8246799,
+      "remaining_owned_group_pids": [],
+      "evidence_hashes": {
+        "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W03-E01/tombstone-red-01/run.json": "d36646a7812cd11241559ad7f4db3d41d26de465c43d4b9cb0a3ddec4fcb24b8",
+        "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W03-E01/tombstone-red-01/stdout.log": "09fc583963a58ccea2cb4c070fb1b0175eaf9c5e1f6b844ba90791add56d21da",
+        "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W03-E01/tombstone-red-01/stderr.log": "2e24a0091c374540495e5974b0ca0c453eea048c2ddb2dcb3cfa85396431d2aa",
+        "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W03-E01/tombstone-red-01/deleted-unknown-receipt.json": "fc12468c296143bd769c159b2ab97bf2fd5867f4a7f69cf13617c4740bfabd95",
+        "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W03-E01/tombstone-red-01/unknown-restart.json": "3822ba1be7b991efa62aed40d2f9718c7294a573e5c866aa0f95b81577cd3a05"
+      },
+      "rss_measured": {
+        "sampled_max_descendant_kib": 1020752,
+        "sampling_seconds": 0.5
+      },
+      "scope": "Root read and integrity check of executor actual business-red evidence; not independent acceptance",
+      "sensitive_home": "retained locally by executor, excluded from delivery"
+    }
+  ],
+  "w01_other_agent_persona_red": {
+    "exit_code": 101,
+    "matching_tests": 1,
+    "source_before_after_equal": true,
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_ar_f01_history",
+      "--locked",
+      "-j8",
+      "f01_child_inherits_authorized_material_only",
+      "--",
+      "--exact",
+      "--nocapture"
+    ],
+    "cwd": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent",
+    "start_time": 1791711061.278497,
+    "end_time": 1791711069.42769,
+    "metadata_sha": "5851c6862bf8501f582a892e20677c0d99e08a245e6f72626c78cf4313b104b8",
+    "log_sha": "c0a818dd46d34a2b18d14164b023176703fcaa5da54d6f89c216ccb29a23c9ee",
+    "synthetic_home_cleaned": true,
+    "guard_armed": true,
+    "child_reaped": true,
+    "classification": "F05/EX03 actual existing context_compiler session,bool cache omits Agent; F01 legal child reaches actual wire. No F05 code changed or pass claimed."
+  }
+}

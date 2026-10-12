@@ -1,0 +1,42 @@
+{
+  "owner": "W05-E01 only final actual-binary rerun synthetic data",
+  "originalExternalRoot": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w05-e01-final-bin-w3b1zbfo",
+  "lsofArgv": [
+    "lsof",
+    "-t",
+    "+D",
+    "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w05-e01-final-bin-w3b1zbfo"
+  ],
+  "lsofExit": 1,
+  "lsofStdout": "",
+  "lsofStderr": "",
+  "fullOwnedFileSha256": {
+    "home/w05-tools-live-27661-1791729889600691000/service.json": "0492f3ae16bc36cab6d7ddf00f59ffd7be2e8d690be95047972c388f0e6994f1",
+    "home/w05-tools-live-27661-1791729889600691000/input.txt": "cdebfece6d9aca9813b5dca0d32280d832900bb0bbbcdbd6a56e5f64f4967d6d",
+    "home/w05-tools-live-27661-1791729889600691000/product/agents.example.md": "28376d6a39b571a251d83459c81cb86957c0dd3eb5801823c64008e4759895d3",
+    "home/w05-tools-live-27661-1791729889600691000/logs/security-audit.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "home/w05-tools-live-27661-1791729889600691000/knowledge/knowledge.db": "557e3c9f57f88f3b8751bd2ca8d28330618c1092ab333a1402659c90d2e0ed91",
+    "home/w05-tools-live-27661-1791729889600691000/knowledge/knowledge_index.db": "651eb29b0db5fba555a7eebb12411f2ced5126e96edf6019c5cd9cc4e64278fe",
+    "home/w05-tools-live-27661-1791729889600691000/knowledge/knowledge_vector.db": "0be57f840f8ecf76f1a1447d9ac438a652055e0d8b2b94e98aed9c67b9f6f09e",
+    "home/w05-tools-live-27661-1791729889600691000/lingxi-service/local-token.json": "201c046d9e31f4a05b7888ed350bfc5c683cb060500454c034129d7fa807e6aa",
+    "home/w05-tools-live-27661-1791729889600691000/lingxi-service/management.json": "c24c085474e06e94d2e45411d1c61f091f1a8b759fddc1b1bce8208f74103d13",
+    "home/w05-tools-live-27661-1791729889600691000/lingxi-service/device-credentials.json": "a62a9d6e68575ef3d86afa6a48795cfe1ab1607bcd2f05e61058cd1f38d91d2f",
+    "home/w05-tools-live-27661-1791729889600691000/lingxi-service/devices.json": "cec0b84af686c1a5771f68c69ae0e4b4ec1d0008f7b70b1a3935001de458cb9c",
+    "home/w05-tools-live-27661-1791729889600691000/lingxi-service/data/runs.db": "68ae9090a41141820e4c37c04a2dafbc287e20e48762e6b1dea202b6881bedf9",
+    "home/w05-tools-live-27661-1791729889600691000/lingxi-service/data/runs.db-shm": "4b1118b39dc382c10ff60d3abe1555c94f3db43870af016c5ac65897c6ba33ba",
+    "home/w05-tools-live-27661-1791729889600691000/lingxi-service/data/runs.db-wal": "87c9b10afda2fb33313fcf8b599e4f3d6d2956bee80267af0692477c51a9e269",
+    "home/w05-tools-live-27661-1791729889600691000/product/yuan/lingxi.md": "f5454d1cb2bfe4625ece976e4205b3b0a1d8ba8976aac74caf4a02e0e1a3670e",
+    "home/w05-tools-live-27661-1791729889600691000/agents/lingxi/identity.md": "2638ad7cb6890688fe8d42371a7517a9ffd2760fce25dab3a2eec45112357dbc",
+    "home/w05-tools-live-27661-1791729889600691000/agents/lingxi/config.yaml": "4a3e2a7be3932444fcd384bd05e14aa7fa253480463084ea264f6f457d5cdd1e"
+  },
+  "fileCount": 17,
+  "privateCopy": "artifacts/rust-tauri/R06/AR/W05-E01/local-only/final-f05-all-05-private",
+  "privateCopyMatchesOriginal": true,
+  "firstPostprocessCheck": "FAIL: initial exact absolute-path equality did not match actual ps relative executable path; source/data untouched, copy made before assertion; normalized actual path now agrees",
+  "policy": "完整自有合成数据/home/SQL不导出；只有必要wire/业务行safe",
+  "wrapperExit": 101,
+  "sourceStable": true,
+  "ownedDescendantsRemaining": [],
+  "binaryBeforeAfterSha256": "5923f148f12c9c1525112a3ac63e587cf181e72048847ad4230783a5a4f6338c",
+  "at": "2026-10-11T14:48:04.838054+00:00"
+}

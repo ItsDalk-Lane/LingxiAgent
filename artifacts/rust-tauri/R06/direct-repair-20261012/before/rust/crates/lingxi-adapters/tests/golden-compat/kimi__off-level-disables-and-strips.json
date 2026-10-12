@@ -1,0 +1,46 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "kimi",
+  "case": "off-level-disables-and-strips",
+  "model": {
+    "provider": "kimi-coding",
+    "id": "kimi-for-coding",
+    "baseUrl": "https://api.kimi.com/coding/v1",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "kimi-for-coding",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": "x",
+        "reasoning_content": "trace"
+      }
+    ],
+    "thinking": {
+      "type": "enabled"
+    }
+  },
+  "options": {
+    "mode": "chat",
+    "reasoningLevel": "off"
+  },
+  "expected": {
+    "thinkingFormat": "kimi",
+    "reasoningProfile": "kimi-openai",
+    "matched": "kimi",
+    "result": {
+      "model": "kimi-for-coding",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "x"
+        }
+      ],
+      "thinking": {
+        "type": "disabled"
+      }
+    }
+  }
+}

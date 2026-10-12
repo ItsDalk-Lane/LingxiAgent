@@ -45,9 +45,77 @@ pub type EmbedFuture<'a> = std::pin::Pin<
     >,
 >;
 
+use lingxi_adapters::models::dispatch::SendObservation;
+pub type EmbeddingSendObserver<'a> =
+    &'a (dyn Fn(SendObservation) -> Result<(), KnowledgeError> + Send + Sync);
+pub struct OwnedEmbeddingResult {
+    pub identity: EmbeddingModelIdentity,
+    pub vectors: Vec<Vec<f32>>,
+    pub accounting_error: Option<KnowledgeError>,
+    pub model_call_id: Option<String>,
+    pub reused_paid_response: bool,
+}
+pub type OwnedEmbedFuture<'a> = std::pin::Pin<
+    Box<dyn std::future::Future<Output = Result<OwnedEmbeddingResult, KnowledgeError>> + Send + 'a>,
+>;
 pub trait KnowledgeEmbedder: Send + Sync {
+    fn settle_pending<'a>(
+        &'a self,
+        _cause: &'a str,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), KnowledgeError>> + Send + 'a>>
+    {
+        Box::pin(async { Ok(()) })
+    }
+    fn settle_pending_owned<'a>(
+        &'a self,
+        runtime: &'a crate::operations::EmbeddingCallRuntime,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), KnowledgeError>> + Send + 'a>>
+    {
+        self.settle_pending(&runtime.ownership.cause_ref)
+    }
     fn identity(&self) -> Result<Option<EmbeddingModelIdentity>, KnowledgeError>;
     fn embed<'a>(&'a self, texts: Vec<String>, input_type: EmbeddingInputType) -> EmbedFuture<'a>;
+    fn embed_owned<'a>(
+        &'a self,
+        texts: Vec<String>,
+        input_type: EmbeddingInputType,
+        runtime: &'a crate::operations::EmbeddingCallRuntime,
+        observer: Option<EmbeddingSendObserver<'a>>,
+    ) -> OwnedEmbedFuture<'a> {
+        Box::pin(async move {
+            runtime
+                .check()
+                .map_err(|e| KnowledgeError::new("KNOWLEDGE_MODEL_UNAVAILABLE", e.message))?;
+            let (identity, vectors) = self.embed_observed(texts, input_type, observer).await?;
+            Ok(OwnedEmbeddingResult {
+                identity,
+                vectors,
+                accounting_error: None,
+                model_call_id: None,
+                reused_paid_response: false,
+            })
+        })
+    }
+    /// 外部嵌入器兼容入口；生产网关通知 transport 可观察事实。
+    fn embed_observed<'a>(
+        &'a self,
+        texts: Vec<String>,
+        input_type: EmbeddingInputType,
+        observer: Option<EmbeddingSendObserver<'a>>,
+    ) -> EmbedFuture<'a> {
+        Box::pin(async move {
+            if let Some(observer) = observer {
+                observer(SendObservation::AttemptStarted)?;
+            }
+            let result = self.embed(texts, input_type).await;
+            if result.is_ok() {
+                if let Some(observer) = observer {
+                    observer(SendObservation::ResponseHeadersReceived)?;
+                }
+            }
+            result
+        })
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -95,17 +163,97 @@ impl GatewayKnowledgeEmbedder {
 }
 
 impl KnowledgeEmbedder for GatewayKnowledgeEmbedder {
+    fn settle_pending<'a>(
+        &'a self,
+        cause: &'a str,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), KnowledgeError>> + Send + 'a>>
+    {
+        Box::pin(async move {
+            self.operations
+                .settle_embedding_usage_for_cause(cause)
+                .await
+                .map_err(|e| KnowledgeError::storage_invalid(e.message))
+        })
+    }
+    fn settle_pending_owned<'a>(
+        &'a self,
+        runtime: &'a crate::operations::EmbeddingCallRuntime,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), KnowledgeError>> + Send + 'a>>
+    {
+        Box::pin(async move {
+            self.operations
+                .settle_embedding_usage_for_runtime(runtime)
+                .await
+                .map_err(|e| KnowledgeError::storage_invalid(e.message))
+        })
+    }
+    fn embed_owned<'a>(
+        &'a self,
+        texts: Vec<String>,
+        input_type: EmbeddingInputType,
+        runtime: &'a crate::operations::EmbeddingCallRuntime,
+        observer: Option<EmbeddingSendObserver<'a>>,
+    ) -> OwnedEmbedFuture<'a> {
+        Box::pin(async move {
+            let request = embedding_request(texts, input_type);
+            let on_send = |observation| {
+                observer
+                    .map(|observer| {
+                        observer(observation).map_err(|e| {
+                            lingxi_protocol::ProtocolError::new(
+                                lingxi_protocol::ErrorCode::Internal,
+                                e.to_string(),
+                                false,
+                            )
+                        })
+                    })
+                    .unwrap_or(Ok(()))
+            };
+            let result = self
+                .operations
+                .embed_owned_observed(request, runtime, Some(&on_send))
+                .await
+                .map_err(|e| KnowledgeError::new("KNOWLEDGE_MODEL_UNAVAILABLE", e.message))?;
+            let served = result.served;
+            let dimensions = served
+                .outcome
+                .vectors
+                .first()
+                .map(|v| v.len() as u32)
+                .unwrap_or(0);
+            let identity = EmbeddingModelIdentity::with_parameters(
+                &served.route.provider,
+                &served.route.model,
+                served.route.protocol.config_name(),
+                dimensions,
+                served.parameter_fingerprint,
+            );
+            Ok(OwnedEmbeddingResult {
+                identity,
+                vectors: served.outcome.vectors,
+                accounting_error: result
+                    .accounting_error
+                    .map(|e| KnowledgeError::storage_invalid(e.message)),
+                model_call_id: Some(result.model_call_id),
+                reused_paid_response: result.reused_paid_response,
+            })
+        })
+    }
     fn identity(&self) -> Result<Option<EmbeddingModelIdentity>, KnowledgeError> {
         match self.route() {
-            // 维度在响应落地前未知（key 由 embed() 的实测维度补全）——这里只
-            // 回答「嵌入模型是否已配置」。
-            Ok(_route) => Ok(Some(EmbeddingModelIdentity {
-                key: String::new(),
-                provider: String::new(),
-                model_id: String::new(),
-                protocol: String::new(),
-                dimensions: 0,
-            })),
+            // 配置可比，但零维度明确表示尚未发送/实测，不可据此声明 ready 命中。
+            Ok(route) => {
+                let request = embedding_request(Vec::new(), EmbeddingInputType::Document);
+                Ok(Some(EmbeddingModelIdentity::with_parameters(
+                    &route.provider,
+                    &route.model,
+                    route.protocol.config_name(),
+                    0,
+                    lingxi_adapters::models::operations::embedding::embedding_space_fingerprint(
+                        &route, &request,
+                    ),
+                )))
+            }
             Err(err) => match err.code.as_str() {
                 "KNOWLEDGE_MODEL_UNAVAILABLE" => Ok(None),
                 _ => Err(err),
@@ -125,53 +273,91 @@ impl KnowledgeEmbedder for GatewayKnowledgeEmbedder {
                 + 'a,
         >,
     > {
+        self.embed_observed(texts, input_type, None)
+    }
+
+    fn embed_observed<'a>(
+        &'a self,
+        texts: Vec<String>,
+        input_type: EmbeddingInputType,
+        observer: Option<EmbeddingSendObserver<'a>>,
+    ) -> EmbedFuture<'a> {
         Box::pin(async move {
-            let route = self.route()?;
-            let request = lingxi_adapters::models::operations::embedding::EmbeddingRequest {
-                inputs: texts,
-                dimensions: None,
-                context_window: None,
-                input_type: match input_type {
-                    EmbeddingInputType::Document => {
-                        lingxi_adapters::models::operations::embedding::EmbeddingInputType::Document
-                    }
-                    EmbeddingInputType::Query => {
-                        lingxi_adapters::models::operations::embedding::EmbeddingInputType::Query
-                    }
-                },
-            };
-            let outcome = self
-                .operations
-                .embed(request, None, None)
-                .await
-                .map_err(|failure| {
-                    KnowledgeError::new("KNOWLEDGE_MODEL_UNAVAILABLE", failure.message)
-                })?;
-            let mut vectors = outcome.vectors;
-            let Some(first) = vectors.first() else {
-                return Err(KnowledgeError::retrieval_unavailable(
-                    "Embedding response does not match the requested batch",
-                ));
-            };
-            let dimensions = first.len() as u32;
-            if vectors
-                .iter()
-                .any(|vector| vector.len() as u32 != dimensions)
-            {
-                return Err(KnowledgeError::retrieval_unavailable(
-                    "Embedding response contains an invalid vector",
-                ));
-            }
-            let identity = EmbeddingModelIdentity::new(
-                &route.provider,
-                &route.model,
-                route.protocol.config_name(),
-                dimensions,
+            // 兼容独立宿主入口也有服务铸造身份及预算，不留下无归属知识调用。
+            static HOST_SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+            let now = lingxi_adapters::models::dispatch::unix_ms_now();
+            let cause = format!(
+                "knowledge-embedding-host:{now}:{}",
+                HOST_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed),
             );
-            let _ = &mut vectors;
-            Ok((identity, vectors))
+            let runtime = crate::operations::EmbeddingCallRuntime {
+                ownership: crate::operations::OperationOwnership {
+                    principal_kind: "local_user".into(),
+                    principal_subject: lingxi_kernel::LOCAL_OWNER_SUBJECT.into(),
+                    agent_id: None,
+                    session_id: None,
+                    run_id: None,
+                    attempt: None,
+                    parent_tool_call_id: None,
+                    cause_ref: cause.clone(),
+                    deadline_unix_ms: now.saturating_add(300_000),
+                    budget_ms: 300_000,
+                },
+                cancel: crate::cancel::CancelScope::background_root(&cause),
+                request_key: cause,
+                manual_retry_authorized: false,
+            };
+            let result = self
+                .embed_owned(texts, input_type, &runtime, observer)
+                .await?;
+            if let Some(error) = result.accounting_error {
+                return Err(error);
+            }
+            Ok((result.identity, result.vectors))
         })
     }
+}
+
+fn embedding_request(
+    texts: Vec<String>,
+    input_type: EmbeddingInputType,
+) -> lingxi_adapters::models::operations::embedding::EmbeddingRequest {
+    lingxi_adapters::models::operations::embedding::EmbeddingRequest {
+        inputs: texts,
+        dimensions: None,
+        context_window: None,
+        input_type: match input_type {
+            EmbeddingInputType::Document => {
+                lingxi_adapters::models::operations::embedding::EmbeddingInputType::Document
+            }
+            EmbeddingInputType::Query => {
+                lingxi_adapters::models::operations::embedding::EmbeddingInputType::Query
+            }
+        },
+    }
+}
+
+fn validate_embedding_batch(
+    identity: &EmbeddingModelIdentity,
+    vectors: &[Vec<f32>],
+    count: usize,
+) -> Result<(), KnowledgeError> {
+    if identity.key.is_empty()
+        || identity.provider.is_empty()
+        || identity.model_id.is_empty()
+        || identity.protocol.is_empty()
+        || identity.dimensions == 0
+        || identity.dimensions > 65_536
+        || vectors.len() != count
+        || vectors.iter().any(|vector| {
+            vector.len() != identity.dimensions as usize || vector.iter().any(|v| !v.is_finite())
+        })
+    {
+        return Err(KnowledgeError::retrieval_unavailable(
+            "embedding identity or batch shape is invalid",
+        ));
+    }
+    Ok(())
 }
 
 // ── 检索请求/结果 ───────────────────────────────────────────────────────────
@@ -230,6 +416,8 @@ pub struct SearchResult {
 #[derive(Default)]
 struct WorkerHandle {
     stop: OnceLock<Arc<std::sync::atomic::AtomicBool>>,
+    lifecycle: Mutex<()>,
+    task: tokio::sync::Mutex<Option<tokio::task::JoinHandle<()>>>,
 }
 
 pub struct KnowledgeService {
@@ -240,6 +428,7 @@ pub struct KnowledgeService {
     embedder: Mutex<Option<Arc<dyn KnowledgeEmbedder>>>,
     worker: WorkerHandle,
     wake: tokio::sync::Notify,
+    write_gate: Mutex<()>,
 }
 
 impl std::fmt::Debug for KnowledgeService {
@@ -269,6 +458,7 @@ impl KnowledgeService {
             embedder: Mutex::new(None),
             worker: WorkerHandle::default(),
             wake: tokio::sync::Notify::new(),
+            write_gate: Mutex::new(()),
         })
     }
 
@@ -285,48 +475,113 @@ impl KnowledgeService {
         *self.embedder.lock().expect("embedder lock") = embedder;
         // 模型就绪信号：pending_embedding 显式终态的补跑重排（engine.ts:2401-2402
         // onModelConfigMayHaveChanged 的同语义承担）。
-        if let Ok(resumed) = self.facts.requeue_pending_embedding_jobs() {
-            if resumed > 0 {
-                self.wake.notify_waiters();
-            }
+        match self.facts.requeue_pending_embedding_jobs() {
+            Ok(resumed) if resumed > 0 => self.wake.notify_waiters(),
+            Ok(_) => {}
+            Err(error) => tracing::error!(%error,"pending embedding requeue failed"),
         }
     }
 
     /// 启动摄入 worker（bootstrap 调用一次）。
-    pub fn start_worker(self: &Arc<Self>) {
-        let service = Arc::clone(self);
+    pub fn start_worker(self: &Arc<Self>) -> Result<(), KnowledgeError> {
+        let _lifecycle = self.worker.lifecycle.lock().expect("worker lifecycle lock");
+        if self.worker.stop.get().is_some() {
+            return Ok(());
+        }
+        // 标准库排他锁由操作系统释放，不用 PID/过期时间猜测仍活的 worker。
+        let lock = std::fs::OpenOptions::new()
+            .create(true)
+            .truncate(false)
+            .read(true)
+            .write(true)
+            .open(self.facts.root().join("ingestion-worker.lock"))
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        lock.try_lock().map_err(|e| {
+            KnowledgeError::conflict(format!("another knowledge worker owns this data root: {e}"))
+        })?;
+        self.facts.recover_interrupted_jobs()?;
         let stop_flag = Arc::new(std::sync::atomic::AtomicBool::new(false));
-        let stop_for_handle = Arc::clone(&stop_flag);
-        let _ = self.worker.stop.set(stop_flag);
-        tokio::spawn(async move {
+        self.worker
+            .stop
+            .set(stop_flag.clone())
+            .map_err(|_| KnowledgeError::conflict("worker already started"))?;
+        let service = Arc::clone(self);
+        let task = tokio::spawn(async move {
+            let _ownership = lock;
             loop {
-                if stop_for_handle.load(std::sync::atomic::Ordering::Relaxed) {
+                if stop_flag.load(std::sync::atomic::Ordering::Acquire) {
                     break;
                 }
-                let claimed = {
-                    let _guard = service.jobs_mutex().await;
-                    service.facts.claim_next_job().ok().flatten()
-                };
-                match claimed {
-                    Some(job) => {
-                        service.process_job(job).await;
-                    }
-                    None => {
+                match service.facts.claim_next_job() {
+                    Ok(Some(job)) => service.process_job(job).await,
+                    Ok(None) => tokio::select! {
+                        _=service.wake.notified()=>{},
+                        _=tokio::time::sleep(std::time::Duration::from_millis(100))=>{},
+                    },
+                    Err(error) => {
+                        tracing::error!(%error,"knowledge worker claim failed");
                         tokio::select! {
-                            _ = service.wake.notified() => {}
-                            _ = tokio::time::sleep(std::time::Duration::from_millis(500)) => {}
+                            _=service.wake.notified()=>{},
+                            _=tokio::time::sleep(std::time::Duration::from_millis(500))=>{},
                         }
                     }
                 }
             }
         });
+        *self
+            .worker
+            .task
+            .try_lock()
+            .expect("worker task lock before first start") = Some(task);
+        Ok(())
     }
 
-    async fn jobs_mutex(&self) -> tokio::sync::MutexGuard<'_, ()> {
-        static JOBS: OnceLock<tokio::sync::Mutex<()>> = OnceLock::new();
-        JOBS.get_or_init(|| tokio::sync::Mutex::new(()))
-            .lock()
-            .await
+    pub async fn wait_worker_stopped(&self) -> Result<(), KnowledgeError> {
+        self.shutdown();
+        // &mut 轮询保留 JoinHandle；取消一个等待者不能让另一个假称任务已退出。
+        let mut slot = self.worker.task.lock().await;
+        if let Some(task) = slot.as_mut() {
+            let outcome = task.await;
+            slot.take();
+            outcome.map_err(|error| {
+                KnowledgeError::storage_invalid(format!("knowledge worker exit failed: {error}"))
+            })?;
+        }
+        Ok(())
+    }
+
+    fn ensure_job_active(&self, job: &ks::JobRow) -> Result<(), KnowledgeError> {
+        if self
+            .worker
+            .stop
+            .get()
+            .is_some_and(|s| s.load(std::sync::atomic::Ordering::Acquire))
+        {
+            return Err(KnowledgeError::conflict(
+                "ingestion worker stopped; checkpoint and unknown requests preserved",
+            ));
+        }
+        let current = self.facts.get_job(&job.id)?;
+        if current
+            .embedding_stats
+            .as_ref()
+            .and_then(|stats| stats["ownership"]["deadline_unix_ms"].as_u64())
+            .is_some_and(|deadline| lingxi_adapters::models::dispatch::unix_ms_now() >= deadline)
+        {
+            return Err(KnowledgeError::conflict(
+                "knowledge job absolute deadline exhausted; paid checkpoints preserved",
+            ));
+        }
+        if current.status != "running"
+            || current.cancelled_at.is_some()
+            || current.attempt != job.attempt
+        {
+            return Err(KnowledgeError::conflict(
+                "ingestion job cancelled or no longer owned",
+            ));
+        }
+        self.facts.get_source(&job.source_id)?;
+        Ok(())
     }
 
     pub fn shutdown(&self) {
@@ -563,20 +818,22 @@ impl KnowledgeService {
             .map_err(|error| KnowledgeError::storage_invalid(format!("parse_source: {error}")))?;
         // 导入+解析完成即入队摄入（chunk→fts_index→embed 异步执行），HTTP 立即
         // 返回（routes L417-429）。
-        self.enqueue_ingestion(notebook_id, &source.id, artifact["id"].as_str());
+        self.enqueue_ingestion(notebook_id, &source.id, artifact["id"].as_str())?;
         Ok(self.notebook_source_payload(notebook_id, &source, &snapshot, Some(&artifact)))
     }
 
     /// 入队（解析失败的保底路径 artifactId 为 None；入队后唤醒 worker）。
-    fn enqueue_ingestion(&self, notebook_id: &str, source_id: &str, artifact_id: Option<&str>) {
-        let profile = self
-            .notebook_chunk_profile(notebook_id)
-            .map(|(_, profile)| profile)
-            .unwrap_or_default();
-        let _ = self
-            .facts
-            .enqueue_source_ingestion(notebook_id, source_id, artifact_id, &profile);
+    fn enqueue_ingestion(
+        &self,
+        notebook_id: &str,
+        source_id: &str,
+        artifact_id: Option<&str>,
+    ) -> Result<(), KnowledgeError> {
+        let (_, profile) = self.notebook_chunk_profile(notebook_id)?;
+        self.facts
+            .enqueue_source_ingestion(notebook_id, source_id, artifact_id, &profile)?;
         self.wake.notify_waiters();
+        Ok(())
     }
 
     /// 文件导入（file-import-security.ts + knowledge-manager.ts resolveSupportedMimeType
@@ -602,7 +859,7 @@ impl KnowledgeService {
         )?;
         self.facts.add_membership(notebook_id, &source.id)?;
         let artifact = self.parse_source(&source.id, &snapshot)?;
-        self.enqueue_ingestion(notebook_id, &source.id, artifact["id"].as_str());
+        self.enqueue_ingestion(notebook_id, &source.id, artifact["id"].as_str())?;
         Ok(self.notebook_source_payload(notebook_id, &source, &snapshot, Some(&artifact)))
     }
 
@@ -693,12 +950,8 @@ impl KnowledgeService {
                 }
                 Err(err) => {
                     let (_, profile) = self.notebook_chunk_profile(notebook_id)?;
-                    let _ = self.facts.enqueue_source_ingestion(
-                        notebook_id,
-                        &source_id,
-                        None,
-                        &profile,
-                    );
+                    self.facts
+                        .enqueue_source_ingestion(notebook_id, &source_id, None, &profile)?;
                     results.push(json!({"sourceId": source_id, "ingestion": "parse_failed_enqueued_for_retry", "error": err.code}));
                 }
             }
@@ -748,7 +1001,7 @@ impl KnowledgeService {
             .remove_source_from_notebook(notebook_id, source_id)?;
         self.facts.add_membership(notebook_id, &source.id)?;
         let artifact = self.parse_source(&source.id, &snapshot)?;
-        self.enqueue_ingestion(notebook_id, &source.id, artifact["id"].as_str());
+        self.enqueue_ingestion(notebook_id, &source.id, artifact["id"].as_str())?;
         let mut payload =
             self.notebook_source_payload(notebook_id, &source, &snapshot, Some(&artifact));
         if let Some(object) = payload.as_object_mut() {
@@ -787,30 +1040,38 @@ impl KnowledgeService {
 
     /// delete wins：取消活跃 job + 清变体/快照（活跃 turn 冻结引用时 409）。
     pub fn delete_source(&self, source_id: &str) -> Result<Value, KnowledgeError> {
+        let _write = self.write_gate.try_lock().map_err(|_| {
+            KnowledgeError::storage_invalid("knowledge write gate busy; no unbounded wait")
+        })?;
         if self.facts.any_active_scope_freezes_source(source_id)? {
             return Err(KnowledgeError::conflict(
                 "source is referenced by an active turn scope",
             ));
         }
-        let source = self.facts.get_source(source_id)?;
-        // 物理痕迹：解析产物与变体（索引可重建 ≠ 源文件可删——这里是显式删除）。
-        if let Ok(snapshot) = self.facts.latest_snapshot_for_source(source_id) {
-            if let Ok(Some(artifact)) = self.facts.latest_parse_artifact_for_snapshot(&snapshot.id)
-            {
-                let _ = self.vectors.remove_artifact(&artifact.id);
-                let _ = self.index.reset();
-                let _ = std::fs::remove_file(
-                    self.facts
-                        .root()
-                        .join("artifacts")
-                        .join(&snapshot.id)
-                        .join(format!("{}.json", artifact.id)),
-                );
+        self.facts.get_source(source_id)?;
+        let artifacts = self.facts.list_source_parse_artifacts(source_id)?;
+        let cancelled = self.facts.cancel_jobs_for_source(source_id)?;
+        // 只清此来源的全部版本；缓存写入失败必须返回错误，不能声称purge成功。
+        for (artifact_id, snapshot_id) in artifacts {
+            self.vectors.remove_artifact(&artifact_id)?;
+            self.index.remove_artifact(&artifact_id)?;
+            let artifact_path = self
+                .facts
+                .root()
+                .join("artifacts")
+                .join(snapshot_id)
+                .join(format!("{artifact_id}.json"));
+            match std::fs::remove_file(artifact_path) {
+                Ok(()) => {}
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+                Err(error) => {
+                    return Err(KnowledgeError::storage_invalid(format!(
+                        "knowledge artifact cleanup failed: {error}"
+                    )));
+                }
             }
         }
-        let cancelled = self.facts.cancel_jobs_for_source(source_id)?;
-        let _ = source;
-        let _ = self.facts.delete_source(source_id)?;
+        self.facts.delete_source(source_id)?;
         self.facts.purge_source(source_id)?;
         Ok(json!({"cancelledJobs": cancelled, "purge": {"snapshots": true, "indexVariants": true}}))
     }
@@ -1074,6 +1335,80 @@ impl KnowledgeService {
         Ok(scope)
     }
 
+    /// 从当前认证与运行记录铸造冻结选择，工具不能用旧UI范围冒认本轮授权。
+    pub fn freeze_run_scope(
+        &self,
+        ctx: &lingxi_kernel::RunContext,
+        agent_id: &str,
+        notebook_ids: &[String],
+        source_ids: &[String],
+    ) -> Result<ks::TurnScopeRow, KnowledgeError> {
+        if agent_id.is_empty() {
+            return Err(KnowledgeError::scope_violation(
+                "Knowledge agent binding is missing",
+            ));
+        }
+        let binding = ks::RunScopeBinding {
+            principal_kind: ctx.principal.storage_kind().to_string(),
+            principal_subject: ctx.principal.storage_subject(),
+            agent_id: agent_id.to_string(),
+            session_id: ctx.session_id.to_string(),
+            run_id: ctx.run_id.to_string(),
+            attempt: ctx.attempt.to_string(),
+            generation: ctx.generation,
+        };
+        self.facts
+            .freeze_run_scope(&self.studio_id, &binding, notebook_ids, source_ids)
+    }
+
+    /// 驱动确认合法下一 attempt 后，原子衔接本轮冻结材料并淘汰旧句柄。
+    pub(crate) fn advance_run_scope_attempt(
+        &self,
+        scope_id: &str,
+        previous: &lingxi_kernel::RunContext,
+        current: &lingxi_kernel::RunContext,
+        agent_id: &str,
+    ) -> Result<ks::TurnScopeRow, KnowledgeError> {
+        let binding = |ctx: &lingxi_kernel::RunContext| ks::RunScopeBinding {
+            principal_kind: ctx.principal.storage_kind().to_string(),
+            principal_subject: ctx.principal.storage_subject(),
+            agent_id: agent_id.to_string(),
+            session_id: ctx.session_id.to_string(),
+            run_id: ctx.run_id.to_string(),
+            attempt: ctx.attempt.to_string(),
+            generation: ctx.generation,
+        };
+        self.facts.advance_run_scope_attempt(
+            &self.studio_id, scope_id, &binding(previous), &binding(current),
+        )
+    }
+
+    /// 每次执行前重验本轮身份；同一会话旧范围、换主体或换Agent均不能复用。
+    pub fn validate_run_scope(
+        &self,
+        scope_id: &str,
+        ctx: &lingxi_kernel::RunContext,
+        agent_id: &str,
+    ) -> Result<ks::TurnScopeRow, KnowledgeError> {
+        let scope = self.resolve_turn_scope(scope_id, ctx.session_id.as_str())?;
+        let binding = scope.run_binding.as_ref().ok_or_else(|| {
+            KnowledgeError::scope_violation("Knowledge scope was not minted for a trusted run")
+        })?;
+        if binding.principal_kind != ctx.principal.storage_kind()
+            || binding.principal_subject != ctx.principal.storage_subject()
+            || binding.agent_id != agent_id
+            || binding.session_id != ctx.session_id.as_str()
+            || binding.run_id != ctx.run_id.as_str()
+            || binding.attempt != ctx.attempt.as_str()
+            || binding.generation != ctx.generation
+        {
+            return Err(KnowledgeError::scope_violation(
+                "Knowledge scope belongs to a different run owner, agent or generation",
+            ));
+        }
+        Ok(scope)
+    }
+
     pub fn get_turn_scope(&self, scope_id: &str) -> Result<Value, KnowledgeError> {
         let scope = self
             .facts
@@ -1131,6 +1466,42 @@ impl KnowledgeService {
         &self,
         request: &SearchRequest,
     ) -> Result<SearchResult, KnowledgeError> {
+        static QUERY_SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+        let now = lingxi_adapters::models::dispatch::unix_ms_now();
+        let cause = format!(
+            "knowledge-query:{}:{}:{}",
+            self.studio_id,
+            now,
+            QUERY_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+        );
+        let runtime = crate::operations::EmbeddingCallRuntime {
+            ownership: crate::operations::OperationOwnership {
+                principal_kind: "local_user".into(),
+                principal_subject: lingxi_kernel::LOCAL_OWNER_SUBJECT.into(),
+                agent_id: None,
+                session_id: None,
+                run_id: None,
+                attempt: None,
+                parent_tool_call_id: None,
+                cause_ref: cause.clone(),
+                deadline_unix_ms: now.saturating_add(300_000),
+                budget_ms: 300_000,
+            },
+            cancel: crate::cancel::CancelScope::background_root(&cause),
+            request_key: cause,
+            manual_retry_authorized: false,
+        };
+        self.search_in_scope_owned(request, &runtime).await
+    }
+
+    pub async fn search_in_scope_owned(
+        &self,
+        request: &SearchRequest,
+        runtime: &crate::operations::EmbeddingCallRuntime,
+    ) -> Result<SearchResult, KnowledgeError> {
+        runtime
+            .check()
+            .map_err(|e| KnowledgeError::retrieval_unavailable(e.message))?;
         let limit = request.limit.clamp(1, 24);
         let scope = self.resolve_turn_scope(&request.scope_id, &request.session_id)?;
         let query = request.query.trim();
@@ -1244,10 +1615,24 @@ impl KnowledgeService {
             if let Some(embedder) = embedder {
                 if !ready.is_empty() {
                     match embedder
-                        .embed(vec![query.to_string()], EmbeddingInputType::Query)
+                        .embed_owned(
+                            vec![query.to_string()],
+                            EmbeddingInputType::Query,
+                            runtime,
+                            None,
+                        )
                         .await
                     {
-                        Ok((identity, vectors)) => {
+                        Ok(result) => {
+                            if let Some(error) = result.accounting_error {
+                                return Err(error);
+                            }
+                            runtime
+                                .check()
+                                .map_err(|e| KnowledgeError::retrieval_unavailable(e.message))?;
+                            let identity = result.identity;
+                            let vectors = result.vectors;
+                            validate_embedding_batch(&identity, &vectors, 1)?;
                             let query_vector = &vectors[0];
                             let mut viv_ids: Vec<String> = Vec::new();
                             for scope in &ready {
@@ -1272,6 +1657,7 @@ impl KnowledgeService {
                                         "chunkIndexVariantId": civ,
                                         "vectorIndexVariantId": viv,
                                         "dimensions": identity.dimensions,
+                                        "parameterFingerprint": identity.parameter_fingerprint,
                                     }));
                                 } else {
                                     // A14：变体缺失/非 ready/维度不符 → 显式降级
@@ -1298,6 +1684,9 @@ impl KnowledgeService {
                             }
                         }
                         Err(err) => {
+                            runtime
+                                .check()
+                                .map_err(|e| KnowledgeError::retrieval_unavailable(e.message))?;
                             // 查询嵌入失败 → 显式降级 FTS + 留痕（向量是增强层，
                             // 不炸检索，也不静默换模型）。
                             degraded.push(DegradedScope {
@@ -1393,6 +1782,9 @@ impl KnowledgeService {
             });
         }
         let candidates: Vec<ks::StoredChunk> = candidates_by_id.into_values().collect();
+        runtime
+            .check()
+            .map_err(|e| KnowledgeError::retrieval_unavailable(e.message))?;
         Ok(SearchResult {
             mode,
             degraded,
@@ -1714,280 +2106,545 @@ impl KnowledgeService {
 
     // ── 摄入 worker ─────────────────────────────────────────────────────────
 
-    async fn process_job(&self, mut job: ks::JobRow) {
-        // delete wins：已取消的 job 不再执行。
-        if job.cancelled_at.is_some() {
-            return;
-        }
-        if self.facts.get_source(&job.source_id).is_err() {
-            let _ = self.facts.fail_job(&job.id, "cancelled: source deleted");
-            return;
-        }
-        let (target_chars, config_id) = match self.notebook_chunk_profile(&job.notebook_id) {
-            Ok(pair) => pair,
-            Err(err) => {
-                let _ = self.facts.fail_job(&job.id, &err.message);
-                return;
+    fn prepare_job_plan(
+        &self,
+        job: &ks::JobRow,
+    ) -> Result<(String, String, String, Vec<ks::StoredChunk>), KnowledgeError> {
+        let _write = self.write_gate.try_lock().map_err(|_| {
+            KnowledgeError::storage_invalid("knowledge write gate busy; no unbounded wait")
+        })?;
+        self.ensure_job_active(job)?;
+        let (target_chars, _) = self.notebook_chunk_profile(&job.notebook_id)?;
+        let artifact_id = match &job.artifact_id {
+            Some(id) => id.clone(),
+            None => {
+                let snapshot = self.facts.latest_snapshot_for_source(&job.source_id)?;
+                let artifact = self.parse_source(&job.source_id, &snapshot)?;
+                artifact["id"]
+                    .as_str()
+                    .ok_or_else(|| KnowledgeError::index_invalid("parse produced no artifact id"))?
+                    .to_string()
             }
         };
-        // chunk + fts_index 相位（同一次幂等替换）。
-        let artifact_id: String = match job.artifact_id.clone() {
-            Some(artifact_id) => artifact_id,
-            None => {
-                // parse 相位兜底重试（parse 失败入队的 job 从 parse 相位续跑）。
-                let snapshot = match self.facts.latest_snapshot_for_source(&job.source_id) {
-                    Ok(snapshot) => snapshot,
-                    Err(err) => {
-                        let _ = self.facts.fail_job(&job.id, &err.message);
-                        return;
+        self.facts.set_job_phase(&job.id, "chunk")?;
+        let blocks = self.facts.list_artifact_blocks(&artifact_id)?;
+        let blocks = blocks.iter().map(chunker_block_of).collect::<Vec<_>>();
+        let fingerprint = block_fingerprint(&blocks);
+        let (_, _, profile) = resolve_chunker_config(&blocks, Some(target_chars))?;
+        let planned = build_chunks(&artifact_id, &blocks, Some(target_chars))?;
+        if !self
+            .index
+            .has_artifact_fingerprint(&artifact_id, &profile, &fingerprint)?
+        {
+            let sections = lingxi_kernel::knowledge::build_sections(&artifact_id, &blocks)
+                .iter()
+                .map(|section| ks::SectionMetaRow {
+                    id: section.id.clone(),
+                    section_ordinal: section.section_ordinal,
+                    heading_path: section.heading_path.clone(),
+                    start_block_ordinal: section.start_block_ordinal,
+                    end_block_ordinal: section.end_block_ordinal,
+                })
+                .collect::<Vec<_>>();
+            self.index.replace_artifact_chunks(
+                &artifact_id,
+                &profile,
+                &fingerprint,
+                &planned,
+                &sections,
+            )?;
+        }
+        let civ = chunk_index_variant_id(&artifact_id, &profile);
+        let chunks = self.index.list_variant_chunks(&civ)?;
+        // 计划来自权威原文；缓存里等量错ID/正文也不能定义另一套“正确计划”。
+        if chunks.is_empty()
+            || chunks.len() != planned.len()
+            || chunks.iter().zip(&planned).any(|(stored, planned)| {
+                stored.chunk_id != planned.id
+                    || stored.ordinal != planned.ordinal
+                    || stored.text != planned.text
+            })
+        {
+            return Err(KnowledgeError::index_invalid(
+                "chunk cache does not match the authoritative source plan",
+            ));
+        }
+        let mut hash = String::new();
+        for chunk in &chunks {
+            hash.push_str(&chunk.chunk_id);
+            hash.push('\0');
+            hash.push_str(&chunk.text);
+            hash.push('\0');
+        }
+        self.facts.set_job_phase(&job.id, "embed")?;
+        Ok((artifact_id, civ, sha256_hex(hash.as_bytes()), chunks))
+    }
+
+    async fn process_job(&self, job: ks::JobRow) {
+        let result = async {
+            let mut initial = job.embedding_stats.clone().unwrap_or_else(|| json!({}));
+            if initial.get("ownership").is_none() {
+                let now = lingxi_adapters::models::dispatch::unix_ms_now();
+                initial["ownership"] =
+                    serde_json::to_value(crate::operations::OperationOwnership {
+                        principal_kind: "local_user".into(),
+                        principal_subject: lingxi_kernel::LOCAL_OWNER_SUBJECT.into(),
+                        agent_id: None,
+                        session_id: None,
+                        run_id: None,
+                        attempt: Some(format!("job:{}#a{}", job.id, job.attempt)),
+                        parent_tool_call_id: None,
+                        cause_ref: format!("knowledge-job:{}:{}", self.studio_id, job.id),
+                        deadline_unix_ms: now.saturating_add(300_000),
+                        budget_ms: 300_000,
+                    })
+                    .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+                self.facts.set_job_embedding_stats(&job.id, &initial)?;
+            }
+            let mut ownership: crate::operations::OperationOwnership =
+                serde_json::from_value(initial["ownership"].clone()).map_err(|e| {
+                    KnowledgeError::storage_invalid(format!("knowledge job ownership invalid: {e}"))
+                })?;
+            ownership.attempt = Some(format!("job:{}#a{}", job.id, job.attempt));
+            let runtime = crate::operations::EmbeddingCallRuntime {
+                cancel: crate::cancel::CancelScope::background_root(&ownership.cause_ref),
+                request_key: job.id.clone(),
+                manual_retry_authorized: initial["manualRetryAttempt"].as_i64()
+                    == Some(job.attempt),
+                ownership,
+            };
+            runtime
+                .check()
+                .map_err(|e| KnowledgeError::conflict(e.message))?;
+            let (artifact_id, civ, fingerprint, chunks) = self.prepare_job_plan(&job)?;
+            let embedder = self.embedder.lock().expect("embedder lock").clone();
+            let Some(embedder) = embedder else {
+                self.facts.mark_job_pending_embedding(&job.id)?;
+                return Ok(());
+            };
+            runtime
+                .check()
+                .map_err(|e| KnowledgeError::conflict(e.message))?;
+            self.ensure_job_active(&job)?;
+            // 等待补账时同样监督原作业；取消后等待真实 IO 有界收尾，不能丢 future 冒认停止。
+            let settlement = embedder.settle_pending_owned(&runtime);
+            tokio::pin!(settlement);
+            tokio::select! {
+                result=&mut settlement=>result?,
+                cancelled=async {
+                    loop {
+                        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+                        if let Err(error)=self.ensure_job_active(&job) {break error;}
                     }
+                }=>{
+                    runtime.cancel.cancel(&cancelled.to_string());
+                    settlement.await?;
+                    return Err(cancelled);
+                },
+            };
+            runtime
+                .check()
+                .map_err(|e| KnowledgeError::conflict(e.message))?;
+            self.embed_planned_job(
+                &job,
+                (&artifact_id, &civ, &fingerprint, &chunks),
+                embedder.as_ref(),
+                &runtime,
+            )
+            .await
+        }
+        .await;
+        if let Err(error) = result {
+            tracing::error!(job_id=%job.id,%error,"knowledge ingestion job did not complete");
+            if !self
+                .worker
+                .stop
+                .get()
+                .is_some_and(|s| s.load(std::sync::atomic::Ordering::Acquire))
+            {
+                let Ok(_write) = self.write_gate.try_lock() else {
+                    tracing::error!(job_id=%job.id,%error,"knowledge job failure persistence unconfirmed: write gate busy");
+                    return;
                 };
-                match self.parse_source(&job.source_id, &snapshot) {
-                    Ok(artifact) => match artifact["id"].as_str() {
-                        Some(id) => id.to_string(),
-                        None => {
-                            let _ = self
-                                .facts
-                                .fail_job(&job.id, "parse produced no artifact id");
-                            return;
+                let mut failure = error.to_string();
+                if let Ok(current) = self.facts.get_job(&job.id) {
+                    if current.status == "running"
+                        && current.cancelled_at.is_none()
+                        && current.attempt == job.attempt
+                    {
+                        if let Some(mut stats) = current.embedding_stats {
+                            if let Some(variant) =
+                                stats["checkpointVariantId"].as_str().map(str::to_string)
+                            {
+                                match self.vectors.checkpoint_entries(&variant) {
+                                    Ok(entries) => {
+                                        let reused = stats["chunksResumedFromCheckpoint"]
+                                            .as_u64()
+                                            .unwrap_or(0)
+                                            + stats["chunksReusedFromReadyVariant"]
+                                                .as_u64()
+                                                .unwrap_or(0);
+                                        let written = (entries.len() as u64).saturating_sub(reused);
+                                        stats["chunksNewlyEmbedded"] = json!(written);
+                                        stats["actualWrittenChunkCount"] = json!(written);
+                                        if let Err(error) =
+                                            self.facts.set_job_embedding_stats(&job.id, &stats)
+                                        {
+                                            failure.push_str(&format!("; confirmed checkpoint count={}, persisted statistics unavailable: {error}",entries.len()));
+                                        }
+                                    }
+                                    Err(error) => failure.push_str(&format!(
+                                        "; checkpoint validation failed: {error}"
+                                    )),
+                                }
+                                if let Err(error) = self.vectors.fail_build(&variant) {
+                                    failure.push_str(&format!(
+                                        "; variant failure status unavailable: {error}"
+                                    ));
+                                }
+                            }
                         }
-                    },
-                    Err(err) => {
-                        // 解析失败显式终态（可手动重试）。
-                        let _ = self
-                            .facts
-                            .fail_job(&job.id, &format!("parse failed: {}", err.code));
-                        return;
                     }
                 }
+                if let Err(storage_error) = self.facts.fail_job(&job.id, &failure) {
+                    tracing::error!(%storage_error,"knowledge job failure could not be persisted");
+                }
             }
+        }
+    }
+
+    async fn embed_planned_job(
+        &self,
+        job: &ks::JobRow,
+        plan: (&str, &str, &str, &[ks::StoredChunk]),
+        embedder: &dyn KnowledgeEmbedder,
+        runtime: &crate::operations::EmbeddingCallRuntime,
+    ) -> Result<(), KnowledgeError> {
+        let (artifact_id, civ, fingerprint, chunks) = plan;
+        let Some(configured) = embedder.identity()? else {
+            self.facts.mark_job_pending_embedding(&job.id)?;
+            return Ok(());
         };
-        let _ = self.facts.set_job_phase(&job.id, "chunk");
-        let blocks = match self.facts.list_artifact_blocks(&artifact_id) {
-            Ok(blocks) => blocks,
-            Err(err) => {
-                let _ = self.facts.fail_job(&job.id, &err.message);
-                return;
+        let plan = chunks
+            .iter()
+            .map(|c| (c.chunk_id.clone(), c.ordinal))
+            .collect::<Vec<_>>();
+        let expected = plan
+            .iter()
+            .cloned()
+            .collect::<std::collections::BTreeSet<_>>();
+        if expected.len() != chunks.len() {
+            return Err(KnowledgeError::index_invalid("duplicate planned chunks"));
+        }
+        // 零维度只是未发送配置。只有相同完整指纹下、已实测且字节有效的旧变体
+        // 才能提供维度；未知/旧身份不凭同名模型冒认兼容。
+        let mut identity = None;
+        let mut build = None;
+        let mut checkpoint = std::collections::BTreeSet::new();
+        let mut ready_reused = false;
+        for variant in self.vectors.list_variants_by_artifact(artifact_id)? {
+            if variant.chunk_index_variant_id != civ || variant.chunk_fingerprint != fingerprint {
+                continue;
             }
-        };
-        let chunker_blocks: Vec<ChunkerBlock> = blocks.iter().map(chunker_block_of).collect();
-        let fingerprint = block_fingerprint(&chunker_blocks);
-        let chunk_profile_hash = chunker_config_id(
-            resolve_chunker_config(&chunker_blocks, Some(target_chars))
-                .map(|(strategy, _, _)| strategy)
-                .unwrap_or(lingxi_kernel::knowledge::ChunkerStrategy::Markdown),
-            target_chars,
-        );
-        let already_ready = self
-            .index
-            .has_artifact_fingerprint(&artifact_id, &chunk_profile_hash, &fingerprint)
-            .unwrap_or(false);
-        if !already_ready {
-            let chunks = match build_chunks(&artifact_id, &chunker_blocks, Some(target_chars)) {
-                Ok(chunks) => chunks,
-                Err(err) => {
-                    let _ = self.facts.fail_job(&job.id, &err.message);
-                    return;
+            let learned =
+                if configured.dimensions == 0 && !configured.parameter_fingerprint.is_empty() {
+                    EmbeddingModelIdentity::with_parameters(
+                        &configured.provider,
+                        &configured.model_id,
+                        &configured.protocol,
+                        variant.dimensions,
+                        configured.parameter_fingerprint.clone(),
+                    )
+                } else {
+                    configured.clone()
+                };
+            if learned.key != variant.model_key || learned.dimensions != variant.dimensions {
+                continue;
+            }
+            let entries = self.vectors.checkpoint_entries(&variant.variant_id)?;
+            checkpoint = entries
+                .iter()
+                .map(|e| (e.chunk_id.clone(), e.ordinal))
+                .collect();
+            if checkpoint.len() != entries.len() || !checkpoint.is_subset(&expected) {
+                return Err(KnowledgeError::index_invalid(
+                    "checkpoint does not match the actual planned chunk set",
+                ));
+            }
+            ready_reused = variant.status == "ready" && checkpoint == expected;
+            if variant.status == "ready" && !ready_reused {
+                return Err(KnowledgeError::index_invalid("ready variant is incomplete"));
+            }
+            identity = Some(learned);
+            build = Some(ks::BuildBegin {
+                variant_id: variant.variant_id,
+                reset_stale: false,
+            });
+            break;
+        }
+        let reused = checkpoint.len();
+        let previous = job.embedding_stats.as_ref();
+        let previous_requests = previous
+            .and_then(|v| v["requestCount"].as_u64())
+            .unwrap_or(0)
+            + previous
+                .and_then(|v| v["previousRequestCount"].as_u64())
+                .unwrap_or(0);
+        let previous_unknown = previous
+            .and_then(|v| v["unknownRequestsFromPreviousAttempt"].as_u64())
+            .unwrap_or(0)
+            + previous
+                .and_then(|v| v["pendingRequestCount"].as_u64())
+                .unwrap_or(0)
+            + previous
+                .and_then(|v| v["unknownSentRequestCount"].as_u64())
+                .unwrap_or(0);
+        let previous_transport = previous
+            .and_then(|v| v["transportAttemptCount"].as_u64())
+            .unwrap_or(0)
+            + previous
+                .and_then(|v| v["previousTransportAttemptCount"].as_u64())
+                .unwrap_or(0);
+        let previous_not_sent = previous
+            .and_then(|v| v["knownNotSentAttemptCount"].as_u64())
+            .unwrap_or(0)
+            + previous
+                .and_then(|v| v["previousKnownNotSentAttemptCount"].as_u64())
+                .unwrap_or(0);
+        let mut stats = json!({"chunksNewlyEmbedded":0,"chunksResumedFromCheckpoint":if ready_reused{0}else{reused},"chunksReusedFromReadyVariant":if ready_reused{reused}else{0},"requestCount":0,"requestCountSemantics":"confirmed_or_possibly_sent_excluding_known_not_sent","transportAttemptCount":0,"confirmedResponseRequestCount":0,"knownNotSentAttemptCount":0,"unknownSentRequestCount":0,"failedTransportAttemptCount":0,"callAttemptCount":0,"pendingCallIntentCount":0,"successfulRequestCount":0,"failedRequestCount":0,"failedCallCount":0,"pendingRequestCount":0,"previousRequestCount":previous_requests,"previousTransportAttemptCount":previous_transport,"previousKnownNotSentAttemptCount":previous_not_sent,"unknownRequestsFromPreviousAttempt":previous_unknown,"plannedChunkCount":chunks.len(),"actualWrittenChunkCount":0,"attempt":job.attempt,"resetStaleVectors":false,"model":null,"abandonedStaleVariantId":null});
+        stats["ownership"] = serde_json::to_value(&runtime.ownership)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        stats["modelCallIds"] = json!([]);
+        stats["previousModelCallIds"] = json!(previous
+            .into_iter()
+            .flat_map(|v| ["modelCallIds", "previousModelCallIds"]
+                .into_iter()
+                .flat_map(move |key| v[key].as_array().into_iter().flatten().cloned()))
+            .collect::<Vec<_>>());
+        stats["paidResponsesReused"] = json!(0);
+        {
+            let _write = self.write_gate.try_lock().map_err(|_| {
+                KnowledgeError::storage_invalid("knowledge write gate busy; no unbounded wait")
+            })?;
+            self.ensure_job_active(job)?;
+            self.facts.set_job_embedding_stats(&job.id, &stats)?;
+            self.facts
+                .set_job_progress(&job.id, reused as i64, Some(chunks.len() as i64))?;
+        }
+        let missing = chunks
+            .iter()
+            .filter(|c| !checkpoint.contains(&(c.chunk_id.clone(), c.ordinal)))
+            .collect::<Vec<_>>();
+        for batch in missing.chunks(EMBED_BATCH) {
+            {
+                let _write = self.write_gate.try_lock().map_err(|_| {
+                    KnowledgeError::storage_invalid("knowledge write gate busy; no unbounded wait")
+                })?;
+                self.ensure_job_active(job)?;
+                stats["callAttemptCount"] = json!(stats["callAttemptCount"].as_u64().unwrap() + 1);
+                stats["pendingCallIntentCount"] = json!(1);
+                self.facts.set_job_embedding_stats(&job.id, &stats)?;
+            }
+            let texts = batch.iter().map(|c| c.text.clone()).collect::<Vec<_>>();
+            let requests_before_call = stats["requestCount"].as_u64().unwrap();
+            let transport_before_call = stats["transportAttemptCount"].as_u64().unwrap();
+            let dispatch_stats = Mutex::new(stats.clone());
+            let on_send = |observation| {
+                let _write = self.write_gate.try_lock().map_err(|_| {
+                    KnowledgeError::storage_invalid("knowledge write gate busy; no unbounded wait")
+                })?;
+                self.ensure_job_active(job)?;
+                let mut stats = dispatch_stats.lock().expect("dispatch statistics lock");
+                let mut next = stats.clone();
+                match observation {
+                    SendObservation::AttemptStarted => {
+                        next["transportAttemptCount"] =
+                            json!(next["transportAttemptCount"].as_u64().unwrap() + 1);
+                        next["requestCount"] = json!(next["requestCount"].as_u64().unwrap() + 1);
+                        next["pendingRequestCount"] = json!(1);
+                    }
+                    SendObservation::ResponseHeadersReceived => {
+                        next["confirmedResponseRequestCount"] =
+                            json!(next["confirmedResponseRequestCount"].as_u64().unwrap() + 1);
+                        next["pendingRequestCount"] = json!(0);
+                    }
+                    SendObservation::ConnectFailedBeforeSend => {
+                        next["knownNotSentAttemptCount"] =
+                            json!(next["knownNotSentAttemptCount"].as_u64().unwrap() + 1);
+                        next["requestCount"] = json!(next["requestCount"]
+                            .as_u64()
+                            .unwrap()
+                            .checked_sub(1)
+                            .expect("transport attempt preceded connect failure"));
+                        next["pendingRequestCount"] = json!(0);
+                    }
+                }
+                self.facts.set_job_embedding_stats(&job.id, &next)?;
+                *stats = next;
+                Ok(())
+            };
+            let mut batch_runtime = runtime.clone();
+            batch_runtime.request_key = format!(
+                "{}:{}:{}",
+                job.id,
+                civ,
+                sha256_hex(
+                    &serde_json::to_vec(&texts)
+                        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+                )
+            );
+            let result = {
+                let future = embedder.embed_owned(
+                    texts,
+                    EmbeddingInputType::Document,
+                    &batch_runtime,
+                    Some(&on_send),
+                );
+                tokio::pin!(future);
+                tokio::select! {
+                    outcome=&mut future=>outcome,
+                    cancelled=async {
+                        loop {
+                            tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+                            if let Err(error)=self.ensure_job_active(job) {break error;}
+                        }
+                    }=>{ batch_runtime.cancel.cancel(&cancelled.to_string()); let settlement=future.await; match settlement { Err(error)=>Err(error),Ok(_)=>Err(cancelled) } },
                 }
             };
-            let sections: Vec<ks::SectionMetaRow> =
-                lingxi_kernel::knowledge::build_sections(&artifact_id, &chunker_blocks)
-                    .iter()
-                    .map(|section| ks::SectionMetaRow {
-                        id: section.id.clone(),
-                        section_ordinal: section.section_ordinal,
-                        heading_path: section.heading_path.clone(),
-                        start_block_ordinal: section.start_block_ordinal,
-                        end_block_ordinal: section.end_block_ordinal,
-                    })
-                    .collect();
-            if let Err(err) = self.index.replace_artifact_chunks(
-                &artifact_id,
-                &chunk_profile_hash,
-                &fingerprint,
-                &chunks,
-                &sections,
-            ) {
-                let _ = self.index.set_variant_status(
-                    &chunk_index_variant_id(&artifact_id, &chunk_profile_hash),
-                    "failed",
-                );
-                let _ = self.facts.fail_job(&job.id, &err.message);
-                return;
-            }
-        }
-        job.chunker_config_id = config_id;
-        let _ = self.facts.set_job_phase(&job.id, "embed");
-        let _ = job.artifact_id.insert(artifact_id.clone());
-
-        // embed 相位：嵌入模型未配置 → 显式 pending_embedding（禁静默降级）。
-        let embedder = self.embedder.lock().expect("embedder lock").clone();
-        let Some(embedder) = embedder else {
-            let _ = self.facts.mark_job_pending_embedding(&job.id);
-            return;
-        };
-        let chunks = self
-            .index
-            .list_variant_chunks(&chunk_index_variant_id(&artifact_id, &chunk_profile_hash))
-            .unwrap_or_default();
-        if chunks.is_empty() {
-            let _ = self.facts.fail_job(&job.id, "index has no chunks to embed");
-            return;
-        }
-        let civ = chunk_index_variant_id(&artifact_id, &chunk_profile_hash);
-        let chunk_fingerprint = {
-            let mut hash = String::new();
-            for chunk in &chunks {
-                hash.push_str(&chunk.chunk_id);
-                hash.push('\0');
-                hash.push_str(&chunk.text);
-                hash.push('\0');
-            }
-            sha256_hex(hash.as_bytes())
-        };
-        // 首批探测：真实响应确认模型身份（provider/model/protocol + 实测维度）。
-        // identity() 仅回答「是否已配置」；维度在响应落地前未知。
-        if embedder
-            .identity()
-            .map(|identity| identity.is_none())
-            .unwrap_or(true)
-        {
-            let _ = self.facts.mark_job_pending_embedding(&job.id);
-            return;
-        }
-        let mut batches = chunks.chunks(EMBED_BATCH).peekable();
-        let Some(first_batch) = batches.peek().copied() else {
-            return;
-        };
-        let first_texts: Vec<String> = first_batch.iter().map(|chunk| chunk.text.clone()).collect();
-        let identity = match embedder
-            .embed(first_texts, EmbeddingInputType::Document)
-            .await
-        {
-            Ok((identity, vectors)) => {
-                let (identity, vectors) = (identity, vectors);
-                // 已 ready 的同身份变体整体命中 → 免于重嵌（付费产物不重跑）。
-                let viv_expected = vector_index_variant_id(&civ, &identity.key);
-                if let Ok(Some(existing)) = self.vectors.get_variant(&viv_expected) {
-                    if existing.status == "ready" && existing.chunk_fingerprint == chunk_fingerprint
-                    {
-                        let stats = json!({
-                            "chunksNewlyEmbedded": 0,
-                            "chunksResumedFromCheckpoint": 0,
-                            "chunksReusedFromReadyVariant": chunks.len(),
-                            "requestCount": 1,
-                            "model": {
-                                "key": identity.key,
-                                "provider": identity.provider,
-                                "modelId": identity.model_id,
-                                "protocol": identity.protocol,
-                                "dimensions": identity.dimensions,
-                            },
-                        });
-                        let _ = self.facts.complete_job(&job.id, &stats);
-                        return;
+            stats = dispatch_stats
+                .into_inner()
+                .expect("dispatch statistics lock");
+            stats["pendingCallIntentCount"] = json!(0);
+            let potentially_sent_count =
+                stats["requestCount"].as_u64().unwrap() - requests_before_call;
+            stats["unknownSentRequestCount"] = json!(
+                stats["unknownSentRequestCount"].as_u64().unwrap()
+                    + stats["pendingRequestCount"].as_u64().unwrap()
+            );
+            stats["pendingRequestCount"] = json!(0);
+            let (served, vectors, accounting_error) = match result {
+                Ok(value) => {
+                    if let Some(call_id) = &value.model_call_id {
+                        stats["modelCallIds"]
+                            .as_array_mut()
+                            .expect("call identity list")
+                            .push(json!(call_id));
                     }
-                }
-                // begin：真实身份（实测维度）落 variant 行。
-                let build = match self.vectors.begin_variant_build(
-                    &civ,
-                    &artifact_id,
-                    &identity.key,
-                    &chunk_fingerprint,
-                    identity.dimensions,
-                ) {
-                    Ok(build) => build,
-                    Err(err) => {
-                        let _ = self.facts.fail_job(&job.id, &err.message);
-                        return;
+                    if value.reused_paid_response {
+                        stats["paidResponsesReused"] =
+                            json!(stats["paidResponsesReused"].as_u64().unwrap() + 1);
                     }
-                };
-                let entries: Vec<ks::VectorEntry> = first_batch
-                    .iter()
-                    .zip(vectors.iter())
-                    .map(|(chunk, vector)| ks::VectorEntry {
-                        chunk_id: chunk.chunk_id.clone(),
-                        ordinal: chunk.ordinal,
-                        vector: vector.clone(),
-                    })
-                    .collect();
-                let entries_len = entries.len();
-                if let Err(err) = self.vectors.upsert_batch(&build.variant_id, &entries) {
-                    let _ = self.vectors.fail_build(&build.variant_id);
-                    let _ = self.facts.fail_job(&job.id, &err.message);
-                    return;
-                }
-                (identity, build, entries_len)
-            }
-            Err(err) => {
-                let _ = self
-                    .facts
-                    .fail_job(&job.id, &format!("embedding failed: {}", err.message));
-                return;
-            }
-        };
-        let (identity, build, mut newly_embedded) = identity;
-        let mut request_count = 1_usize;
-        let _ =
-            self.facts
-                .set_job_progress(&job.id, newly_embedded as i64, Some(chunks.len() as i64));
-        for batch in batches {
-            let texts: Vec<String> = batch.iter().map(|chunk| chunk.text.clone()).collect();
-            match embedder.embed(texts, EmbeddingInputType::Document).await {
-                Ok((_identity, vectors)) => {
-                    request_count += 1;
-                    let entries: Vec<ks::VectorEntry> = batch
-                        .iter()
-                        .zip(vectors.iter())
-                        .map(|(chunk, vector)| ks::VectorEntry {
-                            chunk_id: chunk.chunk_id.clone(),
-                            ordinal: chunk.ordinal,
-                            vector: vector.clone(),
-                        })
-                        .collect();
-                    let entries_len = entries.len();
-                    if let Err(err) = self.vectors.upsert_batch(&build.variant_id, &entries) {
-                        let _ = self.vectors.fail_build(&build.variant_id);
-                        let _ = self.facts.fail_job(&job.id, &err.message);
-                        return;
-                    }
-                    newly_embedded += entries_len;
-                    let _ = self.facts.set_job_progress(
-                        &job.id,
-                        newly_embedded as i64,
-                        Some(chunks.len() as i64),
+                    stats["successfulRequestCount"] = json!(
+                        stats["successfulRequestCount"].as_u64().unwrap()
+                            + u64::from(!value.reused_paid_response)
                     );
+                    (value.identity, value.vectors, value.accounting_error)
                 }
-                Err(err) => {
-                    // 请求级错误照常退避重试（failed 手动重试/恢复续跑）；
-                    // 已落库向量绝不删除（付费产物）。
-                    let _ = self.vectors.fail_build(&build.variant_id);
-                    let _ = self
-                        .facts
-                        .fail_job(&job.id, &format!("embedding failed: {}", err.message));
-                    return;
+                Err(error) => {
+                    stats["failedTransportAttemptCount"] = json!(
+                        stats["failedTransportAttemptCount"].as_u64().unwrap()
+                            + stats["transportAttemptCount"].as_u64().unwrap()
+                            - transport_before_call
+                    );
+                    stats["failedCallCount"] =
+                        json!(stats["failedCallCount"].as_u64().unwrap() + 1);
+                    stats["failedRequestCount"] = json!(
+                        stats["failedRequestCount"].as_u64().unwrap() + potentially_sent_count
+                    );
+                    self.facts.set_job_embedding_stats(&job.id, &stats)?;
+                    if let Some(build) = &build {
+                        self.vectors.fail_build(&build.variant_id)?;
+                    }
+                    return Err(error);
                 }
+            };
+            self.facts.set_job_embedding_stats(&job.id, &stats)?;
+            if let Err(error) = validate_embedding_batch(&served, &vectors, batch.len()) {
+                if let Some(build) = &build {
+                    self.vectors.fail_build(&build.variant_id)?;
+                }
+                return Err(error);
+            }
+            if identity
+                .as_ref()
+                .is_some_and(|identity| *identity != served)
+            {
+                if let Some(build) = &build {
+                    self.vectors.fail_build(&build.variant_id)?;
+                }
+                return Err(KnowledgeError::conflict("embedding identity changed; preserve old paid results and rebuild a distinct variant"));
+            }
+            let _write = self.write_gate.try_lock().map_err(|_| {
+                KnowledgeError::storage_invalid("knowledge write gate busy; no unbounded wait")
+            })?;
+            self.ensure_job_active(job)?;
+            if identity.is_none() {
+                build = Some(self.vectors.begin_variant_build(
+                    civ,
+                    artifact_id,
+                    &served.key,
+                    fingerprint,
+                    served.dimensions,
+                )?);
+                identity = Some(served.clone());
+            } else if stats["chunksNewlyEmbedded"] == 0 {
+                self.vectors.begin_variant_build(
+                    civ,
+                    artifact_id,
+                    &served.key,
+                    fingerprint,
+                    served.dimensions,
+                )?;
+            }
+            let entries = batch
+                .iter()
+                .zip(vectors)
+                .map(|(c, vector)| ks::VectorEntry {
+                    chunk_id: c.chunk_id.clone(),
+                    ordinal: c.ordinal,
+                    vector,
+                })
+                .collect::<Vec<_>>();
+            let current = build.as_ref().expect("served build identity");
+            stats["checkpointVariantId"] = json!(current.variant_id);
+            stats["model"] = json!({"key":served.key,"provider":served.provider,"modelId":served.model_id,"protocol":served.protocol,"dimensions":served.dimensions,"parameterFingerprint":served.parameter_fingerprint});
+            // 写入前保存变体锚点；写后统计故障可从已确认的字节恢复真实写入数。
+            self.facts.set_job_embedding_stats(&job.id, &stats)?;
+            if let Err(error) = self.vectors.upsert_batch(&current.variant_id, &entries) {
+                self.vectors.fail_build(&current.variant_id)?;
+                return Err(error);
+            }
+            stats["chunksNewlyEmbedded"] =
+                json!(stats["chunksNewlyEmbedded"].as_u64().unwrap() + entries.len() as u64);
+            stats["actualWrittenChunkCount"] = stats["chunksNewlyEmbedded"].clone();
+            self.facts.set_job_embedding_stats(&job.id, &stats)?;
+            self.facts.set_job_progress(
+                &job.id,
+                (reused + stats["chunksNewlyEmbedded"].as_u64().unwrap() as usize) as i64,
+                Some(chunks.len() as i64),
+            )?;
+            if let Some(error) = accounting_error {
+                self.vectors.fail_build(&current.variant_id)?;
+                return Err(error);
             }
         }
-        if let Err(err) = self.vectors.complete_build(&build.variant_id, chunks.len()) {
-            let _ = self.facts.fail_job(&job.id, &err.message);
-            return;
+        let _write = self.write_gate.try_lock().map_err(|_| {
+            KnowledgeError::storage_invalid("knowledge write gate busy; no unbounded wait")
+        })?;
+        self.ensure_job_active(job)?;
+        let identity = identity
+            .ok_or_else(|| KnowledgeError::index_invalid("no confirmed embedding identity"))?;
+        let build = build.ok_or_else(|| KnowledgeError::index_invalid("no vector build"))?;
+        if let Err(error) = self.vectors.complete_build_plan(&build.variant_id, &plan) {
+            self.vectors.fail_build(&build.variant_id)?;
+            return Err(error);
         }
-        let stats = json!({
-            "chunksNewlyEmbedded": newly_embedded,
-            "chunksResumedFromCheckpoint": 0,
-            "chunksReusedFromReadyVariant": 0,
-            "requestCount": request_count,
-            "model": {
-                "key": identity.key,
-                "provider": identity.provider,
-                "modelId": identity.model_id,
-                "protocol": identity.protocol,
-                "dimensions": identity.dimensions,
-            },
-            "resetStaleVectors": build.reset_stale,
-        });
-        let _ = self.facts.complete_job(&job.id, &stats);
+        stats["model"] = json!({"key":identity.key,"provider":identity.provider,"modelId":identity.model_id,"protocol":identity.protocol,"dimensions":identity.dimensions,"parameterFingerprint":identity.parameter_fingerprint});
+        if let Err(error) = self.facts.complete_job(&job.id, &stats) {
+            self.vectors.fail_build(&build.variant_id)?;
+            return Err(error);
+        }
+        Ok(())
     }
 
     /// A14 证据面：artifact 的向量变体身份清单（model_key/dimensions/status）。

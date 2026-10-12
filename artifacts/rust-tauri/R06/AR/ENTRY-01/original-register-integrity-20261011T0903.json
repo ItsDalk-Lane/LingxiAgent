@@ -1,0 +1,34 @@
+{
+  "recorded_at": "2026-10-11T09:00:30.466302+00:00",
+  "role": "ROOT_REGISTER_PRESERVATION_CHECK_NOT_RUNTIME_ACCEPTANCE",
+  "source_sha256": "b5a135c7e3725f9aa01577157c4f584da9499651f71077f2edbaab0de758077e",
+  "current_control_sha256": "447cb515e582cb6c5a61780019e0d3ee73e1faf8b75ad74344c92bd79cc81bd4",
+  "unique_original_records": 1234,
+  "original_clauses_owners_deadlines_preserved": true,
+  "unique_due_leaves": 281,
+  "all_leaf_dispositions_preserve_ids": true,
+  "counts": {
+    "original_tasks": 8,
+    "original_steps": 37,
+    "original_deliverables": 24,
+    "original_base_acceptances": 16,
+    "ar_issues": 15,
+    "ar_base_checks": 60,
+    "r00_unique_r06_features": 281,
+    "current_leaf_map_unique_features": 281,
+    "current_leaf_map_memberships": 376,
+    "leaf_assertions": 687,
+    "old_review_documents": 14,
+    "old_review_extracted_items": 74,
+    "inherited_upstream_share_rows": 90,
+    "extra_root_clusters": 12,
+    "obligation_records": 1234,
+    "agent_avatar_r06_only_scope_conflict_leaves": 28
+  },
+  "current_record_statuses": [
+    "NOT_RUN"
+  ],
+  "runtime_complete": false,
+  "stage_accepted": false,
+  "note": "registration and historical/task share partial checks do not close complete original task/leaf/assertion; no blanket R07 waiver"
+}

@@ -1,0 +1,8 @@
+{
+  "candidate_source_sha256": "0d9fd6679e7681b42bde359657b7a78bd9bc4862c01da2f5c96a1d3f7e439cef",
+  "mutant_source_sha256": "1a5cd61f340f6bd9c8f14932a06a560af675af8b06bea5058e6cd545742a923e",
+  "diff": "Only remove later-batch served_identity != identity check; preserve real Gateway/OperationService/KnowledgeService/SQLite and vector shape guard",
+  "lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "full_sources": "LOCAL_ONLY_NEVER_GIT/mutant",
+  "candidate_unchanged": true
+}

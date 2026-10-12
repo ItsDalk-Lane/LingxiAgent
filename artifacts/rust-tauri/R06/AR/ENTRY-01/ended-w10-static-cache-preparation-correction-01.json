@@ -1,0 +1,7 @@
+{
+  "at": "2026-10-11T14:26:46.622117+00:00",
+  "original_helper_exit": 1,
+  "no_delete_before_failure": true,
+  "actual_reason": "Same 394 hashes; old keys relative to rust/target, new keys relative to workspace. Raw inventories retained. Canonical path-coordinate normalization has zero hash changes.",
+  "all_394_actual_hashes_equal_after_path_coordinate_normalization": true
+}

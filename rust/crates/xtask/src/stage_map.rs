@@ -64,6 +64,8 @@ pub const BASIS_ROUTE_PRESENT_STATIC: &str = "route_basis_present_static";
 pub const BASIS_PROTOCOL: &str = "protocol_basis";
 pub const BASIS_AUTH_PRIMITIVE_ONLY: &str = "auth_primitive_only";
 pub const BASIS_CLIENT_ONLY_STAGE_CONFLICT: &str = "client_only_stage_boundary_conflict";
+/// 本阶段必需行为尚无完整逐断言证据；登记和局部测试不能将它判为通过。
+pub const BASIS_REQUIRED_BEHAVIOR_PENDING: &str = "required_behavior_pending";
 /// 原行为（含前端正反分支）已由本阶段独立生产者完整实测；必须逐条列出
 /// R00 原断言与专属案例的对应关系，不能只把原 R07 份额写成字符串后放行。
 pub const BASIS_FULL_ORIGINAL_BEHAVIOR: &str = "full_original_behavior";
@@ -91,6 +93,7 @@ pub const SUPPLEMENTAL_BASIS_KINDS: &[&str] = &[
     BASIS_PROTOCOL,
     BASIS_AUTH_PRIMITIVE_ONLY,
     BASIS_CLIENT_ONLY_STAGE_CONFLICT,
+    BASIS_REQUIRED_BEHAVIOR_PENDING,
     BASIS_FULL_ORIGINAL_BEHAVIOR,
     BASIS_R02_SHARE_SATISFIED,
     BASIS_DEFERRED_TO_R07,
@@ -503,7 +506,9 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                     )));
                 }
                 let (r02_share, r07_share, stage_share, later_share) =
-                    if basis_kind == BASIS_FULL_ORIGINAL_BEHAVIOR {
+                    if basis_kind == BASIS_FULL_ORIGINAL_BEHAVIOR
+                        || basis_kind == BASIS_REQUIRED_BEHAVIOR_PENDING
+                    {
                         // R05 RR1 F25: a FULL leaf owns its original behavior
                         // in THIS stage — there is no share split at all, so
                         // none of the four share texts is required; the
@@ -573,7 +578,9 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                     }
                     evidence_command_refs.push(key);
                 }
-                if basis_kind == BASIS_CLIENT_ONLY_STAGE_CONFLICT {
+                if basis_kind == BASIS_CLIENT_ONLY_STAGE_CONFLICT
+                    || basis_kind == BASIS_REQUIRED_BEHAVIOR_PENDING
+                {
                     if !evidence_command_refs.is_empty() {
                         return Err(err(&format!(
                             "supplemental leaf {id:?} is a stage-boundary conflict and must \
@@ -654,7 +661,10 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                                 &format!("supplemental leaf {id:?} evidencePaths element"),
                             )?);
                         }
-                        if basis_kind == BASIS_CLIENT_ONLY_STAGE_CONFLICT && !paths.is_empty() {
+                        if (basis_kind == BASIS_CLIENT_ONLY_STAGE_CONFLICT
+                            || basis_kind == BASIS_REQUIRED_BEHAVIOR_PENDING)
+                            && !paths.is_empty()
+                        {
                             return Err(err(&format!(
                                 "supplemental leaf {id:?} is BLOCKED by stage-boundary \
                                  conflict and must not declare pass-able evidencePaths"
@@ -774,6 +784,7 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                 // acceptance is not judged by this gate — the deferred cases
                 // below are observations, never gates).
                 let uncontracted_kind = basis_kind == BASIS_CLIENT_ONLY_STAGE_CONFLICT
+                    || basis_kind == BASIS_REQUIRED_BEHAVIOR_PENDING
                     || basis_kind == BASIS_DEFERRED_TO_R07
                     || basis_kind == BASIS_DEFERRED_TO_LATER_STAGE;
                 let assertion_contract = match entry.get("assertionContract") {
@@ -1174,6 +1185,42 @@ mod map_tests {
         assert_eq!(map.commands[0].timeout_secs, 30);
         assert_eq!(map.scenarios.len(), 1);
         assert_eq!(map.scenarios[0].command_refs, vec!["a_ok"]);
+    }
+
+    #[test]
+    fn r06_registered_map_executes_checks_without_releasing_unproved_obligations() {
+        let map = parse_stage_map(include_str!("stage_maps/R06.json")).expect("真实R06阶段图可解析");
+        assert_eq!(map.scenarios.len(), 77, "16项原验收、60项修复检查及前序闭包均保留");
+        assert_eq!(map.supplemental_leaves.len(), 280, "原始到期条款不能丢失");
+        assert!(map.scenarios.iter().all(|row| row.requirement == "REQUIRED"));
+        let aggregate = map.scenarios.iter().find(|row| row.id == "R06-AR-F14-C02").unwrap();
+        for command in &map.commands {
+            if command.key.starts_with("r06_test_") {
+                assert!(aggregate.command_refs.contains(&command.key));
+                assert!(command.argv.iter().any(|arg| arg == "--binding"));
+                assert!(!command.evidence_paths.is_empty());
+            }
+        }
+        let upstream = map.scenarios.iter().find(|row| row.id == "R06-AR-F14-C03").unwrap();
+        assert_eq!(upstream.command_refs, vec!["r05_regression_gate"]);
+        let fork = map.supplemental_leaves.iter().find(|leaf| leaf.id == "R00-T02-LA-960668141E07").unwrap();
+        assert_eq!(fork.basis_kind, BASIS_FULL_ORIGINAL_BEHAVIOR);
+        assert_eq!(fork.original_assertion_cases.len(), fork.r00_assertions.len());
+        for leaf in map.supplemental_leaves.iter().filter(|leaf| leaf.id != fork.id) {
+            match leaf.basis_kind.as_str() {
+                BASIS_FULL_ORIGINAL_BEHAVIOR => {
+                    assert_eq!(leaf.original_assertion_cases.len(), leaf.r00_assertions.len());
+                    assert!(leaf.original_assertion_cases.iter().all(|cases| cases.len() == 1));
+                    assert!(leaf.assertion_contract.is_some());
+                    assert!(!leaf.evidence_command_refs.is_empty());
+                }
+                BASIS_REQUIRED_BEHAVIOR_PENDING => {
+                    assert!(leaf.evidence_command_refs.is_empty());
+                    assert!(leaf.assertion_contract.is_none(), "缺失行为证据不能借用局部成功收据");
+                }
+                other => panic!("原279项不得更改期限或豁免验收：{other}"),
+            }
+        }
     }
 
     #[test]

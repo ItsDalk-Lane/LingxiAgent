@@ -1,0 +1,88 @@
+{"command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-service", "--test", "r06_ar_f06_config", "--test", "r06_ar_f06_binary", "-p", "lingxi-adapters", "--test", "r06_ar_f06_config_preservation", "--", "--nocapture"], "start": 1791697416.670013, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-final-four-c-9q860tj9", "guard": "8192MB/600s"}
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0283]: type annotations needed
+   --> crates/lingxi-service/tests/r06_ar_f06_config.rs:534:70
+    |
+534 |         session_id: lingxi_protocol::SessionId::new("session-config".into()),
+    |                     -------------------------------                  ^^^^
+    |                     |
+    |                     required by a bound introduced by this call
+    |
+    = note: the type must implement `Into<std::string::String>`
+note: required by a bound in `SessionId::new`
+   --> crates/lingxi-protocol/src/lib.rs:59:34
+    |
+ 59 |               pub fn new(raw: impl Into<String>) -> Self {
+    |                                    ^^^^^^^^^^^^ required by this bound in `SessionId::new`
+...
+ 83 | / opaque_id! {
+ 84 | |     /// Identity of one user session (conversation thread).
+ 85 | |     SessionId
+ 86 | | }
+    | |_- in this macro invocation
+    = note: this error originates in the macro `opaque_id` (in Nightly builds, run with -Z macro-backtrace for more info)
+help: try using a fully qualified path to specify the expected types
+    |
+534 -         session_id: lingxi_protocol::SessionId::new("session-config".into()),
+534 +         session_id: lingxi_protocol::SessionId::new(<&str as Into<T>>::into("session-config")),
+    |
+help: consider removing this method call, as the receiver has type `&'static str` and `&'static str: Into<std::string::String>` trivially holds
+    |
+534 -         session_id: lingxi_protocol::SessionId::new("session-config".into()),
+534 +         session_id: lingxi_protocol::SessionId::new("session-config"),
+    |
+
+error[E0283]: type annotations needed
+   --> crates/lingxi-service/tests/r06_ar_f06_config.rs:534:70
+    |
+534 |         session_id: lingxi_protocol::SessionId::new("session-config".into()),
+    |                                                                      ^^^^
+    |
+    = note: multiple `impl`s satisfying `_: From<&str>` found in the following crates: `axum_core`, `bytes`, `reqwest`:
+            - impl From<&'static str> for axum_core::body::Body;
+            - impl From<&'static str> for bytes::bytes::Bytes;
+            - impl From<&'static str> for reqwest::async_impl::body::Body;
+    = note: required for `&str` to implement `Into<_>`
+help: try using a fully qualified path to specify the expected types
+    |
+534 -         session_id: lingxi_protocol::SessionId::new("session-config".into()),
+534 +         session_id: lingxi_protocol::SessionId::new(<&str as Into<T>>::into("session-config")),
+    |
+
+error[E0283]: type annotations needed
+   --> crates/lingxi-service/tests/r06_ar_f06_config.rs:535:58
+    |
+535 |         run_id: lingxi_protocol::RunId::new("run-config".into()),
+    |                                                          ^^^^
+    |
+    = note: multiple `impl`s satisfying `_: From<&str>` found in the following crates: `axum_core`, `bytes`, `reqwest`:
+            - impl From<&'static str> for axum_core::body::Body;
+            - impl From<&'static str> for bytes::bytes::Bytes;
+            - impl From<&'static str> for reqwest::async_impl::body::Body;
+    = note: required for `&str` to implement `Into<_>`
+help: try using a fully qualified path to specify the expected types
+    |
+535 -         run_id: lingxi_protocol::RunId::new("run-config".into()),
+535 +         run_id: lingxi_protocol::RunId::new(<&str as Into<T>>::into("run-config")),
+    |
+
+error[E0283]: type annotations needed
+   --> crates/lingxi-service/tests/r06_ar_f06_config.rs:536:66
+    |
+536 |         attempt: lingxi_protocol::AttemptId::new("run-config#a1".into()),
+    |                                                                  ^^^^
+    |
+    = note: multiple `impl`s satisfying `_: From<&str>` found in the following crates: `axum_core`, `bytes`, `reqwest`:
+            - impl From<&'static str> for axum_core::body::Body;
+            - impl From<&'static str> for bytes::bytes::Bytes;
+            - impl From<&'static str> for reqwest::async_impl::body::Body;
+    = note: required for `&str` to implement `Into<_>`
+help: try using a fully qualified path to specify the expected types
+    |
+536 -         attempt: lingxi_protocol::AttemptId::new("run-config#a1".into()),
+536 +         attempt: lingxi_protocol::AttemptId::new(<&str as Into<T>>::into("run-config#a1")),
+    |
+
+For more information about this error, try `rustc --explain E0283`.
+error: could not compile `lingxi-service` (test "r06_ar_f06_config") due to 4 previous errors
+warning: build failed, waiting for other jobs to finish...

@@ -1,0 +1,108 @@
+{
+  "status": "READY_FOR_INDEPENDENT_REVIEW",
+  "independent_acceptance": false,
+  "cases": [
+    {
+      "id": "R06-AR-F10-C01",
+      "required": true,
+      "status": "SELF_CHECKED_PENDING_INDEPENDENT_REVIEW",
+      "expectation": "实际请求端、响应身份、usage记录与variant归属一致；不得出现B结果贴A标签。",
+      "actual": "已解析A后、真实配额等待期间正式reload B；同一不可变route把真实首次A请求、A usage、A variant与served身份绑定；后续B批拒绝，不用外层第二次配置给结果贴标签",
+      "evidence": [
+        "commands/final-nine-cases-13/c01.json",
+        "commands/final-nine-cases-13/record.json"
+      ],
+      "acceptance": "NOT_ACCEPTED_EXECUTOR_ONLY"
+    },
+    {
+      "id": "R06-AR-F10-C02",
+      "required": true,
+      "status": "SELF_CHECKED_PENDING_INDEPENDENT_REVIEW",
+      "expectation": "旧variant不混入B向量；按明确策略拒绝、完成固定A或新建B，不能仅凭维度相等通过。",
+      "actual": "真正64+多批输入；A/B同2维但向量值分离，正式reload后旧任务failed；A variant没有B字节；旧源码/撤后批比较 mutation 都业务红",
+      "evidence": [
+        "commands/final-nine-cases-13/c02.json",
+        "commands/final-nine-cases-13/record.json"
+      ],
+      "acceptance": "NOT_ACCEPTED_EXECUTOR_ONLY"
+    },
+    {
+      "id": "R06-AR-F10-C03",
+      "required": true,
+      "status": "SELF_CHECKED_PENDING_INDEPENDENT_REVIEW",
+      "expectation": "只检索身份兼容的variant，或明确降级/要求重建；所有searchedVectorVariants可与真实请求对账。",
+      "actual": "A索引；查询发送A后reload B，in-flight仍只取A variant；新B同维与C不同维都明确FTS且searchedVectorVariants空；无旧维度兜底",
+      "evidence": [
+        "commands/final-nine-cases-13/c03.json",
+        "commands/final-nine-cases-13/record.json"
+      ],
+      "acceptance": "NOT_ACCEPTED_EXECUTOR_ONLY"
+    },
+    {
+      "id": "R06-AR-F10-C04",
+      "required": true,
+      "status": "PARTIAL_BLOCKED_DEPENDENCY_F09",
+      "expectation": "不会复用不兼容已写向量；旧产物保留可解释，新构建身份准确，不静默覆盖。",
+      "actual": "失败中断→真实存储A64 paid向量→停止重启B→正式reingest，B独立variant准确且旧A字节保留；SIGKILL running→真正binary重启B则正式reingest409，旧A字节保留但没有可验证running续跑入口",
+      "evidence": [
+        "commands/final-nine-cases-13/c04.json",
+        "commands/final-nine-cases-13/record.json",
+        "commands/final-nine-cases-13/crash-running.json"
+      ],
+      "acceptance": "NOT_ACCEPTED_EXECUTOR_ONLY"
+    }
+  ],
+  "adversarial": [
+    {
+      "case": "same_model_endpoint_change_is_incompatible_but_unchanged_reload_is_compatible",
+      "actual": "真实同model ID，仅endpoint变化即新fingerprint并FTS；无关reload仍hybrid旧variant",
+      "evidence": "commands/final-nine-cases-13/parameters.json",
+      "status": "SELF_CHECKED"
+    },
+    {
+      "case": "configured_unknown_dimensions_and_parameter_compatibility_are_explicit",
+      "actual": "无需发送便可获取provider/model/protocol/fingerprint；dimensions=0为UNKNOWN_NOT_SENT；MiniMax group/Ollama declared context/请求dimensions指纹纯算法断言，不冒充真实协议请求证明",
+      "evidence": "commands/final-nine-cases-13/configured-identity.json",
+      "status": "SELF_CHECKED_WITH_RUNTIME_BOUNDARY"
+    },
+    {
+      "case": "legacy_paid_identity_is_preserved_and_requires_explicit_rebuild",
+      "actual": "仅外部旧元数据夹具，真实Knowledge/query/storage拒旧key，不改旧向量；正式重建新key后新旧variants并存",
+      "evidence": "commands/final-nine-cases-13/legacy.json",
+      "status": "SELF_CHECKED"
+    },
+    {
+      "case": "crash_running_job_is_explicitly_refused_and_preserves_paid_vectors",
+      "actual": "真实shipping binary READY source=env两个进程、实际home吻合；强杀后旧running无法恢复；409是当前安全拒绝证据，非完整C04PASS",
+      "evidence": "commands/final-nine-cases-13/crash-running.json",
+      "status": "SAFETY_ONLY_RESUME_BLOCKED"
+    }
+  ],
+  "old_red": [
+    "commands/positive-baseline-03/record.json",
+    "commands/c02-old-red-01/record.json",
+    "commands/c02-old-red-01/c02.json"
+  ],
+  "mutation": [
+    "mutation-setup.json",
+    "commands/c02-mutation-red-02/record.json",
+    "commands/c02-mutation-red-02/c02.json",
+    "mutation-restored.json"
+  ],
+  "mock_boundary": "只有loopback外部供应商应答替身；真实Gateway/CredentialService/OperationService/KnowledgeService/usage/SQLite；quota C01是实际配额入口，不是固定route假对象",
+  "open": [
+    "F09 duplicate first batch / accurate stats / ready reuse / running recovery",
+    "F11 real deadline and session/run/causal/cancel ownership",
+    "F12 cache-open independent unaccepted candidate",
+    "F13 formal chat selection independent task",
+    "F14 registry9vs7 and upstream original assertions synchronization"
+  ],
+  "stage_status": "R05_R04_R03_ACTUAL_FAIL",
+  "issue_status": "NOT_COMPLETED",
+  "completion": "BLOCKED_DEPENDENCY_F09",
+  "required_next": "Fresh independent W10 Reviewer must actually review current candidate, including C04 missing running recovery; F09 may then repair/rebind, no R07 deferral.",
+  "final_affected_regressions": [
+    "commands/affected-old-service-final-02/record.json",
+    "commands/affected-old-adapters-final-02/record.json"
+  ]
+}

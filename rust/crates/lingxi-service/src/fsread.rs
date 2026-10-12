@@ -114,6 +114,7 @@ pub fn resolve_allowed_path(file_path: &str, allowed_roots: &[PathBuf]) -> Optio
 /// 授权根持有者（现役 getAllowedRoots 的候选映射）。
 pub struct FsReadService {
     allowed_roots: Vec<PathBuf>,
+    file_safety: crate::file_safety::FileSafety,
 }
 
 impl FsReadService {
@@ -126,11 +127,16 @@ impl FsReadService {
         }
         FsReadService {
             allowed_roots: roots,
+            file_safety: crate::file_safety::FileSafety::new(data_home),
         }
     }
 
     pub fn resolve(&self, file_path: &str) -> Option<PathBuf> {
-        resolve_allowed_path(file_path, &self.allowed_roots)
+        let path = resolve_allowed_path(file_path, &self.allowed_roots)?;
+        if self.file_safety.is_protected(&path) {
+            return None;
+        }
+        Some(path)
     }
 }
 

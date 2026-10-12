@@ -1,0 +1,33 @@
+{
+  "at": "2026-10-11T10:50:19.325521+00:00",
+  "role": "ROOT_CONTROL_STRUCTURE_AND_PROTECTION_CHECK_NOT_BUSINESS_ACCEPTANCE",
+  "HEAD": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "initial_user_settings_sha256": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3",
+  "index_empty": true,
+  "issue_count": 15,
+  "unique_C_ids": 60,
+  "original_obligation_records": 1234,
+  "original_due_leaves": 281,
+  "extra_root_clusters": 12,
+  "original_A_ids": 16,
+  "original_A_status": "all NOT_RUN for full final current-source acceptance",
+  "actors_unique": 23,
+  "closed_count": 1,
+  "open_count": 14,
+  "stage_gate": "NOT_RUN",
+  "final_upstream_verdict": "NOT_RUN",
+  "task_executor_upstream_current": "W10 actual R05/R04/R03 FAIL",
+  "blocked_platform_reviews": [
+    "W02",
+    "W06",
+    "W12"
+  ],
+  "active_roles": [
+    "W01 Executor",
+    "W03 Executor",
+    "W10 first new independent Reviewer"
+  ],
+  "free_bytes": 208510971904,
+  "R07_started": false,
+  "final_status": "R06_NOT_ACCEPTED"
+}

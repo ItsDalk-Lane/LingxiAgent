@@ -1,0 +1,354 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "producedBy": "cargo test -p lingxi-service --test r04_t08_tool_matrix (real chain)",
+ "cases": [
+  {
+   "case": "a15-directory-claim-refused",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a15-gateway-audit-directory-ref-failed",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a15-gateway-audit-fake-ref-failed",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a15-gateway-audit-real-ref-passes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a15-missing-claim-refused",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a15-out-of-grant-claim-refused",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a15-real-delivery-registered",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a15-structure-violation-refused",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a16-alias-route-covered",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a16-history-preserved",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "approval-answer-executes-once",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "approval-duplicate-idempotent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "approval-reject-zero-dispatch",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "catalog-face-lists-mcp-tools-with-permission",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "future-tool-shape-ast_edit-discoverable-not-callable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "future-tool-shape-ast_grep-discoverable-not-callable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "future-tool-shape-file-discoverable-not-callable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "future-tool-shape-find-discoverable-not-callable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "future-tool-shape-grep-discoverable-not-callable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "future-tool-shape-ls-discoverable-not-callable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "future-tool-shape-lsp-discoverable-not-callable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "future-tool-shape-materialize-discoverable-not-callable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "future-tool-shape-run_code-discoverable-not-callable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "future-tool-shape-security_scan-discoverable-not-callable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "future-tool-shape-stage_files-discoverable-not-callable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "gateway-each-call-independent-permission",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "matrix-lifecycle-disable-holes",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "matrix-lifecycle-generation-refusals",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "matrix-lifecycle-uninstall-holes",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "matrix-permission-consistency",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "matrix-route-consistency",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "matrix-tool-family-count",
+   "expect": 7,
+   "actual": 7,
+   "ok": true
+  },
+  {
+   "case": "mcp-connector-catalog-sync",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "mcp-connector-register-handshake",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "mcp-describe-no-side-effect",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "mcp-describe-real-identity",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "mcp-search-honest-availability",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "mcp-search-namespaced",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "mcp-tool-call-full-chain",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "mcp-tool-permission-face",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "permission-face-modes-verifiable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "preauthorization-single-session-scoped",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "semantics-cancel-leaves-no-fabricated-receipt",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "semantics-failed-never-dispatched-receipt",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "semantics-success-receipt-dispatched",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "semantics-unknown-receipt-honest",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "sup01-ask-subagent-write-refused",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "terminal-close-stops-terminal",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "terminal-snapshot-current-transcript",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "terminal-tail-cursor-continuation",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "tool-edit-conflict-preserves-user-version",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "tool-edit-real-chain",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "tool-exec-cancel-cleanup",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "tool-exec-command-real-chain",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "tool-read-real-chain",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "tool-write-real-chain",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "tool-write-stdin-continuation",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "tool-write-stdin-foreign-writes",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  }
+ ]
+}

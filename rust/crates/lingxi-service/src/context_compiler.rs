@@ -1,24 +1,8 @@
-//! R06-T01 服务侧上下文编译：材料采集 + 会话级冻结缓存 + 观测装饰。
-//!
-//! 职责切分（R01 依赖规则）：
-//! - kernel `lingxi_kernel::context` 拥有纯确定性的编译/渲染/预算/观测视图；
-//! - 本模块拥有「材料从哪来」（$LINGXI_HOME 文件布局、preferences、config.yaml
-//!   窄扫描、platform note 组装、会话开始标签格式化）与「观测的 digest 装饰」
-//!   （sha256 在本 crate 的锁内依赖里，kernel 不引）。
-//!
-//! 同源契约（R06-A01）：`ContextCompilerService::compiled_for_run` 返回的
-//! `CompiledContext` 同时是 (a) drive_run 发给 provider 的 system 文本来源
-//! （`render()`）与 (b) `GET /lingxi/v1/sessions/{id}/context-observation`
-//! 的观测来源（`observation()`）——不存在第二套 prompt 重建。
-//!
-//! 会话级冻结：编译结果按 (session_id, for_subagent) 缓存，与现役
-//! session-coordinator 的会话快照同语义；跨重启重编译（材料漂移经 digest
-//! 变化可观测）。
-//!
-//! 读取纪律：材料文件缺失按现役 `safeReadFile` 语义读为空；缺失以外的 I/O
-//! 错误与 JSON 损坏一律响亮失败（本栈 R02 完整性立场，禁止静默降级）。
+//! R06 上下文材料每 Run 重读，运行内冻结，真实调用观测同源且有界。
+//! 缺失材料遵循现役默认；其它读取/解析错误响亮传播。历史观测来自
+//! 实际调用的 key_events，绝不为查询临时重新编译。
 
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::fmt;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
@@ -99,13 +83,18 @@ impl std::error::Error for ContextCompileFailure {}
 pub struct MaterialQuery {
     pub agent_id: String,
     pub for_subagent: bool,
-    /// 会话开始时刻（会话内首次编译的 run 受理时刻；冻结进 artifact）。
+    /// 会话真实创建时刻（从权威会话行读取；冻结进本 Run artifact）。
     pub session_started_unix_ms: u64,
 }
 
 /// 材料采集端口（生产实现 = FileContextMaterialSource；测试可注入替身）。
 pub trait ContextMaterialSource: Send + Sync {
     fn gather(&self, query: &MaterialQuery) -> Result<ContextCompileInput, ContextMaterialError>;
+    fn publication_epoch(
+        &self,
+    ) -> Option<Arc<lingxi_adapters::storage::agent_memory::ContextMaterialEpoch>> {
+        None
+    }
 }
 
 /// 运行时技能材料端口（R06-T06 R1 F-01）：编译期对「该 agent 已启用技能」
@@ -316,7 +305,7 @@ pub fn format_session_started_label(unix_ms: u64) -> String {
 // ─── 文件材料源（现役 $LINGXI_HOME 布局） ───
 
 /// 从 $LINGXI_HOME 文件布局采集编译材料：
-/// - agents/{id}/config.yaml（窄扫描 locale/agent.name/agent.yuan/memory.enabled）；
+/// - agents/{id}/config.yaml（完整 YAML 解析与敏感字段类型验证）；
 /// - agents/{id}/identity.md、AGENTS.md（resolvePersonaSource 回落链）；
 /// - agents/{id}/memory/memory.md、memory/tenets.json、appearance-summary.json；
 /// - user/preferences.json（userName/locale/experiments/learn_skills）；
@@ -327,6 +316,7 @@ pub struct FileContextMaterialSource {
     user_dir: PathBuf,
     product_dir: PathBuf,
     host: HostFacts,
+    material_epoch: Arc<lingxi_adapters::storage::agent_memory::ContextMaterialEpoch>,
 }
 
 impl FileContextMaterialSource {
@@ -336,7 +326,11 @@ impl FileContextMaterialSource {
         product_dir: PathBuf,
         host: HostFacts,
     ) -> Self {
+        let material_epoch = lingxi_adapters::storage::agent_memory::context_material_epoch(
+            agents_root.parent().unwrap_or(&agents_root),
+        );
         Self {
+            material_epoch,
             agents_root,
             user_dir,
             product_dir,
@@ -375,77 +369,22 @@ fn parse_json_material(path: &Path) -> Result<Option<Value>, ContextMaterialErro
         })
 }
 
-/// config.yaml 的 T01 窄扫描结果。现役用完整 YAML 解析；本扫描器只识别
-/// 两格缩进的四个键（顶层 locale、agent.name、agent.yuan、memory.enabled），
-/// 注释与引号按行内规则剥离。这是已登记的子集实现（T01 报告差异节）。
-#[derive(Debug, Default, Clone, PartialEq)]
-pub struct AgentConfigScan {
-    pub locale: Option<String>,
-    pub agent_name: Option<String>,
-    pub yuan: Option<String>,
-    pub memory_enabled: Option<bool>,
+/// 配置读取与记忆、技能服务共用真正的 YAML 解析和类型验证。
+pub use lingxi_adapters::storage::agent_memory::config::AgentConfigScan;
+
+pub fn scan_agent_config(
+    text: &str,
+) -> Result<AgentConfigScan, lingxi_adapters::storage::agent_memory::MemoryError> {
+    lingxi_adapters::storage::agent_memory::config::AgentConfigDocument::parse(text)?.scan()
 }
 
-pub fn scan_agent_config(text: &str) -> AgentConfigScan {
-    fn clean_value(raw: &str) -> String {
-        // 剥离行内注释（" #" 起）与成对引号。
-        let without_comment = raw.split(" #").next().unwrap_or(raw);
-        let trimmed = without_comment.trim();
-        trimmed
-            .strip_prefix('"')
-            .and_then(|v| v.strip_suffix('"'))
-            .or_else(|| {
-                trimmed
-                    .strip_prefix('\'')
-                    .and_then(|v| v.strip_suffix('\''))
-            })
-            .unwrap_or(trimmed)
-            .to_string()
-    }
-    let mut scan = AgentConfigScan::default();
-    let mut section = String::new();
-    for line in text.lines() {
-        let trimmed = line.trim_end();
-        if trimmed.is_empty() || trimmed.trim_start().starts_with('#') {
-            continue;
-        }
-        let indent = line.len() - line.trim_start().len();
-        let body = line.trim();
-        if indent == 0 {
-            if let Some(name) = body.strip_suffix(':') {
-                section = name.trim().to_string();
-                continue;
-            }
-            if let Some((key, value)) = body.split_once(':') {
-                section.clear();
-                if key.trim() == "locale" {
-                    let value = clean_value(value);
-                    if !value.is_empty() {
-                        scan.locale = Some(value);
-                    }
-                }
-            }
-            continue;
-        }
-        let Some((key, value)) = body.split_once(':') else {
-            continue;
-        };
-        let key = key.trim();
-        let value = clean_value(value);
-        match (section.as_str(), key) {
-            ("agent", "name") if !value.is_empty() => scan.agent_name = Some(value),
-            ("agent", "yuan") if !value.is_empty() => scan.yuan = Some(value),
-            ("memory", "enabled") => {
-                scan.memory_enabled = match value.as_str() {
-                    "true" => Some(true),
-                    "false" => Some(false),
-                    _ => None,
-                };
-            }
-            _ => {}
-        }
-    }
-    scan
+fn parse_agent_material(path: &Path) -> Result<AgentConfigScan, ContextMaterialError> {
+    lingxi_adapters::storage::agent_memory::config::read_agent_config(path)
+        .and_then(|doc| doc.scan())
+        .map_err(|err| ContextMaterialError::Parse {
+            path: path.to_path_buf(),
+            detail: err.to_string(),
+        })
 }
 
 /// preferences.json 的 T01 读取面（现役 PreferencesManager 子集）。
@@ -651,7 +590,7 @@ fn scan_roster(
                 if id == current_agent_id {
                     continue;
                 }
-                let scan = scan_agent_config(&read_material(&config_path)?);
+                let scan = parse_agent_material(&config_path)?;
                 others.push(RosterEntry {
                     name: scan.agent_name.unwrap_or_else(|| id.clone()),
                     id,
@@ -680,9 +619,14 @@ fn scan_roster(
 }
 
 impl ContextMaterialSource for FileContextMaterialSource {
+    fn publication_epoch(
+        &self,
+    ) -> Option<Arc<lingxi_adapters::storage::agent_memory::ContextMaterialEpoch>> {
+        Some(Arc::clone(&self.material_epoch))
+    }
     fn gather(&self, query: &MaterialQuery) -> Result<ContextCompileInput, ContextMaterialError> {
         let agent_dir = self.agents_root.join(&query.agent_id);
-        let config = scan_agent_config(&read_material(&agent_dir.join("config.yaml"))?);
+        let config = parse_agent_material(&agent_dir.join("config.yaml"))?;
         let prefs_path = self.user_dir.join("preferences.json");
         let prefs = scan_preferences(parse_json_material(&prefs_path)?.as_ref());
 
@@ -766,7 +710,7 @@ impl ContextMaterialSource for FileContextMaterialSource {
     }
 }
 
-// ─── 编译服务（会话级冻结 + digest 装饰） ───
+// ─── 编译服务（每 Run 冻结 + 实际调用观测） ───
 
 /// 一次编译的冻结产物：发送文本与观测视图同源。
 pub struct CompiledContext {
@@ -829,14 +773,24 @@ impl fmt::Debug for CompiledContext {
     }
 }
 
-/// 会话级上下文编译器：同一 (session_id, for_subagent) 的重复编译返回
-/// 同一份冻结 artifact（现役会话快照语义；跨重启重编译）。
+/// 只缓存已经提交的真实调用观测。材料始终在下一 Run 重读；当前 Run
+/// 持有自己的 Arc 产物，不靠全局缓存维持冻结，也不因淘汰改写它。
+pub const CONTEXT_OBSERVATION_CACHE_CAP: usize = 128;
+pub const CONTEXT_OBSERVATION_CACHE_BYTES: usize = 8 * 1024 * 1024;
+
+#[derive(Default)]
+struct ObservationCache {
+    entries: HashMap<String, Value>,
+    order: VecDeque<String>,
+    bytes: usize,
+    evictions: u64,
+    reclaimed: u64,
+}
+
 pub struct ContextCompilerService {
     materials: Arc<dyn ContextMaterialSource>,
-    /// 运行时技能材料端口（R06-T06 R1 F-01）：绑定后 `skill.catalog` 的
-    /// 材料归属权整体移交该端口（材料源一侧的 skills 字段按 T01 形状恒空）。
     skill_materials: Mutex<Option<Arc<dyn SkillMaterialPort>>>,
-    cache: Mutex<HashMap<(String, bool), Arc<CompiledContext>>>,
+    cache: Mutex<ObservationCache>,
 }
 
 impl ContextCompilerService {
@@ -844,89 +798,187 @@ impl ContextCompilerService {
         Self {
             materials,
             skill_materials: Mutex::new(None),
-            cache: Mutex::new(HashMap::new()),
+            cache: Mutex::new(ObservationCache::default()),
         }
     }
-
-    /// 绑定运行时技能材料端口（生产 bootstrap 用 SkillService 调用；
-    /// 未绑定时保持 T01 形状——skills 恒空，段缺席）。
     pub fn set_skill_materials(&self, port: Arc<dyn SkillMaterialPort>) {
         *self
             .skill_materials
             .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(port);
+            .unwrap_or_else(|p| p.into_inner()) = Some(port);
     }
 
-    /// drive_run 的编译入口：provider 检查之后、首个模型调用之前调用。
-    /// 编译失败 = 响亮 run 失败（调用方映射 FailureCause），不静默降级。
+    fn gather(&self, query: &MaterialQuery) -> Result<ContextCompileInput, ContextCompileFailure> {
+        let mut input = self
+            .materials
+            .gather(query)
+            .map_err(ContextCompileFailure::Material)?;
+        if let Some(port) = self
+            .skill_materials
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .clone()
+        {
+            input.skills = port
+                .skill_catalog(&query.agent_id)
+                .map_err(ContextCompileFailure::Material)?;
+        }
+        Ok(input)
+    }
+
+    /// 无身份复用：每次调用新采集并编译，材料更新失败不会沿用旧版本。
+    /// 此端口本身不把未发送的编译结果登记成观测。
     pub fn compiled_for_run(
         &self,
         session_id: &str,
         agent_id: &str,
         for_subagent: bool,
-        now_unix_ms: u64,
+        session_started_unix_ms: u64,
     ) -> Result<Arc<CompiledContext>, ContextCompileFailure> {
-        let key = (session_id.to_string(), for_subagent);
-        if let Some(hit) = self
-            .cache
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner())
-            .get(&key)
-        {
-            return Ok(Arc::clone(hit));
-        }
-        let mut input = self
-            .materials
-            .gather(&MaterialQuery {
-                agent_id: agent_id.to_string(),
-                for_subagent,
-                session_started_unix_ms: now_unix_ms,
-            })
-            .map_err(ContextCompileFailure::Material)?;
-        // R06-T06 R1 F-01：端口绑定后，运行时技能选择是该端口的材料——
-        // 解析失败与材料读取失败同权（响亮编译失败），绝不静默为空目录。
-        if let Some(port) = self
-            .skill_materials
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner())
-            .clone()
-        {
-            input.skills = port
-                .skill_catalog(agent_id)
-                .map_err(ContextCompileFailure::Material)?;
-        }
-        let artifact = ContextCompiler::compile(&input).map_err(ContextCompileFailure::Compile)?;
-        let compiled = Arc::new(CompiledContext::new(artifact));
-        self.cache
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner())
-            .insert(key, Arc::clone(&compiled));
-        Ok(compiled)
+        self.compile_snapshot(
+            session_id,
+            agent_id,
+            for_subagent,
+            session_started_unix_ms,
+            true,
+        )
     }
 
-    /// 观测端点读面：只返回已冻结的 artifact（没有 = 该会话尚未发送过任何
-    /// 请求，观测不存在第二份构建）。主 agent 形态优先。
+    pub fn compile_snapshot(
+        &self,
+        _session_id: &str,
+        agent_id: &str,
+        for_subagent: bool,
+        session_started_unix_ms: u64,
+        session_memory_enabled: bool,
+    ) -> Result<Arc<CompiledContext>, ContextCompileFailure> {
+        let query = MaterialQuery {
+            agent_id: agent_id.to_string(),
+            for_subagent,
+            session_started_unix_ms,
+        };
+        // 文件直接合法更新没有服务栅栏，第二次实际采集校验同一份内容；服务写入
+        // 则同时核验发布代次和活动写者。有限重试后响亮失败，不假称新版本成功。
+        for _ in 0..8 {
+            let epoch = self.materials.publication_epoch();
+            let Some(before) = epoch
+                .as_ref()
+                .map_or(Some(0), |epoch| epoch.stable_revision())
+            else {
+                std::thread::yield_now();
+                continue;
+            };
+            let mut input = self.gather(&query)?;
+            let confirm = self.gather(&query)?;
+            let after = epoch
+                .as_ref()
+                .map_or(Some(0), |epoch| epoch.stable_revision());
+            if after != Some(before) || input != confirm {
+                std::thread::yield_now();
+                continue;
+            }
+            input.memory_enabled &= session_memory_enabled;
+            let material_sha = sha256_hex(&format!("{input:?}"));
+            let artifact =
+                ContextCompiler::compile(&input).map_err(ContextCompileFailure::Compile)?;
+            let mut compiled = CompiledContext::new(artifact);
+            compiled.observation["materialSha256"] = Value::String(material_sha);
+            compiled.observation["materialRevision"] = Value::from(before);
+            compiled.observation["sessionMemoryEnabled"] = Value::Bool(session_memory_enabled);
+            return Ok(Arc::new(compiled));
+        }
+        Err(ContextCompileFailure::Material(
+            ContextMaterialError::SkillMaterial {
+                detail:
+                    "context materials changed during snapshot acquisition; no snapshot published"
+                        .to_string(),
+            },
+        ))
+    }
+
+    /// 只在真实调用的持久记录提交后发布，key 为真实 snapshot+call，不是 session。
+    pub fn record_call_observation(&self, view: Value) {
+        let key = format!(
+            "{}:{}",
+            view["snapshotId"].as_str().unwrap_or(""),
+            view["modelCallId"].as_str().unwrap_or("")
+        );
+        let size = view.to_string().len();
+        let mut cache = self.cache.lock().unwrap_or_else(|p| p.into_inner());
+        if cache.entries.contains_key(&key) {
+            return;
+        }
+        while !cache.order.is_empty()
+            && (cache.entries.len() >= CONTEXT_OBSERVATION_CACHE_CAP
+                || cache.bytes.saturating_add(size) > CONTEXT_OBSERVATION_CACHE_BYTES)
+        {
+            let oldest = cache.order.pop_front().expect("非空队列");
+            if let Some(old) = cache.entries.remove(&oldest) {
+                cache.bytes -= old.to_string().len();
+                cache.evictions += 1;
+            }
+        }
+        if size > CONTEXT_OBSERVATION_CACHE_BYTES {
+            return;
+        }
+        cache.bytes += size;
+        cache.order.push_back(key.clone());
+        cache.entries.insert(key, view);
+    }
+
+    /// 内存读面只用于可信宿主；HTTP 历史读面以实际持久化调用为准。
     pub fn observation_for_session(&self, session_id: &str) -> Option<Value> {
-        let cache = self
-            .cache
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner());
-        cache
-            .get(&(session_id.to_string(), false))
-            .or_else(|| cache.get(&(session_id.to_string(), true)))
-            .map(|compiled| compiled.observation().clone())
+        let cache = self.cache.lock().unwrap_or_else(|p| p.into_inner());
+        for shape in [false, true] {
+            if let Some(view) = cache
+                .order
+                .iter()
+                .rev()
+                .filter_map(|key| cache.entries.get(key))
+                .find(|v| v["sessionId"] == session_id && v["forSubagent"] == shape)
+            {
+                return Some(view.clone());
+            }
+        }
+        None
+    }
+    pub fn invalidate_session(&self, session_id: &str) {
+        let mut cache = self.cache.lock().unwrap_or_else(|p| p.into_inner());
+        let removed: Vec<String> = cache
+            .entries
+            .iter()
+            .filter(|(_, v)| v["sessionId"] == session_id)
+            .map(|(k, _)| k.clone())
+            .collect();
+        for key in &removed {
+            if let Some(v) = cache.entries.remove(key) {
+                cache.bytes -= v.to_string().len();
+                cache.reclaimed += 1;
+            }
+        }
+        cache.order.retain(|k| !removed.contains(k));
+    }
+    pub fn cached_session_ids(&self) -> Vec<String> {
+        let cache = self.cache.lock().unwrap_or_else(|p| p.into_inner());
+        let mut ids: Vec<String> = cache
+            .entries
+            .values()
+            .filter_map(|v| v["sessionId"].as_str().map(str::to_string))
+            .collect();
+        ids.sort();
+        ids.dedup();
+        ids
+    }
+    pub fn cache_stats(&self) -> Value {
+        let cache = self.cache.lock().unwrap_or_else(|p| p.into_inner());
+        serde_json::json!({"entries":cache.entries.len(),"bytes":cache.bytes,"capacity":CONTEXT_OBSERVATION_CACHE_CAP,"byteCapacity":CONTEXT_OBSERVATION_CACHE_BYTES,"evictions":cache.evictions,"reclaimed":cache.reclaimed,"policy":"oldest_committed_call_first"})
     }
 }
 
 impl fmt::Debug for ContextCompilerService {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let cached = self
-            .cache
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner())
-            .len();
         f.debug_struct("ContextCompilerService")
-            .field("cached_sessions", &cached)
+            .field("cache", &self.cache_stats())
             .finish()
     }
 }

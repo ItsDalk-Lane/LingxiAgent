@@ -87,12 +87,36 @@ pub struct ActiveRunFacts {
     pub current_attempt: String,
 }
 
+/// 服务所有者注册一个关闭前资源收尾；适配器不依赖服务类型。
+pub type BeforeCloseHook = Arc<
+    dyn Fn()
+            -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), StorageError>> + Send>>
+        + Send
+        + Sync,
+>;
+struct CloseLifecycle {
+    started: std::sync::atomic::AtomicBool,
+    hook: std::sync::Mutex<Option<BeforeCloseHook>>,
+    result: tokio::sync::watch::Sender<Option<Result<(), StorageError>>>,
+}
+impl Default for CloseLifecycle {
+    fn default() -> Self {
+        Self {
+            started: std::sync::atomic::AtomicBool::new(false),
+            hook: std::sync::Mutex::new(None),
+            result: tokio::sync::watch::channel(None).0,
+        }
+    }
+}
+
 /// The new run/message database: bounded queue + dedicated SQLite worker.
 /// Cloning shares the one queue/worker (there is exactly one per database
 /// file per process; the composition root owns the original).
 #[derive(Clone)]
 pub struct RunDatabase {
     queue: Arc<DbQueue>,
+    close_lifecycle: Arc<CloseLifecycle>,
+    admission: Arc<lingxi_kernel::session_admission::SessionAdmission>,
     /// Process-wide atomic run-id allocator (R02 stage-repair R1 / F01,
     /// reseeded correctly in stage-repair R2 / R2-F01, strict minted-format
     /// recognition in stage-repair R5 / R5-F02). Seeded at open (AFTER
@@ -110,9 +134,48 @@ pub struct RunDatabase {
     /// genuinely exhausted space surfaces as
     /// [`StorageError::RunIdExhausted`] instead of a panic.
     run_id_seq: Arc<std::sync::atomic::AtomicU64>,
+    file_payload_leases: Arc<tokio::sync::RwLock<()>>,
+}
+
+/// 同一进程内重复打开同一数据库也必须共用准入；跨进程宿主须先持InstanceGuard。
+fn shared_session_admission(
+    path: &Path,
+) -> Result<Arc<lingxi_kernel::session_admission::SessionAdmission>, StorageError> {
+    type Gate = lingxi_kernel::session_admission::SessionAdmission;
+    static REGISTRY: std::sync::OnceLock<
+        std::sync::Mutex<std::collections::HashMap<PathBuf, std::sync::Weak<Gate>>>,
+    > = std::sync::OnceLock::new();
+    let key = std::fs::canonicalize(path).map_err(|e| StorageError::Internal {
+        detail: format!("cannot bind session admission database: {e}"),
+    })?;
+    let mut registry = REGISTRY
+        .get_or_init(Default::default)
+        .lock()
+        .unwrap_or_else(|p| p.into_inner());
+    registry.retain(|_, gate| gate.strong_count() > 0);
+    if let Some(gate) = registry.get(&key).and_then(std::sync::Weak::upgrade) {
+        return Ok(gate);
+    }
+    let gate = Arc::new(Gate::default());
+    registry.insert(key, Arc::downgrade(&gate));
+    Ok(gate)
 }
 
 impl RunDatabase {
+    /// 内部恢复按宿主 call 身份读原不可改写账目，不暴露新的用户查询入口。
+    pub async fn model_usage_by_call(
+        &self,
+        call_id: String,
+    ) -> Result<Option<lingxi_kernel::usage::ModelCallUsageRecord>, StorageError> {
+        self.queue
+            .submit(move |conn| load_usage_row(conn, &call_id))
+            .await
+    }
+    /// 租约覆盖实际线程的字节访问，不能以请求取消代替线程已退出。
+    pub fn file_payload_leases(&self) -> Arc<tokio::sync::RwLock<()>> {
+        self.file_payload_leases.clone()
+    }
+
     /// Opens (creating if needed) the run database, runs the open-time
     /// migration pass and verifies receipts. Errors are loud: a newer,
     /// tampered or unreadable database refuses to open.
@@ -125,8 +188,11 @@ impl RunDatabase {
     pub async fn open(path: &Path, options: StoreOptions) -> Result<Self, StorageError> {
         let queue = Arc::new(DbQueue::open(path, options)?);
         let db = Self {
+            close_lifecycle: Arc::new(CloseLifecycle::default()),
+            admission: shared_session_admission(path)?,
             queue,
             run_id_seq: Arc::new(std::sync::atomic::AtomicU64::new(0)),
+            file_payload_leases: Arc::new(tokio::sync::RwLock::new(())),
         };
         let applied_by = format!("lingxi-adapters {}", env!("CARGO_PKG_VERSION"));
         let outcome: MigrationOutcome = db
@@ -224,6 +290,10 @@ impl RunDatabase {
     }
 
     /// Path of the underlying database file.
+    pub fn session_admission(&self) -> &Arc<lingxi_kernel::session_admission::SessionAdmission> {
+        &self.admission
+    }
+
     pub fn db_path(&self) -> &Path {
         self.queue.db_path()
     }
@@ -322,10 +392,144 @@ impl RunDatabase {
             .await
     }
 
-    /// Graceful close: FIFO-drains queued work, checkpoints the WAL
-    /// (TRUNCATE) and joins the worker. See [`DbQueue::close`].
+    /// 同一 DB 只允许一次注册；关闭开始后不再接受新资源。
+    pub fn register_before_close(&self, hook: BeforeCloseHook) -> Result<(), StorageError> {
+        let mut slot = self
+            .close_lifecycle
+            .hook
+            .lock()
+            .map_err(|_| StorageError::Internal {
+                detail: "before-close registration lock poisoned".into(),
+            })?;
+        if slot.is_some()
+            || self
+                .close_lifecycle
+                .started
+                .load(std::sync::atomic::Ordering::Acquire)
+        {
+            return Err(StorageError::Conflict {
+                detail: "before-close resource already registered or close started".into(),
+            });
+        }
+        *slot = Some(hook);
+        Ok(())
+    }
+
+    /// 先收回该 DB 关联资源，再原样 FIFO drain/checkpoint/join 数据库 worker。
+    /// 注册资源的同时、重复及被取消等待者共享一次真实关闭；取消不丢掉实际 join。
+    /// 未注册资源的裸 DB 保持原队列关闭后再次关闭报错的合同。
     pub async fn close(&self) -> Result<(), StorageError> {
-        self.queue.close().await
+        let lifecycle = self.close_lifecycle.clone();
+        let managed_resource = {
+            let hook = lifecycle.hook.lock().map_err(|_| StorageError::Internal {
+                detail: "before-close resource lock poisoned".into(),
+            })?;
+            let managed = hook.is_some();
+            if !managed {
+                // 持有注册锁时标记关闭，防止裸 DB 关闭后才插入关联资源。
+                lifecycle
+                    .started
+                    .store(true, std::sync::atomic::Ordering::Release);
+            }
+            managed
+        };
+        if !managed_resource {
+            return self.queue.close().await;
+        }
+        let mut result = lifecycle.result.subscribe();
+        if !lifecycle
+            .started
+            .swap(true, std::sync::atomic::Ordering::AcqRel)
+        {
+            let queue = self.queue.clone();
+            let completion = lifecycle.clone();
+            tokio::spawn(async move {
+                let resource = match completion.hook.lock() {
+                    Ok(slot) => Ok(slot.clone()),
+                    Err(_) => Err(StorageError::Internal {
+                        detail: "before-close resource lock poisoned".into(),
+                    }),
+                };
+                let resource = match resource {
+                    Ok(Some(hook)) => match tokio::spawn(async move { hook().await }).await {
+                        Ok(outcome) => outcome,
+                        Err(error) => Err(StorageError::Internal {
+                            detail: format!("before-close resource task failed: {error}"),
+                        }),
+                    },
+                    Ok(None) => Ok(()),
+                    Err(error) => Err(error),
+                };
+                let database = queue.close().await;
+                let outcome = match (resource, database) {
+                    (Ok(()), outcome) => outcome,
+                    (Err(error), Ok(())) => Err(error),
+                    (Err(resource), Err(database)) => Err(StorageError::Internal {
+                        detail: format!(
+                            "resource close failed: {resource}; database close failed: {database}"
+                        ),
+                    }),
+                };
+                completion.result.send_replace(Some(outcome));
+            });
+        }
+        loop {
+            if let Some(outcome) = result.borrow_and_update().clone() {
+                return outcome;
+            }
+            result
+                .changed()
+                .await
+                .map_err(|error| StorageError::Internal {
+                    detail: format!("close result unavailable: {error}"),
+                })?;
+        }
+    }
+
+    /// 从实际已开始的模型调用读取原始观测。已有 key_events 为唯一持久事实，
+    /// 不新增迁移或另建资料库；删会话后的孤立事件不能绕过当前会话存在性。
+    pub async fn model_context_observation(
+        &self,
+        session_id: &str,
+        run_id: Option<&str>,
+        call_id: Option<&str>,
+        snapshot_id: Option<&str>,
+    ) -> Result<Option<serde_json::Value>, StorageError> {
+        let session_id = session_id.to_string();
+        let run_id = run_id.map(str::to_string);
+        let call_id = call_id.map(str::to_string);
+        let snapshot_id = snapshot_id.map(str::to_string);
+        self.queue.submit(move |conn| {
+            let row: Option<(String, String, String, String, String)> = conn.query_row(
+                "SELECT e.payload_json, r.run_id, r.owner_kind, r.owner_subject, s.owner_user_id
+                 FROM key_events e JOIN runs r ON r.run_id=e.run_id JOIN sessions s ON s.session_id=e.session_id
+                 WHERE e.session_id=?1 AND r.session_id=?1 AND e.event_type='model_context_snapshot'
+                   AND (?2 IS NULL OR e.run_id=?2)
+                   AND (?3 IS NULL OR json_extract(e.payload_json,'$.observation.modelCallId')=?3)
+                   AND (?4 IS NULL OR json_extract(e.payload_json,'$.observation.snapshotId')=?4)
+                   AND EXISTS (SELECT 1 FROM key_events issued WHERE issued.run_id=e.run_id
+                       AND issued.event_type='model_call_started' AND issued.attempt=e.attempt
+                       AND json_extract(issued.payload_json,'$.modelCallId')=json_extract(e.payload_json,'$.observation.modelCallId'))
+                 ORDER BY CASE WHEN ?2 IS NULL AND ?3 IS NULL AND ?4 IS NULL
+                               AND json_extract(e.payload_json,'$.observation.forSubagent')=0 THEN 0 ELSE 1 END, e.seq DESC LIMIT 1",
+                rusqlite::params![session_id,run_id,call_id,snapshot_id],
+                |row| Ok((row.get(0)?,row.get(1)?,row.get(2)?,row.get(3)?,row.get(4)?)),
+            ).optional().map_err(migrations::map_rusqlite)?;
+            let Some((raw,run,kind,subject,owner))=row else { return Ok(None); };
+            let parsed: serde_json::Value = serde_json::from_str(&raw).map_err(|e| StorageError::Corrupted {detail: format!("context snapshot JSON: {e}")})?;
+            let view=parsed.get("observation").cloned().ok_or_else(|| StorageError::Corrupted {detail:"context snapshot missing observation".into()})?;
+            if parsed["schema"] != "lingxi.model-context-snapshot.v1" || view["sessionId"] != session_id || view["runId"] != run || view["actor"]["kind"] != kind || view["actor"]["subject"] != subject || view["sessionOwnerUserId"] != owner {
+                return Err(StorageError::Corrupted {detail:"context snapshot identity disagrees with actual run/session".into()});
+            }
+            let mut base=view.clone();
+            let object=base.as_object_mut().ok_or_else(|| StorageError::Corrupted {detail:"context observation is not an object".into()})?;
+            for key in ["snapshotId","modelCallId","attempt"] { object.remove(key); }
+            use sha2::{Digest, Sha256};
+            let bytes=serde_json::to_vec(&base).map_err(|e| StorageError::Corrupted {detail:e.to_string()})?;
+            let expected:String=Sha256::digest(bytes).iter().map(|b| format!("{b:02x}")).collect();
+            if view["snapshotId"] != expected { return Err(StorageError::Corrupted {detail:"context snapshot digest mismatch".into()}); }
+            Ok(Some(view))
+        }).await
     }
 
     /// Online-Backup-API snapshot into `{dest_dir}/{file_stem}.db`
@@ -359,6 +563,10 @@ impl RunDatabase {
                     .unchecked_transaction()
                     .map_err(migrations::map_rusqlite)?;
                 for row in &rows {
+                    if super::session_operations::identity_retired(&tx,&row.session_id)? {
+                        tracing::info!(session_id=%row.session_id,"session seed skipped: durable operation identity retired");
+                        continue;
+                    }
                     tx.execute(
                         "INSERT OR IGNORE INTO sessions \
                          (session_id, agent_id, owner_user_id, title, created_at_unix_ms) \
@@ -502,6 +710,8 @@ impl RunDatabase {
         );
         self.queue
             .submit(move |conn| {
+                let operation_count:i64=conn.query_row("SELECT COUNT(*) FROM session_operations WHERE session_id=?1 AND owner_kind=?2 AND owner_subject=?3 AND request_id=?4",rusqlite::params![session_id,owner_kind,owner_subject,canonical],|r|r.get(0)).map_err(migrations::map_rusqlite)?;
+                if operation_count>0{return Err(StorageError::Conflict{detail:"session_request_id_conflict".into()});}
                 // The LIKE only NARROWS the scan (every user-cause anchor
                 // starts with the prefix); the authoritative match is the
                 // Rust-side prefix strip + canonical comparison below.
@@ -889,6 +1099,22 @@ fn stage_event(
 ) -> Result<(EventEnvelope, i64), StorageError> {
     let seq = next_seq(conn, stream_id)?;
     let payload_json = canon::canonical_string(&event.payload);
+    if event.payload.event_type() == "tool_call_completed" {
+        let value: serde_json::Value =
+            serde_json::from_str(&payload_json).map_err(|e| StorageError::Corrupted {
+                detail: e.to_string(),
+            })?;
+        if let Some(result) = value.get("result") {
+            super::session_files::sync_message_refs(
+                conn,
+                session_id,
+                event.event_id.as_str(),
+                &result.to_string(),
+                now_ms as u64,
+            )?;
+        }
+    }
+
     conn.execute(
         "INSERT INTO key_events \
          (event_id, stream_id, seq, session_id, run_id, attempt, event_type, \
@@ -1311,6 +1537,26 @@ fn read_stored_final_message(
 }
 
 impl StoragePort for RunDatabase {
+    fn session_admission(&self) -> Option<Arc<lingxi_kernel::session_admission::SessionAdmission>> {
+        Some(Arc::clone(RunDatabase::session_admission(self)))
+    }
+    async fn load_session_admission(
+        &self,
+        session_id: &str,
+    ) -> Result<Option<lingxi_kernel::ports::SessionAdmissionFacts>, StorageError> {
+        let sid = session_id.to_string();
+        self.queue().submit(move |conn| {
+            let facts: Option<(String,String,String,Option<String>,bool)> = conn.query_row(
+                "SELECT owner_user_id,agent_id,lifecycle,permission_mode,EXISTS(SELECT 1 FROM session_operations WHERE session_id=sessions.session_id AND state='prepared' AND file_effects=1) FROM sessions WHERE session_id=?1", [&sid],
+                |r| Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?))
+            ).optional().map_err(migrations::map_rusqlite)?;
+            facts.map(|(owner_user_id,agent_id,lifecycle,permission,unknown_file_effects)| {
+                let permission_mode = permission.map(|raw| lingxi_kernel::subagent::SessionPermissionMode::parse(&raw).ok_or(StorageError::Corrupted{detail:format!("unknown session permission mode: {raw}")})).transpose()?.unwrap_or(lingxi_kernel::subagent::SessionPermissionMode::Operate);
+                Ok(lingxi_kernel::ports::SessionAdmissionFacts{owner_user_id,agent_id,lifecycle,permission_mode,unknown_file_effects})
+            }).transpose()
+        }).await
+    }
+
     async fn record_run_started(
         &self,
         ctx: &RunContext,
@@ -1371,6 +1617,7 @@ impl StoragePort for RunDatabase {
                             ),
                         });
                     }
+                    super::session_files::touch_on_connection(conn, &session_id, now_unix_ms)?;
                     conn.execute(
                         "INSERT INTO runs \
                          (run_id, session_id, owner_kind, owner_subject, principal_id, \
@@ -1388,6 +1635,14 @@ impl StoragePort for RunDatabase {
                         ],
                     )
                     .map_err(migrations::map_rusqlite)?;
+                    // 与创建运行同一写事务读取真实分支头；不接受请求自报或时间猜测。
+                    conn.execute(
+                        "INSERT INTO run_history_anchors(run_id,session_id,anchor_message_id) \
+                         SELECT ?1,?2,COALESCE( \
+                           (SELECT head_message_id FROM session_branch_heads WHERE session_id=?2), \
+                           (SELECT message_id FROM messages WHERE session_id=?2 AND entry_type='message' ORDER BY seq DESC LIMIT 1))",
+                        rusqlite::params![run_id,session_id],
+                    ).map_err(migrations::map_rusqlite)?;
                     conn.execute(
                         "INSERT INTO run_attempts \
                          (run_id, attempt, generation, started_at_unix_ms) \
@@ -1605,6 +1860,7 @@ impl StoragePort for RunDatabase {
                             ],
                         )
                         .map_err(migrations::map_rusqlite)?;
+                        super::session_files::sync_message_refs(conn, &session_id, &final_message_id, &content_json, now_unix_ms)?;
                         // R06-T03: the branch head advances to the final
                         // message in the SAME transaction (the head never
                         // points at a superseded position after a terminal

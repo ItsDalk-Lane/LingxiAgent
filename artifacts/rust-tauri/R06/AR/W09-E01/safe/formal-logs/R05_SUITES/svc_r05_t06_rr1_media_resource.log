@@ -1,0 +1,27 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s
+     Running tests/r05_t06_rr1_media_resource.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t06_rr1_media_resource-aa511c416fefa1d5)
+W09_ACTUAL_TEST_BINARY_START {"binary": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t06_rr1_media_resource-aa511c416fefa1d5", "argv": ["/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t06_rr1_media_resource-aa511c416fefa1d5", "--test-threads=2"], "wrapper_pid": 66382, "process_group": 57282, "before_sha256": "0ec602c3014e3f40af148466713671f343e5452f40a1818a0d84a352758f2f0c", "before_at": "2026-10-11T13:54:31.625468+00:00", "guard_env": {"LINGXI_TEST_GUARD": "1", "TEST_TIME_LIMIT_SEC": "600", "TEST_MEM_LIMIT_MB": "8192"}, "product_dir": "<W09_WORKSPACE>/lib", "shipping_inventory_before": {"path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service", "sha256": "52b3947e119f13eb43bd19bbcd43b012a2f94c6649bc2ef42c74047fca8f108f"}, "case_receipts": null, "actual_graph_sink": null, "actual_graph_evidence_root": null, "effective_case_env": {"W09_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/case-formal-r05-final-59", "W10_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/w10-formal-r05-final-59"}}
+LINGXI_TEST_GUARD: armed (pid 66383, mem_limit=8192 MB, time_limit=600 s)
+
+running 17 tests
+test rr1_f17_attachment_read_uses_the_authorized_canonical_path ... ok
+test rr1_f17_leaf_symlink_to_outside_is_refused_by_real_target ... ok
+test rr1_f17_legal_attachment_reads_still_work ... ok
+test rr1_f17_special_file_is_refused_not_read_unbounded ... ok
+test rr1_f18_cross_kind_task_id_is_refused ... ok
+test rr1_f18_duplicate_provider_task_id_is_disambiguated ... ok
+test rr1_f18_f19_dashscope_image_task_still_completes_via_registered_product ... ok
+test rr1_f18_legacy_fallback_uses_the_distinct_host_tracker_id ... ok
+test rr1_f18_old_task_survives_reload_without_retargeting ... ok
+test rr1_f18_video_poll_sends_the_provider_job_id ... ok
+test rr1_f19_cancel_after_completion_keeps_the_delivered_fact ... ok
+test rr1_f17_attachment_size_caps_refuse_loudly ... ok
+test rr1_f19_cancel_during_inflight_poll_fences_download_and_completion ... ok
+test rr1_f19_concurrent_polls_deliver_once ... ok
+test rr1_f37_parent_dir_swapped_to_inside_symlink_reads_the_real_target ... ok
+test rr1_f37_parent_dir_swapped_to_outside_symlink_is_refused_by_real_target ... ok
+test rr1_f19_cancel_during_download_leaves_no_registered_product ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+W09_ACTUAL_TEST_BINARY_END {"binary": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t06_rr1_media_resource-aa511c416fefa1d5", "argv": ["/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/deps/r05_t06_rr1_media_resource-aa511c416fefa1d5", "--test-threads=2"], "wrapper_pid": 66382, "process_group": 57282, "before_sha256": "0ec602c3014e3f40af148466713671f343e5452f40a1818a0d84a352758f2f0c", "before_at": "2026-10-11T13:54:31.625468+00:00", "guard_env": {"LINGXI_TEST_GUARD": "1", "TEST_TIME_LIMIT_SEC": "600", "TEST_MEM_LIMIT_MB": "8192"}, "product_dir": "<W09_WORKSPACE>/lib", "shipping_inventory_before": {"path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service", "sha256": "52b3947e119f13eb43bd19bbcd43b012a2f94c6649bc2ef42c74047fca8f108f"}, "case_receipts": null, "actual_graph_sink": null, "actual_graph_evidence_root": null, "effective_case_env": {"W09_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/case-formal-r05-final-59", "W10_EVIDENCE": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/LOCAL_ONLY_NEVER_GIT/w10-formal-r05-final-59"}, "actual_child_pid": 66383, "exit_code": 0, "actual_wait_reaped": true, "elapsed_seconds": 0.8989406250038883, "after_sha256": "0ec602c3014e3f40af148466713671f343e5452f40a1818a0d84a352758f2f0c", "after_at": "2026-10-11T13:54:32.579554+00:00", "shipping_inventory_after": {"path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r06-ar-w09-e01-formal-q3s6ck2h/target/debug/lingxi-service", "sha256": "52b3947e119f13eb43bd19bbcd43b012a2f94c6649bc2ef42c74047fca8f108f"}, "binary_stable": true}

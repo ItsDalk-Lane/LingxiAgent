@@ -1,0 +1,658 @@
+[
+  {
+    "path": "rust/crates/lingxi-adapters/src/storage/knowledge.rs",
+    "sha256": "a123a9e0b11e0a95f630c18f8e002c36889905364361eaa34e89bad22506db01",
+    "occurrences": [
+      {
+        "line": 293,
+        "text": "check_user_version(&probe, supported)?;"
+      },
+      {
+        "line": 301,
+        "text": "check_user_version(&conn, supported)?;"
+      },
+      {
+        "line": 309,
+        "text": "fn check_user_version(conn: &Connection, supported: i64) -> Result<(), KnowledgeError> {"
+      },
+      {
+        "line": 311,
+        "text": ".query_row(\"PRAGMA user_version\", [], |row| row.get(0))"
+      },
+      {
+        "line": 418,
+        "text": "check_user_version(&probe, supported)?;"
+      },
+      {
+        "line": 457,
+        "text": "check_user_version(&tx, supported)?;"
+      },
+      {
+        "line": 459,
+        "text": "tx.pragma_update(None, \"user_version\", supported)"
+      },
+      {
+        "line": 573,
+        "text": "fn cache_write("
+      },
+      {
+        "line": 580,
+        "text": "check_user_version(&tx, supported)?;"
+      },
+      {
+        "line": 882,
+        "text": "check_user_version(&tx, FACTS_SCHEMA_VERSION)?;"
+      },
+      {
+        "line": 884,
+        "text": "tx.pragma_update(None, \"user_version\", FACTS_SCHEMA_VERSION)"
+      },
+      {
+        "line": 1466,
+        "text": "let _ = std::fs::remove_file(self.root.join(&snapshot.storage_path));"
+      },
+      {
+        "line": 2231,
+        "text": "let conn = cache_write(&mut connection, INDEX_SCHEMA_VERSION)?;"
+      },
+      {
+        "line": 2265,
+        "text": "pub fn set_variant_status(&self, variant_id: &str, status: &str) -> Result<(), KnowledgeError> {"
+      },
+      {
+        "line": 2267,
+        "text": "let conn = cache_write(&mut connection, INDEX_SCHEMA_VERSION)?;"
+      },
+      {
+        "line": 2318,
+        "text": "let tx = cache_write(&mut conn, INDEX_SCHEMA_VERSION)?;"
+      },
+      {
+        "line": 2551,
+        "text": "let tx = cache_write(&mut conn, INDEX_SCHEMA_VERSION)?;"
+      },
+      {
+        "line": 2559,
+        "text": "let tx = cache_write(&mut conn, INDEX_SCHEMA_VERSION)?;"
+      },
+      {
+        "line": 2711,
+        "text": "let conn = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;"
+      },
+      {
+        "line": 2754,
+        "text": "let tx = cache_write(&mut conn, VECTOR_SCHEMA_VERSION)?;"
+      },
+      {
+        "line": 2794,
+        "text": "let conn = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;"
+      },
+      {
+        "line": 2825,
+        "text": "pub fn fail_build(&self, variant_id: &str) -> Result<(), KnowledgeError> {"
+      },
+      {
+        "line": 2827,
+        "text": "let conn = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;"
+      },
+      {
+        "line": 2950,
+        "text": "let tx = cache_write(&mut conn, VECTOR_SCHEMA_VERSION)?;"
+      }
+    ]
+  },
+  {
+    "path": "rust/crates/lingxi-service/src/knowledge.rs",
+    "sha256": "3f98131c88c8c1c1945a87752f1702d2cfb75ffdf2454e0d88d4554edbd3c370",
+    "occurrences": [
+      {
+        "line": 808,
+        "text": "match std::fs::remove_file(artifact_path) {"
+      },
+      {
+        "line": 1721,
+        "text": "fn record_cache_job_failure("
+      },
+      {
+        "line": 1838,
+        "text": "self.index.set_variant_status("
+      },
+      {
+        "line": 1843,
+        "text": "self.record_cache_job_failure(&job.id, &err, cleanup);"
+      },
+      {
+        "line": 1929,
+        "text": "self.record_cache_job_failure(&job.id, &err, None);"
+      },
+      {
+        "line": 1945,
+        "text": ".then(|| self.vectors.fail_build(&build.variant_id));"
+      },
+      {
+        "line": 1946,
+        "text": "self.record_cache_job_failure(&job.id, &err, cleanup);"
+      },
+      {
+        "line": 1980,
+        "text": ".then(|| self.vectors.fail_build(&build.variant_id));"
+      },
+      {
+        "line": 1981,
+        "text": "self.record_cache_job_failure(&job.id, &err, cleanup);"
+      },
+      {
+        "line": 1994,
+        "text": "self.record_cache_job_failure("
+      },
+      {
+        "line": 1997,
+        "text": "Some(self.vectors.fail_build(&build.variant_id)),"
+      },
+      {
+        "line": 2004,
+        "text": "self.record_cache_job_failure(&job.id, &err, None);"
+      }
+    ]
+  },
+  {
+    "path": "lib/knowledge/vector-index-adapter.ts",
+    "sha256": "4c74ef0a579de04195ac1b7612b398f5dc8d558c17eac83051b6f55b488b8877",
+    "occurrences": [
+      {
+        "line": 77,
+        "text": "// v2：vector_artifacts 加 last_used_at（查询命中即刷新），支撑笔记本级"
+      },
+      {
+        "line": 80,
+        "text": "// last_used_at（created_at 兼作 indexed_at 语义）；v2 老库按表形分流迁移"
+      },
+      {
+        "line": 373,
+        "text": "const future = Number(probe.pragma(\"user_version\", { simple: true }));"
+      },
+      {
+        "line": 381,
+        "text": "const version = Number(this.db.pragma(\"user_version\", { simple: true }));"
+      },
+      {
+        "line": 392,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 396,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 408,
+        "text": "last_used_at TEXT NOT NULL DEFAULT '',"
+      },
+      {
+        "line": 430,
+        "text": "this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);"
+      },
+      {
+        "line": 431,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 433,
+        "text": "// 祖先线 v1（vector_artifacts 无 last_used_at）：身份迁移 + 补列。"
+      },
+      {
+        "line": 437,
+        "text": "// v2 有两条历史线（本分支 variant 表 vs main 线 vector_artifacts+last_used_at），"
+      },
+      {
+        "line": 448,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 451,
+        "text": "/** v3 补列（幂等）：variant 表加 last_used_at，存量行回填 created_at（=indexed_at 语义）。 */"
+      },
+      {
+        "line": 454,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 456,
+        "text": "if (!columns.some((col: any) => col.name === \"last_used_at\")) {"
+      },
+      {
+        "line": 457,
+        "text": "this.db.exec(`ALTER TABLE vector_index_variants ADD COLUMN last_used_at TEXT NOT NULL DEFAULT '';`);"
+      },
+      {
+        "line": 459,
+        "text": "this.db.exec(`UPDATE vector_index_variants SET last_used_at = created_at WHERE last_used_at = '';`);"
+      },
+      {
+        "line": 460,
+        "text": "this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);"
+      },
+      {
+        "line": 461,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 473,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 592,
+        "text": "this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);"
+      },
+      {
+        "line": 593,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 596,
+        "text": "private assertWritableSchema() {"
+      },
+      {
+        "line": 597,
+        "text": "const version = Number(this.db.pragma(\"user_version\", { simple: true }));"
+      },
+      {
+        "line": 728,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 752,
+        "text": "chunk_fingerprint, dimensions, status, created_at, updated_at, last_used_at"
+      },
+      {
+        "line": 759,
+        "text": "last_used_at = excluded.last_used_at"
+      },
+      {
+        "line": 771,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 781,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 784,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 791,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 794,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 835,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 836,
+        "text": "this.db.prepare(\"UPDATE vector_index_variants SET last_used_at = ? WHERE id IN (SELECT value FROM json_each(?))\")"
+      },
+      {
+        "line": 838,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 847,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 851,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 908,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 953,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 973,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 994,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 1008,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 1030,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 1105,
+        "text": "// 查询涉及即为使用：scope 内全部 variant 刷新 last_used_at（按 artifact 维度"
+      },
+      {
+        "line": 1109,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 1121,
+        "text": "UPDATE vector_index_variants SET last_used_at = ? WHERE ${usageConditions.join(\" OR \")}"
+      },
+      {
+        "line": 1123,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 1147,
+        "text": "SELECT parse_artifact_id, model_key, created_at, last_used_at"
+      },
+      {
+        "line": 1153,
+        "text": "lastUsedAt: row.last_used_at || row.created_at,"
+      },
+      {
+        "line": 1164,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 1171,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 1183,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 1184,
+        "text": "const version = Number(this.db.pragma(\"user_version\", { simple: true }));"
+      },
+      {
+        "line": 1213,
+        "text": "}).immediate();"
+      }
+    ]
+  },
+  {
+    "path": "lib/knowledge/knowledge-index-store.ts",
+    "sha256": "eca060010a31ffb6acac5e349fd6a8a72875c59db673bc797ce04e7ddb0862d6",
+    "occurrences": [
+      {
+        "line": 387,
+        "text": "private assertWritableSchema() {"
+      },
+      {
+        "line": 388,
+        "text": "const version = Number(this.db.pragma(\"user_version\", { simple: true }));"
+      },
+      {
+        "line": 421,
+        "text": "if (Number(probe.pragma(\"user_version\", { simple: true })) > KNOWLEDGE_INDEX_SCHEMA_VERSION) {"
+      },
+      {
+        "line": 427,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 432,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 433,
+        "text": "const version = Number(this.db.pragma(\"user_version\", { simple: true }));"
+      },
+      {
+        "line": 434,
+        "text": "if (version === 0) { this.createSchema(); this.db.pragma(`user_version = ${KNOWLEDGE_INDEX_SCHEMA_VERSION}`); }"
+      },
+      {
+        "line": 436,
+        "text": "if (version === 1 || version === 2) { this.db.exec(CHUNK_VARIANT_METADATA_DDL); this.db.pragma(\"user_version = 3\"); }"
+      },
+      {
+        "line": 437,
+        "text": "if (version > 0 && version < 4) { this.db.exec(KNOWLEDGE_MULTIGRAIN_DDL); this.db.pragma(\"user_version = 4\"); }"
+      },
+      {
+        "line": 441,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 462,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 503,
+        "text": "this.db.pragma(\"user_version = 2\");"
+      },
+      {
+        "line": 504,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 582,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 599,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 609,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 622,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 627,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 637,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 680,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 721,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 727,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 739,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 765,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 785,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 871,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 876,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 990,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 1008,
+        "text": "}).immediate());"
+      },
+      {
+        "line": 1201,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 1202,
+        "text": "const version = Number(this.db.pragma(\"user_version\", { simple: true }));"
+      },
+      {
+        "line": 1231,
+        "text": "}).immediate();"
+      }
+    ]
+  },
+  {
+    "path": "lib/knowledge/ann-index-store.ts",
+    "sha256": "d18aace5c86d100e37e2f5932eb184044daabc4dec503800ec43a37264848404",
+    "occurrences": [
+      {
+        "line": 56,
+        "text": "try { if (Number(probe.pragma(\"user_version\", { simple: true })) > 1) throw new KnowledgeError(\"KNOWLEDGE_SCHEMA_NEWER\", \"ANN schema newer; original preserved\"); }"
+      },
+      {
+        "line": 62,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 64,
+        "text": "const version = Number(db.pragma(\"user_version\", { simple: true }));"
+      },
+      {
+        "line": 67,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 81,
+        "text": "db.pragma(\"user_version = 1\");"
+      },
+      {
+        "line": 83,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 88,
+        "text": "private assertWritableSchema(): void {"
+      },
+      {
+        "line": 89,
+        "text": "const version = Number(this.db.pragma(\"user_version\", { simple: true }));"
+      },
+      {
+        "line": 112,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 129,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 134,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 137,
+        "text": "}).immediate();"
+      },
+      {
+        "line": 141,
+        "text": "this.assertWritableSchema();"
+      },
+      {
+        "line": 143,
+        "text": "}).immediate();"
+      }
+    ]
+  },
+  {
+    "path": "lib/knowledge/vector-search-backend-factory.ts",
+    "sha256": "54aeefa97965fe574859085616cc74070405489cce5557c2f29abb406fb2d74d",
+    "occurrences": []
+  },
+  {
+    "path": "lib/knowledge/usearch-vector-backend.ts",
+    "sha256": "2df6f775646d13fb2c6eea51f452ae31ef0c98dc2908770d203f210ae53c6560",
+    "occurrences": [
+      {
+        "line": 198,
+        "text": "if (row) fs.rmSync(path.join(this.root, row.fileName), { force: true });"
+      },
+      {
+        "line": 297,
+        "text": "try { fs.rmSync(temporaryFile, { force: true }); } catch { this.log(`knowledge ANN: temporary cleanup failed ${job.id}`); }"
+      }
+    ]
+  },
+  {
+    "path": "lib/knowledge/knowledge-query-service.ts",
+    "sha256": "3523acb8804b878330072c413390bc4dd1a4b2a688bf12302a2b7f634233b87b",
+    "occurrences": [
+      {
+        "line": 429,
+        "text": "* 挂靠笔记本配置的保留天数（以向量库 last_used_at 计，查询命中即刷新）未"
+      },
+      {
+        "line": 535,
+        "text": "this.deps.indexStore.reset();"
+      },
+      {
+        "line": 743,
+        "text": "this.deps.indexStore.reset();"
+      },
+      {
+        "line": 990,
+        "text": "vectorIndex.rebuild();"
+      },
+      {
+        "line": 1179,
+        "text": "this.deps.indexStore.reset();"
+      },
+      {
+        "line": 1296,
+        "text": "vectorIndex!.rebuild();"
+      }
+    ]
+  },
+  {
+    "path": "lib/knowledge/ingestion-service.ts",
+    "sha256": "5655b0832e777640b0bedbade84627e57d09787c4f8d679b58db1bd8073a3082",
+    "occurrences": []
+  },
+  {
+    "path": "lib/knowledge/knowledge-store.ts",
+    "sha256": "118d8ad8f497a8d8b1b8f41205a4751801e9a368c811e6b8a43d8595facda46d",
+    "occurrences": [
+      {
+        "line": 760,
+        "text": "const current = Number(this.db.pragma(\"user_version\", { simple: true }));"
+      },
+      {
+        "line": 806,
+        "text": "this.db.pragma(`user_version = ${KNOWLEDGE_SCHEMA_VERSION}`);"
+      }
+    ]
+  },
+  {
+    "path": "lib/knowledge/knowledge-manager.ts",
+    "sha256": "a744e4cee7e513deebb34fa33bef08c31c5390e40818774077e676ea24791cec",
+    "occurrences": [
+      {
+        "line": 639,
+        "text": "fs.rmSync(path.join(this.artifactsRoot, snapshotId), { recursive: true, force: true });"
+      },
+      {
+        "line": 649,
+        "text": "fs.rmSync(path.join(this.sourcesRoot, input.sourceId), { recursive: true, force: true });"
+      }
+    ]
+  }
+]

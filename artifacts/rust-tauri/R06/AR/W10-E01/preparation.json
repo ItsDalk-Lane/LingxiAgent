@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-11T08:55:29.853409+00:00",
+  "status": "PREPARED_EXECUTOR_NOT_RUN",
+  "workspace": "/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent",
+  "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "isolation": "approved product base only; no W02/W06/W12 unaccepted product; no protected user setting",
+  "cargo_lock_sha256": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+  "node_modules": "read dependencies shared symlink; build target must own non-symlink",
+  "integration": "W12 unaccepted knowledge candidate remains preserved; no combine before new verification; F09/F11 later owners"
+}

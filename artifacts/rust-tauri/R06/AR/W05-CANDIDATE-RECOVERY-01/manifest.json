@@ -1,0 +1,75 @@
+{
+  "at": "2026-10-11T23:01:17.528226+00:00",
+  "role": "ROOT_EXACT_FROZEN_PRODUCT_BYTES_RECOVERY_ONLY",
+  "family": "W05",
+  "base": "bc2ce51fd005ea75b9949156974e15d2761eb734",
+  "owned_count": 10,
+  "rows": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/agent_memory.rs",
+      "copied_from": "/Users/study_superior/.codex/r06-w05-r01-runtime/mutant/rust/crates/lingxi-adapters/src/storage/agent_memory.rs",
+      "sha256": "a5d8f3547955fd35490410330554d09e8bf147e4b2a2810635428412835854fd",
+      "bytes": 86150
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+      "copied_from": "/Users/study_superior/.codex/r06-w05-r01-runtime/mutant/rust/crates/lingxi-adapters/src/storage/run_store.rs",
+      "sha256": "14bf2208024d10a4b51990866da7dac615a4a981a3c1bac05c856d5fabd56d3d",
+      "bytes": 156155
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/context.rs",
+      "copied_from": "/Users/study_superior/.codex/r06-w05-r01-runtime/mutant/rust/crates/lingxi-kernel/src/context.rs",
+      "sha256": "6dfa6b6913d559f9dde785133e9a8621e26dbd17c7191e7fe2100e0b875c1d6f",
+      "bytes": 48765
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/context_compiler.rs",
+      "copied_from": "/private/tmp/r06-exact-byte-recovery-01/W05/rust/crates/lingxi-service/src/context_compiler.rs",
+      "sha256": "6c9c663d1143e04d700ce14a3a3459f467d67fbf8d755aa262c719691ec84e8c",
+      "bytes": 38304
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "copied_from": "/Users/study_superior/.codex/r06-w05-r01-runtime/mutant/rust/crates/lingxi-service/src/lib.rs",
+      "sha256": "7e8274655b54a4fe4ad96c10411d5ea4fc61b483dfdf45dd0202ad864c9c7576",
+      "bytes": 286987
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "copied_from": "/Users/study_superior/.codex/r06-w05-r01-runtime/mutant/rust/crates/lingxi-service/src/runs.rs",
+      "sha256": "a8b782a60df9b6d20ad6a29dae013fabf9b922c9d3bd58606c3d9f0ab3971b4f",
+      "bytes": 238446
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_admin.rs",
+      "copied_from": "/Users/study_superior/.codex/r06-w05-r01-runtime/mutant/rust/crates/lingxi-service/src/session_admin.rs",
+      "sha256": "4636c863249cf56cea9923323ffc64cc04cce47e4bfcea8fcaf34365bb3d3e9c",
+      "bytes": 15354
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/skills.rs",
+      "copied_from": "/Users/study_superior/.codex/r06-w05-r01-runtime/mutant/rust/crates/lingxi-service/src/skills.rs",
+      "sha256": "c97930e12705dc61f6de8bad3fcc54b79f4f0b392043046a55ee4ed239e22097",
+      "bytes": 62996
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs",
+      "copied_from": "/Users/study_superior/.codex/r06-w05-r01-runtime/mutant/rust/crates/lingxi-service/tests/r06_t01_context_compiler.rs",
+      "sha256": "897c690538f357312697d749980838ed31cb2b36a884e0bfdd3aa454a0936f3f",
+      "bytes": 37445
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f05_cache.rs",
+      "copied_from": "/Users/study_superior/.codex/r06-w05-r01-runtime/mutant/rust/crates/lingxi-service/tests/r06_ar_f05_cache.rs",
+      "sha256": "3e605474528291fbbb5ead9f37da2bc5ec96f607d12678387d91d2d8f7547635",
+      "bytes": 37214
+    }
+  ],
+  "aggregate_sha256": "5f93a185714aaba5e6c2110997e10e1cdde880b76331d40b43d25ba462737570",
+  "all_frozen_SHA_match": true,
+  "historical_test_evidence_not_recreated": true,
+  "no_current_review_acceptance": true,
+  "main_product_overlay": false,
+  "status": "RECOVERED_EXACT_SOURCE_NOT_ACCEPTED"
+}

@@ -1,0 +1,254 @@
+{
+  "at": "2026-10-12T01:45:16.861036+00:00",
+  "role": "ROOT_MECHANICAL_DOCUMENT_CORRECTION",
+  "files": [
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W01_REVIEWER_TEMPLATE.md",
+      "role": "REVIEWER",
+      "before_sha256": "4a644d24f0aa2e0628cfbfbe16a72e34858405ec1eaabdc7dd0554ded7bd1c0d",
+      "after_sha256": "47e36eee09f5f72039a2f197b186d5a4edb89b709135b46649c7b1fe38ae580a",
+      "unchanged_spec_sha256": "725580c062bb5f853b1aab33dbe17df4fc754831f3ef323707dba92875588e9c",
+      "original_leaves": 4,
+      "original_assertions": 8,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W01_REPAIR_TEMPLATE.md",
+      "role": "REPAIR",
+      "before_sha256": "b7ee94e8d75ca6a38686fe7893a19f21481694b730eb1de937a64ae04dd65152",
+      "after_sha256": "a6ced02f5c47e0bd2db68d3cb4a3a0d78760211b46f091e3c57ef9bff3002f0f",
+      "unchanged_spec_sha256": "725580c062bb5f853b1aab33dbe17df4fc754831f3ef323707dba92875588e9c",
+      "original_leaves": 4,
+      "original_assertions": 8,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W02_REVIEWER_TEMPLATE.md",
+      "role": "REVIEWER",
+      "before_sha256": "f5542b42de6172fa05e0c1ceb5d2e0e6f54527905361421159abc2d050eac809",
+      "after_sha256": "a8b1fc6622efd67cfe301c7f1cabe6dd6573c80277e0d3130ca9f60fed950a4e",
+      "unchanged_spec_sha256": "296eb1dbdca6872d86a6e101d3abd8d91395c8802dd095c73247d5fc91f964fe",
+      "original_leaves": 9,
+      "original_assertions": 20,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W02_REPAIR_TEMPLATE.md",
+      "role": "REPAIR",
+      "before_sha256": "a8ce4141478d61f3d3ccb653bf399fba14c2d12db45673873bb47fae5a930834",
+      "after_sha256": "7317cdc4134db3db3996802127bbb005c9f70b5c7c21b9200f7f9159f8693de0",
+      "unchanged_spec_sha256": "296eb1dbdca6872d86a6e101d3abd8d91395c8802dd095c73247d5fc91f964fe",
+      "original_leaves": 9,
+      "original_assertions": 20,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W03_REVIEWER_TEMPLATE.md",
+      "role": "REVIEWER",
+      "before_sha256": "26fa13caf82e5569d365c0354c57eedd9e4c03e1eafe45e8864a2f8ff067406b",
+      "after_sha256": "f7f4a31f396fc68c7e080775f7d0c012328a47afa55bc5e562943c5778ae8fca",
+      "unchanged_spec_sha256": "24911976402a28a371c1ea1a9da80986b3e5556d7dd4b5b18a12adb47b3b02ad",
+      "original_leaves": 32,
+      "original_assertions": 79,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W03_REPAIR_TEMPLATE.md",
+      "role": "REPAIR",
+      "before_sha256": "63ff23b6248d56ddd9578576ff4e8e5d30a3d1cc77eaafdaec44d1a8dc817dc1",
+      "after_sha256": "e5d2ff7e80c3718a4ad2185db70e7c4754da46dbcdcb3196be519f83fe997b25",
+      "unchanged_spec_sha256": "24911976402a28a371c1ea1a9da80986b3e5556d7dd4b5b18a12adb47b3b02ad",
+      "original_leaves": 32,
+      "original_assertions": 79,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W04_REVIEWER_TEMPLATE.md",
+      "role": "REVIEWER",
+      "before_sha256": "075e4157d39097699ed64d8aefcaa06e8e5f46bae77bb49f70f732acdaf24b68",
+      "after_sha256": "2d450bc069c0177dab13b4d4556298f224776c2eb6b86c4f37a2a99bb0679d81",
+      "unchanged_spec_sha256": "55b193c92aab93bd9289bfd352d942b8b85fe1356c3f63d9d8d76879d4c4af1d",
+      "original_leaves": 5,
+      "original_assertions": 10,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W04_REPAIR_TEMPLATE.md",
+      "role": "REPAIR",
+      "before_sha256": "3189a44d2b43592a14ffdf72d7933f9b19b2453a4f6a30158ba0938af3ee7189",
+      "after_sha256": "0c42fa0bc696083a3607a0d02dde2ca79703cf130bbf770563cb017c1fe11c18",
+      "unchanged_spec_sha256": "55b193c92aab93bd9289bfd352d942b8b85fe1356c3f63d9d8d76879d4c4af1d",
+      "original_leaves": 5,
+      "original_assertions": 10,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W05_REVIEWER_TEMPLATE.md",
+      "role": "REVIEWER",
+      "before_sha256": "7ef1b514e7e2c46feb00351785391ab23ba300fd5da2f2ada6a76af09fa09c15",
+      "after_sha256": "51ac9a02b77244e5e88469b64fee2abb256d2c6d8d93bdc1b64a7ebad491ac25",
+      "unchanged_spec_sha256": "b26b094817a7f8bba52aa1ddf48a8c0883c2a8232951b78587681601044146e8",
+      "original_leaves": 5,
+      "original_assertions": 10,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W05_REPAIR_TEMPLATE.md",
+      "role": "REPAIR",
+      "before_sha256": "c0c2004ed0238dc9564c88f675bed17fda4d7cab002f0f408e2f1df044edfb1f",
+      "after_sha256": "5fc5bd80dd12d6e6a59644e27a3a7a6f1ab2cdf03de52778390ea31024493f0d",
+      "unchanged_spec_sha256": "b26b094817a7f8bba52aa1ddf48a8c0883c2a8232951b78587681601044146e8",
+      "original_leaves": 5,
+      "original_assertions": 10,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W06_REVIEWER_TEMPLATE.md",
+      "role": "REVIEWER",
+      "before_sha256": "a8fb220b3f5e8639d953298c0ae307fb8cac00c629ffee5549176f01142ab19f",
+      "after_sha256": "0943bbadd8f8a5a5f771cd64cca76f74f5d476f9b8aaa20e669c2bbe73addb84",
+      "unchanged_spec_sha256": "4db1f3ba6876b375f2fdcba01640416da0cc341e1d7f6918ff2391f9418acce1",
+      "original_leaves": 7,
+      "original_assertions": 19,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W06_REPAIR_TEMPLATE.md",
+      "role": "REPAIR",
+      "before_sha256": "33c3caedc0576face209559d7020208519000a09340787a23529bbe228911f62",
+      "after_sha256": "3ce0aaac65807cd95dbb6acc6c9b39635bc18e35782de888eff26df339d4a904",
+      "unchanged_spec_sha256": "4db1f3ba6876b375f2fdcba01640416da0cc341e1d7f6918ff2391f9418acce1",
+      "original_leaves": 7,
+      "original_assertions": 19,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W07_REVIEWER_TEMPLATE.md",
+      "role": "REVIEWER",
+      "before_sha256": "2ec9a24e5b6b16b791fcf5519dd7e4e0d4cdc1ef1cc705acf3093a2bf71235c9",
+      "after_sha256": "1860d7dad1607a06b788383c5239ea579d03d152d8823d9ab1fabc559f26bc18",
+      "unchanged_spec_sha256": "f2e4edffa8e71036df78b997bf0eecc3a1d06e3205b814e031a68fae2e3754be",
+      "original_leaves": 6,
+      "original_assertions": 12,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W07_REPAIR_TEMPLATE.md",
+      "role": "REPAIR",
+      "before_sha256": "946bb14142e975b2ee3bc441bd185af042c6d5738898c2143d355d5eae90c6e6",
+      "after_sha256": "a64e504bf5aefe43039a28ba141cd3f8eff69d0f0b9c4eb723e36097c7589f9b",
+      "unchanged_spec_sha256": "f2e4edffa8e71036df78b997bf0eecc3a1d06e3205b814e031a68fae2e3754be",
+      "original_leaves": 6,
+      "original_assertions": 12,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W08_REVIEWER_TEMPLATE.md",
+      "role": "REVIEWER",
+      "before_sha256": "17987bc7dc55b2a36288ad391b80a369011c40cd729e2fff73a7fa0f9c45f317",
+      "after_sha256": "a3796ab273b6d1f866743df5abeef082bdc8ed003eb2dd7791fa329ace14f02b",
+      "unchanged_spec_sha256": "81629231aa975678eac2e90a91f65b558482465bd77e1095822719e3b6946b34",
+      "original_leaves": 7,
+      "original_assertions": 14,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W08_REPAIR_TEMPLATE.md",
+      "role": "REPAIR",
+      "before_sha256": "dc8b46c77f255c788cc5dfb77f466f40838eb0612c9bc6c1417485521f2e8f4f",
+      "after_sha256": "913be8204594bec38e1d6cb6b412a533070efb90431852aeeecdce9539ceb7d6",
+      "unchanged_spec_sha256": "81629231aa975678eac2e90a91f65b558482465bd77e1095822719e3b6946b34",
+      "original_leaves": 7,
+      "original_assertions": 14,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W09_REVIEWER_TEMPLATE.md",
+      "role": "REVIEWER",
+      "before_sha256": "ee6294565ca97d32cf20b4b4a2a2ba0c32cd33deec4f1dfb23791cad6c01fb9f",
+      "after_sha256": "b06581b433c23d51ea8360f9a5cff5f2972e2e7d2363c9dca760108eb611924e",
+      "unchanged_spec_sha256": "85074b70bfb25841710581a2bb1349ccf929edc556172419030caa4e2e5b8c87",
+      "original_leaves": 5,
+      "original_assertions": 14,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W09_REPAIR_TEMPLATE.md",
+      "role": "REPAIR",
+      "before_sha256": "215cc48d45bcdba1f6b9cf0d47140cf9835a9d9acf3eabe2e4be6ee43a45ef7f",
+      "after_sha256": "1cbf7690f857be17a9328f9411bc52a2407611c40544cc2208799670fa6f63df",
+      "unchanged_spec_sha256": "85074b70bfb25841710581a2bb1349ccf929edc556172419030caa4e2e5b8c87",
+      "original_leaves": 5,
+      "original_assertions": 14,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W10_REVIEWER_TEMPLATE.md",
+      "role": "REVIEWER",
+      "before_sha256": "5c60374ecf57dda2c363026f5cae233936e1613f1ff7c547b7335caced2a0a5a",
+      "after_sha256": "ec4c5abb57167e1be475db70ec6fc0d7da50a18a047c2da9dd5e0a9058256172",
+      "unchanged_spec_sha256": "74b0f3a62a816e70831cc2297e2e5f0801596ca1610f31388dfc858e9596748a",
+      "original_leaves": 19,
+      "original_assertions": 53,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W10_REPAIR_TEMPLATE.md",
+      "role": "REPAIR",
+      "before_sha256": "bd087bd03183aca001382e1492d5762b941a249b63538e8b56317e1cae08369a",
+      "after_sha256": "67a40c71091556c5d6b820d53fe5198346a9cfcbaff3ec7847b53e42665f638c",
+      "unchanged_spec_sha256": "74b0f3a62a816e70831cc2297e2e5f0801596ca1610f31388dfc858e9596748a",
+      "original_leaves": 19,
+      "original_assertions": 53,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W11_REVIEWER_TEMPLATE.md",
+      "role": "REVIEWER",
+      "before_sha256": "a187e7aae6694c89b0642aae717f0e3425dfc23a1fccac4aae9e9ad8ce3e3ccf",
+      "after_sha256": "5601dbc0c114121dc91f0d103c4ce6313db804aba50ed70ff26d12edccd78467",
+      "unchanged_spec_sha256": "b4442ed133e29e1f936d3039b9e2aebb46ac779deb1ab9729d43bc2277c58377",
+      "original_leaves": 54,
+      "original_assertions": 106,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W11_REPAIR_TEMPLATE.md",
+      "role": "REPAIR",
+      "before_sha256": "fecf99cefc561e383c3269a442196f5b5ec044147c210f5f6968f30d8712a3a7",
+      "after_sha256": "78803a21c0af768346b6ff3a3aa5ea356f39a10e9b4c45ec3da450f647ef0b44",
+      "unchanged_spec_sha256": "b4442ed133e29e1f936d3039b9e2aebb46ac779deb1ab9729d43bc2277c58377",
+      "original_leaves": 54,
+      "original_assertions": 106,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W12_REVIEWER_TEMPLATE.md",
+      "role": "REVIEWER",
+      "before_sha256": "5bcb1c183f0e3d9bb05d660376ff7a67e26a3abe64179566c8f335e8558d6988",
+      "after_sha256": "eee2c78868974a061325f3db407e77d1f1bb22e25bd14ca7692414021d792fc8",
+      "unchanged_spec_sha256": "776d10e721e55d56fd5832a8d4d891bee5628e04c055a2af938924bb3f215449",
+      "original_leaves": 28,
+      "original_assertions": 70,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-EX-W12_REPAIR_TEMPLATE.md",
+      "role": "REPAIR",
+      "before_sha256": "46351b1bc1d18ef6da515d3594acd15419efd380d6c45bba3069502cf1f336bd",
+      "after_sha256": "9dd3c288b9a7b95e0aff4a07c6452daa7327bb2c3b5969687472f07455fc570d",
+      "unchanged_spec_sha256": "776d10e721e55d56fd5832a8d4d891bee5628e04c055a2af938924bb3f215449",
+      "original_leaves": 28,
+      "original_assertions": 70,
+      "applicability": "UNUSED_TEMPLATE_ONLY_NOT_ACTIVE_DISPATCH"
+    }
+  ],
+  "original_register_sha256_unchanged": "db4ceda76ca3911b9e4001934bd49f6d756c800634d3fe1da481730907876fae",
+  "active_dispatches_changed": false,
+  "product_source_changed": false,
+  "new_actor_created": false,
+  "runtime_tests": "NOT_RUN_DOCUMENT_ONLY",
+  "independent_acceptance": "NONE",
+  "stage_status": "NOT_RUN",
+  "R07_started": false
+}

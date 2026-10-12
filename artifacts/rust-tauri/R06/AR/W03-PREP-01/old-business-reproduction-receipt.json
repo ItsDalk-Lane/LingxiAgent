@@ -1,0 +1,28 @@
+{
+  "recorded_at": "2026-10-11T08:28:46.552718+00:00",
+  "role": "ROOT_CONTROL_READING_ACTUAL_EXECUTOR_EVIDENCE_NOT_REVIEWER",
+  "status": "OLD_BUSINESS_FAILURE_CONFIRMED_PRELIMINARY",
+  "source_evidence_root": "/Users/study_superior/.codex/worktrees/r06-w03-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W03-E01/baseline-red-02",
+  "evidence_sha256": {
+    "run.json": "5a672388a4421f1757b3149936e181de0e7ccb77c795aa12586a7b4cc3da84bb",
+    "atomicity.json": "d3da60a4d0683cf65c4717a0d7e80519cbd3e03a6458a301fa4f5170e16127ff"
+  },
+  "actual": {
+    "positive_fork_status": 200,
+    "failed_fork_status": 500,
+    "fork_exists_after_event_failure": true,
+    "model_request_count": 1,
+    "exit_code": 101,
+    "start_time": 1791705371.6655118,
+    "end_time": 1791705374.172947,
+    "guard": {
+      "rss_mib": 8192,
+      "seconds": 600
+    },
+    "lock_hash": "d4f8c2977adbde14dd42e670205f1054fa7ef1ddceb9f0b13c190c2bfa9d6fd4",
+    "mock_boundary": "only external loopback model",
+    "cleanup": "owned process reaped; synthetic home retained as evidence"
+  },
+  "expected": "event insert failure must rollback fork state; positive normal fork succeeds",
+  "not_claimed": "new-source correctness or independent PASS"
+}

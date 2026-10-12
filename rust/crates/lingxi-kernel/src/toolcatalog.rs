@@ -472,7 +472,7 @@ impl DeclaredPermission {
 /// migrated yet registers as [`Availability::Future`], never as available.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Availability {
-    /// Callable and in the resident surface.
+    /// 可调用；是否进入常驻发送面由独立的模型常驻策略决定。
     Available,
     /// Callable through the on-demand catalog (discovery/describe/call),
     /// not resident in the system prompt.
@@ -1467,6 +1467,8 @@ pub struct RegisteredTool {
 /// and a cached description snapshot carry).
 #[derive(Debug, Clone, PartialEq)]
 pub struct ToolDescription {
+    /// 正式完整说明，不能用显示名称替代。
+    pub description: String,
     pub target_id: ToolTargetId,
     pub origin: ToolOrigin,
     pub source_id: String,
@@ -1597,6 +1599,7 @@ pub struct ToolRegistry {
 #[derive(Debug, Default)]
 struct RegistryState {
     catalog_generation: u64,
+    model_residents: Option<std::collections::BTreeSet<ToolTargetId>>,
     targets: BTreeMap<ToolTargetId, RegisteredTool>,
     /// Every name/alias → (owner, role). A PRIMARY name may have several
     /// owners (one per source); an ALIAS has exactly one owner, enforced
@@ -1699,6 +1702,39 @@ impl ToolRegistry {
             listing: description_of(target_id, tool),
             input_schema: tool.manifest.input_schema.clone(),
         })
+    }
+
+    /// 说明、参数和代次在同一次锁内读取，不能跨代次拼接。
+    pub fn describe_full_at_generation(&self, target: &ToolTargetId) -> Result<(u64, ToolFullDescription), ToolCatalogError> {
+        let state = self.lock();
+        let tool = state.targets.get(target).ok_or_else(|| ToolCatalogError::TargetNotFound { reference: format!("target {target}") })?;
+        Ok((state.catalog_generation, ToolFullDescription { listing: description_of(target, tool), input_schema: tool.manifest.input_schema.clone() }))
+    }
+
+    /// 常驻策略只控制发送给模型的声明，不改变注册或执行授权。
+    pub fn configure_model_residents(&self, targets: std::collections::BTreeSet<ToolTargetId>) {
+        let mut state = self.lock();
+        if state.model_residents.as_ref() != Some(&targets) {
+            state.model_residents = Some(targets);
+            state.catalog_generation += 1;
+        }
+    }
+
+    /// 一次原子读取完整的当前模型声明；按需工具仍保留在真实目录。
+    pub fn model_declaration_snapshot(&self) -> (u64, Vec<ToolFullDescription>) {
+        self.model_declaration_snapshot_with_activated_targets(&std::collections::BTreeSet::new())
+    }
+
+    /// 本轮按可信来源激活的声明与常驻声明一起原子读取，不改变共享目录策略或执行授权。
+    pub fn model_declaration_snapshot_with_activated_targets(
+        &self,
+        activated: &std::collections::BTreeSet<ToolTargetId>,
+    ) -> (u64, Vec<ToolFullDescription>) {
+        let state = self.lock();
+        let tools = state.targets.iter().filter(|(id, tool)| {
+            tool.manifest.availability == Availability::Available && (activated.contains(*id) || state.model_residents.as_ref().is_none_or(|set| set.contains(*id)))
+        }).map(|(id, tool)| ToolFullDescription { listing: description_of(id, tool), input_schema: tool.manifest.input_schema.clone() }).collect();
+        (state.catalog_generation, tools)
     }
 
     /// Discovery: every discoverable target whose local name, display
@@ -2110,6 +2146,7 @@ fn description_of(target_id: &ToolTargetId, tool: &RegisteredTool) -> ToolDescri
         source_id: manifest.origin.source_id().to_string(),
         local_name: manifest.local_name.clone(),
         display_name: manifest.display_name.clone(),
+        description: manifest.description.clone(),
         aliases: manifest.aliases.clone(),
         version: manifest.version.clone(),
         target_generation: tool.target_generation,

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "R06-AR-F06-C01",
+    "expected": "等价block/flow false都关闭记忆",
+    "actual": "旧block1绿、flow实际请求红；新gather/run/binary均核对nonce不在实际请求",
+    "tests": "positive_block_disabled_real_request / c01_flow_disabled_real_request / c01_c02_c03_c04_real_binary_authenticated_requests",
+    "formal_status": "SELF_CHECKED_FROZEN_CANDIDATE",
+    "prior_evidence": "final-four-c-complete.json (10pass); now fixture has I/O test and clippy-only corrections",
+    "formal_evidence": "isolated-final-dedicated-four-c.json",
+    "test_count": 10,
+    "service_binary_sha256": "ac78d36d8f84034bc4b49c72ca293b3ce04cdbc901d6a5f9baa3ff83080a60f7",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-AR-F06-C02",
+    "expected": "字符串内部#、引号转义、中文、冒号及BOM/CRLF保真",
+    "actual": "精确gather名字及binary实际请求名字；行外注释不影响",
+    "tests": "c02_quoted_hash_gather_preserved / c02_c03_standard_semantics_and_fail_closed_gather / binary",
+    "formal_status": "SELF_CHECKED_FROZEN_CANDIDATE",
+    "prior_evidence": "final-four-c-complete.json (10pass); now fixture has I/O test and clippy-only corrections",
+    "formal_evidence": "isolated-final-dedicated-four-c.json",
+    "test_count": 10,
+    "service_binary_sha256": "ac78d36d8f84034bc4b49c72ca293b3ce04cdbc901d6a5f9baa3ff83080a60f7",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-AR-F06-C03",
+    "expected": "同名深层不串扰，语法/类型/重复明确错误",
+    "actual": "15非法输入、alias/multi-doc、错误更新、I/O目录注入；binary零请求+DBfailed+flags/feedback/persona400；真正tool失败且零pending",
+    "tests": "c02_c03_standard_semantics_and_fail_closed_gather / adapters c03两测试 / adversarial_real_memory_tool_rechecks_flow_and_corrupt_config / binary",
+    "formal_status": "SELF_CHECKED_FROZEN_CANDIDATE",
+    "prior_evidence": "final-four-c-complete.json (10pass); now fixture has I/O test and clippy-only corrections",
+    "formal_evidence": "isolated-final-dedicated-four-c.json",
+    "test_count": 10,
+    "service_binary_sha256": "ac78d36d8f84034bc4b49c72ca293b3ce04cdbc901d6a5f9baa3ff83080a60f7",
+    "independent_review": "NOT_RUN"
+  },
+  {
+    "id": "R06-AR-F06-C04",
+    "expected": "缺文件、空、部分、现役样本默认兼容且未知值保留",
+    "actual": "默认memorytrue保持；read byte equality；Value未知嵌套/列表完整比较；坏写原字节不变",
+    "tests": "c04_incumbent_sample_defaults_and_unknown_fields_survive_updates / c04_updates_preserve_all_unknown_nested_values_and_escaped_lists / binary",
+    "formal_status": "SELF_CHECKED_FROZEN_CANDIDATE",
+    "prior_evidence": "final-four-c-complete.json (10pass); now fixture has I/O test and clippy-only corrections",
+    "formal_evidence": "isolated-final-dedicated-four-c.json",
+    "test_count": 10,
+    "service_binary_sha256": "ac78d36d8f84034bc4b49c72ca293b3ce04cdbc901d6a5f9baa3ff83080a60f7",
+    "independent_review": "NOT_RUN"
+  }
+]

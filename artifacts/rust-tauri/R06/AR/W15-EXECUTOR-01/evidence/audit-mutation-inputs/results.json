@@ -1,0 +1,92 @@
+[
+  {
+    "name": "false-zero",
+    "exit_code": 1,
+    "expected_point": "inputTokens",
+    "actual_message": "拒绝虚报或缺测：BE-04 inputTokens 未测量冒零或求和错误",
+    "rejected_as_expected": true,
+    "input_sha256": "a23c8c8a0ca63928fee8cf1f7780e526ccc6991e270697129ed428719939b879",
+    "records_sha256": "69a9a203536a995c025a9611859b93753e2a7d667657bcd7ce4e601ebba9e799"
+  },
+  {
+    "name": "missing-as-zero",
+    "exit_code": 1,
+    "expected_point": "BE-06",
+    "actual_message": "拒绝虚报或缺测：BE-06 未测量冒零",
+    "rejected_as_expected": true,
+    "input_sha256": "a23c8c8a0ca63928fee8cf1f7780e526ccc6991e270697129ed428719939b879",
+    "records_sha256": "498eae1ea07d594786f27e81e33431f44131ce85a8d989d313320e93b3b704aa"
+  },
+  {
+    "name": "remove-negative",
+    "exit_code": 1,
+    "expected_point": "BE-10",
+    "actual_message": "拒绝虚报或缺测：固定行为电池或负控缺失：['BE-10']",
+    "rejected_as_expected": true,
+    "input_sha256": "a23c8c8a0ca63928fee8cf1f7780e526ccc6991e270697129ed428719939b879",
+    "records_sha256": "4c72b0f97dd042df0e04919879cba85f2ea5fab79a2d06a887e09f3cf7dfa9c1"
+  },
+  {
+    "name": "echo-as-full-leaf",
+    "exit_code": 1,
+    "expected_point": "F-D01-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-QUICK-CHAT-WINDOW-A2C385",
+    "actual_message": "拒绝虚报或缺测：F-D01-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-QUICK-CHAT-WINDOW-A2C385 missing→deferred或伪造业务通过；原R06义务仍须履行",
+    "rejected_as_expected": true,
+    "input_sha256": "b5382c09e10ea3656ae9abc49967a14088d3c50cfd60007504dc8c1b60459ac9",
+    "records_sha256": "5a56187c9c8e259c90f74ad1a8770404b54a4dfab2ff0eef3762f6f2b1adae30"
+  },
+  {
+    "name": "missing-as-deferred",
+    "exit_code": 1,
+    "expected_point": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHAT-TASK-TASKID-ABORT-POST-B47CAC",
+    "actual_message": "拒绝虚报或缺测：F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHAT-TASK-TASKID-ABORT-POST-B47CAC missing→deferred或伪造业务通过；原R06义务仍须履行",
+    "rejected_as_expected": true,
+    "input_sha256": "15756a7020ea12547030d5e421f512e0ae0cc5aa3acf24a2b47c7c5a0434dde8",
+    "records_sha256": "5a56187c9c8e259c90f74ad1a8770404b54a4dfab2ff0eef3762f6f2b1adae30"
+  },
+  {
+    "name": "deadline-moved",
+    "exit_code": 1,
+    "expected_point": "R06-T01-S01",
+    "actual_message": "拒绝虚报或缺测：R06-T01-S01 无原依据后移期限",
+    "rejected_as_expected": true,
+    "input_sha256": "a647f0022faec019976983d5f20ea358ca8db1b68e47b4b6064b45f669152bb4",
+    "records_sha256": "5a56187c9c8e259c90f74ad1a8770404b54a4dfab2ff0eef3762f6f2b1adae30"
+  },
+  {
+    "name": "a15-echo-binding",
+    "exit_code": 1,
+    "expected_point": "A15/A16",
+    "actual_message": "拒绝虚报或缺测：A15/A16 被echo/握手错误绑定",
+    "rejected_as_expected": true,
+    "input_sha256": "c36896a2121fd00ddae36de21f4408a24dc6086fb49ca5436c2d68f48ef462f6",
+    "records_sha256": "5a56187c9c8e259c90f74ad1a8770404b54a4dfab2ff0eef3762f6f2b1adae30"
+  },
+  {
+    "name": "stale-candidate",
+    "exit_code": 1,
+    "expected_point": "候选漂移",
+    "actual_message": "拒绝虚报或缺测：候选漂移/旧证据复用：rust/crates/lingxi-service/tests/r06_t08_behavior_eval.rs",
+    "rejected_as_expected": true,
+    "input_sha256": "23a88abcebd475ae39a47d0d7c90b94cf8dc0fb9ebab724d1f0468901005f454",
+    "records_sha256": "5a56187c9c8e259c90f74ad1a8770404b54a4dfab2ff0eef3762f6f2b1adae30"
+  },
+  {
+    "name": "false-stage-accepted",
+    "exit_code": 1,
+    "expected_point": "当前放行状态",
+    "actual_message": "拒绝虚报或缺测：当前放行状态与未决集合/真实Git事实矛盾",
+    "rejected_as_expected": true,
+    "input_sha256": "b6409748364a4e67d39b2c1afa47bf38654b55482b22f15659fac1f54abb2494",
+    "records_sha256": "5a56187c9c8e259c90f74ad1a8770404b54a4dfab2ff0eef3762f6f2b1adae30"
+  },
+  {
+    "name": "semantic-negative-as-pass",
+    "exit_code": 1,
+    "expected_point": "R06-A15",
+    "actual_message": "拒绝虚报或缺测：R06-A15 错误绑定：须保留BE10语义失败负控",
+    "rejected_as_expected": true,
+    "input_sha256": "a23c8c8a0ca63928fee8cf1f7780e526ccc6991e270697129ed428719939b879",
+    "records_sha256": "371e200f4d99f8f4107318e86bdd9675c1819805d186e9cb224763c49a326e6b"
+  }
+]

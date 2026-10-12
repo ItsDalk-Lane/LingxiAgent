@@ -1,0 +1,20 @@
+{
+  "command": [
+    "npx",
+    "eslint",
+    "lib/knowledge/vector-index-adapter.ts",
+    "lib/knowledge/knowledge-index-store.ts",
+    "lib/knowledge/ann-index-store.ts",
+    "lib/knowledge/vector-search-backend-factory.ts",
+    "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+    "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+    "tests/r06-ar-f12-ann-cache-preservation.test.ts"
+  ],
+  "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-lint-01-qox4gvff",
+  "start": 1791701140.617733,
+  "end": 1791701141.632734,
+  "exit_code": 0,
+  "log_sha256": "664cb8402baadb72f5b60cf809ce3986a42fa8c75ef83b40626ee3674fc53acf",
+  "home_files": []
+}

@@ -1,0 +1,23 @@
+{
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-j8",
+    "-p",
+    "lingxi-adapters",
+    "--test",
+    "knowledge_store_r06t07",
+    "--test",
+    "r06_ar_f12_cache_preservation",
+    "--",
+    "--nocapture"
+  ],
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r01-adapters-67l7ui_f",
+  "start": 1791698342.286294,
+  "end": 1791698472.521812,
+  "exit_code": 0,
+  "log_sha256": "db90ffe176e15a9beb403deae6ff8091fddd0c680567831ad0970720cfc006db"
+}

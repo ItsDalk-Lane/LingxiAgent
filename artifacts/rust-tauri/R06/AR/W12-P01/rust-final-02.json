@@ -1,0 +1,32 @@
+{
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-j8",
+    "-p",
+    "lingxi-adapters",
+    "--test",
+    "knowledge_store_r06t07",
+    "--test",
+    "r06_ar_f12_cache_preservation",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r06_ar_f12_cache_consumers",
+    "--test",
+    "r06_t07_knowledge",
+    "--test",
+    "r06_t07_knowledge_tools",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-rust-final-02-z4o1_nzg",
+  "start": 1791699870.016596,
+  "end": 1791700056.387254,
+  "exit_code": 0,
+  "log_sha256": "cd335e530b0a6bb642f13f7ec03e5015dd93250586167868f311d942af0b75bb"
+}

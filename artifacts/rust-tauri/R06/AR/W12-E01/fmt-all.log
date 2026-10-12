@@ -1,0 +1,46 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:23:
+ use std::sync::{Arc, Mutex, MutexGuard};
+ 
+ use lingxi_kernel::knowledge::KnowledgeError;
+-use rusqlite::{Connection, OptionalExtension, params};
++use rusqlite::{params, Connection, OptionalExtension};
+ 
+ pub use lingxi_kernel::knowledge::{
+-    ChunkDraft, ChunkSpan, ChunkerBlock, build_chunks, chunk_index_variant_id, chunker_config_id,
+-    embedding_model_key, estimate_text_tokens, sha256_hex, vector_index_variant_id,
++    build_chunks, chunk_index_variant_id, chunker_config_id, embedding_model_key,
++    estimate_text_tokens, sha256_hex, vector_index_variant_id, ChunkDraft, ChunkSpan, ChunkerBlock,
+ };
+ 
+ // ── 行类型 ──────────────────────────────────────────────────────────────────
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs:23:
+     let root = fixture("positive");
+     drop(KnowledgeIndexStore::open(&root).expect("正常索引"));
+     drop(KnowledgeVectorStore::open(&root).expect("正常向量"));
+-    assert!(
+-        KnowledgeIndexStore::open(&root)
+-            .unwrap()
+-            .list_ready_variant_metadata("absent")
+-            .unwrap()
+-            .is_empty()
+-    );
+-    assert!(
+-        KnowledgeVectorStore::open(&root)
+-            .unwrap()
+-            .list_variants_by_artifact("absent")
+-            .unwrap()
+-            .is_empty()
+-    );
++    assert!(KnowledgeIndexStore::open(&root)
++        .unwrap()
++        .list_ready_variant_metadata("absent")
++        .unwrap()
++        .is_empty());
++    assert!(KnowledgeVectorStore::open(&root)
++        .unwrap()
++        .list_variants_by_artifact("absent")
++        .unwrap()
++        .is_empty());
+ }
+ 
+ #[test]

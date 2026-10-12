@@ -681,10 +681,23 @@ pub async fn resource_content_route(
             return resource_error_response(err);
         }
     }
+    let lease = state.session_files().payload_lease().await;
     let content = match state.resources().resolve_content(&resource_id).await {
         Ok(content) => content,
         Err(err) => return resource_error_response(err),
     };
+    // 旧附件映射也不能把内部来源证明或恢复副本变成通用下载对象。
+    if state
+        .resource_io()
+        .file_safety()
+        .is_protected(&content.file_path)
+    {
+        return resource_error_response(ResourceError::new(
+            403,
+            "resource_access_denied",
+            "protected service state",
+        ));
+    }
 
     if let Some(inm) = headers
         .get(axum::http::header::IF_NONE_MATCH)
@@ -742,7 +755,12 @@ pub async fn resource_content_route(
     // 流式，流式化留待后续任务；语义/头/状态码保真）。tokio 未启用 fs
     // feature（不动 feature 面），阻塞读放进 blocking 池。
     let read_path = content.file_path.clone();
-    let bytes = match tokio::task::spawn_blocking(move || std::fs::read(read_path)).await {
+    let bytes = match tokio::task::spawn_blocking(move || {
+        let _lease = lease;
+        std::fs::read(read_path)
+    })
+    .await
+    {
         Ok(Ok(bytes)) => bytes,
         Ok(Err(err)) => {
             return resource_error_response(ResourceError::new(

@@ -1,0 +1,431 @@
+{
+  "at": "2026-10-12T00:03:37.632644+00:00",
+  "role": "ROOT_READONLY_INPUT_PROVENANCE_TRANSFER_NO_ACCEPTANCE",
+  "author_inputs": 269,
+  "reused_exact": 186,
+  "copied_missing": [
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/w06-p02-partial-integrity.json",
+      "sha256": "b37e1e834c202f5753d74e8d2c3f4a63562e2fb38b5f61c7a63c1345ee500849",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/daybreak-access-20261011T064724Z.json",
+      "sha256": "dc8cb16f713781dd62720fa3aefeb7a7c367432c348c2dbee2b3fc33f68a945a",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/w10-first-review-preparation-note.json",
+      "sha256": "07bb35ed7c01499f51c3b74f50db1f8bed4e335c7d250ee7c97dd686dd2b5453",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/entry.json",
+      "sha256": "d84e4ee4e340f1fa465641ef50f3aa27a0113190eba7b82c29399bfbcc248e8e",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w03-reviewer-owned-static-cache-cleanup-01-before.json",
+      "sha256": "be1bcf555c432fd4d16787415fc3677360fea405347c37d8010887e8689d3ac8",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/registry-baseline-result.json",
+      "sha256": "f9949dcc002b4696e5d2615b872a7f25eb13c24c56e2f3fd7048e47eff459d87",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/knowledge-causal-deadline-execution-preparation.json",
+      "sha256": "dfbf49b2408ee9715b1b8a99d8092a64742ce4b83349cb6015ddacb3d30b8050",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/control-protection-current.json",
+      "sha256": "e300a3475853bd75c0b8a94b1813afd818c0d26edcb7ae37ad4c9d3805cb3b3b",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/context-cache-execution-preparation.json",
+      "sha256": "790979e96d6d45ab8739d0a4d2e5274aaea7a77185d8179e6b52225947d82e89",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/isolation-result.json",
+      "sha256": "af78921b0bb4b51a3cf9bfde47ba4c2fccd80db10358fc51060d4b9af24e1f63",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/f08-upstream-fixed-sequence-pure-bc-receipt.json",
+      "sha256": "a664f692f9934fa1f847f090e028559de47d8897c9b06b36fa2eb8214f973ee4",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/w10-partial-formal-producer-readback.json",
+      "sha256": "be6bb585c8c7369352ff72766816f785a51c067115faa3c02c0dd5188823de73",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/session-file-lifecycle-execution-preparation.json",
+      "sha256": "d25c4861270aca8ef851b8481f817afc585428272a07f53ac8a02ef3df4bba4b",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/control-consistency-current.json",
+      "sha256": "9062a33617666e13f575b039aa6aeb7ebd1155020b727c50b5cc51e335c9f321",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/registry-baseline.log",
+      "sha256": "1b78cfb8ee59d76a98788923d8d08e34d33a072f91ff612d0c68344088c4f029",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/control-protection-20261011T0919.json",
+      "sha256": "23070d900e2e46dc429ca88ed7abbe4270904493c8cc192b124fc7df81a00d6a",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/tool-declaration-execution-preparation.json",
+      "sha256": "e99975e960f3cdea59c6d763f11bf48a46dfd4c0c7736dc8ebefdde20786be82",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/post-space-restoration-owned-processes.json",
+      "sha256": "688f920562f6001b3ce1ec80a55e3ad6be1740f9edabe0fad6bb8849ca8ee8fb",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w10-executor-owned-incremental-cleanup-before.json",
+      "sha256": "303ee4c0440a60c2d90bf1f9e854bb02c6e2d7ee36f3f87833f4511987a4a8db",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w10-executor-owned-static-cache-cleanup-01-before.json",
+      "sha256": "6586e780c262e66905cd19692fcdfa9324724ca29846f9ff2d781ba5b022f240",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/control-consistency-latest.json",
+      "sha256": "915586f6c69cf65b9bf7511eca9f22c77c87ddd891424662c7c6e125b0a11ce9",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/isolation-startup.log",
+      "sha256": "cc56fa72c21096a87dc99231e9794f3ba57a7adf79078503f75ffb50bf62b487",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/control-json-integrity-readback-06.json",
+      "sha256": "b97f8b4a30916eadefb5e94472b109ee98e615a2ecb458862e5e5f4a24748c3b",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/control-consistency-20261011T0858.json",
+      "sha256": "07192a93e6325d790839013313a9fc79fa4d6794425eab9658aefcf399eb191b",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/future-dispatch-resource-and-home-clarification-01.json",
+      "sha256": "0609c6e8082f9b58ad32143e95d912460a890fa46d46d9887cf12d203e15a189",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/dependency-copy-location-correction.json",
+      "sha256": "5831010b8dcfe854eb291cb4c51d8638cf53bdf9722aae341325ed7cb2958b43",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/current-owned-source-scan-04.json",
+      "sha256": "55d8dbac3858f7303dce1f0768cb427bff229bde305edb8126746bf364a490de",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/final-stage-reviewer-template-prepared.json",
+      "sha256": "401d0da2e28b7cd4241df0cd2e7950542bc9e9e5e1d601d7c191cd16b79b63e1",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/f08-upstream-cancellation-pure-bc-new-window-receipt.json",
+      "sha256": "df4ad96bc426549bf0d9f9338e276d3e17cd6c14e828de4ea50ceb89930e0494",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-reviews-owned-incremental-cleanup-02-before.json",
+      "sha256": "00ba31dcf6b8989bc35f7467eae8b9d00527d5b48b71b0aeed9f26e373c2898b",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w10-executor-owned-incremental-cleanup-receipt.json",
+      "sha256": "cd352a07a87c00305d261bc87d0a792e6ed06e75c48a15a4746c25feda899ac6",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/control-json-integrity-readback-07.json",
+      "sha256": "bc5b5b537f79d4e1831bf19b8f5aa89736ab5ad0008780ab9254fe00ae57b72a",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w10-incremental-cleanup-preparation-failure.json",
+      "sha256": "e636dd67f056084139ebd43e320b337d9f4838cdce86eee5d392929037f94828",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/knowledge-gap-resumption-execution-preparation.json",
+      "sha256": "ac8f0ac407364e827fdcca3c9fb54ceb374ca658f5120c7e389a0ca30f3d38ad",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w10-static-cache-preparation-correction-01.json",
+      "sha256": "8adb70aae8c0609c4e3e620ccac6e033859bdc7501a621e38d45e834e9a1aac6",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/local-owner-original-contract-correction.json",
+      "sha256": "3d6bb3363473e961f5006c8eba51e699472137a774e3d0c29cdaaf3f34e269da",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-reviews-owned-incremental-cleanup-02-receipt.json",
+      "sha256": "b45e91d64289dd33e338cabf7c22cd789f90a6e81dfb0671c74439a25adfa5bd",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/control-json-integrity-readback-04.json",
+      "sha256": "120b4aa01f360374877e7bb8de12bd9f49a78dfc7564c70160c4dea27f8f2f2d",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-reviews-incremental-cleanup-02-first-attempt-correction.json",
+      "sha256": "ab8fa9d84c8f13ad609fe56891e090b5d0f55e0efec76b826c3ee0805d9458dd",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/control-protection-20261011T0838.json",
+      "sha256": "8acbe92411d9dc56beb933c950a78a05b31a5f4e335a0349d46174deb632c708",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/owner-history-and-full-workspace-readback.json",
+      "sha256": "b03ee910373a1a97f03bf4daa570e20950375ea1b53dd523de0084cdefe9134d",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/knowledge-identity-execution-preparation-20261011T0840.json",
+      "sha256": "59b1e4ac07eb76081a0c4459151cf00cc2309eda7ba815f0c28131acbf94b4de",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w10-static-cache-preparation-failure-01.json",
+      "sha256": "39ec589239b3a03b09720a99e6c62a386fa6e7c78b0dc942d18a144d3ab99c5d",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/control-json-integrity-readback-05.json",
+      "sha256": "e2a89e09db5975c42a29df245aeb96e5e2fc6b6156d4474e2a957d3186a7d125",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/isolation.json",
+      "sha256": "41f46359ccf66220a72a1db9416f3162d8e695a5b4a70e80c3db7c5d301818ea",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w05-executor-owned-static-cache-cleanup-01-receipt.json",
+      "sha256": "14685db1a3542e94119f4ec982f85ae49b35db215b8f3b5ba3b045d264a8f03e",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/git-delivery-readiness.json",
+      "sha256": "fbc1c6dce7d8469488f28e19b0ffa0d99f7b34aa4daa7439e20cdb27854d6840",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/w10-formal-layer-result-readback.json",
+      "sha256": "4ea7e8486d6a84af241c37421d7bdf499d11b71c94119e3c5e480f9a066f6d24",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/daybreak-access-20261011T080716Z.json",
+      "sha256": "40d57e992520b644fdcfa84f67e36a44ca49ab080b57ef59678f52c5dd89adc7",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/control-consistency-20261011T0755.json",
+      "sha256": "9d60cbe2d2f9292b5bd7e1c1ed0a5b0ffd66366ab1c7f32b33adf2324ed2d3e6",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/original-register-integrity-20261011T0903.json",
+      "sha256": "4fabd91345b1d17648c5b29c1ba54773429bdc4f701e405fdde439a64d337692",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/official-daybreak-access-page-readonly-01.json",
+      "sha256": "56af2af2c9ebb955a41edbe98b672f895d77905b2914c0bfe8447d1d3a889ef8",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/w03-snapshot-case-count-correction.json",
+      "sha256": "7e833e3b0fe18d5982de563161b561bd9747ea70762bdf7eedd55bf2b5e9326a",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/original-human-prompt-thread-inventory-readonly-02.json",
+      "sha256": "a356f0685309dbde37419687aea3231943c23b5e446a3238707e7633e005112f",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w03-reviewer-owned-static-cache-cleanup-01-receipt.json",
+      "sha256": "9e983709f77ac20881cde2ad61640764f16ed38ca46f38f641d602e81839f9e6",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w10-executor-owned-static-cache-cleanup-01-prepared.json",
+      "sha256": "b9fa40e3255c662241b3185b028779d879847e31eecd55fb2dbe8a0fc74c3df8",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/current-safe-execution-readback-02.json",
+      "sha256": "82e5d375a580b031f39b2cd2083005a5a0e4cf1769fa8a030429a845f7c94953",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/toolchain.json",
+      "sha256": "944dd70c49cdf4c10d44bb87369b25c0607fbcf29b76b1e763556184bb68843f",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/knowledge-chat-scope-execution-preparation.json",
+      "sha256": "0388125ebea30166886bbd223bbb881f2b689d8e9509026ae88868a3902d0f00",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/new-family-actual-reds-control-receipt.json",
+      "sha256": "a3dfb2a31a9f75ed76e87de2e96c284a1daabd958550dc4f7e02dc0a753a2824",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/current-safe-execution-readback-03.json",
+      "sha256": "6d4bcee1aae59fe8b9bcbb6aab20199ef96c80e2abd692e5e3150361ad0e6867",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/tool-declaration-snapshot-contract-correction.json",
+      "sha256": "528880e6cd7e78f573e26777d619acec71e3f270fdbc1020701bec5a8b9ce635",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/specification-integrity.json",
+      "sha256": "bb461e9085613677203b9054c7f1f4f7b2cc0218e47c6e0849e9afcfc9eaecf6",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/common-path-planning-20261011T0805.json",
+      "sha256": "16f9609affb5e6d44fbb59810a7ce2f0d99ea6999ddfe289620e6c80a4449b94",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w10-executor-owned-static-cache-cleanup-01-receipt.json",
+      "sha256": "c532551694027291adea3ec53ad90af80287166a60db4a26562e25ab8145b6d3",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ended-w05-executor-owned-static-cache-cleanup-01-before.json",
+      "sha256": "7ca551da2f263ecd8ad3004e0ace08daea30f3e0067f02f6b4ab45486d6ff339",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/context-lifecycle-execution-preparation.json",
+      "sha256": "f2b8ea5b91efca725309cb4c4e63b545673e2de2b1cde9fa8fc863be4d934aad",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/aggregate-time-budget-correction.json",
+      "sha256": "144c9fd7065084e8da9667fbfe431518bdedcfeed4d12277acc626cc4a753719",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/owned-build-space-readback-01.json",
+      "sha256": "de3e105ba77f2e1c73dd7e41abf813c5e82ff4bf3ef89c7df96bbd0e6cfd6917",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/post-space-control-reconciliation-01.json",
+      "sha256": "2e21c4a259926c100c702389c5ae928b4fb8cadda3c657e636de9b9249f9602c",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ordinary-clone-preparation-01/checkout-receipt.json",
+      "sha256": "3f8009b6d3d79099b27d5255f0fa52d268660f6a8a0e88878c0375ef4182bdc2",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ordinary-clone-preparation-01/clone.stderr",
+      "sha256": "18574e3da6b4521fdbbad799ba5cfc530d83123fc8e0b3500b5880f930ed1d87",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ordinary-clone-preparation-01/checkout.stderr",
+      "sha256": "c325ec02a89bd136ef2505ec6830e1390c7ad5134e1b453ca346c7853751966b",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ordinary-clone-preparation-01/checkout.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ordinary-clone-preparation-01/input-overlay-preparation-failure.json",
+      "sha256": "c32f88cba54fa73c7d729181d3fcd4b494bfe34d5ed44855e8144dc476000afd",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ordinary-clone-preparation-01/clone.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/ENTRY-01/ordinary-clone-preparation-01/receipt.json",
+      "sha256": "3f4fa0a22c52a606978a17fa3ed75154140c38038bfe215b43f45201cde62212",
+      "read_only_input": true
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/AR/W15-PREP-01/source-contract-readback.json",
+      "sha256": "dec3885668136acb1035076168a33384b9aee8cf6dd6bda245283caf0b97f138",
+      "read_only_input": true
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/W15_EXECUTOR_01_REPORT.md",
+      "sha256": "ddc31c34d7cb328219213e0d47cd51477555263346d8a0a8e0c290a61cc13bce",
+      "read_only_input": false,
+      "owned_handoff": true
+    }
+  ],
+  "historical_mutable_inputs": [
+    {
+      "path": "docs/rust-tauri/R06/repair-current/AR_PROGRESS.json",
+      "sha256": "f199916b4831a5367c9bd81330ff3f3fd49c36a38117db396bc067f74c4ea5f6",
+      "read_only_input": true,
+      "snapshot_path": "artifacts/rust-tauri/R06/AR/W15-REVIEW-PREP-01/author-historical-mutable-inputs/docs/rust-tauri/R06/repair-current/AR_PROGRESS.json"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/AR_ISSUE_MATRIX.json",
+      "sha256": "625b1a9269c2b8ebe69b348236543c8bf4374a48d4ede1ed18afcaa0bf2bea08",
+      "read_only_input": true,
+      "snapshot_path": "artifacts/rust-tauri/R06/AR/W15-REVIEW-PREP-01/author-historical-mutable-inputs/docs/rust-tauri/R06/repair-current/AR_ISSUE_MATRIX.json"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/AR_HANDOFF.md",
+      "sha256": "89abc407a754402c4a9f1f4c5ef623053821d5674a6c0b6d98a3bbbba43392c2",
+      "read_only_input": true,
+      "snapshot_path": "artifacts/rust-tauri/R06/AR/W15-REVIEW-PREP-01/author-historical-mutable-inputs/docs/rust-tauri/R06/repair-current/AR_HANDOFF.md"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W11_EXECUTOR_01.md",
+      "sha256": "8ade7d6b7fdf9baf381d331ad3d3e35fb6ec1b935e81f166500299cf7dacca4c",
+      "read_only_input": true,
+      "snapshot_path": "artifacts/rust-tauri/R06/AR/W15-REVIEW-PREP-01/author-historical-mutable-inputs/docs/rust-tauri/R06/repair-current/dispatches/R06-AR-W11_EXECUTOR_01.md"
+    }
+  ],
+  "current_controls": "Fresh root current controls separately copied at actual reviewer registration; historical frozen author snapshots kept distinct."
+}

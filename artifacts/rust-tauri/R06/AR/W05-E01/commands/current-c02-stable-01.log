@@ -1,0 +1,7 @@
+LINGXI_TEST_GUARD: armed (pid 69665, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+test c02_real_runtime_other_agent_child_has_its_own_persona ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.08s
+

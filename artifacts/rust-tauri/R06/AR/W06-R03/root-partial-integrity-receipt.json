@@ -1,0 +1,24 @@
+{
+  "recorded_at": "2026-10-11T08:58:06.336021+00:00",
+  "role": "ROOT_PARTIAL_EVIDENCE_INTEGRITY_NOT_REVIEWER",
+  "platform_terminal": "INTERRUPTED_BY_PLATFORM_CONTENT_REVIEW",
+  "partial_saved_binding_time": "2026-10-11T08:44:30.494036+00:00",
+  "partial_saved_binary_sha256": "e2675cbe9b6102bfff1a2cf63166c18a7c96f263fe1e2cd030b3adcf0f402b17",
+  "current_fixed_binary_sha256": "e16779d1cb542013b93970ebaf4e24c36fa4a2281f3ffae3944864598a363184",
+  "binary_same_as_partial_binding": false,
+  "source_integrity": [
+    {
+      "side": "main",
+      "all15_match_snapshot": true
+    },
+    {
+      "side": "fixed",
+      "all15_match_snapshot": true
+    }
+  ],
+  "partial_report_statement": "platform_blocking=false and stable binary describe pre-rebuild/pre-platform snapshot; not current completed verdict",
+  "full_final_manifest": "NOT_PRESENT",
+  "final_new_binary_full_rerun": "NOT_COMPLETED_BEFORE_PLATFORM_STOP",
+  "report_results": "partial original FAIL preserved, no PASS or completed acceptance",
+  "do_not_rewrite": "saved source/binary proof remains historical actual; preserve failed retries/interruptednewwindow"
+}

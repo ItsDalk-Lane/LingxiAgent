@@ -1,0 +1,14 @@
+   Compiling serde_core v1.0.229
+   Compiling syn v3.0.6
+   Compiling serde_derive_internals v0.30.0
+   Compiling serde_derive v1.0.229
+   Compiling ref-cast-impl v1.0.27
+   Compiling schemars_derive v1.2.2
+   Compiling ref-cast v1.0.27
+   Compiling serde_json v1.0.151
+   Compiling serde v1.0.229
+   Compiling schemars v1.2.2
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.07s
+     Running unittests src/lib.rs (/Users/study_superior/.codex/r06-w05-r01-runtime/target/debug/deps/lingxi_kernel-1fd7126cc038a159)

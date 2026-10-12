@@ -1,0 +1,33 @@
+{
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "tests/r06-ar-f12-vector-cache-preservation.test.ts",
+    "tests/r06-ar-f12-fulltext-cache-preservation.test.ts",
+    "tests/r06-ar-f12-ann-cache-preservation.test.ts",
+    "tests/knowledge-index-metadata-migration.test.ts",
+    "tests/knowledge-section-index.test.ts",
+    "tests/knowledge-query-index-separation.test.ts",
+    "tests/knowledge-query-config-alignment.test.ts",
+    "tests/knowledge-vector-index.test.ts",
+    "tests/knowledge-vector-backend-parity.test.ts",
+    "tests/knowledge-vector-backend-fallback.test.ts",
+    "tests/knowledge-vector-shutdown.test.ts",
+    "tests/knowledge-ann-crash-recovery.test.ts",
+    "tests/knowledge-ann-rebuild.test.ts",
+    "tests/knowledge-index-metadata-backfill.test.ts",
+    "tests/knowledge-index-variants.test.ts",
+    "tests/knowledge-ann-index-store.test.ts",
+    "tests/knowledge-ingestion.test.ts",
+    "tests/knowledge-lifecycle.test.ts",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-ts-suite-01-pll52riv",
+  "start": 1791701052.330038,
+  "end": 1791701080.91806,
+  "exit_code": 0,
+  "log_sha256": "b2f072ec8d197e53a66c98c01391649535936fed55385db142c363b59d8ca7fd",
+  "home_files": []
+}

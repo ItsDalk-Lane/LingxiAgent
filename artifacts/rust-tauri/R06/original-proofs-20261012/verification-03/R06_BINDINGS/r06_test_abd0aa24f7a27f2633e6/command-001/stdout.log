@@ -1,0 +1,15 @@
+
+running 1 test
+test original_settings_refresh_remove_reingest_and_purge_use_real_facts ... ok
+
+successes:
+
+---- original_settings_refresh_remove_reingest_and_purge_use_real_facts stdout ----
+LINGXI_AUTH_REJECTED request_id="req-b4abd59b41a3f15b64baaf2d361fe260" method=POST [token] status=403 reason=local_owner_required remote=127.0.0.1:63201
+
+
+successes:
+    original_settings_refresh_remove_reingest_and_purge_use_real_facts
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 3.11s
+

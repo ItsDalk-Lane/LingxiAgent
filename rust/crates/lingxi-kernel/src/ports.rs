@@ -224,6 +224,16 @@ pub struct CommittedOutcome {
     pub events: Vec<EventEnvelope>,
 }
 
+/// 真实存储在操作权取得前后读取的会话事实；纯内存测试端口不提供此权威面。
+#[derive(Debug, Clone)]
+pub struct SessionAdmissionFacts {
+    pub owner_user_id: String,
+    pub agent_id: String,
+    pub lifecycle: String,
+    pub permission_mode: crate::subagent::SessionPermissionMode,
+    pub unknown_file_effects: bool,
+}
+
 /// Persistence of run/session authority data: the storage port (R02-T04).
 ///
 /// Contract (taskbook 02 §8, R02-T04):
@@ -239,6 +249,20 @@ pub struct CommittedOutcome {
 ///   never a silent drop), enforce a busy timeout, and surface disk-full
 ///   as [`StorageError::DiskFull`].
 pub trait StoragePort: Send + Sync {
+    /// 真实持久化端口及其包装必须转发同一数据根的准入实例。
+    fn session_admission(
+        &self,
+    ) -> Option<std::sync::Arc<crate::session_admission::SessionAdmission>> {
+        None
+    }
+    fn load_session_admission(
+        &self,
+        _session_id: &str,
+    ) -> impl std::future::Future<Output = Result<Option<SessionAdmissionFacts>, StorageError>> + Send
+    {
+        async { Ok(None) }
+    }
+
     /// Durable facts of one run's start (run row + first attempt row +
     /// `run_state_changed` key events). The run enters `running`.
     fn record_run_started(

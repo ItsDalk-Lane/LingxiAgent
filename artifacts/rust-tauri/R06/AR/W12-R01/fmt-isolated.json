@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "fmt",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--all",
+    "--",
+    "--check"
+  ],
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r01-fmt-isolated-cw10y95r",
+  "start": 1791698671.8499641,
+  "end": 1791698673.2771971,
+  "exit_code": 0,
+  "log_sha256": "887fb20fd8fb1e3375cbb1893f2c50dd3fb06a226c9cb33f5e017de37a9c0d8d"
+}

@@ -1,0 +1,34 @@
+{
+  "at": "2026-10-12T00:35:09.941438+00:00",
+  "actor": "/root/ar_w15_reviewer_01",
+  "role": "FIRST_FRESH_INDEPENDENT_REVIEW",
+  "verdict": "FAIL",
+  "businessResourcesClosed": true,
+  "actorEndedOneTimeNoReuse": true,
+  "sourceCount": 4059,
+  "sourceManifestSha256": "b0b34cfc463a1f7ae3daa51e59cefedbf28f2b0f2d6e5e61f7e2e6022df3b24c",
+  "inputManifestSha256": "54dc906619bcd30031688cfc0fba3d1e9e4ea6685ab26927cb6a221c7d710204",
+  "originalInputProvenanceSha256": "9ffbd4039e96d5f6c6398b88c4242ef27bb72682bcedfee3e1c981a7fa27e3b5",
+  "safeManifestSha256": "69ddf42c7d3482220f3b2d86824dc8138b22f9157d94c22d8ea1ab7360c25d7a",
+  "safeFiles": 389,
+  "safeBytes": 205271529,
+  "reportSha256": "bf9030efba18fc3e58ca63d733f8dc9e4a71a173639e0dddbbe6c0e2e4712e20",
+  "resultsSha256": "2e710f954a82dca237763266ebadef7b58238642103d9322b732a31664e53bd6",
+  "pidClosureSha256": "e58946fe4d4df6477248d3db71770b109a391e17e34d4be26506912306679b0f",
+  "candidate": {
+    "rust/crates/lingxi-service/tests/r06_t08_behavior_eval.rs": "3c4e194eea3e3949f7717d6b6069d57aaede6b1f5a37bd8c4d4d8765fdb3a981",
+    "scripts/rust-tauri/r06_evaluation_audit.py": "c125148aee718be26f683352160f5043a8f610f164935322d1b747620788c574"
+  },
+  "fullStage": "NOT_RUN_NOT_STAGE_ROLE",
+  "commitPush": "NONE",
+  "guardBreaches": [],
+  "businessSurvivors": [],
+  "samplingUnknownPaths": 1536,
+  "metadataWriter": {
+    "pid": 78453,
+    "started": "2026-10-12T00:35:05.520037+00:00",
+    "recordWritten": "2026-10-12T00:35:09.942166+00:00",
+    "elapsedAtWrite": 4.421834791981382,
+    "actualExit": "Tool-call actual completion will be read after this writer returns; this field is not fabricated exit0"
+  }
+}

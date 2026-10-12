@@ -7,9 +7,9 @@
 //!   content_snapshots / parse_artifacts / knowledge_blocks /
 //!   knowledge_citations / ingestion_jobs / knowledge_turn_scopes(+sources)。
 //! - `knowledge_index.db`（FTS 缓存）：chunk_index_variants + knowledge_chunks
-//!   (+FTS5) + sections。可重建缓存：打不开/迁移失败 → 只重建该文件。
+//!   (+FTS5) + sections。确证且静止的损坏缓存隔离后重建；其它错误保留。
 //! - `knowledge_vector.db`（向量缓存）：vector_index_variants + chunk_vectors
-//!   （f32 LE BLOB，维度铁律）。可重建缓存：同上。
+//!   （f32 LE BLOB，维度铁律）。损坏保留隔离原件，不自动重新付费嵌入。
 //! - 快照字节 `knowledge/snapshots/<id>`；解析产物 JSON
 //!   `knowledge/artifacts/<snapshotId>/<artifactId>.json`。
 //!   索引可重建 ≠ 源文件可删。
@@ -17,6 +17,8 @@
 //! 退役边界：不建 research_runs / analysis_* / coverage_* 等已退役研究引擎表
 //! （兼容残留叶 F-D08-C-RESEARCH-LEDGER）；runs.db v1–v9 冻结不动。
 
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, MutexGuard};
 
@@ -162,6 +164,19 @@ pub struct TurnScopeSourceRow {
     pub notebook_ids: Vec<String>,
 }
 
+/// 服务铸造的当前运行归属；选择内容不能由工具参数补充身份。
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RunScopeBinding {
+    pub principal_kind: String,
+    pub principal_subject: String,
+    pub agent_id: String,
+    pub session_id: String,
+    pub run_id: String,
+    pub attempt: String,
+    pub generation: u64,
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct TurnScopeRow {
     pub id: String,
@@ -172,6 +187,7 @@ pub struct TurnScopeRow {
     pub status: String,
     pub created_at: String,
     pub sources: Vec<TurnScopeSourceRow>,
+    pub run_binding: Option<RunScopeBinding>,
 }
 
 pub struct NotebookSourceEntry {
@@ -230,20 +246,113 @@ fn parse_json(raw: Option<String>) -> serde_json::Value {
         .unwrap_or(serde_json::Value::Null)
 }
 
-fn open_connection(path: &Path) -> Result<Connection, KnowledgeError> {
-    let conn = Connection::open(path)
-        .map_err(|e| KnowledgeError::storage_invalid(format!("cannot open knowledge db: {e}")))?;
-    conn.pragma_update(None, "journal_mode", "WAL")
-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+fn storage_io(error: std::io::Error) -> KnowledgeError {
+    let code = match error.kind() {
+        std::io::ErrorKind::PermissionDenied => "KNOWLEDGE_STORAGE_PERMISSION",
+        std::io::ErrorKind::WouldBlock => "KNOWLEDGE_STORAGE_BUSY",
+        _ => "KNOWLEDGE_STORAGE_IO",
+    };
+    KnowledgeError::new(code, format!("knowledge storage I/O: {error}"))
+}
+
+fn storage_lock(error: std::fs::TryLockError) -> KnowledgeError {
+    match error {
+        std::fs::TryLockError::WouldBlock => KnowledgeError::new(
+            "KNOWLEDGE_STORAGE_BUSY",
+            "cache recovery lock is held by another instance",
+        ),
+        std::fs::TryLockError::Error(error) => storage_io(error),
+    }
+}
+
+fn storage_sqlite(error: rusqlite::Error) -> KnowledgeError {
+    let code = match error.sqlite_error_code() {
+        Some(rusqlite::ErrorCode::DatabaseBusy | rusqlite::ErrorCode::DatabaseLocked) => {
+            "KNOWLEDGE_STORAGE_BUSY"
+        }
+        Some(rusqlite::ErrorCode::PermissionDenied | rusqlite::ErrorCode::ReadOnly) => {
+            "KNOWLEDGE_STORAGE_PERMISSION"
+        }
+        Some(
+            rusqlite::ErrorCode::SystemIoFailure
+            | rusqlite::ErrorCode::DiskFull
+            | rusqlite::ErrorCode::CannotOpen,
+        ) => "KNOWLEDGE_STORAGE_IO",
+        Some(rusqlite::ErrorCode::DatabaseCorrupt | rusqlite::ErrorCode::NotADatabase) => {
+            "KNOWLEDGE_STORAGE_CORRUPT"
+        }
+        _ => "KNOWLEDGE_STORAGE_INVALID",
+    };
+    KnowledgeError::new(code, format!("knowledge SQLite: {error}"))
+}
+
+fn open_connection(path: &Path, supported: i64) -> Result<Connection, KnowledgeError> {
+    // /var、/tmp等系统目录别名可规范化；最终数据库文件仍必须NOFOLLOW。
+    let canonical_path = std::fs::canonicalize(
+        path.parent()
+            .ok_or_else(|| KnowledgeError::storage_invalid("knowledge db parent missing"))?,
+    )
+    .map_err(storage_io)?
+    .join(
+        path.file_name()
+            .ok_or_else(|| KnowledgeError::storage_invalid("knowledge db filename missing"))?,
+    );
+    let path = canonical_path.as_path();
+    if path.exists() {
+        let probe = Connection::open_with_flags(
+            path,
+            rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY | rusqlite::OpenFlags::SQLITE_OPEN_NOFOLLOW,
+        )
+        .map_err(storage_sqlite)?;
+        check_user_version(&probe, supported)?;
+    }
+    let conn = Connection::open_with_flags(
+        path,
+        rusqlite::OpenFlags::default() | rusqlite::OpenFlags::SQLITE_OPEN_NOFOLLOW,
+    )
+    .map_err(storage_sqlite)?;
+    // 同步存储争用立即失败，不占用取消监督的异步线程等锁。
+    conn.busy_timeout(std::time::Duration::ZERO)
+        .map_err(storage_sqlite)?;
+    // 关闭旧句柄不能把另一实例升级后的 WAL checkpoint 到未来格式原件。
+    conn.set_db_config(
+        rusqlite::config::DbConfig::SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE,
+        true,
+    )
+    .map_err(storage_sqlite)?;
+    let journal: String = conn
+        .query_row("PRAGMA journal_mode", [], |row| row.get(0))
+        .map_err(storage_sqlite)?;
+    if journal != "wal" {
+        conn.pragma_update(None, "locking_mode", "EXCLUSIVE")
+            .map_err(storage_sqlite)?;
+        let tx =
+            rusqlite::Transaction::new_unchecked(&conn, rusqlite::TransactionBehavior::Exclusive)
+                .map_err(storage_sqlite)?;
+        check_user_version(&tx, supported)?;
+        tx.commit().map_err(storage_sqlite)?;
+        // 提交后仍持排他文件锁；NORMAL 本身不释放，切 WAL 完成后才释放。
+        // 在进入 WAL 前恢复 NORMAL，避免永久占用、破坏普通并发读写。
+        conn.pragma_update(None, "locking_mode", "NORMAL")
+            .map_err(storage_sqlite)?;
+        let actual: String = conn
+            .query_row("PRAGMA journal_mode=WAL", [], |row| row.get(0))
+            .map_err(storage_sqlite)?;
+        if actual != "wal" {
+            return Err(KnowledgeError::storage_invalid(
+                "knowledge WAL initialization refused",
+            ));
+        }
+    }
     conn.pragma_update(None, "synchronous", "NORMAL")
-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        .map_err(storage_sqlite)?;
     Ok(conn)
 }
 
 fn check_user_version(conn: &Connection, supported: i64) -> Result<(), KnowledgeError> {
     let current: i64 = conn
         .query_row("PRAGMA user_version", [], |row| row.get(0))
-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        .map_err(storage_sqlite)?;
     if current > supported {
         return Err(KnowledgeError::new(
             "KNOWLEDGE_SCHEMA_NEWER",
@@ -251,6 +360,289 @@ fn check_user_version(conn: &Connection, supported: i64) -> Result<(), Knowledge
         ));
     }
     Ok(())
+}
+
+// 正常关闭仍允许 SQLite 清理 WAL；必须先锁住并重验版本，不能牺牲静止缓存的受控恢复。
+// 未来版本、同行占用或检查失败时保留 NO_CKPT_ON_CLOSE，原件和必要 WAL 留在磁盘。
+fn prepare_supported_close(conn: &Connection, supported: i64) -> Result<(), KnowledgeError> {
+    check_user_version(conn, supported)?;
+    conn.busy_timeout(std::time::Duration::ZERO)
+        .map_err(storage_sqlite)?;
+    conn.pragma_update(None, "locking_mode", "EXCLUSIVE")
+        .map_err(storage_sqlite)?;
+    let tx = rusqlite::Transaction::new_unchecked(conn, rusqlite::TransactionBehavior::Exclusive)
+        .map_err(storage_sqlite)?;
+    check_user_version(&tx, supported)?;
+    tx.commit().map_err(storage_sqlite)?;
+    // 排他锁跨 COMMIT 保留至连接关闭，正常 checkpoint 与清理期间不允许另一实例升级。
+    conn.set_db_config(
+        rusqlite::config::DbConfig::SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE,
+        false,
+    )
+    .map_err(storage_sqlite)?;
+    Ok(())
+}
+
+fn sidecar(path: &Path, suffix: &str) -> PathBuf {
+    let mut name = path.as_os_str().to_os_string();
+    name.push(suffix);
+    PathBuf::from(name)
+}
+
+// 不跟随缓存/守卫/归属文件的链接；多链接文件也不能当作专属缓存恢复。
+fn regular_file(path: &Path) -> Result<Option<std::fs::Metadata>, KnowledgeError> {
+    match std::fs::symlink_metadata(path) {
+        Ok(meta) => {
+            if !meta.is_file() {
+                return Err(KnowledgeError::new(
+                    "KNOWLEDGE_STORAGE_UNSAFE",
+                    "knowledge cache must be a regular file",
+                ));
+            }
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::MetadataExt;
+                if meta.nlink() != 1 {
+                    return Err(KnowledgeError::new(
+                        "KNOWLEDGE_STORAGE_UNSAFE",
+                        "knowledge cache has multiple hard links",
+                    ));
+                }
+            }
+            Ok(Some(meta))
+        }
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(e) => Err(storage_io(e)),
+    }
+}
+
+fn cache_identity(path: &Path) -> Result<String, KnowledgeError> {
+    let meta =
+        regular_file(path)?.ok_or_else(|| KnowledgeError::storage_invalid("cache disappeared"))?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        Ok(format!("{}:{}", meta.dev(), meta.ino()))
+    }
+    #[cfg(not(unix))]
+    {
+        let created = meta.created().map_err(storage_io)?;
+        Ok(format!("{:?}", created))
+    }
+}
+
+fn ownership_record(path: &Path) -> Result<String, KnowledgeError> {
+    Ok(format!(
+        "lingxi-cache-v1\n{}\n{}\n",
+        path.file_name().unwrap().to_string_lossy(),
+        cache_identity(path)?
+    ))
+}
+
+fn record_cache_owner(path: &Path) -> Result<(), KnowledgeError> {
+    let marker = sidecar(path, ".owner");
+    regular_file(&marker)?;
+    let temporary = sidecar(path, &format!(".owner-{}", new_id("tmp")));
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&temporary)
+        .map_err(storage_io)?;
+    file.write_all(ownership_record(path)?.as_bytes())
+        .map_err(storage_io)?;
+    file.sync_all().map_err(storage_io)?;
+    std::fs::rename(&temporary, marker).map_err(storage_io)
+}
+
+fn try_cache_connection(
+    path: &Path,
+    supported: i64,
+    schema: &str,
+) -> Result<Connection, KnowledgeError> {
+    if let Some(meta) = regular_file(path)? {
+        if meta.len() > 0 {
+            let mut header = [0_u8; 16];
+            let mut file = File::open(path).map_err(storage_io)?;
+            let bytes = file.read(&mut header).map_err(storage_io)?;
+            if bytes != 16 || &header != b"SQLite format 3\0" {
+                return Err(KnowledgeError::new(
+                    "KNOWLEDGE_STORAGE_CORRUPT",
+                    "invalid SQLite header; original and sidecars preserved",
+                ));
+            }
+        }
+    }
+    if path.exists() {
+        // 只读预检保护尚未checkpoint的未来版本WAL；可写句柄的Drop也可能checkpoint。
+        let probe = Connection::open_with_flags(
+            path,
+            rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY | rusqlite::OpenFlags::SQLITE_OPEN_NOFOLLOW,
+        )
+        .map_err(storage_sqlite)?;
+        check_user_version(&probe, supported)?;
+        let integrity: String = probe
+            .query_row("PRAGMA quick_check", [], |row| row.get(0))
+            .map_err(storage_sqlite)?;
+        if integrity != "ok" {
+            return Err(KnowledgeError::new(
+                "KNOWLEDGE_STORAGE_CORRUPT",
+                "SQLite quick_check failed; original preserved",
+            ));
+        }
+        let expected_table = if schema == INDEX_SCHEMA_SQL {
+            "chunk_index_variants"
+        } else {
+            "vector_index_variants"
+        };
+        let tables: i64 = probe
+            .query_row(
+                "SELECT count(*) FROM sqlite_master WHERE type='table'",
+                [],
+                |row| row.get(0),
+            )
+            .map_err(storage_sqlite)?;
+        let owned: i64 = probe
+            .query_row(
+                "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?1",
+                [expected_table],
+                |row| row.get(0),
+            )
+            .map_err(storage_sqlite)?;
+        if tables > 0 && owned == 0 {
+            return Err(KnowledgeError::new(
+                "KNOWLEDGE_STORAGE_UNSAFE",
+                "existing SQLite file is not a recognized knowledge cache",
+            ));
+        }
+    }
+    let conn = open_connection(path, supported)?;
+    let tx = rusqlite::Transaction::new_unchecked(&conn, rusqlite::TransactionBehavior::Immediate)
+        .map_err(storage_sqlite)?;
+    check_user_version(&tx, supported)?;
+    tx.execute_batch(schema).map_err(storage_sqlite)?;
+    tx.pragma_update(None, "user_version", supported)
+        .map_err(storage_sqlite)?;
+    tx.commit().map_err(storage_sqlite)?;
+    Ok(conn)
+}
+
+/// 正常打开持有共享恢复锁；损坏隔离必须独占，且不能有任何 WAL/journal。
+/// 无法确认归属/静止点时保留原件并拒绝，绝不尝试删除 sidecar。
+fn open_cache(
+    path: &Path,
+    supported: i64,
+    schema: &str,
+) -> Result<(Connection, File), KnowledgeError> {
+    let canonical_path = std::fs::canonicalize(
+        path.parent()
+            .ok_or_else(|| KnowledgeError::storage_invalid("knowledge cache parent missing"))?,
+    )
+    .map_err(storage_io)?
+    .join(
+        path.file_name()
+            .ok_or_else(|| KnowledgeError::storage_invalid("knowledge cache filename missing"))?,
+    );
+    let path = canonical_path.as_path();
+    regular_file(path)?;
+    let guard_path = sidecar(path, ".guard");
+    regular_file(&guard_path)?;
+    let guard = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(&guard_path)
+        .map_err(storage_io)?;
+    guard.try_lock_shared().map_err(storage_lock)?;
+    let first = match try_cache_connection(path, supported, schema) {
+        Ok(conn) => {
+            record_cache_owner(path)?;
+            return Ok((conn, guard));
+        }
+        Err(error) => error,
+    };
+    if first.code != "KNOWLEDGE_STORAGE_CORRUPT" {
+        return Err(first);
+    }
+    guard.unlock().map_err(storage_io)?;
+    guard.try_lock().map_err(storage_lock)?;
+    // 锁升级后重新验证：另一个打开者可能已恢复，或版本已改变。
+    match try_cache_connection(path, supported, schema) {
+        Ok(conn) => {
+            record_cache_owner(path)?;
+            return Ok((conn, guard));
+        }
+        Err(error) if error.code == "KNOWLEDGE_STORAGE_CORRUPT" => {}
+        Err(error) => return Err(error),
+    }
+    for suffix in ["-wal", "-shm", "-journal"] {
+        if std::fs::symlink_metadata(sidecar(path, suffix)).is_ok() {
+            return Err(KnowledgeError::new(
+                "KNOWLEDGE_STORAGE_BUSY",
+                "corrupt cache has SQLite sidecars; preserve the complete database for offline recovery",
+            ));
+        }
+    }
+    let marker = sidecar(path, ".owner");
+    if regular_file(&marker)?.is_none() {
+        return Err(KnowledgeError::new(
+            "KNOWLEDGE_STORAGE_CORRUPT",
+            "cache ownership unknown; original preserved",
+        ));
+    }
+    let expected_owner = ownership_record(path)?;
+    if std::fs::read_to_string(&marker).map_err(storage_io)? != expected_owner {
+        return Err(KnowledgeError::new(
+            "KNOWLEDGE_STORAGE_CORRUPT",
+            "cache ownership changed; original preserved",
+        ));
+    }
+    // 无 sidecar 的只读检查避免把迁移 SQL 或权限错误当作可重建损坏。
+    let probe = Connection::open_with_flags(path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)
+        .and_then(|conn| conn.query_row("PRAGMA quick_check", [], |row| row.get::<_, String>(0)));
+    let confirmed = match probe {
+        Ok(result) => result != "ok",
+        Err(error) => storage_sqlite(error).code == "KNOWLEDGE_STORAGE_CORRUPT",
+    };
+    if !confirmed {
+        return Err(first);
+    }
+    if ownership_record(path)? != expected_owner {
+        return Err(KnowledgeError::new(
+            "KNOWLEDGE_STORAGE_UNSAFE",
+            "cache identity changed before quarantine",
+        ));
+    }
+    let quarantine = sidecar(path, &format!(".quarantine-{}", new_id("cache")));
+    std::fs::create_dir(&quarantine).map_err(storage_io)?;
+    std::fs::copy(&marker, quarantine.join("owner")).map_err(storage_io)?;
+    std::fs::rename(path, quarantine.join("original.db")).map_err(storage_io)?;
+    #[cfg(unix)]
+    {
+        File::open(&quarantine)
+            .and_then(|dir| dir.sync_all())
+            .map_err(storage_io)?;
+        File::open(path.parent().unwrap())
+            .and_then(|dir| dir.sync_all())
+            .map_err(storage_io)?;
+    }
+    // 保留原始缓存以供人工恢复；此处不生成 embedding，不宣称恢复付费向量。
+    tracing::warn!(cache = %path.display(), quarantine = %quarantine.display(),
+        "confirmed corrupt cache quarantined; empty cache rebuilt, reindex required, embeddings not regenerated");
+    let conn = try_cache_connection(path, supported, schema)?;
+    record_cache_owner(path)?;
+    Ok((conn, guard))
+}
+
+fn cache_write(
+    conn: &mut Connection,
+    supported: i64,
+) -> Result<rusqlite::Transaction<'_>, KnowledgeError> {
+    let tx = conn
+        .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)
+        .map_err(storage_sqlite)?;
+    check_user_version(&tx, supported)?;
+    Ok(tx)
 }
 
 fn lock_conn(conn: &Mutex<Connection>) -> MutexGuard<'_, Connection> {
@@ -530,6 +922,17 @@ CREATE TABLE IF NOT EXISTS knowledge_turn_scope_sources (
 );
 "#;
 
+impl Drop for KnowledgeFactStore {
+    fn drop(&mut self) {
+        if let Err(error) = prepare_supported_close(&lock_conn(&self.conn), FACTS_SCHEMA_VERSION) {
+            tracing::warn!(
+                code = error.code,
+                "knowledge close preserved WAL without checkpoint"
+            );
+        }
+    }
+}
+
 impl KnowledgeFactStore {
     /// Opens (creating if needed) `knowledge.db` under `root` (schema v1).
     pub fn open(root: &Path) -> Result<Self, KnowledgeError> {
@@ -547,12 +950,15 @@ impl KnowledgeFactStore {
     pub fn open_with_clock(root: &Path, clock: ClockMs) -> Result<Self, KnowledgeError> {
         std::fs::create_dir_all(root)
             .map_err(|e| KnowledgeError::storage_invalid(format!("knowledge root: {e}")))?;
-        let conn = open_connection(&root.join("knowledge.db"))?;
-        check_user_version(&conn, FACTS_SCHEMA_VERSION)?;
-        conn.execute_batch(FACTS_SCHEMA_SQL)
-            .map_err(|e| KnowledgeError::storage_invalid(format!("facts schema: {e}")))?;
-        conn.pragma_update(None, "user_version", FACTS_SCHEMA_VERSION)
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let conn = open_connection(&root.join("knowledge.db"), FACTS_SCHEMA_VERSION)?;
+        let tx =
+            rusqlite::Transaction::new_unchecked(&conn, rusqlite::TransactionBehavior::Immediate)
+                .map_err(storage_sqlite)?;
+        check_user_version(&tx, FACTS_SCHEMA_VERSION)?;
+        tx.execute_batch(FACTS_SCHEMA_SQL).map_err(storage_sqlite)?;
+        tx.pragma_update(None, "user_version", FACTS_SCHEMA_VERSION)
+            .map_err(storage_sqlite)?;
+        tx.commit().map_err(storage_sqlite)?;
         Ok(Self {
             conn: Mutex::new(conn),
             root: root.to_path_buf(),
@@ -1225,6 +1631,19 @@ impl KnowledgeFactStore {
         })
     }
 
+    /// 删除来源时覆盖它的所有解析版本，而非只清最新版本。
+    pub fn list_source_parse_artifacts(
+        &self,
+        source_id: &str,
+    ) -> Result<Vec<(String, String)>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut stmt = conn.prepare("SELECT p.id, p.content_snapshot_id FROM parse_artifacts p JOIN content_snapshots s ON s.id=p.content_snapshot_id WHERE s.source_id=?1").map_err(storage_sqlite)?;
+        let rows = stmt
+            .query_map(params![source_id], |row| Ok((row.get(0)?, row.get(1)?)))
+            .map_err(storage_sqlite)?;
+        rows.collect::<Result<Vec<_>, _>>().map_err(storage_sqlite)
+    }
+
     pub fn latest_parse_artifact_for_snapshot(
         &self,
         snapshot_id: &str,
@@ -1517,33 +1936,56 @@ impl KnowledgeFactStore {
 
     /// 取下一个可执行 job（queued；cancel 检查在服务编排内）。
     pub fn claim_next_job(&self) -> Result<Option<JobRow>, KnowledgeError> {
-        let conn = lock_conn(&self.conn);
-        let next: Option<String> = conn
-            .query_row(
-                "SELECT id FROM ingestion_jobs WHERE status='queued' AND cancelled_at IS NULL ORDER BY created_at, id LIMIT 1",
-                [],
-                |row| row.get(0),
-            )
-            .optional()
+        let mut conn = lock_conn(&self.conn);
+        let tx = conn
+            .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let next: Option<String> = tx.query_row(
+            "SELECT j.id FROM ingestion_jobs j JOIN sources s ON s.id=j.source_id WHERE j.status='queued' AND j.cancelled_at IS NULL AND s.deleted_at IS NULL ORDER BY j.created_at,j.id LIMIT 1", [], |r|r.get(0))
+            .optional().map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
         let Some(id) = next else { return Ok(None) };
-        let now = now_iso(&*self.clock);
-        conn.execute(
-            "UPDATE ingestion_jobs SET status='running', attempt=attempt+1, updated_at=?1 WHERE id=?2 AND status='queued'",
-            params![now, id],
-        )
-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute("UPDATE ingestion_jobs SET status='running',attempt=attempt+1,updated_at=?1 WHERE id=?2 AND status='queued' AND cancelled_at IS NULL",params![now_iso(&*self.clock),id])
+            .map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.commit()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
         drop(conn);
         self.get_job(&id).map(Some)
     }
 
+    /// 调用方必须持有知识 worker 的操作系统排他锁；活跃进程不得接管。
+    pub fn recover_interrupted_jobs(&self) -> Result<usize, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        conn.execute("UPDATE ingestion_jobs SET status='queued',error='KNOWLEDGE_EMBEDDING_INTERRUPTED: confirmed checkpoints retained; inflight settlement unknown',updated_at=?1 WHERE status='running' AND cancelled_at IS NULL AND source_id IN (SELECT id FROM sources WHERE deleted_at IS NULL)",params![now_iso(&*self.clock)])
+            .map_err(|e|KnowledgeError::storage_invalid(e.to_string()))
+    }
+
+    /// 请求前即保存发送意图；中断时待确认请求保持未知，不能冒认零成本。
+    pub fn set_job_embedding_stats(
+        &self,
+        job_id: &str,
+        stats: &serde_json::Value,
+    ) -> Result<(), KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let changed=conn.execute("UPDATE ingestion_jobs SET embedding_stats=?1,updated_at=?2 WHERE id=?3 AND status='running' AND cancelled_at IS NULL",params![stats.to_string(),now_iso(&*self.clock),job_id])
+            .map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::conflict("ingestion no longer running"));
+        }
+        Ok(())
+    }
+
     pub fn set_job_phase(&self, job_id: &str, phase: &str) -> Result<(), KnowledgeError> {
         let conn = lock_conn(&self.conn);
-        conn.execute(
-            "UPDATE ingestion_jobs SET phase=?1, updated_at=?2 WHERE id=?3",
+        let changed = conn.execute(
+            "UPDATE ingestion_jobs SET phase=?1, updated_at=?2 WHERE id=?3 AND status='running' AND cancelled_at IS NULL",
             params![phase, now_iso(&*self.clock), job_id],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::conflict(
+                "ingestion status changed before write",
+            ));
+        }
         Ok(())
     }
 
@@ -1553,12 +1995,22 @@ impl KnowledgeFactStore {
         done: i64,
         total: Option<i64>,
     ) -> Result<(), KnowledgeError> {
+        if done < 0 || total.is_some_and(|total| total < done || total < 0) {
+            return Err(KnowledgeError::invalid_argument(
+                "progress exceeds the planned chunks",
+            ));
+        }
         let conn = lock_conn(&self.conn);
-        conn.execute(
-            "UPDATE ingestion_jobs SET progress_done=?1, progress_total=?2, updated_at=?3 WHERE id=?4",
+        let changed = conn.execute(
+            "UPDATE ingestion_jobs SET progress_done=?1, progress_total=?2, updated_at=?3 WHERE id=?4 AND status='running' AND cancelled_at IS NULL",
             params![done, total, now_iso(&*self.clock), job_id],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::conflict(
+                "ingestion status changed before write",
+            ));
+        }
         Ok(())
     }
 
@@ -1568,32 +2020,47 @@ impl KnowledgeFactStore {
         embedding_stats: &serde_json::Value,
     ) -> Result<(), KnowledgeError> {
         let conn = lock_conn(&self.conn);
-        conn.execute(
-            "UPDATE ingestion_jobs SET phase='done', status='done', error=NULL, embedding_stats=?1, updated_at=?2 WHERE id=?3",
+        let changed = conn.execute(
+            "UPDATE ingestion_jobs SET phase='done', status='done', error=NULL, embedding_stats=?1, updated_at=?2 WHERE id=?3 AND status='running' AND cancelled_at IS NULL",
             params![embedding_stats.to_string(), now_iso(&*self.clock), job_id],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::conflict(
+                "ingestion status changed before write",
+            ));
+        }
         Ok(())
     }
 
     pub fn fail_job(&self, job_id: &str, error: &str) -> Result<(), KnowledgeError> {
         let conn = lock_conn(&self.conn);
-        conn.execute(
-            "UPDATE ingestion_jobs SET status='failed', error=?1, updated_at=?2 WHERE id=?3",
+        let changed = conn.execute(
+            "UPDATE ingestion_jobs SET status='failed', error=?1, updated_at=?2 WHERE id=?3 AND status='running' AND cancelled_at IS NULL",
             params![error, now_iso(&*self.clock), job_id],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::conflict(
+                "ingestion status changed before write",
+            ));
+        }
         Ok(())
     }
 
     /// pending_embedding 显式终态：FTS 已可查、嵌入模型未配置（禁静默降级）。
     pub fn mark_job_pending_embedding(&self, job_id: &str) -> Result<(), KnowledgeError> {
         let conn = lock_conn(&self.conn);
-        conn.execute(
-            "UPDATE ingestion_jobs SET phase='embed', status='pending_embedding', updated_at=?1 WHERE id=?2",
+        let changed = conn.execute(
+            "UPDATE ingestion_jobs SET phase='embed', status='pending_embedding', updated_at=?1 WHERE id=?2 AND status='running' AND cancelled_at IS NULL",
             params![now_iso(&*self.clock), job_id],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::conflict(
+                "ingestion status changed before write",
+            ));
+        }
         Ok(())
     }
 
@@ -1623,12 +2090,32 @@ impl KnowledgeFactStore {
                 "Cancelled ingestion jobs cannot be retried",
             ));
         }
+        // 只有可信手动重试入口发放下一次真实 claim 的授权；启动恢复不续用它。
+        let mut stats = job
+            .embedding_stats
+            .clone()
+            .unwrap_or_else(|| serde_json::json!({}));
+        if !stats.is_object() {
+            return Err(KnowledgeError::storage_invalid(
+                "job embedding stats invalid",
+            ));
+        }
+        let next_attempt = job
+            .attempt
+            .checked_add(1)
+            .ok_or_else(|| KnowledgeError::storage_invalid("job attempt overflow"))?;
+        stats["manualRetryAttempt"] = serde_json::json!(next_attempt);
         let conn = lock_conn(&self.conn);
-        conn.execute(
-            "UPDATE ingestion_jobs SET status='queued', error=NULL, updated_at=?1 WHERE id=?2",
-            params![now_iso(&*self.clock), job_id],
+        let changed = conn.execute(
+            "UPDATE ingestion_jobs SET status='queued', error=NULL, embedding_stats=?3, updated_at=?1 WHERE id=?2 AND status='failed' AND cancelled_at IS NULL AND attempt=?4",
+            params![now_iso(&*self.clock), job_id, stats.to_string(), job.attempt],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::conflict(
+                "ingestion status changed before write",
+            ));
+        }
         drop(conn);
         self.get_job(job_id)
     }
@@ -1657,6 +2144,92 @@ impl KnowledgeFactStore {
         turn_id: &str,
         notebook_ids: &[String],
     ) -> Result<TurnScopeRow, KnowledgeError> {
+        self.create_turn_scope_selection(studio_id, session_id, turn_id, notebook_ids, None, None)
+    }
+
+    /// 原表兼容字段存归属，冻结与用户选择过滤在同一事务完成。
+    pub fn freeze_run_scope(
+        &self,
+        studio_id: &str,
+        binding: &RunScopeBinding,
+        notebook_ids: &[String],
+        source_ids: &[String],
+    ) -> Result<TurnScopeRow, KnowledgeError> {
+        self.create_turn_scope_selection(
+            studio_id,
+            &binding.session_id,
+            &binding.run_id,
+            notebook_ids,
+            Some(binding),
+            Some(source_ids),
+        )
+    }
+
+    /// 合法重试只复制本轮冻结事实；关闭旧句柄与绑定下一 attempt 必须一起提交。
+    pub fn advance_run_scope_attempt(
+        &self,
+        studio_id: &str,
+        scope_id: &str,
+        expected: &RunScopeBinding,
+        next: &RunScopeBinding,
+    ) -> Result<TurnScopeRow, KnowledgeError> {
+        let prefix = format!("{}#a", expected.run_id);
+        let sequence = expected.attempt.strip_prefix(&prefix)
+            .and_then(|value| value.parse::<u32>().ok())
+            .filter(|sequence| *sequence > 0 && expected.attempt == format!("{prefix}{sequence}"))
+            .and_then(|sequence| sequence.checked_add(1))
+            .ok_or_else(|| KnowledgeError::scope_violation("Invalid knowledge retry attempt"))?;
+        let mut allowed = expected.clone();
+        allowed.attempt = format!("{prefix}{sequence}");
+        if &allowed != next {
+            return Err(KnowledgeError::scope_violation(
+                "Knowledge retry must keep the same owner, agent, session, run and generation",
+            ));
+        }
+        let id = new_id("kts");
+        let mut conn = lock_conn(&self.conn);
+        let tx = conn.transaction()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let selection: Option<String> = tx.query_row(
+            "SELECT notebook_ids_json FROM knowledge_turn_scopes WHERE id=?1 AND studio_id=?2 AND session_id=?3 AND turn_id=?4 AND status='active'",
+            params![scope_id, studio_id, expected.session_id, expected.run_id],
+            |row| row.get(0),
+        ).optional().map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let mut selection: serde_json::Value = serde_json::from_str(
+            &selection.ok_or_else(|| KnowledgeError::scope_violation("Knowledge retry scope is closed or missing"))?
+        ).map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let binding: RunScopeBinding = serde_json::from_value(selection["binding"].clone())
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if selection["schema"] != "lingxi.run-knowledge-scope.v1" || &binding != expected {
+            return Err(KnowledgeError::scope_violation("Knowledge retry scope binding changed"));
+        }
+        selection["binding"] = serde_json::to_value(next)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute("UPDATE knowledge_turn_scopes SET status='closed' WHERE id=?1", params![scope_id])
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "INSERT INTO knowledge_turn_scopes (id, turn_id, session_id, studio_id, notebook_ids_json, status, created_at) VALUES (?1, ?2, ?3, ?4, ?5, 'active', ?6)",
+            params![id, next.run_id, next.session_id, studio_id, selection.to_string(), now_iso(&*self.clock)],
+        ).map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        // 不重新查询来源或最新快照，避免供应商失败变相改变本轮已授权内容。
+        tx.execute(
+            "INSERT INTO knowledge_turn_scope_sources (scope_id, source_id, content_snapshot_id, parse_artifact_id, notebook_ids_json) SELECT ?1, source_id, content_snapshot_id, parse_artifact_id, notebook_ids_json FROM knowledge_turn_scope_sources WHERE scope_id=?2",
+            params![id, scope_id],
+        ).map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.commit().map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        drop(conn);
+        self.get_turn_scope(&id)?.ok_or_else(|| KnowledgeError::storage_invalid("retry scope vanished"))
+    }
+
+    fn create_turn_scope_selection(
+        &self,
+        studio_id: &str,
+        session_id: &str,
+        turn_id: &str,
+        notebook_ids: &[String],
+        run_binding: Option<&RunScopeBinding>,
+        selected_sources: Option<&[String]>,
+    ) -> Result<TurnScopeRow, KnowledgeError> {
         if notebook_ids.is_empty() {
             return Err(KnowledgeError::invalid_argument(
                 "notebookIds must be a non-empty array",
@@ -1671,6 +2244,14 @@ impl KnowledgeFactStore {
         for notebook_id in &unique_ids {
             self.get_notebook(studio_id, notebook_id)?;
         }
+        let selection = match run_binding {
+            Some(binding) => serde_json::json!({
+                "schema": "lingxi.run-knowledge-scope.v1",
+                "notebookIds": unique_ids,
+                "binding": binding,
+            }),
+            None => serde_json::json!(unique_ids),
+        };
         let id = new_id("kts");
         let now = now_iso(&*self.clock);
         let mut conn = lock_conn(&self.conn);
@@ -1684,7 +2265,7 @@ impl KnowledgeFactStore {
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
         tx.execute(
             "INSERT INTO knowledge_turn_scopes (id, turn_id, session_id, studio_id, notebook_ids_json, status, created_at) VALUES (?1, ?2, ?3, ?4, ?5, 'active', ?6)",
-            params![id, turn_id, session_id, studio_id, serde_json::to_string(&unique_ids).unwrap_or_default(), now],
+            params![id, turn_id, session_id, studio_id, selection.to_string(), now],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
         let mut frozen: Vec<TurnScopeSourceRow> = Vec::new();
@@ -1702,6 +2283,11 @@ impl KnowledgeFactStore {
                 .collect::<Result<Vec<_>, _>>()
                 .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
             for source_id in source_ids {
+                if selected_sources
+                    .is_some_and(|selected| !selected.is_empty() && !selected.contains(&source_id))
+                {
+                    continue;
+                }
                 if let Some(existing) = frozen.iter_mut().find(|row| row.source_id == source_id) {
                     existing.notebook_ids.push(notebook_id.clone());
                     // 同一源被多个选中笔记本引用时合并为一行——冻结行的
@@ -1746,6 +2332,15 @@ impl KnowledgeFactStore {
                 });
             }
         }
+        if selected_sources.is_some_and(|selected| {
+            selected
+                .iter()
+                .any(|source| !frozen.iter().any(|row| &row.source_id == source))
+        }) {
+            return Err(KnowledgeError::scope_violation(
+                "Selected knowledge source does not belong to the selected notebooks",
+            ));
+        }
         tx.commit()
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
         drop(conn);
@@ -1760,15 +2355,37 @@ impl KnowledgeFactStore {
                 "SELECT id, turn_id, session_id, studio_id, notebook_ids_json, status, created_at FROM knowledge_turn_scopes WHERE id=?1",
                 params![scope_id],
                 |row| {
+                    let selection: serde_json::Value = serde_json::from_str(&row.get::<_, String>(4)?)
+                        .map_err(|error| rusqlite::Error::FromSqlConversionFailure(
+                            4, rusqlite::types::Type::Text, Box::new(error),
+                        ))?;
+                    let (notebook_ids, run_binding) = if selection.is_array() {
+                        (serde_json::from_value(selection).map_err(|error| {
+                            rusqlite::Error::FromSqlConversionFailure(4, rusqlite::types::Type::Text, Box::new(error))
+                        })?, None)
+                    } else {
+                        if selection["schema"] != "lingxi.run-knowledge-scope.v1" {
+                            return Err(rusqlite::Error::InvalidQuery);
+                        }
+                        (
+                            serde_json::from_value(selection["notebookIds"].clone()).map_err(|error| {
+                                rusqlite::Error::FromSqlConversionFailure(4, rusqlite::types::Type::Text, Box::new(error))
+                            })?,
+                            Some(serde_json::from_value(selection["binding"].clone()).map_err(|error| {
+                                rusqlite::Error::FromSqlConversionFailure(4, rusqlite::types::Type::Text, Box::new(error))
+                            })?),
+                        )
+                    };
                     Ok(TurnScopeRow {
                         id: row.get(0)?,
                         turn_id: row.get(1)?,
                         session_id: row.get(2)?,
                         studio_id: row.get(3)?,
-                        notebook_ids: serde_json::from_str(&row.get::<_, String>(4)?).unwrap_or_default(),
+                        notebook_ids,
                         status: row.get(5)?,
                         created_at: row.get(6)?,
                         sources: Vec::new(),
+                        run_binding,
                     })
                 },
             )
@@ -1856,42 +2473,34 @@ pub struct IndexHit {
 
 pub struct KnowledgeIndexStore {
     conn: Mutex<Connection>,
-    db_path: PathBuf,
+    _recovery_guard: File,
 }
 
 const INDEX_SCHEMA_VERSION: i64 = 1;
 
-impl KnowledgeIndexStore {
-    /// 打开 FTS 缓存库；打不开/损坏 → 按「缓存损坏」语义删库重建（只重建该文件）。
-    pub fn open(root: &Path) -> Result<Self, KnowledgeError> {
-        std::fs::create_dir_all(root)
-            .map_err(|e| KnowledgeError::storage_invalid(format!("knowledge root: {e}")))?;
-        let db_path = root.join("knowledge_index.db");
-        match Self::try_open(&db_path) {
-            Ok(store) => Ok(store),
-            Err(first_error) => {
-                tracing::warn!(
-                    error = %first_error,
-                    "knowledge index cache unreadable; resetting the cache file"
-                );
-                let _ = std::fs::remove_file(&db_path);
-                let _ = std::fs::remove_file(root.join("knowledge_index.db-wal"));
-                let _ = std::fs::remove_file(root.join("knowledge_index.db-shm"));
-                Self::try_open(&db_path)
-            }
+impl Drop for KnowledgeIndexStore {
+    fn drop(&mut self) {
+        if let Err(error) = prepare_supported_close(&lock_conn(&self.conn), INDEX_SCHEMA_VERSION) {
+            tracing::warn!(
+                code = error.code,
+                "knowledge close preserved WAL without checkpoint"
+            );
         }
     }
+}
 
-    fn try_open(db_path: &Path) -> Result<Self, KnowledgeError> {
-        let conn = open_connection(db_path)?;
-        check_user_version(&conn, INDEX_SCHEMA_VERSION)?;
-        conn.execute_batch(INDEX_SCHEMA_SQL)
-            .map_err(|e| KnowledgeError::storage_invalid(format!("index schema: {e}")))?;
-        conn.pragma_update(None, "user_version", INDEX_SCHEMA_VERSION)
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+impl KnowledgeIndexStore {
+    /// 打开缓存；未来版本/权限/锁/I/O保留原件，只有确证损坏才隔离恢复。
+    pub fn open(root: &Path) -> Result<Self, KnowledgeError> {
+        std::fs::create_dir_all(root).map_err(storage_io)?;
+        let (conn, guard) = open_cache(
+            &root.join("knowledge_index.db"),
+            INDEX_SCHEMA_VERSION,
+            INDEX_SCHEMA_SQL,
+        )?;
         Ok(Self {
             conn: Mutex::new(conn),
-            db_path: db_path.to_path_buf(),
+            _recovery_guard: guard,
         })
     }
 
@@ -1902,14 +2511,16 @@ impl KnowledgeIndexStore {
         block_fingerprint: &str,
     ) -> Result<IndexVariantRow, KnowledgeError> {
         let id = chunk_index_variant_id(parse_artifact_id, chunk_profile_hash);
-        let conn = lock_conn(&self.conn);
+        let mut connection = lock_conn(&self.conn);
+        let conn = cache_write(&mut connection, INDEX_SCHEMA_VERSION)?;
         conn.execute(
             "INSERT INTO chunk_index_variants (id, parse_artifact_id, chunk_profile_hash, block_fingerprint, status) VALUES (?1, ?2, ?3, ?4, 'building')
              ON CONFLICT(id) DO NOTHING",
             params![id, parse_artifact_id, chunk_profile_hash, block_fingerprint],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        drop(conn);
+        conn.commit().map_err(storage_sqlite)?;
+        drop(connection);
         self.get_variant(&id)?
             .ok_or_else(|| KnowledgeError::storage_invalid("chunk index variant vanished"))
     }
@@ -1936,12 +2547,14 @@ impl KnowledgeIndexStore {
     }
 
     pub fn set_variant_status(&self, variant_id: &str, status: &str) -> Result<(), KnowledgeError> {
-        let conn = lock_conn(&self.conn);
+        let mut connection = lock_conn(&self.conn);
+        let conn = cache_write(&mut connection, INDEX_SCHEMA_VERSION)?;
         conn.execute(
             "UPDATE chunk_index_variants SET status=?1 WHERE id=?2",
             params![status, variant_id],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        conn.commit().map_err(storage_sqlite)?;
         Ok(())
     }
 
@@ -1986,9 +2599,7 @@ impl KnowledgeIndexStore {
             ));
         }
         let mut conn = lock_conn(&self.conn);
-        let tx = conn
-            .transaction()
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let tx = cache_write(&mut conn, INDEX_SCHEMA_VERSION)?;
         tx.execute(
             "UPDATE chunk_index_variants SET block_fingerprint=?1, status='building' WHERE id=?2",
             params![block_fingerprint, variant.id],
@@ -2218,10 +2829,30 @@ impl KnowledgeIndexStore {
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
     }
 
-    /// 缓存级 reset（损坏自愈；只动缓存文件）。
+    /// 显式失效只清同一SQLite事务中的派生行，不unlink活跃数据库。
     pub fn reset(&self) -> Result<(), KnowledgeError> {
-        let _ = std::fs::remove_file(&self.db_path);
-        Ok(())
+        let mut conn = lock_conn(&self.conn);
+        let tx = cache_write(&mut conn, INDEX_SCHEMA_VERSION)?;
+        tx.execute_batch("DELETE FROM knowledge_chunks; DELETE FROM chunk_index_variants; DELETE FROM knowledge_sections;").map_err(storage_sqlite)?;
+        tx.commit().map_err(storage_sqlite)
+    }
+
+    /// 显式删源仅清该解析产物的派生索引，其它来源不受影响。
+    pub fn remove_artifact(&self, artifact: &str) -> Result<(), KnowledgeError> {
+        let mut conn = lock_conn(&self.conn);
+        let tx = cache_write(&mut conn, INDEX_SCHEMA_VERSION)?;
+        tx.execute("DELETE FROM knowledge_chunks WHERE variant_id IN (SELECT id FROM chunk_index_variants WHERE parse_artifact_id=?1)", params![artifact]).map_err(storage_sqlite)?;
+        tx.execute(
+            "DELETE FROM chunk_index_variants WHERE parse_artifact_id=?1",
+            params![artifact],
+        )
+        .map_err(storage_sqlite)?;
+        tx.execute(
+            "DELETE FROM knowledge_sections WHERE parse_artifact_id=?1",
+            params![artifact],
+        )
+        .map_err(storage_sqlite)?;
+        tx.commit().map_err(storage_sqlite)
     }
 }
 
@@ -2304,6 +2935,7 @@ pub struct BuildBegin {
 
 pub struct KnowledgeVectorStore {
     conn: Mutex<Connection>,
+    _recovery_guard: File,
 }
 
 const VECTOR_SCHEMA_VERSION: i64 = 1;
@@ -2329,40 +2961,32 @@ CREATE TABLE IF NOT EXISTS chunk_vectors (
 );
 "#;
 
-impl KnowledgeVectorStore {
-    pub fn open(root: &Path) -> Result<Self, KnowledgeError> {
-        std::fs::create_dir_all(root)
-            .map_err(|e| KnowledgeError::storage_invalid(format!("knowledge root: {e}")))?;
-        let db_path = root.join("knowledge_vector.db");
-        match Self::try_open(&db_path) {
-            Ok(store) => Ok(store),
-            Err(first_error) => {
-                tracing::warn!(
-                    error = %first_error,
-                    "knowledge vector cache unreadable; resetting the cache file"
-                );
-                let _ = std::fs::remove_file(&db_path);
-                let _ = std::fs::remove_file(root.join("knowledge_vector.db-wal"));
-                let _ = std::fs::remove_file(root.join("knowledge_vector.db-shm"));
-                Self::try_open(&db_path)
-            }
+impl Drop for KnowledgeVectorStore {
+    fn drop(&mut self) {
+        if let Err(error) = prepare_supported_close(&lock_conn(&self.conn), VECTOR_SCHEMA_VERSION) {
+            tracing::warn!(
+                code = error.code,
+                "knowledge close preserved WAL without checkpoint"
+            );
         }
     }
+}
 
-    fn try_open(db_path: &Path) -> Result<Self, KnowledgeError> {
-        let conn = open_connection(db_path)?;
-        check_user_version(&conn, VECTOR_SCHEMA_VERSION)?;
-        conn.execute_batch(VECTOR_SCHEMA_SQL)
-            .map_err(|e| KnowledgeError::storage_invalid(format!("vector schema: {e}")))?;
-        conn.pragma_update(None, "user_version", VECTOR_SCHEMA_VERSION)
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        let _ = db_path;
+impl KnowledgeVectorStore {
+    pub fn open(root: &Path) -> Result<Self, KnowledgeError> {
+        std::fs::create_dir_all(root).map_err(storage_io)?;
+        let (conn, guard) = open_cache(
+            &root.join("knowledge_vector.db"),
+            VECTOR_SCHEMA_VERSION,
+            VECTOR_SCHEMA_SQL,
+        )?;
         Ok(Self {
             conn: Mutex::new(conn),
+            _recovery_guard: guard,
         })
     }
 
-    /// begin：既有行指纹或维度漂移 → 显式清旧向量重建（resetStaleVectors 留痕）；
+    /// begin：已有身份的指纹或维度冲突明确拒绝并保留旧付费结果；
     /// 一致 → 保留已落库向量（断点续嵌锚）。维度 1..=65536。
     pub fn begin_variant_build(
         &self,
@@ -2378,7 +3002,8 @@ impl KnowledgeVectorStore {
             ));
         }
         let variant_id = vector_index_variant_id(chunk_index_variant_id, model_key);
-        let conn = lock_conn(&self.conn);
+        let mut connection = lock_conn(&self.conn);
+        let conn = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;
         let existing = conn
             .query_row(
                 "SELECT id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status FROM vector_index_variants WHERE id=?1",
@@ -2387,26 +3012,20 @@ impl KnowledgeVectorStore {
             )
             .optional()
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        let reset_stale = match &existing {
-            Some(record)
-                if record.chunk_fingerprint != chunk_fingerprint
-                    || record.dimensions != dimensions =>
-            {
-                conn.execute(
-                    "DELETE FROM chunk_vectors WHERE vector_index_variant_id=?1",
-                    params![variant_id],
-                )
-                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-                true
-            }
-            _ => false,
-        };
+        if existing
+            .as_ref()
+            .is_some_and(|r| r.chunk_fingerprint != chunk_fingerprint || r.dimensions != dimensions)
+        {
+            return Err(KnowledgeError::conflict("existing paid vector identity is incompatible; preserve it and build a distinct variant"));
+        }
+        let reset_stale = false;
         conn.execute(
             "INSERT INTO vector_index_variants (id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status) VALUES (?1, ?2, ?3, ?4, ?5, ?6, 'building')
              ON CONFLICT(id) DO UPDATE SET status='building', chunk_fingerprint=?5, dimensions=?6",
             params![variant_id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        conn.commit().map_err(storage_sqlite)?;
         Ok(BuildBegin {
             variant_id,
             reset_stale,
@@ -2420,7 +3039,8 @@ impl KnowledgeVectorStore {
         entries: &[VectorEntry],
     ) -> Result<(), KnowledgeError> {
         let mut conn = lock_conn(&self.conn);
-        let variant = conn
+        let tx = cache_write(&mut conn, VECTOR_SCHEMA_VERSION)?;
+        let variant = tx
             .query_row(
                 "SELECT id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status FROM vector_index_variants WHERE id=?1",
                 params![variant_id],
@@ -2429,6 +3049,18 @@ impl KnowledgeVectorStore {
             .optional()
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
             .ok_or_else(|| KnowledgeError::conflict("vector variant does not exist"))?;
+        let mut ids = std::collections::HashSet::new();
+        let mut ordinals = std::collections::HashSet::new();
+        if entries.iter().any(|e| {
+            e.chunk_id.is_empty()
+                || !ids.insert(&e.chunk_id)
+                || !ordinals.insert(e.ordinal)
+                || e.vector.iter().any(|v| !v.is_finite())
+        }) {
+            return Err(KnowledgeError::index_invalid(
+                "invalid or duplicate vector batch",
+            ));
+        }
         for entry in entries {
             if entry.vector.len() != variant.dimensions as usize {
                 return Err(KnowledgeError::conflict(
@@ -2436,9 +3068,6 @@ impl KnowledgeVectorStore {
                 ));
             }
         }
-        let tx = conn
-            .transaction()
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
         for entry in entries {
             let mut blob = Vec::with_capacity(entry.vector.len() * 4);
             for value in &entry.vector {
@@ -2455,13 +3084,144 @@ impl KnowledgeVectorStore {
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
     }
 
+    /// 断点读取同时验证实际字节，损坏或非有限向量不视作可复用。
+    pub fn checkpoint_entries(&self, variant_id: &str) -> Result<Vec<VectorEntry>, KnowledgeError> {
+        let variant = self
+            .get_variant(variant_id)?
+            .ok_or_else(|| KnowledgeError::index_invalid("missing vector variant"))?;
+        let conn = lock_conn(&self.conn);
+        let mut stmt=conn.prepare("SELECT chunk_id,ordinal,vector FROM chunk_vectors WHERE vector_index_variant_id=?1 ORDER BY ordinal")
+            .map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        let rows = stmt
+            .query_map(params![variant_id], |r| {
+                Ok((
+                    r.get::<_, String>(0)?,
+                    r.get::<_, i64>(1)?,
+                    r.get::<_, Vec<u8>>(2)?,
+                ))
+            })
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let mut entries = Vec::new();
+        for row in rows {
+            let (chunk_id, ordinal, bytes) =
+                row.map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            if ordinal < 0 || bytes.len() != variant.dimensions as usize * 4 {
+                return Err(KnowledgeError::index_invalid(
+                    "invalid checkpoint vector bytes",
+                ));
+            }
+            let vector = bytes
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .map(|b| f32::from_le_bytes(*b))
+                .collect::<Vec<_>>();
+            if vector.iter().any(|v| !v.is_finite()) {
+                return Err(KnowledgeError::index_invalid(
+                    "non-finite checkpoint vector",
+                ));
+            }
+            entries.push(VectorEntry {
+                chunk_id,
+                ordinal: ordinal as usize,
+                vector,
+            });
+        }
+        Ok(entries)
+    }
+
+    /// 完成条件绑定真实计划的 ID/ordinal 全集，条数相同的错集合也拒绝。
+    pub fn complete_build_plan(
+        &self,
+        variant_id: &str,
+        plan: &[(String, usize)],
+    ) -> Result<(), KnowledgeError> {
+        let expected = plan
+            .iter()
+            .cloned()
+            .collect::<std::collections::BTreeSet<_>>();
+        if plan.is_empty()
+            || expected.len() != plan.len()
+            || plan
+                .iter()
+                .map(|(_, ordinal)| ordinal)
+                .collect::<std::collections::BTreeSet<_>>()
+                .len()
+                != plan.len()
+        {
+            return Err(KnowledgeError::index_invalid("invalid exact build plan"));
+        }
+        // 校验与 ready 在同一个排他事务；其它连接不能在校验后替换计划集合。
+        let mut conn = lock_conn(&self.conn);
+        let tx = cache_write(&mut conn, VECTOR_SCHEMA_VERSION)?;
+        let dimensions: i64 = tx
+            .query_row(
+                "SELECT dimensions FROM vector_index_variants WHERE id=?1",
+                params![variant_id],
+                |r| r.get(0),
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let mut actual = std::collections::BTreeSet::new();
+        {
+            let mut stmt=tx.prepare("SELECT chunk_id,ordinal,vector FROM chunk_vectors WHERE vector_index_variant_id=?1").map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+            let rows = stmt
+                .query_map(params![variant_id], |r| {
+                    Ok((
+                        r.get::<_, String>(0)?,
+                        r.get::<_, i64>(1)?,
+                        r.get::<_, Vec<u8>>(2)?,
+                    ))
+                })
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            for row in rows {
+                let (id, ordinal, bytes) =
+                    row.map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+                if id.is_empty()
+                    || ordinal < 0
+                    || dimensions <= 0
+                    || bytes.len() != dimensions as usize * 4
+                    || bytes
+                        .as_chunks::<4>()
+                        .0
+                        .iter()
+                        .any(|v| !f32::from_le_bytes(*v).is_finite())
+                    || !actual.insert((id, ordinal as usize))
+                {
+                    return Err(KnowledgeError::index_invalid(
+                        "invalid checkpoint in exact plan",
+                    ));
+                }
+            }
+        }
+        if actual != expected {
+            return Err(KnowledgeError::index_invalid(
+                "vector build does not match the exact planned chunk set",
+            ));
+        }
+        let changed = tx
+            .execute(
+                "UPDATE vector_index_variants SET status='ready' WHERE id=?1",
+                params![variant_id],
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::index_invalid(
+                "variant disappeared during completion",
+            ));
+        }
+        tx.commit()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+    }
+
     /// 完整性校验（条数 + ordinal 去重计数一致且非空）后置 ready。
     pub fn complete_build(
         &self,
         variant_id: &str,
         expected_count: usize,
     ) -> Result<(), KnowledgeError> {
-        let conn = lock_conn(&self.conn);
+        self.checkpoint_entries(variant_id)?;
+        let mut connection = lock_conn(&self.conn);
+        let conn = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;
         let count: i64 = conn
             .query_row(
                 "SELECT COUNT(*) FROM chunk_vectors WHERE vector_index_variant_id=?1",
@@ -2489,17 +3249,18 @@ impl KnowledgeVectorStore {
             params![variant_id],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        Ok(())
+        conn.commit().map_err(storage_sqlite)
     }
 
     pub fn fail_build(&self, variant_id: &str) -> Result<(), KnowledgeError> {
-        let conn = lock_conn(&self.conn);
+        let mut connection = lock_conn(&self.conn);
+        let conn = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;
         conn.execute(
             "UPDATE vector_index_variants SET status='failed' WHERE id=?1",
             params![variant_id],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        Ok(())
+        conn.commit().map_err(storage_sqlite)
     }
 
     fn map_variant(row: &rusqlite::Row<'_>) -> rusqlite::Result<VectorVariantRecord> {
@@ -2616,9 +3377,7 @@ impl KnowledgeVectorStore {
     pub fn remove_artifact(&self, parse_artifact_id: &str) -> Result<usize, KnowledgeError> {
         let variants = self.list_variants_by_artifact(parse_artifact_id)?;
         let mut conn = lock_conn(&self.conn);
-        let tx = conn
-            .transaction()
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let tx = cache_write(&mut conn, VECTOR_SCHEMA_VERSION)?;
         let mut removed = 0;
         for variant in &variants {
             tx.execute(

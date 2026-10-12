@@ -1,0 +1,88 @@
+{
+  "at": "2026-10-11T11:52:06.676218+00:00",
+  "work_id": "R06-AR-W07",
+  "role": "ROOT_READ_ONLY_DISPATCH_PREPARATION_NOT_EXECUTOR",
+  "status": "SOURCE_ONLY_NOT_RUN",
+  "source": {
+    "core/tool-catalog.ts": {
+      "actual_main_sha256": "54080db1ec0da52719e356206f440427d4418312d2c29035d37e106fb56e2d22",
+      "accepted_base_sha256": "54080db1ec0da52719e356206f440427d4418312d2c29035d37e106fb56e2d22",
+      "unaccepted_main_diff": false
+    },
+    "core/tool-catalog-bridge.ts": {
+      "actual_main_sha256": "3256ec50c70f8e9a834e174e39be5c0cb2f538555b7e7a1aa903e6899acf4625",
+      "accepted_base_sha256": "3256ec50c70f8e9a834e174e39be5c0cb2f538555b7e7a1aa903e6899acf4625",
+      "unaccepted_main_diff": false
+    },
+    "core/agent.ts": {
+      "actual_main_sha256": "f1525d4ade1d44a9ccb1ce9be5ed250fb4027b6215e43a77772883279b152d76",
+      "accepted_base_sha256": "f1525d4ade1d44a9ccb1ce9be5ed250fb4027b6215e43a77772883279b152d76",
+      "unaccepted_main_diff": false
+    },
+    "rust/crates/lingxi-kernel/src/model_exchange.rs": {
+      "actual_main_sha256": "ba9d8cb8d355ef080e6b49103fe418215bb2e0c92ef2fc9c9b0c5b7a7c27e53b",
+      "accepted_base_sha256": "ba9d8cb8d355ef080e6b49103fe418215bb2e0c92ef2fc9c9b0c5b7a7c27e53b",
+      "unaccepted_main_diff": false
+    },
+    "rust/crates/lingxi-kernel/src/toolcatalog.rs": {
+      "actual_main_sha256": "2b7505387b6b45aebc9ff7a0c836d49d24573df1d2de2e3137549eab5983ad1f",
+      "accepted_base_sha256": "2b7505387b6b45aebc9ff7a0c836d49d24573df1d2de2e3137549eab5983ad1f",
+      "unaccepted_main_diff": false
+    },
+    "rust/crates/lingxi-kernel/src/context.rs": {
+      "actual_main_sha256": "e710eba1f29e1e990e232cb315228b47fa8e73a6ccd403e6602830994cc0e6a8",
+      "accepted_base_sha256": "e710eba1f29e1e990e232cb315228b47fa8e73a6ccd403e6602830994cc0e6a8",
+      "unaccepted_main_diff": false
+    },
+    "rust/crates/lingxi-service/src/knowledgetools.rs": {
+      "actual_main_sha256": "657748b6bfc69b5f45ef59e9ad6d5111322f5c1727398f976a0ec11cbfd409a4",
+      "accepted_base_sha256": "657748b6bfc69b5f45ef59e9ad6d5111322f5c1727398f976a0ec11cbfd409a4",
+      "unaccepted_main_diff": false
+    },
+    "rust/crates/lingxi-service/src/memorytools.rs": {
+      "actual_main_sha256": "0ef76b60c42a2335b63bbcb9c79c39add3b5d83bb92e9754f4d8fd239aaab0fc",
+      "accepted_base_sha256": "6c81a848d7ae118ab4e5d777efd4fb0e75e050a6edb9fc577ef85f3a9d448f4f",
+      "unaccepted_main_diff": true
+    },
+    "rust/crates/lingxi-service/src/toolgateway.rs": {
+      "actual_main_sha256": "17e9c05aec1d03cdc68db66b97ec84947cccf3d49a8759bca2fa126db6f2bc84",
+      "accepted_base_sha256": "17e9c05aec1d03cdc68db66b97ec84947cccf3d49a8759bca2fa126db6f2bc84",
+      "unaccepted_main_diff": false
+    },
+    "rust/crates/lingxi-service/src/runs.rs": {
+      "actual_main_sha256": "eca52e6151299a43d7386fb2056908a3d86afeadc1085cd3aa55dd35b5646a6e",
+      "accepted_base_sha256": "eca52e6151299a43d7386fb2056908a3d86afeadc1085cd3aa55dd35b5646a6e",
+      "unaccepted_main_diff": false
+    },
+    "rust/crates/lingxi-service/src/lib.rs": {
+      "actual_main_sha256": "39d114c237cecf12e2bdbb115f3df07f864d2218136db3662732503c4c53ea22",
+      "accepted_base_sha256": "abb05a164499956657395906134d20beafbb277547e794d277ed26c3986ef82c",
+      "unaccepted_main_diff": true
+    }
+  },
+  "facts": [
+    "knowledge/memory ToolManifest current Availability::Available uses callable and resident conflation",
+    "ToolDeclarationSnapshot description uses display_name instead of full.description",
+    "TS core/tool-catalog-bridge has mcp_search_tools/mcp_describe_tool/mcp_call real catalog bridge semantics; Rust context refers names but current literal source search shows no Rust service model manifests by those names",
+    "Rust ToolRegistry discovery exists and toolgateway handles Deferred OnDemand; HTTP/method-only discovery cannot prove model-driven C02",
+    "R05 model declarations are live per send and source generation is bound; F05 does not justify blindly freezing all declarations"
+  ],
+  "necessary_closure": [
+    "actual ordinary chat wire resident+explicit infrastructure exact set, no hidden preload",
+    "true model discover-describe-call->real Gateway execution same target/generation/schema/full description",
+    "five protocol renderers and source name collisions",
+    "withdraw/disable both direct and deferred current authorization",
+    "wire system plus tools cost actual measured or null, not string-only count"
+  ],
+  "no_product_edit": true,
+  "old_behavior_red": "NOT_RUN_EXECUTOR_MUST_REPRODUCE",
+  "scope": "full original T01/T06/T07/T08 Steps A and all due shares, extra original capability defects remain open",
+  "dependencies": {
+    "F05": "IN_PROGRESS_ISOLATED_UNACCEPTED",
+    "F01": "INDEPENDENT_BLOCKED",
+    "F13": "NOT_RUN",
+    "F15": "NOT_RUN",
+    "F14": "NOT_RUN",
+    "integration": "NEW_OWNED_EXECUTOR_AND_FRESH_REVIEWS_REQUIRED"
+  }
+}

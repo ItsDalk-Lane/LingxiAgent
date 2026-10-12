@@ -1,0 +1,110 @@
+{
+  "binding": {
+    "package": "lingxi-service",
+    "suite": "r06_t03_session_tree",
+    "test": "fork_copies_history_with_stable_ids_and_writes_stay_independent",
+    "kind": "rust_integration_test",
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_t03_session_tree",
+      "fork_copies_history_with_stable_ids_and_writes_stay_independent",
+      "--",
+      "--exact",
+      "--nocapture"
+    ],
+    "timeoutSecs": 900
+  },
+  "argv": [
+    "rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r06_t03_session_tree",
+    "fork_copies_history_with_stable_ids_and_writes_stay_independent",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "sourceBeforeSha256": "58d736d36260eaa46b776f7bc963ebec85928d4fe7f6886b7e4265c0e70afab5",
+  "exitCode": 0,
+  "timedOut": false,
+  "stdout": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/stdout.log",
+  "stderr": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/stderr.log",
+  "timeoutSecs": 900,
+  "syntheticEnvironment": {
+    "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/runtime/home",
+    "TMPDIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/runtime/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib",
+    "W01_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/raw/w01_evidence",
+    "W09_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/raw/w09_evidence",
+    "W10_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/raw/w10_evidence",
+    "W11_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/raw/w11_evidence",
+    "LINGXI_W03_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/raw/lingxi_w03_evidence",
+    "LINGXI_F05_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/raw/lingxi_f05_evidence",
+    "LINGXI_F08_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/raw/lingxi_f08_evidence",
+    "R06_T08_RAW_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/raw/t08",
+    "R06_T08_EVAL_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/residual-repair-20261012/gate-real-controls-final/R06_BINDINGS/r06_test_b694a01a245121c5c8cd/command-001/raw/t08-evaluations.jsonl"
+  },
+  "actualArgv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r06_t03_session_tree",
+    "fork_copies_history_with_stable_ids_and_writes_stay_independent",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "pid": 90184,
+  "elapsedSecs": 0.29,
+  "outputCheck": {
+    "valid": true,
+    "expectedTest": "fork_copies_history_with_stable_ids_and_writes_stay_independent",
+    "runningCounts": [
+      "1"
+    ],
+    "resultSummaries": [
+      [
+        "ok",
+        "1",
+        "0",
+        "0"
+      ]
+    ],
+    "passedTestNames": [
+      "fork_copies_history_with_stable_ids_and_writes_stay_independent"
+    ],
+    "reason": ""
+  },
+  "stdoutSha256": "06237b2045041d10e1ce861a3c984e3943a345e2edb3fc619c7bdfb4843ea8cf",
+  "stderrSha256": "608535e34484a0aacedf7c56054a7469ea2af74a22e2a1156dd7c26323f1a1fc",
+  "sourceAfterSha256": "58d736d36260eaa46b776f7bc963ebec85928d4fe7f6886b7e4265c0e70afab5",
+  "sourceStable": true,
+  "localPassed": true
+}

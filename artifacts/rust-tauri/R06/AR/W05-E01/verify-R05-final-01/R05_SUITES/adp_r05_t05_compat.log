@@ -1,0 +1,10 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.55s
+     Running tests/r05_t05_compat.rs (rust/target-w05-e01/debug/deps/r05_t05_compat-6861fbc5575871a1)
+LINGXI_TEST_GUARD: armed (pid 7860, mem_limit=8192 MB, time_limit=600 s)
+
+running 1 test
+test every_golden_aligns_with_the_incumbent_ts_run ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

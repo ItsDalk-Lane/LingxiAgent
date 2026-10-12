@@ -1,0 +1,18 @@
+{
+  "oldWindow": "final-f05-all-04",
+  "oldActuallyExecutedSha256": "2d47fcb6dda858d0ce388f5b0654820c380d9d8158b5119c6d53d22bde3e6500",
+  "oldArtifactCurrentlyRetained": false,
+  "oldEvidenceRetained": [
+    "commands/final-f05-all-04.json",
+    "commands/final-f05-all-04.log",
+    "final-f05-all-04/*.json",
+    "F07_OPEN_FINDING.json"
+  ],
+  "reason": "后续Cargo在同deps路径重新链接；未保存旧inode，不能重构后冒作旧artifact",
+  "newActualExecutable": "artifacts/rust-tauri/R06/AR/W05-E01/local-only/frozen-binaries/r06_ar_f05_cache-b8ad9174ba016b7e",
+  "newActualExecutableSha256": "5923f148f12c9c1525112a3ac63e587cf181e72048847ad4230783a5a4f6338c",
+  "compiledSourceStable": true,
+  "sourceFreeze": "SOURCE_FREEZE_FINAL.json",
+  "beforeActualExec": true,
+  "scope": "仅冻结自己的当前实际bin，不使用其它角色overlay"
+}

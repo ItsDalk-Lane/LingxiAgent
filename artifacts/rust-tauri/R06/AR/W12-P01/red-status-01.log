@@ -1,0 +1,7 @@
+{"command": ["/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-probe-gni2k67f/counter-old-status"], "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-red-status-01-gy81k6fh", "start": 1791699153.824955}
+LINGXI_TEST_GUARD: armed (pid 76414, mem_limit=8192 MB, time_limit=600 s)
+home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-red-status-01-gy81k6fh result=Ok(()) before=building after=failed schema=999
+
+thread 'main' (2431766) panicked at artifacts/rust-tauri/R06/AR/W12-P01/counter-old-status.rs:16:5:
+旧句柄必须拒绝写入future库
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

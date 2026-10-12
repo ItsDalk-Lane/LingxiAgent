@@ -1,0 +1,5 @@
+{"command": ["node", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/additional-oracle.mjs"], "start": 1791700773.445295, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-additional-oracle-rzfgzv6q", "guard": "8192MB/600s"}
+{"name":"experience-paused-control","yaml":"memory: {enabled: false}\nexperience: {enabled: false}\n","incumbent":{"memory":{"enabled":false},"experience":{"enabled":false}}}
+{"name":"experience-real-merge-control","yaml":"d: &d {enabled: true}\nmemory: {enabled: false}\nexperience: {<<: *d}\n","incumbent":{"d":{"enabled":true},"memory":{"enabled":false},"experience":{"enabled":true}}}
+{"name":"experience-literal-merge","yaml":"memory: {enabled: false}\nexperience: {\"<<\": {enabled: true}}\n","incumbent":{"memory":{"enabled":false},"experience":{"<<":{"enabled":true}}}}
+{"name":"name-literal-merge","yaml":"memory: {enabled: false}\nagent: {\"<<\": {name: \"LITERAL-NAME-UNEXPECTED\"}}\n","incumbent":{"memory":{"enabled":false},"agent":{"<<":{"name":"LITERAL-NAME-UNEXPECTED"}}}}

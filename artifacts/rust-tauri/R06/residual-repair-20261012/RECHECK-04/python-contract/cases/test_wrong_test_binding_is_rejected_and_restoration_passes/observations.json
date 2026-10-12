@@ -1,0 +1,34 @@
+[
+  {
+    "label": "wrong-binding",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-B",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-eeyxd5dx/scripts/rust-tauri/r06_stage_inputs.py",
+      "--root",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-eeyxd5dx",
+      "--check",
+      "--evidence",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-eeyxd5dx/artifacts/01-wrong-binding"
+    ],
+    "exitCode": 1,
+    "stdout": "R06 输入拒绝：登记的具名测试不存在：r06_t01_closed_loop::sent_wire_system_bytes_match_the_observation_digests\n",
+    "stderr": ""
+  },
+  {
+    "label": "restored-positive",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-B",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-eeyxd5dx/scripts/rust-tauri/r06_stage_inputs.py",
+      "--root",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-eeyxd5dx",
+      "--check",
+      "--evidence",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-eeyxd5dx/artifacts/02-restored-positive"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

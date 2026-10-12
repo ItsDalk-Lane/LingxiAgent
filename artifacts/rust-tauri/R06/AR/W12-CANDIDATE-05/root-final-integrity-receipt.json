@@ -1,0 +1,18 @@
+{
+  "role": "ROOT_FINAL_INTEGRITY_RECEIPT_NOT_REVIEWER",
+  "time_utc": "2026-10-11T07:58:48.844895+00:00",
+  "candidate": "W12-CANDIDATE-05",
+  "product_files_in_each_root": 11,
+  "runtime_binaries": 7,
+  "manifest_own_files": 103,
+  "authority_sources": 21,
+  "all_evidence_hashes_matched": true,
+  "all_owned_and_binaries_and_fixed_gate_inputs_matched": true,
+  "errors": [],
+  "self_check": "SCOPED_COMPLETED_WITH_F14_REGISTRY_FAIL",
+  "registry": "FAIL_9_MIGRATIONS_7_REGISTERED",
+  "independent_review": "BLOCKED_PLATFORM_ACCESS_NOT_GRANTED",
+  "whole_R06": "NOT_ACCEPTED",
+  "main_combined_lock": "OWNED_BY_W06_ACTIVE_NOT_FROZEN_NOT_VALIDATED_BY_W12",
+  "commit_push": "NOT_AUTHORIZED_BY_INDEPENDENT_PASS_YET_NOT_DONE"
+}

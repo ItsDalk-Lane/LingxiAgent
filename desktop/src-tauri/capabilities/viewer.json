@@ -1,0 +1,10 @@
+{
+  "identifier": "resource-viewer",
+  "description": "独立只读预览；宿主还会把读取限制到该窗口自己的文件。",
+  "windows": ["viewer-*"],
+  "permissions": [
+    "core:default", "allow-read-file", "allow-read-file-snapshot", "allow-read-file-base64",
+    "allow-file-info", "allow-resource-subscribe", "allow-resource-events",
+    "allow-resource-unsubscribe", "allow-viewer-request-load", "allow-viewer-close"
+  ]
+}

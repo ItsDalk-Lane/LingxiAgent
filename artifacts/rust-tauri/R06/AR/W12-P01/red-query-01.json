@@ -1,0 +1,12 @@
+{
+  "command": [
+    "node",
+    "artifacts/rust-tauri/R06/AR/W12-P01/counter-query-race.mjs"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-p01-red-query-01-a9aifc0e",
+  "start": 1791699143.8897579,
+  "end": 1791699143.980843,
+  "exit_code": 1,
+  "log_sha256": "acf09d4d022c416cca626749c995561cbe9089c59c88c6f20a9d8b2f3d4bf049"
+}

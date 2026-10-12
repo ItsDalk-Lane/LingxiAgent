@@ -1,0 +1,33 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/r06-ar-f12-vector-cache-preservation.test.ts (2 tests | 1 failed) 113ms
+   × future schema keeps paid sentinel and version 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/r06-ar-f12-vector-cache-preservation.test.ts > future schema keeps paid sentinel and version
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ tests/r06-ar-f12-vector-cache-preservation.test.ts:31:60
+     29|   db.close();
+     30|   const before = fs.readFileSync(dbPath);
+     31|   expect(() => new PortableVectorIndexAdapter({ dbPath })).toThrow(/ne…
+       |                                                            ^
+     32|   expect(fs.readFileSync(dbPath)).toEqual(before);
+     33|   const check = new Database(dbPath);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  13:24:59
+   Duration  253ms (transform 45ms, setup 22ms, import 35ms, tests 113ms, environment 0ms)
+

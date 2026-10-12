@@ -1,0 +1,34 @@
+[
+  {
+    "label": "missing-original-case",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-B",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-3dusrv53/scripts/rust-tauri/r06_stage_inputs.py",
+      "--root",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-3dusrv53",
+      "--check",
+      "--evidence",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-3dusrv53/artifacts/01-missing-original-case"
+    ],
+    "exitCode": 1,
+    "stdout": "R06 输入拒绝：R06-AR-F03 原四项基础检查集合不一致\n",
+    "stderr": ""
+  },
+  {
+    "label": "restored-positive",
+    "argv": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-B",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-3dusrv53/scripts/rust-tauri/r06_stage_inputs.py",
+      "--root",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-3dusrv53",
+      "--check",
+      "--evidence",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-3dusrv53/artifacts/02-restored-positive"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

@@ -465,3 +465,59 @@ pub async fn read_full_branch(
         before = page.next_before;
     }
 }
+
+/// 按页内真实消息锚查找无消息的顶层终态；空根仅在到达原根的最老页读取。
+/// 已移出当前分支的锚不会命中；旧数据无锚不推测、不迁移成新归属。
+pub async fn read_unmessaged_terminal_anchors(
+    db: &RunDatabase,
+    session_id: &str,
+    messages: &[MessageRow],
+    include_empty_root: bool,
+) -> Result<Vec<(String, Option<String>)>, StorageError> {
+    let sid = session_id.to_owned();
+    let mut anchors: Vec<Option<String>> = messages
+        .iter()
+        .map(|m| Some(m.message_id.clone()))
+        .collect();
+    if include_empty_root {
+        anchors.push(None);
+    }
+    db.queue().submit(move |conn| {
+        let mut out = Vec::new();
+        for anchor in anchors {
+            let mut stmt = conn.prepare(
+                "SELECT a.run_id,a.anchor_message_id FROM run_history_anchors a \
+                 JOIN runs r ON r.run_id=a.run_id WHERE a.session_id=?1 AND r.session_id=?1 \
+                 AND a.anchor_message_id IS ?2 AND r.status IN ('completed','failed','cancelled','interrupted_needs_attention') \
+                 AND NOT EXISTS (SELECT 1 FROM messages m WHERE m.session_id=a.session_id AND (m.run_id=a.run_id OR m.message_id='user:'||a.run_id OR m.message_id=a.run_id||'-final')) \
+                 AND NOT EXISTS (SELECT 1 FROM run_lineage l WHERE l.run_id=a.run_id AND l.parent_run_id IS NOT NULL) \
+                 ORDER BY r.last_event_seq,a.run_id").map_err(map_err)?;
+            let rows = stmt.query_map(rusqlite::params![sid,anchor], |r| Ok((r.get(0)?,r.get(1)?))).map_err(map_err)?;
+            for row in rows { out.push(row.map_err(map_err)?); }
+        }
+        Ok(out)
+    }).await
+}
+
+/// 历史条件读取也受真实审计事件推进；终态无消息时不沿用旧的空历史 ETag。
+pub async fn read_history_event_revision(
+    db: &RunDatabase,
+    session_id: &str,
+) -> Result<u64, StorageError> {
+    let sid = session_id.to_owned();
+    db.queue()
+        .submit(move |conn| {
+            conn.query_row(
+                "SELECT COALESCE(MAX(seq),0) FROM key_events WHERE session_id=?1",
+                [sid],
+                |r| r.get::<_, i64>(0),
+            )
+            .map_err(map_err)
+            .and_then(|seq| {
+                u64::try_from(seq).map_err(|_| StorageError::Corrupted {
+                    detail: "negative history event revision".into(),
+                })
+            })
+        })
+        .await
+}

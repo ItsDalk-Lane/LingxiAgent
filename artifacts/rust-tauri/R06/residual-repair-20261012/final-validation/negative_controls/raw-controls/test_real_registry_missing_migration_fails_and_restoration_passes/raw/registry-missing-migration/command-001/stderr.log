@@ -1,0 +1,3 @@
+FAIL: count mismatch: migrations.rs MIGRATIONS has 11 entries, the registry has 10
+FAIL: v11 (r06_ar_f04_run_history_anchors) exists in migrations.rs MIGRATIONS but is MISSING from the registry
+FAIL: registry consistency — migrations.rs MIGRATIONS and R02-T04_STORAGE_REGISTRY.json disagree (root=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f14-inputs-dl5ovs9x)

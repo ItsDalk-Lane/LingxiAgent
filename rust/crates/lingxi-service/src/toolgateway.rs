@@ -78,13 +78,55 @@ use std::sync::Arc;
 
 use lingxi_kernel::ports::{ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest};
 use lingxi_kernel::toolcatalog::{
-    EffectiveArguments, PermissionKind, SchemaBudget, ToolRegistry, ToolTargetId, ToolTargetRef,
+    CatalogPin, EffectiveArguments, PermissionKind, SchemaBudget, ToolRegistry, ToolTargetId, ToolTargetRef,
 };
 use lingxi_kernel::{Principal, RunContext};
 use lingxi_protocol::{ErrorCode, ProtocolError, ToolCallId};
 
 use crate::inject::ServiceClock;
 use crate::resourceaccess::ResourceScope;
+
+/// 监督器在真实工具子任务内注入生命周期；不从 arguments 读取。
+#[derive(Clone)]
+pub(crate) struct TrustedToolLifetime {
+    pub cancel: crate::cancel::CancelScope,
+    pub deadline_unix_ms: u64,
+    pub budget_ms: u64,
+}
+tokio::task_local! {
+    pub(crate) static TOOL_LIFETIME: TrustedToolLifetime;
+    static KNOWLEDGE_RUNTIME: crate::operations::EmbeddingCallRuntime;
+}
+
+pub(crate) fn knowledge_runtime(
+    ctx: &RunContext,
+    call: &ToolCallId,
+) -> Result<crate::operations::EmbeddingCallRuntime, ProtocolError> {
+    KNOWLEDGE_RUNTIME
+        .try_with(Clone::clone)
+        .map_err(|_| {
+            ProtocolError::new(
+                ErrorCode::Unauthorized,
+                "knowledge embedding requires a trusted gateway context",
+                false,
+            )
+        })
+        .and_then(|runtime| {
+            if runtime.ownership.session_id.as_deref() != Some(ctx.session_id.as_str())
+                || runtime.ownership.run_id.as_deref() != Some(ctx.run_id.as_str())
+                || runtime.ownership.attempt.as_deref() != Some(ctx.attempt.as_str())
+                || runtime.ownership.parent_tool_call_id.as_deref() != Some(call.as_str())
+                || runtime.ownership.principal_subject != ctx.principal.storage_subject()
+            {
+                return Err(ProtocolError::new(
+                    ErrorCode::Unauthorized,
+                    "knowledge embedding owner mismatch",
+                    false,
+                ));
+            }
+            Ok(runtime)
+        })
+}
 
 /// The trusted facts a resource-scope derivation may see (R04-T04). All
 /// of them come from the trusted entry's [`RunContext`] — a model
@@ -686,6 +728,7 @@ const CONSUMED_RING_CAP: usize = 4096;
 /// supervisor ([`crate::runs::RunSupervisor`]).
 pub struct ToolInvocationGateway {
     registry: Arc<ToolRegistry>,
+    catalog_definitions: std::sync::Mutex<Option<Arc<crate::toolcatalog_bridge::CatalogDefinitions>>>,
     budget: SchemaBudget,
     policy: Arc<dyn ToolPolicyPort>,
     executors: std::sync::Mutex<std::collections::BTreeMap<ToolTargetId, ExecutorBinding>>,
@@ -724,6 +767,7 @@ impl ToolInvocationGateway {
     ) -> Self {
         Self {
             registry,
+            catalog_definitions: std::sync::Mutex::new(None),
             budget,
             policy,
             executors: std::sync::Mutex::new(std::collections::BTreeMap::new()),
@@ -732,6 +776,23 @@ impl ToolInvocationGateway {
             clock,
             prepared_ttl_ms,
             live_prepared_cap,
+        }
+    }
+
+    pub fn attach_catalog_definitions(&self, definitions: Arc<crate::toolcatalog_bridge::CatalogDefinitions>) {
+        *self.catalog_definitions.lock().unwrap_or_else(|p| p.into_inner()) = Some(definitions);
+    }
+    pub fn has_catalog_definitions(&self) -> bool {
+        self.catalog_definitions.lock().unwrap_or_else(|p| p.into_inner()).is_some()
+    }
+    pub fn catalog_run_lease(&self, ctx: &RunContext) -> Option<crate::toolcatalog_bridge::CatalogRunLease> {
+        self.catalog_definitions.lock().unwrap_or_else(|p| p.into_inner()).as_ref().map(|definitions| crate::toolcatalog_bridge::CatalogRunLease { definitions: Arc::clone(definitions), context: ctx.clone() })
+    }
+    pub fn normalize_model_request(&self, ctx: &RunContext, request: &ToolRequest, pin: Option<CatalogPin>) -> Result<(ToolRequest, Option<CatalogPin>), GatewayRefusal> {
+        let definitions = self.catalog_definitions.lock().unwrap_or_else(|p| p.into_inner()).clone();
+        match definitions {
+            Some(definitions) => definitions.normalize(&self.registry, ctx, request, pin),
+            None => Ok((request.clone(), pin)),
         }
     }
 
@@ -1022,6 +1083,20 @@ impl ToolInvocationGateway {
         call_id: &ToolCallId,
         request: &ToolRequest,
     ) -> Result<(), GatewayRefusal> {
+        self.validate_from_request_pinned(ctx, surface, agent_id, permission, call_id, request, None)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn validate_from_request_pinned(
+        &self,
+        ctx: &RunContext,
+        surface: CallerSurface,
+        agent_id: &str,
+        permission: InvocationPermissionContext,
+        call_id: &ToolCallId,
+        request: &ToolRequest,
+        pin: Option<CatalogPin>,
+    ) -> Result<(), GatewayRefusal> {
         if !request.digest_matches_arguments() {
             return Err(GatewayRefusal::DigestMismatch {
                 declared: request.args_digest.hex.clone(),
@@ -1037,7 +1112,7 @@ impl ToolInvocationGateway {
             agent_id,
             permission,
             reference,
-            None,
+            pin,
             request.arguments.as_value().clone(),
             call_id.clone(),
         );
@@ -1069,6 +1144,20 @@ impl ToolInvocationGateway {
         call_id: &ToolCallId,
         request: &ToolRequest,
     ) -> Result<PreparedInvocation, GatewayRefusal> {
+        self.prepare_from_request_pinned(ctx, surface, agent_id, permission, call_id, request, None)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn prepare_from_request_pinned(
+        &self,
+        ctx: &RunContext,
+        surface: CallerSurface,
+        agent_id: &str,
+        permission: InvocationPermissionContext,
+        call_id: &ToolCallId,
+        request: &ToolRequest,
+        pin: Option<CatalogPin>,
+    ) -> Result<PreparedInvocation, GatewayRefusal> {
         if !request.digest_matches_arguments() {
             return Err(GatewayRefusal::DigestMismatch {
                 declared: request.args_digest.hex.clone(),
@@ -1084,7 +1173,7 @@ impl ToolInvocationGateway {
             agent_id,
             permission,
             reference,
-            None,
+            pin,
             request.arguments.as_value().clone(),
             call_id.clone(),
         );
@@ -1328,8 +1417,45 @@ impl ToolInvocationGateway {
             "gateway dispatch: every re-verification passed; dispatching the server-bound \
              effective arguments to the bound executor"
         );
-        let mut executed = self
-            .dispatch_executor(ctx, call_id, &request, &binding.executor)
+        let lifetime =
+            TOOL_LIFETIME
+                .try_with(Clone::clone)
+                .unwrap_or_else(|_| TrustedToolLifetime {
+                    cancel: crate::cancel::CancelScope::background_root(&format!(
+                        "host-tool:{}",
+                        call_id.as_str()
+                    )),
+                    deadline_unix_ms: record.expires_at_unix_ms,
+                    budget_ms: record
+                        .expires_at_unix_ms
+                        .saturating_sub(record.created_at_unix_ms),
+                });
+        let runtime = crate::operations::EmbeddingCallRuntime {
+            ownership: crate::operations::OperationOwnership {
+                principal_kind: ctx.principal.storage_kind().to_string(),
+                principal_subject: ctx.principal.storage_subject(),
+                agent_id: Some(record.agent_id.clone()),
+                session_id: Some(ctx.session_id.to_string()),
+                run_id: Some(ctx.run_id.to_string()),
+                attempt: Some(ctx.attempt.to_string()),
+                parent_tool_call_id: Some(call_id.to_string()),
+                cause_ref: format!("tool:{}", call_id.as_str()),
+                deadline_unix_ms: lifetime.deadline_unix_ms.min(record.expires_at_unix_ms),
+                budget_ms: lifetime.budget_ms.min(
+                    record
+                        .expires_at_unix_ms
+                        .saturating_sub(record.created_at_unix_ms),
+                ),
+            },
+            cancel: lifetime.cancel,
+            request_key: format!("tool:{}:{}:{}", ctx.run_id, ctx.attempt, call_id),
+            manual_retry_authorized: false,
+        };
+        let mut executed = KNOWLEDGE_RUNTIME
+            .scope(
+                runtime,
+                self.dispatch_executor(ctx, call_id, &request, &binding.executor),
+            )
             .await?;
         // 6) R04-A15 — the DELIVERY-REGISTRATION audit. The executor ran,
         //    so this is NOT a zero-dispatch refusal: a SUCCESS whose
@@ -1418,7 +1544,7 @@ fn digest_of_hex(hex: &str) -> lingxi_protocol::ArgsDigest {
     }
 }
 
-fn map_catalog_error(err: lingxi_kernel::toolcatalog::ToolCatalogError) -> GatewayRefusal {
+pub(crate) fn map_catalog_error(err: lingxi_kernel::toolcatalog::ToolCatalogError) -> GatewayRefusal {
     use lingxi_kernel::toolcatalog::ToolCatalogError as E;
     match err {
         E::TargetNotFound { reference } => GatewayRefusal::TargetNotRegistered { reference },

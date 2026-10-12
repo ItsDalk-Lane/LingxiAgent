@@ -1,0 +1,380 @@
+{
+  "id": "R06-EX-07",
+  "title": "知识导入当前格式与网页快照链",
+  "original_requirements": [
+    {
+      "id": "R06-T07-S01",
+      "clause": "从当前knowledge routes/store/manager实测导入、分块、embedding、索引、检索、读取、来源引用、删除及配置流程；R00清单为范围。"
+    },
+    {
+      "id": "R06-T07-S04",
+      "clause": "保留现有后端fallback、持久化、取消、重启和schema兼容；原文和引用边界正确，索引可重建不等于源文件可删。"
+    },
+    {
+      "id": "R06-T07-S05",
+      "clause": "针对真实生产可达但与范围说明冲突的路径先登记证据，不自行恢复或删除；未决项阻断该功能的完整验收。"
+    }
+  ],
+  "r00_feature_ids": [
+    "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-PARSE-ARTIFA-618978",
+    "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-PARSE-ARTIFA-251147",
+    "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-IMPORT-3D9932",
+    "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-SOURCE-210C79",
+    "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-DB95BA",
+    "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-8A6247"
+  ],
+  "reported_gap": "T07 D9/D10: pdf/docx/xlsx/csv parser unavailable、web_snapshot合法kind却422；现役可达来源须逐项核对，不能笼统以成熟执行器属R07免除导入。",
+  "deadline": "R06 阶段验收前：这里只要求当前核心/服务份额",
+  "status": "NOT_RUN",
+  "evidence_level": "SOURCE_ONLY",
+  "runtime_evidence": [],
+  "coverage_by_existing_f": "R06-AR-F15要求完整性，但F01-F14的具体修复不自动涵盖此行为；保留为extra，不改原F编号",
+  "production_paths": [
+    "rust/crates/lingxi-service/src/knowledge.rs",
+    "rust/crates/lingxi-adapters/src/storage/knowledge.rs"
+  ],
+  "proposed_real_checks": [
+    "隔离来源分别导入原可达格式/本地网页HTTP替身，真实worker/适配器产生原文块及可读取引用",
+    "损坏/超限/撤销/取消/重启分支保持来源，有限重试无重复制嵌入；不是只断言parser unavailable"
+  ],
+  "legal_later_basis": [
+    {
+      "task_id": "R07-T05",
+      "original_goal": "保留原有输入输出与资源交付质量。",
+      "original_steps": [
+        "逐项迁移现役office/beautify/jimeng-cli/media等内置插件的manifest、启停、配置和工具操作；叶子操作从R00盘点展开。",
+        "文档解析与渲染允许成熟worker，调用仍经Rust工具/模型网关；文件与临时目录权限最小化。",
+        "正式接入R01选定PDF renderer，覆盖字体、分页、图片、失败清理与产物验证；不永久依赖旧Electron helper。",
+        "压缩包导入防路径穿越/符号链接/解压炸弹，文档内容不能控制宿主权限或任意下载执行。",
+        "对既有样本文档和产物做语义/视觉验收，输出差异不能只用文件存在证明通过。"
+      ]
+    }
+  ],
+  "current_vs_later": "完整Office编辑/渲染/媒体宿主后续；R06知识入口到解析/检索/引用的可达原格式当前份额必需，可使用受控成熟解析器，不要求新增办公产品。",
+  "suggested_work_unit": {
+    "id": "R06-EX-W07",
+    "scope": "知识导入当前格式与网页快照链",
+    "agent_policy": "一次性边界明确的工作单，主代理整合；不创建长期代理",
+    "prerequisites": [
+      "先核对原生产调用链与有效配置，再以当前真实服务/模型替身验证；不得mock被验收核心"
+    ],
+    "review_required": "全新审查者在实际候选上独立实验，资料核对不签关闭"
+  },
+  "r00_original_assertions": [
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-PARSE-ARTIFA-618978",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "成功：执行“查看解析块”后，返回解析产物的 blocks",
+        "拒绝/边界：studio 身份限定；id 不存在错误；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-6189780D7F52",
+        "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-PARSE-ARTIFA-618978",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户查看解析块",
+        "then": "返回解析产物的 blocks",
+        "assertions": [
+          "成功：执行“查看解析块”后，返回解析产物的 blocks",
+          "拒绝/边界：studio 身份限定；id 不存在错误；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-PARSE-ARTIFA-251147",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "成功：执行“查看分块卡片”后，返回 chunkerConfigId 与有序 chunks",
+        "拒绝/边界：studio 身份限定；id 不存在错误；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-251147E586B2",
+        "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-PARSE-ARTIFA-251147",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户查看分块卡片",
+        "then": "返回 chunkerConfigId 与有序 chunks",
+        "assertions": [
+          "成功：执行“查看分块卡片”后，返回 chunkerConfigId 与有序 chunks",
+          "拒绝/边界：studio 身份限定；id 不存在错误；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-IMPORT-3D9932",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "执行“导入目录到知识笔记本”后核对：登记来源并启动受控入库；返回导入状态或权限、解析错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-3D99324D55C7",
+        "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-IMPORT-3D9932",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "该入口所需目标、身份和数据已准备",
+        "when": "用户导入目录到知识笔记本",
+        "then": "登记来源并启动受控入库；返回导入状态或权限、解析错误",
+        "assertions": [
+          "执行“导入目录到知识笔记本”后核对：登记来源并启动受控入库；返回导入状态或权限、解析错误",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-SOURCE-210C79",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "执行“添加笔记本来源”后核对：登记新来源并返回入库任务或明确错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-210C7965364E",
+        "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-SOURCE-210C79",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "该入口所需目标、身份和数据已准备",
+        "when": "用户添加笔记本来源",
+        "then": "登记新来源并返回入库任务或明确错误",
+        "assertions": [
+          "执行“添加笔记本来源”后核对：登记新来源并返回入库任务或明确错误",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-DB95BA",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "成功：执行“刷新本地文件知识源”后，重新抓取文件形成最新快照/解析物，返回 changed；变化后重建摄入",
+        "拒绝/边界：仅 local owner；文件未变 changed=false；不可访问报错；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-DB95BAC2A204",
+        "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-DB95BA",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户刷新本地文件知识源",
+        "then": "重新抓取文件形成最新快照/解析物，返回 changed；变化后重建摄入",
+        "assertions": [
+          "成功：执行“刷新本地文件知识源”后，重新抓取文件形成最新快照/解析物，返回 changed；变化后重建摄入",
+          "拒绝/边界：仅 local owner；文件未变 changed=false；不可访问报错；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-8A6247",
+      "task_ids": [
+        "R06-T07"
+      ],
+      "assertions": [
+        "成功：执行“重试知识源摄入”后，失败任务重新入队并唤醒；无任务兜底新建任务",
+        "拒绝/边界：最新任务非 failed 返回 409；已删源不可重试；不应错误扩大写入或披露范围"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-8A62470CC75D",
+        "feature_id": "F-D08-SEMANTIC_EFFECT-SEMANTIC-EFFECT-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-8A6247",
+        "task_ids": [
+          "R06-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户重试知识源摄入",
+        "then": "失败任务重新入队并唤醒；无任务兜底新建任务",
+        "assertions": [
+          "成功：执行“重试知识源摄入”后，失败任务重新入队并唤醒；无任务兜底新建任务",
+          "拒绝/边界：最新任务非 failed 返回 409；已删源不可重试；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T07"
+        ],
+        "execution_owner": "Rust Knowledge＋受控解析器",
+        "execution_stage_ids": [
+          "R06"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    }
+  ],
+  "report_sources": [
+    "docs/rust-tauri/R06/R06-T07_REPORT.md"
+  ],
+  "triage": "原义务需真实实验与范围核对，未确证当前Bug；不得因本清单推定修复完成/无需验证",
+  "legacy_comparison_excerpt": [
+    {
+      "path": "lib/knowledge/knowledge-manager.ts",
+      "line": 77,
+      "end_line": 91,
+      "original_source": "  pdf: { unit: \"visual_line\", coordinates: true },\n});\n\nconst SUPPORTED_FILE_TYPES = new Map([\n  [\".txt\", \"text/plain\"],\n  [\".md\", \"text/markdown\"],\n  [\".markdown\", \"text/markdown\"],\n  [\".pdf\", \"application/pdf\"],\n  [\".html\", \"text/html\"],\n  [\".htm\", \"text/html\"],\n  [\".docx\", PROCESSOR_MIME_DOCX],\n  [\".xlsx\", PROCESSOR_MIME_XLSX],\n  [\".csv\", PROCESSOR_MIME_CSV],\n]);\n",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "path": "lib/knowledge/source-processors.ts",
+      "line": 312,
+      "end_line": 325,
+      "original_source": "  const plan = resolveKnowledgeProcessor(input?.mimeType);\n  if (!plan) {\n    throw new KnowledgeError(\n      \"KNOWLEDGE_IMPORT_PROCESSOR_UNAVAILABLE\",\n      \"No knowledge processor is registered for this format\",\n    );\n  }\n  const processed = plan.processorId === \"lingxi-office-docx\"\n    ? await processDocx(input.bytes)\n    : plan.processorId === \"lingxi-office-xlsx\"\n      ? await processXlsx(input.bytes)\n      : await processCsv(input.bytes);\n  return { plan, ...processed };\n}",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "path": "server/routes/knowledge.ts",
+      "line": 355,
+      "end_line": 387,
+      "original_source": "\n  route.post(\"/knowledge/notebooks/:id/sources\", knowledgeSourceBodyLimit, async (c) => {\n    const scope = bindKnowledgeScope(c, engine);\n    if (scope.error) return scope.error;\n    try {\n      const body = await safeJson(c);\n      const kind = body?.kind || (body?.filePath ? \"file\" : null);\n      const allowedByKind = {\n        file: new Set([\"kind\", \"filePath\", \"displayName\"]),\n        pasted_text: new Set([\"kind\", \"text\", \"displayName\"]),\n        web_snapshot: new Set([\"kind\", \"url\", \"displayName\"]),\n      } as const;\n      const allowed = allowedByKind[kind as keyof typeof allowedByKind];\n      if (!allowed || !body || typeof body !== \"object\" || Array.isArray(body)\n        || Object.keys(body).some(key => !(allowed as ReadonlySet<string>).has(key))) {\n        throw new KnowledgeError(\"KNOWLEDGE_INVALID_ARGUMENT\", \"Knowledge source import body is invalid\");\n      }\n      let imported: any;\n      if (kind === \"file\") {\n        if (!isLocalOwnerPrincipal(scope.requestContext.authPrincipal)) {\n          return c.json({\n            error: \"KNOWLEDGE_LOCAL_IMPORT_REQUIRED\",\n            message: \"Importing a server file path requires the local Studio owner\",\n          }, 403);\n        }\n        imported = await scope.knowledge.importFile({\n          studioId: scope.studioId,\n          notebookId: c.req.param(\"id\"),\n          filePath: body.filePath,\n          displayName: body.displayName,\n        });\n      } else if (kind === \"pasted_text\") {\n        imported = await scope.knowledge.importPastedText({",
+      "status": "SOURCE_ONLY"
+    }
+  ]
+}
