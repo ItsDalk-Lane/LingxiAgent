@@ -7188,6 +7188,7 @@
         "r06_test_782fb50cd1feba7e2ca3",
         "r06_test_783ed4646aed5d3e6c79",
         "r06_test_796a1f2c30f0398a9b34",
+        "r06_test_79b37a473efcfda90718",
         "r06_test_7b4a3f6cc1131d44112f",
         "r06_test_7badf69f6fff9c5f068a",
         "r06_test_7be64baa65f6c6cae318",
@@ -18314,9 +18315,35 @@
         "路径不存在回退默认头像；不等于设置或更新头像"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_05cab72bc37b043463d7",
+        "r06_test_79b37a473efcfda90718",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-A02D8C572F5C-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-A02D8C572F5C-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-A02D8C572F5C-assertion-00"
+        ],
+        [
+          "R00-T02-LA-A02D8C572F5C-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-A17D742E55B7",
@@ -99806,7 +99833,7 @@
           "路径不存在回退默认头像；不等于设置或更新头像"
         ],
         "then": "返回本地头像路径供 splash 渲染",
-        "status": "GAP",
+        "status": "READY",
         "groups": [
           {
             "index": 0,
@@ -99815,9 +99842,14 @@
                 "package": "lingxi-adapters",
                 "suite": "agent_memory_r06t06",
                 "test": "persona_fallback_chain_and_avatar_formats"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_splash_avatar_live",
+                "test": "current_rust_saved_offline_splash_real_ipc_and_image_fallback"
               }
             ],
-            "meaning": "avatar-path后端存在，但当前Tauri frontend仅probe页面，没有产品splash读取头像/路径不存在时默认头像回退；原界面效果未实现。",
+            "meaning": "当前候选Rust真实API保存PNG/JPEG/WebP并切当前助手，真实停服后生产IPC/preload/当前SplashApp原生窗口显示正确本地WebP。原16场景含真实图片解码、缺失/坏格式/非普通文件/祖先及文件链接/EACCES和返回路径后加载失败的默认回退；最终原头像字节保留。独立当前binary19场景补真实子frame/非名单本地页拒绝、WebP异步解码途中链接替换拒绝。原生fixture在tests/rust-native纳入源摘要，无白名单或门禁变更。不宣称完整引导、Tauri、其他平台或正式打包。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs",
@@ -99831,12 +99863,103 @@
                     "quote": "    let (_path, mime, bytes) = persona.read_avatar(\"agentA\").unwrap().unwrap();"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_splash_avatar_live.rs",
+                "test": "current_rust_saved_offline_splash_real_ipc_and_image_fallback",
+                "sourceSHA256": "752d7d3016200ac574a5af789bc7c81ba8db30ff2ebba5187c93ae83ec5752e7",
+                "testStartLine": 35,
+                "testEndLine": 138,
+                "assertions": [
+                  {
+                    "line": 36,
+                    "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"当前原生证据需macOS Electron；其他平台未验证，不能跳过算成功\"\n    )"
+                  },
+                  {
+                    "line": 78,
+                    "quote": "assert_eq!(receipt[\"leaf\"], \"R00-T02-LA-A02D8C572F5C\")"
+                  },
+                  {
+                    "line": 79,
+                    "quote": "assert_eq!(receipt[\"result\"], \"PASS\")"
+                  },
+                  {
+                    "line": 80,
+                    "quote": "assert_eq!(receipt[\"backend\"], \"rust\")"
+                  },
+                  {
+                    "line": 81,
+                    "quote": "assert_eq!(receipt[\"serverRequiredForSplash\"], false)"
+                  },
+                  {
+                    "line": 82,
+                    "quote": "assert!(receipt[\"actualElectron\"]\n        .as_str()\n        .is_some_and(|value| !value.is_empty()))"
+                  },
+                  {
+                    "line": 86,
+                    "quote": "assert_eq!(records.len(), 16)"
+                  },
+                  {
+                    "line": 88,
+                    "quote": "assert_eq!(\n        find(\"actual-service-stopped-before-splash\")[\"serviceOffline\"],\n        true\n    )"
+                  },
+                  {
+                    "line": 93,
+                    "quote": "assert_eq!(live[\"visible\"], true)"
+                  },
+                  {
+                    "line": 94,
+                    "quote": "assert_eq!(live[\"splashInfo\"][\"yuan\"], \"ming\")"
+                  },
+                  {
+                    "line": 95,
+                    "quote": "assert!(live[\"localPath\"]\n        .as_str()\n        .unwrap()\n        .ends_with(\"/agents/zeta/avatars/agent.webp\"))"
+                  },
+                  {
+                    "line": 99,
+                    "quote": "assert_eq!(live[\"renderer\"][\"complete\"], true)"
+                  },
+                  {
+                    "line": 100,
+                    "quote": "assert_eq!(live[\"renderer\"][\"width\"], 48)"
+                  },
+                  {
+                    "line": 101,
+                    "quote": "assert!(live[\"renderer\"][\"opacity\"].as_f64().unwrap() >= 0.99)"
+                  },
+                  {
+                    "line": 112,
+                    "quote": "assert!(find(case)[\"localPath\"].is_null(), \"{case}不应返回文件路径\")"
+                  },
+                  {
+                    "line": 113,
+                    "quote": "assert!(find(case)[\"renderer\"][\"src\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/assets/Ming.png\"))"
+                  },
+                  {
+                    "line": 118,
+                    "quote": "assert_eq!(\n        find(\"actual-permission-rejection-default\")[\"ipcRejected\"],\n        true\n    )"
+                  },
+                  {
+                    "line": 122,
+                    "quote": "assert_eq!(\n        find(\"actual-file-load-failure-default\")[\"fileRemovedAfterPath\"],\n        true\n    )"
+                  },
+                  {
+                    "line": 126,
+                    "quote": "assert!(find(\"offline-empty-default\")[\"localPath\"].is_null())"
+                  },
+                  {
+                    "line": 127,
+                    "quote": "assert!(find(\"offline-empty-default\")[\"renderer\"][\"src\"]\n        .as_str()\n        .unwrap()\n        .contains(\"/assets/Lingxi.png\"))"
+                  },
+                  {
+                    "line": 136,
+                    "quote": "assert!(std::fs::metadata(raw.join(png)).unwrap().len() > 100)"
+                  }
+                ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "avatar-path后端存在，但当前Tauri frontend仅probe页面，没有产品splash读取头像/路径不存在时默认头像回退；原界面效果未实现。 已有avatar-path handler返回实际路径/null，但没有该HTTP入口+真实splash读取具名检查"
-            ]
+            "coverage": "FULL",
+            "missingClauses": []
           },
           {
             "index": 1,
@@ -99845,9 +99968,14 @@
                 "package": "lingxi-adapters",
                 "suite": "agent_memory_r06t06",
                 "test": "persona_fallback_chain_and_avatar_formats"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_splash_avatar_live",
+                "test": "current_rust_saved_offline_splash_real_ipc_and_image_fallback"
               }
             ],
-            "meaning": "avatar-path后端存在，但当前Tauri frontend仅probe页面，没有产品splash读取头像/路径不存在时默认头像回退；原界面效果未实现。",
+            "meaning": "当前候选Rust真实API保存PNG/JPEG/WebP并切当前助手，真实停服后生产IPC/preload/当前SplashApp原生窗口显示正确本地WebP。原16场景含真实图片解码、缺失/坏格式/非普通文件/祖先及文件链接/EACCES和返回路径后加载失败的默认回退；最终原头像字节保留。独立当前binary19场景补真实子frame/非名单本地页拒绝、WebP异步解码途中链接替换拒绝。原生fixture在tests/rust-native纳入源摘要，无白名单或门禁变更。不宣称完整引导、Tauri、其他平台或正式打包。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs",
@@ -99861,33 +99989,107 @@
                     "quote": "    assert!(persona.read_avatar(\"agentA\").unwrap().is_none());"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_splash_avatar_live.rs",
+                "test": "current_rust_saved_offline_splash_real_ipc_and_image_fallback",
+                "sourceSHA256": "752d7d3016200ac574a5af789bc7c81ba8db30ff2ebba5187c93ae83ec5752e7",
+                "testStartLine": 35,
+                "testEndLine": 138,
+                "assertions": [
+                  {
+                    "line": 36,
+                    "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"当前原生证据需macOS Electron；其他平台未验证，不能跳过算成功\"\n    )"
+                  },
+                  {
+                    "line": 78,
+                    "quote": "assert_eq!(receipt[\"leaf\"], \"R00-T02-LA-A02D8C572F5C\")"
+                  },
+                  {
+                    "line": 79,
+                    "quote": "assert_eq!(receipt[\"result\"], \"PASS\")"
+                  },
+                  {
+                    "line": 80,
+                    "quote": "assert_eq!(receipt[\"backend\"], \"rust\")"
+                  },
+                  {
+                    "line": 81,
+                    "quote": "assert_eq!(receipt[\"serverRequiredForSplash\"], false)"
+                  },
+                  {
+                    "line": 82,
+                    "quote": "assert!(receipt[\"actualElectron\"]\n        .as_str()\n        .is_some_and(|value| !value.is_empty()))"
+                  },
+                  {
+                    "line": 86,
+                    "quote": "assert_eq!(records.len(), 16)"
+                  },
+                  {
+                    "line": 88,
+                    "quote": "assert_eq!(\n        find(\"actual-service-stopped-before-splash\")[\"serviceOffline\"],\n        true\n    )"
+                  },
+                  {
+                    "line": 93,
+                    "quote": "assert_eq!(live[\"visible\"], true)"
+                  },
+                  {
+                    "line": 94,
+                    "quote": "assert_eq!(live[\"splashInfo\"][\"yuan\"], \"ming\")"
+                  },
+                  {
+                    "line": 95,
+                    "quote": "assert!(live[\"localPath\"]\n        .as_str()\n        .unwrap()\n        .ends_with(\"/agents/zeta/avatars/agent.webp\"))"
+                  },
+                  {
+                    "line": 99,
+                    "quote": "assert_eq!(live[\"renderer\"][\"complete\"], true)"
+                  },
+                  {
+                    "line": 100,
+                    "quote": "assert_eq!(live[\"renderer\"][\"width\"], 48)"
+                  },
+                  {
+                    "line": 101,
+                    "quote": "assert!(live[\"renderer\"][\"opacity\"].as_f64().unwrap() >= 0.99)"
+                  },
+                  {
+                    "line": 112,
+                    "quote": "assert!(find(case)[\"localPath\"].is_null(), \"{case}不应返回文件路径\")"
+                  },
+                  {
+                    "line": 113,
+                    "quote": "assert!(find(case)[\"renderer\"][\"src\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/assets/Ming.png\"))"
+                  },
+                  {
+                    "line": 118,
+                    "quote": "assert_eq!(\n        find(\"actual-permission-rejection-default\")[\"ipcRejected\"],\n        true\n    )"
+                  },
+                  {
+                    "line": 122,
+                    "quote": "assert_eq!(\n        find(\"actual-file-load-failure-default\")[\"fileRemovedAfterPath\"],\n        true\n    )"
+                  },
+                  {
+                    "line": 126,
+                    "quote": "assert!(find(\"offline-empty-default\")[\"localPath\"].is_null())"
+                  },
+                  {
+                    "line": 127,
+                    "quote": "assert!(find(\"offline-empty-default\")[\"renderer\"][\"src\"]\n        .as_str()\n        .unwrap()\n        .contains(\"/assets/Lingxi.png\"))"
+                  },
+                  {
+                    "line": 136,
+                    "quote": "assert!(std::fs::metadata(raw.join(png)).unwrap().len() > 100)"
+                  }
+                ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "avatar-path后端存在，但当前Tauri frontend仅probe页面，没有产品splash读取头像/路径不存在时默认头像回退；原界面效果未实现。 默认图片由renderer承担；无路径不存在时真实splash默认回退且不写头像的具名检查"
-            ]
+            "coverage": "FULL",
+            "missingClauses": []
           }
         ],
-        "gaps": [
-          {
-            "assertionIndex": 0,
-            "kind": "UNIMPLEMENTED",
-            "reason": "avatar-path后端存在，但当前Tauri frontend仅probe页面，没有产品splash读取头像/路径不存在时默认头像回退；原界面效果未实现。 已有avatar-path handler返回实际路径/null，但没有该HTTP入口+真实splash读取具名检查"
-          },
-          {
-            "assertionIndex": 1,
-            "kind": "UNIMPLEMENTED",
-            "reason": "avatar-path后端存在，但当前Tauri frontend仅probe页面，没有产品splash读取头像/路径不存在时默认头像回退；原界面效果未实现。 默认图片由renderer承担；无路径不存在时真实splash默认回退且不写头像的具名检查"
-          },
-          {
-            "kind": "UNIMPLEMENTED",
-            "reason": "avatar-path后端存在，但当前Tauri frontend仅probe页面，没有产品splash读取头像/路径不存在时默认头像回退；原界面效果未实现。"
-          },
-          "avatar-path后端存在，但当前Tauri frontend仅probe页面，没有产品splash读取头像/路径不存在时默认头像回退；原界面效果未实现。 已有avatar-path handler返回实际路径/null，但没有该HTTP入口+真实splash读取具名检查",
-          "avatar-path后端存在，但当前Tauri frontend仅probe页面，没有产品splash读取头像/路径不存在时默认头像回退；原界面效果未实现。 默认图片由renderer承担；无路径不存在时真实splash默认回退且不写头像的具名检查"
-        ],
-        "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/agents-persona.json"
+        "gaps": [],
+        "reviewSource": "artifacts/rust-tauri/R06/route-a-20261014/splash-avatar-proof-review.json"
       },
       {
         "id": "R00-T02-LA-A17D742E55B7",
@@ -143603,6 +143805,31 @@
         "lingxi-kernel",
         "--lib",
         "subagent::tests::policy_defaults_preserve_the_incumbent_switch_values",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "r06_test_79b37a473efcfda90718": {
+      "package": "lingxi-service",
+      "suite": "r06_splash_avatar_live",
+      "test": "current_rust_saved_offline_splash_real_ipc_and_image_fallback",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_splash_avatar_live",
+        "current_rust_saved_offline_splash_real_ipc_and_image_fallback",
         "--",
         "--exact",
         "--show-output"
@@ -210142,6 +210369,248 @@
         "missingClauses": []
       }
     ],
+    "R00-T02-LA-A02D8C572F5C": [
+      {
+        "case": "R00-T02-LA-A02D8C572F5C-assertion-00",
+        "expect": 1,
+        "assertion": "返回本地头像路径供 splash 渲染",
+        "commandRefs": [
+          "r06_test_05cab72bc37b043463d7",
+          "r06_test_79b37a473efcfda90718"
+        ],
+        "evidenceMeaning": "当前候选Rust真实API保存PNG/JPEG/WebP并切当前助手，真实停服后生产IPC/preload/当前SplashApp原生窗口显示正确本地WebP。原16场景含真实图片解码、缺失/坏格式/非普通文件/祖先及文件链接/EACCES和返回路径后加载失败的默认回退；最终原头像字节保留。独立当前binary19场景补真实子frame/非名单本地页拒绝、WebP异步解码途中链接替换拒绝。原生fixture在tests/rust-native纳入源摘要，无白名单或门禁变更。不宣称完整引导、Tauri、其他平台或正式打包。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs",
+            "test": "persona_fallback_chain_and_avatar_formats",
+            "sourceSHA256": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+            "testStartLine": 594,
+            "testEndLine": 631,
+            "assertions": [
+              {
+                "line": 621,
+                "quote": "    let (_path, mime, bytes) = persona.read_avatar(\"agentA\").unwrap().unwrap();"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_splash_avatar_live.rs",
+            "test": "current_rust_saved_offline_splash_real_ipc_and_image_fallback",
+            "sourceSHA256": "752d7d3016200ac574a5af789bc7c81ba8db30ff2ebba5187c93ae83ec5752e7",
+            "testStartLine": 35,
+            "testEndLine": 138,
+            "assertions": [
+              {
+                "line": 36,
+                "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"当前原生证据需macOS Electron；其他平台未验证，不能跳过算成功\"\n    )"
+              },
+              {
+                "line": 78,
+                "quote": "assert_eq!(receipt[\"leaf\"], \"R00-T02-LA-A02D8C572F5C\")"
+              },
+              {
+                "line": 79,
+                "quote": "assert_eq!(receipt[\"result\"], \"PASS\")"
+              },
+              {
+                "line": 80,
+                "quote": "assert_eq!(receipt[\"backend\"], \"rust\")"
+              },
+              {
+                "line": 81,
+                "quote": "assert_eq!(receipt[\"serverRequiredForSplash\"], false)"
+              },
+              {
+                "line": 82,
+                "quote": "assert!(receipt[\"actualElectron\"]\n        .as_str()\n        .is_some_and(|value| !value.is_empty()))"
+              },
+              {
+                "line": 86,
+                "quote": "assert_eq!(records.len(), 16)"
+              },
+              {
+                "line": 88,
+                "quote": "assert_eq!(\n        find(\"actual-service-stopped-before-splash\")[\"serviceOffline\"],\n        true\n    )"
+              },
+              {
+                "line": 93,
+                "quote": "assert_eq!(live[\"visible\"], true)"
+              },
+              {
+                "line": 94,
+                "quote": "assert_eq!(live[\"splashInfo\"][\"yuan\"], \"ming\")"
+              },
+              {
+                "line": 95,
+                "quote": "assert!(live[\"localPath\"]\n        .as_str()\n        .unwrap()\n        .ends_with(\"/agents/zeta/avatars/agent.webp\"))"
+              },
+              {
+                "line": 99,
+                "quote": "assert_eq!(live[\"renderer\"][\"complete\"], true)"
+              },
+              {
+                "line": 100,
+                "quote": "assert_eq!(live[\"renderer\"][\"width\"], 48)"
+              },
+              {
+                "line": 101,
+                "quote": "assert!(live[\"renderer\"][\"opacity\"].as_f64().unwrap() >= 0.99)"
+              },
+              {
+                "line": 112,
+                "quote": "assert!(find(case)[\"localPath\"].is_null(), \"{case}不应返回文件路径\")"
+              },
+              {
+                "line": 113,
+                "quote": "assert!(find(case)[\"renderer\"][\"src\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/assets/Ming.png\"))"
+              },
+              {
+                "line": 118,
+                "quote": "assert_eq!(\n        find(\"actual-permission-rejection-default\")[\"ipcRejected\"],\n        true\n    )"
+              },
+              {
+                "line": 122,
+                "quote": "assert_eq!(\n        find(\"actual-file-load-failure-default\")[\"fileRemovedAfterPath\"],\n        true\n    )"
+              },
+              {
+                "line": 126,
+                "quote": "assert!(find(\"offline-empty-default\")[\"localPath\"].is_null())"
+              },
+              {
+                "line": 127,
+                "quote": "assert!(find(\"offline-empty-default\")[\"renderer\"][\"src\"]\n        .as_str()\n        .unwrap()\n        .contains(\"/assets/Lingxi.png\"))"
+              },
+              {
+                "line": 136,
+                "quote": "assert!(std::fs::metadata(raw.join(png)).unwrap().len() > 100)"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      },
+      {
+        "case": "R00-T02-LA-A02D8C572F5C-assertion-01",
+        "expect": 1,
+        "assertion": "路径不存在回退默认头像；不等于设置或更新头像",
+        "commandRefs": [
+          "r06_test_05cab72bc37b043463d7",
+          "r06_test_79b37a473efcfda90718"
+        ],
+        "evidenceMeaning": "当前候选Rust真实API保存PNG/JPEG/WebP并切当前助手，真实停服后生产IPC/preload/当前SplashApp原生窗口显示正确本地WebP。原16场景含真实图片解码、缺失/坏格式/非普通文件/祖先及文件链接/EACCES和返回路径后加载失败的默认回退；最终原头像字节保留。独立当前binary19场景补真实子frame/非名单本地页拒绝、WebP异步解码途中链接替换拒绝。原生fixture在tests/rust-native纳入源摘要，无白名单或门禁变更。不宣称完整引导、Tauri、其他平台或正式打包。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs",
+            "test": "persona_fallback_chain_and_avatar_formats",
+            "sourceSHA256": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
+            "testStartLine": 594,
+            "testEndLine": 631,
+            "assertions": [
+              {
+                "line": 628,
+                "quote": "    assert!(persona.read_avatar(\"agentA\").unwrap().is_none());"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_splash_avatar_live.rs",
+            "test": "current_rust_saved_offline_splash_real_ipc_and_image_fallback",
+            "sourceSHA256": "752d7d3016200ac574a5af789bc7c81ba8db30ff2ebba5187c93ae83ec5752e7",
+            "testStartLine": 35,
+            "testEndLine": 138,
+            "assertions": [
+              {
+                "line": 36,
+                "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"当前原生证据需macOS Electron；其他平台未验证，不能跳过算成功\"\n    )"
+              },
+              {
+                "line": 78,
+                "quote": "assert_eq!(receipt[\"leaf\"], \"R00-T02-LA-A02D8C572F5C\")"
+              },
+              {
+                "line": 79,
+                "quote": "assert_eq!(receipt[\"result\"], \"PASS\")"
+              },
+              {
+                "line": 80,
+                "quote": "assert_eq!(receipt[\"backend\"], \"rust\")"
+              },
+              {
+                "line": 81,
+                "quote": "assert_eq!(receipt[\"serverRequiredForSplash\"], false)"
+              },
+              {
+                "line": 82,
+                "quote": "assert!(receipt[\"actualElectron\"]\n        .as_str()\n        .is_some_and(|value| !value.is_empty()))"
+              },
+              {
+                "line": 86,
+                "quote": "assert_eq!(records.len(), 16)"
+              },
+              {
+                "line": 88,
+                "quote": "assert_eq!(\n        find(\"actual-service-stopped-before-splash\")[\"serviceOffline\"],\n        true\n    )"
+              },
+              {
+                "line": 93,
+                "quote": "assert_eq!(live[\"visible\"], true)"
+              },
+              {
+                "line": 94,
+                "quote": "assert_eq!(live[\"splashInfo\"][\"yuan\"], \"ming\")"
+              },
+              {
+                "line": 95,
+                "quote": "assert!(live[\"localPath\"]\n        .as_str()\n        .unwrap()\n        .ends_with(\"/agents/zeta/avatars/agent.webp\"))"
+              },
+              {
+                "line": 99,
+                "quote": "assert_eq!(live[\"renderer\"][\"complete\"], true)"
+              },
+              {
+                "line": 100,
+                "quote": "assert_eq!(live[\"renderer\"][\"width\"], 48)"
+              },
+              {
+                "line": 101,
+                "quote": "assert!(live[\"renderer\"][\"opacity\"].as_f64().unwrap() >= 0.99)"
+              },
+              {
+                "line": 112,
+                "quote": "assert!(find(case)[\"localPath\"].is_null(), \"{case}不应返回文件路径\")"
+              },
+              {
+                "line": 113,
+                "quote": "assert!(find(case)[\"renderer\"][\"src\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/assets/Ming.png\"))"
+              },
+              {
+                "line": 118,
+                "quote": "assert_eq!(\n        find(\"actual-permission-rejection-default\")[\"ipcRejected\"],\n        true\n    )"
+              },
+              {
+                "line": 122,
+                "quote": "assert_eq!(\n        find(\"actual-file-load-failure-default\")[\"fileRemovedAfterPath\"],\n        true\n    )"
+              },
+              {
+                "line": 126,
+                "quote": "assert!(find(\"offline-empty-default\")[\"localPath\"].is_null())"
+              },
+              {
+                "line": 127,
+                "quote": "assert!(find(\"offline-empty-default\")[\"renderer\"][\"src\"]\n        .as_str()\n        .unwrap()\n        .contains(\"/assets/Lingxi.png\"))"
+              },
+              {
+                "line": 136,
+                "quote": "assert!(std::fs::metadata(raw.join(png)).unwrap().len() > 100)"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      }
+    ],
     "R00-T02-LA-A17D742E55B7": [
       {
         "case": "R00-T02-LA-A17D742E55B7-assertion-00",
@@ -242728,64 +243197,6 @@
         "coverage": "PARTIAL",
         "missingClauses": [
           "外部目录PUT/GET及视图重扫有真实证据；原生选择取消不PUT/成功失败toast及重载失败catch的候选UI未证明。"
-        ]
-      }
-    ],
-    "R00-T02-LA-A02D8C572F5C": [
-      {
-        "case": "R00-T02-LA-A02D8C572F5C-assertion-00",
-        "expect": 1,
-        "assertion": "返回本地头像路径供 splash 渲染",
-        "commandRefs": [
-          "r06_test_05cab72bc37b043463d7"
-        ],
-        "evidenceMeaning": "avatar-path后端存在，但当前Tauri frontend仅probe页面，没有产品splash读取头像/路径不存在时默认头像回退；原界面效果未实现。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs",
-            "test": "persona_fallback_chain_and_avatar_formats",
-            "sourceSHA256": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
-            "testStartLine": 594,
-            "testEndLine": 631,
-            "assertions": [
-              {
-                "line": 621,
-                "quote": "    let (_path, mime, bytes) = persona.read_avatar(\"agentA\").unwrap().unwrap();"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "avatar-path后端存在，但当前Tauri frontend仅probe页面，没有产品splash读取头像/路径不存在时默认头像回退；原界面效果未实现。 已有avatar-path handler返回实际路径/null，但没有该HTTP入口+真实splash读取具名检查"
-        ]
-      },
-      {
-        "case": "R00-T02-LA-A02D8C572F5C-assertion-01",
-        "expect": 1,
-        "assertion": "路径不存在回退默认头像；不等于设置或更新头像",
-        "commandRefs": [
-          "r06_test_05cab72bc37b043463d7"
-        ],
-        "evidenceMeaning": "avatar-path后端存在，但当前Tauri frontend仅probe页面，没有产品splash读取头像/路径不存在时默认头像回退；原界面效果未实现。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-adapters/tests/agent_memory_r06t06.rs",
-            "test": "persona_fallback_chain_and_avatar_formats",
-            "sourceSHA256": "c13e2d1145f5b9447f918d20721f849bad8915062eb4a75247fd6782913e3275",
-            "testStartLine": 594,
-            "testEndLine": 631,
-            "assertions": [
-              {
-                "line": 628,
-                "quote": "    assert!(persona.read_avatar(\"agentA\").unwrap().is_none());"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "avatar-path后端存在，但当前Tauri frontend仅probe页面，没有产品splash读取头像/路径不存在时默认头像回退；原界面效果未实现。 默认图片由renderer承担；无路径不存在时真实splash默认回退且不写头像的具名检查"
         ]
       }
     ],

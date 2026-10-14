@@ -5813,6 +5813,21 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_3fc1a3615b976c030631/binding-result.json"
       ]
     },
+    "r06_test_79b37a473efcfda90718": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_79b37a473efcfda90718",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_79b37a473efcfda90718"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_79b37a473efcfda90718/binding-result.json"
+      ]
+    },
     "r06_test_0c715f430837644a1030": {
       "argv": [
         "python3",
@@ -7518,6 +7533,7 @@
         "r06_test_782fb50cd1feba7e2ca3",
         "r06_test_783ed4646aed5d3e6c79",
         "r06_test_796a1f2c30f0398a9b34",
+        "r06_test_79b37a473efcfda90718",
         "r06_test_7b4a3f6cc1131d44112f",
         "r06_test_7badf69f6fff9c5f068a",
         "r06_test_7be64baa65f6c6cae318",
@@ -17193,9 +17209,35 @@
         "路径不存在回退默认头像；不等于设置或更新头像"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_05cab72bc37b043463d7",
+        "r06_test_79b37a473efcfda90718",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-A02D8C572F5C-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-A02D8C572F5C-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-A02D8C572F5C-assertion-00"
+        ],
+        [
+          "R00-T02-LA-A02D8C572F5C-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-A17D742E55B7",
@@ -21680,5 +21722,5 @@
       "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
     }
   ],
-  "inputDigestSha256": "7fc8c30190b62e91069e3f8fc11998be5d6bc989c5cb4681791988bc527abb8a"
+  "inputDigestSha256": "202d75c3cc9033a6033df86ba8e89213baed2875fcc629fcf7805def196b9c52"
 }

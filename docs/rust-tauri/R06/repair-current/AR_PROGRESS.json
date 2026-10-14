@@ -1179,7 +1179,7 @@
     "receipt": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/independent-reviews/",
     "note": "2026-10-14 收口轮：14 项独立审查 PASS（RV1-RV7 全新空历史子代理于冻结候选独立克隆亲跑），F14 由正式门禁关闭；GUI 真实链路证据在案（两叶待阶段裁定）；192 READY / 87 GAP"
   },
-  "last_updated_utc": "2026-10-14T16:23:31.152038+00:00",
+  "last_updated_utc": "2026-10-14T16:42:23.359514+00:00",
   "control_corrections": [
     {
       "at": "2026-10-11T09:48:29.816963+00:00",
@@ -2224,6 +2224,26 @@
         "report": "artifacts/rust-tauri/R06/route-a-20261014/dream-binding-window-summary.json"
       },
       "validation": "artifacts/rust-tauri/R06/route-a-20261014/dream-validation.json"
+    },
+    "splash_avatar": {
+      "status": "IMPLEMENTED_REVIEWED_FROZEN_BINDING_WINDOW_PASS",
+      "leafIds": [
+        "R00-T02-LA-A02D8C572F5C"
+      ],
+      "registeredReady": 226,
+      "registeredGap": 53,
+      "completedInitialGaps": 25,
+      "remainingInitialGaps": 53,
+      "onlyR06Completed": 23,
+      "onlyR06Remaining": 3,
+      "stageAccepted": false,
+      "independentReview": "artifacts/rust-tauri/R06/route-a-20261014/splash-avatar-independent-review.json",
+      "bindingWindow": {
+        "bindingsPassed": 2,
+        "originalLeavesPassed": 1,
+        "report": "artifacts/rust-tauri/R06/route-a-20261014/splash-avatar-binding-window-summary.json"
+      },
+      "validation": "artifacts/rust-tauri/R06/route-a-20261014/splash-avatar-validation.json"
     }
   }
 }

@@ -1,0 +1,71 @@
+{
+  "leaf": "R00-T02-LA-A02D8C572F5C",
+  "new_boundary": "desktop-splash-local-avatar",
+  "baseline_head": "bf8c533dc282fdf35901adaeaa5ddc1edcd557b5",
+  "baseline_scope_files": {
+    "desktop/main.cjs": "96a491741ebfda806fc4cb15d331de78150cd7268b9dacd3d628f67fca9f3f03",
+    "desktop/src/react/splash/SplashApp.tsx": "e6e46e4a77ecefbd626770452e8ac3f0fd50beac222a2ea5ef656091fa04b819"
+  },
+  "candidate_scope_files": {
+    "desktop/main.cjs": "bd71b90b2b04f1b02af2cf87eaffc534e90935f2f6710d69ee188dc62dcd5f85",
+    "desktop/src/react/splash/SplashApp.tsx": "83facbaf160d017dc3a88b1d12adcbd9654a9666c94cd0d8d6cbb296b2855fec",
+    "desktop/src/shared/splash-avatar-path.cjs": "1746dbd374eb62811b92733c37edc462078d264e317de549362d9d2846de054b",
+    "tests/r06-splash-avatar-path.test.ts": "2915459b1a5e48c9c73e9e357053dc33696f8f959d9583e37fcc88f8c1097a3b",
+    "artifacts/rust-tauri/R06/route-a-20261015/splash-avatar-native.cjs": "ebcb30ad358621d3e74ea1974a687204d55f2a0cf4e22712adc53b8a296bdc8d"
+  },
+  "rust_binary": {
+    "path": "/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/lingxi-service",
+    "copy": "/tmp/splash-avatar-evidence/bin/lingxi-service",
+    "sha256": "514e70be45f1040862004eaf8a579a6a0b0a4e6e90271bbc82d53b1679171d5a",
+    "source_head": "bf8c533dc282fdf35901adaeaa5ddc1edcd557b5"
+  },
+  "bf8c_real_chain_source_files": {
+    "desktop/main.cjs": "96a491741ebfda806fc4cb15d331de78150cd7268b9dacd3d628f67fca9f3f03",
+    "desktop/preload.cjs": "a39d002e01d7f16d8df913ece2e98c980102d3e2c7213fb4fd02dd2e30c9664b",
+    "desktop/src/modules/platform.js": "9e251e7f1782adcd58492a31bdf51c108a17f853b6cc575d17af0deffa4050d4",
+    "desktop/src/shared/rust-local-service.cjs": "fa295d857d3f04a1f252a7c5e7ea285c0a6c52cd15a25cd142eeeb04fb2e6947",
+    "shared/hana-runtime-paths.cjs": "0247e5c2dc644ffde2603d0a60c24534e0101263566a5eb82649751d244e2c65",
+    "rust/crates/lingxi-service/src/persona.rs": "6e2020ada32b4503a420e5a4b7d7850a8f41d6d13e2cad87acd05965442ff5ba",
+    "rust/crates/lingxi-service/src/agents_admin.rs": "10a927344ba04295087d02f76821fd502f207843366016d17251394a278131d0",
+    "rust/crates/lingxi-service/src/lib.rs": "9a88bafe9c80a0798fd79686c5b40fffbca58d257763a398ef465c96a96e386c",
+    "rust/crates/lingxi-service/src/auth.rs": "33524ef400b2579398ea219d0d368adce0d779f8dd1177038e2f48c0ade5910d"
+  },
+  "original_assertions": [
+    "返回本地头像路径供 splash 渲染",
+    "路径不存在回退默认头像；不等于设置或更新头像"
+  ],
+  "native_receipt_sha256": "e3c5991cb264e13d489e92cd10492534e2ba30e569cb6ff6840e6a6a305e49f6",
+  "native_records": 16,
+  "node_unit_passed": 14,
+  "node_unit_new": 8,
+  "negative": {
+    "path": "/tmp/splash-avatar-old-host-negative.log",
+    "sha256": "cdd683f8cffbf4bf884d9a9de83285b0c08351ad611056b0f258ddbfe3d2cd30",
+    "exit": 1,
+    "actually_displayed_wrong_agent": "alpha JPEG instead of zeta WebP"
+  },
+  "final_native_log": {
+    "path": "/tmp/splash-avatar-final-isolated.log",
+    "sha256": "0cd4e746b2e42b8fc0712fc66241c24026ba679c8bd5d8ee9f767d0601ba7c11",
+    "exit": 0
+  },
+  "checks": {
+    "root_tsc": "PASS",
+    "test_tsc": "PASS",
+    "main_build": "PASS",
+    "splash_build": "PASS",
+    "preload_build": "PASS",
+    "node_syntax": "PASS"
+  },
+  "existing_dependency_only": "yaml",
+  "limits": [
+    "macOS native integration host only",
+    "full desktop bootstrap not tested",
+    "Tauri not tested",
+    "Windows/Linux not tested",
+    "formal packaging/full R06 gate not run"
+  ],
+  "main_source_governance_modified": false,
+  "shared_cache_metadata": "initial .vite-temp via whole node_modules symlink; corrected isolated cache before final validation",
+  "committed_or_pushed": false
+}

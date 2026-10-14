@@ -40,6 +40,7 @@ const {
 } = require("./src/shared/onboarding-completion.cjs");
 const { resolveTrashItemPath } = require("./src/shared/trash-item-path.cjs");
 const { resolveAgentAvatarPath } = require("./src/shared/agent-avatar-path.cjs");
+const { isTrustedSplashAvatarSender, registerSplashDataIpc } = require("./src/shared/splash-avatar-path.cjs");
 const {
   normalizeDesktopNotificationOptions,
   shouldSuppressDesktopNotification,
@@ -5874,42 +5875,16 @@ wrapIpcOn("settings-changed", (_event, type, data) => {
   }
 });
 
-// 获取头像本地路径（splash 用，不依赖 server）
-wrapIpcHandler("get-avatar-path", (_event, role) => {
-  if (role !== "agent" && role !== "user") return null;
-  const agentId = getCurrentAgentId();
-  // agent 头像在 agents/{id}/avatars/，user 头像在 user/avatars/
-  const baseDir = role === "user"
-    ? path.join(lingxiHome, "user")
-    : agentId ? path.join(lingxiHome, "agents", agentId) : null;
-  if (!baseDir) return null;
-  const avatarDir = path.join(baseDir, "avatars");
-  for (const ext of ["png", "jpg", "jpeg", "webp"]) {
-    const p = path.join(avatarDir, `${role}.${ext}`);
-    if (fs.existsSync(p)) return p;
-  }
-  return null;
-});
-
-// 读取 config.yaml 基本信息（splash 用，不依赖 server）
-wrapIpcHandler("get-splash-info", () => {
-  try {
-    const agentId = getCurrentAgentId();
-    if (!agentId) return { agentName: null, locale: "zh-CN", yuan: "lingxi" };
-    const configPath = path.join(lingxiHome, "agents", agentId, "config.yaml");
-    const text = fs.readFileSync(configPath, "utf-8");
-    // 简易提取：agent:\n  name: xxx / yuan: xxx 和顶层 locale: xxx
-    const agentMatch = text.match(/^agent:\s*\n\s+name:\s*([^#\n]+)/m);
-    const localeMatch = text.match(/^locale:\s*(.+)/m);
-    const yuanMatch = text.match(/^\s+yuan:\s*([^#\n]+)/m);
-    return {
-      agentName: agentMatch?.[1]?.trim() || null,
-      locale: localeMatch?.[1]?.trim() || null,
-      yuan: yuanMatch?.[1]?.trim() || "lingxi",
-    };
-  } catch {
-    return { agentName: null, locale: "zh-CN", yuan: "lingxi" };
-  }
+// 只向当前本地启动/引导窗口返回头像路径；Rust启动也使用同一lingxiHome。
+registerSplashDataIpc({
+  home: lingxiHome,
+  senderAllowed: event => isTrustedSplashAvatarSender(
+    event,
+    [splashWindow, onboardingWindow],
+    [path.join(_distSplash, 'splash.html'), path.join(_distRenderer, 'onboarding.html'),
+      path.join(__dirname, 'src', 'splash.html'), path.join(__dirname, 'src', 'onboarding.html')],
+    _isDev ? process.env.VITE_DEV_URL : null,
+  ),
 });
 
 // 选择文件夹（系统原生对话框）

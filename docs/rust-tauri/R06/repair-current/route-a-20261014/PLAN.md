@@ -36,7 +36,7 @@
 - [x] `R00-T02-LA-7C699FD2A740`（R06）：写入 AGENTS.public.md 并广播 agent-updated；兼容旧地址同效
 - [x] `R00-T02-LA-7F0F3F76E38A`（R06）：删除旧格式头像并写入新的图片，刷新助手列表并广播 agent-updated
 - [x] `R00-T02-LA-856B28902999`（R06）：持久写入 identity.md，刷新描述并广播 agent-updated
-- [ ] `R00-T02-LA-A02D8C572F5C`（R06）：返回本地头像路径供 splash 渲染
+- [x] `R00-T02-LA-A02D8C572F5C`（R06）：返回本地头像路径供 splash 渲染
 - [x] `R00-T02-LA-A17D742E55B7`（R06）：经验文档和索引出现新内容，后续recall可读。
 - [x] `R00-T02-LA-A9AD4C7F76AE`（R06）：启动一次手动 dream，返回 202 与运行信息
 - [x] `R00-T02-LA-B09CC9536400`（R06）：读取已保存 MOOD 轨迹并恢复历史展示
@@ -143,3 +143,11 @@ Dream R1/R2及可恢复删除R3/R4已合入。真实手动五阶段调用、付�
 主树 Dream17、删除10、原记忆7、助手生命周期2共36PASS；原非空修订独立读回1PASS，strictClippy/fmt及登记契约20PASS。三Dream叶6项具名绑定和六组原断言rollup全部PASS，各完整源码候选摘要为5c48894615295f4cb23db9c3e7a6705cdd36a19b903ece01237290bac3322afa且前后稳定。局部汇总脚本最初误读sourceStable层级，实际六绑定及rollup均PASS；据未修改的原始收据纠正汇总，原helper诊断保留，不修改门禁或重跑碰运气。
 
 累计24原GAP完成、225READY/54GAP，26仅R06已22、剩4（真实自动周期、完整助手设置页、删除UI、离线启动头像）。0B自动ticker未在本批登记。窗口后仅审计收据/状态更新，不声称该执行候选为最终提交全阶段封印；全R06门禁/F14仍开放。
+
+## 2026-10-15 离线启动头像单项交付
+
+当前Rust服务真实API写入三格式头像、切换current=zeta/primary=alpha，真实停止服务后，由生产本地IPC/实际preload/当前SplashApp显示正确zeta WebP；现役Rust偏好键与YAML引号解析已接线。真实缺失、坏格式、目录/FIFO、文件/祖先链接、EACCES及返回路径后加载失败均默认回退，不更新原头像。真实旧宿主负控显示alpha JPEG并FAIL，保留原断言。
+
+主树当前CARGO_BIN_EXE父1PASS/原16强断言Electron场景、受影响JS19PASS、root/test TS与父strictClippy、生产main/preload/splash构建通过。父初次仅误用receipt里的场景名称，实际child已16PASS；修正两处父标签后重跑成功，诊断保留，原child强断言未改。原生脚本逐字放入tests/rust-native纳入源码摘要。独立复核使用当前复制服务binary20真实窗口场景，额外验证Node旧primary选择、非名单本地页/真实子frame拒绝及WebP异步解码途中链接替换，亲读5张截图。
+
+最终2绑定与1叶两组原断言rollup PASS，候选摘要跨绑定一致且前后稳定。累计25原GAP完成、226READY/53GAP；26仅R06已23、剩3。完整执行候选包含同工作区已应用而尚未提交的删除UI，本次只保存启动头像，不冒称该局部窗口已封印最终已提交阶段；完整desktop引导、Tauri、其他平台、正式打包与全阶段门禁未验证。F14仍开放。
